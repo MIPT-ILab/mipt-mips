@@ -17,3 +17,5 @@ In order to create MIPS binary file do the following steps:
 
    5*) look the content of <test name>.out using (pay attention only to .text section):
           mips-objdump -D <test name>.out
+
+Or you can use the makefile in this directory.

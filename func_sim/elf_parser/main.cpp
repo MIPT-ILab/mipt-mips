@@ -1,6 +1,7 @@
 // Generci C
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 // Generic C++
 #include <iostream>
@@ -10,26 +11,25 @@
 
 using namespace std;
 
-
 int main (int argc, char* argv[])
 {
     const int num_of_args = 2;
-
+    
     if ( argc == num_of_args && strcmp(argv[1],"--help"))
     {
-        // parse and dump .text section
-        ElfSection * section = new ElfSection( argv[1], ".text");
-        cout << section->Dump() << endl;
+        // parse and dump .reginfo section
+        ElfSection section( argv[1], ".reginfo");
+        cout << section.dump() << endl;
  
     } else if ( argc != num_of_args)
     {
-        cerr << "ERROR: too many arguments!" << endl
+        cerr << "ERROR: wrong number of arguments!" << endl
              << "Type \"" << argv[0] << " --help\" for usage." << endl;
-        abort();
+        exit( EXIT_FAILURE);
 
     } else
     {
-        cout << "This program prints content of \".text\" section" << endl
+        cout << "This program prints content of \".reginfo\" section" << endl
              << "of ELF binary file, which name is given as only parameter." << endl
              << endl
              << "Usage: \"" << argv[0] << " <ELF binary file>\"" << endl; 

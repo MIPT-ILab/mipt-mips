@@ -9,10 +9,8 @@
 #define ELF_PARSER__ELF_PARSER_H
 
 // Generic C++
-class Elf;
-
-// Generic C++
 #include <string>
+class Elf;
 
 // uArchSim modules
 #include <types.h>
@@ -21,29 +19,32 @@ using namespace std;
 
 class ElfSection
 {
-public:
     char* name; // name of the elf section (e.g. ".text", ".data", etc)
     uint8* content; // the row data of the section
     uint64 size; // size of the section in bytes
-    uint64 start_address; // the start address of the section
-     
+    uint64 start_addr; // the start address of the section
+    
     static void extractSectionParams( Elf* elf, const char* section_name,
                                       uint64& offset, uint64& size,
                                       uint64& start_addr);
     
     // You could not create the object
     // using this default constructor
-    ElfSection(){};
+    ElfSection(){}
 
 public:
 
     ElfSection( const char* elf_file_name, const char* section_name);
-    ~ElfSection();
+    virtual ~ElfSection();
     
-    string Dump();
     
-    string strByBytes();
-    string strByWords();
+    uint64 read( uint64 addr, short num_of_bytes = 4) const;
+    bool   isInside( uint64 addr, short num_of_bytes = 1) const;
+    uint64 startAddr() const;
+    
+    string dump( string indent = "") const;
+    string strByBytes() const;
+    string strByWords() const;
 };
 
 #endif // #ifndef ELF_PARSER__ELF_PARSER_H
