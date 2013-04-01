@@ -124,25 +124,50 @@ void ElfSection::extractSectionParams( Elf* elf, const char* section_name,
     exit( EXIT_FAILURE);
 }
 
-uint64 ElfSection::read( uint64 addr, short num_of_bytes) const
+bool ElfSection::isInside( uint64 addr, unsigned short num_of_bytes) const
 {
-    // insert here your implementation
-    assert(0);
-    return NO_VAL64; 
-}
+    assert( num_of_bytes > 0);
 
-bool ElfSection::isInside( uint64 addr, short num_of_bytes) const
-{
-    // insert here your implementation
-    assert(0);
-    return false;
+    return ( this->start_addr <= addr) &&
+           ( ( this->start_addr + this->size) > ( addr + num_of_bytes - 1));
 }
 
 uint64 ElfSection::startAddr() const
 {
-    // insert here your implementation
-    assert(0);
-    return NO_VAL64;
+    return this->start_addr;
+}
+
+uint64 ElfSection::read( uint64 addr, unsigned short num_of_bytes) const
+{
+    // check that the all requeted bytes are inside the section
+    assert( this->isInside( addr, num_of_bytes));
+    // check that the requested data can be returned via uint64
+    assert( num_of_bytes <= sizeof( uint64));
+
+    uint64 dword = *( ( uint64 *)( this->content + ( addr - this->start_addr)));
+
+    // number of redundant butes in the end
+    short shift = 8 * ( sizeof( uint64) - num_of_bytes);
+
+    // delete redundant bytes in the end
+    dword = ( dword << shift) >> shift;
+
+    return dword;
+}
+
+void ElfSection::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
+{
+    // check that the all requeted bytes are inside the section
+    assert( this->isInside( addr, num_of_bytes));
+    // check that we do not try to write more bytes that is in uint64 (size of the value)
+    assert( num_of_bytes <= sizeof( uint64));
+    
+    for( unsigned short index = addr - this->start_addr;
+         num_of_bytes > 0; --num_of_bytes, ++index)
+    {
+        this->content[ index] = ( uint8) value; // write the least significant byte
+	value >>= 8 * sizeof( uint8); // shift value to the next byte 
+    }
 }
 
 string ElfSection::dump( string indent) const

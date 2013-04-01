@@ -34,7 +34,7 @@ main.o: main.cpp elf_parser.o
 	$(CXX) -c $< $(INCL)
 
 #
-# Enter for building elf_parser stand alone program
+# Enter for building elf_parser unit test
 #
 test: unit_test
 	@echo ""
@@ -54,4 +54,4 @@ unit_test.o: unit_test.cpp elf_parser.o
 
 clean:
 	@-rm *.o
-	@-rm elf_parser unit_test test
+	@-rm elf_parser unit_test

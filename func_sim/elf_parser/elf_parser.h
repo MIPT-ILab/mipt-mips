@@ -37,10 +37,11 @@ public:
     ElfSection( const char* elf_file_name, const char* section_name);
     virtual ~ElfSection();
     
-    
-    uint64 read( uint64 addr, short num_of_bytes = 4) const;
-    bool   isInside( uint64 addr, short num_of_bytes = 1) const;
+    bool   isInside( uint64 addr, unsigned short num_of_bytes = 1) const;
     uint64 startAddr() const;
+    
+    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+    void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     
     string dump( string indent = "") const;
     string strByBytes() const;
