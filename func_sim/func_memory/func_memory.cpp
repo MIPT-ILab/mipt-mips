@@ -18,10 +18,16 @@
 // uArchSim modules
 #include <func_memory.h>
 
-FuncMemory::FuncMemory( const char* executable_file_name,
-                        const char* const elf_sections_names[],
-                        unsigned short num_of_elf_sections)
+FuncMemory::FuncMemory( const char* executable_file_name)
            : start_PC( NO_VAL64) 
+{
+    const char* const section_names[] = {".data", ".text"};
+    this->Init(executable_file_name, section_names, 2);
+}
+
+void FuncMemory::Init( const char* executable_file_name,
+                       const char* const elf_sections_names[],
+                       unsigned short num_of_elf_sections)
 {
     assert( executable_file_name != NULL);
     assert( elf_sections_names != NULL);

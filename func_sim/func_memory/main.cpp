@@ -20,13 +20,8 @@ int main (int argc, char* argv[])
         // set the name of the executable file
         const char * file_name = argv[1];        
         
-        // define the list of setion to extract from the file 
-        // into the functional memory
-        short num_of_sections = 2;
-        const char * const section_names[] = {".text", ".reginfo"};
-
         // create the functiona memory
-        FuncMemory func_mem( file_name, section_names, num_of_sections);
+        FuncMemory func_mem( file_name);
         
         // print content of the memory
         cout << func_mem.dump() << endl;

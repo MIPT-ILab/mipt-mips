@@ -9,8 +9,6 @@
 #include <func_memory.h>
 
 static const char * valid_elf_file = "./mips_bin_exmpl.out";
-static const char * const valid_elf_section_name[] = {".data", ".text", ".reginfo"};
-static const unsigned short num_of_elf_sections = 3;
 
 //
 // Check that all incorect input params of the constructor
@@ -18,44 +16,31 @@ static const unsigned short num_of_elf_sections = 3;
 //
 TEST( Func_memory_init, Process_Wrong_Args_Of_Constr)
 {   
-    ASSERT_NO_THROW( FuncMemory( valid_elf_file, valid_elf_section_name,
-                                 num_of_elf_sections));
+    ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file));
 
     // test behavior when the file name does not exist
     const char * wrong_file_name = "./1234567890/qwertyuiop";
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( FuncMemory func_mem( wrong_file_name, valid_elf_section_name,
-                                      num_of_elf_sections),
+    ASSERT_EXIT( FuncMemory func_mem( wrong_file_name),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
     
     // test behavior when the file name is valid, but not in ELF format
     const char * not_elf_file = "./elf_parser.h";
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( FuncMemory func_mem( not_elf_file, valid_elf_section_name,
-                                      num_of_elf_sections),
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
-
-    // test behavior when thegiven func_mem does not exist
-    const char * const wrong_elf_section_name[] =
-        {"qwertyuiop_0", "qwertyuiop_1", "qwertyuiop_2"};
-    // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( FuncMemory func_mem( valid_elf_file, wrong_elf_section_name,
-                                      num_of_elf_sections),
+    ASSERT_EXIT( FuncMemory func_mem( not_elf_file),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
 TEST( Func_memory, StartPC_Method_Test)
 {
-    FuncMemory func_mem( valid_elf_file, valid_elf_section_name,
-                         num_of_elf_sections);
+    FuncMemory func_mem( valid_elf_file);
 
     ASSERT_EQ( func_mem.startPC(), 0x4000b0 /*address of the ".text" section*/);
 }
 
 TEST( Elf_parser, Read_Method_Test)
 {
-    FuncMemory func_mem( valid_elf_file, valid_elf_section_name,
-                         num_of_elf_sections);
+    FuncMemory func_mem( valid_elf_file);
 
     // the address of the ".data" section
     uint64 dataSectAddr = 0x4100c0;
@@ -87,8 +72,7 @@ TEST( Elf_parser, Read_Method_Test)
 
 TEST( Elf_parser, Write_Method_Test)
 {
-    FuncMemory func_mem( valid_elf_file, valid_elf_section_name,
-                         num_of_elf_sections);
+    FuncMemory func_mem( valid_elf_file);
 
     // the address of the ".data" func_memion
     uint64 dataSectAddr = 0x4100c0;

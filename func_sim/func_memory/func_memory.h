@@ -30,13 +30,14 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+    
+    void Init( const char* executable_file_name,
+               const char* const elf_sections_names[],
+               unsigned short num_of_elf_sections);
 
 public:
-    
-    FuncMemory( const char* executable_file_name,
-                const char* const elf_sections_names[],
-                unsigned short num_of_elf_sections);
 
+    FuncMemory ( const char* executable_file_name);
     virtual ~FuncMemory();
     
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
