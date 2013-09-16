@@ -1,0 +1,64 @@
+#summary Some tips to make your pages well-formatted.
+
+<font size="5"> *Introduction* </font>
+<wiki:comment>"Introduction" is not done as a heading, because I don't want it to be displayed in the table of content below</wiki:comment>
+
+_[http://en.wikipedia.org/wiki/Wiki Wiki]_ is a great tool to manage knowledge and share information among people. It introduces a special _[http://en.wikipedia.org/wiki/Markup_language markup language]_ in order to present information in a well-formated and structured form.
+
+_Google Code hoisting_ provides wiki service with its own simplified markup language. The detailed description of its syntax can be found in [http://code.google.com/p/support/wiki/WikiSyntax this manual]. Please, read it carefully before start modifying or creating wiki pages.
+
+The last part of this page presents some tips and rules that can be useful for wiki formating and are not covered by [http://code.google.com/p/support/wiki/WikiSyntax the standard manual]. The whole list of them can be found below:
+
+<wiki:toc max_depth="2"/>
+<br /><wiki:comment>it is just an empty line</wiki:comment>
+----
+
+== How to add an empty line? ==
+In order to separate paragraphs just put one empty line in the markup:
+
+{{{
+Text of paragraph 1.
+
+Text of paragraph 2.
+}}}
+
+It will be displayed as the following:
+
+<table border="0">
+<td>
+Text of paragraph 1.<br />Text of paragraph 2.
+</td>
+</table>
+
+However, even if you add more empty line in the markup still only one will be displayed. Also, empty lines are not displayed between text, delimiters, tables and other objects.
+
+If you want to add several empty lines use HTML tag [http://www.w3schools.com/tags/tag_br.asp <br />] as many times as you need:
+
+{{{
+Text of paragraph 1.
+<br /><br /><wiki:comment> add 2 empty lines</wiki:comment>
+Text of paragraph 2.
+}}}
+
+The previous code will be displayed as following:
+
+<table border="0">
+<td>
+Text of paragraph 1.<br /><br />Text of paragraph 2.
+</td>
+</table>
+
+In fact, this tag can be useful too add an empty line before a horizontal rule. Try the two following examples and see the difference:
+{{{
+Text section 1
+----
+Text section 2
+}}}
+{{{
+Text section 1
+<br />
+----
+Text section 2
+}}}
+
+||<font color="red">*Note:*</font> don't use `<br />` tag to create a new paragraph! Use the standard wiki syntax: just add an empty line in the markup.||

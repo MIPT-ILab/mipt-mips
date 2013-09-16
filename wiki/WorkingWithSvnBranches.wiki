@@ -1,0 +1,76 @@
+#summary Some knowlegde on SVN branches and Google Code specifics of it
+#labels Phase-Requirements,Phase-QA
+=Introduction=
+== What is a branch?==
+
+One of the features of version control systems is the ability to isolate changes onto a separate line of development. This line is known as a _branch_. Branches are often used to try out new features without disturbing the main line of development with compiler errors and bugs. As soon as the new feature is stable enough then the development branch is merged back into the main branch (_trunk_).
+
+Another feature of version control systems is the ability to mark particular revisions (e.g. a release version), so you can at any time recreate a certain build or environment. This process is known as _tagging_.
+
+== Does svn support branches?==
+
+Subversion does not have special commands for branching or tagging, but uses so-called “cheap copies” instead. Cheap copies are similar to hard links in Unix, which means that instead of making a complete copy in the repository, an internal link is created, pointing to a specific tree/revision. As a result branches and tags are very quick to create, and take up almost no extra space in the repository.
+
+----
+= Branches in our project =
+== Rules and policies ==
+We have special place to create branches in our svn. It is [http://uarch-sim.googlecode.com/svn/branches/2012/ /branches/2012/].
+
+The name of your branch folder should begin from the first letter of your name and your surname. For example, for _Alexander Titov_ it will be `atitov`. Then after underscore `task` word, and after underscore, task number. You will get names like these examples:
+
+  * `atitov_task_1`
+  * `pkryukov_task_3`
+  * `kgarifullin_task_4`
+
+You are allowed to create own branches not connected with task. For the name of these branches you also must use your surname and underscores: `pikryukov_decoder`, `atitov_ports`, `atitov_scheduler_optimization`, etc.
+
+|| <font color="red"><b>Note:</b></font> When you commit changes into your branch you have to add `[branch]` prefix in the beginning of your comment.<br>See [SVNCheatSheet#Commit_messages SVN cheat sheet] for more information on commit prefixes.||
+
+
+
+== Creating a branch ==
+
+First of all you should decided which files will be copied into your branch folder. Usually a whole trunk is copied as copying is almost free for svn. However, it is a good style to copy only those files that you need. Don't worry to forget something, you will be able to copy it later.
+
+Then think up a name for your branch folder. It must follow [WorkingWithSvnBranches#Rules_and_policies our rules] presented above.
+
+After that you just have to copy selected files. The copy process depends on the system you are using.
+
+=== On Unix/Linux ===
+
+Use the following svn command to create an svn branch and copy files into it:
+{{{
+svn copy <URL_of_svn_folder_to_copy> https://uarch-sim.googlecode.com/svn/branches/2012/<name_of_your_branch_folder> \
+    -m "[branch] <reason_to_create_a_branch>"
+}}}
+
+For example, if you want to create a branch folder with the name `atitov_task_1` and to copy the whole content of `trunk` folder there, you have to enter the following command:
+{{{
+svn copy https://uarch-sim.googlecode.com/svn/trunk https://uarch-sim.googlecode.com/svn/branches/2012/atitov_task_1 \
+    -m "[branch] create a branch for the first assignment"
+}}}
+
+If you want to add something else into your branch folder just use the same command:
+{{{
+svn copy <URL_of_one_more_folder_to_copy> <URL_of_target_folder> \
+    -m "[branch] <describe_what_you_added>"
+}}}
+
+=== On Windows using TortoiseSVN ===
+|| <font color="red"><b>Note!</b></font> Even if you work on Windows read the previous section. ||
+
+Right click on the folder you want to copy, then select {{{TortoiseSVN -> Branch/tag}}}. In the appeared window enter `http://uarch-sim.googlecode.com/svn/branches/2012/<name_of_your_branch_folder>` into "`to URL`" field, select "`HEAD Revision in the repository`", enter a proper comment into "`Log message`" field and press "`OK`".
+
+For example, if I want to create a branch folder with the name `atitov_ports` and to copy `source` folder there, the window will be look like:
+
+https://uarch-sim.googlecode.com/svn/wiki/images/creating_branch_in_tortoise_svn.png
+
+== Working with branches: checkout, commit, update ==
+
+To start work with your branch (i.e. add files, commit changes and so on) you have to checkout it. The procedure is absolutely the same as for [HowToMakeYourFirstSVNCommit checkout of the trunk], but you have to use URL of your branch folder (`https://uarch-sim.googlecode.com/svn/branches/2012/<name_of_your_branch_folder>`) instead of URL of the trunk folder (`https://uarch-sim.googlecode.com/svn/trunk`).
+
+|| <font color="red"><b>Warning!</b></font> Don't checkout your branch into the folder which has already under revision control (i.e. has folder `.svn`). It won't work! ||
+
+All other commands and actions are also the same as if you work with trunk. Excepts the fact that they will be performed not to the trunk, but to your branch folder.
+
+|| <font color="red"><b>Please</b></font>, don't forget to use `[branch]` prefix in your commit messages.||

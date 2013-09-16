@@ -1,0 +1,9 @@
+#summary How to report a bug
+
+If you found a bug or think that something should be improved in MDSP project, then don't hesitate to submit a new bug.
+
+ # Go to https://code.google.com/p/mdsp/issues/list
+ # Check if the same thing hasn't been already reported so you won't duplicate the problem report.
+ # Press [https://code.google.com/p/mdsp/issues/entry New Issue] button
+ # Enter _Summary_ field, short _Description_, ways of reproducing the wrong behaviour.
+ # As _Owner_ of bug specify one of the mentors (see [https://code.google.com/p/mdsp/ Home Page])

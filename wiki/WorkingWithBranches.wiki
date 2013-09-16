@@ -1,0 +1,62 @@
+#summary Some knowlegde on SVN branches and Google Code specifics of it
+#labels Phase-Requirements
+
+= Intro =
+
+Branches are used to separate your version of code, which is allowed to have some errors and even to not build, from the trunk that should be as stable as possible. The approximate work procedure is as follows:
+ # create a branch for a task you are going to work on;
+ # modify the code in the branch, build it, test it;
+ # commit your changes to the branch;
+ # request a code review from a mentor;
+ # mentor looks through the code in the branch, makes some comments, and eventually approves it;
+ # after an approvement merge your branch with the trunk.
+
+Look through the details below. There are some commands that can be run from a command line (_if you installed a command line version of `svn`_), but you can easily find the way to do it from TortoiseSVN.
+
+= To create a branch and switch to it =
+
+From the root of your SVN working copy:
+{{{
+svn copy . https://mdsp.googlecode.com/svn/branches/new-branch-name -m 'reason of creation'
+svn switch https://mdsp.googlecode.com/svn/branches/new-branch-name
+}}}
+
+= To request a code review =
+
+ * Go to [http://code.google.com/p/mdsp/issues/list Issues list] or [https://code.google.com/p/mdsp/source/list Changes list].
+
+ * Find your issue or change you wish to present.
+
+ * Find [https://code.google.com/p/mdsp/issues/entry?show=review&former=sourcelist request review] link.
+
+ * # assign your reviewer as an owner;
+   # put comments for reviewer;
+   # specify the branch name;
+ 
+ * Wait a response from the reviewer
+
+ * If your code is accepted then proceed to merge your changes with trunk
+
+= To merge the branch with trunk = 
+
+ # Get a working copy (WC) of *trunk*, <font color="red">_not a branch!_</font>
+   {{{
+   svn checkout https://mdsp.googlecode.com/svn/trunk
+   }}}
+ # Remember the number of revision when your branch was created. Suppose it is *250*.
+ # Inside the trunk WC run the command:
+   {{{
+   svn merge -r 250:HEAD https://mdsp.googlecode.com/svn/branches/new-branch-name
+   }}}
+   where {{{250:HEAD}}} is a range of revisions since the moment of branch creation to its latest version.
+ # Now your WC of trunk has merged version of the branch and the changes from trunk. If you have some messages of conflicts, resolve them (_how? this is another story..._), if everything is OK, proceed to the next step.
+ # Commit the changes to the main trunk:
+   {{{
+   svn commit -m 'Merged with new-branch-name'
+   }}}
+ # Congratulations! Now your work is available to the whole team. Hope you've done it well.
+
+
+= Notes = 
+
+More details at http://svnbook.red-bean.com/en/1.0/re16.html and in Google :)

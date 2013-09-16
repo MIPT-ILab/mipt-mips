@@ -1,0 +1,54 @@
+#summary Code guidelines of our project
+
+= Code style =
+
+A common code style is very important aspect of a team code development. Our project uses the code style of [http://code.google.com/p/mipt-vis/ MIPT-VIS] project with some complements.
+
+== Main conventions ==
+
+It is available on [http://code.google.com/p/mipt-vis/wiki/CodingStyle this external page]. Please, read it carefully and follow these rules when you commit any code into the project svn repository.
+
+== Additional rules ==
+
+||<font color="red"><b>Note:</b></font> All statements described it this paragraph have higher priority than rules of MIPT-VIS!||
+
+=== Indentation ===
+
+Every indentation blank spaces is multiplier of 4 spaces.
+We use *only* spaces for indentation. Tabs are not allowed!
+
+Example:
+{{{
+if ( cond)
+{
+    for ( int i = 0; i < 10; i++)
+    {
+        some_var+= some_array[ i];  
+    }
+}
+}}}
+
+We recommend you to configure your text editor for printing 4 spaces with Tab key. 
+
+  * In Notepad++, it can be set from menu:
+{{{
+Settings\Preferences\Language Menu/Tab Settings\Tab size>: 4, Replace by space — ON
+}}}
+  * In Vim, open `.vimrc` file and add following lines:
+{{{
+ set tabstop=4
+ set shiftwidth=4
+ set expandtab
+}}} 
+  * In Visual Studio 2010 from menu:
+{{{
+Tools\Options\Text Editor\C/C++\Tabs\Tab size: 4, Indent size 4:, Insert spaces — ON
+}}}
+
+You can always use _find and replace_ feature of editors or regular expression: `%s/\t/    /g`
+
+=== Exceptions and error handling ===
+
+We do not use C++ exceptions (`try`, `catch`, `throw` keywords). We are agreed with [http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Exceptions Google Code Style opinion on exceptions].
+
+For error handling please use C-style `assert()` and `warning()` macros, `exit()` function with output messages in `stderr`.

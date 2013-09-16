@@ -1,0 +1,111 @@
+#summary Using Doxygen for generating a documentation of source code.
+#labels Phase-Deploy
+
+= Introduction =
+
+Doxygen is a documentation generator for the programming languages C, C++, C#, Fortran, Java etc. Doxygen can create documentation as html, Latex,man ,rtf and XML format. I think that html format is more useful and convenient.
+
+
+= How to install =
+
+Doxygen runs on most Unix-like system in command line. But there are versions for Linux and Windows. Also there is GUI for user-friendly creating config file.
+== Linux ==
+Simplest way for installation Doxygen on Linux is use apt-get, aptitude etc. Example for Ubuntu:
+{{{
+sudo apt-get install doxygen
+ }}}
+And for installing GUI:
+{{{
+sudo apt-get install doxygen-gui
+}}}
+Also you can compiled Doxygen from sources or install from binary:
+    http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
+
+== Windows ==
+To install on Windows you need to download self-extracting archive from here:
+  http://ftp.stack.nl/pub/users/dimitri/doxygen-1.7.2-setup.exe
+or  
+  http://sourceforge.net/downloads/doxygen/
+= How to use =
+Doxygen uses config file to work, so there are two ways to make it.
+First of them is to create template:
+{{{
+doxygen -g <name of config file>
+}}}
+Then you need to edit this file. Information about configuration file and tags you can find here:
+http://www.stack.nl/~dimitri/doxygen/config.html
+
+Or you can use Doxygen GUI - Doxywizard. This is quite simple.
+
+After the creation config file:
+{{{
+doxygen <name of config file>
+}}}
+Result will be in directory you wrote in config file:
+{{{
+OUTPUT_DIRECTORY       = C:/Users/User/Documents/Mdsp/doxygen
+}}}
+
+Doxygen extracts documentation from source file comments. Comment must be begin with double star or 3 slashes. Make sure the parameter EXTRACT_ALL in the config file is set to YES. So there is a example of comment.
+{{{
+/**
+ * @file    ...
+ * @author  ...
+ * @version 1.0
+ *
+ * @section LICENSE
+ * GNU 
+ * @section DESCRIPTION
+ *
+ * The time class represents a moment of time.
+ */
+ 
+class Time 
+{
+    public:
+       /**
+        * Constructor that sets the time to a given value.
+        * 
+        * @param timemillis Number of milliseconds 
+        */
+       Time (int timemillis)
+       {
+           ...
+       }
+
+       /**
+        * Get the current time.
+        *
+        * @return A time object set to the current time.
+        */
+       static Time now( )
+       {
+           ...
+       }
+};
+}}}
+Alternative form:
+{{{
+       /**
+        * Constructor that sets the time to a given value.
+        * 
+        */
+       Time (int timemillis ///< Number of milliseconds
+            ) 
+       {
+           ...
+       }
+
+}}}
+ 
+== Links ==
+For more information about Doxygen you can visit
+
+Wiki:
+  http://ru.wikipedia.org/wiki/Doxygen
+
+  http://en.wikipedia.org/wiki/Doxygen
+Official site:
+  http://www.stack.nl/~dimitri/doxygen/
+Russian translate of official site:
+  http://www.doxygenorg.ru/

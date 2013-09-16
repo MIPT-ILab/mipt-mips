@@ -1,0 +1,93 @@
+#summary Assignment 2: instruction decoder and disassembler
+
+= Introduction =
+
+In this assignment you will implement the instruction decoder and disassembler.
+
+All requirements remain the same [Assignment_1#Notes as in previous task]
+
+You should create a new branch `<yourname>_task_2` and create four new files:
+  * `func_sim/func_instr/func_instr.h`
+  * `func_sim/func_instr/func_instr.cpp`
+  * `func_sim/func_instr/disasm.cpp`
+  * `func_sim/func_instr/Makefile`
+
+== What is disassembler? ==
+
+As you know, all instructions are just sets of bits. In MIPS, it is 4-byte words. Processors decodes instruction according to its rules called *format*. You may read more about MIPS format on [MIPSInstructionSet this page].
+
+Although formatted 4-bytes opcodes are compact and fully readable by processor, for programmer it is very complicated. That's why people use _assembler language_ — a language with translates understandable and standardized statement. Every statement can be converted to 4-byte instruction — it is called assembling. Vice versa, every 4-byte instruction can be converted to statement of _assembler language_ — disassembling.
+
+So, disassembler is a program that converts assembled program back to human-understandable view. It is extremely useful during development of any simulator, architectual or micro-architectual, functional or performance.
+
+----
+
+= FuncInstr class =
+
+Class FuncInstr is a basic abstraction of instruction in our simulator.
+
+== Interface ==
+
+Your implementation should provide at least these interfaces
+
+{{{
+class FuncInstr
+{
+    public:
+        FuncInstr( uint32 bytes);
+        std::string Dump( std::string indent = " ") const;
+};
+
+std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
+}}}
+
+You are free to create your own internal variables and methods.
+
+=== Suggested internal variables ===
+
+You need to specify:
+
+   * Format type (R, I or J)
+   * Registers addresses
+   * Type of instruction
+
+The easiest way to support these options is C enumerations.
+
+=== Constructor ===
+
+Constructor takes `bytes` variable and initializes internal variables (parser) using MIPS instruction format on these bytes.
+
+Please avoid long constructor. We recommend you to write some function-helpers.
+
+=== Dump ===
+
+Dump method should return disassembly of instructions with their correct names and registers names. Format of output is following:
+
+`<indent><instr name> <reg1>[, <reg2>][, <reg3>][, const]`
+
+Examples:
+
+`add $t0, $t1, $t2`
+
+`    addi $t0, $t4, 0x20`
+
+Constants are printed in hexadecimal format.
+
+|| <font color="red">*Note*</font>: Dump function *must not* parse any input bytes! It should use internal variables of class.  ||
+
+=== Output operator ===
+
+Output operator should just call Dump method with empty indent string.
+
+= Disassembler =
+
+Disassembler will be in disasm.cpp file. This file should have "main" function taking two arguments — elf filename and section name. After it launches ElfParser, reads every 32-bit word in this section and print its disassembler on standard output with four space indentation.
+
+= Supported instructions and registers =
+
+  * [MIPSInstructionSet#Instructions_Table List of instructions that your disassembler must support]
+  * [MIPSRegisters#User_accessible_registers List of register names that your disassembler must support]
+
+Your disassembler should also support `nop` pseudoinstruction.
+
+|| <font color="red">*Note*</font>: These lists are not full yet. You should write your program in expandable way to support future instructions and registers  ||

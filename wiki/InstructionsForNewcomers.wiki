@@ -1,0 +1,79 @@
+#summary Instructions for project's newcomers
+
+= Introduction =
+
+|| <font color="red"> *Note:*</font> Only second year students of [http://phystech.edu/ MIPT] that have successfully passed the offline interview <font color="gray">(for more information about the interview visit [http://ilab.mipt.ru])</font><br> and received the invitation can became members of this project and attend the educational classes. ||
+
+As a new member of the project you have to follow the instructions below in order to receive access to the project's resources ([https://groups.google.com/forum/?fromgroups#!forum/uarchsim_mipt2012 the mail list], [http://code.google.com/p/uarch-sim/ the project repository], [https://www.google.com/calendar/embed?src=5upa7tmnm0e40g19d256hoaqus%40group.calendar.google.com&ctz=Europe/Moscow the class schedule], etc).
+
+If you cannot pass some step or think that the description has an error, please, read the instruction once again and make sure that you have done all correctly. If the problem still exists write a mail to [mailto:alexander.igorevich.titov@gmail.com the project owners].<br /><wiki:comment>in order to make an empty line</wiki:comment>
+
+----
+
+== Step 1: creating Google account ==
+
+Almost all the project's resources are connected with Google in one way or another. Therefore you need a valid Google account in order to be an active member of the project.
+
+Our project has the strong naming requirement for the accounts of its members, which are listed below:
+
+  * The name of you account should consists of only the full version of your first name, middle name, given name or the their first letters.
+  * The only proper separator is a dot (`.`). Other signs are prohibited.
+  * Digits in the account name are not allowed.
+
+For instance, if you are _Vladimir Sergeevich Pupkin_ the following names are allowed for your account (from the most appropriate to less one):
+  * `vladimir.pupkin@gmail.com`
+  * `vladimir.s.pupkin@gmail.com`
+  * `vpupkin@gmail.com`
+  * `vladimir.sergeevich.pupkin@gmail.com`
+  * `pupkin@gmail.com`
+  * `vspupkin@gmail.com`
+  * `vladimir.pupkin.mipt@gmail.com` (*only!* if all the previous names are already busy)
+
+||<font color="red">*Note:*</font> Even if you already have a Google account, but its name does not meet the requirements above, you have to create a new account.||
+
+After creating your Google account you can move to the following step.
+
+<br><wiki:comment>in order to make an empty line</wiki:comment>
+----
+== Step 2: joining the project group ==
+
+Login into your Google account created on [InstructionsForNewcomers#Step_1:_creating_Google_account the previous step] and open [https://groups.google.com/forum/?fromgroups#!forum/uarchsim_mipt2012 our google group site].  Then press _"Apply to join group"_ button:
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_group_1.png" width="650">||
+
+Enter your first name and surname and press _"Apply to this group:"_
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_group_2.png" width="650">||
+
+After doing that the group administrator will consider your request (that can take a day or two):
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_group_3.png" width="650">||
+
+If your account name meets the requirements you will receive notifications that your are successfully added to the group and to the project repository. Only then you can move to the next step.
+
+<br /><wiki:comment>in order to make an empty line</wiki:comment>
+----
+
+== Step 3: setting notifications in the project calendar ==
+In order to properly plan our classes and to inform the project members about any changes in the schedule the project calendar is created. It is located at the google calendar service and can be examined by you after you have received the access.
+
+||<font color="red"> *Note*:</font> do not proceed this step until your received a notification that you have been invited to the calendar!||
+
+After you have received the invitation open [https://www.google.com/calendar/ the Google calendar page]. In the up right corner click the gear icon and open the settings:
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_calendar_1.png" width="250">||
+
+On the settings page select the _"Mobile Setup"_ tab and follow instructions to register your phone number. It will allow you to receive sms notifications when something is changed in the calendar. The final page should look like the following:
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_calendar_2.png" width="650">||
+
+Then go to the _"Calendars"_ tab, there you should see our calendar has already been added:
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_calendar_3.png" width="650">||
+
+Click _"Notification"_ link and set all the check boxes and controls like on the following picture:
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/joining_google_calendar_4.png" width="650">||
+
+Now, you will receive notifications about any changes in the calendar both by mail and sms.
+ 

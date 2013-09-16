@@ -1,0 +1,82 @@
+#summary This page is used to replace the standard download tab
+
+= Course Calendar with Handouts =
+
+||<font color="red">*Please*</font>, read [#Instructions_to_use_downloading_material the instructions] in the bottom of the page before downloading media materials and presentations.||
+
+<table border="1" width="100%" cellspacing="0" cellpadding="8">
+  <tr>
+    <th width="3%"><font size="3">#</font></th>
+    <th width="5%"><font size="3">Date</font></th>
+    <th width="57%"><font size="3">Lecture</font></th>
+    <th width="35%"><font size="3">Homework</font></th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>06 Oct</td>
+    <td><font size="3">*L1: Project Introduction*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Lecture_1__6_Oct__Project_Introduction__Rus.pptx PPTX] (Rus text, no audio), [http://uarch-sim.googlecode.com/svn/lectures/Lecture_1__6_Oct__Project_Introduction__Rus.wrf WRF] (Rus, 11 MB)</dd></td>
+    <td>Read about [http://en.wikipedia.org/wiki/Revision_control Revision control], [http://en.wikipedia.org/wiki/Apache_Subversion SVN], [http://en.wikipedia.org/wiki/Makefile Makefile]. <font color="gray">_Note_, that you are free to use any other source of information, not only wikipedia.</font></td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>13 Oct</td>
+    <td><font size="3">*L2: Basics of Team Work (mail, svn, make)*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Lecture_2_Basics_of_team_work.pptx PPTX] (Eng text, Rus audio, 9.5 MB)</dd><br />Background papers:<ul><li>_Svn-book_ (<a href="http://svnbook.red-bean.com/ru/1.4/svn-book.html">Rus</a> | <a href="http://svnbook.red-bean.com/en/1.4/svn-book.html">Eng</a>) is a very detailed document about subversion. For you it is more than enough to read the chapters 1, 2 and review the begging of chapter 4 (to be familiar with "branches"). Also note that Chapter 9 contains descriptions of all the svn commands.</li><li>_GNU Make Manual_ (<a href="http://www.linuxlib.ru/prog/make_379_manual.html">Rus</a>) is a good reference book about the make utility. You are advised to read chapters 1, 2, 4 and the begging of the 3rd chapter.</li></ul>
+</td>
+    <td>Make your first SVN commit with help of [HowToMakeYourFirstSVNCommit this manual]. You may also need [SVNCheatSheet SVN Cheat Sheet].</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>20 Oct</td>
+    <td><font size="3">*L3: Instruction Set Architecture*</font><dd>[https://uarch-sim.googlecode.com/svn/lectures/Lecture_3__20_Oct__Instruction_Set_Architecture__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 40.5 MB)</dd><dd>[https://uarch-sim.googlecode.com/svn/lectures/Lecture_3__20_Oct__Instruction_Set_Architecture__Eng_text__No_audio.pptx PPTX] (the same as previous one, but w/o audio, 0.6 MB)</dd></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>27 Oct</td>
+    <td><font size="3">*L4: Combinational Circuits*</font><br/><dd>Schemes:<ul><li>[https://uarch-sim.googlecode.com/svn/wiki/images/1bit_multiplexer_4_in_1.png Multiplexer]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/simple_alu_scheme.png Simple ALU]</li></ul></dd></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>10 Nov</td>
+    <td><font size="3">*L5: Integrated circuit design*</font><dd>The materials are not ready.</dd></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>1 Dec</td>
+    <td><font size="3">*L6: Sequential circuits*</font><br /><dd>Schemes:<ul><li>[https://uarch-sim.googlecode.com/svn/wiki/images/SR_and_Data_flip-flops.png SR and D flip-flops]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/4_elements_X_1_bit_memory_array.png 4 elements X 1 bit Memory Array]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/4_elements_X_2_bit_memory_array.png 4 elements X 2 bit Memory Array]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/ALU_with_RF.png MIPS ALU with Register File]</li></ul></dd></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>15 Dec</td>
+    <td><font size="3">*L7: Single-cycle implementation*</font><dd>There is a really well-done external presentation: [http://www.cs.washington.edu/education/courses/cse378/10sp/lectures/lec08-singlecyc.pdf Lecture 8, CSE378, University of Washington].</dd></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>02 Mar</td>
+    <td><font size="3">*L10: Caches*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Caches.pptx PPTX] (Eng text, no audio)</dd></td>
+    <td>Refresh basic caches formulas:
+  * how to calculate bit masks for tag, index or offset parts of address
+  * how to measure Average Memory Access Time
+  * what basic cache parameters are and how they affect performance</td>
+  </tr>
+</table>
+<br />
+----
+
+== Instructions to use downloading material ==
+
+=== How to play audio narrations in Powerpoint ===
+Some presentation contains recorded audio from the seminar (narration). Usually, it is marked with phrase _"Rus/End audio"_ near a link in the table above. Those presentation that contain narrations can be played in [http://office.microsoft.com/en-us/powerpoint/ MS Powerpoint] as an ordinary video (we have verified it in Powerpoint 2010).
+
+To start playing select the following values in the check boxes on _Slide Show_ tab (point 1):
+
+||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/how_to_play_narrations_in_powerpoint.png" width="650">||
+
+Then click _From Beginning_ button (point 2), which starts the presentation with audio and automatic animations from the first foil. You also can start this mode from any slide, pause it and so on. If you want to look the presentation without animations and audio just deselect the check boxes.   
+
+=== How to play video in WRF format ===
+Some lectures are written in WRF format. It is a video format of Cisco [http://en.wikipedia.org/wiki/WebEx WebEx] Recorder Tool. In order to play it you have to install the WebEx Player. For more details about installation, please view [http://www.webex.com/play-webex-recording.html this page]. 

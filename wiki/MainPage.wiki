@@ -1,0 +1,22 @@
+#summary Main page of uArchSim wiki
+
+= uArchSim project Wiki =
+
+== Table of contents ==
+
+
+  * Environment
+    * How to create Google account, receive access to the project mail group and calendar ([InstructionsForNewcomers link]).
+    * Instructions how to connect to ILab servers using SSH ([HowToConnectToILabServers link]).
+    * Coding Guidelines ([CodeGuidelines link]).
+    * SVN
+      * How to make your first commit into the project SVN repository ([HowToMakeYourFirstSVNCommit link]).
+      * Description of main SVN commands ([SVNCheatSheet link]).
+      * How to work with SVN branches ([WorkingWithSvnBranches link]).
+  * Development
+  * Assignments
+    * A1: implement initial interfaces of the functional memory ([Assignment_1 link]).
+    * A2: implement basis of FuncInstr class and Disassembler ([Assignment_2 link]).
+    * A3: implement a basic cache model and research how miss rate depends on cache parameters ([Assignment_3 link]).
+  * Lectures
+    * All lectures can be downloaded from *[https://code.google.com/p/uarch-sim/wiki/DownloadTab Downloads tab]*.

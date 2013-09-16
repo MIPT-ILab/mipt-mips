@@ -1,0 +1,12 @@
+#labels Phase-Implementation
+= CodingStyle =
+
+Good C/C++ coding conventions of MIPT-VIS project are described  [http://code.google.com/p/mipt-vis/wiki/CodingStyle here]. They are also applicable for our project and should be used for any new code added.
+
+= Automated code style checks =
+
+It is possible to use certain third-party programs to check and correct the coding style.
+
+For example, see http://universalindent.sourceforge.net/ for a GUI front-end for many of such tools.
+
+*TODO* Write me!

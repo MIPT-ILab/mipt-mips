@@ -1,0 +1,70 @@
+#summary Performance simulation methodology.
+
+= Motivation =
+
+  * We want to simulate target processor quickly
+  * We also want to construct simulator quickly
+  * *Partitioned simulators* are a known technique:
+    * Simplifies timing model
+    * Amortize functional model design effort over many models
+
+http://mdsp.googlecode.com/svn/wiki/images/func-timing-partitioning.png 
+
+= Different Partitioning Schemes =
+
+Within partitioned simulation, there are many potential ways for these functional/timing partitions to interact. Mauer, Hill and Wood (Mauer 2002, ACM SIGMETRICS) categorized such simulators as *functional-first* (traditionally called *trace-driven*), *timing-directed*, and *timing-first*. 
+
+http://mdsp.googlecode.com/svn/wiki/images/partitioning-schemes.png 
+
+In the functional-first scheme a functional model is used to generate an execution trace that is fed into a timing model, which adds microprocessor-specific timing information to the trace. 
+
+A timing-directed simulator, in contrast, is an execution-driven simulator where the timing model invokes operations on the functional model at
+the right time. 
+
+In the timing-first style timing is first calculated, and then a functional model invoked to verify the results. Contemporary
+partitioned software simulators include Asim and MASE.
+
+*We believe that a timing-directed solution will ultimately lead to the best performance.*
+
+= Functional Partition Interface = 
+
+Generally, functional partition should have the following interface methods:
+
+|| *Operation* || *Parameters* || *Return value* || *Effect* ||
+|| Get Instruction || Addr || Instr || Fetch the instruction at this address and place it in flight. ||
+|| Get Dependencies || Instr || Deps || Get the dependencies of this instruction relative to other in-flight instructions. ||
+|| Get Operands || Instr || Srcs || Read the register file and prepare the instruction for execution. ||
+|| Get Results || Instr || Result || Execute the instruction and return the result, including branch information. For loads and stores, do effective address calculation. ||
+|| Read Memory (Do Loads) || Instr || Value || Perform and memory reads associated with the instruction. ||
+|| Speculatively Write Memory || Instr || -- || Make any memory writes visible to local loads. ||
+|| Commit || Instr || -- || Commit the instruction’s local changes and remove it from being in-flight. ||
+|| Abort  || Instr || -- || Abort the instruction’s local changes and remove it from being in-flight. ||
+|| Write Memory || Instr || -- || Make any memory writes globally visible. ||
+
+These operations roughly correspond to stages in a traditional microprocessor pipeline, with additional support for controlling the precise timing of store operations.
+
+The order in which the timing partition invokes these operations determines the state of the machine at any given moment.
+
+= Execution in Phases = 
+
+According to Joel Emer, _all_ data dependencies can be represented via these phases.
+
+http://mdsp.googlecode.com/svn/wiki/images/execution-in-phases.png 
+
+For a single in-flight instruction, the operations are typically invoked in-order  (operations which do not apply may by skipped). This corresponds to instructions flowing through pipeline stages in a real computer:
+  * the instruction is fetched (`getInstruction`) before 
+  * it is decoded (`getDependencies`), takes place before 
+  * register read (`getOperands`), and so on. 
+
+The order in which the timing model invokes these operations on separate in-flight instructions determines the state of the machine. We can conceive of a timing model which fetches ten instructions before decoding one, for example.
+
+The distinction between local writes and global writes allows for accurate control of inter-thread communication. The
+fact that the timing model uses these operations to control the exact timing, in modeled time, of the visibility of data allows for precise control of the timing of inter-thread communication. This is a key attribute of a closely-coupled functional partition.
+
+= Detailed Example = 
+
+As the functional partition executes each operation, it changes the architectural state of the simulator, and thus the result of subsequent operations. For example, executing `getResult()` on an instruction which writes register will mean that a subsequent `getOperands()` call will see that value of th register. If an instruction is executed in some way which is not consistent with program order, the `abort()` operation undoes its effects and allows it to be retried. All operations are speculative and may be aborted until the `commit()` operation is called, at which point they become permanent.
+
+Three different timing models executing the same instruction sequence:
+
+http://mdsp.googlecode.com/svn/wiki/images/execution-example.png 
