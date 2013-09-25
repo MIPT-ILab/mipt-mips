@@ -21,7 +21,7 @@ See [SVNCheatSheet#How_to_install instructions in the SVN cheat sheet]
 
   # Decide what folder will be a destination of checkout
   # Open the folder in Explorer, make a right click at blank space, press "SVN checkout"
-  # Put this address *https://uarch-sim.googlecode.com/svn/trunk/ * in field "URL of repository" field ||<font color="red">*Note:*</font> Use only *https* prefix, not "http"! Otherwise you won't be able to make commits!||
+  # Put this address *https://mipt-mips.googlecode.com/svn/trunk/ * in field "URL of repository" field ||<font color="red">*Note:*</font> Use only *https* prefix, not "http"! Otherwise you won't be able to make commits!||
   # Press OK
 
 == Step 3: modify ==
