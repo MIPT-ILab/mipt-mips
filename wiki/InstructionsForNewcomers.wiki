@@ -37,11 +37,11 @@ After creating your Google account you can move to the following steps.
 ----
 == Step 2: joining the project group ==
 
-Login into your Google account created on [InstructionsForNewcomers#Step_1:_creating_Google_account the previous step] and open [https://groups.google.com/forum/?fromgroups#!forum/uarchsim_mipt2012 our google group site].  Then press _"Apply to join group"_ button:
+Login into your Google account created on [InstructionsForNewcomers#Step_1:_creating_Google_account the previous step] and open [https://groups.google.com/forum/?fromgroups#!forum/mipt-mips-2013 our google group site].  Then press _"Apply to membership"_ button:
 
 <img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_group_1.png" width="650">
 
-Enter your first name and surname and press _"Apply to this group:"_
+Check that the email is correct and enter your message, then press _"Apply to join this group"_:
 
 <img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_group_2.png" width="650">
 
@@ -61,19 +61,19 @@ In order to properly plan our classes and to inform the project members about an
 
 After you have received the invitation open [https://www.google.com/calendar/ the Google calendar page]. In the up right corner click the gear icon and open the settings:
 
-||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_1.png" width="250">||
+<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_1.png" width="250">
 
 On the settings page select the _"Mobile Setup"_ tab and follow instructions to register your phone number. It will allow you to receive sms notifications when something is changed in the calendar. The final page should look like the following:
 
-||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_2.png" width="650">||
+<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_2.png" width="650">
 
 Then go to the _"Calendars"_ tab, there you should see our calendar has already been added:
 
-||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_3.png" width="650">||
+<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_3.png" width="650">
 
-Click _"Notification"_ link and set all the check boxes and controls like on the following picture:
+Click _"Reminders and notifications"_ link and set all the check boxes and controls like on the following picture:
 
-||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_4.png" width="650">||
+<img src="http://mipt-mips.googlecode.com/svn/wiki/images/joining_google_calendar_4.png" width="650">
 
 Now, you will receive notifications about any changes in the calendar both by mail and sms.
  
