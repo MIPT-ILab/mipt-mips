@@ -9,9 +9,22 @@ In our labs we will use official integrated environment for FPGA development Xil
   # Download tar archive from the server... (TBD, need to place on the lab server) and extract it on your local disk.
   # Run xsetup.exe application.
   # Follow the instruction given by installer. Accept license agreements.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/accepting-ise-agreement.png
   # On step 'Select Products to Install' select 'ISE WebPACK'.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/tool-selection.png
   # Check all options on the next step.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/install-options.png
   # Choose destination directory.
   # Press install button and wait for a while.
-  # [ Acquire WebPACK ISE license]
-  
+  # The Xilinx License Configuration Manager window appears.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/license-acquirement-options.png
+  # Choose option 'Get Free Vivado/ISE WebPack License'
+  # Press button 'Connect now' on the popup. You will be redirected to the Xilinx website. You need to create an account, if none. As a corporate e-mail, use the same as you are using for google-groups.
+  # After signing in you are to provide additional information about yourself.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/personal-information.png
+  # Press 'Manage Licenses' and create 'Vivado and ISE Design Suite: WebPACK License'. Press 'Next' until you get notification about successfull generation of the license.
+  # The license file 'Xilinx.lic' should be sent to your e-mail. Download license file.
+  # Go back to Xilinx License Configuration Manager. Press Manage Xilinx License and press 'Load License...' button there.
+https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/load-license.png
+  # Find 'Xilinx.lic' that you have downloaded and close the window.
+  # That's it! The quest have been completed.
