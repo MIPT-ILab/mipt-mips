@@ -4,6 +4,8 @@
 
 ||<font color="red">*Please*</font>, read [#Instructions_to_use_downloading_material the instructions] in the bottom of the page before downloading media materials and presentations.||
 
+No lectures or seminars have been carried out yet!
+<wiki:comment>
 <table border="1" width="100%" cellspacing="0" cellpadding="8">
   <tr>
     <th width="3%"><font size="3">#</font></th>
@@ -64,6 +66,7 @@
   * what basic cache parameters are and how they affect performance</td>
   </tr>
 </table>
+</wiki:comment>
 <br />
 ----
 
@@ -77,6 +80,3 @@ To start playing select the following values in the check boxes on _Slide Show_ 
 ||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/how_to_play_narrations_in_powerpoint.png" width="650">||
 
 Then click _From Beginning_ button (point 2), which starts the presentation with audio and automatic animations from the first foil. You also can start this mode from any slide, pause it and so on. If you want to look the presentation without animations and audio just deselect the check boxes.   
-
-=== How to play video in WRF format ===
-Some lectures are written in WRF format. It is a video format of Cisco [http://en.wikipedia.org/wiki/WebEx WebEx] Recorder Tool. In order to play it you have to install the WebEx Player. For more details about installation, please view [http://www.webex.com/play-webex-recording.html this page]. 
