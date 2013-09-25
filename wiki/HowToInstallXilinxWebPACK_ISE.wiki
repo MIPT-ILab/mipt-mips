@@ -1,0 +1,17 @@
+#summary Step by step installation guide on how to install Xilinx WebPACK ISE on your PC.
+
+= Introduction =
+
+In our labs we will use official integrated environment for FPGA development Xilinx WebPACK ISE. The detailed description on installing this tool is given below.
+
+
+= Steps =
+  # Download tar archive from the server... (TBD, need to place on the lab server) and extract it on your local disk.
+  # Run xsetup.exe application.
+  # Follow the instruction given by installer. Accept license agreements.
+  # On step 'Select Products to Install' select 'ISE WebPACK'.
+  # Check all options on the next step.
+  # Choose destination directory.
+  # Press install button and wait for a while.
+  # [ Acquire WebPACK ISE license]
+  
