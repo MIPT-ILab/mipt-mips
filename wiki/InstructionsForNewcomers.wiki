@@ -4,7 +4,7 @@
 
 || <font color="red"> *Note:*</font> Only second year students of [http://phystech.edu/ MIPT] that have successfully passed the offline interview <font color="gray">(for more information about the interview visit [http://ilab.mipt.ru])</font><br> and received the invitation can became members of this project and attend the educational classes. ||
 
-As a new member of the project you have to follow the instructions below in order to receive access to the project's resources ([https://groups.google.com/forum/?fromgroups#!forum/uarchsim_mipt2012 the mail list], [http://code.google.com/p/uarch-sim/ the project repository], [https://www.google.com/calendar/embed?src=5upa7tmnm0e40g19d256hoaqus%40group.calendar.google.com&ctz=Europe/Moscow the class schedule], etc).
+As a new member of the project you have to follow the instructions below in order to receive access to the project's resources ([https://groups.google.com/forum/?fromgroups#!forum/mipt-mips-2013 the mail list], [http://code.google.com/p/mipt-mips/ the project repository], [https://www.google.com/calendar/embed?src=c1smor52p757mfejbdh54ijq1g%40group.calendar.google.com&ctz=Europe/Moscow%22 the class schedule], etc).
 
 If you cannot pass some step or think that the description has an error, please, read the instruction once again and make sure that you have done all correctly. If the problem still exists write a mail to [mailto:alexander.igorevich.titov@gmail.com the project owners].<br /><wiki:comment>in order to make an empty line</wiki:comment>
 
@@ -29,9 +29,9 @@ For instance, if you are _Vladimir Sergeevich Pupkin_ the following names are al
   * `vspupkin@gmail.com`
   * `vladimir.pupkin.mipt@gmail.com` (*only!* if all the previous names are already busy)
 
-||<font color="red">*Note:*</font> Even if you already have a Google account, but its name does not meet the requirements above, you have to create a new account.||
+||<font color="red">*Note:*</font> Even if you already have a Google account, but its name does not meet the requirements above, you have to create a new account!||
 
-After creating your Google account you can move to the following step.
+After creating your Google account you can move to the following steps.
 
 <br><wiki:comment>in order to make an empty line</wiki:comment>
 ----
