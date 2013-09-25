@@ -1,7 +1,0 @@
-#summary Details of implementation-specific things on funcsim.
-
-= Things to implement =
-
- * ELF loading - external libelf on Linux/Windows/CygWin
-
- * User intercative interface - external *libreadline* support on Linux/Windows
