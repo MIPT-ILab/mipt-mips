@@ -77,6 +77,6 @@ Some presentation contains recorded audio from the seminar (narration). Usually,
 
 To start playing select the following values in the check boxes on _Slide Show_ tab (point 1):
 
-||<img src="http://uarch-sim.googlecode.com/svn/wiki/images/how_to_play_narrations_in_powerpoint.png" width="650">||
+||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/how_to_play_narrations_in_powerpoint.png" width="650">||
 
 Then click _From Beginning_ button (point 2), which starts the presentation with audio and automatic animations from the first foil. You also can start this mode from any slide, pause it and so on. If you want to look the presentation without animations and audio just deselect the check boxes.   
