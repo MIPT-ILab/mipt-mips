@@ -7,6 +7,7 @@
 
   * Environment
     * How to create Google account, receive access to the project mail group and calendar ([InstructionsForNewcomers link]).
+
 <wiki:comment>
     * Instructions how to connect to ILab servers using SSH ([HowToConnectToILabServers link]).
     * How to install Xilinx ISE WebPACK ([HowToInstallXilinxWebPACK_ISE link])
@@ -21,5 +22,6 @@
     * A2: implement basis of FuncInstr class and Disassembler ([Assignment_2 link]).
     * A3: implement a basic cache model and research how miss rate depends on cache parameters ([Assignment_3 link]).
 </wiki:comment>
+
   * Lectures
-    * All lectures can be downloaded from *[https://code.google.com/p/uarch-sim/wiki/DownloadTab the Downloads tab]*.
+    * All lectures can be downloaded from *[https://code.google.com/p/mipt-mips/wiki/DownloadTab the Downloads tab]*.
