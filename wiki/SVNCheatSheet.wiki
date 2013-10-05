@@ -33,11 +33,11 @@ Checkout is operation of initial download of sources from repository. Syntax is 
 
 For example, to check out our project type in command line: 
 
-`svn checkout https://uarch-sim.googlecode.com/svn/trunk/ uarch-sim --username student@example.com`
+`svn checkout https://mipt-mips.googlecode.com/svn/trunk/ mipt-mips --username student@example.com`
 
 and you will get HEAD revision in uarch-sim folder (*local copy*)
 
-||In Tortoise SVN, make right click on any blank space in Explorer, click _SVN Checkout..._ and enter repository path and checkout path. You can also select revision number.<br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/checkout.png" width="650">||
+||In Tortoise SVN, make right click on any blank space in Explorer, click _SVN Checkout..._ and enter repository path and checkout path. You can also select revision number.<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/checkout.png" width="650">||
 
 == Update (up) ==
 
@@ -49,7 +49,7 @@ If there is no -r flag, local copy will be updated to current HEAD revision. Num
 
 `svn info`
 
-||In Tortoise SVN, make right click on folder with local copy and select _SVN Update_.<br />By default, local copy will be updated to HEAD revision. If you want to update to other revision, select _Update to revision..._ in _TortoiseSVN_ submenu<br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/update.png" width="750">||
+||In Tortoise SVN, make right click on folder with local copy and select _SVN Update_.<br />By default, local copy will be updated to HEAD revision. If you want to update to other revision, select _Update to revision..._ in _TortoiseSVN_ submenu<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/update.png" width="750">||
 
 == Diff ==
 
@@ -70,7 +70,7 @@ svn diff allows you to make a solid file with only your changes (called *patch*)
 
 Note that patch command is independent from SVN.
 
-||Patches can be generated and applied with _TortoiseSVN_ submenu commands _Create patch..._ and _Apply patch..._.<br />On picture below you can see example of patchfile opened in Tortoise Patch Viewer.<br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/patch.png" width="750">||
+||Patches can be generated and applied with _TortoiseSVN_ submenu commands _Create patch..._ and _Apply patch..._.<br />On picture below you can see example of patchfile opened in Tortoise Patch Viewer.<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/patch.png" width="750">||
 
 == Commit ==
 
@@ -82,7 +82,7 @@ Commit is operation of uploading changes of local copy to repository
 
 Commit message is a brief description of changes. Using messages makes easy to understand, what commit _should have_ changed.
 
-http://code.google.com/p/uarch-sim/source/list
+http://code.google.com/p/mipt-mips/source/list
 
 In our project, there must be message in every commit and message should have one of following prefixes:
 
@@ -91,7 +91,7 @@ In our project, there must be message in every commit and message should have on
 || `[branch]` || if you changed branch ||
 || `[lectures]` || if you changed lectures (only for mentors!) ||
 
-||To run commit in TortoiseSVN, just make left click on you local copy and select _SVN Commit..._<br /> Subwindow on the bottom shows you files you're going to change in repository. Make double click on them to observe changes.<br />Top subwindow is for commit message, never forget about it!<br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/commit.png" width="750">||
+||To run commit in TortoiseSVN, just make left click on you local copy and select _SVN Commit..._<br /> Subwindow on the bottom shows you files you're going to change in repository. Make double click on them to observe changes.<br />Top subwindow is for commit message, never forget about it!<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/commit.png" width="750">||
 
 == Add and Delete ==
 
@@ -103,4 +103,4 @@ Inverse operation is called svn delete
 
 `svn delete <file1> <file2> ...`
 
-||See on picture below how to perform this operations in Tortoise:<br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/add.png" width="750"><br /><img src="http://uarch-sim.googlecode.com/svn/wiki/images/tortoise-svn/delete.png" width="750">||
+||See on picture below how to perform this operations in Tortoise:<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/add.png" width="750"><br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/delete.png" width="750">||
