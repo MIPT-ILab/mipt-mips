@@ -7,6 +7,10 @@
 
   * Environment
     * How to create Google account, receive access to the project mail group and calendar ([InstructionsForNewcomers link]).
+    * SVN
+      * How to make your first commit into the project SVN repository ([HowToMakeYourFirstSVNCommit link]).
+      * Description of main SVN commands ([SVNCheatSheet link]).
+      * How to work with SVN branches ([WorkingWithSvnBranches link]).
 
 <wiki:comment>
     * Instructions how to connect to ILab servers using SSH ([HowToConnectToILabServers link]).
