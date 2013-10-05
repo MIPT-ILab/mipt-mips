@@ -4,7 +4,7 @@
 
 This is a step-by-step instruction describing how to make your first commit into our SVN repository.
 
-|| <font color="red">*Note*:</font> Before executing this instruction, please study the short manual about svn commands which is located on [http://code.google.com/p/uarch-sim/wiki/SVNCheatSheet this page]. ||
+|| <font color="red">*Note*:</font> Before executing this instruction, please study the short manual about svn commands which is located on [http://code.google.com/p/mipt-mips/wiki/SVNCheatSheet this page]. ||
 
 If you cannot pass some step or think that the description has an error, please, read the instruction once again and make sure that you have done all correctly. If the problem still exists send a mail to [mailto:kryukov@frtk.ru the project owners].
 
@@ -47,7 +47,7 @@ See [SVNCheatSheet#How_to_install instructions in the SVN cheat sheet]
 == Step 1: checkout ==
 
   # Decide what directory will be a destination for checkout, make 'cd' to it
-  # Run there the following command to perform checkout: <br/>`svn checkout https://uarch-sim.googlecode.com/svn/trunk/ . --username <your name>`
+  # Run there the following command to perform checkout: <br/>`svn checkout https://mipt-mips.googlecode.com/svn/trunk/ . --username <your name>`
 
 == Step 2: modify ==
   #  Open `members.txt`, which is located in `trunk` folder, in any text editor. For example, in [http://en.wikipedia.org/wiki/Vim_%28text_editor%29 vim]: `vim members.txt`
@@ -62,4 +62,4 @@ See [SVNCheatSheet#How_to_install instructions in the SVN cheat sheet]
 
 = Observe the latest commits through the web interface =
 
-[https://code.google.com/p/uarch-sim/source/list This page] contains all changes in SVN repository. Your commit should be the latest or almost latest (on the top of the list). You can see your changes through web interface and make comments.
+[https://code.google.com/p/mipt-mips/source/list This page] contains all changes in SVN repository. Your commit should be the latest or almost latest (on the top of the list). You can see your changes through web interface and make comments.
