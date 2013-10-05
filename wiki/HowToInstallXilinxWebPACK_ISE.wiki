@@ -6,7 +6,7 @@ In our labs we will use official integrated environment for FPGA development Xil
 
 
 = Steps =
-  # Download tar archive from the server... (TBD, need to place on the lab server) and extract it on your local disk.
+  # Download tar archive from the server... (//helena.ilab.mipt.ru/incoming/! For/Xilinx webpack/) and extract it on your local disk.
   # Run xsetup.exe application.
   # Follow the instruction given by installer. Accept license agreements. https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/accepting-license-agreement.png
   # On step 'Select Products to Install' select 'ISE WebPACK'. https://mipt-mips.googlecode.com/svn/wiki/images/xilinx-ise-install/tool-selection.png
