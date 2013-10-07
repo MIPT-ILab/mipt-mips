@@ -17,13 +17,28 @@
     <td>1</td>
     <td>28 Sep</td>
     <td><font size="3">*L1: Project Introduction*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/arch/Lecture_1__28_Sep__Project_Introduction__Rus_text__Rus_audio.pptx PPTX] (Rus text, Rus audio, 18 MB)</dd><dd>[https://mipt-mips.googlecode.com/svn/lectures/arch/Lecture_1__28_Sep__Project_Introduction__Rus_text__No_audio.pptx PPTX] (the same as previous one, but w/o audio, 0.3 MB)</dd></td>
-    <td>Read about [http://en.wikipedia.org/wiki/Revision_control Revision control], [http://en.wikipedia.org/wiki/Apache_Subversion SVN], [http://en.wikipedia.org/wiki/Makefile Makefile] and [http://svnhowto.com/ svn-how-to] (but this one only if you are a geek). <font color="gray">_Note_, that you are free to use any other source of information, not only wikipedia.</font></td>
+    <td></td>
   </tr>
 </table>
 
 == Lectures on FPGA ==
 
-No lectures or seminars have been carried out yet!
+<table border="1" width="100%" cellspacing="0" cellpadding="8">
+  <tr>
+    <th width="3%"><font size="3">#</font></th>
+    <th width="5%"><font size="3">Date</font></th>
+    <th width="57%"><font size="3">Lecture</font></th>
+    <th width="35%"><font size="3">Homework</font></th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>5 Oct</td>
+    <td><font size="3">*L1: Basics of Teamwork*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/fpga/Lecture_1__05_Oct__Basics_of_Teamwork_Eng_text__No_audio.pptx PPTX] (Eng text, no audio, 0.3 MB)</dd></td>
+    <td>Read about [http://en.wikipedia.org/wiki/Revision_control Revision control], [http://en.wikipedia.org/wiki/Apache_Subversion SVN] and [http://svnhowto.com/ svn-how-to] (but this one only if you are a geek). <font color="gray">_Note_, that you are free to use any other source of information, not only wikipedia.</font></td>
+  </tr>
+</table>
+
+
 <wiki:comment>
 <table border="1" width="100%" cellspacing="0" cellpadding="8">
   <tr>
