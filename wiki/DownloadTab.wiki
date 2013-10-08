@@ -31,7 +31,7 @@
   <tr>
     <td align="center">3</td>
     <td align="center">ww42</td>
-    <td><font size="3">*Lec1: Layers of Computer Science, ISA and uArch*</font><dd>The presentation will be downloaded after the lecture.</dd></td>
+    <td><font size="3">*Lec2: Layers of Computer Science, ISA and uArch*</font><dd>The presentation will be downloaded after the lecture.</dd></td>
     <td></td>
     <td></td>
   </tr>
