@@ -1,0 +1,21 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Add your content here.
+
+ # From the Project Navigator, select File -> New Project. The New Project dialog box will appear.
+ # In the Project Name box, type in a name for your project.
+ # Select a directory for the project files by specifying the project location. You may type in the path, or you may click the browse button to find a directory to place the files.
+ # Click the Device Family value and the installed Xilinx families appear. 
+ # Select a family from the list, and then click in the Device value box on the second row to select specific devices. Repeat for packages and speed selection.
+ # Select the Design Flow value box and select the language and compiler you want to use for design synthesis. 
+ # Once your project is set up you can select the Project Navigator Project menu item and either create a new source or add an existing source. 
+Additional information on these processes may be found under the Help menu >> ISE Help Contents selection.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
