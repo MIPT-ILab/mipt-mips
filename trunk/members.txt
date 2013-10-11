@@ -1,4 +1,4 @@
-1. Anton Mitrokhin
+1. temporarily removed
 2. Pavel Kryukov
 3. Aleksei Gusarov
 4. Petr Kurapov
