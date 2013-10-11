@@ -1,7 +1,7 @@
 1. Anton Mitrokhin
 2. Pavel Kryukov
 3. Aleksei Gusarov
-4. Kurapov Petr
+4. Petr Kurapov
 5. Fofanov Vladislav
 6. Alehin Andrey
 7. Konychev Valery
