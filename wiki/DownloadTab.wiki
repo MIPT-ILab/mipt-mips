@@ -31,7 +31,7 @@
   <tr>
     <td align="center">3</td>
     <td align="center">ww42</td>
-    <td><font size="3">*Lec2: Layers of Computer Science, ISA and uArch*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/arch/Lecture_1__12_Oct__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__No_audio.pptx PPTX] (Eng text, no audio, 0.6 MB)</dd><dd>The presentation with audio will be uploaded after the lecture.</dd></td>
+    <td><font size="3">*Lec2: Layers of Computer Science, ISA and uArch*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/arch/Lecture_2__12_Oct__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 26.9 MB)</dd><dd>[https://mipt-mips.googlecode.com/svn/lectures/arch/Lecture_2__12_Oct__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__No_audio.pptx PPTX] (Eng text, no audio, 0.6 MB)</dd></td>
     <td></td>
     <td></td>
   </tr>
