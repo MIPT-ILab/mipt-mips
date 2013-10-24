@@ -50,7 +50,7 @@
 
 === Programming ===
 
- * *[http://lib.mipt.ru/book/27518/ C++ manual, Herbert Schildt, 3rd edition]* - this is the main book for studing `C++` in this project. The complexity growths from the zero level, thus, even if you don't know `C` you can learn `C++` using this book.
+ * *[http://lib.mipt.ru/book/27518/ C++ manual, Herbert Schildt, 3rd edition] (Rus)* - this is the main book for studing `C++` in this project. The complexity growths from the zero level, thus, even if you don't know `C` you can learn `C++` using this book.
 
 <br />
 ----
