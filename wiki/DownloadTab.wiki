@@ -39,68 +39,19 @@
   </tr>
 </table>
 
-<wiki:comment>
-<table border="1" width="100%" cellspacing="0" cellpadding="8">
-  <tr>
-    <th width="3%"><font size="3">#</font></th>
-    <th width="5%"><font size="3">Date</font></th>
-    <th width="57%"><font size="3">Lecture</font></th>
-    <th width="35%"><font size="3">Homework</font></th>
-  </tr>
-  <tr>
-    <td>1</td>
-    <td>06 Oct</td>
-    <td><font size="3">*L1: Project Introduction*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Lecture_1__6_Oct__Project_Introduction__Rus.pptx PPTX] (Rus text, no audio), [http://uarch-sim.googlecode.com/svn/lectures/Lecture_1__6_Oct__Project_Introduction__Rus.wrf WRF] (Rus, 11 MB)</dd></td>
-    <td>Read about [http://en.wikipedia.org/wiki/Revision_control Revision control], [http://en.wikipedia.org/wiki/Apache_Subversion SVN], [http://en.wikipedia.org/wiki/Makefile Makefile]. <font color="gray">_Note_, that you are free to use any other source of information, not only wikipedia.</font></td>
-  </tr>
-  <tr>
-    <td>2</td>
-    <td>13 Oct</td>
-    <td><font size="3">*L2: Basics of Team Work (mail, svn, make)*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Lecture_2_Basics_of_team_work.pptx PPTX] (Eng text, Rus audio, 9.5 MB)</dd><br />Background papers:<ul><li>_Svn-book_ (<a href="http://svnbook.red-bean.com/ru/1.4/svn-book.html">Rus</a> | <a href="http://svnbook.red-bean.com/en/1.4/svn-book.html">Eng</a>) is a very detailed document about subversion. For you it is more than enough to read the chapters 1, 2 and review the begging of chapter 4 (to be familiar with "branches"). Also note that Chapter 9 contains descriptions of all the svn commands.</li><li>_GNU Make Manual_ (<a href="http://www.linuxlib.ru/prog/make_379_manual.html">Rus</a>) is a good reference book about the make utility. You are advised to read chapters 1, 2, 4 and the begging of the 3rd chapter.</li></ul>
-</td>
-    <td>Make your first SVN commit with help of [HowToMakeYourFirstSVNCommit this manual]. You may also need [SVNCheatSheet SVN Cheat Sheet].</td>
-  </tr>
-  <tr>
-    <td>3</td>
-    <td>20 Oct</td>
-    <td><font size="3">*L3: Instruction Set Architecture*</font><dd>[https://uarch-sim.googlecode.com/svn/lectures/Lecture_3__20_Oct__Instruction_Set_Architecture__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 40.5 MB)</dd><dd>[https://uarch-sim.googlecode.com/svn/lectures/Lecture_3__20_Oct__Instruction_Set_Architecture__Eng_text__No_audio.pptx PPTX] (the same as previous one, but w/o audio, 0.6 MB)</dd></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>4</td>
-    <td>27 Oct</td>
-    <td><font size="3">*L4: Combinational Circuits*</font><br/><dd>Schemes:<ul><li>[https://uarch-sim.googlecode.com/svn/wiki/images/1bit_multiplexer_4_in_1.png Multiplexer]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/simple_alu_scheme.png Simple ALU]</li></ul></dd></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>5</td>
-    <td>10 Nov</td>
-    <td><font size="3">*L5: Integrated circuit design*</font><dd>The materials are not ready.</dd></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>6</td>
-    <td>1 Dec</td>
-    <td><font size="3">*L6: Sequential circuits*</font><br /><dd>Schemes:<ul><li>[https://uarch-sim.googlecode.com/svn/wiki/images/SR_and_Data_flip-flops.png SR and D flip-flops]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/4_elements_X_1_bit_memory_array.png 4 elements X 1 bit Memory Array]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/4_elements_X_2_bit_memory_array.png 4 elements X 2 bit Memory Array]</li><li>[https://uarch-sim.googlecode.com/svn/wiki/images/ALU_with_RF.png MIPS ALU with Register File]</li></ul></dd></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>7</td>
-    <td>15 Dec</td>
-    <td><font size="3">*L7: Single-cycle implementation*</font><dd>There is a really well-done external presentation: [http://www.cs.washington.edu/education/courses/cse378/10sp/lectures/lec08-singlecyc.pdf Lecture 8, CSE378, University of Washington].</dd></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>10</td>
-    <td>02 Mar</td>
-    <td><font size="3">*L10: Caches*</font><dd>[http://uarch-sim.googlecode.com/svn/lectures/Caches.pptx PPTX] (Eng text, no audio)</dd></td>
-    <td>Refresh basic caches formulas:
-  * how to calculate bit masks for tag, index or offset parts of address
-  * how to measure Average Memory Access Time
-  * what basic cache parameters are and how they affect performance</td>
-  </tr>
-</table>
-</wiki:comment>
+<br />
+----
+
+== Useful books and materials ==
+
+=== Microprocessor Arch/uArch ===
+
+ * *[http://lib.mipt.ru/book/267604/ Computer Organization and Design: The Hardware/Software Interface, Patterson D.A., Hennessy J.L., 3rd Edition] (Eng)* - the main book for this course. It contains all that you need to know about the computer architecture and MIPS ISA.
+
+=== Programming ===
+
+ * *[http://lib.mipt.ru/book/27518/ C++ manual, Herbert Schildt, 3rd edition]* - this is the main book for studing `C++` in this project. The complexity growths from the zero level, thus, even if you don't know `C` you can learn `C++` using this book.
+
 <br />
 ----
 
