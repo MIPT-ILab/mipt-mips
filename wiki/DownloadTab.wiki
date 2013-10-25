@@ -39,7 +39,7 @@
   </tr>
   <tr>
     <td align="center">5</td>
-    <td align="center">25 Oct</td>
+    <td align="center">26 Oct</td>
     <td><font size="3">*L5: Transistors and Integrated Circuits*</font><dd>The foils will be added after the lecture.</dd></td>
     <td></td>
   </tr>
