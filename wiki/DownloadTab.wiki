@@ -40,7 +40,7 @@
   <tr>
     <td align="center">5</td>
     <td align="center">26 Oct</td>
-    <td><font size="3">*L5: Transistors and Integrated Circuits*</font><dd>The foils will be added after the lecture.</dd></td>
+    <td><font size="3">*L5: Transistors and Integrated Circuits*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_5__26_Oct__Transistors_and_Integrated_Circuits__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 20.4 MB)</dd><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_5__26_Oct__Transistors_and_Integrated_Circuits__Eng_text__No_audio.pptx PPTX] (the same as previous one, but w/o audio, 0.3 MB)</dd></td>
     <td></td>
   </tr>
 </table>
