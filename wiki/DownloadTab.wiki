@@ -34,7 +34,9 @@
   <tr>
     <td align="center">4</td>
     <td align="center">19 Oct</td>
-    <td><font size="3">*L4: Combinational Circuits*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_4__19_Oct__Combinational_Circuits__Eng_text__No_audio.pptx PPTX] (Eng text, No audio, 0.5 MB)</dd></td>
+    <td><font size="3">*L4: Combinational Circuits*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_4__19_Oct__Combinational_Circuits__Eng_text__No_audio.pptx PPTX] (Eng text, No audio, 0.5 MB)</dd>
+<dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_4__19_Oct__Combinational_Circuits__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 8.5 MB)</dd>
+</td>
     <td></td>
   </tr>
   <tr>
