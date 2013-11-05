@@ -2,10 +2,12 @@
 
 
 = Commit prefixes =
-To easily distinguish between different parts of our SVN it is required that any commit message is preceded with special tag added by commit author:
+To easily distinguish between different parts of our SVN it is required that any commit message is preceded with special tag added by the commit author:
 
-`[wiki]` - if change of a wiki page is made.
+`[wiki]` - if a change of a wiki page is made.
 
 `[branch]` - if a private branch is modified.
 
-`[trunk]` - if changes go to main trunk.
+`[trunk]` - if changes go to the main trunk.
+
+`[lecture]` - if materials from lectures are added.
