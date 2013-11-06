@@ -59,11 +59,11 @@ svn copy <URL_of_one_more_folder_to_copy> <URL_of_target_folder> \
 === On Windows using TortoiseSVN ===
 || <font color="red"><b>Note!</b></font> Even if you work on Windows read the previous section. ||
 
-Right click on the folder you want to copy, then select {{{TortoiseSVN -> Branch/tag}}}. In the appeared window enter `http:///mipt-mips.googlecode.com/svn/branches/2013/<name_of_your_branch_folder>` into "`to URL`" field, select "`HEAD Revision in the repository`", enter a proper comment into "`Log message`" field and press "`OK`".
+Right click on the folder you want to copy, then select {{{TortoiseSVN -> Branch/tag}}}. In the appeared window enter `http://mipt-mips.googlecode.com/svn/branches/2013/<name_of_your_branch_folder>` into "`to URL`" field, select "`HEAD Revision in the repository`", enter a proper comment into "`Log message`" field and press "`OK`".
 
 For example, if I want to create a branch folder with the name `atitov_ports` and to copy `source` folder there, the window will be look like:
 
-https:///mipt-mips.googlecode.com/svn/wiki/images/creating_branch_in_tortoise_svn.png
+https://mipt-mips.googlecode.com/svn/wiki/images/creating_branch_in_tortoise_svn.png
 
 == Working with branches: checkout, commit, update ==
 
