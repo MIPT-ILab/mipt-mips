@@ -58,8 +58,9 @@
      <font size="3">*Practitum: Make Utility and Separate Build*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_6__2_Nov__Make_Utility_and_Separate_Build__Eng_text__No_audio.pptx PPTX] (Eng text, No audio, 0.3 MB)</dd>
     </td>
     <td>
+ * Understand how critical paths for combinational logic are calculated. Be ready to do this task on test (16 Nov).<br />
  * Create makefile for your educational project from 1st or 2nd year of MIPT. It should build project, have correct rebuild if any file is changed and perform accurate clean.
- * Understand how critical paths for combinational logic are calculated. Be ready to do this task on test (16 Nov).
+ * _GNU Make Manual_ (<a href="http://www.linuxlib.ru/prog/make_379_manual.html">Rus</a>) is a good reference book about the make utility. You are advised to read chapters 1, 2, 4 and the begging of the 3rd chapter.
     </td>
 </tr>
 </table>
