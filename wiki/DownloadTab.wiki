@@ -49,6 +49,19 @@
  * [http://www.youtube.com/watch?v=aCOyq4YzBtY Sand to Silicon - the Making of a Chip] shows the whole process shortly, but, unfortunatelly, without any discription
 </td>
   </tr>
+  <tr>
+    <td align="center">6</td>
+    <td align="center">2 Nov</td>
+    <td><font size="3">*L6: Basics of Sequential Logic and Critical Paths*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_6__2_Nov__Basics_of_Sequential_Logic_and_Critical_Paths__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 8.8 MB)</dd>
+<dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_6__2_Nov__Basics_of_Sequential_Logic_and_Critical_Paths__Eng_text__No_audio.pptx PPTX] (the same as previous one, but w/o audio, 0.4 MB)</dd>
+<dd></dd>
+     <font size="3">*Practitum: Make Utility and Separate Build*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_6__2_Nov__Make_Utility_and_Separate_Build__Eng_text__No_audio.pptx PPTX] (Eng text, No audio, 0.3 MB)</dd>
+    </td>
+    <td>
+ * Create makefile for your educational project from 1st or 2nd year of MIPT. It should build project, have correct rebuild if any file is changed and perform accurate clean.
+ * Understand how critical paths for combinational logic are calculated. Be ready to do this task on test (16 Nov).
+    </td>
+</tr>
 </table>
 
 <br />
