@@ -57,70 +57,132 @@ To checkout our repository using Tortoise SVN perform the following steps:
  * Enter the path to the place where the working copy will be created and the name for it (in our case it is `mipt-mips`, but you can choose any other name) -- *point 3*.
  * On the picture we download _HEAD_ revision, but you can also select any revision number.<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/checkout.png" width="650">
 
+<br />
 == Update (up) ==
 
 === Linux ===
 
-Update is operation of downloading _changes_ of the repository to _previouisly checkouted_ local copy.
+Update is operation of downloading _changes_ of the repository to _previouisly checkouted_ working copy.
+{{{
+svn up [-r <revision number>]
+}}}
+If there is no -r flag, the working copy will be updated to the current HEAD revision. The number of the last downloaded revision is stored in local copy, and only *update* operation can change it. You can always look it using 'info' operation:
+{{{
+svn info
+}}}
 
-`svn up [-r <revision number>]`
+=== Tortoise SVN ===
 
-If there is no -r flag, local copy will be updated to current HEAD revision. Number of last downloaded revision is stored in local copy, and only *update* operation can change it. You can always look it using 'info' operation:
+||<font color="red">*Note:*</font> even if you work with Tortois SVN read the _Linux_ chapter first.||
 
-`svn info`
+ * Right click on folder with the working copy (or any other folders or files that you want to update) -- *point 1*.
+ * Select _SVN Update_ -- *point 2*.<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/update.png" width="750">
+ * By default, local copy will be updated to the HEAD revision. If you want to update to other revision, select _Update to revision..._ in the _TortoiseSVN_ submenu.
 
-||In Tortoise SVN, make right click on folder with local copy and select _SVN Update_.<br />By default, local copy will be updated to HEAD revision. If you want to update to other revision, select _Update to revision..._ in _TortoiseSVN_ submenu<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/update.png" width="750">||
-
+<br />
 == Diff ==
 
-Diff operation shows changes with last downoladed revision
+Diff operation shows changes that you have done comparing to the revision of your working copy.
 
-`svn diff`
+=== Linux ===
 
+Enter the following command line in the target repository:
+{{{
+svn diff
+}}}
+or
+{{{
+svn diff <your file or folder>
+}}}
+<br />
 It is useful to redirect output somewhere else:
+{{{
+svn diff > my_changes.patch
+}}}
+or if you use [http://en.wikipedia.org/wiki/Vim_(text_editor) vim] editor:
+{{{
+svn diff | vim -
+}}}
 
-`svn diff > my_changes.patch`
-`svn diff | vim -`
+=== Tortoise SVN ===
 
-=== Patch command ===
+Right click on files and folders that you want to compare then in select _TortoiseSVN_ -> _Diff_.
 
-svn diff allows you to make a solid file with only your changes (called *patch*). It is useful to send patches to your colleagues for review, as hotfix or for any other purpose. To apply a patch for your local copy, you may use 'patch' command with its tricky syntax:
+<br />
+== Patch command ==
 
-`patch -p0 < my_changes.patch`
+Svn diff allows you to make a solid file with only your changes (called *patch*). It is needed, because sometimes it can be useful not to commit your changes to the repository, but create a patch. For example, you can create a hotfix for the bug or want your colleague to review your changes before the commit.
 
-Note that patch command is independent from SVN.
+=== Linux ===
 
-||Patches can be generated and applied with _TortoiseSVN_ submenu commands _Create patch..._ and _Apply patch..._.<br />On picture below you can see example of patchfile opened in Tortoise Patch Viewer.<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/patch.png" width="750">||
+To apply a patch to your working copy (i.e. make the changes that are contained in the patch), you may use `patch` command:
+{{{
+patch -p0 -i <your patch>
+}}}
 
+Note that patch command is independent from SVN (i.e. it is not an operation of svn tool).
+
+=== Tortoise SVN ===
+
+Patches can be generated and applied with _TortoiseSVN_ submenu commands _Create patch..._ and _Apply patch..._.
+
+<br />
 == Commit ==
 
-Commit is operation of uploading changes of local copy to repository
+Commit is operation of uploading your changes of the working copy to the repository. Usually commit is accompanied with a message that briefly describes the changes. Using these messages makes easy to understand what exactly has been changed.
 
-`svn commit -m <message>`
-
-=== Commit messages ===
-
-Commit message is a brief description of changes. Using messages makes easy to understand, what commit _should have_ changed.
-
-http://code.google.com/p/mipt-mips/source/list
-
-In our project, there must be message in every commit and message should have one of following prefixes:
+In our project, there must be message in every commit and message should have one of the following prefixes:
 
 || `[trunk]`  || if you changed trunk ||
 || `[wiki]`   || if you changed wiki page ||
 || `[branch]` || if you changed branch ||
 || `[lectures]` || if you changed lectures (only for mentors!) ||
 
-||To run commit in TortoiseSVN, just make left click on you local copy and select _SVN Commit..._<br /> Subwindow on the bottom shows you files you're going to change in repository. Make double click on them to observe changes.<br />Top subwindow is for commit message, never forget about it!<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/commit.png" width="750">||
+For example, `[trunk] added my name to the list of the project members`.
 
+=== Linux ===
+
+Type the following command staying in the folder that contains your changes:
+{{{
+svn commit -m <your message>
+}}}
+
+=== Tortoise SVN ===
+
+To run commit in TortoiseSVN perform the following steps:
+
+ * Right click your entire working (or any other folder and files that you want to commit) -- *point 1*.
+ * Select _SVN Commit..._ -- *point 2*
+ * Check that you commit to the right URL (to the main trunk, your branch, etc.) -- *point 3*.
+ * Enter your commit message (don't forget about the prefix!) -- *point 4*<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/commit.png" width="750">
+
+<br />
 == Add and Delete ==
 
-Before commiting newly created files to repository, you should perform add operation:
+Before committing newly created files to the repository, you should perform `svn add` operation. Otherwise, the svn will not pay any attention to them.
 
-`svn add <file1> <file2> ...`
+Inverse operation is called `svn delete`. Note, the if you delete the files in your working copy, but don't perform `svn delete`, your files will still exist in the repository, as svn don't know that you have deleted them.
 
-Inverse operation is called svn delete
+=== Linux ===
 
-`svn delete <file1> <file2> ...`
+Use the following command to add files or folders:
+{{{
+svn add <file1> <file2> <folder1> ...
+}}}
+For example:
+{{{
+svn add my_new_folder
+}}}
 
-||See on picture below how to perform this operations in Tortoise:<br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/add.png" width="750"><br /><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/delete.png" width="750">||
+Use the following command to delete files or folders:
+{{{
+svn delete <file1> <file2> <folder1>...
+}}}
+
+=== Tortoise SVN ===
+
+See on pictures below how to perform this operations in Tortoise SVN.
+
+To add files or folders:<br><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/add.png" width="650">
+
+To delete files or folders:<br><img src="http://mipt-mips.googlecode.com/svn/wiki/images/tortoise-svn/delete.png" width="750">
