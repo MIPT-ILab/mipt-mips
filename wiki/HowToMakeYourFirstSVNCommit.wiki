@@ -40,9 +40,8 @@ See the chapter about svn installation in [SVNCheatSheet#How_to_install the SVN 
   # If the commit passes, the changes will be uploaded to the server and become available for other users.
 
 <br>
-----
-
 = Instructions for Linux (console) =
+----
 
 == Step 1: checkout ==
 
