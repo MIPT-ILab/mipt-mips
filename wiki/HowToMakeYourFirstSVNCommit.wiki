@@ -4,62 +4,72 @@
 
 This is a step-by-step instruction describing how to make your first commit into our SVN repository.
 
-|| <font color="red">*Note*:</font> Before executing this instruction, please study the short manual about svn commands which is located on [http://code.google.com/p/mipt-mips/wiki/SVNCheatSheet this page]. ||
+|| <font color="red">*Note*:</font> Before executing this instruction, please study the short manual about svn commands that is located on [http://code.google.com/p/mipt-mips/wiki/SVNCheatSheet this page]. ||
 
 If you cannot pass some step or think that the description has an error, please, read the instruction once again and make sure that you have done all correctly. If the problem still exists send a mail to [mailto:kryukov@frtk.ru the project owners].
 
-<br><wiki:comment>in order to make an empty line</wiki:comment>
-----
-
+<br>
 = Instructions for Windows (Tortoise SVN) =
+----
 
 == Step 1: install SVN software ==
 
-See [SVNCheatSheet#How_to_install instructions in the SVN cheat sheet]
+See the chapter about svn installation in [SVNCheatSheet#How_to_install the SVN cheat sheet].
 
 == Step 2: checkout ==
 
-  # Decide what folder will be a destination of checkout
-  # Open the folder in Explorer, make a right click at blank space, press "SVN checkout"
-  # Put this address *https://mipt-mips.googlecode.com/svn/trunk/ * in field "URL of repository" field ||<font color="red">*Note:*</font> Use only *https* prefix, not "http"! Otherwise you won't be able to make commits!||
+  # Decide what folder will be a destination of the checkout (i.e. where the working copy will be located).
+  # Open the folder in the MSExplorer, make a right click at blank space, press _SVN checkout_
+  # Put this address `https://mipt-mips.googlecode.com/svn/trunk/` in field _URL of repository_<br />||<font color="red">*Note:*</font> Use only *https* prefix, not http! Otherwise you won't be able to make commits!||
   # Press OK
 
 == Step 3: modify ==
 
-  # Open `members.txt`, which is located in `trunk` folder, in any text editor.
+  # Open `members.txt`, which is located in your working copy, in any text editor.
   # Add your name and number on a new line in the end of the file.
-  # Save the file. Notice that the small icon is changed: now it is red. It shows that the file is modified
+  # Save the file. Notice that the small icon at the file is changed: now it is red. It shows that the file is modified
 
 == Step 4: commit ==
 
-  # Right click on blank space in the `trunk` directory.
-  # Type a message in order to describe what you have changed. For our example, it should be:<br>"`[trunk] Added <your name> to list of members`". || <font color="red">*Note*:</font> do not forget to add `[trunk]` prefix and to replace `<your name>` by your name||
-  # "Changes made" area shows your files that you're going to commit. *Please* check that there's nothing unnecessary.
+  # Right click on blank space in the working copy folder.
+  # Press _SVN commit..._
+  # In the window that appeared type a message describing what you have changed. For our example, it should be:<br />`[trunk] Added <your name> to the list of members`.<br />|| <font color="red">*Note*:</font> do not forget to add `[trunk]` prefix and to replace `<your name>` by your name||
+  # _Changes made_ area shows changed files that you're going to commit. *Please* check that there's nothing unnecessary.
   # Double click on a file name in this list will show you a diff for this file. *Please* check your changes.
-  # TortoiseSVN will ask you for a password. You can find it in your Google profile [https://code.google.com/hosting/settings on this page]. ||<font color="red">*Note:*</font> this password *is not* your Google account password! It is used only to access to the svn repository.||
-  # If the commit passes, the changes will be downloaded to the server and become available for other users. You can observe the latests changes trough the web interface. [#Observe_the_latest_commits_through_the_web_interface See below] how to do it.
+  # TortoiseSVN will ask you for a password. You can find it in your Google profile [https://code.google.com/hosting/settings on this page].<br />||<font color="red">*Note:*</font> this password *is not* the same as your Google account password! It is used only to access to the svn repository.||
+  # If the commit passes, the changes will be uploaded to the server and become available for other users.
 
-<br><wiki:comment>in order to make an empty line</wiki:comment>
+<br>
 ----
 
 = Instructions for Linux (console) =
 
 == Step 1: checkout ==
 
-  # Decide what directory will be a destination for checkout, make 'cd' to it
-  # Run there the following command to perform checkout: <br/>`svn checkout https://mipt-mips.googlecode.com/svn/trunk/ . --username <your name>`
+  # Decide what directory will be a destination for checkout, make `cd` to it
+  # Run there the following command to perform checkout (where `<user name>` is your email address):
+{{{
+svn checkout https://mipt-mips.googlecode.com/svn/trunk/ . --username <your name>
+}}}
 
 == Step 2: modify ==
-  #  Open `members.txt`, which is located in `trunk` folder, in any text editor. For example, in [http://en.wikipedia.org/wiki/Vim_%28text_editor%29 vim]: `vim members.txt`
+  #  Open `members.txt`, which is located in your working copy, in any text editor. For example, in [http://en.wikipedia.org/wiki/Vim_(text_editor) vim]:
+{{{
+vim members.txt
+}}}
 
 == Step 3: commit ==
-  # Check your changes unsing `svn diff` command: `svn diff | vim -`
-  # Run the commit:<br/>`svn commit -m <your text message> --username <your google account name>`<br/>Where `<your text message>` should be "`[trunk] Added <your name> to list of members`" ||<font color="red">*Note*:</font> do not forget to add `[trunk]` prefix and to replace `<your name>` by your name||
-  # You may be asked for a password. You can find it in your Google profile [https://code.google.com/hosting/settings on this page]. ||<font color="red">*Note:*</font> this password *is not* your Google account password! It is used only to access to the svn repository.||
+  # Check your changes unsing `svn diff` command:
+{{{
+svn diff
+}}}
+  # Run the commit:<br><code>svn commit -m <your text message> --username <your google account name></code>Where `<your text message>` should be `[trunk] Added <your name> to the list of members`<br />||<font color="red">*Note*:</font> do not forget to add `[trunk]` prefix and to replace `<your name>` by your name||
+  # You may be asked for a password. You can find it in your Google profile [https://code.google.com/hosting/settings on this page].<br />||<font color="red">*Note:*</font> this password *is not* the same as your Google account password! It is used only to access to the svn repository.||
 
-<br><wiki:comment>in order to make an empty line</wiki:comment>
+<br><wiki:comment>
 ----
 
 = Observe the latest commits through the web interface =
 
 [https://code.google.com/p/mipt-mips/source/list This page] contains all changes in SVN repository. Your commit should be the latest or almost latest (on the top of the list). You can see your changes through web interface and make comments.
+</wiki:comment>
