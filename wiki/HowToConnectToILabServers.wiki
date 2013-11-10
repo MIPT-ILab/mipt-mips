@@ -2,7 +2,7 @@
 
 = Introduction =
 
-[http://ilab.mipt.ru/ ILab] provides to the uArchSim project two servers, Helena and Julia. You can use them for code editing, compiling, testing, running. In fact, it is allowed to develop code on any other platform (for example, on Windows using MS Visual Studio), but you have to check that it is compiled and works correctly on iLab servers.
+[http://ilab.mipt.ru/ ILab] provides to the MIPT-MIPS project two servers, Helena and Julia. You can use them for code editing, compiling, testing, running. In fact, it is allowed to develop code on any other platform (for example, on Windows using MS Visual Studio), but you have to check that it is compiled and works correctly on iLab servers.
 
 The most important feature of this servers is GNU Assembler and Linker for MIPS instruction set that are installed there. They will be strongly needed for many further tasks.
 
