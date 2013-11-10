@@ -48,8 +48,8 @@
  * [http://www.youtube.com/watch?v=qm67wbB5GmI How a CPU is made] is shorter, but also contains good material
  * [http://www.youtube.com/watch?v=aCOyq4YzBtY Sand to Silicon - the Making of a Chip] shows the whole process shortly, but, unfortunatelly, without any discription
 </td>
-  </tr>
-  <tr>
+</tr>
+<tr>
     <td align="center">6</td>
     <td align="center">2 Nov</td>
     <td><font size="3">*L6: Basics of Sequential Logic and Critical Paths*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_6__2_Nov__Basics_of_Sequential_Logic_and_Critical_Paths__Eng_text__Rus_audio.pptx PPTX] (Eng text, Rus audio, 8.8 MB)</dd>
@@ -61,6 +61,26 @@
  * Understand how critical paths for combinational logic are calculated. Be ready to do this task on test (16 Nov).<br />
  * Create makefile for your educational project from 1st or 2nd year of MIPT. It should build project, have correct rebuild if any file is changed and perform accurate clean.
  * _GNU Make Manual_ (<a href="http://www.linuxlib.ru/prog/make_379_manual.html">Rus</a>) is a good reference book about the make utility. You are advised to read chapters 1, 2, 4 and the begging of the 3rd chapter.
+    </td>
+</tr>
+<tr>
+    <td align="center">7</td>
+    <td align="center">9 Nov</td>
+    <td><font size="3">*L7: Sequential Circuits (Static Memory Arrays, MIPS ALU with Register File)*</font><dd>[https://mipt-mips.googlecode.com/svn/lectures/Lecture_7__9_Nov__Sequential_Logic__Eng_text__No_audio.pptx PPTX] (Eng text, No audio, 0.5 MB)</dd>
+    </td>
+    <td>*Prepare to the upcoming test.*<br />It will include questions based on the material of the 1-6th lectures (but without sequential circuits). There will be also questions on C++. They will be based on the chapter 1 and 2 of [http://lib.mipt.ru/book/27518/ the C++ Manual by Schildt]. The approximate distribution of questions:
+ * 40% - C++
+ * 10% - svn, make, etc.
+ * 30% - combinational circuits
+ * 20% - transistors, CMOS circuits
+    </td>
+</tr>
+<tr>
+    <td align="center">-</td>
+    <td align="center">16 Nov</td>
+    <td><font size="3" color="red">*Test*</font>
+    </td>
+    <td>
     </td>
 </tr>
 </table>
