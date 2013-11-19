@@ -24,6 +24,8 @@ For this assignment you should create a separate svn branch as it is described i
 
 The `class ElfSection` implements functionality to parse a MIPS executable file, download and store content of all their sections. The class is defined in `trunk/func_sim/elf_parser/elf_parser.h`.
 
+|| <font color="red">*Note:*</font> the ELF parser has already implemented. You don't need to change anything in it. ||
+
 == Download contents of an ELF section ==
 
 Functionality for parsing ELF executable files of the MIPS architecture is already implemented. To create a vector of objects of `ElfSection` class that contain the data of all the section in the binary, you have to invoke the following static function:
@@ -77,24 +79,41 @@ Compare the output of this program with the data printed by the standard `mips-o
 
 = Functional Memory =
 ----
-The `FuncMemory` class implements a functional memory model. It provides interfaces to parse an ELF formatted executable file, download and store content of desired sections and read data from them. The class is defined in `trunk/func_sim/func_memory/func_memory.h`. 
+The functional memory is an abstraction that present how the memory is defined in the ISA. In the other word, it is how a programmer sees the memory. Note that functional memory does not reflect the organization of the memory in the real machine.
 
-|| <font color="red">*Note*</font> that all interfaces of the `FuncMemory` class are empty. You have to implement them. || 
+In short, the functional memory is a sequence of bytes. Each of them has unique address and can be read and written using it.
+
+The `FuncMemory` class implements a functional memory model. It provides interfaces to parse an ELF formatted executable file, download and store content of ELF sections, read and write data. The class is defined in `trunk/func_sim/func_memory/func_memory.h`. 
+
+|| <font color="red">*Note*</font> that all interfaces of the `FuncMemory` class are empty. You have to implement them. ||
+
+== Structure ==
+
+The typical address size for the MIPS architecture is equal to 32 bits, i.e. the memory size is 2^32 = 4 GB. It is clear that such amount of memory cannot be assign in the simulator. Moreover, an usual program uses significantly less memory.
+
+In order to not allocated the whole required bytes at once, but still be able to read or write by any address, the functional memory is organized as a hierarchy.
+|| <font color="red">*Note*</font> that is done only because of the limitation of our program model and does not reflect the real memory organization. ||
+
+There are three levels in our implementation of the functional memory:
+ * The lowest level is a page. It is a block of bytes that keeps the real data.
+ * The middle level is a set of pages. It is an array of pointers to all pages that includes in the set.
+ * The highest level is an array of sets.
 
 == Download contents of ELF sections ==
 
-An object of `FuncMemory` class just stored a set of objects of `ElfSection` class, i.e. the functional memory is a set of ELF sections. To create an object of `FuncMemory` class and download context of desired sections, you have to invoke its constructor:
+An object of `FuncMemory` class is initialized taking the information from the binary ELF file. To create an object of `FuncMemory` class and download context of ELF sections, you have to invoke its constructor:
  
 {{{
-    FuncMemory( const char* executable_file_name,
-                const char* const elf_sections_names[],
-                short num_of_elf_sections);
+FuncMemory ( const char* executable_file_name,
+             uint64 addr_size = 32,
+             uint64 page_num_size = 10,
+             uint64 offset_size = 12);
 }}}
 
 with the following parameters:
 
-  # *`elf_file_name`* -- name of a MIPS executable file (e.g. `test.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
-  # *`const elf_sections_names`* -- array of names of the section to download (e.g. `{".text", ".reginfo"}`).
+  # *`elf_file_name`* -- name of a MIPS executable file (e.g. `mips_bin_exmpl.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
+  # *`addr_size`* -- the size of the memory address (number of bits).
   # *`num_of_elf_sections`* -- number of sections to download.
 
 You can see how it is done in `trunk/func_sim/func_memory/main.cpp`. This module implements `func_memory` program which download `.text` and `.reginfo` section from an executable file given as a parameter (e.g. `./elf_parser test.out`) and print the contents of the functional memory. To build `func_memory` just type `make` in `trunk/func_sim/func_memory/`.
