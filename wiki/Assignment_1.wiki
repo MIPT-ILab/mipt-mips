@@ -1,10 +1,9 @@
 #summary Assignment 1: initial interfaces of the functional memory
 
 = Introduction =
+----
 
-In this assignment you will implement the initial set of interfaces of a functional memory and an ELF parser.
-
-The initial set includes only those interfaces that allow reading data from ELF sections of a MIPS executable file. The write interfaces will be implemented in future assignments.
+In this assignment you will implement the main interfaces of the functional memory. They include initialization from a MIPS executable file in the ELF format, reading/writing data and others. 
 
 For this assignment you should create a separate svn branch as it is described in [WorkingWithSvnBranches this wiki page] and work only there.
 
@@ -13,35 +12,94 @@ For this assignment you should create a separate svn branch as it is described i
 <font color="red">*Please don't forget that:*</font>
 
   * You should use `svn copy` instead of just `copy` and `svn add`.
-  * Your branch folder has to be called like `atitov_task_1`
+  * Your branch folder has to be called like `atitov_task_1` (see more info about naming [WorkingWithSvnBranches#Rules_and_policies here]).
   * You a free to commit into your branch as many times as you need, but you have to use `[branch]` prefix.
   * Use `assert` macro from `assert.h` to handle wrong parameters and to protect your code from hidden errors. For more information about `assert` usage visit [http://www.cplusplus.com/reference/clibrary/cassert/assert/ this page].
   * You have to follow [CodeGuidelines our code guidelines]. Don't violate them!
-    * Set tabs as 4 spaces in your text editor.
-<br/>
-----
+  * Set tabs as 4 spaces in your text editor (see [CodeGuidelines#Indentation the instruction]).
+<br>
 
 = ELF Parser =
+----
 
-The `class ElfSection` implements functionality to parse a MIPS executable file, download and store content of a desired section and read data from it. The class is defined in `trunk/func_sim/elf_parser/elf_parser.h`.
+The `class ElfSection` implements functionality to parse a MIPS executable file, download and store content of all their sections. The class is defined in `trunk/func_sim/elf_parser/elf_parser.h`.
 
 == Download contents of an ELF section ==
 
-Functionality for parsing ELF executable files of MIPS architecture is already implemented. To create an object of `ElfSection` class and download context of a desired section, you have to invoke its constructor:
+Functionality for parsing ELF executable files of the MIPS architecture is already implemented. To create a vector of objects of `ElfSection` class that contain the data of all the section in the binary, you have to invoke the following static function:
 
 {{{
-ElfSection( const char* elf_file_name, const char* section_name);
+static void getAllElfSections( const char* elf_file_name,
+                               vector<ElfSection>& sections_array /*used as output*/);
+}}}
+
+with the following parameters:
+
+  # *`elf_file_name`* -- name of a MIPS executable file (e.g. `mips_bin_exmpl.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
+  # *`sections_array`* -- [http://www.cplusplus.com/reference/vector/vector/ STL vector] that is used as output container (don't worry you will be able to complete this task even if you don't know STL).
+
+You can see how it works in `trunk/func_sim/elf_parser/main.cpp`. This file implements `elf_parser` program that downloads and prints all the sections from the executable file given as the only parameter (e.g. `./elf_parser mips_bin_exmpl.out`). The output will be something like the following:
+{{{
+Dump ELF section ".reginfo"
+  size = 24 Bytes
+  start_addr = 0x400094
+  Content:
+    0x400094:    000c0000
+  ....
+    0x4000a8:    70814100
+
+Dump ELF section ".text"
+  size = 16 Bytes
+  start_addr = 0x4000b0
+  Content:
+    0x4000b0:    41000b3c
+    0x4000b4:    cc006b25
+    0x4000b8:    04006a8d
+  ....
+
+Dump ELF section ".data"
+  size = 192 Bytes
+  start_addr = 0x4100c0
+  Content:
+    0x4100c0:    00010203
+    0x4100c4:    04050607
+    0x4100c8:    08090000
+    0x4100cc:    07000000
+    0x4100d0:    0b000000
+    0x4100d4:    0d000000
+  ....
+}}}
+
+To build `elf_parser` just type `make` in `trunk/func_sim/elf_parser/`.
+
+Compare the output of this program with the data printed by the standard `mips-objdump` (`mips-objdump -D mips_bin_exmpl.out`). You can see that each byte has the same value, but bytes in a words are mirrored. It occurs, because `mips-objdump` prints each word as a value of 4 Bytes from left to right (the least significant byte on the left), but `elf_parser` prints each word per byte from right to the left.
+<br>
+
+= Functional Memory =
+----
+The `FuncMemory` class implements a functional memory model. It provides interfaces to parse an ELF formatted executable file, download and store content of desired sections and read data from them. The class is defined in `trunk/func_sim/func_memory/func_memory.h`. 
+
+|| <font color="red">*Note*</font> that all interfaces of the `FuncMemory` class are empty. You have to implement them. || 
+
+== Download contents of ELF sections ==
+
+An object of `FuncMemory` class just stored a set of objects of `ElfSection` class, i.e. the functional memory is a set of ELF sections. To create an object of `FuncMemory` class and download context of desired sections, you have to invoke its constructor:
+ 
+{{{
+    FuncMemory( const char* executable_file_name,
+                const char* const elf_sections_names[],
+                short num_of_elf_sections);
 }}}
 
 with the following parameters:
 
   # *`elf_file_name`* -- name of a MIPS executable file (e.g. `test.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
-  # *`section_name`* -- name of the section to download (e.g. `.text`). To see all the section into an executable file and their content you can use `mips-objdump -D <executable_file>`.
+  # *`const elf_sections_names`* -- array of names of the section to download (e.g. `{".text", ".reginfo"}`).
+  # *`num_of_elf_sections`* -- number of sections to download.
 
-You can see how it is done in `trunk/func_sim/elf_parser/main.cpp`. This module implements `elf_parser` program which download and print `.reginfo` section from an executable file given as a parameter (e.g. `./elf_parser test.out`). To build `elf_parser` just type `make` in ``trunk/func_sim/elf_parser/`.
+You can see how it is done in `trunk/func_sim/func_memory/main.cpp`. This module implements `func_memory` program which download `.text` and `.reginfo` section from an executable file given as a parameter (e.g. `./elf_parser test.out`) and print the contents of the functional memory. To build `func_memory` just type `make` in `trunk/func_sim/func_memory/`.
 
-Compare the result of this program with the data printed by `mips-objdump`. You can see that each byte has the same value, but bytes in a words are mirrored. It occurs, because `mips-objdump` prints each word as a value of 4 Bytes from left to right (the least significant byte on the left), but `elf_parser` prints each word per byte from right to the left.
-
+|| <font color="red">*Note*</font> that if in the constructor you allocate any memory using a C++ operator `new` then this memory has to be deallocated in the destructor ||
 
 == Read data of a section ==
 
@@ -91,34 +149,6 @@ The [http://code.google.com/p/googletest/ Google C++ Testing Framework] is used 
 || <font color="red">*Note*</font> that in the beginning the testing will not pass as the read interfaces are not implemented. However, when you complete them the testing<br>has to pass successfully. Otherwise, you did something wrong or your code has an error.|| 
 
 <br/>
-----
-
-= Functional Memory =
-
-The `FuncMemory` class implements a functional memory model. It provides interfaces to parse an ELF formatted executable file, download and store content of desired sections and read data from them. The class is defined in `trunk/func_sim/func_memory/func_memory.h`. 
-
-|| <font color="red">*Note*</font> that all interfaces of the `FuncMemory` class are empty. You have to implement them. || 
-
-== Download contents of ELF sections ==
-
-An object of `FuncMemory` class just stored a set of objects of `ElfSection` class, i.e. the functional memory is a set of ELF sections. To create an object of `FuncMemory` class and download context of desired sections, you have to invoke its constructor:
- 
-{{{
-    FuncMemory( const char* executable_file_name,
-                const char* const elf_sections_names[],
-                short num_of_elf_sections);
-}}}
-
-with the following parameters:
-
-  # *`elf_file_name`* -- name of a MIPS executable file (e.g. `test.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
-  # *`const elf_sections_names`* -- array of names of the section to download (e.g. `{".text", ".reginfo"}`).
-  # *`num_of_elf_sections`* -- number of sections to download.
-
-You can see how it is done in `trunk/func_sim/func_memory/main.cpp`. This module implements `func_memory` program which download `.text` and `.reginfo` section from an executable file given as a parameter (e.g. `./elf_parser test.out`) and print the contents of the functional memory. To build `func_memory` just type `make` in `trunk/func_sim/func_memory/`.
-
-|| <font color="red">*Note*</font> that if in the constructor you allocate any memory using a C++ operator `new` then this memory has to be deallocated in the destructor ||
-
 == Read data from the functional memory ==
 
 === `read` method ===
