@@ -210,6 +210,65 @@ Phrase `Unit testing for the moduler ELF parser passed SUCCESSFULLY!` in the end
 
 Note that in the beginning the unit tests for `FuncMemory` class will not pass as its interfaces are not implemented. You will see something like this:
 {{{
+alexandr.titov@helena:~/mipt-mips/func_sim/func_memory$ make test
+
+Running ./unit_test
+
+[==========] Running 5 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 1 test from Func_memory_init
+[ RUN      ] Func_memory_init.Process_Wrong_Args_Of_Constr
+unit_test.cpp:28: Failure
+Death test: FuncMemory func_mem( wrong_file_name)
+    Result: failed to die.
+ Error msg:
+[  DEATH   ]
+[  FAILED  ] Func_memory_init.Process_Wrong_Args_Of_Constr (6 ms)
+[----------] 1 test from Func_memory_init (6 ms total)
+
+[----------] 4 tests from Func_memory
+[ RUN      ] Func_memory.StartPC_Method_Test
+unit_test.cpp:35: Failure
+Value of: 0x4000b0
+  Actual: 4194480
+Expected: func_mem.startPC()
+Which is: 140736709710576
+[  FAILED  ] Func_memory.StartPC_Method_Test (1 ms)
+[ RUN      ] Func_memory.Read_Method_Test
+unit_test.cpp:47: Failure
+Value of: right_ret
+  Actual: 50462976
+Expected: func_mem.read( dataSectAddr)
+Which is: 0
+[  FAILED  ] Func_memory.Read_Method_Test (0 ms)
+[ RUN      ] Func_memory.Write_Read_Initialized_Mem_Test
+unit_test.cpp:81: Failure
+Value of: right_ret
+  Actual: 50462977
+Expected: func_mem.read( data_sect_addr)
+Which is: 0
+[  FAILED  ] Func_memory.Write_Read_Initialized_Mem_Test (1 ms)
+[ RUN      ] Func_memory.Write_Read_Not_Initialized_Mem_Test
+unit_test.cpp:107: Failure
+Value of: right_ret
+  Actual: 256
+Expected: func_mem.read( write_addr, sizeof( uint16))
+Which is: 0
+[  FAILED  ] Func_memory.Write_Read_Not_Initialized_Mem_Test (1 ms)
+[----------] 4 tests from Func_memory (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 2 test cases ran. (10 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 5 tests, listed below:
+[  FAILED  ] Func_memory_init.Process_Wrong_Args_Of_Constr
+[  FAILED  ] Func_memory.StartPC_Method_Test
+[  FAILED  ] Func_memory.Read_Method_Test
+[  FAILED  ] Func_memory.Write_Read_Initialized_Mem_Test
+[  FAILED  ] Func_memory.Write_Read_Not_Initialized_Mem_Test
+
+ 5 FAILED TESTS
+make: *** [test] Error 1
 }}}
 
 However, when you complete them the testing has to pass successfully and you will see something like:
