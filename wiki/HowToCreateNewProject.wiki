@@ -1,8 +1,0 @@
-How to create new project in Xilinx ISE.
-
-= Usefull links =
-
-You can find a good tutorial on <a href=http://www.fpga4fun.com/ISEQuickStart.html>external page</a>.
-But make sure you are providing the correct device type at the creating of a new project.
-
-Device that is used in our project is Nexys3 from Digilent and it uses FPGA from Spartan6 family, device code *XC6SLX16* in package *CSG324*. Specs for this device can be found on their <a href=http://www.digilentinc.com/Products/Detail.cfm?NavPath=2,400,897&Prod=NEXYS3&CFID=2717097&CFTOKEN=77927142> official site </a>

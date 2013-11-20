@@ -1,7 +1,0 @@
-#summary Code review process.
-
-= Introduction =
-
-[http://geekandpoke.typepad.com/.a/6a00d8341d3df553ef013488a2d48f970c-800wi?nonsense=something_that_ends_with.png]
-
-= Details =

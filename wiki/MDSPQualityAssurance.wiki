@@ -1,5 +1,0 @@
-#summary Describes the means of QA of MDSP code.
-
-= Introduction =
-
-This page contains details on process of assuring that our simulation model stays stable, buildable and fully-functional after every commit to the SVN main trunk.
