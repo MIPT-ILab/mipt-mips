@@ -87,7 +87,7 @@ The `FuncMemory` class implements a functional memory model. It provides interfa
 
 || <font color="red">*Note*</font> that all interfaces of the `FuncMemory` class are empty. You have to implement them. ||
 
-== Structure ==
+== Hierarchy of Functional Memory ==
 
 The typical address size for the MIPS architecture is equal to 32 bits, i.e. the memory size is 2^32 = 4 GB. It is clear that such amount of memory cannot be assign in the simulator. Moreover, an usual program uses significantly less memory.
 
@@ -98,6 +98,21 @@ There are three levels in our implementation of the functional memory:
  * The lowest level is a page. It is a block of bytes that keeps the real data.
  * The middle level is a set of pages. It is an array of pointers to all pages that includes in the set.
  * The highest level is an array of sets.
+
+The hierarchy is shown on the following picture:
+||<img src="http://mipt-mips.googlecode.com/svn/wiki/images/assigment 1/functional_memory_heirarchy.png" width="750">||
+
+`NULL` means that this `set` or `page` has not been written yet and the memory for it is not allocated in the simulator.
+
+The values of `set number`, `page number` and `offset` can be extracted directly from the memory address. The following picture shows the address separating:
+||<img src="https://mipt-mips.googlecode.com/svn/wiki/images/assigment 1/address_separating.png" width="500">||
+
+<br>
+== Simplified Hierarchy of Functional Memory ==
+
+If the three level hierarchy is too complex for you. It is possible to implement a simpler hierarchy described in this section. Note that in this case you will receive lower mark, but it is better than nothing.
+
+In the simplified version the functional memory is just an static array of bytes (i.e. no dynamic memory allocation). In this case the size of your memory will be small and can be able to process only a limited range of memory address. For our work, it will be enough to process only addresses from the following range: `[0x3FFFF0; 41FFF0]`. Therefore, the array will contain 0x20000 bytes. As it is not a very larger number, it can be allocated at once statically.
 
 == Download contents of ELF sections ==
 
