@@ -114,7 +114,11 @@ If the three level hierarchy is too complex for you. It is possible to implement
 
 In the simplified version the functional memory is just an static array of bytes (i.e. no dynamic memory allocation). In this case the size of your memory will be small and can be able to process only a limited range of memory address. For our work, it will be enough to process only addresses from the following range: `[0x3FFFF0; 41FFF0]`. Therefore, the array will contain 0x20000 bytes. As it is not a very larger number, it can be allocated at once statically.
 
+Note that if you decides to choose this option you should not care about address separation into `set`, `page` and `offset`.
+
+<br>
 == Download contents of ELF sections ==
+||<font color="red">*Note:*</font> the constructor of the `FuncMemeory` class is empty and to implement them is a part of the first assignment. Use `ElfParser` class to do that.||
 
 An object of `FuncMemory` class is initialized taking the information from the binary ELF file. To create an object of `FuncMemory` class and download context of ELF sections, you have to invoke its constructor:
  
@@ -129,68 +133,113 @@ with the following parameters:
 
   # *`elf_file_name`* -- name of a MIPS executable file (e.g. `mips_bin_exmpl.out`). You can find examples of such files in `trunk/tests/samples/` or even create your own files (for more information see `README.txt` in that folder).
   # *`addr_size`* -- the size of the memory address (number of bits).
-  # *`num_of_elf_sections`* -- number of sections to download.
+  # *`page_num_size`* -- the number of bits in the memory address that represent the page number inside the set.
+  # *`offset_size`* -- the number of bits in the memory address that represent the byte number inside the page.
 
-You can see how it is done in `trunk/func_sim/func_memory/main.cpp`. This module implements `func_memory` program which download `.text` and `.reginfo` section from an executable file given as a parameter (e.g. `./elf_parser test.out`) and print the contents of the functional memory. To build `func_memory` just type `make` in `trunk/func_sim/func_memory/`.
+You can see how it should work in `trunk/func_sim/func_memory/main.cpp`. This file implements `func_memory` program that downloads sections from an executable file given as the only parameter (e.g. `./elf_parser mips_bin_exmpl.out`) and print the contents of the functional memory. To build `func_memory` just type `make` in `trunk/func_sim/func_memory/`.
 
-|| <font color="red">*Note*</font> that if in the constructor you allocate any memory using a C++ operator `new` then this memory has to be deallocated in the destructor ||
+<br>
 
-== Read data of a section ==
+== Read and write data ==
 
 || <font color="red">*Note*</font> that the read interfaces are empty and to implement them is a part of the first assignment ||
 
-
 === `read` method ===
 
-Class `ElfParser` contains only one method to read the data of the stored section:
+Class `FuncMemory` contains only one method to read the data of the stored section:
 {{{
-uint64 read( uint64 addr, short num_of_bytes = 4) const;
+uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
 }}}
 
-It returns a value stored in the bytes sequence, which length is equal to `num_of_bytes` and the address of the first byte of which is equal to `addr`.
+It returns a value stored in the byte sequence, which length is equal to `num_of_bytes` and the address of the first byte of which is equal to `addr`.
 
-For example, if the section has the following contents (the order of bits into the bytes are from left to right):
+For example, if the functional memory has the following content (the order of bits into the bytes are from left to right):
 {{{
    0x400090    0x400091    0x400092     <-- addresses of bytes
        |           |           |
    ... | 0001 0011 | 0011 1000 | 1111 0010 | 1101 0000 | ...
 }}}
 
-Then `read( 0x400091, 2)` return the value of subsequence `| 0011 1000 | 1111 0010 |` which is equal to `0x4f1c`.
+Then `read( 0x400091, 2)` return the value of subsequence `| 0011 1000 | 1111 0010 |`, which is equal to `0x4f1c`.
 
-|| <font color="red">*Note*</font> that `addr` is not an index into the internal bytes array of an object. To receive the internal index you have to subtract the start address of<br>the stored sections from `addr`.|| 
+=== `startPC` method ===
 
-=== `isInside` method ===
-
-Its declaration is similar to `read` method:
+This method just return the start address of `.text` and has the following declaration:
 {{{
-bool   isInside( uint64 addr, short num_of_bytes = 1) const;
+uint64 startPC() const;
+}}}
+It is used to know where the first instruction of the program is located.
+
+=== `write` method ===
+
+It is similar to the `read` despite the fact that the data is not read, but written by the specified address. The method has the following interface:
+{{{
+void write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
 }}}
 
-It returns `true` if the whole bytes sequence, which length is equal to `num_of_bytes` and the address of the first byte of which is equal to `addr`, is located inside the section. Otherwise, it returns `false`.
+=== `dump` method ===
 
-=== `startAddr` method ===
+This method is used to display the contents of the functional memory. It should print the information in the format like `dump` method of the `ElfParser` class does.
 
-This method just return the start address of the section and have the following declaration:
+<br>
+
+= Unit Testing =
+----
+The [http://code.google.com/p/googletest/ Google C++ Testing Framework] is used in our project to check the quality of our code. The classes `ElfParser` and `FuncMemory` have already been covered by unit tests, which are located in `trunk/func_sim/elf_parser/unit_test.cpp` and `trunk/func_sim/func_memory/unit_test.cpp` correspondently. To run the tests just type `make test`. It builds the tests and run them. The test log will be printed and you will see passed and failed (if they are) tests.
+
+For example, for `ElfParser` the output will be something like:
 {{{
-uint64 startAddr() const;
+alexandr.titov@helena:~/mipt-mips/func_sim/elf_parser$ make test
+
+Running ./unit_test
+
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Elf_parser_init
+[ RUN      ] Elf_parser_init.Process_Wrong_Args_Of_Constr
+[       OK ] Elf_parser_init.Process_Wrong_Args_Of_Constr (4 ms)
+[----------] 1 test from Elf_parser_init (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (5 ms total)
+[  PASSED  ] 1 test.
+Unit testing for the moduler ELF parser passed SUCCESSFULLY!
 }}}
 
-== Unit Testing ==
+Phrase `Unit testing for the moduler ELF parser passed SUCCESSFULLY!` in the end means that everything was ok and your changes have passed all tests.
 
-The [http://code.google.com/p/googletest/ Google C++ Testing Framework] is used in our project. The class `ElfParser` has already been covered by unit tests which are located in  `trunk/func_sim/elf_parser/unit_test.cpp`. To run the tests just type `make test` stying in `trunk/func_sim/elf_parser`. It builds the tests and run them. The test log will be printed and if all the tests will passes successfully you will see the string `"Unit testing for the module ELF parser passed SUCCESSFULLY!"`. Otherwise, you will see the error log specifying which tests failed and why.
-
-|| <font color="red">*Note*</font> that in the beginning the testing will not pass as the read interfaces are not implemented. However, when you complete them the testing<br>has to pass successfully. Otherwise, you did something wrong or your code has an error.|| 
-
-<br/>
-== Read data from the functional memory ==
-
-=== `read` method ===
-
-Class `FuncMemory` contains only one method to read the data of the stored sections:
-
+Note that in the beginning the unit tests for `FuncMemory` class will not pass as its interfaces are not implemented. You will see something like this:
 {{{
-uint64 read( uint64 addr, short num_of_bytes = 4) const;
 }}}
 
-The data is read from the section, where the byte sequence defining by the parameters is located, i.e. the `read` method of `ElfSection` class is simply invoked here under the proper section.
+However, when you complete them the testing has to pass successfully and you will see something like:
+{{{
+alexandr.titov@helena:~/mipt-mips/func_sim/func_memory$ make test
+
+Running ./unit_test
+
+[==========] Running 5 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 1 test from Func_memory_init
+[ RUN      ] Func_memory_init.Process_Wrong_Args_Of_Constr
+[       OK ] Func_memory_init.Process_Wrong_Args_Of_Constr (9 ms)
+[----------] 1 test from Func_memory_init (9 ms total)
+
+[----------] 4 tests from Func_memory
+[ RUN      ] Func_memory.StartPC_Method_Test
+[       OK ] Func_memory.StartPC_Method_Test (1 ms)
+[ RUN      ] Func_memory.Read_Method_Test
+[       OK ] Func_memory.Read_Method_Test (927 ms)
+[ RUN      ] Func_memory.Write_Read_Initialized_Mem_Test
+[       OK ] Func_memory.Write_Read_Initialized_Mem_Test (225 ms)
+[ RUN      ] Func_memory.Write_Read_Not_Initialized_Mem_Test
+[       OK ] Func_memory.Write_Read_Not_Initialized_Mem_Test (0 ms)
+[----------] 4 tests from Func_memory (1154 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 2 test cases ran. (1163 ms total)
+[  PASSED  ] 5 tests.
+Unit testing for the moduler functional memory passed SUCCESSFULLY!
+}}}
+
+Otherwise, you did something wrong or your code has an error.
