@@ -30,3 +30,6 @@
 
   * Lectures
     * All lectures can be downloaded from *[https://code.google.com/p/mipt-mips/wiki/DownloadTab the Downloads tab]*.
+
+  * Assignments
+    * A1: implement main interfaces of the functional memory ([Assignment_1 link]).
