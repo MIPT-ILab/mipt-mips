@@ -19,17 +19,32 @@
 
 using namespace std;
 
+
 class FuncMemory
 {
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
 
+    // Main array of sets, which point to pages
+    uint8 ***mem_set;
+
+    // Check if this address allocated, otherwise allocate it
+    void memAlloc(uint64 address);
+    // Gets host machine adress from virtual address
+    uint8* getRealAddress(uint64 addr);
+
+    // Some basic constants
+    uint64 addr_bits;
+    uint64 set_bits;
+    uint64 page_bits;
+    uint64 offset_bits;
+
 public:
 
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
+                 uint64 page_size = 10,
                  uint64 offset_size = 12);
     
     virtual ~FuncMemory();
@@ -43,3 +58,4 @@ public:
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
+
