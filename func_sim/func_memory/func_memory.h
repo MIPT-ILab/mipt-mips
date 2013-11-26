@@ -1,8 +1,8 @@
 /**
  * func_memory.h - Header of module implementing the concept of 
  * programer-visible memory space accesing via memory address.
- * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012 uArchSim iLab project
+ * @author Anton Mitrokhin <anton.v.mitrokhin@gmail.com>
+ * Copyright 2013 uArchSim iLab project
  */
 
 // protection from multi-include
@@ -10,6 +10,7 @@
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
 // Generic C++
+#include <vector>
 #include <string>
 #include <cassert>
 
@@ -19,14 +20,50 @@
 
 using namespace std;
 
+
+class MemLocation
+{
+public:
+	uint64 set_num;
+    uint64 page_num;
+    uint64 byte_num;
+
+	MemLocation()
+		: set_num( 0), page_num( 0), byte_num( 0) {}
+
+	MemLocation( uint64 addr,               
+				 uint64 addr_size = 32,
+                 uint64 page_num_size = 10,
+                 uint64 offset_size = 12);
+};
+
+
+class Set
+{
+
+};
+
+
+class Page
+{
+
+};
+
+
 class FuncMemory
 {
+    uint64 addr_size;
+    uint64 page_num_size;
+    uint64 offset_size;
+
+    uint64 size; // memory size in bytes
+    uint8* content; // the raw memory data
+
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
 
 public:
-
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
@@ -40,6 +77,9 @@ public:
     uint64 startPC() const;
     
     string dump( string indent = "") const;
+
+private:
+	uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
