@@ -1,7 +1,7 @@
 /**
  * func_memory.h - Header of module implementing the concept of 
  * programer-visible memory space accesing via memory address.
- * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
+vn copy https://mipt-mips.googlecode.com/svn/trunk/libs/gtest-1.6.0/libgtest.a https://mipt-mips.googlecode.com/svn/branches/2013/<name_of_your_branch>/libs/gtest-1.6.0/libgtest.a -m "[branch] copy /libs/gtest-1.6.0/libgtest.a from the trunkvn copy https://mipt-mips.googlecode.com/svn/trunk/libs/gtest-1.6.0/libgtest.a https://mipt-mips.googlecode.com/svn/branches/2013/<name_of_your_branch>/libs/gtest-1.6.0/libgtest.a -m "[branch] copy /libs/gtest-1.6.0/libgtest.a from the trunk"* @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012 uArchSim iLab project
  */
 
@@ -12,6 +12,7 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <map>
 
 // uArchSim modules
 #include <types.h>
@@ -19,11 +20,17 @@
 
 using namespace std;
 
+map< uint64, map< uint64, map< uint64, ElfSection> > > memory;
+
 class FuncMemory
 {
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+    uint8* name[];
+    uint64 start_addr[];
+    uint64 size[];
+    uint8* content[];
 
 public:
 
