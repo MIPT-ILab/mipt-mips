@@ -8,6 +8,7 @@
 // Generic C
 
 // Generic C++
+#include <cmath>
 
 // uArchSim modules
 #include <elf_parser.h>
@@ -18,9 +19,18 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 page_bits,
                         uint64 offset_bits)
 {
-	addr_size		= addr_size;
-    page_num_size	= page_bits;
-    offset_size		= offset_bits;
+	this->addr_size     = addr_size_bits;
+    this->page_num_size	= page_bits;
+    this->offset_size   = offset_bits;
+
+    this->max_set_number = pow( 2, addr_size_bits - page_bits - offset_bits);
+    this->max_pages_per_set pow( 2, page_bits);
+    this->max_page_size pow( 2, offset_bits);
+
+    this->content = new *Set[ this->max_set_number];
+    for( size_t iterator = 0; iterator < ( this->max_set_number); iterator++)
+        ( this->content)[ iterator] = NULL;
+
 
     // extract all ELF sections into the section_array variable
     vector<ElfSection> sections_array;
@@ -34,7 +44,8 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 
 FuncMemory::~FuncMemory()
 {
-    delete [] this->name;
+    for( size_t iterator = 0; iterator < ( this->max_set_number); iterator++)
+        delete [] content[ iterator];
     delete [] this->content;
 }
 
@@ -45,68 +56,53 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
-    // put your code here
+    MemLocation memlock( addr,
+						 this->addr_size,
+                         this->page_num_size,
+                         this->offset_size);
 
-    return 0;
+
+    if( content[ memlock.set_num] == NULL)
+    {
+        cerr << "ERROR: unable to read "
+             << " - the set does not exist" << endl;
+        exit( EXIT_FAILURE);
+    }
+
+    Set* set = content[ memlock.set_num];
+    return set->read( memlock.page_num, memlock.byte_num, num_of_bytes);
 }
 
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    // put your code here
+    MemLocation memlock( addr,
+						 this->addr_size,
+                         this->page_num_size,
+                         this->offset_size);
+
+    if( content[ memlock.set_num] == NULL)
+    {
+        content[ memlock.set_num] = new Set( memlock.set_num, this->max_pages_per_set, this->max_page_size);
+    }
+
+    content[ memlock.set_num]->write( value, memlock.page_num, memlock.byte_num, num_of_bytes);
 }
 
 string FuncMemory::dump( string indent) const
 {
     ostringstream oss;
 
-    oss << indent << "Dump memory section \"" << this->name << "\"" << endl
-        << indent << "  size = " << this->size << " Bytes" << endl
-        << indent << "  start_addr = 0x" << hex << this->start_addr << dec << endl
+    oss << indent << "Dump memory section \"" << endl
         << indent << "  Content:" << endl;
      
-    string str = this->strByBytes();
-
-    // split the contents into words of 4 bytes
-    bool skip_was_printed = false;
-    for ( size_t offset = 0; offset < this->size; offset += sizeof( uint32))
+    for( size_t iterator = 0; iterator < ( this->max_set_number); iterator++)
     {
-        string substr =  str.substr( 2 * offset, // 2 hex digits is need per byte
-                                     sizeof( uint64));
-
-        if ( substr.compare( "00000000") == 0)
-        {   
-            if ( !skip_was_printed)
-            {
-                oss << indent << "  ....  " << endl;
-                skip_was_printed = true;
-            }
-        }
-        else
-        { 
-            oss << indent << "    0x" << hex << ( this->start_addr + offset) 
-                << indent << ":    " << substr << endl;
-            skip_was_printed = false;
+        if( this->content[ iterator] != NULL)
+        {
+            oss << this->content[ iterator].dump( "  ");
         }
     }
 
     return oss.str();
-}
-
-uint64 FuncMemory::mirror( uint64 value, unsigned short num_of_bytes = 4) const
-{
-	// this function will convert data from big endian to little endian and back
-	// in case num_of_bytes equals zero, the function will return zero
-	uint64 output = 0;
-
-	const unsigned int max_bit_num = 8 * num_of_bytes - 1;
-	for( uint32 iterator = 0; iterator <= max_bit_num; ++iterator)
-	{
-		unsigned short bit_value = ( ( value & ( 1 << iterator)) >> iterator);
-		uint64 mask = (bit_value << ( max_bit_num - iterator));
-		output |= mask;
-	}
-
-	cout << value << " " << output << endl; // test
-	return output;
 }
 
