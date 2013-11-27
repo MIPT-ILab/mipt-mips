@@ -35,18 +35,53 @@ public:
 				 uint64 addr_size = 32,
                  uint64 page_num_size = 10,
                  uint64 offset_size = 12);
-};
 
-
-class Set
-{
-
+	MemLocation& operator=( const MemLocation& that);
 };
 
 
 class Page
 {
+	uint8* content; // the raw data of the section
 
+public:
+    uint64 size; // size of the page in bytes
+    uint64 start_addr; // the start address of the page in set
+
+    Page ( uint64 start_addr, 
+           uint64 size);
+
+    virtual ~Page();
+    
+    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+    void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
+    string dump( string indent = "") const;
+
+private:
+	uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
+    string strByBytes() const;
+    string strByWords() const;
+};
+
+
+class Set
+{
+    Page** content;
+
+public:
+    uint64 size; // size of the set in pages
+    uint64 page_size; // page size in bytes
+    uint64 start_addr; // the start address of the set in memory
+
+    Set( uint64 start_addr,
+         uint64 size,
+         uint64 page_size)
+
+    virtual ~Set();
+
+    uint64 read( uint64 page_num, uint64 page_offset, unsigned short num_of_bytes = 4) const;
+    void   write( uint64 value, uint64 page_num, uint64 page_offset, unsigned short num_of_bytes = 4);
+    string dump( string indent = "") const;
 };
 
 
@@ -56,18 +91,18 @@ class FuncMemory
     uint64 page_num_size;
     uint64 offset_size;
 
-    uint64 size; // memory size in bytes
-    uint8* content; // the raw memory data
+    Set** content;
+    uint64 max_set_number;
+    uint64 max_pages_per_set;
+    uint64 max_page_size;
 
-    // You could not create the object
-    // using this default constructor
-    FuncMemory(){}
+    FuncMemory();
 
 public:
-    FuncMemory ( const char* executable_file_name,
-                 uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
+    FuncMemory( const char* executable_file_name,
+                uint64 addr_size = 32,
+                uint64 page_num_size = 10,
+                uint64 offset_size = 12);
     
     virtual ~FuncMemory();
     
@@ -77,9 +112,7 @@ public:
     uint64 startPC() const;
     
     string dump( string indent = "") const;
-
-private:
-	uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
+    
