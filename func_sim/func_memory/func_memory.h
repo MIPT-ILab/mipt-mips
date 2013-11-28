@@ -12,12 +12,25 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <map>
+#include <iostream>
 
 // uArchSim modules
 #include <types.h>
 #include <elf_parser.h>
 
 using namespace std;
+
+class Mem_const
+{
+public:
+
+    uint64 size;
+    uint64 start_addr;
+    char* name;
+    uint8 content;
+};
+
 
 class FuncMemory
 {
