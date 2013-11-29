@@ -47,24 +47,31 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 
     // extract all ELF sections into the section_array variable
     vector<ElfSection> sections_array;
-    //ElfSection::getAllElfSections( executable_file_name, sections_array); //*********
+    ElfSection::getAllElfSections( executable_file_name, sections_array); //*********
 
     // print the information about each section
-    for ( int i = 0; i < sections_array.size(); ++i)
-        cout << sections_array[ i].dump() << endl;
+    for( int i = 0; i < sections_array.size(); ++i)
+    {
+        if( strcmp( sections_array[ i].name, ".text") == 0)
+            this->startPC_addr = sections_array[ i].start_addr;
+
+        for( int offset = 0; offset < sections_array[ i].size; offset++)
+            this->write( sections_array[ i].content[ offset], sections_array[ i].start_addr + offset, 1);
+
+    }
 
 }
 
 FuncMemory::~FuncMemory()
 {
     for( size_t iterator = 0; iterator < ( this->max_set_number); iterator++)
-        delete [] content[ iterator];
+        delete content[ iterator];
     delete [] this->content;
 }
 
 uint64 FuncMemory::startPC() const
 {
-    // put your code here
+    return startPC_addr;
 }
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
@@ -105,8 +112,7 @@ string FuncMemory::dump( string indent) const
 {
     ostringstream oss;
 
-    oss << indent << "Dump memory section \"" << endl
-        << indent << "  Content:" << endl;
+    oss << indent << "Dump memory section..." << endl;
 
     for( size_t iterator = 0; iterator < ( this->max_set_number); iterator++)
     {

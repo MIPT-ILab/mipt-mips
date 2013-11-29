@@ -38,7 +38,7 @@ Set::Set( uint64 start_addr,
 Set::~Set()
 {
     for( size_t iterator = 0; iterator < ( this->size); iterator++)
-        delete [] content[ iterator];
+        delete content[ iterator];
     delete [] this->content;
 }
 
@@ -83,9 +83,8 @@ string Set::dump( string indent) const
 {
     ostringstream oss;
 
-    oss << indent << "Set start_addr = 0x" << hex << this->start_addr << dec << endl
-        << indent << "  size = " << this->size << " Pages" << endl
-        << indent << "  Content:" << endl;
+    oss << indent << "Set start_addr = 0x" << hex << this->start_addr << dec
+        << indent << " size = " << this->size << " Pages" << endl;
 
     for( size_t iterator = 0; iterator < ( this->size); iterator++)
     {

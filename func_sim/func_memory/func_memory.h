@@ -92,6 +92,7 @@ class FuncMemory
     uint64 addr_size;
     uint64 page_num_size;
     uint64 offset_size;
+    uint64 startPC_addr;
 
     Set** content;
     uint64 max_set_number;

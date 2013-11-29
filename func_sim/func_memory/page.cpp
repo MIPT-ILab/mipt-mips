@@ -38,6 +38,7 @@ Page::~Page()
 
 uint64 Page::read( uint64 addr, unsigned short num_of_bytes) const
 {
+    assert( num_of_bytes != 0);
     if( addr + num_of_bytes  > size)
     {
         cerr << "ERROR: unable to read "
@@ -63,9 +64,10 @@ uint64 Page::read( uint64 addr, unsigned short num_of_bytes) const
 
 void   Page::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
+    assert( num_of_bytes != 0);
     if( addr + num_of_bytes  > size)
     {
-        cerr << "ERROR: unable to read "
+        cerr << "ERROR: unable to write "
              << "- the address does not exist" << endl;
         exit( EXIT_FAILURE);
     }
@@ -88,7 +90,7 @@ string Page::dump( string indent) const
 {
     ostringstream oss;
 
-    oss << "Dump Page Section:" << endl << endl
+    oss << indent << "Page Section:" << endl
         << indent << "  size = " << this->size << " Bytes" << endl
         << indent << "  start_addr (in set) = 0x" << hex << this->start_addr << dec << endl
         << indent << "  Content:" << endl;
