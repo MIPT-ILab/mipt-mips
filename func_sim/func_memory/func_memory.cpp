@@ -26,6 +26,11 @@
 
 using namespace std;
 
+union Mirrorer
+{
+    uint64 val;
+    uint8 byte[ 8];
+};
 
 FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size_bits,
@@ -76,36 +81,52 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
-    MemLocation memlock( addr,
-                         this->addr_size,
-                         this->page_num_size,
-                         this->offset_size);
+    assert( num_of_bytes != 0);
+    Mirrorer byte_to_int;
+    byte_to_int.val = 0;
 
-
-    if( content[ memlock.set_num] == NULL)
+    for ( uint64 byte_addr = addr, i = 0; byte_addr < addr + num_of_bytes; byte_addr++, i++)
     {
-        cerr << "ERROR: unable to read "
-             << " - the set does not exist" << endl;
-        exit( EXIT_FAILURE);
+        MemLocation memlock( byte_addr,
+                             this->addr_size,
+                             this->page_num_size,
+                             this->offset_size);
+
+        if( content[ memlock.set_num] == NULL)
+        {
+            cerr << "ERROR: unable to read "
+                 << " - the set does not exist" << endl;
+            exit( EXIT_FAILURE);
+        }
+
+        Set* set = content[ memlock.set_num];
+        byte_to_int.byte[ i] = (uint8)set->read( memlock.page_num, memlock.byte_num, 1);
+        //cout << i << ":" << hex << (int)byte_to_int.byte[ i] << dec << endl;
     }
 
-    Set* set = content[ memlock.set_num];
-    return set->read( memlock.page_num, memlock.byte_num, num_of_bytes);
+    //cout << ":" << hex << (int)byte_to_int.val << endl << endl;
+    return byte_to_int.val;
 }
 
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    MemLocation memlock( addr,
-                         this->addr_size,
-                         this->page_num_size,
-                         this->offset_size);
+    assert( num_of_bytes != 0);
+    Mirrorer int_to_byte;
+    int_to_byte.val = value;
 
-    if( content[ memlock.set_num] == NULL)
+    for ( uint64 byte_addr = addr, i = 0; byte_addr < addr + num_of_bytes; byte_addr++, i++)
     {
-        content[ memlock.set_num] = new Set( memlock.set_num, this->max_pages_per_set, this->max_page_size);
-    }
+        MemLocation memlock( byte_addr,
+                             this->addr_size,
+                             this->page_num_size,
+                             this->offset_size);
 
-    content[ memlock.set_num]->write( value, memlock.page_num, memlock.byte_num, num_of_bytes);
+        if( content[ memlock.set_num] == NULL)
+            content[ memlock.set_num] = new Set( memlock.set_num, this->max_pages_per_set, this->max_page_size);
+
+        /* This function will write bytes one by one */
+        content[ memlock.set_num]->write( int_to_byte.byte[ i], memlock.page_num, memlock.byte_num, 1);
+    }
 }
 
 string FuncMemory::dump( string indent) const
