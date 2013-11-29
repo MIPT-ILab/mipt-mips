@@ -1,4 +1,4 @@
-# 
+#
 # Building the elf_parser for MIPS ElF binaries
 # @author Alexander Titov <alexander.igorevich.titov@gmail.com>
 # Copyright 2012 uArchSim iLab Project
@@ -12,7 +12,7 @@ vpath %.h $(TRUNK)/common
 vpath %.h $(TRUNK)/func_sim/elf_parser/
 vpath %.cpp $(TRUNK)/func_sim/elf_parser/
 
-# option for C++ compiler specifying directories 
+# option for C++ compiler specifying directories
 # to search for headers
 INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/
 
@@ -23,7 +23,7 @@ GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
 #
 # Enter for building func_memory stand alone program
 #
-func_memory: func_memory.o elf_parser.o main.o
+func_memory: mem_location.o page.o set.o func_memory.o elf_parser.o main.o
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
@@ -37,6 +37,16 @@ elf_parser.o: elf_parser.cpp elf_parser.h types.h
 
 main.o: main.cpp func_memory.h types.h
 	$(CXX) -c $< $(INCL)
+
+set.o: set.cpp func_memory.h types.h
+	$(CXX) -c $< $(INCL)
+
+page.o: page.cpp func_memory.h types.h
+	$(CXX) -c $< $(INCL)
+
+mem_location.o: mem_location.cpp func_memory.h types.h
+	$(CXX) -c $< $(INCL)
+
 
 #
 # Enter for building func_memory unit test
@@ -55,7 +65,7 @@ unit_test: unit_test.o func_memory.o elf_parser.o
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp func_memory.o elf_parser.o
-	$(CXX) -c $< $(INCL_GTEST) $(INCL) 
+	$(CXX) -c $< $(INCL_GTEST) $(INCL)
 
 clean:
 	@-rm *.o

@@ -22,7 +22,7 @@
 
 
 
-Page::Page ( uint64 start_addr, 
+Page::Page ( uint64 start_addr,
              uint64 size)
 {
     this->start_addr = start_addr;
@@ -35,10 +35,10 @@ Page::~Page()
 {
     delete [] this->content;
 }
-    
-uint64 Page::read( uint64 addr, unsigned short num_of_bytes = 4) const
+
+uint64 Page::read( uint64 addr, unsigned short num_of_bytes) const
 {
-    if( addr >= size)
+    if( addr + num_of_bytes  > size)
     {
         cerr << "ERROR: unable to read "
              << "- the address does not exist" << endl;
@@ -52,15 +52,18 @@ uint64 Page::read( uint64 addr, unsigned short num_of_bytes = 4) const
         exit( EXIT_FAILURE);
     }
 
-    uint64 read_data = (uint64) *( this->content + addr);
-    read_data = this->mirror( read_data, num_of_bytes);
+    uint64 read_data = 0;
+    for( int i = 0; i < num_of_bytes; i++)
+    {
+        read_data += ( mirror_byte( content[ addr + i]) << 8*i);
+    }
 
     return read_data;
 }
 
-void   Page::write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4)
+void   Page::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    if( addr >= size)
+    if( addr + num_of_bytes  > size)
     {
         cerr << "ERROR: unable to read "
              << "- the address does not exist" << endl;
@@ -74,17 +77,22 @@ void   Page::write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4)
         exit( EXIT_FAILURE);
     }
 
-    content[ addr] = value;
+    uint64 mask = 255;
+    for( int i = 0; i < num_of_bytes; i++)
+    {
+        content[ addr + i] = mirror_byte( ( value >> 8*i) & mask);
+    }
 }
 
 string Page::dump( string indent) const
 {
     ostringstream oss;
 
-    oss << indent << "  size = " << this->size << " Bytes" << endl
-        << indent << "  start_addr = 0x" << hex << this->start_addr << dec << endl
+    oss << "Dump Page Section:" << endl << endl
+        << indent << "  size = " << this->size << " Bytes" << endl
+        << indent << "  start_addr (in set) = 0x" << hex << this->start_addr << dec << endl
         << indent << "  Content:" << endl;
-     
+
     string str = this->strByBytes();
 
     // split the contents into words of 4 bytes
@@ -95,7 +103,7 @@ string Page::dump( string indent) const
                                      sizeof( uint64));
 
         if ( substr.compare( "00000000") == 0)
-        {   
+        {
             if ( !skip_was_printed)
             {
                 oss << indent << "  ....  " << endl;
@@ -103,8 +111,8 @@ string Page::dump( string indent) const
             }
         }
         else
-        { 
-            oss << indent << "    0x" << hex << ( this->start_addr + offset) 
+        {
+            oss << indent << "    0x" << hex << ( this->start_addr + offset)
                 << indent << ":    " << substr << endl;
             skip_was_printed = false;
         }
@@ -113,22 +121,35 @@ string Page::dump( string indent) const
     return oss.str();
 }
 
-uint64 Page::mirror( uint64 value, unsigned short num_of_bytes = 4) const
+uint64 Page::mirror( uint64 value, unsigned short num_of_bytes) const
 {
-	// this function will convert data from big endian to little endian and back
-	// in case num_of_bytes equals zero, the function will return zero
-	uint64 output = 0;
+    // this function will convert data from big endian to little endian and back
+    // in case num_of_bytes equals zero, the function will return zero
+    uint64 output = 0;
 
-	const unsigned int max_bit_num = 8 * num_of_bytes - 1;
-	for( uint32 iterator = 0; iterator <= max_bit_num; ++iterator)
-	{
-		unsigned short bit_value = ( ( value & ( 1 << iterator)) >> iterator);
-		uint64 mask = (bit_value << ( max_bit_num - iterator));
-		output |= mask;
-	}
+    const unsigned int max_bit_num = 8 * num_of_bytes - 1;
+    for( uint32 iterator = 0; iterator <= max_bit_num; ++iterator)
+    {
+        unsigned short bit_value = ( ( value & ( 1 << iterator)) >> iterator);
+        uint64 mask = (bit_value << ( max_bit_num - iterator));
+        output |= mask;
+    }
 
-	cout << value << " " << output << endl; // debug
-	return output;
+    cout << value << " " << output << endl; // debug
+    return output;
+}
+
+uint8 Page::mirror_byte( uint8 value) const
+{
+    uint8 output = 0;
+    for( size_t i = 0; i < 8; i++)
+    {
+        output = output << 1;
+        output += ( value >> i) & 1;
+
+        int buf = ( value >> i) & 1;
+    }
+    return output;
 }
 
 string Page::strByBytes() const
@@ -136,18 +157,18 @@ string Page::strByBytes() const
     // temp stream is used to convert numbers into the output string
     ostringstream oss;
     oss << hex;
-	
-    // convert each byte into 2 hex digits 
+
+    // convert each byte into 2 hex digits
     for( size_t i = 0; i < this->size; ++i)
     {
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
-        
-        // print a value of 
+
+        // print a value of
         oss << (uint16) *( this->content + i); // need converting to uint16
-                                               // to be not preinted as an alphabet symbol	
+                                               // to be not preinted as an alphabet symbol
     }
-    
+
     return oss.str();
 }
 
@@ -162,10 +183,10 @@ string Page::strByWords() const
     {
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
-        
+
         oss << *( ( uint32*)this->content + i);
     }
-    
+
     return oss.str();
 }
 

@@ -29,8 +29,8 @@ Set::Set( uint64 start_addr,
     this->size = size;
     this->page_size = page_size;
 
-    this->content = new *Page[ this->size];
-    
+    this->content = new Page* [ this->size];
+
     for( size_t iterator = 0; iterator < ( this->size); iterator++)
         ( this->content)[ iterator] = NULL;
 }
@@ -42,7 +42,7 @@ Set::~Set()
     delete [] this->content;
 }
 
-uint64 Set::read( uint64 page_num, uint64 page_offset, unsigned short num_of_bytes = 4) const
+uint64 Set::read( uint64 page_num, uint64 page_offset, unsigned short num_of_bytes) const
 {
     if( page_num >= size)
     {
@@ -62,7 +62,7 @@ uint64 Set::read( uint64 page_num, uint64 page_offset, unsigned short num_of_byt
     return page->read( page_offset, num_of_bytes);
 }
 
-void   Set::write( uint64 value, uint64 page_num, uint64 page_offset, unsigned short num_of_bytes = 4)
+void   Set::write( uint64 value, uint64 page_num, uint64 page_offset, unsigned short num_of_bytes)
 {
     if( page_num >= size)
     {
@@ -79,19 +79,19 @@ void   Set::write( uint64 value, uint64 page_num, uint64 page_offset, unsigned s
     content[ page_num]->write( value, page_offset, num_of_bytes);
 }
 
-string Set::dump( string indent = "") const
+string Set::dump( string indent) const
 {
     ostringstream oss;
 
     oss << indent << "Set start_addr = 0x" << hex << this->start_addr << dec << endl
         << indent << "  size = " << this->size << " Pages" << endl
         << indent << "  Content:" << endl;
-     
+
     for( size_t iterator = 0; iterator < ( this->size); iterator++)
     {
         if( this->content[ iterator] != NULL)
         {
-            oss << this->content[ iterator].dump( "  ");
+            oss << (this->content)[ iterator]->dump( "  ");
         }
     }
 

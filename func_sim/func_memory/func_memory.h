@@ -1,5 +1,6 @@
 /**
- * func_memory.h - Header of module implementing the concept of 
+ * func_memory.h - H./func_memory.h:78:26: error: expected ‘;’ at end of member declaration
+eader of module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Anton Mitrokhin <anton.v.mitrokhin@gmail.com>
  * Copyright 2013 uArchSim iLab project
@@ -24,41 +25,42 @@ using namespace std;
 class MemLocation
 {
 public:
-	uint64 set_num;
+    uint64 set_num;
     uint64 page_num;
     uint64 byte_num;
 
-	MemLocation()
-		: set_num( 0), page_num( 0), byte_num( 0) {}
+    MemLocation()
+        : set_num( 0), page_num( 0), byte_num( 0) {}
 
-	MemLocation( uint64 addr,               
-				 uint64 addr_size = 32,
+    MemLocation( uint64 addr,
+                 uint64 addr_size = 32,
                  uint64 page_num_size = 10,
                  uint64 offset_size = 12);
 
-	MemLocation& operator=( const MemLocation& that);
+    MemLocation& operator=( const MemLocation& that);
 };
 
 
 class Page
 {
-	uint8* content; // the raw data of the section
+    uint8* content; // the raw data of the section
 
 public:
     uint64 size; // size of the page in bytes
     uint64 start_addr; // the start address of the page in set
 
-    Page ( uint64 start_addr, 
+    Page ( uint64 start_addr,
            uint64 size);
 
     virtual ~Page();
-    
+
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     string dump( string indent = "") const;
 
 private:
-	uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
+    uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
+    uint8  mirror_byte( uint8 value) const;
     string strByBytes() const;
     string strByWords() const;
 };
@@ -75,7 +77,7 @@ public:
 
     Set( uint64 start_addr,
          uint64 size,
-         uint64 page_size)
+         uint64 page_size);
 
     virtual ~Set();
 
@@ -103,16 +105,15 @@ public:
                 uint64 addr_size = 32,
                 uint64 page_num_size = 10,
                 uint64 offset_size = 12);
-    
+
     virtual ~FuncMemory();
-    
+
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
-    
+
     uint64 startPC() const;
-    
+
     string dump( string indent = "") const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
-    
