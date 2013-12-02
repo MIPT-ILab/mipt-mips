@@ -46,9 +46,10 @@ public:
 
 class elem_of_memory
 {
-    void* array;
+    public:
+    elem_of_memory**  array_of_elem_of_memory;
+    uint8** array_of_byte;
     uint64 size;
-public:
     elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_page);
     ~elem_of_memory();
 };
