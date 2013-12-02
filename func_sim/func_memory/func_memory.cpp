@@ -48,6 +48,45 @@ elem_of_memory::elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_pag
 
 //------------------------------------------------------------------------------
 
+// Деструктор класса elem_of_memory. Он ничего не делает, так как всю работу за него выполняет функция clear.
+
+elem_of_memory::~elem_of_memory()
+{
+	
+}
+//------------------------------------------------------------------------------
+
+// Функция clear, используемая для рекурсивной очистки памяти.
+
+void clear(elem_of_memory* elem)
+{
+	uint64 counter;
+	if(elem -> array_of_byte == NULL)
+	{
+		for(counter = 0; counter < elem -> size; counter++)
+		{
+			if(elem -> array_of_elem_of_memory[counter] != NULL)
+			{
+				clear(elem -> array_of_elem_of_memory[counter]);
+			}		
+		}
+		delete elem -> array_of_byte;
+	}
+	if(elem -> array_of_elem_of_memory == NULL)
+	{
+		for(counter = 0; counter < elem -> size; counter++)
+		{
+			if(elem -> array_of_byte[counter] != NULL)
+			{
+				delete elem -> array_of_byte[counter];
+			}
+		}
+		delete elem -> array_of_byte;
+	}
+}
+
+//------------------------------------------------------------------------------
+
 // Конструктор класса FuncMemory.
 
 FuncMemory::FuncMemory( const char* executable_file_name,
@@ -59,13 +98,21 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 	vector<ElfSection> sections_array;
 	ElfSection::getAllElfSections(executable_file_name, sections_array);
 // Считаем число бит, уходящее на адрес блока в массиве блоков(верхний уровень иерархии памяти).
-	uint64 array_of_sets_bits = addr_size - page_bits - offset_bits;
+	uint64 sets_bits = addr_size - page_bits - offset_bits;
 // Считаем размер каждого типа элементов памяти(число элементов массива в элементе памяти).
-	uint64 size_of_array_of_sets = bit_to_size(array_of_sets_bits);
-	uint64 size_of_set = bit_to_size(offset_bits);
-	uint64 size_of_page = bit_to_size(page_bits);
-// Создаем элемент памяти, отвечающий за верхний уровень иерархии(массив блоков). Он содержит массив указателей на элементы среднего уровня иерархии памяти(блоки). При создании все указатели в массиве равны NULL.
-	elem_of_memory array_of_sets(size_of_array_of_sets, size_of_page);
+	uint64 size_of_array_of_sets = bit_to_size(sets_bits);
+	uint64 size_of_set = bit_to_size(page_bits);
+	uint64 size_of_page = bit_to_size(offset_bits);
+// Инициализируем массив блоков, входящий в класс FuncMemory(верхний уровень иерархии памяти).
+	array_of_sets.size = size_of_array_of_sets;
+	array_of_sets.array_of_byte = NULL;
+	array_of_sets.array_of_elem_of_memory = new elem_of_memory*[array_of_sets.size];
+	uint64 counter = 0;
+	while(counter < array_of_sets.size)
+	{
+		array_of_sets.array_of_elem_of_memory[counter] = NULL;
+		counter++;
+	}
 // Запихиваем секции данных в созданную нами память.	
 	uint64 sections_counter;
 	for(sections_counter = 0; sections_counter < sections_array.size(); sections_counter++)
@@ -78,8 +125,8 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 // Для каждого байта из секции находем номер его блока, страницы и непосредственно местоположения. 
 			uint64 this_addr = this_section.start_addr + byte_counter;
 			uint64 this_addr_in_array_of_sets = this_addr >> (offset_bits + page_bits);
-			uint64 this_addr_in_set = (this_addr << array_of_sets_bits) >> (array_of_sets_bits + page_bits);
-			uint64 this_addr_in_page = (this_addr << (array_of_sets_bits + offset_bits)) >> (array_of_sets_bits + offset_bits);
+			uint64 this_addr_in_set = (this_addr << sets_bits) >> (sets_bits + page_bits);
+			uint64 this_addr_in_page = (this_addr << (sets_bits + offset_bits)) >> (sets_bits + offset_bits);
 // Проверяем, выделена ли память под блок и страницу, если нет - выделяем.
 			if(array_of_sets.array_of_elem_of_memory[this_addr_in_array_of_sets] == NULL)
 			{
@@ -116,12 +163,14 @@ uint64 bit_to_size(uint64 bits)
 
 //-----------------------------------------------------------------------------
 
-// Деструктор класса FuncMemory.
+// Деструктор класса FuncMemory. Он вызывает функцию clear для верхнего уровня памяти, содержащего в себе указатели на блоки. Эта функция рекурсивно очищает память.
 
 FuncMemory::~FuncMemory()
 {
-    // put your code here
+    clear(&array_of_sets);
 }
+
+//-----------------------------------------------------------------------------
 
 uint64 FuncMemory::startPC() const
 {

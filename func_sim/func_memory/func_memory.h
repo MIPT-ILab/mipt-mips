@@ -19,12 +19,28 @@
 
 using namespace std;
 
+// Класс elem_of_memory является массивом блоков страниц, блоком страниц или страницей, в зависимости от того, что мы запишем в size. Соответственно, элементы массива указывают на блоки страниц, страницы или на сами участки памяти (uint8)
+
+class elem_of_memory
+{
+    public:
+    elem_of_memory**  array_of_elem_of_memory;
+    uint8** array_of_byte;
+    uint64 size;
+
+    elem_of_memory() {};
+    elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_page);
+    ~elem_of_memory();
+};
+
+
 class FuncMemory
 {
     // You could not create the object
     // using this default constructor
-    FuncMemory(){}
-
+    FuncMemory() {};
+    // Самый верхний уровень иерархии памяти. Содержит в себе указатели на блоки.
+    elem_of_memory array_of_sets; 
 public:
 
     FuncMemory ( const char* executable_file_name,
@@ -40,18 +56,10 @@ public:
     uint64 startPC() const;
     
     string dump( string indent = "") const;
-};
 
-// Класс elem_of_memory является массивом блоков страниц, блоком страниц или страницей, в зависимости от того, что мы запишем в size. Соответственно, элементы массива указывают на блоки страниц, страницы или на сами участки памяти (uint8). 
+// Функция, используемая для рекурсивной очистки памяти.
 
-class elem_of_memory
-{
-    public:
-    elem_of_memory**  array_of_elem_of_memory;
-    uint8** array_of_byte;
-    uint64 size;
-    elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_page);
-    ~elem_of_memory();
+    friend void clear(elem_of_memory* elem);
 };
 
 // Функция перевода размера адреса, используемого в элементе памяти в размер самого элемента памяти(кол-ва элементов массива). 
