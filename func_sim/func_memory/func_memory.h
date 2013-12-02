@@ -42,4 +42,19 @@ public:
     string dump( string indent = "") const;
 };
 
+// Класс elem_of_memory является массивом блоков страниц, блоком страниц или страницей, в зависимости от того, что мы запишем в size. Соответственно, элементы массива указывают на блоки страниц, страницы или на сами участки памяти (uint8). 
+
+class elem_of_memory
+{
+    void* array;
+    uint64 size;
+public:
+    elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_page);
+    ~elem_of_memory();
+};
+
+// Функция перевода размера адреса, используемого в элементе памяти в размер самого элемента памяти(кол-ва элементов массива). 
+
+uint64 bit_to_size(uint64 bits);
+
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
