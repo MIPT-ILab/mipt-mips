@@ -44,19 +44,9 @@ Set::~Set()
 
 uint64 Set::read( uint64 page_num, uint64 page_offset, unsigned short num_of_bytes) const
 {
-    if( page_num >= size)
-    {
-        cerr << "ERROR: unable to read "
-             << " - the page number is too big" << endl;
-        exit( EXIT_FAILURE);
-    }
+    assert( page_num < size);
+    assert( content[ page_num] != NULL);
 
-    if( content[ page_num] == NULL)
-    {
-        cerr << "ERROR: unable to read "
-             << " - the page does not exist" << endl;
-        exit( EXIT_FAILURE);
-    }
 
     Page* page = content[ page_num];
     return page->read( page_offset, num_of_bytes);
@@ -64,12 +54,8 @@ uint64 Set::read( uint64 page_num, uint64 page_offset, unsigned short num_of_byt
 
 void   Set::write( uint64 value, uint64 page_num, uint64 page_offset, unsigned short num_of_bytes)
 {
-    if( page_num >= size)
-    {
-        cerr << "ERROR: unable to write "
-             << " - the page number is too big" << endl;
-        exit( EXIT_FAILURE);
-    }
+    assert( page_num < size);
+
 
     if( content[ page_num] == NULL)
     {

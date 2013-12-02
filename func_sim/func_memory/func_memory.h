@@ -59,8 +59,6 @@ public:
     string dump( string indent = "") const;
 
 private:
-    uint64 mirror( uint64 value, unsigned short num_of_bytes = 4) const;
-    uint8  mirror_byte( uint8 value) const;
     string strByBytes() const;
     string strByWords() const;
 };

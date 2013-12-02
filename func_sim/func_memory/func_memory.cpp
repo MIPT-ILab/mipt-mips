@@ -92,12 +92,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
                              this->page_num_size,
                              this->offset_size);
 
-        if( content[ memlock.set_num] == NULL)
-        {
-            cerr << "ERROR: unable to read "
-                 << " - the set does not exist" << endl;
-            exit( EXIT_FAILURE);
-        }
+        assert( content[ memlock.set_num] != NULL);
 
         Set* set = content[ memlock.set_num];
         byte_to_int.byte[ i] = (uint8)set->read( memlock.page_num, memlock.byte_num, 1);

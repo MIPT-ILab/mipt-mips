@@ -39,24 +39,14 @@ Page::~Page()
 uint64 Page::read( uint64 addr, unsigned short num_of_bytes) const
 {
     assert( num_of_bytes != 0);
-    if( addr + num_of_bytes  > size)
-    {
-        cerr << "ERROR: unable to read "
-             << "- the address does not exist" << endl;
-        exit( EXIT_FAILURE);
-    }
+    assert( addr + num_of_bytes  <= size);
+    assert( num_of_bytes <= 8);
 
-    if( num_of_bytes > 8)
-    {
-        cerr << "ERROR: unable to read "
-             << "the maximum number of bytes to read is 8" << endl;
-        exit( EXIT_FAILURE);
-    }
 
     uint64 read_data = 0;
     for( int i = 0; i < num_of_bytes; i++)
     {
-        read_data += ( mirror_byte( content[ addr + i]) << 8*i);
+        read_data += ( content[ addr + i] << 8*i);
     }
 
     return read_data;
@@ -65,24 +55,13 @@ uint64 Page::read( uint64 addr, unsigned short num_of_bytes) const
 void   Page::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
     assert( num_of_bytes != 0);
-    if( addr + num_of_bytes  > size)
-    {
-        cerr << "ERROR: unable to write "
-             << "- the address does not exist" << endl;
-        exit( EXIT_FAILURE);
-    }
-
-    if( num_of_bytes > 8)
-    {
-        cerr << "ERROR: unable to write "
-             << "the maximum number of bytes to write is 8" << endl;
-        exit( EXIT_FAILURE);
-    }
+    assert( addr + num_of_bytes  <= size);
+    assert( num_of_bytes <= 8);
 
     uint64 mask = 255;
     for( int i = 0; i < num_of_bytes; i++)
     {
-        content[ addr + i] = mirror_byte( ( value >> 8*i) & mask);
+        content[ addr + i] = ( value >> 8*i) & mask;
     }
 }
 
@@ -123,36 +102,7 @@ string Page::dump( string indent) const
     return oss.str();
 }
 
-uint64 Page::mirror( uint64 value, unsigned short num_of_bytes) const
-{
-    // this function will convert data from big endian to little endian and back
-    // in case num_of_bytes equals zero, the function will return zero
-    uint64 output = 0;
 
-    const unsigned int max_bit_num = 8 * num_of_bytes - 1;
-    for( uint32 iterator = 0; iterator <= max_bit_num; ++iterator)
-    {
-        unsigned short bit_value = ( ( value & ( 1 << iterator)) >> iterator);
-        uint64 mask = (bit_value << ( max_bit_num - iterator));
-        output |= mask;
-    }
-
-    cout << value << " " << output << endl; // debug
-    return output;
-}
-
-uint8 Page::mirror_byte( uint8 value) const
-{
-    uint8 output = 0;
-    for( size_t i = 0; i < 8; i++)
-    {
-        output = output << 1;
-        output += ( value >> i) & 1;
-
-        int buf = ( value >> i) & 1;
-    }
-    return output;
-}
 
 string Page::strByBytes() const
 {
