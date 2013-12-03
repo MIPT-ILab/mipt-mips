@@ -45,9 +45,19 @@ FuncMemory::FuncMemory( const char* executable_file_name,                       
         exit(EXIT_FAILURE);
     }
 
-    // Get all sections from executable elf file (Elfsections will be saved in Private: sections_array)
+	int fd = open(executable_file_name, O_RDONLY);
+    if (fd == -1)
+    {
+        cerr << "ERROR. File doesn't exist\n";
+        exit(EXIT_FAILURE);
+    }
+    close(fd);
 
-    ElfSection::getAllElfSections(executable_file_name, this->sections_array);
+    if (addr_size > (sizeof(uint32)*8))
+    {
+        this->mem = NULL;
+        return;
+    }
 
     this->set_num_size = addr_size - page_num_size - offset_size;
     this->page_num_size = page_num_size;
@@ -64,6 +74,9 @@ FuncMemory::FuncMemory( const char* executable_file_name,                       
     this->mem = new uint8**[this->sets_array_size];
     memset(this->mem, 0, (this->sets_array_size)*sizeof(uint8**));
 
+    // Get all sections from executable elf file (Elfsections will be saved in Private: sections_array)
+
+	ElfSection::getAllElfSections(executable_file_name, this->sections_array);
     Write_AllElfSections();            // write elf sections in memory
 }
 
@@ -192,6 +205,12 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 string FuncMemory::dump(string indent) const
 {
     ostringstream oss;
+    
+    if (mem == NULL)
+    {
+        oss << indent << "Memory is not initialized" << endl;
+        return oss.str();
+    }
 
     oss << indent << "Dump for allocated memory:" << endl
         << indent << "Memory size = " << ((this->sets_array_size)*(this->pages_array_size)*(this->page_size))/1024/1024/1024 << " gigabytes" << endl
@@ -272,6 +291,11 @@ void FuncMemory::pars_addr(uint64 addr, uint64 &set_number, uint64 &page_number,
 
 void FuncMemory::destroy_mem()                   // destruct memory after using
 {
+    if (mem == NULL)
+    {
+        return;
+    }
+    
     for(int i=0; i < this->sets_array_size; i++)       //destroy sets
     {
         if (mem[i] != NULL)
