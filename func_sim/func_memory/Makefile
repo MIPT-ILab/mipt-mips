@@ -29,7 +29,7 @@ func_memory: func_memory.o elf_parser.o main.o
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_memory.o: func_memory.cpp func_memory.h types.h
+func_memory.o: func_memory.cpp func_memory.h types.h my_assert.h
 	$(CXX) -c $< $(INCL)
 
 elf_parser.o: elf_parser.cpp elf_parser.h types.h
