@@ -24,11 +24,12 @@ using namespace std;
 class Mem_const
 {
 public:
-
+    Mem_const();
+    ~Mem_const();
     uint64 size;
     uint64 start_addr;
     char* name;
-    uint8 content;
+    uint8* content;
 };
 
 
