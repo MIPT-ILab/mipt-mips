@@ -17,29 +17,33 @@
 #include <types.h>
 #include <elf_parser.h>
 
+//My_lib
+#include <m_memory.h>
+
 using namespace std;
 
 class FuncMemory
 {
     // You could not create the object
     // using this default constructor
-    FuncMemory(){}
-
+    	FuncMemory(){}
 public:
+    	Memory *mem;	
+	uint64 start_PC;
 
-    FuncMemory ( const char* executable_file_name,
-                 uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
+    	FuncMemory ( const char* executable_file_name,
+                	uint64 addr_size = 32,
+                 	uint64 page_num_size = 10,
+                 	uint64 offset_size = 12);
     
-    virtual ~FuncMemory();
+    	virtual ~FuncMemory();
     
-    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
-    void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
+    	uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+    	void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     
-    uint64 startPC() const;
+    	uint64 startPC() const;
     
-    string dump( string indent = "") const;
+    	string dump( string indent = "") const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

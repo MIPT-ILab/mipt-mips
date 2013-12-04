@@ -20,12 +20,15 @@ int main (int argc, char* argv[])
         // set the name of the executable file
         const char * file_name = argv[1];        
         
-        // create the functiona memory
-        FuncMemory func_mem( file_name, 32, 10, 12);
-        
+        // create the functiona memory	
+        FuncMemory func_mem( file_name, 32, 10, 12);      
         // print content of the memory
+	cout << func_mem.dump() << endl;
+
+	cout << hex << func_mem.startPC() << dec  << endl ;	
+	func_mem.write ( 0x12345678, 0x4100c1, 4 );	
+	cout << hex << func_mem.read ( 0x4100c1, 4 ) << dec << endl; 
         cout << func_mem.dump() << endl;
- 
     } else if ( argc - 1 > num_of_args)
     {
         cerr << "ERROR: too many arguments!" << endl

@@ -23,17 +23,26 @@ GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
 #
 # Enter for building func_memory stand alone program
 #
-func_memory: func_memory.o elf_parser.o main.o
+func_memory: func_memory.o elf_parser.o m_memory.o m_segment.o m_page.o main.o
 	@# don't forget to link ELF library using "-l elf"
-	$(CXX) -o $@ $^ -l elf
+	$(CXX) -o $@ $^ -l elf -g -Wall
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_memory.o: func_memory.cpp func_memory.h types.h
-	$(CXX) -c $< $(INCL)
+m_page.o: m_page.cpp m_page.h types.h
+	$(CXX) -c $< $(INCL) -g -Wall
+
+m_segment.o: m_segment.cpp m_segment.h m_page.h types.h
+	$(CXX) -c $< $(INCL) -g -Wall
+
+m_memory.o: m_memory.cpp m_memory.h m_segment.h m_page.h types.h
+	$(CXX) -c $< $(INCL) -g -Wall
+
+func_memory.o: func_memory.cpp func_memory.h elf_parser.h m_memory.h types.h
+	$(CXX) -c $< $(INCL) -g -Wall
 
 elf_parser.o: elf_parser.cpp elf_parser.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) -c $< $(INCL) -g -Wall
 
 main.o: main.cpp func_memory.h types.h
 	$(CXX) -c $< $(INCL)
