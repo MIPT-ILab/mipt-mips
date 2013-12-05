@@ -40,7 +40,7 @@ class FuncMemory
     // using this default constructor
     FuncMemory() {};
     // Самый верхний уровень иерархии памяти. Содержит в себе указатели на блоки.
-    elem_of_memory array_of_sets; 
+    elem_of_memory* array_of_sets; 
 public:
 
     FuncMemory ( const char* executable_file_name,
