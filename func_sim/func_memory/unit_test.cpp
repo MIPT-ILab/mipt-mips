@@ -1,6 +1,7 @@
 // generic C
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
 
 // Google Test library
 #include <gtest/gtest.h>

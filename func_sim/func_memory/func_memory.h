@@ -54,6 +54,7 @@ private:
     uint64 page_num_size;
     uint64 offset_size;
 
+    uint64 MAX_ADDR;
     uint64 page_size;               // in bytes
     uint64 pages_array_size;
     uint64 sets_array_size;

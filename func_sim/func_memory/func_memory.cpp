@@ -6,13 +6,16 @@
  */
 
 // Generic C
+#include <libelf.h>
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
 #include <fcntl.h>
+#include <gelf.h>
 #include <cstdlib>
 #include <cerrno>
 #include <cassert>
+#include <malloc.h>
 
 // Generic C++
 #include <iostream>
@@ -24,6 +27,7 @@
 
 //my modules
 #include <my_assert.h>
+#include <size.h>
 
 FuncMemory::FuncMemory()
 {
@@ -41,11 +45,11 @@ FuncMemory::FuncMemory( const char* executable_file_name,                       
 {
     if (executable_file_name == NULL)
     {
-		cerr << "ERROR: You must choose executable file to parse\n";
+	cerr << "ERROR. You must choose executable file to parse\n";
         exit(EXIT_FAILURE);
     }
 
-	int fd = open(executable_file_name, O_RDONLY);
+    int fd = open(executable_file_name, O_RDONLY);
     if (fd == -1)
     {
         cerr << "ERROR. File doesn't exist\n";
@@ -53,31 +57,26 @@ FuncMemory::FuncMemory( const char* executable_file_name,                       
     }
     close(fd);
 
-    if (addr_size > (sizeof(uint32)*8))
-    {
-        this->mem = NULL;
-        return;
-    }
-
     this->set_num_size = addr_size - page_num_size - offset_size;
     this->page_num_size = page_num_size;
     this->offset_size = offset_size;
 
     // count page_size, pages_array_size, sets_array_size
 
-    this->page_size = 1 << offset_size;
-    this->pages_array_size = 1 << page_num_size;
-    this->sets_array_size = 1 << set_num_size;
+    this->MAX_ADDR = SIZE_IN_ELEMENTS(addr_size);
+    this->page_size = SIZE_IN_ELEMENTS(offset_size)+1;
+    this->pages_array_size = SIZE_IN_ELEMENTS(page_num_size)+1;
+    this->sets_array_size = SIZE_IN_ELEMENTS(set_num_size)+1;
 
     //inicialization of memory
 
-    this->mem = new uint8**[this->sets_array_size];
-    memset(this->mem, 0, (this->sets_array_size)*sizeof(uint8**));
+    this->mem = (uint8***)calloc(this->sets_array_size, sizeof(uint8**));
+    MY_ASSERT(this->mem != NULL, "You requaried a very big memory");
 
     // Get all sections from executable elf file (Elfsections will be saved in Private: sections_array)
 
-	ElfSection::getAllElfSections(executable_file_name, this->sections_array);
-    Write_AllElfSections();            // write elf sections in memory
+    ElfSection::getAllElfSections(executable_file_name, this->sections_array);               
+    Write_AllElfSections();                                                          // write elf sections in memory
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +90,7 @@ FuncMemory::~FuncMemory()
 
 uint64 FuncMemory::startPC() const
 {
-    for(int i=0; i < sections_array.size(); i++)
+    for(uint64 i=0; i < sections_array.size(); i++)
     {
         if (strcmp(sections_array[i].name, ".text") == 0)
         {
@@ -105,9 +104,9 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
 {
-    MY_ASSERT(addr < (this->page_size)*(this->pages_array_size)*(this->sets_array_size), "Invalid address for reading");
+    MY_ASSERT(addr <= MAX_ADDR, "Invalid address for reading");
     MY_ASSERT((num_of_bytes <= sizeof(uint64)) && (num_of_bytes > 0), "Number_of_bytes for writing can't be more then sizeof(uint64) or less then 1");
-    MY_ASSERT(num_of_bytes+addr-1 < (this->page_size)*(this->pages_array_size)*(this->sets_array_size), "Attempt to read beyond memory");
+    MY_ASSERT(num_of_bytes+addr-1 <= MAX_ADDR, "Attempt to read beyond memory");
 
     uint64 set_number;
     uint64 page_number;
@@ -115,14 +114,14 @@ uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
 
     pars_addr(addr, set_number, page_number, offset);
 
-    if (mem[set_number] != NULL)
+    if (this->mem[set_number] != NULL)
     {
-        if (mem[set_number][page_number] != NULL)
+        if (this->mem[set_number][page_number] != NULL)
         {
             uint64 res_value = 0;
             if (offset + num_of_bytes <= this->page_size)           // if we will read from one page
             {
-                for(int i=0; i <= num_of_bytes-1; i++)
+                for(uint64 i=0; i <= num_of_bytes-1; i++)
                 {
                     res_value = res_value << ((sizeof(uint8)*8));
                     res_value = res_value + mem[set_number][page_number][offset+num_of_bytes-1-i];
@@ -156,9 +155,9 @@ uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
 
 void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    MY_ASSERT(addr < (this->page_size)*(this->pages_array_size)*(this->sets_array_size), "Invalid address for writing");
+    MY_ASSERT(addr <= MAX_ADDR, "Invalid address for writing");
     MY_ASSERT((num_of_bytes <= sizeof(uint64)) && (num_of_bytes > 0), "Number_of_bytes for writing can't be more then sizeof(uint64) or less then 1");
-    MY_ASSERT(num_of_bytes+addr < (this->page_size)*(this->pages_array_size)*(this->sets_array_size), "Attempt to write beyond memory");
+    MY_ASSERT(num_of_bytes+addr-1 <= MAX_ADDR, "Attempt to write beyond memory");
 
     uint64 set_number;
     uint64 page_number;
@@ -169,26 +168,27 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 
     if (offset + num_of_bytes <= this->page_size)                      // if we will write on one page
     {
-        if (mem[set_number] == NULL)                              // if address doesn't exist then create it
+        if (this->mem[set_number] == NULL)                              // if address doesn't exist then create it
         {
-            mem[set_number] = new uint8*[this->pages_array_size];
-            memset(mem[set_number], NULL, (this->pages_array_size)*sizeof(uint8*));
-            mem[set_number][page_number] = new uint8[this->page_size];
-            memset(mem[set_number][page_number], NULL, (this->page_size)*sizeof(uint8));
+            this->mem[set_number] = (uint8**)calloc(this->pages_array_size, sizeof(uint8*));
+            MY_ASSERT(this->mem[set_number] != NULL, "You requaried a very big memory");
+
+            this->mem[set_number][page_number] = (uint8*)calloc(this->page_size, sizeof(uint8));
+            MY_ASSERT(this->mem[set_number][page_number] != NULL, "You requaried a very big memory");
         }
-        if (mem[set_number][page_number] == NULL)
+        if (this->mem[set_number][page_number] == NULL)
         {
-            mem[set_number][page_number] = new uint8[this->page_size];
-            memset(mem[set_number][page_number], NULL, (this->page_size)*sizeof(uint8));
+            this->mem[set_number][page_number] = (uint8*)calloc(this->page_size, sizeof(uint8));
+            MY_ASSERT(this->mem[set_number][page_number] != NULL, "You requaried a very big memory");
         }
 
         uint64 temp = 0;                               // temp variable
 
-        for(int i=0; i <= num_of_bytes-1; i++)            //writing value in memory
+        for(uint64 i=0; i <= num_of_bytes-1; i++)            //writing value in memory
         {
             temp = value << ((sizeof(uint64)-i-1)*8);
             temp = temp >> ((sizeof(uint64)-1)*8);
-            mem[set_number][page_number][offset+i] = temp;
+            this->mem[set_number][page_number][offset+i] = temp;
         }
     }
     else                                                     // if we will write on two pages
@@ -197,6 +197,7 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
         uint64 value_next = value >> ((this->page_size-offset)*8);
 
         write(value_next, addr+(this->page_size-offset), num_of_bytes-(this->page_size-offset));
+
     }
 }
 
@@ -205,26 +206,26 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 string FuncMemory::dump(string indent) const
 {
     ostringstream oss;
-    
-    if (mem == NULL)
+
+    if (this->mem == NULL)
     {
         oss << indent << "Memory is not initialized" << endl;
         return oss.str();
     }
 
     oss << indent << "Dump for allocated memory:" << endl
-        << indent << "Memory size = " << ((this->sets_array_size)*(this->pages_array_size)*(this->page_size))/1024/1024/1024 << " gigabytes" << endl
+        << indent << "Memory size = " << MAX_ADDR/1024/1024/1024 + 1 << " gigabytes" << endl
         << indent << "Set size = " << this->pages_array_size << " bytes" << endl
         << indent << "Page size = " << this->page_size << " bytes" << endl
         << indent << endl;
 
     for(uint64 set_number = 0; set_number < this->sets_array_size; set_number++)             //research the sets_array
     {
-        if (mem[set_number] != NULL)          // if set exists
+        if (this->mem[set_number] != NULL)          // if set exists
         {
             for(uint64 page_number = 0; page_number < this->pages_array_size; page_number++)     //resaearch pages_array
             {
-                if (mem[set_number][page_number] != NULL)          //if page exists
+                if (this->mem[set_number][page_number] != NULL)          //if page exists
                 {
                     oss << indent << endl;
                     oss << indent << hex << "In set number " << set_number << " Page number " << page_number << endl;
@@ -242,7 +243,7 @@ string FuncMemory::dump(string indent) const
 
 string FuncMemory::page_dump(uint64 set_number, uint64 page_number) const
 {
-     string temp;
+     string indent;
      ostringstream oss;
 
      uint64 addr = (set_number << (this->offset_size+this->page_num_size)) + (page_number << this->offset_size);
@@ -255,10 +256,21 @@ string FuncMemory::page_dump(uint64 set_number, uint64 page_number) const
          uint64 val = read(addr+offset, sizeof(uint32));
          if (val != NULL)
          {
-             oss << temp << "0x" << addr+offset << ": " ;
-             oss << temp << val << endl;
-         }
+             oss << indent << "0x" << addr+offset << ": " ;
+             uint64 temp = 0;
+             uint64 mask = MAX_VAL8;
 
+             for(uint64 i = 0; i <= sizeof(uint32)-1; i++)
+             {
+                 temp = val >> i*8;
+                 temp = mask & temp;
+                 oss.width(2);               //two hex simbols to print a byte
+                 oss.fill('0');           //1 will be printed as 01
+                 oss << (uint16) temp;
+             }
+             
+             oss << indent << "\n";
+         }
          offset = offset + sizeof(uint32);
      }
 
@@ -291,26 +303,26 @@ void FuncMemory::pars_addr(uint64 addr, uint64 &set_number, uint64 &page_number,
 
 void FuncMemory::destroy_mem()                   // destruct memory after using
 {
-    if (mem == NULL)
+    if (this->mem == NULL)                 //if memory is not initialized
     {
         return;
     }
-    
-    for(int i=0; i < this->sets_array_size; i++)       //destroy sets
+
+    for(uint64 i=0; i < this->sets_array_size; i++)       //destroy sets
     {
-        if (mem[i] != NULL)
+        if (this->mem[i] != NULL)
         {
-            for(int j=0; j < this->pages_array_size; j++)   //destroy pages
+            for(uint64 j=0; j < this->pages_array_size; j++)   //destroy pages
             {
-                if (mem[i][j] != NULL)
+                if (this->mem[i][j] != NULL)
                 {
-                    delete [] mem[i][j];
+                    free(this->mem[i][j]);
                 }
             }
-            delete [] mem[i];
+            free(this->mem[i]);
         }
     }
-    delete [] mem;          //destroy head pointer
+    free(this->mem);          //destroy head pointer
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -339,9 +351,7 @@ void FuncMemory::Write_Section(uint64 sect_number)
     uint64 number_of_records = (size - size % sizeof(uint64))/sizeof(uint64);
     uint64 modulo = size % sizeof(uint64);
 
-
-    uint64 i = 1;
-    for(i = 1; i <= number_of_records; i++)
+    for(uint64 i = 1; i <= number_of_records; i++)
     {
         value_to_write = 0;
 
@@ -357,7 +367,6 @@ void FuncMemory::Write_Section(uint64 sect_number)
         cont_pointer = cont_pointer + sizeof(uint64);
 
     }
-
 
     value_to_write = 0;
 
