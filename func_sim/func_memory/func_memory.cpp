@@ -6,12 +6,10 @@
  */
 
 // Generic C
-#include <libelf.h>
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
 #include <fcntl.h>
-#include <gelf.h>
 #include <cstdlib>
 #include <cerrno>
 #include <cassert>
@@ -19,7 +17,6 @@
 
 // Generic C++
 #include <iostream>
-#include <string>
 #include <sstream>
 
 // uArchSim modules
@@ -45,14 +42,14 @@ FuncMemory::FuncMemory( const char* executable_file_name,                       
 {
     if (executable_file_name == NULL)
     {
-	cerr << "ERROR. You must choose executable file to parse\n";
+	cerr << "ERROR. You must choose executable file to parse" << endl;
         exit(EXIT_FAILURE);
     }
 
     int fd = open(executable_file_name, O_RDONLY);
     if (fd == -1)
     {
-        cerr << "ERROR. File doesn't exist\n";
+        cerr << "ERROR. File doesn't exist" << endl;
         exit(EXIT_FAILURE);
     }
     close(fd);
@@ -104,9 +101,9 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
 {
-    MY_ASSERT(addr <= MAX_ADDR, "Invalid address for reading");
+    MY_ASSERT(addr <= this->MAX_ADDR, "Invalid address for reading");
     MY_ASSERT((num_of_bytes <= sizeof(uint64)) && (num_of_bytes > 0), "Number_of_bytes for writing can't be more then sizeof(uint64) or less then 1");
-    MY_ASSERT(num_of_bytes+addr-1 <= MAX_ADDR, "Attempt to read beyond memory");
+    MY_ASSERT(num_of_bytes+addr-1 <= this->MAX_ADDR, "Attempt to read beyond memory");
 
     uint64 set_number;
     uint64 page_number;
@@ -129,11 +126,12 @@ uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
                 return res_value;
 
             }
-            else                                                      // if we will read from two pages
+            else                                                      // if we will read from several pages
             {
-                uint64 part2 = read(addr+(this->page_size-offset), num_of_bytes-(this->page_size-offset));
+                uint64 part2 = read(addr+(this->page_size-offset), num_of_bytes-(this->page_size-offset));   //get the part of number which                                                                                                             is situated on the next page
                 part2 = part2 << ((this->page_size-offset)*8);
-                uint64 part1 = read(addr, this->page_size-offset);
+
+                uint64 part1 = read(addr, this->page_size-offset);    //get the part of number which is situated on this page
 
                 res_value = part2+part1;
                 return res_value;
@@ -155,9 +153,9 @@ uint64 FuncMemory::read(uint64 addr, unsigned short num_of_bytes) const
 
 void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    MY_ASSERT(addr <= MAX_ADDR, "Invalid address for writing");
+    MY_ASSERT(addr <= this->MAX_ADDR, "Invalid address for writing");
     MY_ASSERT((num_of_bytes <= sizeof(uint64)) && (num_of_bytes > 0), "Number_of_bytes for writing can't be more then sizeof(uint64) or less then 1");
-    MY_ASSERT(num_of_bytes+addr-1 <= MAX_ADDR, "Attempt to write beyond memory");
+    MY_ASSERT(num_of_bytes+addr-1 <= this->MAX_ADDR, "Attempt to write beyond memory");
 
     uint64 set_number;
     uint64 page_number;
@@ -191,7 +189,7 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
             this->mem[set_number][page_number][offset+i] = temp;
         }
     }
-    else                                                     // if we will write on two pages
+    else                                                     // if we will write on several pages
     {
         write(value, addr, (this->page_size-offset));
         uint64 value_next = value >> ((this->page_size-offset)*8);
@@ -215,7 +213,7 @@ string FuncMemory::dump(string indent) const
 
     oss << indent << "Dump for allocated memory:" << endl
         << indent << "Memory size = " << MAX_ADDR/1024/1024/1024 + 1 << " gigabytes" << endl
-        << indent << "Set size = " << this->pages_array_size << " bytes" << endl
+        << indent << "Set size = " << this->pages_array_size << " pages" << endl
         << indent << "Page size = " << this->page_size << " bytes" << endl
         << indent << endl;
 
@@ -265,11 +263,11 @@ string FuncMemory::page_dump(uint64 set_number, uint64 page_number) const
                  temp = val >> i*8;
                  temp = mask & temp;
                  oss.width(2);               //two hex simbols to print a byte
-                 oss.fill('0');           //1 will be printed as 01
+                 oss.fill('0');              //1 will be printed as 01
                  oss << (uint16) temp;
              }
              
-             oss << indent << "\n";
+             oss << indent << endl;
          }
          offset = offset + sizeof(uint32);
      }

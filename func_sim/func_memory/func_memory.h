@@ -45,6 +45,7 @@ public:
     string page_dump(uint64 set_number, uint64 page_number) const;
 
 private:
+
     void destroy_mem();
     void pars_addr(uint64 addr, uint64 &set_number, uint64 &page_number, uint64 &offset) const;
     void Write_AllElfSections();
@@ -55,7 +56,7 @@ private:
     uint64 offset_size;
 
     uint64 MAX_ADDR;
-    uint64 page_size;               // in bytes
+    uint64 page_size;               // sizes of page, set in bytes
     uint64 pages_array_size;
     uint64 sets_array_size;
 
