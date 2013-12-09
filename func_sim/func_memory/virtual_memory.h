@@ -14,17 +14,21 @@
 // Generic C
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 // Generic C++
-#include "../../common/types.h"
 #include <iostream>
+
+// uArchSim modules
+//#include <types.h>
+#include "../../common/types.h"
 
 class VirtualMemory
 {
     uint8** sets;   // this is a main array of data ( 1st level)
     uint64 addr_size;       //--------
     uint64 sets_num_size;   //Sizes in bits. Class is working with
-    uint64 page_num_size;   //any sizes, from 1 to 63. (0 is included) 
+    uint64 page_num_size;   //any sizes, from 3 to 64. 
     uint64 offset_size;     //--------
     uint64 sets_num_mask;   //--Constants wich is defined in the constructor.
     uint64 page_num_mask;   // It is uint64 with 1 bits in same positions.
@@ -58,8 +62,5 @@ public:
     ~VirtualMemory();   // Recursive memory freeng
 
 };
-
-
-
 
 #endif //ifndef FUNC_MEMORY__VIRTUAL_MEMORY_H

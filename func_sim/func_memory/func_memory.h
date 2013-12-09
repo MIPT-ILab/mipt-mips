@@ -17,6 +17,10 @@
 #include <types.h>
 #include <elf_parser.h>
 
+//--------------------------------------------------------------
+#include "virtual_memory.h" //while no changes in the makefile
+//--------------------------------------------------------------
+
 using namespace std;
 
 class FuncMemory
@@ -26,7 +30,7 @@ class FuncMemory
     FuncMemory(){}
 
 public:
-
+    VirtualMemory* memory;
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
@@ -34,12 +38,12 @@ public:
     
     virtual ~FuncMemory();
     
-    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+    uint64 read( uint64 addr, unsigned short num_of_bytes = 4); //const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     
-    uint64 startPC() const;
+    uint64 startPC(); //const;
     
-    string dump( string indent = "") const;
+    string dump( string indent = ""); //const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

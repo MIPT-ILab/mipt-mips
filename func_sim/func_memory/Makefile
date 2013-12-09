@@ -23,19 +23,19 @@ GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
 #
 # Enter for building func_memory stand alone program
 #
-func_memory: func_memory.o elf_parser.o main.o
+func_memory: func_memory.o elf_parser.o main.o virtual_memory.o
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_memory.o: func_memory.cpp func_memory.h types.h
+func_memory.o: func_memory.cpp func_memory.h types.h virtual_memory.h
 	$(CXX) -c $< $(INCL)
 
-elf_parser.o: elf_parser.cpp elf_parser.h types.h
+elf_parser.o: elf_parser.cpp elf_parser.h
 	$(CXX) -c $< $(INCL)
 
-main.o: main.cpp func_memory.h types.h
+main.o: main.cpp func_memory.h types.h 
 	$(CXX) -c $< $(INCL)
 
 #
@@ -47,7 +47,7 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
 
-unit_test: unit_test.o func_memory.o elf_parser.o
+unit_test: unit_test.o func_memory.o elf_parser.o virtual_memory.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
 	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf  $(GTEST_LIB)
