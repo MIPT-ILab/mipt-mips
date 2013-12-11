@@ -22,9 +22,18 @@ int main (int argc, char* argv[])
         
         // create the functiona memory
         FuncMemory func_mem( file_name, 32, 10, 12);
-        
+       
+        // test read
+        //cout << "Value read = "; 
+        //cout << func_mem.read( 4194452, 1) << endl;
+
+        // print startPC
+        cout << "startPC = ";
+        cout << func_mem.startPC() << endl;
+
         // print content of the memory
         cout << func_mem.dump() << endl;
+
  
     } else if ( argc - 1 > num_of_args)
     {

@@ -21,11 +21,11 @@
 
 using namespace std;
 
-class Mem_const
+class mem_field
 {
 public:
-    Mem_const();
-    ~Mem_const();
+    mem_field();
+    ~mem_field();
     uint64 size;
     uint64 start_addr;
     char* name;
@@ -38,15 +38,26 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+    uint8 ***memory;
+    uint64 setSize;
+    uint64 pageSize;
+    uint64 offsetSize;
+    uint64 blindSize; // For empty space due to size of address
+    uint64 txt_addr;
+    void mem_delete();
+    uint64 set_num; // Number of pointers
+    uint64 page_num;
+    uint64 offset_num;
 
 public:
 
-    FuncMemory ( const char* executable_file_name,
+
+        FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
                  uint64 offset_size = 12);
     
-    virtual ~FuncMemory();
+        virtual ~FuncMemory();
     
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
