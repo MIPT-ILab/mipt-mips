@@ -62,14 +62,26 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 offset_bits)
 {
     // Check file exist
-    /*ofstream file_t ( executable_file_name, ios::binary);
-    if( !file_t.is_open()) 
+    FILE* file = fopen( executable_file_name, "r");
+    if( !file)
     {
+        fclose( file);
         cerr << "Wrong file name!" << endl;
         exit( EXIT_FAILURE);
-    };
-    file_t.close();*/
-
+    }
+    else
+        fclose( file);
+    
+    /*ifstream file_t ( executable_file_name, ios::binary);
+    if( !file_t.good()) 
+    {    
+        file_t.close();
+        cerr << "Wrong file name!" << endl;
+        exit( EXIT_FAILURE);
+    } 
+    else
+        file_t.close();
+    */
     // Set address parameters
     setSize = addr_size - page_bits - offset_bits;
     pageSize = page_bits;
@@ -78,7 +90,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 
     set_num = 1 << setSize; 
     page_num = 1 << pageSize ;
-    offset_num = 1 << offsetSize;
+    offset_num = 1 << (offsetSize-1);
 
     cout << "set_num = " << set_num << endl;
     cout << "page_num = " << page_num << endl;
@@ -97,7 +109,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     ElfSection::getAllElfSections( executable_file_name, section_array);
     cout << "parsed" << endl;
     
-    cout << "vector size" << section_array.size() << endl;
+    cout << "vector size " << section_array.size() << endl;
     // Init memory                   
     memory = new uint8 **[ set_num];
 
@@ -127,7 +139,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         // Allocating memory
         cout << "*****************************"<<endl;
         
-        if( !memory[ set])
+        if( memory[ set] == NULL)
         {
             memory[ set] = new uint8 *[ page_num];
             cout << "page allocated" << endl;
@@ -141,7 +153,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         cout << "memory allocated!" << endl;
         cout << "*****************************"<<endl;
 
-        uint64 num = 0;
+        /*uint64 num = 0;
         uint64 a = (*it).content[num];
         cout << "ex value = " << a << "|";
         a = (*it).content[1];
@@ -149,13 +161,15 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         a = (*it).content[2];
         cout << a << "|";
         a = (*it).content[3];
-        cout << a << endl;
+        cout << a << endl;*/
 
 
         // Filling content
         for( uint64 i = 0; i < (*it).size; i++)
         {
             memory[ set][ page][ offset + i] = (*it).content[i];
+            uint64 temp = memory[ set][ page][ offset + i];
+            //cout << "wrote " << temp << " to " << offset+i << endl;
         }
 
         cout << "section filled!" << endl;
@@ -177,12 +191,13 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
+    // Get set, page and offset
     uint64 value = 0;
     uint64 set = addr >> ( pageSize + offsetSize);
     uint64 page = addr << ( blindSize + setSize) >> ( blindSize + pageSize + offsetSize);
     uint64 offset = addr << ( blindSize + setSize + pageSize) >> ( blindSize + setSize + pageSize);
    
-    cout << "here we are going to seg fault" << endl;
+    // Check if address exists
     if( memory[ set] == NULL)
     {
         cerr << "Reading wrong address! Abort." << endl;
@@ -193,13 +208,12 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
         cerr << "Reading wrong address! Abort." << endl;
         exit( EXIT_FAILURE);
     }
+    // Reading value
     for( unsigned short i = 0; i < num_of_bytes; i++)
     {
         uint64 temp = memory[ set][ page][ offset + i];
-        //cout << "temp = " << temp;
         value = value << ( 8 * i);
         value += temp;
-        //cout << value;
     }
  
     return value;
@@ -207,12 +221,37 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
+    // Check argument
+    if( num_of_bytes > 8)
+    {
+        cerr << "Wrong num_of_bytes argument!" << endl;
+        exit( EXIT_FAILURE);
+    }
+    // Get set, page and offset
     uint64 set = addr >> ( pageSize + offsetSize);
     uint64 page = addr << ( blindSize + setSize) >> ( blindSize + pageSize + offsetSize);
     uint64 offset = addr << ( blindSize + setSize + pageSize) >> ( blindSize + setSize + pageSize);
  
+    // Allocating memory if not
     if( memory[ set] == NULL)
-    {}
+    {
+        memory[ set] = new uint8 *[ page_num];
+        cout << "new set allocated" << endl;
+    }
+    if( memory[ set][ page] == NULL)
+    {
+        memory[ set][ page] = new uint8 [ offset_num];
+        cout << "new page allocated" << endl;
+    }
+
+    uint64 temp;
+    for( unsigned short i = 0; i < num_of_bytes; i++)
+    {
+        temp = value >> ( ( num_of_bytes - i - 1) * 8); // Now 8 bits are at right
+        temp << ( 7 * 8) >> ( 7 * 8);                   // Delete higher bits
+        memory[ set][ page][ offset + i] = temp;
+    }
+
 }
 
 string FuncMemory::dump( string indent) const

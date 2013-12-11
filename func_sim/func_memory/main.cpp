@@ -24,12 +24,17 @@ int main (int argc, char* argv[])
         FuncMemory func_mem( file_name, 32, 10, 12);
        
         // test read
-        //cout << "Value read = "; 
-        //cout << func_mem.read( 4194452, 1) << endl;
+        cout << "Value read = "; 
+        cout << func_mem.read( 4260032, 3) << endl;
 
         // print startPC
         cout << "startPC = ";
         cout << func_mem.startPC() << endl;
+
+        // test write
+        func_mem.write( 2000, 11111111, 2);
+
+        cout << "written value = " << func_mem.read( 11111111, 2) << endl;
 
         // print content of the memory
         cout << func_mem.dump() << endl;
