@@ -17,6 +17,7 @@ private:
 	Memory ();	 
 public:
 	vector<Segment*> mem;
+	uint64 mem_size;	
 	uint64 num_seg;	
 	uint64 addr_size;
 	uint64 page_bits;

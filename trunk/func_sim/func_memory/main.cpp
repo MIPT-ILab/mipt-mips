@@ -26,9 +26,8 @@ int main (int argc, char* argv[])
 	cout << func_mem.dump() << endl;
 
 	cout << hex << func_mem.startPC() << dec  << endl ;	
-	func_mem.write ( 0x12345678, 0x4100c1, 4 );	
-	cout << hex << func_mem.read ( 0x4100c1, 4 ) << dec << endl; 
-        cout << func_mem.dump() << endl;
+	func_mem.write ( 50462977, 0x4100c1, 4 );	
+	cout << dec << func_mem.read ( 0x4100c1, 4 ) << dec << endl; 
     } else if ( argc - 1 > num_of_args)
     {
         cerr << "ERROR: too many arguments!" << endl

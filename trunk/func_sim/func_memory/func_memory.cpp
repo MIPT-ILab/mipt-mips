@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <cassert>
+#include <cmath>
 
 // uArchSim modules
 #include <func_memory.h>
@@ -24,11 +26,19 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////
 
+void M_EXIT_FAIL ( const char *reason )
+{
+	cout << reason << endl;
+	assert ( 0 );
+} 
+
+///////////////////////////////////////////////////////////////////////////
+
 FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size,
                         uint64 page_bits,
                         uint64 offset_bits)
-{
+{	
 	//Start check
 	if ( ( addr_size > 64 ) || ( page_bits > 64 ) || ( offset_bits > 64 ) )
 	{
@@ -89,14 +99,18 @@ uint64 FuncMemory::startPC() const
 ///////////////////////////////////////////////////////////////////////////
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
-{
-	//if ( addr + num_of_bytes ) > MAX_VAL64
+{	
 	if ( ( MAX_VAL64 - addr ) < num_of_bytes )
 	{
-		cout << "This addr 0x" << hex << addr 
+		cout << "ERROR : This addr 0x" << hex << addr 
 		<< dec << " and num_of_bytes " << num_of_bytes 
 		<< " are too big\n";
-		return 0; 
+		M_EXIT_FAIL ( "READ_FAIL" ); 
+	}
+	if ( !num_of_bytes )
+	{
+		cout << "ERROR : num_of_bytes = " << num_of_bytes << endl;
+		M_EXIT_FAIL ( "READ_FAIL" );
 	}
 	uint64 offset = 0;
 	uint64 num_page = 0;
@@ -115,22 +129,21 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 		
 		//get num_seg
 		num_seg = ( (addr+i) >> ( ( mem -> offset_bits ) + ( mem -> page_bits ) ) );
-		if ( num_seg >> ( (  mem -> addr_size ) - ( ( mem -> offset_bits ) + ( mem -> page_bits ) ) ) )
+		if ( num_seg > mem -> num_seg )
 		{
-			cout << "This addr 0x" << hex << addr << dec << " is to big\n";
-			return 0; 
+			cout << "ERROR : This addr 0x" << hex << addr << dec << " is too big\n";
+			M_EXIT_FAIL ( "READ_FAIL" ); 
 		}
 		
 		if ( ( mem -> mem[num_seg] ) &&
 			( mem -> mem[num_seg] -> Seg[num_page] ) )
 		{
-			int byte = ( mem -> mem[num_seg] -> Seg[num_page] -> data_page[offset] ); 
-			result += ( ( ( byte & 0xf ) << 4 ) + ( ( byte & 0xf0 ) >> 4 ) ) << i*8; 
+			result += ( mem -> mem[num_seg] -> Seg[num_page] -> data_page[offset] ) << i*8;  
 		}
 		else
 		{
-			cout << "Memory isn't allocated, addr 0x" << hex << addr << dec  << " isn't valid\n";
-			return 0;
+			cout << "ERROR : Memory isn't allocated, addr 0x" << hex << addr << dec  << " isn't valid\n";
+			M_EXIT_FAIL ( "READ_FAIL" ); 
 		}
 	}
 	return result;
@@ -145,22 +158,29 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 		cout << "ERROR : This addr 0x" << hex << addr 
 		<< dec << " and num_of_bytes " << num_of_bytes 
 		<< " are too big\n";
-		return; 
+		M_EXIT_FAIL ( "WRITE_FAIL" ); 
 	}
-	if ( value >> ( num_of_bytes * 8 ) )
+	if ( value > pow ( 256, num_of_bytes) - 1 )
 	{
 		cout << "ERROR : value 0x" << hex << value
-		<< dec << " isn't valid\n";
-		return;
+		<< dec <<  " isn't valid\n";
+		M_EXIT_FAIL ( "WRITE_FAIL" );
 	}
+ 	if ( !num_of_bytes )
+	{
+		cout << "ERROR : num_of_bytes = " << num_of_bytes << endl;
+		M_EXIT_FAIL ( "WRITE_FAIL" );
+	}
+	
 
 	for ( int i = 0; i < num_of_bytes; ++i )
 	{
-		uint8 data = ( ( ( value & ( 0xf << i*8 ) ) << 4 ) + ( ( value & ( 0xf0 << i*8 ) ) >> 4 ) ) >> i*8;
+		uint8 data =  ( value & ( 0xFF << i*8 ) ) >> i*8;
+		 
 		if ( mem -> filling ( addr + i, data ) )
 		{
 			cout << "ERROR: problem with filling memory\n";
-			exit ( EXIT_FAILURE );
+			M_EXIT_FAIL ( "WRITE_FAIL" );
 		}
 	}
 	

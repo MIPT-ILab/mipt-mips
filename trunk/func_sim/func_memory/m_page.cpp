@@ -24,7 +24,7 @@ Page :: Page ( uint64 p_bits )
 		{	
 			size = pow ( 2, p_bits );
 			data_page = new uint8[size];
-			memset ( data_page, 0, size * sizeof ( uint8 ) );	
+			//memset ( data_page, 0, size * sizeof ( uint8 ) );			
 		}
 
 //////////////////////////////////////////////////////////////////////
@@ -43,3 +43,5 @@ Page :: ~Page ()
 		{
 			delete [] data_page;		
 		}
+
+//////////////////////////////////////////////////////////////////////

@@ -39,8 +39,13 @@ Memory :: Memory ( uint64 addrSize, uint64 pageBits, uint64 offsetBits )
 			addr_size = addrSize;
 			page_bits = pageBits;
 			offset_bits = offsetBits;
-			num_seg = pow ( 2, addr_size - page_bits - offset_bits );
 			
+			num_seg = pow ( 2, addr_size - page_bits - offset_bits );
+			if ( addr_size != 64 ) 
+				mem_size = pow ( 2, addr_size );
+			else 
+				mem_size = -1;
+
 			mem.resize(num_seg, NULL);						
 		}
 
@@ -62,9 +67,9 @@ Memory :: Memory ( Memory &m )
 int Memory :: filling ( uint64 addr, uint8  data )
 		{
 			//start check addr
-			if ( addr >> addr_size )
+			if ( addr > mem_size )
 			{
-				cout << "ERROR : Addr 0x" << hex << addr <<dec
+				cout << "ERROR : Addr 0x" << hex << addr << dec << mem_size 
 				<< " is to big\n";
 				return -1;
 			}
@@ -78,7 +83,7 @@ int Memory :: filling ( uint64 addr, uint8  data )
 			num_page = ( addr << ( (sizeof(addr)*8)- offset_bits - page_bits) ) >> ( (sizeof(addr)*8) - page_bits );
 			//get num_seg
 			num_seg = addr >> (offset_bits + page_bits);
-				
+									
 			//create new segment and new page
 			if ( !(this -> mem[num_seg]) )
 			{			
@@ -90,19 +95,21 @@ int Memory :: filling ( uint64 addr, uint8  data )
 				}	
 				this -> mem[num_seg] = new_seg;
 			}
-
+			
 			if ( !(this -> mem[num_seg] -> Seg[num_page]) )
 			{
-				Page *new_page = new Page ( offset_bits );	
+				Page *new_page = new Page ( offset_bits );
 				if ( new_page <= 0 )
 				{
 					cout << "ERROR: memory isn't allocate\n";
 					return -1;
 				}	
-				this -> mem[num_seg] -> Seg[num_page] = new_page;				
+				
+				this -> mem[num_seg] -> Seg[num_page] = new_page;			
 				this -> mem[num_seg] -> Seg[num_page] -> start_addr = ( addr >> offset_bits ) << offset_bits;
 			
 			}
+			
 			//fill new page
 			this -> mem[num_seg] -> Seg[num_page] -> data_page[offset] = data;
 			return 0;
@@ -119,8 +126,7 @@ Memory :: ~Memory ()
 			}
 		}
 
-
-
+//////////////////////////////////////////////////////////////////////
 
 
 
