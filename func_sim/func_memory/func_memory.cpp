@@ -11,8 +11,9 @@
 
 // uArchSim modules
 #include <func_memory.h>
-#include <cstdio>
+#include <iostream>
 
+using namespace std;
 //------------------------------------------------------------------------------
 
 // Конструктор класса elem_of_memory. 
@@ -21,7 +22,6 @@ elem_of_memory::elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_pag
 {
 // Присваиваем элементу памяти размер его массива(т.е. косвенно определяем, какой это элемент - массив блоков страниц, блок страниц или страница).
 	size = size_of_elem_of_memory;
-	printf("-5");
 	uint64 counter = 0;
 // Если этот элемент - страница, то она должна содержать в себе массив указателей на байты памяти(uint8). Поэтому мы выделяем необходимую для массива память и инициализируем все указатели на память в массиве как NULL
 	if(size == size_of_page)
@@ -34,7 +34,6 @@ elem_of_memory::elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_pag
 			array_of_byte[counter] = NULL;
 			counter++;
 		}
-		printf("-6");
 	}
 // Если этот элемент не страница, то в её массиве содержатся указатели на другие элементы памяти(elem_of_memory). Поэтому мы делаем то же что и в предыдущем случае, только тип элементов массива заменяем на elem_of_memory.
 	else
@@ -47,11 +46,8 @@ elem_of_memory::elem_of_memory(uint64 size_of_elem_of_memory, uint64 size_of_pag
 			array_of_elem_of_memory[counter] = NULL;
 			counter++;
 		}
-		printf("-7");	
 	}
-	printf("-8");
 }
-
 //------------------------------------------------------------------------------
 
 // Деструктор класса elem_of_memory. Он ничего не делает, так как всю работу за него выполняет функция clear.
@@ -70,21 +66,19 @@ void clear(elem_of_memory* elem)
 	uint64 counter;
 	if(elem -> array_of_byte == NULL)
 	{
-		assert(elem -> array_of_elem_of_memory != 0);
 		for(counter = 0; counter < elem -> size; counter++)
 		{
 			if(elem -> array_of_elem_of_memory[counter] != NULL)
 			{
 				clear(elem -> array_of_elem_of_memory[counter]);
+				delete elem -> array_of_elem_of_memory[counter];
 			}
 			assert(counter < elem -> size);		
 		}
 		delete elem -> array_of_elem_of_memory;
-		delete elem;
 	}
 	if(elem -> array_of_elem_of_memory == NULL)
 	{
-		assert(elem -> array_of_byte);
 		for(counter = 0; counter < elem -> size; counter++)
 		{
 			if(elem -> array_of_byte[counter] != NULL)
@@ -94,7 +88,6 @@ void clear(elem_of_memory* elem)
 			assert(counter < elem -> size);
 		}
 		delete elem -> array_of_byte;
-		delete elem;
 	}
 }
 
@@ -108,46 +101,76 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 offset_bits)
 {
 // Создаем вектор sections_array и загружаем в него секции памяти из elf файла.
-	printf("1");
 	vector<ElfSection> sections_array;
-	printf("2");
 	ElfSection::getAllElfSections(executable_file_name, sections_array);
 // Считаем число бит, уходящее на адрес блока в массиве блоков(верхний уровень иерархии памяти).
-	printf("3");
 	uint64 sets_bits = addr_size - page_bits - offset_bits;
 // Считаем размер каждого типа элементов памяти(число элементов массива в элементе памяти).
-	printf("4");	
 	uint64 size_of_array_of_sets = bit_to_size(sets_bits);
 	uint64 size_of_set = bit_to_size(page_bits);
 	uint64 size_of_page = bit_to_size(offset_bits);
-	printf("5");
+	
 // Инициализируем массив блоков, входящий в класс FuncMemory(верхний уровень иерархии памяти).
 	array_of_sets = new elem_of_memory(size_of_array_of_sets, size_of_page);
-	printf("6");
-	/*array_of_sets.size = size_of_array_of_sets;
-	array_of_sets.array_of_byte = NULL;
-	array_of_sets.array_of_elem_of_memory = new elem_of_memory*[array_of_sets.size];
-	assert(array_of_sets.array_of_elem_of_memory != NULL);
-	uint64 counter = 0;
-	while(counter < array_of_sets.size)
-	{
-		array_of_sets.array_of_elem_of_memory[counter] = NULL;
-		counter++;
-	}*/
 // Запихиваем секции данных в созданную нами память.	
 	uint64 sections_counter;
 	for(sections_counter = 0; sections_counter < sections_array.size(); sections_counter++)
 	{
-// Выделяем одну секцию.
+// Выделяем одну секцию. Назначение этих переменных будет понятно далее.
+		uint32 this_addr_32 = 0;
+		uint32 this_addr_in_array_of_sets_32 = 0;
+		uint32 this_addr_in_set_32 = 0;
+		uint32 this_addr_in_page_32 = 0;
+
+		uint64 this_addr_64 = 0;
+                uint64 this_addr_in_array_of_sets_64 = 0;
+                uint64 this_addr_in_set_64 = 0;
+                uint64 this_addr_in_page_64 = 0;
+
+		uint64 this_addr = 0;
+                uint64 this_addr_in_array_of_sets = 0;
+                uint64 this_addr_in_set = 0;
+                uint64 this_addr_in_page = 0;
+	
+		
 		ElfSection this_section = sections_array[sections_counter];
 		uint64 byte_counter;
 		for(byte_counter = 0; byte_counter < this_section.size; byte_counter++)
 		{
-// Для каждого байта из секции находем номер его блока, страницы и непосредственно местоположения. 
-			uint64 this_addr = this_section.start_addr + byte_counter;
-			uint64 this_addr_in_array_of_sets = this_addr >> (offset_bits + page_bits);
-			uint64 this_addr_in_set = (this_addr << sets_bits) >> (sets_bits + offset_bits);
-			uint64 this_addr_in_page = (this_addr << (sets_bits + page_bits)) >> (sets_bits + page_bits);
+// Для каждого байта из секции находем номер его блока, страницы и непосредственно местоположения. Учитываем, что адреса могут быть как 32 бита, так и 64 бита.
+
+// Для 32 битных адресов: 
+
+		        this_addr_32 = (uint32)this_section.start_addr + (uint32)byte_counter;
+			this_addr_in_array_of_sets_32 = this_addr_32 >> (offset_bits + page_bits);
+			this_addr_in_set_32 = (this_addr_32 << sets_bits) >> (sets_bits + offset_bits);
+			this_addr_in_page_32 = (this_addr_32 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
+			
+// Для 64 битных адресов:
+
+			this_addr_64 = this_section.start_addr + byte_counter;
+                        this_addr_in_array_of_sets_64 = this_addr_64 >> (offset_bits + page_bits);
+                        this_addr_in_set_64 = (this_addr_64 << sets_bits) >> (sets_bits + offset_bits);
+                        
+			this_addr_in_page_64 = (this_addr_64 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
+			
+			this_addr_in_array_of_sets = 0;
+			this_addr_in_set = 0;
+			this_addr_in_page = 0;
+			
+			if(addr_size == 32)
+			{
+				this_addr_in_array_of_sets = this_addr_in_array_of_sets_32;
+				this_addr_in_set = this_addr_in_set_32;
+				this_addr_in_page = this_addr_in_page_32;
+			}
+			if(addr_size == 64)
+			{
+				this_addr_in_array_of_sets = this_addr_in_array_of_sets_64;             
+                                this_addr_in_set = this_addr_in_set_64;
+                                this_addr_in_page = this_addr_in_page_64;
+			}
+			
 // Проверяем, выделена ли память под блок, если нет - выделяем.
 			if(array_of_sets -> array_of_elem_of_memory[this_addr_in_array_of_sets] == NULL)
 			{
@@ -157,12 +180,11 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 			if(array_of_sets -> array_of_elem_of_memory[this_addr_in_array_of_sets] -> array_of_elem_of_memory[this_addr_in_set] == NULL)
 			{
 				array_of_sets -> array_of_elem_of_memory[this_addr_in_array_of_sets] -> array_of_elem_of_memory[this_addr_in_set] = new elem_of_memory(size_of_page, size_of_page);
-			}		
+			}
 // Записываем данные по нашему адресу, предварительно выделив память.
 			array_of_sets -> array_of_elem_of_memory[this_addr_in_array_of_sets] -> array_of_elem_of_memory[this_addr_in_set] -> array_of_byte[this_addr_in_page] = new uint8(this_section.content[byte_counter]);
 		}
 	}
-	printf("7");
 }
 
 //------------------------------------------------------------------------------
@@ -186,9 +208,8 @@ uint64 bit_to_size(uint64 bits)
 
 FuncMemory::~FuncMemory()
 {
-    printf("8");
     clear(array_of_sets);
-    printf("9");
+    delete array_of_sets;
 }
 
 //-----------------------------------------------------------------------------
