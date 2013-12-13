@@ -179,6 +179,26 @@ uint8* FuncMemory::allocateSet()
 }
 
 
+//It takes addres and returns Sets offset
+uint64 VirtualMemory::getSetsNum( uint64 addr)
+{
+    return (addr & this->sets_num_mask) >> 
+            (this->page_num_size + this->offset_size);
+}
+
+//It takes addres and returns Pages offset
+uint64 VirtualMemory::getPageNum( uint64 addr)
+{
+    return (addr & this->page_num_mask) >> 
+            (this->offset_size);
+}
+
+//It takes addres and returns Offset
+uint64 VirtualMemory::getOffset( uint64 addr)
+{
+    return (addr & this->offset_mask);
+}
+
 
 FuncMemory::~FuncMemory()
 {
