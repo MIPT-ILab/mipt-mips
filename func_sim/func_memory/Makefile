@@ -47,7 +47,7 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
 
-unit_test: unit_test.o func_memory.o elf_parser.o virtual_memory.o
+unit_test: unit_test.o func_memory.o elf_parser.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
 	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf  $(GTEST_LIB)

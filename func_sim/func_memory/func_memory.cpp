@@ -19,8 +19,8 @@ uint64 getMask(int first, int last);//capter, implementation below...
 
 FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size,
-                        uint64 page_bits,
-                        uint64 offset_bits)
+                        uint64 page_num_size,
+                        uint64 offset_size)
 {
     //memory initialisation
     assert( addr_size > page_num_size+ offset_size ); //-------
@@ -180,21 +180,21 @@ uint8* FuncMemory::allocateSet()
 
 
 //It takes addres and returns Sets offset
-uint64 VirtualMemory::getSetsNum( uint64 addr)
+uint64 FuncMemory::getSetsNum( uint64 addr)
 {
     return (addr & this->sets_num_mask) >> 
             (this->page_num_size + this->offset_size);
 }
 
 //It takes addres and returns Pages offset
-uint64 VirtualMemory::getPageNum( uint64 addr)
+uint64 FuncMemory::getPageNum( uint64 addr)
 {
     return (addr & this->page_num_mask) >> 
             (this->offset_size);
 }
 
 //It takes addres and returns Offset
-uint64 VirtualMemory::getOffset( uint64 addr)
+uint64 FuncMemory::getOffset( uint64 addr)
 {
     return (addr & this->offset_mask);
 }
