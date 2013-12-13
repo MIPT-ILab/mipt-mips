@@ -5,7 +5,6 @@
  *
 */
 
-#include "virtual_memory.h"
 //method to get mask ( 1 in pleces from first to last, including ends)
 //from 1 to 64
 uint64 getMask(int first, int last);//capter, implementation below...

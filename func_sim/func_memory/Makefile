@@ -23,13 +23,13 @@ GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
 #
 # Enter for building func_memory stand alone program
 #
-func_memory: func_memory.o elf_parser.o main.o virtual_memory.o
+func_memory: func_memory.o elf_parser.o main.o
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_memory.o: func_memory.cpp func_memory.h types.h virtual_memory.h
+func_memory.o: func_memory.cpp func_memory.h types.h
 	$(CXX) -c $< $(INCL)
 
 elf_parser.o: elf_parser.cpp elf_parser.h
