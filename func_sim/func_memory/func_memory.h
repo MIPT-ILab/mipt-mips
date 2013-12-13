@@ -12,6 +12,9 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <cstdlib>
+#include <csignal>
+#include <cstring>
 
 // uArchSim modules
 #include <types.h>
@@ -41,6 +44,15 @@ class FuncMemory
     FuncMemory() {};
     // Самый верхний уровень иерархии памяти. Содержит в себе указатели на блоки.
     elem_of_memory* array_of_sets; 
+	
+    // Адрес первого элемента области кода .text.
+    uint64 start_addr;
+  
+    // Число бит, выделенное под адрес блока, адрес страницы и адрес байта.
+    uint64 sets_bits;
+    uint64 page_bits;
+    uint64 offset_bits;
+	 
 public:
 
     FuncMemory ( const char* executable_file_name,
