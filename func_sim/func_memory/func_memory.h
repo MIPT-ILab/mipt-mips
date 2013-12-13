@@ -9,6 +9,9 @@
 #ifndef FUNC_MEMORY__FUNC_MEMORY_H
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
+// Genecic C
+#include <stdlib.h>
+#include <string.h>
 // Generic C++
 #include <string>
 #include <cassert>
@@ -17,9 +20,6 @@
 #include <types.h>
 #include <elf_parser.h>
 
-//--------------------------------------------------------------
-#include "virtual_memory.h" //while no changes in the makefile
-//--------------------------------------------------------------
 
 using namespace std;
 
@@ -33,14 +33,11 @@ class FuncMemory
     uint64 sets_num_mask;   //--Constants wich is defined in the constructor.
     uint64 page_num_mask;   // It is uint64 with 1 bits in same positions.
     uint64 offset_mask;     //--It is using to make code simpler.
-    uint64 startPC; // It is pointer to start of executable code;
+    uint64 startPC_var; // It is pointer to start of executable code;
   
-  // You could not create the object
-    // using this default constructor
     FuncMemory(){}
 
 public:
-    VirtualMemory* memory;
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
@@ -74,8 +71,6 @@ public:
     uint8* allocatePage();  //Functions for
     uint8* allocateSet();   //memory allocating
 
-    ~VirtualMemory();   // Recursive memory freeng
-    
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

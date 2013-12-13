@@ -86,7 +86,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) //const
 }
 
 //It take byteADDRES and returns byte's value
-uint8 VirtualMemory::getByteFromAddr( uint64 addr )
+uint8 FuncMemory::getByteFromAddr( uint64 addr )
 {
     uint64 sets_num = getSetsNum( addr );
     uint64 page_num = getPageNum( addr );
@@ -101,7 +101,7 @@ uint8 VirtualMemory::getByteFromAddr( uint64 addr )
 
 // Like previous. It takes PagePtr, PageOffset and Offset of byte and
 // returns it's byte 
-uint8 VirtualMemory::getByteFromPages( uint8** pages, uint64 page_num,
+uint8 FuncMemory::getByteFromPages( uint8** pages, uint64 page_num,
                             uint64 offset)
 {
     assert( pages[page_num] != NULL );
@@ -123,7 +123,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 }
 
 //It take byteADDRES and byte and write byte to this addres.
-void VirtualMemory::setByteToAddr( uint64 addr, uint8 byte)
+void FuncMemory::setByteToAddr( uint64 addr, uint8 byte)
 {
     uint64 sets_num = getSetsNum( addr );
     uint64 page_num = getPageNum( addr );
@@ -138,7 +138,7 @@ void VirtualMemory::setByteToAddr( uint64 addr, uint8 byte)
 }
 
 //Like previous. It take PagePtr.. and byte and write byte to this addres.
-void VirtualMemory::setByteToPages( uint8** pages, uint64 page_num,
+void FuncMemory::setByteToPages( uint8** pages, uint64 page_num,
                           uint64 offset, uint8 byte)
 {
     if ( pages[page_num] == NULL )
@@ -147,19 +147,19 @@ void VirtualMemory::setByteToPages( uint8** pages, uint64 page_num,
 }
 
 //It is clear
-uint64 VirtualMemory::setStartPC( uint64 startPC )
+uint64 FuncMemory::setStartPC( uint64 startPC )
 {
-    return this->startPC = startPC;
+    return this->startPC_var = startPC;
 }
 
 //It is clear
-uint64 VirtualMemory::getStartPC()
+uint64 FuncMemory::getStartPC()
 {
-    return this->startPC;
+    return this->startPC_var;
 }
 
 //Returns pointer to free memory for one page
-uint8* VirtualMemory::allocatePage()
+uint8* FuncMemory::allocatePage()
 {
     uint8* page = (uint8*) malloc(sizeof(uint8) << this->offset_size );
     assert( page!=NULL );
@@ -167,7 +167,7 @@ uint8* VirtualMemory::allocatePage()
 }
 
 //Returns pointer to free memory for one set of pages
-uint8* VirtualMemory::allocateSet()
+uint8* FuncMemory::allocateSet()
 {
     uint8* pages = (uint8*) malloc(sizeof(uint8*) << this->page_num_size );
     assert( pages!=NULL );
