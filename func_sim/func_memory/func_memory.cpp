@@ -156,13 +156,13 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 			this_addr_in_set_32 = (this_addr_32 << sets_bits) >> (sets_bits + offset_bits);
 			this_addr_in_page_32 = (this_addr_32 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
 			
-// Для 64 битных адресов(не работает):
+// Для 64 битных адресов:
 
-			/*this_addr_64 = this_section.start_addr + byte_counter;
+			this_addr_64 = this_section.start_addr + byte_counter;
                         this_addr_in_array_of_sets_64 = this_addr_64 >> (offset_bits + page_bits);
                         this_addr_in_set_64 = (this_addr_64 << sets_bits) >> (sets_bits + offset_bits);
                         
-			this_addr_in_page_64 = (this_addr_64 << (sets_bits + page_bits)) >> (sets_bits + page_bits);*/
+			this_addr_in_page_64 = (this_addr_64 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
 			
 			this_addr_in_array_of_sets = 0;
 			this_addr_in_set = 0;
@@ -174,12 +174,12 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 				this_addr_in_set = this_addr_in_set_32;
 				this_addr_in_page = this_addr_in_page_32;
 			}
-			/*if(addr_size == 64)
+			if(addr_size == 64)
 			{
 				this_addr_in_array_of_sets = this_addr_in_array_of_sets_64;             
                                 this_addr_in_set = this_addr_in_set_64;
                                 this_addr_in_page = this_addr_in_page_64;
-			}*/
+			}
 			
 // Проверяем, выделена ли память под блок, если нет - выделяем.
 			if(array_of_sets -> array_of_elem_of_memory[this_addr_in_array_of_sets] == NULL)
@@ -239,38 +239,47 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
 // Прверяем, не равно ли нулю число считываемых байт. Если равно - ошибка.
 	assert(num_of_bytes != 0);
-// Наша версия программы работает только с 32-битным адресами, поэтому сразу переводим адресс в 32-битный формат.
-	uint32 addr_32 = (uint32)addr;
-
+	
 // Считываем байты из памяти и записываем в возвращаемое значение.
 	uint64 data = 0;
 
-	for(uint32 counter = 0; counter < num_of_bytes; counter++)
+	for(uint64 counter = 0; counter < num_of_bytes; counter++)
 	{
 // Для каждого считываемого байта:
 
 	// Записываем его адрес.
-		addr_32 = addr_32 + counter;
+
+		addr = addr + counter;
 	
-	// Считаем адрес в каждой секции.
-		uint32 addr_in_array_of_sets_32 = addr_32 >> (offset_bits + page_bits);
-        	uint32 addr_in_set_32 = (addr_32 << sets_bits) >> (sets_bits + offset_bits);
-        	uint32 addr_in_page_32 = (addr_32 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
-	
+	// Считаем адрес в каждой секции. Если адрес 32-битный, то зануляем первые 32 бита addr.
+		uint64 addr_in_array_of_sets = addr >> (offset_bits + page_bits);
+        	uint64 addr_in_set = addr << sets_bits;
+		if(offset_bits + page_bits + sets_bits == 32)
+		{
+			addr_in_set = addr_in_set & 0x00000000ffffffff;
+		}
+		addr_in_set = addr_in_set >> (sets_bits + offset_bits);
+        	uint64 addr_in_page = addr << (sets_bits + page_bits);
+		if(offset_bits + page_bits + sets_bits == 32)
+		{
+			addr_in_page = addr_in_page & 0x00000000ffffffff;
+		}
+		addr_in_page = addr_in_page >> (sets_bits + page_bits);
+
 	// Проверяем, велась ли вообще запись по данному адресу.
-		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] != NULL);
-		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] != NULL);
-		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] -> array_of_byte[addr_in_page_32] != NULL);
+		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] != NULL);
+		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] != NULL);
+		assert(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] -> array_of_byte[addr_in_page] != NULL);
 	
 	// Считываем байт. 
-		uint64 byte = *(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] -> array_of_byte[addr_in_page_32]);
+		uint64 byte = *(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] -> array_of_byte[addr_in_page]);
 		
 	// Записываем байт в возвращаемый параметр.
 		byte = byte << (8 * counter);
 		data = data + byte;
 	
 	// Восстанавливаем значение начального адреса, чтобы мы могли получить адрес следующего быйта для чтения.
-		addr_32 = addr_32 - counter;
+		addr = addr - counter;
 	}	
 	return data;
 }
@@ -283,9 +292,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
 // Прверяем, не равно ли нулю число записываемых байт. Если равно - ошибка.
         assert(num_of_bytes != 0);
-// Наша версия программы работает только с 32-битным адресами, поэтому сразу переводим адресс в 32-битный формат.
-        uint32 addr_32 = (uint32)addr;
-        
+       
 // Также считаем размер масивов указателей для каждого уровня памяти. Это понадобится в случае, если мы будем записывать данные в ранее не использовавшийся участок памяти, и нам понадобится выделять для него память.
         uint64 size_of_array_of_sets = bit_to_size(sets_bits);
         uint64 size_of_set = bit_to_size(page_bits);
@@ -297,47 +304,83 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 // Для каждого записываемого байта:
 
 	// Считаем его полный адрес:
-		addr_32 = addr_32 + counter;
-	// Выделяем из полного адреса адрес в массиве блоков, адрес в блоке и адрес в странице.
-        	uint32 addr_in_array_of_sets_32 = addr_32 >> (offset_bits + page_bits);
-        	uint32 addr_in_set_32 = (addr_32 << sets_bits) >> (sets_bits + offset_bits);
-        	uint32 addr_in_page_32 = (addr_32 << (sets_bits + page_bits)) >> (sets_bits + page_bits);
+		addr = addr + counter;
+	// Считаем адрес в каждой секции. Если адрес 32-битный, то зануляем первые 32 бита addr.
+                uint64 addr_in_array_of_sets = addr >> (offset_bits + page_bits);
+                uint64 addr_in_set = addr << sets_bits;
+                if(offset_bits + page_bits + sets_bits == 32)
+                {
+                        addr_in_set = addr_in_set & 0x00000000ffffffff;
+                }
+                addr_in_set = addr_in_set >> (sets_bits + offset_bits);
+                uint64 addr_in_page = addr << (sets_bits + page_bits);
+                if(offset_bits + page_bits + sets_bits == 32)
+                {
+                        addr_in_page = addr_in_page & 0x00000000ffffffff;
+                }
+                addr_in_page = addr_in_page >> (sets_bits + page_bits);
 
 	// Выделяем записываемый байт из всех данных.
-		uint8 write_byte =(uint8)((value << (8 * (7 - counter))) >> (8 * 7));
+		uint8 write_byte =(uint8)((value << (8 * (sizeof(uint64) - 1 - counter))) >> (8 * (sizeof(uint64) - 1)));
 
 	// Проверяем, выделена ли память под блок, если нет - выделяем.
-                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] == NULL)
+                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] == NULL)
                 {
-                        array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] = new elem_of_memory(size_of_set, size_of_page);
+                        array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] = new elem_of_memory(size_of_set, size_of_page);
                 }
 
 	// Проверяем, выделена ли память под страницу, если нет, выделяем.
-                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] == NULL)
+                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] == NULL)
                 {
-                        array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] = new elem_of_memory(size_of_page, size_of_page);
+                        array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] = new elem_of_memory(size_of_page, size_of_page);
                 }
 
 	// Проверяем, выделена ли память под байт, если нет - выделяем. Затем записываем в байт данные.
 	
-                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] -> array_of_byte[addr_in_page_32] == NULL)
+                if(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] -> array_of_byte[addr_in_page] == NULL)
 		{
-			array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] -> array_of_byte[addr_in_page_32] = new uint8(write_byte);
+			array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] -> array_of_byte[addr_in_page] = new uint8(write_byte);
 		}
 		else
 		{
-			*(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets_32] -> array_of_elem_of_memory[addr_in_set_32] -> array_of_byte[addr_in_page_32]) = write_byte;
+			*(array_of_sets -> array_of_elem_of_memory[addr_in_array_of_sets] -> array_of_elem_of_memory[addr_in_set] -> array_of_byte[addr_in_page]) = write_byte;
 		}
 
 		// Возращаем адрес записи в начальное значение, иначе мы не сможем получить нужный адрес для следующего байта.
-		addr_32 = addr_32 - counter;
+		addr = addr - counter;
 	}
 }
 
 //------------------------------------------------------------------------------
 
+// Функция, распечатывающая содержимое нашей памяти.
+
 string FuncMemory::dump( string indent) const
 {
-    // put your code here
-    return string("ERROR: You need to implement FuncMemory!");
+	for(uint64 sets_counter = 0; sets_counter < array_of_sets -> size; sets_counter++)
+	{
+		if(array_of_sets -> array_of_elem_of_memory[sets_counter] != NULL)
+		{
+			for(uint64 page_counter = 0; page_counter < array_of_sets -> array_of_elem_of_memory[sets_counter] -> size; page_counter++)
+			{
+				if(array_of_sets -> array_of_elem_of_memory[sets_counter] -> array_of_elem_of_memory[page_counter] != NULL)
+				{
+					for(uint64 byte_counter = 0; byte_counter < array_of_sets -> array_of_elem_of_memory[sets_counter] -> array_of_elem_of_memory[page_counter] -> size; byte_counter++)
+					{
+						if(array_of_sets -> array_of_elem_of_memory[sets_counter] -> array_of_elem_of_memory[page_counter] -> array_of_byte[byte_counter] != NULL)
+						{
+							uint32 byte_addr = byte_counter + (page_counter << offset_bits) + (sets_counter << (offset_bits + page_bits));
+							cout.fill('0');
+							cout.width(8);
+							cout << hex << byte_addr << "   ";
+							cout.fill('0');
+                                                        cout.width(2);
+							cout << (uint32)(*(array_of_sets -> array_of_elem_of_memory[sets_counter] -> array_of_elem_of_memory[page_counter] -> array_of_byte[byte_counter])) << "\n";
+						}
+					}
+				}
+			}
+		}
+	}
+	return string("Done");
 }

@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
+#include <iostream>
 
 // uArchSim modules
 #include <types.h>
