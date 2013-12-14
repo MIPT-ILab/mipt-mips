@@ -13,6 +13,7 @@ VirtualMemory::VirtualMemory ( uint64 addr_size/* = 32*/,
                     uint64 page_num_size /*= 10*/,
                     uint64 offset_size /*= 12*/)
 {
+// basic initialisation -------------------------------------------
     assert( addr_size > page_num_size+ offset_size ); //-------
     assert( addr_size <= 64 );                        // Critical
     assert( page_num_size > 0 );                      // tests
@@ -30,7 +31,9 @@ VirtualMemory::VirtualMemory ( uint64 addr_size/* = 32*/,
                                    offset_size);
     this->offset_mask = getMask( offset_size-1,
                                  0);
-    //allocating memory for main set
+    // allocating memory for main set
+    // I am using malloc because of there is no possible to
+    // pass errors with new ( try: )
     this->sets=( uint8**) malloc( sizeof( uint64) *
                                 ( 1 << this->sets_num_size) );
     //Main set initialisation. It is important!
