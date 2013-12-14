@@ -21,23 +21,26 @@ using namespace std;
 
 class FuncMemory
 {
-    // Why we need this declaration? It makes some troubles 
-    // with initialization const values
-    //FuncMemory(){}
 
-    // Main array of pointers to sets
-    uint8 ***mem_set;
+    /* Main memory pointer
+     * This is an array of pointers to sets, 
+     * any set is an array of pages,
+     * that are pointers to host memory, just to allocated page.
+     * guest_mem[setNum] - pointer to set;
+     * guest_mem[setNum][pageNum] - pointer to page;
+     * guest_mem[setNum][pageNum][offset] - guest data.
+     */
+    uint8 ***guest_mem;
 
     // Check if this address allocated, otherwise allocate it
     int memAlloc(uint64 address);
-    int memAlloc(uint64 address) const;
+    int checkAlloc(uint64 address) const;
 
-    // Gets host machine adress from virtual address
+    // Gets host adress from guest address
     uint8* getRealAddress(uint64 addr) const;
-    inline uint8* getPage(uint8** set, uint64 page_num) const;
-    inline uint8** getSet(uint64 num) const;
-    inline uint64 getGuestPage(uint64 set, uint64 page) const;
 
+    // Small and simple address computations
+    inline uint64 getGuestPage(uint64 set, uint64 page) const;
     inline uint64 getSetNum(uint64 addr) const;
     inline uint64 getPageNum(uint64 addr) const;
     inline uint64 getOffset(uint64 addr) const;
@@ -45,9 +48,10 @@ class FuncMemory
     // Dump one page
     string dumpPage(uint8* host_page, uint64 guest_page) const;
 
+    // PC start position taked from ELF file
     uint64 start_pc;
 
-    // Some basic constants
+    // Some basic constants. Order is significant
     const uint64 addr_bits;
     const uint64 offset_bits;
     const uint64 page_bits;
