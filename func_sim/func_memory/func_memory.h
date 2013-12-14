@@ -10,8 +10,7 @@
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
 // Generic C++
-#include <string>
-#include <cassert>
+
 
 // uArchSim modules
 #include <types.h>
@@ -24,9 +23,18 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
-
-public:
-
+    
+    vector<ElfSection> sections_array;
+    uint64 addr_size;
+    uint64 page_bits;
+    uint64 offset_bits;
+    uint64 set_bits;
+    uint64 max_addr;
+    uint64 max_page;
+    uint64 max_offset;
+    uint64 max_set;
+    uint8*** memory;
+public:    
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
@@ -41,5 +49,7 @@ public:
     
     string dump( string indent = "") const;
 };
+
+uint64 reverse ( uint64 );
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
