@@ -11,6 +11,8 @@
 
 // Generic C++
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 // uArchSim modules
 #include <func_memory.h>
@@ -18,110 +20,207 @@
 FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size,
                         uint64 page_size,
-                        uint64 offset_size)
+                        uint64 offset_size) :
+                    addr_bits( addr_size),
+                    page_bits( page_size),
+                    offset_bits( offset_size),
+                    set_bits( addr_bits - offset_bits - page_bits),
+                    offset_mask( ( 1 << offset_bits) - 1),
+                    page_mask( ( ( 1 << page_bits) - 1) << offset_bits),
+                    set_mask( ( ( 1 << set_bits) - 1) << ( page_bits + offset_bits))
 {
-    addr_bits = addr_size;
-    offset_bits = offset_size;
-    page_bits = page_size;
-    set_bits = addr_bits - offset_bits - page_bits;
-
-    int set_cnt = 1 << set_bits;
-    int page_cnt = 1 << page_bits;
-    int offset_cnt = 1 << offset_bits;
+    assert( addr_bits <= 64);
+    assert( set_bits > 0);
+    assert( page_bits > 0);
+    assert( offset_bits >= 4);
 
     // Creating array of sets and its initialization
-    mem_set = ( uint8***) malloc( set_cnt * sizeof( uint8**));
-    for ( int i = 0; i < set_cnt; i++)
-        mem_set[i] = NULL;
+    uint64 set_cnt = 1 << set_bits;
+    mem_set = new uint8** [set_cnt]();
 
     // Parsing ELF file and first allocation
     vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
-    for (int i = 0; i < sections_array.size(); i++)
+    for ( int i = 0; i < sections_array.size(); i++)
     {
         uint64 start_addr = sections_array[i].start_addr;
         uint64 last_addr = start_addr + sections_array[i].size;
         uint64 addr = start_addr;
+        if ( !strcmp( sections_array[i].name, ".text"))
+            start_pc = start_addr;
         // Loop for many real pages
         while ( addr != last_addr)
         {
-            memAlloc(addr);     // Allocate this particular page in host memory
-            uint64 next_page_addr = ((addr >> page_bits) + 1) << page_bits;
-            int count = (next_page_addr < last_addr) ? 
-                        (next_page_addr - addr) :
-                        (last_addr - addr);
-            // Debugging
-            uint64 page_num = (addr << (64 - page_bits - offset_bits)) >> (64 - page_bits);
-            cout << "Init " << count << "b for " << sections_array[i].name 
-                 << "\tPage #" << page_num << endl;
-            // End debugging
-
-            // Copy content into memory (less or equal than 1 page)
-            memcpy(getRealAddress(addr),
+            memAlloc( addr);     // Allocate this particular page in host memory
+            uint64 next_page_addr = ( ( addr >> page_bits) + 1) << page_bits;
+            int count = ( next_page_addr < last_addr) ? 
+                        ( next_page_addr - addr) :
+                        ( last_addr - addr);
+            // Copy content into memory ( less or equal than 1 page)
+            memcpy( getRealAddress( addr),
                    sections_array[i].content + addr - start_addr, 
                    count);
-
             addr += count;
         }
-
     }
 }
 
 
-// Gets host machine adress from virtual address
-uint8* FuncMemory::getRealAddress(uint64 addr)
+inline uint8** FuncMemory::getSet( uint64 num) const
 {
-    uint64 set_num = addr >> (offset_bits + page_bits);
-    uint64 page_num = (addr << (64 - page_bits - offset_bits)) >> (64 - page_bits);
-    uint64 offset = (addr << (64 - offset_bits)) >> (64 - offset_bits);
+    return mem_set[num];
+}
 
-    return *(*(mem_set + set_num) + page_num) + offset;
+
+inline uint8* FuncMemory::getPage( uint8** set, uint64 page_num) const
+{
+    return set[page_num];
+}
+
+
+// Gets host machine adress from virtual address
+uint8* FuncMemory::getRealAddress( uint64 addr) const
+{
+    return getPage( getSet( getSetNum( addr)), getPageNum( addr)) + getOffset( addr);
+}
+
+
+inline uint64 FuncMemory::getGuestPage( uint64 set, uint64 page) const
+{
+    return ( set << ( page_bits + offset_bits)) + ( page << offset_bits);
+}
+
+inline uint64 FuncMemory::getSetNum( uint64 addr) const
+{
+    return ( addr & set_mask) >> ( page_bits + offset_bits);
+}
+
+
+inline uint64 FuncMemory::getPageNum( uint64 addr) const
+{
+    return ( addr & page_mask) >> offset_bits;
+}
+
+
+inline uint64 FuncMemory::getOffset( uint64 addr) const
+{
+    return addr & offset_mask;
 }
 
 
 FuncMemory::~FuncMemory()
 {
-    // put your code here
+    uint64 set_cnt = ( 1 << set_bits);
+    uint64 page_cnt = ( 1 << page_bits);
+    uint8** set;
+    uint8* page;
+    for ( uint64 i = 0; i < set_cnt; i++)
+        if ( ( set = getSet( i)) != NULL)
+        {
+            for ( uint64 j = 0; j < page_cnt; j++)
+                if ( ( page = getPage( set, j)) != NULL)
+                    delete [] page;
+            delete [] set;
+        }
 }
 
 uint64 FuncMemory::startPC() const
 {
-    // put your code here
+    return start_pc;
 }
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
-    // put your code here
+    assert( !memAlloc( addr));
+    assert( !memAlloc( addr + num_of_bytes - 1));
 
-    return 0;
+    uint64 value( 0);
+    for ( int i = 0; i < num_of_bytes; i++)
+        ( ( uint8*) &value)[i] = *getRealAddress( addr + i);
+    return value;
 }
 
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
-    // put your code here
+    memAlloc( addr);
+    memAlloc( addr + num_of_bytes - 1);
+    for ( int i = 0; i < num_of_bytes; i++)
+        *getRealAddress( addr + i) = ( ( uint8*) &value)[i];
 }
 
 string FuncMemory::dump( string indent) const
 {
-    // put your code here
-    return string("ERROR: You need to implement FuncMemory!");
+    uint64 set_cnt = ( 1 << set_bits);
+    uint64 page_cnt = ( 1 << page_bits);
+    uint8** set;
+    uint8* page;
+    string str;
+    for ( uint64 i = 0; i < set_cnt; i++)
+        if ( ( set = getSet( i)) != NULL)
+        {
+            for ( uint64 j = 0; j < page_cnt; j++)
+                if ( ( page = getPage( set, j)) != NULL)
+                    str += dumpPage( page, getGuestPage( i, j));
+        }
+    // We need to return string and NOT printf in function!
+    return str;
+}
+
+
+string FuncMemory::dumpPage( uint8* host_page, uint64 guest_page) const 
+{
+    uint64 offset_cnt = ( 1 << offset_bits);
+    uint64 i( 0);
+    ostringstream sstream;
+    sstream << setfill( '0') << hex;
+    while ( i < offset_cnt)
+    {
+        if ( host_page[i] == 0)
+        {
+            i++;
+            continue;
+        }
+        i = ( i >> 4) << 4;      // Align to 4 uint32
+        sstream << "0x" << setw( 16) << ( guest_page + i) << ":\t";
+        for ( uint64 j = 0; j < 4; j++, i += 4)
+        {
+            sstream << setw( 2) << ( uint32) host_page[i];
+            sstream << setw( 2) << ( uint32) host_page[i + 1];
+            sstream << setw( 2) << ( uint32) host_page[i + 2];
+            sstream << setw( 2) << ( uint32) host_page[i + 3] << "  ";
+        }
+        sstream << endl;
+    }
+    return sstream.str();
 }
 
 
 /* This function will allocate some memory if need
  * We will use it in most of write actions
- * Note that we use fact that all load operations use ONLY aligned addresses
  */
-void FuncMemory::memAlloc(uint64 address)
+int FuncMemory::memAlloc( uint64 addr)
 {
-    uint64 set_num = address >> (offset_bits + page_bits);
-    uint64 page_num = (address << (64 - page_bits - offset_bits)) >> (64 - page_bits);
-    
-    uint8*** set = mem_set + set_num;
+    uint8*** set = mem_set + getSetNum( addr);
     if ( *set == NULL)
-        *set = (uint8**) malloc((1 << page_bits) * sizeof(uint8*));
-    if ( *(*set + page_num) == NULL)
-        *(*set + page_num) = (uint8*) malloc(1 << offset_bits);
+        *set = new uint8* [1 << page_bits]();
+    uint8** page = *set + getPageNum( addr);
+    if ( *page == NULL){
+        *page = new uint8 [1 << offset_bits]();
+        return 1;
+    }
+    return 0;
 }
 
+
+int FuncMemory::memAlloc( uint64 addr) const
+{
+    uint8** set = getSet( getSetNum( addr));
+    if ( set == NULL)
+        return 1;
+    uint8* page = getPage( set, getPageNum( addr));
+    if ( page == NULL){
+        return 1;
+    }
+    return 0;
+}
 

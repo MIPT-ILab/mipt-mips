@@ -19,27 +19,43 @@
 
 using namespace std;
 
-
 class FuncMemory
 {
-    // You could not create the object
-    // using this default constructor
-    FuncMemory(){}
+    // Why we need this declaration? It makes some troubles 
+    // with initialization const values
+    //FuncMemory(){}
 
-    // Main array of sets, which point to pages
+    // Main array of pointers to sets
     uint8 ***mem_set;
 
     // Check if this address allocated, otherwise allocate it
-    void memAlloc(uint64 address);
+    int memAlloc(uint64 address);
+    int memAlloc(uint64 address) const;
+
     // Gets host machine adress from virtual address
-    uint8* getRealAddress(uint64 addr);
+    uint8* getRealAddress(uint64 addr) const;
+    inline uint8* getPage(uint8** set, uint64 page_num) const;
+    inline uint8** getSet(uint64 num) const;
+    inline uint64 getGuestPage(uint64 set, uint64 page) const;
+
+    inline uint64 getSetNum(uint64 addr) const;
+    inline uint64 getPageNum(uint64 addr) const;
+    inline uint64 getOffset(uint64 addr) const;
+
+    // Dump one page
+    string dumpPage(uint8* host_page, uint64 guest_page) const;
+
+    uint64 start_pc;
 
     // Some basic constants
-    uint64 addr_bits;
-    uint64 set_bits;
-    uint64 page_bits;
-    uint64 offset_bits;
+    const uint64 addr_bits;
+    const uint64 offset_bits;
+    const uint64 page_bits;
+    const uint64 set_bits;
 
+    const uint64 offset_mask;
+    const uint64 page_mask;
+    const uint64 set_mask;
 public:
 
     FuncMemory ( const char* executable_file_name,
