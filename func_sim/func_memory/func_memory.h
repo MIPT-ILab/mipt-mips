@@ -21,33 +21,28 @@
 
 using namespace std;
 
-class mem_field
-{
-public:
-    mem_field();
-    ~mem_field();
-    uint64 size;
-    uint64 start_addr;
-    char* name;
-    uint8* content;
-};
-
 
 class FuncMemory
 {
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
-    uint8 ***memory;
+
+    uint8 ***memory; // Mem container
+
     uint64 setSize;
     uint64 pageSize;
     uint64 offsetSize;
     uint64 blindSize; // For empty space due to size of address
-    uint64 txt_addr;
-    void mem_delete();
+
+    uint64 txt_addr; // For startPC
     uint64 set_num; // Number of pointers
     uint64 page_num;
     uint64 offset_num;
+
+    uint64 getDegree( uint64 degree);
+    bool isPage( uint64 set_t, uint64 page_t);
+    void memDelete();
 
 public:
 

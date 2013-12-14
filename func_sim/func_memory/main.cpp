@@ -31,10 +31,11 @@ int main (int argc, char* argv[])
         cout << "startPC = ";
         cout << func_mem.startPC() << endl;
 
+        cout << func_mem.read( func_mem.startPC(), 1) << endl;
         // test write
-        func_mem.write( 2000, 11111111, 2);
+        func_mem.write( 2000, 11111112, 2);
 
-        cout << "written value = " << func_mem.read( 11111111, 2) << endl;
+        cout << "written value = " << func_mem.read( 11111112, 2) << endl;
 
         // print content of the memory
         cout << func_mem.dump() << endl;

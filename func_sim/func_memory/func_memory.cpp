@@ -18,11 +18,20 @@
 #include <func_memory.h>
 #include <elf_parser.h>
 
-//map< uint64, map< uint64, map< uint64, Mem_const> > > memory;
 // Allocating memory for name and content
 
+uint64 FuncMemory::getDegree( uint64 degree)
+{
+    uint64 result = 1;
+    for( uint64 i = 0; i < degree; i++)
+    {
+        result = result << 1;
+    }
 
-void FuncMemory::mem_delete()
+    return result;
+}
+
+void FuncMemory::memDelete()
 {
     cout << "deleting memory" << endl;
     if(!memory)
@@ -32,27 +41,27 @@ void FuncMemory::mem_delete()
 
     for( uint64 i = 0; i < set_num; i++)
     {
-        if( memory[i]!= NULL)
+        if( memory[ i]!= NULL)
         {
+            //cout << "no seg fault on [i]" << endl;
             for( uint64 j = 0; j < page_num; j++)
-                if( memory[i][j]!= NULL)
-                     delete [] memory[i][j];
-               
-            delete [] memory[i];
+            {
+                if( memory[ i][ j]!= NULL)
+                {
+                    //cout << "no seg fault on [j]" << endl;
+                    delete [] memory[i][j];
+                    //cout << "offset deleted" << endl;
+                }
+            }
         }
+          
+        delete [] memory[i];
+        //cout << "page deleted" << endl;
     }
     
     delete [] memory;
+    cout << "mem deleted" << endl;
 }
-mem_field::mem_field()
-{
-}
-
-mem_field::~mem_field()
-{
-    cout << "mem_field deleted!" << endl;
-}
-
 using std::map;
 
 
@@ -88,11 +97,11 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     offsetSize = offset_bits;
     blindSize = 64 - addr_size;
 
-    set_num = 1 << setSize; 
-    page_num = 1 << pageSize ;
-    offset_num = 1 << (offsetSize-1);
+    set_num = getDegree( setSize); 
+    page_num = getDegree( pageSize);
+    offset_num = getDegree( offsetSize);
 
-    cout << "set_num = " << set_num << endl;
+    /*cout << "set_num = " << set_num << endl;
     cout << "page_num = " << page_num << endl;
     cout << "offset_num = " << offset_num << endl;
     cout << "-------------------------------------" << endl << endl;
@@ -102,25 +111,25 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     cout << "pageSize = " << pageSize << endl;
     cout << "offsetSize = " << offsetSize << endl;
     cout << "blindSize = " << blindSize << endl;
-    cout << endl;
+    cout << endl;*/
 
     // Parsing file
     vector<ElfSection> section_array;
     ElfSection::getAllElfSections( executable_file_name, section_array);
     cout << "parsed" << endl;
     
-    cout << "vector size " << section_array.size() << endl;
+    //cout << "vector size " << section_array.size() << endl;
     // Init memory                   
     memory = new uint8 **[ set_num];
 
-    cout << "memory initializated" << endl;
+    //cout << "memory initializated" << endl;
     // test
 
 
     for( vector<ElfSection>::iterator it = section_array.begin(); it!= section_array.end(); it++)
     {
         //string b = (*it).name;
-        cout << "getting elfsection " << endl;
+        //cout << "getting elfsection " << endl;
         // Getting set, page, offset
         uint64 set = (*it).start_addr >> ( pageSize + offsetSize);
         uint64 page = (*it).start_addr << ( blindSize + setSize) >> ( blindSize + pageSize + offsetSize);
@@ -135,23 +144,32 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         string name = (*it).name;
         if( name == ".text")
             txt_addr = (*it).start_addr;
+        cout << name << endl;
 
         // Allocating memory
-        cout << "*****************************"<<endl;
+        //cout << "*****************************"<<endl;
         
         if( memory[ set] == NULL)
         {
             memory[ set] = new uint8 *[ page_num];
-            cout << "page allocated" << endl;
+            for( uint64 i; i < page_num; i++)
+            {
+                memory[ set][ i] = NULL;
+            }
+            //cout << "page allocated" << endl;
         }  
         if( memory[ set][ page] == NULL)
         {
             memory[ set][ page] = new uint8 [ offset_num];
-            cout << "offset allocated" << endl;
+            for( uint64 i = 0; i < offset_num; i++)
+            {
+                memory[ set][ page][ i] = 0;
+            }
+            //cout << "offset allocated" << endl;
         }
 
-        cout << "memory allocated!" << endl;
-        cout << "*****************************"<<endl;
+        /*cout << "memory allocated!" << endl;
+        cout << "*****************************"<<endl;*/
 
         /*uint64 num = 0;
         uint64 a = (*it).content[num];
@@ -169,10 +187,10 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         {
             memory[ set][ page][ offset + i] = (*it).content[i];
             uint64 temp = memory[ set][ page][ offset + i];
-            //cout << "wrote " << temp << " to " << offset+i << endl;
+            cout << "wrote " << temp << " to " << offset+i << endl;
         }
 
-        cout << "section filled!" << endl;
+        //cout << "section filled!" << endl;
     }
     
 }
@@ -180,7 +198,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 FuncMemory::~FuncMemory()
 {
     //Cleaning memory
-    mem_delete();
+    memDelete();
     cout << "mem delete" << endl;
 }
 
@@ -191,6 +209,11 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
+    if( num_of_bytes > 8)
+    {
+        cerr << "Wrong num_of_bytes!" << endl;
+        exit( EXIT_FAILURE);
+    }
     // Get set, page and offset
     uint64 value = 0;
     uint64 set = addr >> ( pageSize + offsetSize);
@@ -236,11 +259,19 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     if( memory[ set] == NULL)
     {
         memory[ set] = new uint8 *[ page_num];
+        for( uint64 i = 0; i < page_num; i++)
+        {
+            memory[ set][ i] = NULL;
+        }
         cout << "new set allocated" << endl;
     }
     if( memory[ set][ page] == NULL)
     {
         memory[ set][ page] = new uint8 [ offset_num];
+        for( uint64 i = 0; i < offset_num; i++)
+        {
+            memory[ set][ page][ i] = 0;
+        }
         cout << "new page allocated" << endl;
     }
 
@@ -258,29 +289,57 @@ string FuncMemory::dump( string indent) const
 {
     ostringstream oss;
     cout << "dumping..." << endl << endl;
-    //memory = f_memory;
-    /*for( iter_i = memory.begin(); iter_i!= memory.end(); iter_i++)
-    {
-        for( iter_j = iter_i->second.begin(); iter_j!= iter_i->second.end(); iter_j++)
-        {
-            for( iter_k = iter_j->second.begin(); iter_k!= iter_j->second.end(); iter_k++)
-            {
-                oss << indent << "Dump Elf section \"" << ( *iter_k).second.name << "\"" << endl
-                    << indent << "  size = " << ( *iter_k).second.size << " Bytes" << endl
-                    << indent << "  start_addr = 0x" << ( *iter_k).second.start_addr << endl;
-                    //<< indent << "  Content:" << ( *iter_k).second.content << endl; //Must be changed
-            }
-        }
-    }*/
 
     for( uint64 i = 0; i < setSize; i++)
     {
         if( memory[ i]!= NULL)
-            for( uint64 j = 0; j < pageSize; j++)
+            for( uint64 j = 0; j < page_num; j++)
             {
                 if( memory[ i][ j]!= NULL)
                 {
-                    //oss << indent << 
+                    //cout << "SET = " << i << endl;
+                    //cout << "PAGE = " << j << endl;
+                    for( uint64 k = 0; k < offset_num - 4; k = k + 4)
+                    {
+                        uint64 value = 0;
+                        uint64 temp = 0;
+                        uint64 val[ 4];
+                        for( uint64 delta = 0; delta < 4; delta++)
+                        {
+                            temp = memory[ i][ j][ k + delta];
+                            value = value << ( 8 * delta);
+                            value += temp;
+                            val[ delta] = temp;
+                        }
+
+                        if( value!= 0)
+                        {
+                            uint64 address = i;
+                            address = address << 8;
+                            address += j;
+                            address = address << 8;
+                            address += k;
+
+                            //cout << "addr = " << address << "  value = " << value << endl; 
+                            oss << indent << "0x" << hex << address << " ";
+                            for( uint64 val_i = 0; val_i < 4; val_i++)
+                            {
+                                if( val[ val_i] == 0)
+                                {
+                                    oss << indent << "00";
+                                } else
+                                if( val[ val_i] < 16)
+                                {
+                                    oss << indent << "0"
+                                       << indent << hex << val[ val_i] << dec;
+                                } else {
+                                    oss << indent << hex << val[ val_i] << dec;
+                                }
+                                
+                            }
+                            oss << indent << endl;
+                        }
+                    }
                 }
             }
     }
