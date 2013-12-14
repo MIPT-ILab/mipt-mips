@@ -21,7 +21,7 @@ int main (int argc, char* argv[])
         const char * file_name = argv[1];        
         
         // create the functiona memory
-        FuncMemory func_mem( file_name, 32, 10, 12);
+        FuncMemory func_mem( file_name, 64, 20, 24);
        
         // test read
         cout << "Value read = "; 

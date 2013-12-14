@@ -75,7 +75,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     if( !file)
     {
         fclose( file);
-        cerr << "Wrong file name!" << endl;
+        cerr << "ERROR. Wrong file name!" << endl;
         exit( EXIT_FAILURE);
     }
     else
@@ -187,7 +187,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         {
             memory[ set][ page][ offset + i] = (*it).content[i];
             uint64 temp = memory[ set][ page][ offset + i];
-            cout << "wrote " << temp << " to " << offset+i << endl;
+            //cout << "wrote " << temp << " to " << offset+i << endl;
         }
 
         //cout << "section filled!" << endl;
@@ -211,7 +211,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
     if( num_of_bytes > 8)
     {
-        cerr << "Wrong num_of_bytes!" << endl;
+        cerr << "ERROR. Wrong num_of_bytes!" << endl;
         exit( EXIT_FAILURE);
     }
     // Get set, page and offset
@@ -223,12 +223,12 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     // Check if address exists
     if( memory[ set] == NULL)
     {
-        cerr << "Reading wrong address! Abort." << endl;
+        cerr << "ERROR. Reading wrong address! Abort." << endl;
         exit( EXIT_FAILURE);
     }
     if( memory[ set][ page] == NULL)
     {
-        cerr << "Reading wrong address! Abort." << endl;
+        cerr << "ERROR. Reading wrong address! Abort." << endl;
         exit( EXIT_FAILURE);
     }
     // Reading value
@@ -247,7 +247,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     // Check argument
     if( num_of_bytes > 8)
     {
-        cerr << "Wrong num_of_bytes argument!" << endl;
+        cerr << "ERROR. Wrong num_of_bytes argument!" << endl;
         exit( EXIT_FAILURE);
     }
     // Get set, page and offset
