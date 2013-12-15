@@ -21,21 +21,21 @@ int main (int argc, char* argv[])
         const char * file_name = argv[1];        
         
         // create the functiona memory
-        FuncMemory func_mem( file_name, 64, 20, 24);
+        FuncMemory func_mem( file_name, 32, 10, 12);
        
         // test read
         cout << "Value read = "; 
-        cout << func_mem.read( 4260032, 3) << endl;
+        cout << func_mem.read( 4260031, 4) << endl;
+
+        // test write
+        func_mem.write( 50462976, 4194302, 4);
+        cout << "THE VALUE = " << func_mem.read( 4194302, 1) << endl;
 
         // print startPC
         cout << "startPC = ";
         cout << func_mem.startPC() << endl;
 
-        cout << func_mem.read( func_mem.startPC(), 1) << endl;
-        // test write
-        func_mem.write( 2000, 11111112, 2);
-
-        cout << "written value = " << func_mem.read( 11111112, 2) << endl;
+        cout << func_mem.read( func_mem.startPC(), 2) << endl;
 
         // print content of the memory
         cout << func_mem.dump() << endl;
