@@ -12,44 +12,37 @@
 // uArchSim modules
 #include <func_memory.h>
 
-//method to get mask ( 1 in pleces from first to last, including ends)
-//from 1 to 64
-uint64 getMask(int first, int last);//capter, implementation below...
-
-
 FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size,
                         uint64 page_num_size,
-                        uint64 offset_size)
+                        uint64 offset_size) :
+        // Consts initialization
+        addr_size( addr_size),
+        sets_num_size( addr_size - page_num_size - offset_size),
+        page_num_size( page_num_size),
+        offset_size( offset_size),
+        // Set mask, like this 000000011110000
+        sets_num_mask( ( ( 1 << sets_num_size) - 1) 
+                << page_num_size + offset_size),
+        page_num_mask( ( ( 1 << page_num_size) - 1) 
+                << offset_size),
+        offset_mask( ( ( 1 << offset_size) - 1))
 {
-// Basic initialisation ----------------------------------------
     assert( addr_size > page_num_size+ offset_size ); //--------
     assert( addr_size <= 64 );                        // Critical
     assert( page_num_size > 0 );                      // tests
     assert( offset_size > 0 );                        //--------
-    // Constants definition
-    this->addr_size = addr_size;
-    this->sets_num_size = addr_size- page_num_size - offset_size;
-    this->page_num_size = page_num_size;
-    this->offset_size = offset_size;
-    this->sets_num_mask = getMask( this->addr_size -1,
-                                   page_num_size+
-                                   offset_size);
-    this->page_num_mask = getMask( page_num_size+
-                                   offset_size -1,
-                                   offset_size);
-    this->offset_mask = getMask( offset_size-1,
-                                 0);
-    // allocating memory for main set
+    // Allocating memory for main set
+    // !!! malloc is used because of we must use
+    // asserts ( not "try") to trap bugs.
     this->sets=( uint8**) malloc( sizeof( uint64) *
                                 ( 1 << this->sets_num_size) );
     // Main set initialisation. It is important!
-    for( int i = 0; i < ( 1 << this->sets_num_size) ; i++ )
+    for( int i = 0; i < ( 1 << this->sets_num_size) ; i++)
     {
         this->sets[i] = NULL;
     }   
-    
-// Data initialisation ------------------------------------------
+    // Data initialisation ------------------------------------------
     vector<ElfSection> sections;
     ElfSection::getAllElfSections( executable_file_name, sections);
     vector<ElfSection>::iterator section;
@@ -231,7 +224,7 @@ string FuncMemory::dump( string indent) const
     string stream;
     uint64 i,j;
     char temp[256];
-    stream += "Dump of all allocated memory\n\n";
+    stream += "Dump of all nonZERO memory\n\n";
     for ( i = 0; i < ( 1 << this->sets_num_size); i++)
     {
         if ( this->sets[ i] == NULL)
@@ -262,27 +255,21 @@ string FuncMemory::dumpPage( uint8* page ) const
     string stream;
     uint64 i,j;
     char temp[256];
-    stream + "Dump of all allocated memory\n\n";
     for ( i = 0; i < ( 1 << this->offset_size); i+=4)
     {
-        sprintf( temp, "    +%08llX    %02X %02X %02X %02X\n", 
-                ( long long) i,
-                ( short) page[ i],
-                ( short) page[ i + 1],
-                ( short) page[ i + 2],
-                ( short) page[ i + 3]);
-        stream += temp;
+        // Comment this to [rint all memory
+        if ( page[ i] || page[ i + 1] || page[ i + 2] || page[ i + 3] )
+        {
+            sprintf( temp, "    +%08llX    %02X %02X %02X %02X\n", 
+                    ( long long) i,
+                    ( short) page[ i],
+                    ( short) page[ i + 1],
+                    ( short) page[ i + 2],
+                    ( short) page[ i + 3]);
+            stream += temp;
+        }
     }
     return stream; 
 }
 
-// Returns mask, like this 000000011110000
-// Used negative numbers presention and bits operations
-uint64 getMask( int first, int last)
-{
-    uint64 temp = ( uint64) ( ( int64) -1);
-    temp = ( temp >> last ) << last;
-    temp = ( temp << ( 63 - first) ) >> ( 63 - first);
-    return temp;
-}
 

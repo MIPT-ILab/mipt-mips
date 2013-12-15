@@ -26,26 +26,26 @@ using namespace std;
 
 class FuncMemory
 {
-    // Attention! I am not using const type of constant variables, because
-    // of complex method of initialization for
-    // same variables, like "page_num_mask"
-    uint8** sets;   // this is a main array of data ( 1st level)
-    uint64 addr_size;       //--------
-    uint64 sets_num_size;   //Sizes in bits. Class is working with
-    uint64 page_num_size;   //any sizes, from 3 to 64. 
-    uint64 offset_size;     //--------
-    uint64 sets_num_mask;   //----Constants wich is defined in the constructor
-    uint64 page_num_mask;   // It is uint64 with 1 bits in same positions
-    uint64 offset_mask;     //----It is using to make code simpler
-    uint64 startPC_var;     // It is pointer to start of executable code;
+    uint8** sets;   // this is the main array of data ( 1st level)
+    
+    const uint64 addr_size;      //+
+    const uint64 sets_num_size;  //+ Sizes in bits. Class is working with
+    const uint64 page_num_size;  //+ any sizes, from 1 to 63. 
+    const uint64 offset_size;    //+ 
+
+    const uint64 sets_num_mask; //* Constants wich is defined before construct
+    const uint64 page_num_mask; //* It is uint64 with 1 bits in same positions
+    const uint64 offset_mask;   //* It is using to make code simpler
   
-    FuncMemory(){}
+    uint64 startPC_var;     // It is pointer to start of executable code,
+                            // I propogate, it can be changed.
+    //FuncMemory(){}
 
 public:
     FuncMemory ( const char* executable_file_name,
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
+                 uint64 offset_size = 12); // Consts initialisation
     
     // Functions for work with data
     // I try to name it like it works.
