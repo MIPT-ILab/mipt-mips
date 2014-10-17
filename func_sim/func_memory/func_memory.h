@@ -12,10 +12,14 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <iostream>
+#include <sstream>
 
 // uArchSim modules
 #include <types.h>
 #include <elf_parser.h>
+
+#include <vector>
 
 using namespace std;
 
@@ -24,6 +28,12 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+    uint64 addr_size_tmp;
+    uint64 page_bits_tmp;
+    uint64 offset_bits_tmp;
+    vector<vector<vector<uint8> > > memory;
+    uint64 start_addres;
+        
 
 public:
 
@@ -42,4 +52,6 @@ public:
     string dump( string indent = "") const;
 };
 
+uint64 maskfunc(uint64 addr_size_len, uint64 size_right, uint64 size);
+uint8 invert(uint8 var);
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
