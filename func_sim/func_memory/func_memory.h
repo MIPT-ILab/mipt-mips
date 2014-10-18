@@ -12,46 +12,56 @@
 // Generic C++
 #include <string>
 #include <cassert>
-#include <iostream>
-#include <sstream>
 
 // uArchSim modules
 #include <types.h>
 #include <elf_parser.h>
 
-#include <vector>
+#define LINK_CONST 256
 
 using namespace std;
 
-class FuncMemory
+//---- Hierarchy ----------------------
+typedef char OffsetMemory;
+
+struct PageMemory
 {
-    // You could not create the object
-    // using this default constructor
-    FuncMemory(){}
-    uint64 addr_size_tmp;
-    uint64 page_bits_tmp;
-    uint64 offset_bits_tmp;
-    vector<vector<vector<uint8> > > memory;
-    uint64 start_addres;
-        
-
-public:
-
-    FuncMemory ( const char* executable_file_name,
-                 uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
-    
-    virtual ~FuncMemory();
-    
-    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
-    void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
-    
-    uint64 startPC() const;
-    
-    string dump( string indent = "") const;
+    OffsetMemory * offset;
 };
 
-uint64 maskfunc(uint64 addr_size_len, uint64 size_right, uint64 size);
-uint8 invert(uint8 var);
+struct SetMemory
+{
+    PageMemory *( * page);
+};
+//-------------------------------------
+
+class FuncMemory
+{
+
+    private :
+        SetMemory * * Memory;
+        uint64 SetSize;
+        uint64 PageSize;
+        uint64 OffsetSize;
+        uint64 Start;
+        uint64 SetBits;
+        uint64 PageBits;
+        uint64 OffsetBits;
+
+        FuncMemory(){}
+
+    public:
+        FuncMemory ( const char* executable_file_name,
+                     uint64 addr_size = 32,
+                     uint64 page_num_size = 10,
+                     uint64 offset_size = 12);
+        virtual ~FuncMemory();
+        uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+        void write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
+        void ArrayWrite( uint8* value, uint64 addr, uint64 size);
+        uint64 startPC() const;
+        string dump( string indent = "") const;
+
+};
+
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
