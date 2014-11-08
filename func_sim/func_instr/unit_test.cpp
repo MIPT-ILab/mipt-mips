@@ -24,8 +24,8 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
 TEST( Func_instr_dump, Process_Disasm)
 {   
     FuncInstr fi(0x016A4821ull);
-    std::string result = fi.Dump("");
-    std::string master = "add $t0, $t1, $t2";
+    std::string master = fi.Dump("");
+    std::string result = "addu $t1, $t3, $t2";
 
     // must exit and return EXIT_FAILURE
     ASSERT_EQ( result, master);
