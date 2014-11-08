@@ -21,13 +21,30 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
-TEST( Func_instr_dump, Process_Disasm)
+TEST( Func_instr_R, Process_Disasm)
 {   
+    // R-type
     FuncInstr fi(0x016A4821ull);
-    std::string master = fi.Dump("");
-    std::string result = "addu $t1, $t3, $t2";
+    std::string result = fi.Dump("");
+    std::string master = "addu $t1, $t3, $t2";
+    ASSERT_EQ( result, master);
+}
 
-    // must exit and return EXIT_FAILURE
+TEST( Func_instr_I, Process_Disasm)
+{
+    // I-type
+    FuncInstr fi(0x216AFFFFull);
+    std::string result = fi.Dump("");
+    std::string master = "addi $t2, $t3, 0xffff";
+    ASSERT_EQ( result, master);
+}
+
+TEST( Func_instr_J, Process_Disasm)
+{
+    // J-type
+    FuncInstr fi(0x0BAAAAAAull);
+    std::string result = fi.Dump("");
+    std::string master = "j 0x3aaaaaa";
     ASSERT_EQ( result, master);
 }
 
