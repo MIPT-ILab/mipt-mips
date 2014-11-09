@@ -10,239 +10,148 @@
 
 // Generic C++
 #include <sstream>
+#include <iomanip>
 
 // uArchSim modules
 #include <func_memory.h>
 
+union uint64_8
+{
+    uint8 bytes[sizeof(uint64) / sizeof(uint8)];
+    uint64 val;
+};
 
 FuncMemory::FuncMemory( const char* executable_file_name,
-                        uint64 addr_size,
+                        uint64 addr_bits,
                         uint64 page_bits,
-                        uint64 offset_bits)
+                        uint64 offset_bits) :
+    addr_bits( addr_bits),
+    page_bits( page_bits),
+    offset_bits( offset_bits),
+    set_bits( addr_bits - offset_bits - page_bits),
+    offset_mask( ( 1 << offset_bits) - 1),
+    page_mask ( ( ( 1 << page_bits) - 1) << offset_bits),
+    set_mask ( (( 1 << set_bits) - 1) << ( page_bits + offset_bits))
 {
     assert( executable_file_name);
 
-    SetBits = addr_size - page_bits - offset_bits;
-    PageBits = page_bits;
-    OffsetBits = offset_bits;
-
-    SetSize = 1;
-    PageSize = 1;
-    OffsetSize = 1;
-
-    for ( int i = 0; i < SetBits; i ++)
-        SetSize *= 2;
-    for ( int i = 0; i < OffsetBits; i ++)
-        OffsetSize *= 2;
-    for ( int i = 0; i < PageBits; i ++)
-        PageSize *= 2;
-
-    Memory = new SetMemory * [ SetSize];
-
-    for ( int i = 0; i < SetSize; i ++)
-        Memory[ i] = NULL;
-
-    vector<ElfSection> sections_array;
+    memory = new uint8** [1 << set_bits];
+    
+    std::vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
-    for ( int i = 0; i < sections_array.size(); i ++)
+
+    for ( vector<ElfSection>::iterator it = sections_array.begin(); it != sections_array.end(); ++it)
     {
-        if ( !strcmp( ".text", sections_array[ i].name))
+        if ( !strcmp( ".text", it->name))
         {
-            Start = sections_array[ i].start_addr;
+            startPC_addr = it->start_addr;
         }
-        ArrayWrite( sections_array[ i].content, sections_array[ i].start_addr, sections_array[ i].size);
-    }
-}
-
-void FuncMemory::ArrayWrite( uint8* value, uint64 addr, uint64 size)
-{
-    assert( value);
-
-    uint64 CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-    uint64 CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
-    uint64 CurrentOffset = ( ( OffsetSize - 1) & addr);
-
-    uint64 x = 0;
-    bool flag = false;
-
-    while ( size > 0)
-    {
-        if ( Memory[ CurrentSet])
+        for ( size_t offset = 0; offset < it->size; ++offset)
         {
-            if ( Memory[ CurrentSet]->page[ CurrentPage])
-            {
-                bool flag = false;
-
-                while ( ( ( CurrentSet) || ( !flag)) && ( size))
-                {
-                    Memory[ CurrentSet]->page[ CurrentPage]->offset[ CurrentOffset] = value[ x];
-                    addr ++;
-                    x ++;
-                    size --;
-                    flag = true;
-                    CurrentOffset = ( ( OffsetSize - 1) & addr);
-                }
-                CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-                CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
-            }
-            else
-            {
-                Memory[ CurrentSet]->page[ CurrentPage] = new PageMemory;
-
-                Memory[ CurrentSet]->page[ CurrentPage]->offset = new OffsetMemory[ OffsetSize];
-                flag = false;
-
-                while ( ( ( CurrentSet) || ( !flag)) && ( size))
-                {
-                    Memory[ CurrentSet]->page[ CurrentPage]->offset[ CurrentOffset] = value[ x];
-                    addr ++;
-                    x ++;
-                    size --;
-                    flag = true;
-                    CurrentOffset = ( ( OffsetSize - 1) & addr);
-                }
-                CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-                CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
-            }
-        }
-        else
-        {
-            Memory[ CurrentSet] = new SetMemory;
-            Memory[ CurrentSet]->page = new PageMemory * [ PageSize];
-
-            for ( int i = 0; i < PageSize; i++)
-            {
-                Memory[ CurrentSet]->page[ i] = NULL;
-            }
-
-            Memory[ CurrentSet]->page[ CurrentPage] = new PageMemory;
-
-            Memory[ CurrentSet]->page[ CurrentPage]->offset = new OffsetMemory[ OffsetSize];
-            flag = false;
-
-            while ( ( ( CurrentSet) || ( !flag)) && ( size))
-            {
-                Memory[ CurrentSet]->page[ CurrentPage]->offset[ CurrentOffset] = value[ x];
-                addr ++;
-                x ++;
-                size --;
-                flag = true;
-                CurrentOffset = ( ( OffsetSize - 1) & addr);
-            }
-            CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-            CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
+            write_byte( it->start_addr + offset, it->content[offset]);
         }
     }
 }
 
 FuncMemory::~FuncMemory()
 {
-    delete [] Memory;
-}
+    uint64 set_cnt = 1 << set_bits;
+    uint64 page_cnt = 1 << page_bits;
 
-uint64 FuncMemory::startPC() const
-{
-    return Start;
+    for ( size_t set = 0; set < set_cnt; ++set)
+    {
+        if (memory[set] != NULL)
+        {
+            for ( size_t page = 0; page < page_cnt; ++page)
+            {
+                if (memory[set][page] != NULL)
+                {
+                    delete [] memory[set][page];
+                }
+            }
+            delete [] memory[set];
+        }
+    }
+    delete [] memory;
 }
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
-    assert( ( num_of_bytes <= 8) && ( num_of_bytes != 0));
-    assert( addr != 0 );
+    assert( num_of_bytes <= 8);
+    assert( num_of_bytes == 0);
+    assert( check( addr));
+    assert( check( addr + num_of_bytes - 1));
 
-    uint64 CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-    uint64 CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
-    uint64 CurrentOffset = ( ( OffsetSize - 1) & addr);
-    
-    uint8 ArrayResult[ 8];
-    uint64 result = 0;
+    uint64_8 value;
+    value.val = 0ull;
 
-    for ( int i = 0; i < num_of_bytes; i ++)
+    for ( size_t i = 0; i < num_of_bytes; ++i)
     {
-        assert( Memory[ CurrentSet]);
-        assert( Memory[ CurrentSet]->page[ CurrentPage]);
-        
-        ArrayResult[ i] = Memory[ CurrentSet]->page[ CurrentPage]->offset[ CurrentOffset];
-        addr ++;
-        CurrentSet = ( ( SetSize - 1) & ( addr >> ( OffsetBits + PageBits)));
-        CurrentPage = ( ( PageSize - 1) & ( addr >> OffsetBits));
-        CurrentOffset = ( ( OffsetSize - 1) & addr);
+        value.bytes[i] = read_byte( addr + i);
     }
 
-    for ( int i = num_of_bytes - 1; i >= 0; i --)
-    {
-        result = result * LINK_CONST + ArrayResult[ i];
-    }
-
-    return result;
+    return value.val;
 }
 
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
     assert( addr != 0);
     assert( num_of_bytes != 0 );
+    alloc( addr);
+    alloc( addr + num_of_bytes - 1);
 
-    uint8 result[ 8];
-    for ( int i = 0; i < num_of_bytes; i ++)
+    uint64_8 value_;
+    value_.val = value;
+
+    for ( size_t i = 0; i < num_of_bytes; ++i)
     {
-        result[ i] = uint8 ( ( value >> ( 8 * i)) & 255);
+        write_byte( addr + i, value_.bytes[i]);
     }
+}
 
-    ArrayWrite( result, addr, num_of_bytes);
+void FuncMemory::alloc( uint64 addr)
+{
+    uint8*** set = &memory[get_set(addr)];
+    if (*set == NULL)
+    {
+        *set = new uint8* [1 << page_bits];
+    }
+    uint8** page = *set + get_page(addr);
+    if ( *page == NULL)
+    {
+        *page = new uint8 [1 << offset_bits];
+    }
+}
+
+bool FuncMemory::check( uint64 addr) const
+{
+    uint8** set = memory[get_set(addr)];
+    return set != NULL && set[get_page(addr)] != NULL;
 }
 
 string FuncMemory::dump( string indent) const
 {
-    ostringstream oss;
+    std::ostringstream oss;
+    oss << std::setfill( '0') << hex;
     
-    oss << indent << "Dump of memory by setcions:" << endl;
-    oss << indent << "Start : " << Start << endl;
-
-    uint64 value = 0;
-    uint64 addr = 0;
-    bool flag = false;
-
-    for ( int i = 0; i < SetSize; i ++)
+    uint64 set_cnt = 1 << set_bits;
+    uint64 page_cnt = 1 << page_bits;
+    uint64 offset_cnt = 1 << offset_bits;
+    
+    for ( size_t set = 0; set < set_cnt; ++set)
     {
-        if ( this->Memory[ i])
+        if (memory[set] != NULL)
         {
-            for ( int j = 0; j < PageSize; j ++)
+            for ( size_t page = 0; page < page_cnt; ++page)
             {
-                if ( Memory[ i]->page[ j])
+                if (memory[set][page] != NULL)
                 {
-                    int last = 0;
-                    for ( int h = 0; h < ( OffsetSize / 4); h ++)
+                    for ( size_t offset = 0; offset < offset_cnt; ++offset)
                     {
-                        addr = OffsetSize * PageSize * i + OffsetSize * j + 4 * h;
-                        value = read( addr, 4);
-                        if ( value == 0)
+                        if (memory[set][page][offset])
                         {
-                            if ( !flag)
-                                oss << indent << endl << indent << "          ....  " << endl << indent << endl;
-                            flag = true;
-                        }
-                        else
-                        {
-                            flag = false;
-                            oss << indent << "  " << addr << ":    " << value << endl;
-                        }
-                        last = h;
-                    }
-                    last++;
-                    if ( OffsetSize % 4)
-                    {
-                        addr = OffsetSize * PageSize * i + OffsetSize * j + last * 4;
-                        value = read( addr, OffsetSize % 4);
-                        if ( value == 0)
-                        {
-                            if ( !flag)
-                                oss << indent << endl << indent << "          ....  " << endl << indent << endl;
-                            flag = true;
-                        }
-                        else
-                        {
-                            flag = false;
-                            oss << indent << "  " << addr << ":    " << value << endl;
+                            oss << "addr 0x" << get_addr( set, page, offset) 
+                                << ": data 0x" << memory[set][page][offset] << std::endl;
                         }
                     }
                 }
@@ -250,6 +159,5 @@ string FuncMemory::dump( string indent) const
         }
     }
 
-    oss << indent << "End of FuncMemory" << endl;
     return oss.str();
 }

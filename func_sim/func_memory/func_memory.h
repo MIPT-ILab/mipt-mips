@@ -11,44 +11,65 @@
 
 // Generic C++
 #include <string>
+#include <iostream>
 #include <cassert>
 
 // uArchSim modules
 #include <types.h>
 #include <elf_parser.h>
 
-#define LINK_CONST 256
-
-using namespace std;
-
-//---- Hierarchy ----------------------
-typedef char OffsetMemory;
-
-struct PageMemory
-{
-    OffsetMemory * offset;
-};
-
-struct SetMemory
-{
-    PageMemory *( * page);
-};
-//-------------------------------------
-
 class FuncMemory
 {
+    private:
+        uint8*** memory;
+        uint64 startPC_addr;
+    
+        uint64 addr_bits;
+        uint64 set_bits;
+        uint64 page_bits;
+        uint64 offset_bits;
+        
+        uint64 set_mask;
+        uint64 page_mask;
+        uint64 offset_mask;        
+        
+        inline size_t get_set( uint64 addr) const
+        {
+            return ( addr & set_mask) >> ( page_bits + offset_bits);
+        }
+        
+        inline size_t get_page( uint64 addr) const
+        {
+            return ( addr & page_mask) >> offset_bits;
+        }
 
-    private :
-        SetMemory * * Memory;
-        uint64 SetSize;
-        uint64 PageSize;
-        uint64 OffsetSize;
-        uint64 Start;
-        uint64 SetBits;
-        uint64 PageBits;
-        uint64 OffsetBits;
+        inline size_t get_offset( uint64 addr) const
+        {
+            return ( addr & offset_mask);
+        }
+        
+        inline uint64 get_addr( uint64 set, uint64 page, uint64 offset) const
+        {
+            return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
+        }
+        
+        inline uint8* get_host_addr( uint64 addr) const
+        {
+            return &memory[get_set(addr)][get_page(addr)][get_offset(addr)];
+        }
 
-        FuncMemory(){}
+        inline uint8 read_byte( uint64 addr) const
+        {
+            return *get_host_addr(addr);
+        }
+        
+        inline void write_byte( uint64 addr, uint8 value)
+        {
+           *get_host_addr(addr) = value;
+        }
+        
+        void alloc( uint64 addr);
+        bool check( uint64 addr) const;
 
     public:
         FuncMemory ( const char* executable_file_name,
@@ -58,10 +79,8 @@ class FuncMemory
         virtual ~FuncMemory();
         uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
         void write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
-        void ArrayWrite( uint8* value, uint64 addr, uint64 size);
-        uint64 startPC() const;
-        string dump( string indent = "") const;
-
+        inline uint64 startPC() const { return startPC_addr; }
+        std::string dump( string indent = "") const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
