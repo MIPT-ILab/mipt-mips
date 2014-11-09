@@ -36,6 +36,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     assert( executable_file_name);
 
     memory = new uint8** [1 << set_bits];
+    memset(memory, 0, sizeof(uint8**) * (1 << set_bits));
     
     std::vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
@@ -48,7 +49,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
         }
         for ( size_t offset = 0; offset < it->size; ++offset)
         {
-            write_byte( it->start_addr + offset, it->content[offset]);
+            write( it->content[offset], it->start_addr + offset, 1);
         }
     }
 }
@@ -78,7 +79,7 @@ FuncMemory::~FuncMemory()
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
     assert( num_of_bytes <= 8);
-    assert( num_of_bytes == 0);
+    assert( num_of_bytes != 0);
     assert( check( addr));
     assert( check( addr + num_of_bytes - 1));
 
@@ -112,14 +113,16 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 void FuncMemory::alloc( uint64 addr)
 {
     uint8*** set = &memory[get_set(addr)];
-    if (*set == NULL)
+    if ( *set == NULL)
     {
         *set = new uint8* [1 << page_bits];
+    	memset(*set, 0, sizeof(uint8*) * (1 << page_bits));
     }
-    uint8** page = *set + get_page(addr);
+    uint8** page = &memory[get_set(addr)][get_page(addr)];
     if ( *page == NULL)
     {
         *page = new uint8 [1 << offset_bits];
+    	memset(*page, 0, sizeof(uint8) * (1 << offset_bits));
     }
 }
 
