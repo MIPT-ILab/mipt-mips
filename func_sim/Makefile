@@ -38,7 +38,7 @@ func_sim: func_memory.o elf_parser.o func_instr.o func_sim.o main.o
 main.o: main.cpp func_sim.h
 	$(CXX) -c $< $(INCL)
 
-func_sim.o: func_sim.cpp func_sim.h types.h func_instr.h func_memory.h
+func_sim.o: func_sim.cpp func_sim.h types.h func_instr.h func_memory.h rf.h
 	$(CXX) -c $< $(INCL)
 
 func_instr.o: func_instr.cpp func_instr.h types.h
