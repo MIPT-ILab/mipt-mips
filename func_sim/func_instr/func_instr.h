@@ -174,7 +174,7 @@ class FuncInstr
 
         void execute_beq()    { if (v_src1 == v_src2) new_PC += (v_imm << 2); }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += (v_imm << 2); }
-        void execute_j()      { new_PC = v_imm << 2; }
+        void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
 
         void calculate_addr() { mem_addr = v_src1 + v_imm; }
