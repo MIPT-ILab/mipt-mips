@@ -156,7 +156,7 @@ class FuncInstr
         void execute_addu()  { v_dst = v_src1 + v_src2; }
         void execute_sub()   { v_dst = (int32)v_src1 - (int32)v_src2; }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addi()  { v_dst = (int32)v_src1 + v_imm; }
+        void execute_addi()  { v_dst = (int32)v_src1 + (int16)v_imm; }
         void execute_addiu() { v_dst = v_src1 + v_imm; }
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
@@ -174,7 +174,7 @@ class FuncInstr
 
         void execute_beq()    { if (v_src1 == v_src2) new_PC += (v_imm << 2); }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += (v_imm << 2); }
-        void execute_j()      { new_PC = v_imm << 2; }
+        void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
 
         void calculate_addr() { mem_addr = v_src1 + v_imm; }
