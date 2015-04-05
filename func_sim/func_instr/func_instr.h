@@ -4,6 +4,7 @@
  * Copyright 2014 MIPT-MIPS
  */
 
+/** Edited by Ladin Oleg. */
 
 #ifndef FUNC_INSTR_H
 #define FUNC_INSTR_H
@@ -103,6 +104,7 @@ class FuncInstr
             } asJ;
             uint32 raw;
 
+            _instr() {} // constructor w/o arguments for ports
             _instr(uint32 bytes) {
                  raw = bytes;
             }
@@ -141,7 +143,7 @@ class FuncInstr
 
         bool complete;
 
-        const uint32 PC;
+        uint32 PC; // removing "const" keyword to supporting ports
         uint32 new_PC;
 
         std::string disasm;
@@ -180,6 +182,7 @@ class FuncInstr
         void calculate_addr() { mem_addr = v_src1 + v_imm; }
 
     public:
+        FuncInstr() {} // constructor w/o arguments for ports
         FuncInstr( uint32 bytes, uint32 PC = 0);
         std::string Dump( std::string indent = " ") const;
 
@@ -187,6 +190,10 @@ class FuncInstr
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
       
+        /* Checks if instruction can change PC in unusual way. */
+        bool isJump() const { return operation == OUT_J_JUMP ||
+                                     operation == OUT_R_JUMP ||
+                                     operation == OUT_I_BRANCH; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
 
