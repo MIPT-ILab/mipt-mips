@@ -345,7 +345,7 @@ template<class T> void PortMap<T>::addWritePort( std::string key, WritePort<T>* 
     }
     else
     {
-        if ( !_map[key].writer)
+        if ( _map[key].writer)
         {
         // Warning of double using of same key for WritePort
             warning( "Reusing of '%s' key for WritePort. Last WritePort will be used.", key.c_str());
