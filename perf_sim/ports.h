@@ -3,7 +3,7 @@
  * @author Pavel Kryukov
  * Copyright 2011 MDSP team
  */
- 
+
 #ifndef PORTS_H
 #define PORTS_H
 
@@ -27,28 +27,28 @@ template<class T> class Port: public log
     protected:
         // Key of port
         std::string _key;
-        
+
         // Init flag
         bool _init;
-    public:    
+    public:
         // Static ports Map to connect ports between for themselves;
         static PortMap<T>* portMap;
-        
+
         // Call of initialization of portMap
         static inline void init()
         {
             portMap->init();
         };
-        
+
         // Call of finding lost tokens in ports
         static inline void lost( uint32 cycle)
         {
             portMap->lost( cycle);
         };
-        
+
         // Sets init flag as true.
         void setInit();
-        
+
         // Constructor of port
         Port<T>( std::string);
 };
@@ -83,7 +83,7 @@ template<class T> class WritePort: public Port<T>
     private:
         // Number of tokens that can be added in one cycle;
         uint32 _bandwidth;
-        
+
         // Number of reader that can read from this port
         uint32 _fanout;
 
@@ -91,21 +91,21 @@ template<class T> class WritePort: public Port<T>
         typedef std::list<ReadPort<T>* > ReadListType;
         typedef typename ReadListType::iterator ReadListIt;
         ReadListType* _destinations;
-        
+
         // Variables for counting token in the last cycle
         uint32 _lastCycle;
         uint32 _writeCounter;
-        
+
     public:
         // Constructor
         WritePort<T>( std::string, uint32, uint32);
-        
+
         // Write Method
         void write( T, uint64);
-        
+
         // Addes destination ReadPort to list
         void setDestination( ReadListType*);
-        
+
         // Returns fanout for test of connection
         uint32 getFanout() const;
 };
@@ -124,11 +124,11 @@ template<class T> WritePort<T>::WritePort( std::string key, uint32 bandwidth, ui
 {
     _bandwidth = bandwidth;
     _fanout = fanout;
-    
+
     _lastCycle = 0;
     _writeCounter = 0;
 
-    this->portMap->addWritePort( this->_key, this);    
+    this->portMap->addWritePort( this->_key, this);
 }
 
 /*
@@ -136,15 +136,15 @@ template<class T> WritePort<T>::WritePort( std::string key, uint32 bandwidth, ui
  *
  * First argument is data itself.
  * Second argument is the current cycle number.
- * 
- * Forwards data to all connected ReadPorts 
+ *
+ * Forwards data to all connected ReadPorts
  *
  * If port wasn't initialized, asserts.
  * If port is overloaded by bandwidth (more than _bandwidth token during one cycle, asserts).
 */
 template<class T> void WritePort<T>::write( T what, uint64 cycle)
 {
-    if ( !this->_init) 
+    if ( !this->_init)
     {
     // If no init, asserts
         this->critical( "%s WritePort was not initializated", this->_key.c_str());
@@ -196,7 +196,7 @@ template<class T> class ReadPort: public Port<T>
     private:
         // Latency is the number of cycles after which we may take data from port.
         uint64 _latency;
-        
+
         // Queue of data that should be released
         struct DataCage
         {
@@ -205,17 +205,17 @@ template<class T> class ReadPort: public Port<T>
         };
         typedef std::queue<DataCage> DataQueue;
         DataQueue _dataQueue;
- 
+
     public:
         // Constructor
         ReadPort<T>( std::string, uint64);
-        
+
         // Read method
         bool read( T*, uint64);
 
         // Pushes data from WritePort
         void pushData( T, uint64);
-        
+
         // Tests if there is any ungot data
         bool selfTest( uint64, uint64*) const;
 };
@@ -227,12 +227,12 @@ template<class T> class ReadPort: public Port<T>
  * Second argument is the latency of port.
  *
  * Adds port to needed PortMap.
-*/ 
+*/
 template<class T> ReadPort<T>::ReadPort( std::string key, uint64 latency):
     Port<T>::Port( key)
 {
     _latency = latency;
-    
+
     this->portMap->addReadPort( this->_key, this);
 }
 
@@ -246,8 +246,8 @@ template<class T> ReadPort<T>::ReadPort( std::string key, uint64 latency):
  * If uninitalized, asserts
 */
 template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
-{   
-    if ( !this->_init) 
+{
+    if ( !this->_init)
     {
         this->critical( "%s ReadPort was not initializated", this->_key.c_str());
         return false;
@@ -264,7 +264,7 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
     }
     else
     {
-        // there are some entries, but they are not ready to read 
+        // there are some entries, but they are not ready to read
 		return false;
     }
 }
@@ -301,34 +301,34 @@ template<class T> bool ReadPort<T>::selfTest(uint64 cycle, uint64* wantedCycle) 
 */
 template<class T> class PortMap: public log
 {
-    private:       
+    private:
         typedef std::list<ReadPort<T>* > ReadListType;
         typedef typename ReadListType::iterator ReadListTypeIt;
-        
+
         // Entry of portMap — one writer and list of readers
         struct Entry
         {
             WritePort<T>* writer;
             ReadListType readers;
         };
-        
+
         // Type of map of Entry
         typedef std::map<std::string, Entry> MapType;
         typedef typename MapType::iterator MapTypeIt;
-        
+
         // Map itself
         MapType _map;
     public:
         // Adding methods
         void addWritePort( std::string, WritePort<T>*);
-        void addReadPort( std::string, ReadPort<T>*);        
-        
+        void addReadPort( std::string, ReadPort<T>*);
+
         // Init method
         void init();
-        
+
         // Finding lost elements
         void lost( uint64);
-}; 
+};
 
 /*
  * Adding WritePort to the map.
@@ -364,8 +364,8 @@ template<class T> void PortMap<T>::addReadPort( std::string key, ReadPort<T>* po
     // If there's no record in this map, create it.
         Entry entry;
         entry.writer = 0;
-        entry.readers.resize(0);        
-        _map.insert( std::pair<std::string, Entry>( key, entry));    
+        entry.readers.resize(0);
+        _map.insert( std::pair<std::string, Entry>( key, entry));
     }
     _map[key].readers.push_front( pointer);
 }
@@ -376,7 +376,7 @@ template<class T> void PortMap<T>::addReadPort( std::string key, ReadPort<T>* po
  * Iterates all map and sets destination list to all writePorts
  * If there're any unconnected ports or fanout overload, asserts.
  * If ther's fanout underload, warnings.
-*/ 
+*/
 template<class T> void PortMap<T>::init()
 {
     for ( MapTypeIt it = _map.begin(); it != _map.end(); ++it)
@@ -385,7 +385,7 @@ template<class T> void PortMap<T>::init()
         {
            this->critical( "No WritePort for '%s' key", it->first.c_str());
         }
-        
+
         WritePort<T>* writer = it->second.writer;
         uint32 readersCounter = it->second.readers.size();
         if ( !readersCounter)
@@ -409,7 +409,7 @@ template<class T> void PortMap<T>::init()
         {
             (*jt)->setInit();
         }
-        writer->setInit();        
+        writer->setInit();
     }
 }
 
@@ -432,6 +432,6 @@ template<class T> void PortMap<T>::lost( uint64 cycle)
             }
         }
     }
-}    
-    
+}
+
 #endif // PORTS_H
