@@ -1,6 +1,12 @@
+#ifndef CACHE_TAG_ARRAY_H
+#define CACHE_TAG_ARRAY_H
+
+#include <stdlib.h>
+#include <types.h>
+
 class CacheTagArray
 {
-   
+
 public:
     /**
      * Constructor params:
@@ -16,7 +22,7 @@ public:
      */
     CacheTagArray( unsigned int size_in_bytes,
                    unsigned int ways,
-                   unsigned short block_size_in_bytes, 
+                   unsigned short block_size_in_bytes,
                    unsigned short addr_size_in_bits);
     /**
      * Return true if the byte with the given address is stored in the cache,
@@ -25,7 +31,7 @@ public:
      * Note that his method updates the LRU information.
      */
     bool read( uint64 addr);
-    
+
     /**
      * Mark that the block containing the byte with the given address
      * is stored in the cache.
@@ -36,4 +42,28 @@ public:
      * policy.
      */
     void write( uint64 addr);
+
+private:
+    uint64 * tagArray;
+    unsigned short * LRU_array;
+
+    int ways_num;
+    int way_size;
+    int line_index_bits;
+    int block_bits;
+    int addr_bits;
+    int tag_bits;
+
+    uint64 line_index_mask;
+    uint64 tag_mask;
+    uint64 offset_mask;
+
+    uint64 get_tag(uint64 addr);
+    uint64 get_line_index(uint64 addr);
+
+    int LRU(uint64 line_index);
+    void init_LRU();
+    void LRU_print(uint64 line_index);
 };
+
+#endif
