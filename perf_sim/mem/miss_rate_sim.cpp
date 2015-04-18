@@ -47,14 +47,14 @@ int main(int argc, char* argv[])
     for(int i = 0; i < ROWS - 1; i ++){
         for(int j = 0; j < COLUMNS; j ++){
             float miss_rate = test_cache(argv[1], new CacheTagArray(sizes[j], ways[i], 4, 32));
-            fprintf(output, "%f ", miss_rate);
+            fprintf(output, "%f, ", miss_rate);
         }
         fprintf(output, "\n");
     }
 
     for(int i = 0; i < COLUMNS; i ++){
         float miss_rate = test_cache(argv[1], new CacheTagArray(sizes[i], sizes[i]/4, 4, 32));
-        fprintf(output, "%f ", miss_rate);
+        fprintf(output, "%f, ", miss_rate);
     }
 
     return 0;
