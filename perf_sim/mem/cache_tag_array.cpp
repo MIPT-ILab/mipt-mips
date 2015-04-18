@@ -11,6 +11,8 @@ CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
 
     ways_num = ways;
 
+    cache_size = size_in_bytes;
+
     way_size = size_in_bytes / ways;
     line_index_bits = log2( way_size / block_size_in_bytes);
 
@@ -38,10 +40,14 @@ bool CacheTagArray::read(uint64 addr){
     uint64 line_index = get_line_index(addr);
 
     for(int i = 0; i < ways_num; i++)
-        if(tagArray[ line_index + i*way_size] == tag) return true;
+        if(tagArray[ line_index*ways_num + i] == tag){
+            LRU_refresh(line_index, i);
+            //LRU_print(line_index);
+            return true;
+        }
 
     write(addr);
-    LRU_print(line_index);
+    //LRU_print(line_index);
     return false;
 }
 
@@ -49,30 +55,36 @@ void CacheTagArray::write(uint64 addr){
     uint64 tag = get_tag(addr);
     uint64 line_index = get_line_index(addr);
 
-    int i = LRU(line_index);
-    tagArray[ line_index + i*way_size] = tag;
+    int i = LRU_get(line_index);
+    tagArray[ line_index*ways_num + i] = tag;
 }
 
-int CacheTagArray::LRU(uint64 line_index){
+int CacheTagArray::LRU_get(uint64 line_index){
     int i = 0;
     for(int j = 0; j < ways_num; j ++)
-        if( LRU_array[line_index + j*way_size] < LRU_array[line_index + i*way_size])
+        if( LRU_array[line_index*ways_num + j] < LRU_array[line_index*ways_num + i])
             i = j;
-    for(int j = 0; j < ways_num; j ++)
-        if( LRU_array[line_index + j*way_size] > 0)
-            LRU_array[line_index + j*way_size]-- ;
-    LRU_array[line_index + i*way_size] = ways_num - 1;
+    LRU_refresh(line_index, i);
     return i;
+}
+
+void CacheTagArray::LRU_refresh(uint64 line_index, uint64 mostRecentUsed){
+    for(int i = 0; i < ways_num; i ++)
+        if( LRU_array[line_index*ways_num + i] > LRU_array[line_index*ways_num + mostRecentUsed])
+            LRU_array[line_index*ways_num + i] --;
+    LRU_array[line_index*ways_num + mostRecentUsed] = ways_num-1;
 }
 
 void CacheTagArray::LRU_print(uint64 line_index){
     for(int j = 0; j < ways_num; j ++)
-        std::cout << LRU_array[line_index + j*way_size] << " ";
+        std::cout << LRU_array[line_index*ways_num + j] << " ";
     std::cout << std::endl;
 }
 
+/***********************************/
+
 void CacheTagArray::init_LRU(){
-    LRU_array = (unsigned short *)calloc(ways_num*way_size, sizeof(unsigned short));
-    for(int i = 0; i < way_size; i ++)
-        for(int j = 0; j < ways_num; j ++)LRU_array[i + j*way_size] = j;
+    LRU_array = (unsigned int *)calloc(cache_size, sizeof(unsigned int));
+    for(int i = 0; i < cache_size; i ++)
+        LRU_array[i] = i%ways_num;
 }

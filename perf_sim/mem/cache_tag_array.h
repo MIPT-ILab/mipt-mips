@@ -45,7 +45,7 @@ public:
 
 private:
     uint64 * tagArray;
-    unsigned short * LRU_array;
+    unsigned int * LRU_array;
 
     int ways_num;
     int way_size;
@@ -53,6 +53,7 @@ private:
     int block_bits;
     int addr_bits;
     int tag_bits;
+    int cache_size;
 
     uint64 line_index_mask;
     uint64 tag_mask;
@@ -61,7 +62,8 @@ private:
     uint64 get_tag(uint64 addr);
     uint64 get_line_index(uint64 addr);
 
-    int LRU(uint64 line_index);
+    int LRU_get(uint64 line_index);
+    void LRU_refresh(uint64 line_index, uint64 mostRecentUsed);
     void init_LRU();
     void LRU_print(uint64 line_index);
 };

@@ -13,13 +13,10 @@ INCL= -I ./ -I $(TRUNK)/common/
 #
 Debug: miss_rate_sim
 
-miss_rate_sim: cache_tag_array.o main.o
+miss_rate_sim: cache_tag_array.o miss_rate_sim.o
 	$(CXX) -g -o $@ $^
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
-
-main.o: main.cpp cache_tag_array.h
-	$(CXX) -g -c $< $(INCL)
 
 cache_tag_array.o: cache_tag_array.cpp cache_tag_array.h types.h
 	$(CXX) -g -c $< $(INCL)
