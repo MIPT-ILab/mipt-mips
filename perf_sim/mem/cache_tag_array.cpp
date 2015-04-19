@@ -14,6 +14,7 @@
 
 // uArchSim modules
 #include "cache_tag_array.h"
+//#include "types.h"
 
 //=============== class CacheTagArray ===============
 CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
@@ -158,16 +159,13 @@ MultiWayCache::MultiWayCache( unsigned int size_in_bytes,
                      block_size_in_bytes,
                      addr_size_in_bits)
 {
-//    std::cerr << "Constructor begins\n";
     cache =  new uint64*[ways];
     que_array = new LruQue[1 << get_set_bits()];
     unsigned way_size = culc_way_size();
-//    std::cerr << "way size = " << way_size << std::endl;
     for ( unsigned i = 0; i < ways; i++) {
         cache[i] = new uint64[way_size];
         memset( cache[i], 0xcc, sizeof( uint64) * way_size);
     }
-//    std::cerr << "Constructor ends\n";
 }
 
 MultiWayCache::~MultiWayCache()
@@ -185,14 +183,8 @@ bool  MultiWayCache::read( uint64 addr)
     uint32 set = get_set( addr);
     uint64 tag = get_tag( addr);
     uint32 ways = get_type();
-//    std::cerr << "\tset = " << set << ", tag = " << tag << ", way = " << ways;
     uint32 i = 0;
-//    std::cerr << "\n+_+ 0x";
-//    std::cerr << std::hex << cache[i][set] << std::dec;
-//    std::cerr << " +++\n";
     for ( ; ( i < ways) && ( cache[i][set] != tag); i++);
-//        std::cerr << ", i = " << i << std::endl;
-//    std::cerr << ", i = " << i << std::endl;
     if  ( i != ways) {
         que_array[set].move_to_head( tag);
         return true;
@@ -222,7 +214,6 @@ void  MultiWayCache::write( uint64 addr)
 //=============== class LruOue ===============
 LruQue::~LruQue()
 {
-//    std::cerr << "LruQue is deleting\n";
     Node* tmp_node;
     if  ( head) {
         if  ( head->get_next()) {
@@ -239,7 +230,7 @@ LruQue::~LruQue()
             tmp_node = tmp_node->get_next();
             delete  prev_node;
         }
-        delete  prev_node;
+        delete  tmp_node;
 
         head = NULL;
         last = NULL;

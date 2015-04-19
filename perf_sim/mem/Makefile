@@ -1,39 +1,35 @@
 # 
-# Building the model of cache imp;lementation
-# @author Dmitry Ermilov <ermilov@phystech.edu>
-# For MIPT MIPS 2015
+# Building the single-cycle MIPS simulator
+# @author Pavel Kryukov <pavel.kryukov@phystech.com>
+# Copyright 2015 MIPT-MIPS iLab Project
 #
 
 # specifying relative path to the TRUNK
-TRUNK= ~T5/
+TRUNK= /home/dvermilov/T5
 
 # paths to look for headers
 vpath %.h $(TRUNK)/common
-vpath %.h $(TRUNK)/perf_sim/
-vpath %.cpp $(TRUNK)/perf_sim/
+vpath %.h $(TRUNK)/perf_sim/mem/
+vpath %.cpp $(TRUNK)/perf_sim/mem/
 
 # option for C++ compiler specifying directories 
 # to search for headers
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I $(TRUNK)/func_sim/func_memory/ -I $(TRUNK)/func_sim/func_instr
-
-#options for static linking of boost Unit Test library
-INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
-GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
+INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/perf_sim/mem/ 
 
 #
-# Enter for building func_memory stand alone program
+# Enter for building cache stand alone program
 #
-miss_rate: func_memory.o elf_parser.o func_instr.o func_sim.o main.o
-	$(CXX) -o $@ $^ 
+miss_rate: cache_tag_array.o miss_rate_sim.o
+	$(CXX) -o $@ $^
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-main.o: miss_rate_sim.cpp cache_tag_array.h types.h
+miss_rate_sim.o: miss_rate_sim.cpp cache_tag_array.h types.h
 	$(CXX) -c $< $(INCL)
 
 cache_tag_array.o: cache_tag_array.cpp cache_tag_array.h types.h
 	$(CXX) -c $< $(INCL)
 
 clean:
-	@-rm *.o
+	@-rm cache_tag_array.o miss_rate_sim.o
 	@-rm miss_rate
