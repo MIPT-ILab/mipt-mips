@@ -42,13 +42,16 @@ struct LRUInfo
         std::vector< std::list< unsigned int>> v( sets, l);
         lru = v;
     }
-    /* On hit - mark (push back) way that contains the set. */
+    /*
+     * On hit - mark (push back) way that contains the set.
+     * It's an inversed search because of progs usually have time locality.
+     */
     void update( int set, int way)
     {
-        for ( std::list< unsigned int>::iterator it = lru[ set].begin();
-              it != lru[ set].end();
-              ++it)
+        for ( std::list< unsigned int>::iterator it = lru[ set].end();
+              it != lru[ set].begin(); )
         {
+            --it; // alignment
             if ( *it == way)
             {
                 lru[ set].erase( it);
