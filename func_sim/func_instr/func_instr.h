@@ -133,7 +133,7 @@ class FuncInstr
         RegNum dst;
 
         uint32 v_imm;
-	uint32 v_src1;
+	    uint32 v_src1;
         uint32 v_src2;
         uint32 v_dst;
         uint32 mem_addr;
@@ -141,7 +141,7 @@ class FuncInstr
 
         bool complete;
 
-        const uint32 PC;
+        uint32 PC;
         uint32 new_PC;
 
         std::string disasm;
@@ -180,15 +180,17 @@ class FuncInstr
         void calculate_addr() { mem_addr = v_src1 + v_imm; }
 
     public:
-        FuncInstr( uint32 bytes, uint32 PC = 0);
+        FuncInstr( uint32 bytes = 0, uint32 PC = 0);
         std::string Dump( std::string indent = " ") const;
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
+        uint32 get_raw_bytes() const { return instr.raw; }
       
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
+        bool is_jump() const  { return operation == OUT_R_JUMP || operation == OUT_I_BRANCH || operation == OUT_J_JUMP; }
 
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
