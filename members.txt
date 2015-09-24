@@ -1,1 +1,2 @@
 List of project members:
+1. Igor Smirnov - igor.smirnov@phystech.edu
