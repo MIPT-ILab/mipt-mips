@@ -3,3 +3,4 @@ List of project members:
 2. Igor Smirnov - igor.smirnov@phystech.edu
 3. Viktor Prutyanov - viktor.prutyanov@phystech.edu
 4. Aleksandr Paramonov - aleksandr.paramonov@phystech.edu
+5. Krotov Ilya - ilya.krotov@phystech.edu
