@@ -1,10 +1,11 @@
 List of project members:
-1. Pavel Kryukov - pavel.kryukov@phystech.edu
-2. Igor Smirnov - igor.smirnov@phystech.edu
-3. Viktor Prutyanov - viktor.prutyanov@phystech.edu
-4. Aleksandr Paramonov - aleksandr.paramonov@phystech.edu
-5. Krotov Ilya - ilya.krotov@phystech.edu
-6. Zavodskikh Roman - roman.zavodskikh@phystech.edu
-7. Albert Nagapetyan - albert.nagapetyan@phystech.edu
-8. Grigoriy Chirkov - grigoriy.chirkov@phystech.edu
-9. Grigoriy Melnikov - grigoriy.melnikov@phystech.edu
+1.  Pavel Kryukov - pavel.kryukov@phystech.edu
+2.  Igor Smirnov - igor.smirnov@phystech.edu
+3.  Viktor Prutyanov - viktor.prutyanov@phystech.edu
+4.  Aleksandr Paramonov - aleksandr.paramonov@phystech.edu
+5.  Krotov Ilya - ilya.krotov@phystech.edu
+6.  Zavodskikh Roman - roman.zavodskikh@phystech.edu
+7.  Albert Nagapetyan - albert.nagapetyan@phystech.edu
+8.  Grigoriy Chirkov - grigoriy.chirkov@phystech.edu
+9.  Koposov Denis - denis.koposov@phystech.edu
+10. Melnikov Grigoriy - grigoriy.melnikov@phystech.edu 
