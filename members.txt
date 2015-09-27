@@ -7,3 +7,4 @@ List of project members:
 6. Zavodskikh Roman - roman.zavodskikh@phystech.edu
 7. Albert Nagapetyan - albert.nagapetyan@phystech.edu
 8. Grigoriy Chirkov - grigoriy.chirkov@phystech.edu
+9. Grigoriy Melnikov - grigoriy.melnikov@phystech.edu
