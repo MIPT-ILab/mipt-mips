@@ -10,3 +10,4 @@ List of project members:
 9. Koposov Denis - denis.koposov@phystech.edu
 10. Aleksandr Shashev - aleksandr.shashev@phystech.edu
 11. Melnikov Grigoriy - grigoriy.melnikov@phystech.edu
+12. Levitsky Ilya - ilya.levitsky@phystech.edu
