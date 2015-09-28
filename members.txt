@@ -8,3 +8,4 @@ List of project members:
 7. Albert Nagapetyan - albert.nagapetyan@phystech.edu
 8. Grigoriy Chirkov - grigoriy.chirkov@phystech.edu
 9. Koposov Denis - denis.koposov@phystech.edu
+10. Aleksandr Shashev - aleksandr.shashev@phystech.edu
