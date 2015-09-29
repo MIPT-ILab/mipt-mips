@@ -1,4 +1,4 @@
-List of project members:
+List of 2015 project members:
 1. Pavel Kryukov - pavel.kryukov@phystech.edu
 2. Igor Smirnov - igor.smirnov@phystech.edu
 3. Viktor Prutyanov - viktor.prutyanov@phystech.edu
