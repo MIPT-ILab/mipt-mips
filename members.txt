@@ -11,3 +11,5 @@ List of project members:
 10. Aleksandr Shashev - aleksandr.shashev@phystech.edu
 11. Melnikov Grigoriy - grigoriy.melnikov@phystech.edu
 12. Levitsky Ilya - ilya.levitsky@phystech.edu
+13. Igor Kuzmin - igor.kuzmin@phystech.edu
+
