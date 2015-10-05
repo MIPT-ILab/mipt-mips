@@ -5,12 +5,12 @@
  */
 
 // Genereic C
-#include <libelf.h>
+#include <libelf/libelf.h>
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
 #include <fcntl.h>
-#include <gelf.h>
+#include <libelf/gelf.h>
 #include <cstdlib>
 #include <cerrno>
 #include <cassert>
