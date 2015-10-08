@@ -16,3 +16,4 @@ List of 2015 project members:
 15. Diana Kiseliova - diana.kiseleva@phystech.edu
 16. Taras Khakhulin - taras.khakhulin@phystech.edu
 17. Yarmuhametov Vadim - yarmuhametov.vf@phystech.edu
+18. Gaynullin Dmitry - dmitriy.gaynullin@phystech.edu
