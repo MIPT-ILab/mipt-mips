@@ -55,7 +55,7 @@ unit_test: unit_test.o func_memory.o elf_parser.o
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp func_memory.o elf_parser.o
-	$(CXX) -c $< $(INCL_GTEST) $(INCL) 
+	$(CXX) -c $< $(INCL_GTEST) $(INCL)
 
 clean:
 	@-rm *.o

@@ -33,7 +33,7 @@ class FuncMemory
     uint64 page_bits;
     uint64 offset_bits;
     uint64 addr_size;
-    
+    uint64 max_addr;    
     
 public:
 
@@ -44,7 +44,7 @@ public:
     
     virtual ~FuncMemory(){};
     
-    uint64 read( uint64 addr, unsigned short num_of_bytes = 4);
+    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     
     uint64 startPC() const;
