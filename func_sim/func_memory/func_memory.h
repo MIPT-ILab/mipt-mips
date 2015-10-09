@@ -25,6 +25,8 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+
+    void increase_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set) const;
     
     unsigned num_of_sets_priv;
     unsigned num_of_pages_priv;
