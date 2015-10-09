@@ -12,6 +12,7 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <vector>
 
 // uArchSim modules
 #include <types.h>
@@ -24,6 +25,17 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+    
+    unsigned num_of_sets_priv;
+    unsigned num_of_pages_priv;
+    unsigned max_offset_priv;
+
+    char* exe_file_name_priv;
+    uint64 addr_size_priv;
+    uint64 page_num_size_priv;
+    uint64 offset_size_priv;
+
+    uint8*** sets_array_priv;
 
 public:
 
