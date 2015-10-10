@@ -64,7 +64,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     
     for ( unsigned i = 0; i < sections_array.size( ); ++i)
     {
-        if ( strcmp( sections_array[ i].name, ".name"))
+        if ( strcmp( sections_array[ i].name, ".text") == 0)
         {
             this->start_pc_adress_priv = cur_addr;
             clog << "start_pc_adress finded and written: " << this->start_pc_adress_priv << endl;
@@ -207,5 +207,30 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 string FuncMemory::dump( string indent) const
 {
     // put your code here
-    return "ERROR: You need to implement FuncMemory!\nTHIS IS VERY STUPID DUMP!!!\nDON\'T USE IT IN THE PRODUCTION!!!";
+    ostringstream oss;
+
+    oss << indent << "Dump of FuncMemory" << endl
+        << indent << "Content" << endl;
+
+    oss << hex;
+    for( unsigned set_num = 0; set_num < num_of_pages_priv; ++set_num)
+    {
+        if ( this->sets_array_priv[ set_num] != NULL) 
+        {
+            for( unsigned page_num = 0; page_num < num_of_pages_priv; ++page_num)
+            {
+                if ( this->sets_array_priv[ set_num][ page_num] != NULL)
+                {
+                    for ( unsigned offset = 0; offset < max_offset_priv; ++offset)
+                    {
+                        oss << "set " << set_num << ", page " << page_num << ", offset " << offset << " : "
+                            << ( int)this->sets_array_priv[ set_num][ page_num][ offset] << endl;
+                        
+                    }
+                }
+            }
+        }
+    }
+    oss << "ERROR: You need to implement FuncMemory!\nTHIS IS VERY STUPID DUMP!!!\nDON\'T USE IT IN THE PRODUCTION!!!";
+    return oss.str();
 }
