@@ -39,6 +39,8 @@ class FuncMemory
 
     uint8*** sets_array_priv;
 
+    uint64 start_pc_adress_priv;
+
 public:
 
     FuncMemory ( const char* executable_file_name,

@@ -58,8 +58,25 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     clog << "Initalized array of " << num_of_sets_priv << " sets." << endl;
     memset( this->sets_array_priv, 0, this->num_of_sets_priv * sizeof( *( this->sets_array_priv)));
 
-    vector<ElfSection> sections_array_priv;
+    vector<ElfSection> sections_array;
+    ElfSection::getAllElfSections( this->exe_file_name_priv, sections_array);
+    uint64 cur_addr = 0;
+    
+    for ( unsigned i = 0; i < sections_array.size( ); ++i)
+    {
+        if ( strcmp( sections_array[ i].name, ".name"))
+        {
+            this->start_pc_adress_priv = cur_addr;
+            clog << "start_pc_adress finded and written: " << this->start_pc_adress_priv << endl;
+        }
 
+        string str = sections_array[ i].strByBytes();
+        for ( size_t offset = 0; offset < sections_array[ i].size; offset+=sizeof( uint8))
+        {
+            this->write( sections_array[ i].content[ offset], cur_addr, 1); 
+            ++cur_addr;
+        }
+    }
 }
 
 FuncMemory::~FuncMemory()
@@ -88,6 +105,7 @@ FuncMemory::~FuncMemory()
 uint64 FuncMemory::startPC() const
 {
     // put your code here
+    return start_pc_adress_priv;
 }
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
