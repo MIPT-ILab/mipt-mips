@@ -77,27 +77,24 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     clog << "Initalized array of " << num_of_sets_priv << " sets." << endl;
     memset( this->sets_array_priv, 0, this->num_of_sets_priv * sizeof( *( this->sets_array_priv)));
 
-    #if 0
     vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( this->exe_file_name_priv, sections_array);
-    uint64 cur_addr = begin_addr_priv;
     
     for ( unsigned i = 0; i < sections_array.size( ); ++i)
     {
+        uint64 cur_addr = sections_array[ i].start_addr;
         if ( strcmp( sections_array[ i].name, ".text") == 0)
         {
             this->start_pc_adress_priv = cur_addr;
             clog << "start_pc_adress finded and written: " << this->start_pc_adress_priv << endl;
         }
 
-        string str = sections_array[ i].strByBytes();
         for ( size_t offset = 0; offset < sections_array[ i].size; offset++)
         {
             this->write( sections_array[ i].content[ offset], cur_addr, 1); 
             cur_addr++;
         }
     }
-    #endif
 }
 
 FuncMemory::~FuncMemory()
@@ -164,14 +161,16 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     }
 
     uint64 rtr_val = 0;
-    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes-1);
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {
         rtr_val <<= 8;
         clog << "Read rtr_val(before adding)==" << rtr_val << endl;
-        rtr_val += this->sets_array_priv[ num_of_set][ num_of_page][ offset];
+        if( this->sets_array_priv[ num_of_set] != NULL && this->sets_array_priv[ num_of_set][ num_of_page] != NULL)
+        {
+            rtr_val += this->sets_array_priv[ num_of_set][ num_of_page][ offset];
+        }
         clog << "Read rtr_val(after adding)==" << rtr_val << endl;
-        decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        increase_offset_priv( offset, num_of_page, num_of_set, 1);
     }
     clog << "END_OF_FUNCTION FuncMemory::read. rtr_val == " << rtr_val << endl;
     return rtr_val;
@@ -199,7 +198,6 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     clog << "Counted num_of_set (" << num_of_set <<") num_of_page (" << num_of_page;
     clog << ") and offset (" << offset << ")" << endl;
 
-    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes);
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {   
         if ( this->sets_array_priv[ num_of_set] == NULL)
@@ -223,7 +221,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
         clog << ";value&0xFF<<*==" << ( (value & ( 0xFF << ( num_of_bytes-i-1)*8)) >> (num_of_bytes-i-1 ))  << endl;
         clog << "----num_of_set==" << num_of_set << ", num_of_page==" << num_of_page << ", offset==" << offset << endl;
         this->sets_array_priv[ num_of_set][ num_of_page][ offset] = val_to_write;
-        decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        increase_offset_priv( offset, num_of_page, num_of_set, 1);
     }
     clog << "END_OF_FUNCTION FucnMemory::write" << endl;
 }
