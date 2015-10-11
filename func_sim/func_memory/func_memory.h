@@ -26,7 +26,8 @@ class FuncMemory
     // using this default constructor
     FuncMemory(){}
 
-    void increase_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set) const;
+    void increase_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned inc_by) const;
+    void decrease_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned dec_by) const;
     
     unsigned num_of_sets_priv;
     unsigned num_of_pages_priv;
@@ -40,6 +41,7 @@ class FuncMemory
     uint8*** sets_array_priv;
 
     uint64 start_pc_adress_priv;
+    const static uint64 begin_addr_priv = 0x400098;
 
 public:
 
