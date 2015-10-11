@@ -26,14 +26,16 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
-    map< uint64, map< uint64, map< uint64, uint8> > > memory;
+    map< uint64, map< uint64, map< uint64, uint8 > > > memory;
     uint64 text_start;
     uint64 set_size;
     uint64 page_size;
     uint64 page_bits;
     uint64 offset_bits;
     uint64 addr_size;
-    uint64 max_addr;    
+    uint64 max_addr;
+    uint64 set_count;
+    uint64 page_in_set_count;
     
 public:
 
@@ -52,21 +54,5 @@ public:
     string dump( string indent = "") const;
 };
 
-class Address
-{
-    Address(){};
-
-public:
-    
-    Address(uint64 addr,
-            uint64 addr_size,
-            uint64 page_num_size,
-            uint64 offset_size);
-    ~Address(){};
-    
-    uint64 page;
-    uint64 set;
-    uint64 offset;
-};
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
