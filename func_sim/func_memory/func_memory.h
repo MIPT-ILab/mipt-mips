@@ -29,9 +29,9 @@ class FuncMemory
     void increase_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned inc_by) const;
     void decrease_offset_priv( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned dec_by) const;
     
-    unsigned num_of_sets_priv;
-    unsigned num_of_pages_priv;
-    unsigned max_offset_priv;
+    uint64 num_of_sets_priv;
+    uint64 num_of_pages_priv;
+    uint64 max_offset_priv;
 
     char* exe_file_name_priv;
     uint64 addr_size_priv;
