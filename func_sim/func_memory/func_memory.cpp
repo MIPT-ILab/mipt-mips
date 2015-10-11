@@ -52,7 +52,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     this->addr_size          = addr_size;
     this->page_bits          = page_bits;
     this->offset_bits        = offset_bits;
-    this->max_addr           = (1 << addr_size) - 1;
+    this->max_addr           = ( ( uint64)1 << addr_size) - 1;
     this->set_count          = 1 << ( addr_size - page_bits - offset_bits);
     this->page_in_set_count  = 1 << page_bits;
 
@@ -89,6 +89,7 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
+//cout << max_addr;
     assert( num_of_bytes);
     assert( addr < max_addr);
     
@@ -101,13 +102,13 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
         Address parsed_addr( cur_addr, addr_size, page_bits, offset_bits);
         
         
-        assert( memory.find( parsed_addr.set) == memory.end());                    //checking
+        assert( memory.find( parsed_addr.set) != memory.end());                    //checking
         map< uint64, map< uint64, uint8 > > set = memory.at( parsed_addr.set);     //data
                                                                                    //initialization
-        assert( set.find( parsed_addr.page) == set.end());                         //
+        assert( set.find( parsed_addr.page) != set.end());                         //
         map< uint64, uint8> page = set.at( parsed_addr.page);                      //
                                                                                    //
-        assert( page.find( parsed_addr.offset) == page.end());                     //
+        assert( page.find( parsed_addr.offset) != page.end());                     //
         
         
         res += ( page.at(parsed_addr.offset) << counter);                               
@@ -183,6 +184,7 @@ string FuncMemory::dump( string indent) const
                             oss << "null ";
                         }
                     }
+                    oss << endl;
                 }
             }
         }
