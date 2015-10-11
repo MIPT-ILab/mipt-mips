@@ -52,7 +52,7 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     this->addr_size          = addr_size;
     this->page_bits          = page_bits;
     this->offset_bits        = offset_bits;
-    this->max_addr           = ( uint32) -1;   //!!!
+    this->max_addr           = (1 << addr_size) - 1;
     this->set_count          = 1 << ( addr_size - page_bits - offset_bits);
     this->page_in_set_count  = 1 << page_bits;
 
