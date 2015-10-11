@@ -191,7 +191,12 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     if( num_of_bytes > 8)
     {
         cerr << "Cannot write more than eight (" << num_of_bytes << ") bytes" << endl;
-        return ;
+        abort();
+    }
+    else if( num_of_bytes == 0)
+    {
+        cerr << "Trying to write 0 bytes" << endl;
+        abort();
     }
     clog << "Passed checking num_of_bytes > 8" << endl;
 
