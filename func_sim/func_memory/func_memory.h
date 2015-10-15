@@ -23,18 +23,29 @@ class FuncMemory
 {
     // You could not create the object
     // using this default constructor
-    FuncMemory(){}
+    FuncMemory()
+	{
+
+	}
 
 public:
 
+	vector<ElfSection> sections_array;
+
     FuncMemory ( const char* executable_file_name,
-                 uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
+                 uint64 addr_size_global = 32,
+                 uint64 page_num_size_global = 10,
+                 uint64 offset_size_global = 12);
     
     virtual ~FuncMemory();
-    
+	uint8*** Memory;
+    uint64 addr_size_global, page_num_size_global, offset_size_global;
+	uint64 addr_count, page_num_count, offset_count;
+
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+
+    void   memoryCalculator(uint64* first, uint64* second, uint64* third, uint64 address) const;
+
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
     
     uint64 startPC() const;
