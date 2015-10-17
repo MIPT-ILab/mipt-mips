@@ -89,7 +89,6 @@ uint64 FuncMemory::startPC() const
 
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
-//cout << max_addr;
     assert( num_of_bytes);
     assert( addr < max_addr);
     
@@ -139,8 +138,6 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 
 string FuncMemory::dump( string indent) const
 {
-    Address x( text_start, addr_size, page_bits, offset_bits);
-    cout << x.set << '\t'  <<  x.page << '\t' << x.offset << endl;
     ostringstream oss;
     oss.fill( '0');
     
@@ -159,7 +156,6 @@ string FuncMemory::dump( string indent) const
     for ( uint64 set_num = 0; set_num < set_count; set_num++)
     {
     
-    //cout << memory.find( set_num)->first << endl;
         if ( memory.find( set_num) != memory.end())
         {
             oss << indent << "\t set_num = " << set_num << endl;
