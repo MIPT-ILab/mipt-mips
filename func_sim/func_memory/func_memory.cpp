@@ -17,8 +17,6 @@
 #include <func_memory.h>
 #include <elf_parser.h>
 
-const int POISON = -1;
-
 uint64 FuncMemory::get_num_of_set_priv( uint64 addr) const
 {
     return addr >> ( addr_size_priv - set_num_size_priv);
@@ -145,8 +143,8 @@ FuncMemory::~FuncMemory()
     }
     delete [] sets_array_priv;
 
-    addr_size_priv=page_num_size_priv=offset_size_priv=POISON;
-    num_of_sets_priv=num_of_pages_priv=max_offset_priv=POISON;
+    addr_size_priv=page_num_size_priv=offset_size_priv=NO_VAL64;
+    num_of_sets_priv=num_of_pages_priv=max_offset_priv=NO_VAL64;
 }
 
 uint64 FuncMemory::startPC() const
@@ -195,7 +193,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     }
 
     uint64 rtr_val = 0;
-    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes);
+    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes - 1);
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {
         rtr_val <<= 8;
@@ -204,7 +202,12 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
         {
             rtr_val += sets_array_priv[ num_of_set][ num_of_page][ offset];
         }
-        decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        if ( i != num_of_bytes - 1) 
+        /*We don't need to decrease last time because we need to decrease
+          (num_of_bytes - 1) times, not num_of_bytes!!!*/
+        {
+            decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        }
     }
     clog << "END_OF_FUNCTION FuncMemory::read. rtr_val == " << rtr_val << endl;
     return rtr_val;
@@ -237,7 +240,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
          << ") num_of_page (" << num_of_page;
     clog << ") and offset (" << offset << ")" << endl;
 
-    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes);
+    increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes - 1);
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {   
         if ( sets_array_priv[ num_of_set] == NULL)
@@ -275,7 +278,12 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
              << ", num_of_page==" << num_of_page 
              << ", offset==" << offset << endl;
         sets_array_priv[ num_of_set][ num_of_page][ offset] = val_to_write;
-        decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        if ( i != num_of_bytes - 1) 
+        /*We don't need to decrease last time because we need to decrease
+          (num_of_bytes - 1) times, not num_of_bytes!!!*/
+        {
+            decrease_offset_priv( offset, num_of_page, num_of_set, 1);
+        }
     }
     clog << "END_OF_FUNCTION FucnMemory::write" << endl;
 }
