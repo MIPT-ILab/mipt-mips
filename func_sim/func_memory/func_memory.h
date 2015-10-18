@@ -39,7 +39,7 @@ class FuncMemory
     uint64 num_of_pages_priv;
     uint64 max_offset_priv;
 
-    char* exe_file_name_priv;
+    string exe_file_name_priv;
     uint64 addr_size_priv;
     uint64 set_num_size_priv;
     uint64 page_num_size_priv;

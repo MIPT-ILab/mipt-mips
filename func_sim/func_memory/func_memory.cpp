@@ -6,11 +6,9 @@
  */
 
 // Generic C
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
 
 // Generic C++
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -52,7 +50,7 @@ void FuncMemory::increase_offset_priv ( uint64& offset,
             if( num_of_set >= num_of_sets_priv)
             {
                 cerr << "The END of the memory REACHED!!!" << endl;
-                abort();
+                terminate();
             }
         }
     }
@@ -74,7 +72,7 @@ void FuncMemory::decrease_offset_priv ( uint64& offset,
             if( num_of_set + 1 < 1)
             {
                 cerr << "The BEGINNING of the memory REACHED!!!" << endl;
-                abort();
+                terminate();
             }
         }
     }
@@ -85,13 +83,11 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 offset_bits)
     :addr_size_priv( addr_size),
      page_num_size_priv( page_bits),
-     offset_size_priv( offset_bits)
+     offset_size_priv( offset_bits),
+     exe_file_name_priv( executable_file_name)
 {
-    exe_file_name_priv = new char[ strlen( executable_file_name) + 1];
-    strcpy( exe_file_name_priv, executable_file_name);
-
     vector<ElfSection> sections_array;
-    ElfSection::getAllElfSections( exe_file_name_priv, sections_array);
+    ElfSection::getAllElfSections( exe_file_name_priv.c_str(), sections_array);
     
     set_num_size_priv = addr_size_priv - page_num_size_priv -
         offset_size_priv;
@@ -106,13 +102,18 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 
     sets_array_priv = new uint8**[ num_of_sets_priv];
     clog << "Initalized array of " << num_of_sets_priv << " sets." << endl;
+    #if 0
     memset( sets_array_priv, 0,
         num_of_sets_priv * sizeof( *( sets_array_priv)));
+    #endif
+    fill( sets_array_priv, sets_array_priv + num_of_sets_priv,
+        (unsigned char**)'\0');
 
     for ( unsigned i = 0; i < sections_array.size( ); ++i)
     {
         uint64 cur_addr = sections_array[ i].start_addr;
-        if ( strcmp( sections_array[ i].name, ".text") == 0)
+        if ( string( sections_array[ i].name) ==
+             string( ".text") )
         {
             start_pc_adress_priv = cur_addr;
             clog << "start_pc_adress finded and written: "
@@ -144,7 +145,6 @@ FuncMemory::~FuncMemory()
     }
     delete [] sets_array_priv;
 
-    delete [] exe_file_name_priv;
     addr_size_priv=page_num_size_priv=offset_size_priv=POISON;
     num_of_sets_priv=num_of_pages_priv=max_offset_priv=POISON;
 }
@@ -158,7 +158,6 @@ uint64 FuncMemory::startPC() const
 uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 {
     // put your code here
-    using namespace std;
     clog << "FUNCTION FuncMemory::read" << endl;
     clog << "addr==" << addr << ", num_of_bytes==" << num_of_bytes << endl;
 
@@ -166,12 +165,12 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     {
         cerr << "Cannot read more than eight ("
              << num_of_bytes << ") bytes" << endl;
-        abort();
+        terminate();
     }
     else if( num_of_bytes == 0)
     {
         cerr << "Trying to read 0 bytes" << endl;
-        abort();
+        terminate();
     }
     clog << "Passed num_of_bytes > 8 checking" << endl;
 
@@ -186,13 +185,13 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     if ( sets_array_priv[ num_of_set] == NULL)
     {
         cerr << "Tryed to read from unitialized memory (set)" << endl;
-        abort();
+        terminate();
     }
 
     if ( sets_array_priv[ num_of_set][ num_of_page] == NULL)
     {
         cerr << "Tryed to read from unitialized memory (page)" << endl;
-        abort();
+        terminate();
     }
 
     uint64 rtr_val = 0;
@@ -214,7 +213,6 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
     // put your code here
-    using namespace std;
     clog << "FUNCTION FuncMemory::write" << endl;
     clog << "value==" << value << ", addr==" << addr 
          << ", num_of_bytes==" << num_of_bytes << endl;
@@ -222,12 +220,12 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     {
         cerr << "Cannot write more than eight (" 
              << num_of_bytes << ") bytes" << endl;
-        abort();
+        terminate();
     }
     else if( num_of_bytes == 0)
     {
         cerr << "Trying to write 0 bytes" << endl;
-        abort();
+        terminate();
     }
     clog << "Passed checking num_of_bytes > 8" << endl;
 
@@ -247,8 +245,13 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
             clog << "Initializing set number " << num_of_set << " with " 
                  << num_of_pages_priv << " pages." << endl;
             sets_array_priv[ num_of_set] = new uint8*[ num_of_pages_priv];
+            #if 0
             memset( sets_array_priv[ num_of_set], 0,
                 num_of_pages_priv * sizeof( *( sets_array_priv[ num_of_set])));
+            #endif
+            fill( sets_array_priv[ num_of_set],
+                sets_array_priv[ num_of_set] + num_of_pages_priv,
+                (unsigned char*)'\0');
         }
 
         if ( sets_array_priv[ num_of_set][ num_of_page] == NULL)
