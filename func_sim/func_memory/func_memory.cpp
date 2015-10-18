@@ -21,7 +21,9 @@
 
 const int POISON = -1;
 
-void FuncMemory::increase_offset_priv ( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned inc_by) const
+void FuncMemory::increase_offset_priv ( uint64& offset,
+            uint64& num_of_page,
+            uint64& num_of_set, unsigned inc_by) const
 {
     offset+=inc_by;
     if ( offset >= max_offset_priv)
@@ -35,13 +37,15 @@ void FuncMemory::increase_offset_priv ( unsigned& offset, unsigned& num_of_page,
             if( num_of_set >= num_of_sets_priv)
             {
                 cerr << "The END of the memory REACHED!!!" << endl;
-                exit( -1);
+                abort();
             }
         }
     }
 }
 
-void FuncMemory::decrease_offset_priv ( unsigned& offset, unsigned& num_of_page, unsigned& num_of_set, unsigned dec_by) const
+void FuncMemory::decrease_offset_priv ( uint64& offset,
+        uint64& num_of_page,
+        uint64& num_of_set, unsigned dec_by) const
 {
     offset-=dec_by;
     if ( offset + dec_by < dec_by)
@@ -55,7 +59,7 @@ void FuncMemory::decrease_offset_priv ( unsigned& offset, unsigned& num_of_page,
             if( num_of_set + 1 < 1)
             {
                 cerr << "The BEGINNING of the memory REACHED!!!" << endl;
-                assert( NULL);
+                abort();
             }
         }
     }
@@ -64,35 +68,45 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_size,
                         uint64 page_bits,
                         uint64 offset_bits)
-    :addr_size_priv( addr_size), page_num_size_priv( page_bits), offset_size_priv( offset_bits)
+    :addr_size_priv( addr_size),
+     page_num_size_priv( page_bits),
+     offset_size_priv( offset_bits)
 {
-    this->num_of_sets_priv =  floor( pow( 2, (this->addr_size_priv - this->page_num_size_priv - this->offset_size_priv)));
-    this->num_of_pages_priv = floor( pow( 2, this->page_num_size_priv));
-    this->max_offset_priv = floor( pow( 2, this->offset_size_priv));
-    clog << "The max values: " << "offset==" << max_offset_priv << ", page==" << num_of_pages_priv << ", set==" << num_of_sets_priv << endl;
-
-    this->exe_file_name_priv = new char[ strlen( executable_file_name) + 1];
-    strcpy( this->exe_file_name_priv, executable_file_name);
-
-    this->sets_array_priv = new uint8**[ this->num_of_sets_priv];
-    clog << "Initalized array of " << num_of_sets_priv << " sets." << endl;
-    memset( this->sets_array_priv, 0, this->num_of_sets_priv * sizeof( *( this->sets_array_priv)));
+    exe_file_name_priv = new char[ strlen( executable_file_name) + 1];
+    strcpy( exe_file_name_priv, executable_file_name);
 
     vector<ElfSection> sections_array;
-    ElfSection::getAllElfSections( this->exe_file_name_priv, sections_array);
+    ElfSection::getAllElfSections( exe_file_name_priv, sections_array);
     
+    set_num_size_priv = addr_size_priv - page_num_size_priv -
+        offset_size_priv;
+
+    num_of_sets_priv = (uint64)1 << set_num_size_priv; 
+    num_of_pages_priv = (uint64)1 << page_num_size_priv;
+    max_offset_priv = (uint64)1 << offset_size_priv;
+
+    clog << "The max values: " << "offset==" << max_offset_priv 
+         << ", page==" << num_of_pages_priv
+         << ", set==" << num_of_sets_priv << endl;
+
+    sets_array_priv = new uint8**[ num_of_sets_priv];
+    clog << "Initalized array of " << num_of_sets_priv << " sets." << endl;
+    memset( sets_array_priv, 0,
+        num_of_sets_priv * sizeof( *( sets_array_priv)));
+
     for ( unsigned i = 0; i < sections_array.size( ); ++i)
     {
         uint64 cur_addr = sections_array[ i].start_addr;
         if ( strcmp( sections_array[ i].name, ".text") == 0)
         {
-            this->start_pc_adress_priv = cur_addr;
-            clog << "start_pc_adress finded and written: " << this->start_pc_adress_priv << endl;
+            start_pc_adress_priv = cur_addr;
+            clog << "start_pc_adress finded and written: "
+                 << start_pc_adress_priv << endl;
         }
 
         for ( size_t offset = 0; offset < sections_array[ i].size; offset++)
         {
-            this->write( sections_array[ i].content[ offset], cur_addr, 1); 
+            write( sections_array[ i].content[ offset], cur_addr, 1); 
             cur_addr++;
         }
     }
@@ -102,23 +116,22 @@ FuncMemory::~FuncMemory()
 {
     for( unsigned i = 0; i < num_of_sets_priv; ++i)
     {
-        if( this->sets_array_priv[ i] != NULL)
+        if( sets_array_priv[ i] != NULL)
         {
-            for (unsigned j = 0; j < num_of_pages_priv; ++j)
-            {
-                if( this->sets_array_priv[ i][ j] != NULL)
+            for (unsigned j = 0; j < num_of_pages_priv; ++j) {
+                if( sets_array_priv[ i][ j] != NULL)
                 {
-                    delete [] this->sets_array_priv[ i][ j];
+                    delete [] sets_array_priv[ i][ j];
                 }
             }
-            delete [] this->sets_array_priv[ i];
+            delete [] sets_array_priv[ i];
         }
     }
     delete [] sets_array_priv;
 
-    delete [] this->exe_file_name_priv;
-    this->addr_size_priv=this->page_num_size_priv=this->offset_size_priv=POISON;
-    this->num_of_sets_priv=this->num_of_pages_priv=this->max_offset_priv=POISON;
+    delete [] exe_file_name_priv;
+    addr_size_priv=page_num_size_priv=offset_size_priv=POISON;
+    num_of_sets_priv=num_of_pages_priv=max_offset_priv=POISON;
 }
 
 uint64 FuncMemory::startPC() const
@@ -132,35 +145,37 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     // put your code here
     using namespace std;
     clog << "FUNCTION FuncMemory::read" << endl;
+    clog << "addr==" << addr << ", num_of_bytes==" << num_of_bytes << endl;
+
     if( num_of_bytes > 8)
     {
-        cerr << "Cannot read more than eight (" << num_of_bytes << ") bytes" << endl;
+        cerr << "Cannot read more than eight ("
+             << num_of_bytes << ") bytes" << endl;
         abort();
     }
     else if( num_of_bytes == 0)
     {
-        cerr << "Trying to write 0 bytes" << endl;
+        cerr << "Trying to read 0 bytes" << endl;
         abort();
     }
     clog << "Passed num_of_bytes > 8 checking" << endl;
 
-    clog << "addr==" << addr << ", num_of_bytes==" << num_of_bytes << endl;
-    clog << "for this: " << endl << "---addr_size==" << addr_size_priv << endl << "---page_num_size==" << page_num_size_priv << endl;
-    clog << "---offset_size_priv==" << offset_size_priv << endl;
-    unsigned set_size = addr_size_priv - page_num_size_priv - offset_size_priv;
-    unsigned num_of_set = ( addr & ( ( ( uint64)( -1) >> addr_size_priv - set_size) << addr_size_priv - set_size )) >> addr_size_priv - set_size;
-    unsigned num_of_page = ( addr >> offset_size_priv) & ( ( ( uint64)1 << ( page_num_size_priv)) - 1);
-    unsigned offset = addr & ( ( ( uint64)1 << offset_size_priv) - 1);
-    clog << "Counted num_of_set (" << num_of_set <<") num_of_page (" << num_of_page;
-    clog << ") and offset (" << offset << ")" << endl;
-    if ( this->sets_array_priv[ num_of_set] == NULL)
+    uint64 num_of_set = addr >> ( addr_size_priv - set_num_size_priv);
+    uint64 num_of_page = ( addr >> offset_size_priv) &
+        ( ( 1 << page_num_size_priv) - 1);
+    uint64 offset = addr & ( ( 1 << offset_size_priv) - 1);
 
+    clog << "Counted num_of_set (" << num_of_set 
+         << ") num_of_page (" << num_of_page
+         << ") and offset (" << offset << ")" << endl;
+
+    if ( sets_array_priv[ num_of_set] == NULL)
     {
         cerr << "Tryed to read from unitialized memory (set)" << endl;
         abort();
     }
 
-    if ( this->sets_array_priv[ num_of_set][ num_of_page] == NULL)
+    if ( sets_array_priv[ num_of_set][ num_of_page] == NULL)
     {
         cerr << "Tryed to read from unitialized memory (page)" << endl;
         abort();
@@ -171,12 +186,11 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {
         rtr_val <<= 8;
-        clog << "Read rtr_val(before adding)==" << rtr_val << endl;
-        if( this->sets_array_priv[ num_of_set] != NULL && this->sets_array_priv[ num_of_set][ num_of_page] != NULL)
+        if( sets_array_priv[ num_of_set] != NULL &&
+            sets_array_priv[ num_of_set][ num_of_page] != NULL)
         {
-            rtr_val += this->sets_array_priv[ num_of_set][ num_of_page][ offset];
+            rtr_val += sets_array_priv[ num_of_set][ num_of_page][ offset];
         }
-        clog << "Read rtr_val(after adding)==" << rtr_val << endl;
         decrease_offset_priv( offset, num_of_page, num_of_set, 1);
     }
     clog << "END_OF_FUNCTION FuncMemory::read. rtr_val == " << rtr_val << endl;
@@ -188,9 +202,12 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     // put your code here
     using namespace std;
     clog << "FUNCTION FuncMemory::write" << endl;
+    clog << "value==" << value << ", addr==" << addr 
+         << ", num_of_bytes==" << num_of_bytes << endl;
     if( num_of_bytes > 8)
     {
-        cerr << "Cannot write more than eight (" << num_of_bytes << ") bytes" << endl;
+        cerr << "Cannot write more than eight (" 
+             << num_of_bytes << ") bytes" << endl;
         abort();
     }
     else if( num_of_bytes == 0)
@@ -200,40 +217,48 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     }
     clog << "Passed checking num_of_bytes > 8" << endl;
 
-    clog << "value==" << value << ", addr==" << addr << ", num_of_bytes==" << num_of_bytes << endl;
-    clog << "for this: " << endl << "---addr_size==" << addr_size_priv << endl << "---page_num_size==" << page_num_size_priv << endl;
-    clog << "---offset_size_priv==" << offset_size_priv << endl;
-    unsigned set_size = addr_size_priv - page_num_size_priv - offset_size_priv;
-    unsigned num_of_set = ( addr & ( ( ( uint64)( -1) >> addr_size_priv - set_size) << addr_size_priv - set_size )) >> addr_size_priv - set_size;
-    unsigned num_of_page = ( addr >> offset_size_priv) & ( ( ( uint64)1 << ( page_num_size_priv)) - 1);
-    unsigned offset = addr & ( ( ( uint64)1 << offset_size_priv) - 1);
-    clog << "Counted num_of_set (" << num_of_set <<") num_of_page (" << num_of_page;
+    uint64 num_of_set = addr >> ( addr_size_priv - set_num_size_priv);
+    uint64 num_of_page = ( addr >> offset_size_priv) &
+        ( ( 1 << page_num_size_priv) - 1);
+    uint64 offset = addr & ( ( 1 << offset_size_priv) - 1);
+
+    clog << "Counted num_of_set (" << num_of_set 
+         << ") num_of_page (" << num_of_page;
     clog << ") and offset (" << offset << ")" << endl;
 
     increase_offset_priv( offset, num_of_page, num_of_set, num_of_bytes);
     for ( unsigned i = 0; i < num_of_bytes; ++i)
     {   
-        if ( this->sets_array_priv[ num_of_set] == NULL)
+        if ( sets_array_priv[ num_of_set] == NULL)
         {
-            clog << "Initializing set number " << num_of_set << " with " << num_of_pages_priv << " pages." << endl;
-            this->sets_array_priv[ num_of_set] = new uint8*[ num_of_pages_priv];
-            memset( this->sets_array_priv[ num_of_set], 0, num_of_pages_priv * sizeof( *( this->sets_array_priv[ num_of_set])));
-            clog << "Initialized set number " << num_of_set << " with " << num_of_pages_priv << " pages." << endl;
+            clog << "Initializing set number " << num_of_set << " with " 
+                 << num_of_pages_priv << " pages." << endl;
+            sets_array_priv[ num_of_set] = new uint8*[ num_of_pages_priv];
+            memset( sets_array_priv[ num_of_set], 0,
+                num_of_pages_priv * sizeof( *( sets_array_priv[ num_of_set])));
         }
 
-        if ( this->sets_array_priv[ num_of_set][ num_of_page] == NULL)
+        if ( sets_array_priv[ num_of_set][ num_of_page] == NULL)
         {
-            clog << "Initializing page number " << num_of_page << " in " << num_of_set << " set with " << max_offset_priv << " bytes." << endl;
-            this->sets_array_priv[ num_of_set][ num_of_page] = new uint8[ max_offset_priv];
-            memset( this->sets_array_priv[ num_of_set][ num_of_page], 0, max_offset_priv * sizeof( *( this->sets_array_priv[ num_of_set][ num_of_page])));
-            clog << "Initialized page number " << num_of_page << " in " << num_of_set << " set with " << max_offset_priv << " bytes." << endl;
+            clog << "Initializing page number " << num_of_page << " in " 
+                 << num_of_set << " set with " 
+                 << max_offset_priv << " bytes." << endl;
+            sets_array_priv[ num_of_set][ num_of_page] =
+                new uint8[ max_offset_priv];
+            #if 0
+            memset( sets_array_priv[ num_of_set][ num_of_page], 0,
+                max_offset_priv *
+                    sizeof( *( sets_array_priv[ num_of_set][ num_of_page])));
+            #endif
         }
 
-        uint8 val_to_write = ( value & ( 0xFF << ( num_of_bytes-i-1)*8)) >> ( ( num_of_bytes-i-1)*8);
-        clog << "value==" <<value<< ";val_to_write==" << (unsigned)val_to_write;
-        clog << ";value&0xFF<<*==" << ( (value & ( 0xFF << ( num_of_bytes-i-1)*8)) >> (num_of_bytes-i-1 ))  << endl;
-        clog << "----num_of_set==" << num_of_set << ", num_of_page==" << num_of_page << ", offset==" << offset << endl;
-        this->sets_array_priv[ num_of_set][ num_of_page][ offset] = val_to_write;
+        uint64 val_to_write = ( value & ( 0xFF << ( num_of_bytes-i-1)*8))
+            >> ( ( num_of_bytes-i-1)*8);
+        clog << "value==" << value<< ";val_to_write==" << val_to_write;
+        clog << "----num_of_set==" << num_of_set 
+             << ", num_of_page==" << num_of_page 
+             << ", offset==" << offset << endl;
+        sets_array_priv[ num_of_set][ num_of_page][ offset] = val_to_write;
         decrease_offset_priv( offset, num_of_page, num_of_set, 1);
     }
     clog << "END_OF_FUNCTION FucnMemory::write" << endl;
@@ -251,16 +276,21 @@ string FuncMemory::dump( string indent) const
     bool skip_was_printed = false;
     for( unsigned set_num = 0; set_num < num_of_sets_priv; ++set_num)
     {
-        if ( this->sets_array_priv[ set_num] != NULL) 
+        if ( sets_array_priv[ set_num] != NULL) 
         {
-            for( unsigned page_num = 0; page_num < num_of_pages_priv; ++page_num)
+            for( unsigned page_num = 0;
+                page_num < num_of_pages_priv; ++page_num)
             {
-                if ( this->sets_array_priv[ set_num][ page_num] != NULL)
+                if ( sets_array_priv[ set_num][ page_num] != NULL)
                 {
-                    for ( unsigned offset = 0; offset < max_offset_priv; offset+=sizeof( uint32))
+                    for ( unsigned offset = 0; offset < max_offset_priv;
+                        offset+=sizeof( uint32))
                     {
-                        uint64 addr = ( ( set_num << page_num_size_priv+offset_size_priv) + ( page_num << offset_size_priv) + ( offset));
-                        uint32 val = this->read( addr, sizeof( uint32));
+                        uint64 addr = offset;
+                        addr += set_num << page_num_size_priv+offset_size_priv;
+                        addr += page_num << offset_size_priv;
+
+                        uint32 val = read( addr, sizeof( uint32));
                         if ( val ==0)
                         {
                             if ( !skip_was_printed)
@@ -295,6 +325,5 @@ string FuncMemory::dump( string indent) const
             }
         }
     }
-    oss << "ERROR: You need to implement FuncMemory!\nTHIS IS VERY STUPID DUMP!!!\nDON\'T USE IT IN THE PRODUCTION!!!";
     return oss.str();
 }

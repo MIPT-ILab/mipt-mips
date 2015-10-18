@@ -21,12 +21,9 @@ int main (int argc, char* argv[])
         const char * file_name = argv[1];        
         
         // create the functiona memory
-        FuncMemory func_mem( file_name);
-        func_mem.write( 0xFFF, 0x0C, sizeof( uint32));
-        func_mem.read( 0x0C, sizeof( uint32));
+        FuncMemory func_mem( file_name, 64, 15, 32);
         
         // print content of the memory
-        cout << func_mem.dump() << endl;
  
     } else if ( argc - 1 > num_of_args)
     {
