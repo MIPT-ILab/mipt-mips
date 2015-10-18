@@ -1,5 +1,5 @@
 /**
- * func_memory.h - Header of module implementing the concept of 
+ * func_memory.h - Header of module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012 uArchSim iLab project
@@ -17,13 +17,49 @@
 #include <types.h>
 #include <elf_parser.h>
 
+# define SIZE_OF_BYTES_ARRAY 4096
+# define SIZE_OF_PAGES_ARRAY 1024
+# define SIZE_OF_SETS_ARRAY  1024
+
+class page
+{
+    public:
+    char bytes_array [SIZE_OF_BYTES_ARRAY];
+
+    page ();
+};
+
+class set
+{
+    public:
+    page* pages_array [SIZE_OF_PAGES_ARRAY];
+
+    set  ();
+    ~set ();
+};
+
+union uint64_type
+{
+    uint64 value;
+    char bytes [sizeof (uint64) / sizeof (char)];
+};
+
+
 using namespace std;
 
 class FuncMemory
 {
+    private :
+
+    set* sets_array [SIZE_OF_SETS_ARRAY];
+    vector <ElfSection> sections_array;
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
+
+    int byte_addres (uint64 adress) const;
+    int set_addres  (uint64 adress) const;
+    int page_addres (uint64 adress) const;
 
 public:
 
@@ -31,14 +67,14 @@ public:
                  uint64 addr_size = 32,
                  uint64 page_num_size = 10,
                  uint64 offset_size = 12);
-    
+
     virtual ~FuncMemory();
-    
+
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
-    
+
     uint64 startPC() const;
-    
+
     string dump( string indent = "") const;
 };
 
