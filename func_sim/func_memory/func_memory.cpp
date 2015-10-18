@@ -21,6 +21,21 @@
 
 const int POISON = -1;
 
+uint64 FuncMemory::get_num_of_set_priv( uint64 addr) const
+{
+    return addr >> ( addr_size_priv - set_num_size_priv);
+}
+
+uint64 FuncMemory::get_num_of_page_priv( uint64 addr) const
+{
+    return ( addr >> offset_size_priv) & ( ( 1 << page_num_size_priv) - 1);
+}
+
+uint64 FuncMemory::get_offset_priv( uint64 addr) const
+{
+    return addr & ( ( 1 << offset_size_priv) - 1);
+}
+
 void FuncMemory::increase_offset_priv ( uint64& offset,
             uint64& num_of_page,
             uint64& num_of_set, unsigned inc_by) const
@@ -160,10 +175,9 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     }
     clog << "Passed num_of_bytes > 8 checking" << endl;
 
-    uint64 num_of_set = addr >> ( addr_size_priv - set_num_size_priv);
-    uint64 num_of_page = ( addr >> offset_size_priv) &
-        ( ( 1 << page_num_size_priv) - 1);
-    uint64 offset = addr & ( ( 1 << offset_size_priv) - 1);
+    uint64 num_of_set = get_num_of_set_priv( addr);
+    uint64 num_of_page = get_num_of_page_priv( addr);
+    uint64 offset = get_offset_priv( addr);
 
     clog << "Counted num_of_set (" << num_of_set 
          << ") num_of_page (" << num_of_page
@@ -217,10 +231,9 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     }
     clog << "Passed checking num_of_bytes > 8" << endl;
 
-    uint64 num_of_set = addr >> ( addr_size_priv - set_num_size_priv);
-    uint64 num_of_page = ( addr >> offset_size_priv) &
-        ( ( 1 << page_num_size_priv) - 1);
-    uint64 offset = addr & ( ( 1 << offset_size_priv) - 1);
+    uint64 num_of_set = get_num_of_set_priv( addr);
+    uint64 num_of_page = get_num_of_page_priv( addr);
+    uint64 offset = get_offset_priv( addr);
 
     clog << "Counted num_of_set (" << num_of_set 
          << ") num_of_page (" << num_of_page;

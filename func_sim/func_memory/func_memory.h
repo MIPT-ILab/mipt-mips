@@ -30,6 +30,10 @@ class FuncMemory
         uint64& num_of_set, unsigned inc_by) const;
     void decrease_offset_priv( uint64& offset, uint64& num_of_page,
         uint64& num_of_set, unsigned dec_by) const;
+
+    uint64 get_num_of_set_priv( uint64 addr) const;
+    uint64 get_num_of_page_priv( uint64 addr) const;
+    uint64 get_offset_priv( uint64 addr) const;
     
     uint64 num_of_sets_priv;
     uint64 num_of_pages_priv;
