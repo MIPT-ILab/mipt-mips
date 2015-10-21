@@ -18,6 +18,9 @@
 // uArchSim modules
 #include <func_memory.h>
 
+// Defines
+#define BYTE_SIZE 8
+
 // Local data types
 class Address
 {
@@ -111,7 +114,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
         
         
         res += ( page.at(parsed_addr.offset) << counter);                               
-        counter += 8;                                                               
+        counter += BYTE_SIZE;                                                               
         cur_addr++;
     }
     return res;
@@ -131,7 +134,7 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
         memory[ parsed_addr.set]
               [ parsed_addr.page]
               [ parsed_addr.offset] = ( value & (0xFF << byte_offset)) >> byte_offset;
-        byte_offset += 8;
+        byte_offset += BYTE_SIZE;
         cur_addr++;
     }
 }
