@@ -22,7 +22,7 @@ int main (int argc, char* argv[])
         
         // create the functiona memory
         FuncMemory func_mem( file_name, 32, 10, 12);
-        
+        cout << "1" << endl;
         // print content of the memory
         cout << func_mem.dump() << endl;
  
