@@ -20,6 +20,7 @@
 
 // Defines
 #define BYTE_SIZE 8
+#define DUMPWIDTH 4
 
 // Local data types
 class Address
@@ -34,6 +35,8 @@ public:
              uint64 page_num_size,
              uint64 offset_size);
     ~Address(){};
+    static uint64 makeAddr( uint64 set_num, uint64 page_num, uint64 offset,
+                            uint64 page_bits, uint64 offset_bits);
     
     uint64 page;
     uint64 set;
@@ -156,41 +159,86 @@ string FuncMemory::dump( string indent) const
         << indent << "  page_in_set_count = " << this->page_in_set_count << endl
         << indent << "  Data:"                << endl;
     
+    
     for ( uint64 set_num = 0; set_num < set_count; set_num++)
     {
-    
+        
         if ( memory.find( set_num) != memory.end())
         {
-            oss << indent << "\t set_num = " << set_num << endl;
+            oss << indent << "    set_num = " << set_num << endl;
             map< uint64, map< uint64, uint8 > > set = memory.at( set_num);
+            
+            
             for ( uint64 page_num = 0; page_num < page_in_set_count; page_num++)
             {
                 if ( set.find( page_num) != set.end())
                 {
-                    oss << indent << "\t\t page_num = " << page_num;
+                    oss << indent << "      page_num = " << page_num << endl;
                     map< uint64, uint8> page = set.at( page_num);
-                    for ( uint64 offset = 0; offset < page_size; offset++)
+                    
+                    
+                    bool is_skipped = false;
+                    oss << hex;
+                    for ( uint64 bytes_str = 0; bytes_str < page_size; bytes_str += DUMPWIDTH)
                     {
-                        if ( (offset % 16) == 0)
+                        if ( FuncMemory::makeSkip( set_num, page_num, bytes_str))
                         {
-                            oss << endl << "\t\t\t";
-                        }
-                        if ( page.find( offset) != page.end())
-                        {
-                            oss << "0x" << setw( 2) << hex << ( int) page.at( offset) << dec << " ";
+                            if ( !is_skipped)
+                            {
+                                oss << indent << "      ...." << endl;
+                            }
+                            is_skipped = true;
                         } else
                         {
-                            oss << "null ";
+                            oss << indent << "        ";
+                            uint64 addr = Address::makeAddr( set_num, page_num, bytes_str,
+                                                             this->page_bits, this->offset_bits);
+                            oss << "0x" << setw( 8) << addr << ":    ";
+                            for ( uint64 offset = 0; offset < DUMPWIDTH; offset++)
+                            {
+                                
+                                if ( page.find( offset + bytes_str) != page.end())
+                                {
+                                    oss << setw( 2) << ( int) page.at( offset + bytes_str);
+                                } else
+                                {
+                                    oss << "xx";
+                                }
+                            }
+                            is_skipped = false;
+                            oss << endl;
                         }
                     }
-                    oss << endl;
+                    oss << dec;
                 }
             }
         }
     }
-    
+    oss << "End of dump";
     return oss.str();
     
+}
+
+bool FuncMemory::makeSkip( uint64 set_num, uint64 page_num, uint64 offset) const
+{
+    if ( memory.find( set_num) == memory.end())
+    {
+        return true;
+    }
+    map< uint64, map< uint64, uint8 > > set = memory.at( set_num);
+    if ( set.find( page_num) == set.end())
+    {
+        return true;
+    }
+    map< uint64, uint8> page = set.at( page_num);
+    for ( int i = 0; i < DUMPWIDTH; i++)
+    {
+        if ( page.find( offset + i) != page.end())
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -204,6 +252,14 @@ Address::Address( uint64 addr,
     assert( page_bits + offset_bits < addr_size);
     
     offset = addr & ( ( 1 << offset_bits) - 1);
-    page = ( addr >> offset_bits) & ( (1 << page_bits) - 1);
+    page   = ( addr >> offset_bits) & ( (1 << page_bits) - 1);
     set    = addr >> ( offset_bits + page_bits);
+}
+
+uint64 Address::makeAddr( uint64 set_num, uint64 page_num, uint64 offset,
+                          uint64 page_bits, uint64 offset_bits)
+{
+    return ( set_num << ( page_bits + offset_bits)) +
+           ( page_num << offset_bits) +
+           ( offset);
 }

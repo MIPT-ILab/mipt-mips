@@ -36,6 +36,7 @@ class FuncMemory
     uint64 max_addr;
     uint64 set_count;
     uint64 page_in_set_count;
+    bool makeSkip( uint64 set_num, uint64 page_num, uint64 bytes_str) const;
     
 public:
 
