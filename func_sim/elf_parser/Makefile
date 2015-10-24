@@ -12,7 +12,7 @@ vpath %.h $(TRUNK)/common
 
 # option for C++ compiler specifying directories 
 # to search for headers
-INCL= -I ./ -I $(TRUNK)common/
+INCL= -I ./ -I $(TRUNK)common/ -I /opt/local/include/libelf
 
 #options for static linking of boost Unit Test library
 INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include

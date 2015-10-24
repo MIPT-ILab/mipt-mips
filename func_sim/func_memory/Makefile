@@ -14,7 +14,7 @@ vpath %.cpp $(TRUNK)/func_sim/elf_parser/
 
 # option for C++ compiler specifying directories 
 # to search for headers
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/
+INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I /opt/local/include/libelf
 
 #options for static linking of boost Unit Test library
 INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
@@ -55,7 +55,7 @@ unit_test: unit_test.o func_memory.o elf_parser.o
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp func_memory.o elf_parser.o
-	$(CXX) -c $< $(INCL_GTEST) $(INCL) 
+	$(CXX) -c $< $(INCL_GTEST) $(INCL)
 
 clean:
 	@-rm *.o

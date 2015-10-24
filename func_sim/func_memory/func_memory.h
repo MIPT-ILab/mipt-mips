@@ -12,6 +12,8 @@
 // Generic C++
 #include <string>
 #include <cassert>
+#include <vector>
+#include <map>
 
 // uArchSim modules
 #include <types.h>
@@ -24,7 +26,18 @@ class FuncMemory
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
-
+    map< uint64, map< uint64, map< uint64, uint8 > > > memory;
+    uint64 text_start;
+    uint64 set_size;
+    uint64 page_size;
+    uint64 page_bits;
+    uint64 offset_bits;
+    uint64 addr_size;
+    uint64 max_addr;
+    uint64 set_count;
+    uint64 page_in_set_count;
+    bool makeSkip( uint64 set_num, uint64 page_num, uint64 bytes_str) const;
+    
 public:
 
     FuncMemory ( const char* executable_file_name,
@@ -32,7 +45,7 @@ public:
                  uint64 page_num_size = 10,
                  uint64 offset_size = 12);
     
-    virtual ~FuncMemory();
+    virtual ~FuncMemory(){};
     
     uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
@@ -41,5 +54,6 @@ public:
     
     string dump( string indent = "") const;
 };
+
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
