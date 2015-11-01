@@ -17,31 +17,28 @@
 #include <types.h>
 #include <elf_parser.h>
 
-# define SIZE_OF_BYTES_ARRAY 4096
-# define SIZE_OF_PAGES_ARRAY 1024
-# define SIZE_OF_SETS_ARRAY  1024
-
 class page
 {
     public:
-    char bytes_array [SIZE_OF_BYTES_ARRAY];
+    /*unsigned char**/uint8* bytes_array;
 
     page ();
+    ~page ();
 };
 
-class set
+class Set
 {
     public:
-    page* pages_array [SIZE_OF_PAGES_ARRAY];
+    page** pages_array;
 
-    set  ();
-    ~set ();
+    Set  ();
+    ~Set ();
 };
 
 union uint64_type
 {
     uint64 value;
-    char bytes [sizeof (uint64) / sizeof (char)];
+    unsigned char bytes [sizeof (uint64) / sizeof (char)];
 };
 
 
@@ -51,15 +48,28 @@ class FuncMemory
 {
     private :
 
-    set* sets_array [SIZE_OF_SETS_ARRAY];
+    Set** sets_array;
     vector <ElfSection> sections_array;
+    
+    uint64 _addr_size  ;
+    uint64 _page_bits  ;
+    uint64 _offset_bits;
+    //char*  uint8_values_array;
+    //mutable unsigned char*  uint8_values_array;
+    //mutable uint64 uint64_value               ;
     // You could not create the object
     // using this default constructor
     FuncMemory(){}
 
-    int byte_addres (uint64 adress) const;
-    int set_addres  (uint64 adress) const;
-    int page_addres (uint64 adress) const;
+    void allocate_new_memory (uint64 addr);
+    
+    uint64 byte_address (uint64 address) const;
+    uint64 set_address  (uint64 address) const;
+    uint64 page_address (uint64 address) const;
+    
+    void uint64_to_chars_array (uint64 source        , uint8 dest_array [], int empty_space = 4) const;
+    void chars_array_to_uint64 (uint8 source_array [], uint64* dest        , int empty_space = 4) const;
+    
 
 public:
 
@@ -74,7 +84,8 @@ public:
     void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
 
     uint64 startPC() const;
-
+    
+    string strByWord (uint64 addr) const;
     string dump( string indent = "") const;
 };
 
