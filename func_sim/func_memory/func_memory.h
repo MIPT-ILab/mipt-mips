@@ -20,7 +20,7 @@
 class page
 {
     public:
-    /*unsigned char**/uint8* bytes_array;
+    uint8* bytes_array;
 
     page ();
     ~page ();
@@ -35,13 +35,6 @@ class Set
     ~Set ();
 };
 
-union uint64_type
-{
-    uint64 value;
-    unsigned char bytes [sizeof (uint64) / sizeof (char)];
-};
-
-
 using namespace std;
 
 class FuncMemory
@@ -49,26 +42,26 @@ class FuncMemory
     private :
 
     Set** sets_array;
+
     vector <ElfSection> sections_array;
     
     uint64 _addr_size  ;
     uint64 _page_bits  ;
     uint64 _offset_bits;
-    //char*  uint8_values_array;
-    //mutable unsigned char*  uint8_values_array;
-    //mutable uint64 uint64_value               ;
-    // You could not create the object
-    // using this default constructor
+    
     FuncMemory(){}
 
     void allocate_new_memory (uint64 addr);
     
-    uint64 byte_address (uint64 address) const;
-    uint64 set_address  (uint64 address) const;
-    uint64 page_address (uint64 address) const;
+    uint64 byteAddress (uint64 address) const;
+    uint64 setAddress  (uint64 address) const;
+    uint64 pageAddress (uint64 address) const;
     
-    void uint64_to_chars_array (uint64 source        , uint8 dest_array [], int empty_space = 4) const;
-    void chars_array_to_uint64 (uint8 source_array [], uint64* dest        , int empty_space = 4) const;
+    void uint64ToCharsArray (uint64 source       , 
+                             uint8  dest_array []) const;
+                                
+    void charsArrayToUint64 (uint8   source_array [], 
+                             uint64* dest           ) const;
     
 
 public:
