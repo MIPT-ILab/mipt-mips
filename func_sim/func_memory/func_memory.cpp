@@ -159,11 +159,6 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 page_bits                ,
                         uint64 offset_bits              )
 {
-    std::cout << executable_file_name << std::endl; 
-    std::cout << addr_size            << std::endl; 
-    std::cout << page_bits            << std::endl; 
-    std::cout << offset_bits          << std::endl; 
-    
     _addr_size   = addr_size  ;
     _page_bits   = page_bits  ;
     _offset_bits = offset_bits;
@@ -171,10 +166,6 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     BYTES_ARRAY_SIZE = (uint64)1 << offset_bits;
     PAGES_ARRAY_SIZE = (uint64)1 << page_bits;
     SETS_ARRAY_SIZE  = (uint64)1 << (addr_size - page_bits - offset_bits);
-    
-    std::cout << "BYTES_ARRAY_SIZE = " << BYTES_ARRAY_SIZE << std::endl;
-    std::cout << "PAGES_ARRAY_SIZE = " << PAGES_ARRAY_SIZE << std::endl;
-    std::cout << "SETS_ARRAY_SIZE = "  << SETS_ARRAY_SIZE  << std::endl;
     
     sets_array = new Set* [SETS_ARRAY_SIZE];
 
@@ -186,9 +177,6 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     
     for (int i = 0; i < sections_array.size (); i++)
     {
-        std::cout << "section is " << sections_array [i].name << std::endl
-                  << "size is "    << sections_array [i].size << std::endl;
-    
         for (int j = 0; j < sections_array [i].size; j += 4)
         {
             uint8  source_values_array [sizeof (uint64)] = {};
@@ -216,8 +204,6 @@ FuncMemory::~FuncMemory()
 
 uint64 FuncMemory::startPC() const
 {
-    std::cout <<  "strat PC ()" << std::endl;
-
     for (int i = 0; i < sections_array.size (); i ++)
     {
         if (string (sections_array [i].name) == string (".text")) 
@@ -240,9 +226,9 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
         sets_array [set_pos ]->pages_array [page_pos] == NULL ||
         num_of_bytes                                  == 0      )
     {
-        std::cout << "CRITICAL ERROR!!!!" << std::endl;
-        std::cout << "num_of_bytes = " 
-                  << num_of_bytes << std::endl;
+        //std::cout << "CRITICAL ERROR IN READ!!!!" << std::endl;
+        //std::cout << "num_of_bytes = " 
+        //          << num_of_bytes << std::endl;
             
         terminate ();
     }
@@ -279,8 +265,8 @@ void FuncMemory::write(uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
     if (num_of_bytes == 0)
     {
-        cout << "CRITICAL ERROR IN WRITE!!!!\n" << endl;
-        cout << "num_of_bytes = " << num_of_bytes << endl;
+        //cout << "CRITICAL ERROR IN WRITE!!!!" << endl;
+        //cout << "num_of_bytes = " << num_of_bytes << endl;
             
         terminate ();
     }
@@ -351,10 +337,6 @@ string FuncMemory::dump( string indent) const
     string null_str = "00000000";
     
     bool skip_was_printed = false;
-    
-    uint64 max_size = 0xffffffff;
-    
-    ostringstream convert;
     
     for (unsigned set_offset = 0; set_offset < SETS_ARRAY_SIZE; set_offset++)
     {
