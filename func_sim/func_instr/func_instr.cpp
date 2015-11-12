@@ -41,61 +41,58 @@ const RegEntry FuncInstr::regTable[] = {
 };
 
 const ISAEntry FuncInstr::isaTable[] = {
-    { "add"     ,    0,     0x20, R_FMT, ADD    , true, true, true, false   },
-    { "addu"    ,    0,     0x21, R_FMT, ADDU   , true, true, true, false   },
-    { "sub"     ,    0,     0x22, R_FMT, SUB    , true, true, true, false   },
-    { "subu"    ,    0,     0x23, R_FMT, SUBU   , true, true, true, false   },
-    { "addi"    ,  0x8,        0, I_FMT, ADDI                               },
-    { "addiu"   ,  0x9,        0, I_FMT, ADDIU                              },
-    { "mult"    ,    0,     0x18, R_FMT, MULT                               },
-    { "multu"   ,    0,     0x19, R_FMT, MULTU                              },
-    { "div"     ,    0,     0x1A, R_FMT, DIV                                },
-    { "divu"    ,    0,     0x1B, R_FMT, DIVU                               },
-    { "mhfi"    ,    0,     0x10, R_FMT, MHFI                               },
-    { "mthi"    ,    0,     0x11, R_FMT, MTHI                               },
-    { "mflo"    ,    0,     0x12, R_FMT, MFLO                               },
-    { "mtlo"    ,    0,     0x13, R_FMT, MTLO                               },
-    { "sll"     ,    0,      0x0, R_FMT, SLL                                },
-    { "srl"     ,    0,      0x2, R_FMT, SRL                                },
-    { "sra"     ,    0,      0x3, R_FMT, SRA                                },
-    { "sllv"    ,    0,      0x4, R_FMT, SLLV                               },
-    { "srlv"    ,    0,      0x6, R_FMT, SRLV                               },
-    { "srav"    ,    0,      0x7, R_FMT, SRAV                               },
-    { "lui"     ,  0xF,        0, I_FMT, LUI                                },
-    { "slt"     ,    0,     0x2A, R_FMT, SLT                                },
-    { "sltu"    ,    0,     0x2B, R_FMT, SLTU                               },
-    { "slti"    ,  0xA,        0, I_FMT, SLTI                               },
-    { "sltiu"   ,  0xB,        0, I_FMT, SLTIU                              },
-    { "and"     ,    0,     0x24, R_FMT, AND                                },
-    { "or"      ,    0,     0x25, R_FMT, OR                                 },
-    { "xor"     ,    0,     0x26, R_FMT, XOR                                },
-    { "nor"     ,    0,     0x27, R_FMT, NOR                                },
-    { "andi"    ,  0xC,        0, I_FMT, ANDI                               },
-    { "ori"     ,  0xD,        0, I_FMT, ORI                                },
-    { "xori"    ,  0xE,        0, I_FMT, XORI                               },
-    { "nor"     ,    0,     0x27, R_FMT, NOR                                },
-    { "andi"    ,  0xC,        0, I_FMT, ANDI                               },
-    { "ori"     ,  0xD,        0, I_FMT, ORI                                },
-    { "xori"    ,  0xE,        0, I_FMT, XORI                               },
-    { "beq"     ,  0x4,        0, I_FMT, BEQ                                },
-    { "bne"     ,  0x5,        0, I_FMT, BNE                                },
-    { "blez"    ,  0x6,        0, I_FMT, BLEZ                               },
-    { "bgtz"    ,  0x7,        0, I_FMT, BGTZ                               },
-    { "j"       ,  0x2,        0, J_FMT, J                                  },
-    { "jal"     ,  0x3,        0, J_FMT, JAL                                },
-    { "jr"      ,    0,      0x8, R_FMT, JR                                 },
-    { "jalr"    ,    0,      0x9, R_FMT, JALR                               },
-    { "lb"      , 0x20,        0, I_FMT, LB                                 },
-    { "lh"      , 0x21,        0, I_FMT, LH                                 },
-    { "lw"      , 0x23,        0, I_FMT, LW                                 },
-    { "lbu"     , 0x24,        0, I_FMT, LBU                                },
-    { "lhu"     , 0x25,        0, I_FMT, LHU                                },
-    { "sb"      , 0x28,        0, I_FMT, SB                                 },
-    { "sh"      , 0x29,        0, I_FMT, SH                                 },
-    { "sw"      , 0x2b,        0, I_FMT, SW                                 },
-    { "syscall" ,    0,      0xC, R_FMT, SYSCALL                            },
-    { "break"   ,    0,      0xD, R_FMT, BREAK                              },
-    { "trap"    , 0x1A,        0, J_FMT, TRAP                               }
+//    name       opcode     func  format type     rs     rt     rd     shamt  brackets
+    { "add"     ,    0,     0x20, R_FMT, ADD    , true , true , true , false, false },
+    { "addu"    ,    0,     0x21, R_FMT, ADDU   , true , true , true , false, false },
+    { "sub"     ,    0,     0x22, R_FMT, SUB    , true , true , true , false, false },
+    { "subu"    ,    0,     0x23, R_FMT, SUBU   , true , true , true , false, false },
+    { "addi"    ,  0x8,        0, I_FMT, ADDI   , true , true , false, false, false },
+    { "addiu"   ,  0x9,        0, I_FMT, ADDIU  , true , true , false, false, false },
+    { "mult"    ,    0,     0x18, R_FMT, MULT   , true , true , false, false, false },
+    { "multu"   ,    0,     0x19, R_FMT, MULTU  , true , true , false, false, false },
+    { "div"     ,    0,     0x1A, R_FMT, DIV    , true , true , false, false, false },
+    { "divu"    ,    0,     0x1B, R_FMT, DIVU   , true , true , false, false, false },
+    { "mfhi"    ,    0,     0x10, R_FMT, MFHI   , false, false, true , false, false },
+    { "mthi"    ,    0,     0x11, R_FMT, MTHI   , true , false, false, false, false },
+    { "mflo"    ,    0,     0x12, R_FMT, MFLO   , false, false, true , false, false },
+    { "mtlo"    ,    0,     0x13, R_FMT, MTLO   , true , false, false, false, false },
+    { "sll"     ,    0,      0x0, R_FMT, SLL    , false, true , true , true , false },
+    { "srl"     ,    0,      0x2, R_FMT, SRL    , false, true , true , true , false },
+    { "sra"     ,    0,      0x3, R_FMT, SRA    , false, true , true , true , false },
+    { "sllv"    ,    0,      0x4, R_FMT, SLLV   , true , true , true , false, false },
+    { "srlv"    ,    0,      0x6, R_FMT, SRLV   , true , true , true , false, false },
+    { "srav"    ,    0,      0x7, R_FMT, SRAV   , true , true , true , false, false },
+    { "lui"     ,  0xF,        0, I_FMT, LUI    , false, true , false, false, false },
+    { "slt"     ,    0,     0x2A, R_FMT, SLT    , true , true , true , false, false },
+    { "sltu"    ,    0,     0x2B, R_FMT, SLTU   , true , true , true , false, false },
+    { "slti"    ,  0xA,        0, I_FMT, SLTI   , true , true , false, false, false },
+    { "sltiu"   ,  0xB,        0, I_FMT, SLTIU  , true , true , false, false, false },
+    { "and"     ,    0,     0x24, R_FMT, AND    , true , true , true , false, false },
+    { "or"      ,    0,     0x25, R_FMT, OR     , true , true , true , false, false },
+    { "xor"     ,    0,     0x26, R_FMT, XOR    , true , true , true , false, false },
+    { "nor"     ,    0,     0x27, R_FMT, NOR    , true , true , true , false, false },
+    { "andi"    ,  0xC,        0, I_FMT, ANDI   , true , true , false, false, false },
+    { "ori"     ,  0xD,        0, I_FMT, ORI    , true , true , false, false, false },
+    { "xori"    ,  0xE,        0, I_FMT, XORI   , true , true , false, false, false },
+    { "beq"     ,  0x4,        0, I_FMT, BEQ    , true , true , false, false, false },
+    { "bne"     ,  0x5,        0, I_FMT, BNE    , true , true , false, false, false },
+    { "blez"    ,  0x6,        0, I_FMT, BLEZ   , true , false, false, false, false },
+    { "bgtz"    ,  0x7,        0, I_FMT, BGTZ   , true , false, false, false, false },
+    { "j"       ,  0x2,        0, J_FMT, J      , false, false, false, false, false },
+    { "jal"     ,  0x3,        0, J_FMT, JAL    , false, false, false, false, false },
+    { "jr"      ,    0,      0x8, R_FMT, JR     , true , false, false, false, false },
+    { "jalr"    ,    0,      0x9, R_FMT, JALR   , true , false, false, false, false },
+    { "lb"      , 0x20,        0, I_FMT, LB     , true , true , false, false, true  },
+    { "lh"      , 0x21,        0, I_FMT, LH     , true , true , false, false, true  },
+    { "lw"      , 0x23,        0, I_FMT, LW     , true , true , false, false, true  },
+    { "lbu"     , 0x24,        0, I_FMT, LBU    , true , true , false, false, true  },
+    { "lhu"     , 0x25,        0, I_FMT, LHU    , true , true , false, false, true  },
+    { "sb"      , 0x28,        0, I_FMT, SB     , true , true , false, false, true  },
+    { "sh"      , 0x29,        0, I_FMT, SH     , true , true , false, false, true  },
+    { "sw"      , 0x2b,        0, I_FMT, SW     , true , true , false, false, true  },
+    { "syscall" ,    0,      0xC, R_FMT, SYSCALL, false, false, false, false, false },
+    { "break"   ,    0,      0xD, R_FMT, BREAK  , false, false, false, false, false },
+    { "trap"    , 0x1A,        0, J_FMT, TRAP   , false, false, false, false, false },
 };
 
 FuncInstr::FuncInstr( uint32 bytes)
@@ -112,7 +109,12 @@ FuncInstr::FuncInstr( uint32 bytes)
             {
                 type = isaTable[i].type;
                 name = isaTable[i].name;
-		break;
+                rs   = isaTable[i].rs;
+                rt   = isaTable[i].rt;
+                rd   = isaTable[i].rd;
+                shamt = isaTable[i].shamt;
+                brackets = isaTable[i].brackets; 
+		        break;
             }
         }   
     }
@@ -125,7 +127,12 @@ FuncInstr::FuncInstr( uint32 bytes)
                 format = isaTable[i].format;
                 type = isaTable[i].type;
                 name = isaTable[i].name;
-		break;
+                rs   = isaTable[i].rs;
+                rt   = isaTable[i].rt;
+                rd   = isaTable[i].rd;
+                shamt = isaTable[i].shamt;
+                brackets = isaTable[i].brackets; 
+		        break;
             }
         }   
     } 
@@ -151,20 +158,55 @@ FuncInstr::FuncInstr( uint32 bytes)
 inline void FuncInstr::processAsR()
 {
     std::ostringstream oss;
-    oss << name << " " 
-        << regTable[instr.asR.rd].name << ", " 
-        << regTable[instr.asR.rs].name << ", " 
-        << regTable[instr.asR.rt].name; 
+    oss << name << " ";
+    if (rd)
+    {
+       oss << regTable[instr.asR.rd].name << ", ";  
+    }
+    if (rs)
+    {
+       oss << regTable[instr.asR.rs].name << ", "; 
+    }
+    if (rt)
+    {
+       oss << regTable[instr.asR.rt].name;     
+    }
+    if (shamt)
+    {
+       oss << ", " << hex << instr.asR.shamt;
+    }
     disasm_string = oss.str();
 }
 
 inline void FuncInstr::processAsI()
 {
     std::ostringstream oss;
-    oss << name << " " 
-        << regTable[instr.asI.rt].name << ", " 
-        << regTable[instr.asI.rs].name << ", " 
-        << "0x" << hex << instr.asI.imm;        
+    if (brackets)
+    {
+        oss << name << " ";
+        if (rt)
+        { 
+            oss << regTable[instr.asI.rt].name << ", ";
+        }            
+        oss << instr.asI.imm << "(";
+        if (rs)
+        {
+            oss << regTable[instr.asI.rs].name << ")";
+        }         
+    }
+    else
+    {
+        oss << name << " "; 
+        if (rt)
+        {
+            oss << regTable[instr.asI.rt].name << ", ";
+        }
+        if (rs)
+        {
+            oss << regTable[instr.asI.rs].name << ", ";
+        } 
+        oss << "0x" << hex << instr.asI.imm;        
+    }
     disasm_string = oss.str();
 }
 

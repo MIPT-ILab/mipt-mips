@@ -23,7 +23,7 @@ enum Format
 enum Type
 {
     ADD, ADDU, SUB, SUBU, ADDI, ADDIU,
-    MULT, MULTU, DIV, DIVU, MHFI, MTHI, MFLO, MTLO, 
+    MULT, MULTU, DIV, DIVU, MFHI, MTHI, MFLO, MTLO, 
     SLL, SRL, SRA, SLLV, SRLV, SRAV, LUI,
     SLT, SLTU, SLTI, SLTIU,
     AND, OR, XOR, NOR, ANDI, ORI, XORI,
@@ -51,6 +51,7 @@ struct ISAEntry
     bool rt;
     bool rd;
     bool shamt;
+    bool brackets;
 };
 
 class FuncInstr
@@ -67,6 +68,7 @@ class FuncInstr
         
         string disasm_string;        
         const char* name;
+        bool rs, rt, rd, shamt, brackets;            
 
         union
         {
