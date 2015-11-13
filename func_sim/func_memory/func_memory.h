@@ -11,6 +11,7 @@
 
 // Generic C++
 #include <string>
+#include <iostream>
 #include <cassert>
 #include <vector>
 
@@ -18,52 +19,69 @@
 #include <types.h>
 #include <elf_parser.h>
 
-using namespace std;
-
 class FuncMemory
 {
-    // You could not create the object
-    // using this default constructor
-    FuncMemory(){}
-
-    void increase_offset_priv( uint64& offset, uint64& num_of_page,
-        uint64& num_of_set, unsigned inc_by) const;
-    void decrease_offset_priv( uint64& offset, uint64& num_of_page,
-        uint64& num_of_set, unsigned dec_by) const;
-
-    uint64 get_num_of_set_priv( uint64 addr) const;
-    uint64 get_num_of_page_priv( uint64 addr) const;
-    uint64 get_offset_priv( uint64 addr) const;
+    private:
+        uint8*** memory;
+        uint64 startPC_addr;
     
-    uint64 num_of_sets_priv;
-    uint64 num_of_pages_priv;
-    uint64 max_offset_priv;
+        uint64 addr_bits;
+        uint64 set_bits;
+        uint64 page_bits;
+        uint64 offset_bits;
+        
+        uint64 set_mask;
+        uint64 page_mask;
+        uint64 offset_mask;        
+        
+        inline size_t get_set( uint64 addr) const
+        {
+            return ( addr & set_mask) >> ( page_bits + offset_bits);
+        }
+        
+        inline size_t get_page( uint64 addr) const
+        {
+            return ( addr & page_mask) >> offset_bits;
+        }
 
-    string exe_file_name_priv;
-    uint64 addr_size_priv;
-    uint64 set_num_size_priv;
-    uint64 page_num_size_priv;
-    uint64 offset_size_priv;
+        inline size_t get_offset( uint64 addr) const
+        {
+            return ( addr & offset_mask);
+        }
+        
+        inline uint64 get_addr( uint64 set, uint64 page, uint64 offset) const
+        {
+            return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
+        }
+        
+        inline uint8* get_host_addr( uint64 addr) const
+        {
+            return &memory[get_set(addr)][get_page(addr)][get_offset(addr)];
+        }
 
-    uint8*** sets_array_priv;
+        inline uint8 read_byte( uint64 addr) const
+        {
+            return *get_host_addr(addr);
+        }
+        
+        inline void write_byte( uint64 addr, uint8 value)
+        {
+           *get_host_addr(addr) = value;
+        }
+        
+        void alloc( uint64 addr);
+        bool check( uint64 addr) const;
 
-    uint64 start_pc_adress_priv;
-
-public:
-
-    FuncMemory ( const char* executable_file_name,
-                 uint64 addr_size = 32,
-                 uint64 page_num_size = 10,
-                 uint64 offset_size = 12);
-    
-    virtual ~FuncMemory();
-    
-    uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
-    void   write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
-    
-    uint64 startPC() const;
-    
-    string dump( string indent = "") const;
+    public:
+        FuncMemory ( const char* executable_file_name,
+                     uint64 addr_size = 32,
+                     uint64 page_num_size = 10,
+                     uint64 offset_size = 12);
+        virtual ~FuncMemory();
+        uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
+        void write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
+        inline uint64 startPC() const { return startPC_addr; }
+        std::string dump( string indent = "") const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
