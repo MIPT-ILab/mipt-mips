@@ -48,7 +48,6 @@ class FuncMemory
     uint8*** sets_array_priv;
 
     uint64 start_pc_adress_priv;
-    const static uint64 begin_addr_priv = 0x400094;
 
 public:
 
