@@ -7,6 +7,8 @@
 # specifying relative path to the TRUNK
 TRUNK= ../../
 
+CFLAGS=-std=c++11 -Wall -Werror -Wpedantic
+
 # paths to look for headers
 vpath %.h $(TRUNK)/common
 vpath %.h $(TRUNK)/func_sim/elf_parser/
@@ -29,21 +31,21 @@ GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
 #
 disasm: func_memory.o elf_parser.o disasm.o func_instr.o
 	@# don't forget to link ELF library using "-l elf"
-	$(CXX) -o $@ $^ -l elf
+	$(CXX) $(CFLAGS) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
 func_instr.o: func_instr.cpp func_instr.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CFLAGS) -c $< $(INCL)
     
 func_memory.o: func_memory.cpp func_memory.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CFLAGS) -c $< $(INCL)
 
 elf_parser.o: elf_parser.cpp elf_parser.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CFLAGS) -c $< $(INCL)
 
 disasm.o: disasm.cpp func_memory.h types.h func_instr.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CFLAGS) -c $< $(INCL)
 
 #
 # Enter for building func_memory unit test
@@ -57,12 +59,12 @@ test: unit_test
 unit_test: unit_test.o func_memory.o elf_parser.o func_instr.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
+	$(CXX) $(CFLAGS) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp func_instr.h
-	$(CXX) -c $< $(INCL_GTEST) $(INCL) 
+	$(CXX) $(CFLAGS) -c $< $(INCL_GTEST) $(INCL) 
 
 clean:
 	@-rm *.o
