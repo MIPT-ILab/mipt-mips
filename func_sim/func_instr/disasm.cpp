@@ -14,6 +14,8 @@ using namespace std;
 
 int main ( int argc, char* argv[])
 {
+    FuncInstr fi(0x0);
+
     const int num_of_args = 2;
 
     if ( argc - 1 > num_of_args)

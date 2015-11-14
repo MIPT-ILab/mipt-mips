@@ -7,7 +7,7 @@
 # specifying relative path to the TRUNK
 TRUNK= ../../
 
-CFLAGS=-std=c++11 -Wall -Werror -Wpedantic
+CFLAGS=-std=c++11 
 
 # paths to look for headers
 vpath %.h $(TRUNK)/common
@@ -68,4 +68,4 @@ unit_test.o: unit_test.cpp func_instr.h
 
 clean:
 	@-rm *.o
-	@-rm disasm unit_test
+	@-rm disasm unit_test log.txt
