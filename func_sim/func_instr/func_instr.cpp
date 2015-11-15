@@ -37,6 +37,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "mflo ",    0x0,    0x12,   FuncInstr::FORMAT_R, FuncInstr::MFLO},
     { "mtlo ",    0x0,    0x13,   FuncInstr::FORMAT_R, FuncInstr::MTLO},
     { "sll ",     0x0,    0x0,    FuncInstr::FORMAT_R, FuncInstr::SLL},
+    { "srl ",     0x0,    0x2,    FuncInstr::FORMAT_R, FuncInstr::SRL},
     { "sra ",     0x0,    0x3,    FuncInstr::FORMAT_R, FuncInstr::SRA},
     { "sllv ",    0x0,    0x4,    FuncInstr::FORMAT_R, FuncInstr::SLLV},
     { "srlv ",    0x0,    0x6,    FuncInstr::FORMAT_R, FuncInstr::SRLV},
@@ -107,16 +108,21 @@ FuncInstr::FuncInstr( uint32 bytes_arg)
             os << hex << "0x" << this->bytes.asJ.offset;
             break;
         case FORMAT_I:
-            if ( isLoadStore( this->type))
+            if ( usesTwoOperandsAndOffset( this->type))
             {
                 os << asReg( this->bytes.asI.rt) << ", " 
                    << asRegOff( this->bytes.asI.rs, this->bytes.asI.imm) ;
             }
-            else if ( isAluOp( this->type))
+            else if ( usesTwoRegOperandsAndOneImm( this->type))
             {
                 os << asReg( this->bytes.asI.rt) << ", "
                    << asReg( this->bytes.asI.rs) << ", "
                    << hex << "0x" << this->bytes.asI.imm;
+            }
+            else if ( usesOneRegOperandAndOneImm( this->type))
+            {
+                os << asReg( this->bytes.asR.rt) << ", "
+                   << "0x" << hex << this->bytes.asR.rs;
             }
             else
             {
@@ -124,9 +130,36 @@ FuncInstr::FuncInstr( uint32 bytes_arg)
             }
             break;
         case FORMAT_R:
-            os << asReg( this->bytes.asR.rd) << ", "
-               << asReg( this->bytes.asR.rs) << ", "
-               << asReg( this->bytes.asR.rt);
+            if ( usesThreeRegOperands( this->type))
+            {
+                os << asReg( this->bytes.asR.rd) << ", "
+                   << asReg( this->bytes.asR.rs) << ", "
+                   << asReg( this->bytes.asR.rt);
+            }
+            else if ( usesTwoRegOperands( this->type))
+            {
+                os << asReg( this->bytes.asR.rd) << ", "
+                   << asReg( this->bytes.asR.rs);
+            }
+            else if ( usesTwoRegOperandsAndOneImm( this->type))
+            {
+                os << asReg( this->bytes.asR.rd) << ", "
+                   << asReg( this->bytes.asR.rs) << ", "
+                   << "0x" << hex << this->bytes.asR.rt;
+            }
+            else if ( usesOneRegOperand( this->type))
+            {
+                os << asReg( this->bytes.asR.rt);
+            }
+            else if ( usesOneRegOperandAndOneImm( this->type))
+            {
+                os << asReg( this->bytes.asR.rt) << ", "
+                   << "0x" << hex << this->bytes.asR.rs;
+            }
+            else
+            {
+                assert( NULL);
+            }
             break;
         default:
             assert( NULL);
@@ -214,19 +247,6 @@ string FuncInstr::Dump( string indent) const
     return os.str();
 }
 
-bool FuncInstr::isLoadStore( Type type) const
-{
-    return ( type==LB || type == LH || type == LW || type == LBU
-        || type==LHU || type==SB || type==SH || type==SW || type==LUI);
-}
-
-bool FuncInstr::isAluOp( Type type) const
-{
-    return ( type==ADD || type==ADDU || type==SUB || type==SUBU
-        || type==ADDI || type==ADDIU || type==MULT || type==MULTU
-        || type==DIV || type==DIVU);
-}
-
 string FuncInstr::asReg( unsigned char reg) const
 {
     switch( reg)
@@ -298,4 +318,41 @@ ostream& operator<< ( ostream& out, const FuncInstr& instr)
 {
     out << instr.Dump( "");
     return out; 
+}
+
+bool FuncInstr::usesThreeRegOperands( Type type) const
+{
+    return ( type==ADD || type==ADDU || type==SUB || type==SUBU 
+        || type==SLLV || type==SRLV|| type==SRAV || type==SLT
+        || type==SLTU || type==AND || type==OR || type==XOR || type==NOR);
+}
+
+bool FuncInstr::usesTwoOperandsAndOffset( Type type) const
+{
+    return ( type==LB || type==LH || type==LW || type==LBU || type==LHU
+            || type==SB || type==SH || type==SW);
+}
+
+bool FuncInstr::usesTwoRegOperandsAndOneImm( Type type) const
+{
+    return ( type==ADDI || type==ADDIU || type==SLL || type==SRL
+            || type==SRA || type==SLTI || type==SLTIU
+            || type==ANDI || type==ORI || type==XORI
+            || type==BEQ || type==BNE );
+}
+
+bool FuncInstr::usesTwoRegOperands( Type type) const
+{
+    return ( type==MULT || type==MULTU || type==DIV || type==DIVU);
+}
+
+bool FuncInstr::usesOneRegOperand( Type type) const
+{
+    return ( type==MFHI || type==MTHI || type==MFLO || type==MTLO
+            || type == JR || type==JALR);
+}
+
+bool FuncInstr::usesOneRegOperandAndOneImm( Type type) const
+{
+    return ( type==LUI || type==BLEZ || type==BGTZ);
 }

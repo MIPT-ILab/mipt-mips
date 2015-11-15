@@ -46,6 +46,7 @@ class FuncInstr
             MFLO,
             MTLO,
             SLL,
+            SRL,
             SRA,
             SLLV,
             SRLV,
@@ -139,8 +140,12 @@ class FuncInstr
         void parseI( uint32 bytes);
         void parseJ( uint32 bytes);
 
-        bool isLoadStore( Type type) const;
-        bool isAluOp( Type type) const;
+        bool usesTwoOperandsAndOffset( Type type) const;
+        bool usesTwoRegOperandsAndOneImm( Type type) const;
+        bool usesThreeRegOperands( Type type) const;
+        bool usesTwoRegOperands( Type type) const;
+        bool usesOneRegOperand( Type type) const;
+        bool usesOneRegOperandAndOneImm( Type type) const;
 
         string asReg( unsigned char reg) const;
         string asRegOff( unsigned char reg, uint16 offset) const;
