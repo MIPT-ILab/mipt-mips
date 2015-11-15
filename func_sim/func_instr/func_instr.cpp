@@ -101,12 +101,12 @@ FuncInstr::FuncInstr( uint32 bytes_arg)
 
 void FuncInstr::initFormat( uint32 bytes)
 {
-    uint32 last6 = bytes % ( 1U << 6U);
-    if ( last6 == 0)
+    uint32 first6 = bytes >> 26;
+    if ( first6 == 0)
     {
         this->format=FORMAT_R;
     }
-    else if ( last6 == 2 || last6 == 3 || last6 == 0x1A)
+    else if ( first6 == 2 || first6 == 3 || first6 == 0x1A)
     {
         this->format=FORMAT_J;
     }
@@ -177,7 +177,7 @@ string FuncInstr::Dump( string indent) const
     switch ( this->format)
     {
         case FORMAT_J:
-            os << hex << this->bytes.asJ.offset;
+            os << hex << "0x" << this->bytes.asJ.offset;
             break;
         case FORMAT_I:
             if ( isLoadStore( this->type))
@@ -187,9 +187,9 @@ string FuncInstr::Dump( string indent) const
             }
             else if ( isAluOp( this->type))
             {
-                os << asReg( this->bytes.asI.rs) << ", "
-                   << asReg( this->bytes.asI.rt) << ", "
-                   << this->bytes.asI.imm;
+                os << asReg( this->bytes.asI.rt) << ", "
+                   << asReg( this->bytes.asI.rs) << ", "
+                   << hex << "0x" << this->bytes.asI.imm;
             }
             else
             {
@@ -197,9 +197,9 @@ string FuncInstr::Dump( string indent) const
             }
             break;
         case FORMAT_R:
-            os << asReg( this->bytes.asR.rs) << ", "
-               << asReg( this->bytes.asR.rt) << ", "
-               << asReg( this->bytes.asR.rd);
+            os << asReg( this->bytes.asR.rd) << ", "
+               << asReg( this->bytes.asR.rs) << ", "
+               << asReg( this->bytes.asR.rt);
             break;
         default:
             assert( NULL);
