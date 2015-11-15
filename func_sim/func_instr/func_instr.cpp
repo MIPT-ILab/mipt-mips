@@ -96,6 +96,44 @@ FuncInstr::FuncInstr( uint32 bytes_arg)
             exit( EXIT_FAILURE);
             break;
     }
+    mylog << "Command type: " << this->type << endl;
+
+    ostringstream os;
+
+    os << this->cmd_name;
+    switch ( this->format)
+    {
+        case FORMAT_J:
+            os << hex << "0x" << this->bytes.asJ.offset;
+            break;
+        case FORMAT_I:
+            if ( isLoadStore( this->type))
+            {
+                os << asReg( this->bytes.asI.rt) << ", " 
+                   << asRegOff( this->bytes.asI.rs, this->bytes.asI.imm) ;
+            }
+            else if ( isAluOp( this->type))
+            {
+                os << asReg( this->bytes.asI.rt) << ", "
+                   << asReg( this->bytes.asI.rs) << ", "
+                   << hex << "0x" << this->bytes.asI.imm;
+            }
+            else
+            {
+                assert( NULL);
+            }
+            break;
+        case FORMAT_R:
+            os << asReg( this->bytes.asR.rd) << ", "
+               << asReg( this->bytes.asR.rs) << ", "
+               << asReg( this->bytes.asR.rt);
+            break;
+        default:
+            assert( NULL);
+            break;
+    }
+
+    full_cmd_name = os.str();
     mylog << "Exiting FuncInstr::FuncInstr" << endl;
 }
 
@@ -172,47 +210,14 @@ void FuncInstr::parseI( uint32 bytes)
 string FuncInstr::Dump( string indent) const
 {
     ostringstream os;
-
-    os << indent << this->cmd_name;
-    switch ( this->format)
-    {
-        case FORMAT_J:
-            os << hex << "0x" << this->bytes.asJ.offset;
-            break;
-        case FORMAT_I:
-            if ( isLoadStore( this->type))
-            {
-                os << asReg( this->bytes.asI.rt) << ", " 
-                   << asRegOff( this->bytes.asI.rs, this->bytes.asI.imm) ;
-            }
-            else if ( isAluOp( this->type))
-            {
-                os << asReg( this->bytes.asI.rt) << ", "
-                   << asReg( this->bytes.asI.rs) << ", "
-                   << hex << "0x" << this->bytes.asI.imm;
-            }
-            else
-            {
-                assert( NULL);
-            }
-            break;
-        case FORMAT_R:
-            os << asReg( this->bytes.asR.rd) << ", "
-               << asReg( this->bytes.asR.rs) << ", "
-               << asReg( this->bytes.asR.rt);
-            break;
-        default:
-            assert( NULL);
-            break;
-    }
-
+    os << indent << full_cmd_name;
     return os.str();
 }
 
 bool FuncInstr::isLoadStore( Type type) const
 {
     return ( type==LB || type == LH || type == LW || type == LBU
-        || type==LHU || type==SB || type==SH || type==SW);
+        || type==LHU || type==SB || type==SH || type==SW || type==LUI);
 }
 
 bool FuncInstr::isAluOp( Type type) const
@@ -287,4 +292,10 @@ string FuncInstr::strFormat( FormatType format) const
         case FORMAT_J: return "J";
         default: assert(NULL);
     }
+}
+
+ostream& operator<< ( ostream& out, const FuncInstr& instr)
+{
+    out << instr.Dump( "");
+    return out; 
 }

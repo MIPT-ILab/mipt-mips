@@ -31,7 +31,7 @@ class FuncInstr
 
         enum Type
         {
-            ADD,
+            ADD = 0,
             ADDU,
             SUB,
             SUBU,
@@ -132,6 +132,7 @@ class FuncInstr
         } bytes;
 
         char* cmd_name;
+        string full_cmd_name;
 
         void initFormat( uint32 bytes);
         void parseR( uint32 bytes);

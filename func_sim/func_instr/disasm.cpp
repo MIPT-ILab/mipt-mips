@@ -14,18 +14,16 @@ using namespace std;
 
 int main ( int argc, char* argv[])
 {
-    FuncInstr fi(0x0);
-
     const int num_of_args = 2;
 
     if ( argc - 1 > num_of_args)
     {
-        cerr << "ERROR: too many arguments!" << endl
+        cerr << "ERROR. too many arguments!" << endl
              << "One argument is required, the name of an exe"
              << "cutable file." << endl;
     } else if ( argc - 1 < num_of_args)
     {
-        cerr << "ERROR: too few arguments!" << endl
+        cerr << "ERROR. too few arguments!" << endl
              << "Only two arguments are required, the name of an exe"
              << "cutable file and name of section." << endl;
     }
@@ -48,7 +46,7 @@ int main ( int argc, char* argv[])
 
     if ( start_addr == 0)
     {
-        cerr << "ERROR: section with this name doesn\'t exist." << endl;
+        cerr << "ERROR. section with this name doesn\'t exist." << endl;
     }
 
     //creating memory with loaded file
