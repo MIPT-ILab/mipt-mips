@@ -85,12 +85,16 @@ class FuncInstr
         uint8 S;
         uint8 C;
         uint8 A;
+
+        uint8 R_W;
     };
 
     struct registers
     {
     	const char name [5];
     	uint8 reg_num;
+    	bool write; //is enable writing by user
+    	//bool read ; //is enable reading by user
     };
 
     static const int ISA_SIZE = 51;
@@ -100,6 +104,8 @@ class FuncInstr
     static const registers regTable [REG_SIZE];
 
     mutable int dumpPos;
+
+    mutable int instrPos;
 
 	//FuncInstr (){}
 
@@ -111,6 +117,8 @@ class FuncInstr
 
 	int initFormat (uint32 bytes);
 
+	bool checkInstr ();
+
 	enum opType
 	{
 		s_OP = 0,
@@ -121,7 +129,7 @@ class FuncInstr
 		A_OP
 	} optype;
 
-	int    nextOperandType (int isaPos     ) const;
+	int    nextOperandType (/*int isaPos     */) const;
     uint32 nextOperand     (int operandType) const;
     
     public:
