@@ -71,7 +71,7 @@ class FuncInstr
 
     struct ISAEntry
     {
-        const char name [10];
+        const char* name;
 
         uint8 opcode;
         uint8 func;
@@ -85,13 +85,11 @@ class FuncInstr
         uint8 S;
         uint8 C;
         uint8 A;
-
-        uint8 R_W;
     };
 
     struct registers
     {
-    	const char name [5];
+    	const char* name;
     	uint8 reg_num;
     	bool write; //is enable writing by user
     	//bool read ; //is enable reading by user
@@ -113,11 +111,8 @@ class FuncInstr
 	void parseJ (uint32 bytes);
 	void parseI (uint32 bytes);
 
-	int findInstr (uint32 bytes) const;
-
-	int initFormat (uint32 bytes);
-
-	bool checkInstr ();
+	int findInstr  (uint32 bytes) const;
+	int initFormat (uint32 bytes)      ;
 
 	enum opType
 	{
