@@ -2,9 +2,11 @@
 # include <sstream>
 # include <cstdlib>
 # include <cassert>
-# include "func_instr.h"
+
+# include <func_instr.h>
 
 # define Assert(expr) {if (!expr) exit (EXIT_FAILURE);}
+
 
 const FuncInstr::ISAEntry FuncInstr::isaTable [FuncInstr::ISA_SIZE] =
 {
@@ -108,14 +110,12 @@ const FuncInstr::registers FuncInstr::regTable [FuncInstr::REG_SIZE] =
 	{"ra"  , RA  },
 };
 
+
 FuncInstr::FuncInstr (uint32 bytes)
 {
 	dumpPos = 1;
-
-	//std::cout << "start FuncInstr" << std::endl;
-	//std::cout << "bytes : " << std::hex << bytes << std::endl;
-
-    this->initFormat(bytes);
+	
+	this->initFormat(bytes);
     switch (this->format)
     {
         case FORMAT_R:
@@ -135,7 +135,6 @@ FuncInstr::FuncInstr (uint32 bytes)
         }
         default:
         {
-        	//std::cout << "default" << std::endl;
             Assert (0);
         }
     }
@@ -146,22 +145,6 @@ FuncInstr::FuncInstr (uint32 bytes)
 void FuncInstr::parseR (uint32 bytes)
 {
 	instr.raw = bytes;
-	/*
-
-	uint32 value = bytes;
-	value >>= 26;
-	instr.asR.opcode = bytes >> (32 - 6);
-
-	instr.asR.s = (bytes >> (32 - 6 - 5)) & 0b11111;
-
-	instr.asR.t = (bytes >> (32 - 6 - 5 - 5)) & 0b11111;
-
-	instr.asR.d = (bytes >> (32 - 6 - 5 - 5)) & 0b11111;
-
-	instr.asR.imm = (bytes >> (32 - 6 - 5 - 5 - 6)) & 0b111111;
-	
-	instr.asR.func = bytes & 0b111111;	
-	*/
 
 	/*std::cout << "type-R" << std::endl;
 	std::cout << "opcode : " << std::hex << (uint32)instr.asR.opcode << std::endl;
@@ -177,18 +160,6 @@ void FuncInstr::parseR (uint32 bytes)
 void FuncInstr::parseI (uint32 bytes)
 {
 	instr.raw = bytes;
-	
-	/*std::cout << "bytes is : " << std::hex << bytes << std::endl;
-
-	instr.asI.opcode = bytes >> (32 - 6);
-
-	instr.asI.s = (bytes >> (32 - 6 - 5)) & 0b11111;
-
-	instr.asI.t = (bytes >> (32 - 6 - 5 - 5)) & 0b11111;
-	
-	instr.asI.imm = bytes  & (((uint32)1 << 16) - 1);
-	
-*/
 
 	/*std::cout << "type-I" << std::endl;
 	std::cout << "opcode : " << instr.asI.opcode << std::endl;
@@ -202,11 +173,6 @@ void FuncInstr::parseI (uint32 bytes)
 void FuncInstr::parseJ (uint32 bytes)
 {
 	instr.raw = bytes;
-	/*
-	instr.asR.opcode = bytes >> 26;
-
-	instr.asR.imm = bytes & (((uint32)1 << 26) - 1);
-	*/
 
 	/*std::cout << "type-J" << std::endl;
 	std::cout << "opcode : " << instr.asR.opcode << std::endl;
@@ -220,41 +186,25 @@ int FuncInstr::findInstr (uint32 bytes) const
 	uint32 opcode = bytes >> 26;
 	uint32 func   = bytes & (((uint32)1 << 6) - 1);
 
-	//std::cout << "opcode : " << std::hex << (int)opcode << std::endl;
-	//std::cout << "func   : " << std::hex << (int)func   << std::endl;
-	//std::cout << std::endl;
-
 	for (int pos = 0; pos < ISA_SIZE; pos++)
 	{
 		if (opcode != 0x0 && isaTable [pos].opcode != 0x0)
 		{
-			//std::cout << "opcode != 0" << std::endl;
 			if (opcode == isaTable [pos].opcode) 
 			{
-				//std::cout << "pos = " << pos << " opcode = " << opcode << std::endl;
 				instrPos = pos;
 				return pos;
 			}
 		}
 		else if (opcode == 0x0 && isaTable [pos].opcode == 0x0)
 		{
-			//std::cout << "opcode = 0" << std::endl;
 			if (func   == (int)isaTable [pos].func  ) 
 			{
-				//std::cout << "1) " << (int)isaTable [4].opcode << std::endl;
-				//std::cout << "2) " << (int)isaTable [4].func   << std::endl;
-
-				/*std::cout << "pos = " << pos << 
-							" func = " << (int)isaTable [pos].func << 
-							" opcode = " <<(int) isaTable [pos].opcode << std::endl;
-				*/
 				instrPos = pos;
 				return pos;
 			}
 		}
 	}
-
-	//return -1;
 	std::cerr << "ERROR. Instr didn't find" << std::endl;
 	Assert (0);
 }
@@ -262,36 +212,14 @@ int FuncInstr::findInstr (uint32 bytes) const
 
 int FuncInstr::initFormat (uint32 bytes)
 {
-	/*instrPos = */findInstr (bytes);
+	findInstr (bytes);
 
-	//std::cout << "instrPos : " << instrPos << std::endl;
-	//std::cout << "format   : " << isaTable [instrPos].format << std::endl;
-
-	//return isaTable [instrPos].format;
 	format = isaTable [instrPos].format;
 }
 
 
-int FuncInstr::nextOperandType (/*int isaPos*/) const
+int FuncInstr::nextOperandType () const
 {
-	/*switch (dumpPos)
-	{
-		case (uint32)isaTable [isaPos].s :
-			return s_OP;
-		case (uint32)isaTable [isaPos].t :
-			return t_OP;
-		case (uint32)isaTable [isaPos].d :
-			return d_OP;
-		case (uint32)isaTable [isaPos].S :
-			return S_OP;
-		case (uint32)isaTable [isaPos].C :
-			return C_OP;
-		case (uint32)isaTable [isaPos].A :
-			return A_OP;
-		default : 
-			return -1;
-	};*/
-
 	dumpPos++;
 
 	if      (dumpPos - 1 == (uint32)isaTable [instrPos].s) return s_OP;
@@ -329,19 +257,6 @@ uint32 FuncInstr::nextOperand (int operandType) const
 		default :
 			return -1;			
 	};
-/*	if      (operandType == s_OP) return instr.asR.s;
-	else if (operandType == t_OP) return instr.asR.t;
-	else if (operandType == d_OP) return instr.asR.d;
-	else if (operandType == S_OP) 
-	{
-		if (format == FORMAT_R)
-			return instr.asR.d;
-		else 
-			return instr.asI.imm;
-	}
-	else if (operandType == C_OP) return instr.asI.imm;
-	else if (operandType == A_OP) return instr.asJ.imm;
-	else 						  return -1			;*/
 }
 
 
@@ -350,13 +265,7 @@ std::string FuncInstr::Dump (std::string indent) const
 	dumpPos = 1;
 
 	std::ostringstream oss;
-
-	//uint32 instructionPos = findInstr (instr.raw);
-
-	//std::cout << instrPos << std::endl;
-
 	oss << indent << isaTable [instrPos].name;
-	//std::cout << "command : " << isaTable [instrPos].name << std::endl;
 
 	if (format == FORMAT_R && isaTable [instrPos].type == SPECIAL)
 	{
@@ -368,30 +277,20 @@ std::string FuncInstr::Dump (std::string indent) const
 
 	do
 	{
-		int curr_op_type = nextOperandType (/*instrPos*/);
-
-		//std::cout << "currOpType : " << currOpType << std::endl;
-		//std::cout << "currDump   : " << dumpPos    << std::endl;
+		int curr_op_type = nextOperandType ();
 
 		if (curr_op_type == -1) break;//std::terminate ();
 
 		if (curr_op_type == s_OP || curr_op_type == t_OP ||
-			(curr_op_type == d_OP && format == FORMAT_R))
-		{
+		    (curr_op_type == d_OP && format == FORMAT_R))
 			oss << " $" << regTable [nextOperand (curr_op_type)].name;
-			//std::cout << "$" << regTable [nextOperand (curr_op_type)].name << " ";
-		}
 
 		else
-		{
 			oss << " 0x" << std::hex << nextOperand (curr_op_type);
-			//std::cout<< "0x" << std::hex << nextOperand (curr_op_type) << " ";
-		}
 
 		if (nextOperandType () != -1)
-		{
 			oss << ",";
-		}
+		
 		dumpPos--;
 
 	} while (true);
@@ -399,6 +298,7 @@ std::string FuncInstr::Dump (std::string indent) const
 	return oss.str ();
 }
 //==============================================================================
+
 std::ostream& operator<< ( std::ostream& out, const FuncInstr& instr)
 {
      out << instr.Dump("");

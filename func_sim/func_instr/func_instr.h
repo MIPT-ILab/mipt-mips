@@ -1,5 +1,7 @@
-# include "../../common/types.h"
 # include <iostream>
+
+# include <types.h>
+
 
 class FuncInstr
 {
@@ -65,9 +67,7 @@ class FuncInstr
             unsigned opcode:6;
         } asJ;
         uint32 raw;
-    } instr;//bytes;
-
-    //bytes instr;
+    } instr;
 
     struct ISAEntry
     {
@@ -91,8 +91,6 @@ class FuncInstr
     {
     	const char* name;
     	uint8 reg_num;
-    	bool write; //is enable writing by user
-    	//bool read ; //is enable reading by user
     };
 
     static const int ISA_SIZE = 51;
@@ -101,11 +99,8 @@ class FuncInstr
     static const int REG_SIZE = 32;
     static const registers regTable [REG_SIZE];
 
-    mutable int dumpPos;
-
+    mutable int dumpPos ;
     mutable int instrPos;
-
-	//FuncInstr (){}
 
 	void parseR (uint32 bytes);
 	void parseJ (uint32 bytes);
@@ -124,14 +119,12 @@ class FuncInstr
 		A_OP
 	} optype;
 
-	int    nextOperandType (/*int isaPos     */) const;
+	int    nextOperandType (			   ) const;
     uint32 nextOperand     (int operandType) const;
     
     public:
-        FuncInstr( uint32 bytes);
-        std::string Dump( std::string indent = " ") const;
-
-
+        FuncInstr (uint32 bytes);
+        std::string Dump (std::string indent = " ") const;
 };
 
-std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
+std::ostream& operator << (std::ostream& out, const FuncInstr& instr);
