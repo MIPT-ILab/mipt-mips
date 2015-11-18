@@ -132,6 +132,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         fread( content, sizeof( uint8), size, file);
         ElfSection section( name, start_addr, size, content);
 	    sections_array.push_back( ElfSection( name, start_addr, size, content));
+        delete [] content;
     }
     
     // close all used files
