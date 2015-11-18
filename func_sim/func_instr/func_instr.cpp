@@ -1,0 +1,307 @@
+# include <iostream>
+# include <sstream>
+# include <cstdlib>
+# include <cassert>
+
+# include <func_instr.h>
+
+# define Assert(expr) {if (!expr) exit (EXIT_FAILURE);}
+
+
+const FuncInstr::ISAEntry FuncInstr::isaTable [FuncInstr::ISA_SIZE] =
+{
+    // name    opcode  func  format   type      s  t  d  S  C  A
+    { "add"    , 0x0 , 0x20, FORMAT_R, ADD    , 2, 3, 1, 0, 0, 0},
+    { "addu"   , 0x0 , 0x21, FORMAT_R, ADD    , 2, 3, 1, 0, 0, 0}, 
+    { "sub"    , 0x0 , 0x22, FORMAT_R, SUB    , 2, 3, 1, 0, 0, 0},
+    { "subu"   , 0x0 , 0x23, FORMAT_R, SUB    , 2, 3, 1, 0, 0, 0},
+    { "addi"   , 0x8 , 0x0 , FORMAT_I, ADD    , 2, 1, 0, 0, 3, 0},
+    { "addiu"  , 0x9 , 0x0 , FORMAT_I, ADD    , 2, 1, 0, 0, 3, 0},
+    
+    { "mult"   , 0x0 , 0x18, FORMAT_R, MUL    , 1, 2, 0, 0, 0, 0},
+    { "multu"  , 0x0 , 0x19, FORMAT_R, MUL    , 1, 2, 0, 0, 0, 0},
+    { "div"    , 0x0 , 0x1A, FORMAT_R, DIV    , 1, 2, 0, 0, 0, 0},
+    { "divu"   , 0x0 , 0x1B, FORMAT_R, DIV    , 1, 2, 0, 0, 0, 0},
+    { "mfhi"   , 0x0 , 0x10, FORMAT_R, MOVE   , 0, 0, 1, 0, 0, 0},
+    { "mthi"   , 0x0 , 0x11, FORMAT_R, MOVE   , 1, 0, 0, 0, 0, 0},
+    { "mflo"   , 0x0 , 0x12, FORMAT_R, MOVE   , 0, 0, 1, 0, 0, 0},
+    { "mtlo"   , 0x0 , 0x13, FORMAT_R, MOVE   , 1, 0, 0, 0, 0, 0},
+    
+    { "sll"    , 0x0 , 0x0 , FORMAT_R, SHIFT  , 0, 2, 1, 3, 0, 0},
+    { "srl"    , 0x0 , 0x2 , FORMAT_R, SHIFT  , 0, 2, 1, 3, 0, 0},
+    { "sra"    , 0x0 , 0x3 , FORMAT_R, SHIFT  , 0, 2, 1, 3, 0, 0},
+    { "sllv"   , 0x0 , 0x4 , FORMAT_R, SHIFT  , 3, 2, 1, 0, 0, 0},
+    { "srlv"   , 0x0 , 0x6 , FORMAT_R, SHIFT  , 3, 2, 1, 0, 0, 0},
+    { "srav"   , 0x0 , 0x7 , FORMAT_R, SHIFT  , 3, 2, 1, 0, 0, 0},
+    { "lui"    , 0xF , 0x0 , FORMAT_I, SHIFT  , 0, 1, 0, 0, 2, 0},
+    
+    { "slt"    , 0x0 , 0x2A, FORMAT_R, COMP   , 1, 2, 3, 0, 0, 0},
+    { "sltu"   , 0x0 , 0x2B, FORMAT_R, COMP   , 1, 2, 3, 0, 0, 0},
+    { "slti"   , 0xA , 0x0 , FORMAT_I, COMP   , 1, 2, 0, 0, 3, 0},
+    { "sltiu"  , 0xB , 0x0 , FORMAT_I, COMP   , 1, 2, 0, 0, 3, 0},
+    
+    { "and"    , 0x0 , 0x24, FORMAT_R, LOGIC  , 3, 2, 1, 0, 0, 0},
+    { "or"     , 0x0 , 0x25, FORMAT_R, LOGIC  , 3, 2, 1, 0, 0, 0},
+    { "xor"    , 0x0 , 0x26, FORMAT_R, LOGIC  , 3, 2, 1, 0, 0, 0},
+    { "nor"    , 0x0 , 0x27, FORMAT_R, LOGIC  , 3, 2, 1, 0, 0, 0},
+    { "andi"   , 0xC , 0x0 , FORMAT_I, LOGIC  , 1, 2, 0, 0, 3, 0},
+    { "ori"    , 0xD , 0x0 , FORMAT_I, LOGIC  , 1, 2, 0, 0, 3, 0},
+    { "xori"   , 0xE , 0x0 , FORMAT_I, LOGIC  , 1, 2, 0, 0, 3, 0},
+    
+    { "beq"    , 0x4 , 0x0 , FORMAT_I, COND   , 1, 2, 0, 0, 3, 0},
+    { "bne"    , 0x5 , 0x0 , FORMAT_I, COND   , 1, 2, 0, 0, 3, 0},
+    { "blez"   , 0x6 , 0x0 , FORMAT_I, COND   , 1, 0, 0, 0, 2, 0},
+    { "bdtz"   , 0x7 , 0x0 , FORMAT_I, COND   , 1, 0, 0, 0, 2, 0},
+    
+    { "j"      , 0x2 , 0x0 , FORMAT_J, UNCOND , 0, 0, 0, 0, 0, 1},
+    { "jal"    , 0x3 , 0x0 , FORMAT_J, UNCOND , 0, 0, 0, 0, 0, 1},
+    { "jr"     , 0x0 , 0x8 , FORMAT_R, UNCOND , 1, 0, 0, 0, 0, 0},
+    { "jalr"   , 0x0 , 0x9 , FORMAT_R, UNCOND , 1, 0, 0, 0, 0, 0},
+    
+    { "lb"     , 0x20, 0x0 , FORMAT_I, LOAD   , 3, 1, 0, 2, 0, 0},
+    { "lh"     , 0x21, 0x0 , FORMAT_I, LOAD   , 3, 1, 0, 2, 0, 0},
+    { "lw"     , 0x23, 0x0 , FORMAT_I, LOAD   , 3, 1, 0, 2, 0, 0},
+    { "lbu"    , 0x24, 0x0 , FORMAT_I, LOAD   , 3, 1, 0, 2, 0, 0},
+    { "lhu"    , 0x25, 0x0 , FORMAT_I, LOAD   , 3, 1, 0, 2, 0, 0},
+    
+    { "sb"     , 0x28, 0x0 , FORMAT_I, STORE  , 3, 1, 0, 2, 0, 0},
+    { "sh"     , 0x29, 0x0 , FORMAT_I, STORE  , 3, 1, 0, 2, 0, 0},
+    { "sw"     , 0x2B, 0x0 , FORMAT_I, STORE  , 3, 1, 0, 2, 0, 0},
+    
+    { "syscall", 0x0 , 0xC , FORMAT_R, SPECIAL, 0, 0, 0, 0, 0, 0},
+    { "break"  , 0x0 , 0xD , FORMAT_R, SPECIAL, 0, 0, 0, 0, 0, 0},
+    { "trap"   , 0x1A, 0x0 , FORMAT_J, SPECIAL, 0, 0, 0, 0, 0, 1},
+};
+
+
+const FuncInstr::registers FuncInstr::regTable [FuncInstr::REG_SIZE] =
+{
+	{"zero", ZERO},
+	{"at"  , AT  },
+	{"v0"  , V0  },
+	{"v1"  , V1  },
+	{"a0"  , A0  },
+	{"a1"  , A1  },
+	{"a2"  , A2  },
+	{"a3"  , A3  },
+	{"t0"  , T0  },
+	{"t1"  , T1  },
+	{"t2"  , T2  },
+	{"t3"  , T3  },
+	{"t4"  , T4  },
+	{"t5"  , T5  },
+	{"t6"  , T6  },
+	{"t7"  , T7  },
+	{"s0"  , S0  },
+	{"s1"  , S1  },
+	{"s2"  , S2  },
+	{"s3"  , S3  },
+	{"s4"  , S4  },
+	{"s5"  , S5  },
+	{"s6"  , S6  },
+	{"s7"  , S7  },
+	{"t8"  , T8  },
+	{"t9"  , T9  },
+	{"k0"  , K0  },
+	{"k1"  , K1  },
+	{"gp"  , GP  },
+	{"sp"  , SP  },
+	{"s8"  , S8  },
+	{"ra"  , RA  },
+};
+
+
+FuncInstr::FuncInstr (uint32 bytes)
+{
+	dumpPos = 1;
+	
+	this->initFormat(bytes);
+    switch (this->format)
+    {
+        case FORMAT_R:
+        {
+            this->parseR(bytes);
+            break;
+        }
+        case FORMAT_I:
+        {
+            this->parseI(bytes);
+            break;
+        }
+        case FORMAT_J:
+        {
+            this->parseJ(bytes);
+            break;
+        }
+        default:
+        {
+            Assert (0);
+        }
+    }
+}
+
+
+
+void FuncInstr::parseR (uint32 bytes)
+{
+	instr.raw = bytes;
+
+	/*std::cout << "type-R" << std::endl;
+	std::cout << "opcode : " << std::hex << (uint32)instr.asR.opcode << std::endl;
+	std::cout << "s      : " << std::hex << (uint32)instr.asR.s      << std::endl;
+	std::cout << "t      : " << std::hex << (uint32)instr.asR.t      << std::endl;
+	std::cout << "d      : " << std::hex << (uint32)instr.asR.d      << std::endl;
+	std::cout << "imm    : " << std::hex << (uint32)instr.asR.imm    << std::endl;
+	std::cout << "func   : " << std::hex << (uint32)instr.asR.func   << std::endl;
+	std::cout << std::endl;*/
+}
+
+
+void FuncInstr::parseI (uint32 bytes)
+{
+	instr.raw = bytes;
+
+	/*std::cout << "type-I" << std::endl;
+	std::cout << "opcode : " << instr.asI.opcode << std::endl;
+	std::cout << "s      : " << instr.asI.s      << std::endl;
+	std::cout << "t      : " << instr.asI.t      << std::endl;
+	std::cout << "imm    : " << instr.asI.imm    << std::endl;
+	std::cout << std::endl;*/
+}
+
+
+void FuncInstr::parseJ (uint32 bytes)
+{
+	instr.raw = bytes;
+
+	/*std::cout << "type-J" << std::endl;
+	std::cout << "opcode : " << instr.asR.opcode << std::endl;
+	std::cout << "imm    : " << instr.asR.imm    << std::endl;	
+	std::cout << std::endl;*/
+}
+
+
+int FuncInstr::findInstr (uint32 bytes) const
+{
+	uint32 opcode = bytes >> 26;
+	uint32 func   = bytes & (((uint32)1 << 6) - 1);
+
+	for (int pos = 0; pos < ISA_SIZE; pos++)
+	{
+		if (opcode != 0x0 && isaTable [pos].opcode != 0x0)
+		{
+			if (opcode == isaTable [pos].opcode) 
+			{
+				instrPos = pos;
+				return pos;
+			}
+		}
+		else if (opcode == 0x0 && isaTable [pos].opcode == 0x0)
+		{
+			if (func   == (int)isaTable [pos].func  ) 
+			{
+				instrPos = pos;
+				return pos;
+			}
+		}
+	}
+	std::cerr << "ERROR. Instr didn't find" << std::endl;
+	Assert (0);
+}
+
+
+int FuncInstr::initFormat (uint32 bytes)
+{
+	findInstr (bytes);
+
+	format = isaTable [instrPos].format;
+}
+
+
+int FuncInstr::nextOperandType () const
+{
+	dumpPos++;
+
+	if      (dumpPos - 1 == (uint32)isaTable [instrPos].s) return s_OP;
+	else if (dumpPos - 1 == (uint32)isaTable [instrPos].t) return t_OP;
+	else if (dumpPos - 1 == (uint32)isaTable [instrPos].d) return d_OP;
+	else if (dumpPos - 1 == (uint32)isaTable [instrPos].S) return S_OP;
+	else if (dumpPos - 1 == (uint32)isaTable [instrPos].C) return C_OP;
+	else if (dumpPos - 1 == (uint32)isaTable [instrPos].A) return A_OP;
+	else 											       return -1  ;
+}
+
+
+uint32 FuncInstr::nextOperand (int operandType) const
+{
+	
+	switch (operandType)
+	{
+		case s_OP :
+			return instr.asR.s;
+		case t_OP :
+			return instr.asR.t;
+		case d_OP :
+			return instr.asR.d;
+		case S_OP :
+		{
+			if (format == FORMAT_R)
+				return instr.asR.d;
+			else
+				return instr.asI.imm;
+		}
+		case C_OP :
+			return instr.asI.imm;
+		case A_OP :
+			return instr.asJ.imm;
+		default :
+			return -1;			
+	};
+}
+
+
+std::string FuncInstr::Dump (std::string indent) const
+{
+	dumpPos = 1;
+
+	std::ostringstream oss;
+	oss << indent << isaTable [instrPos].name;
+
+	if (format == FORMAT_R && isaTable [instrPos].type == SPECIAL)
+	{
+		oss << std::endl;
+		return oss.str ();
+	}	
+
+	int curr_op_type = -1;
+
+	do
+	{
+		int curr_op_type = nextOperandType ();
+
+		if (curr_op_type == -1) break;//std::terminate ();
+
+		if (curr_op_type == s_OP || curr_op_type == t_OP ||
+		    (curr_op_type == d_OP && format == FORMAT_R))
+			oss << " $" << regTable [nextOperand (curr_op_type)].name;
+
+		else
+			oss << " 0x" << std::hex << nextOperand (curr_op_type);
+
+		if (nextOperandType () != -1)
+			oss << ",";
+		
+		dumpPos--;
+
+	} while (true);
+
+	return oss.str ();
+}
+//==============================================================================
+
+std::ostream& operator<< ( std::ostream& out, const FuncInstr& instr)
+{
+     out << instr.Dump("");
+
+     return out;
+}
