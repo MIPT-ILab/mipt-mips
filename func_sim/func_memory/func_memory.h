@@ -13,6 +13,7 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 // uArchSim modules
 #include <types.h>
@@ -25,13 +26,13 @@ class FuncMemory
         uint64 startPC_addr;
     
         uint64 addr_bits;
-        uint64 set_bits;
         uint64 page_bits;
         uint64 offset_bits;
+        uint64 set_bits;
         
-        uint64 set_mask;
-        uint64 page_mask;
         uint64 offset_mask;        
+        uint64 page_mask;
+        uint64 set_mask;
         
         inline size_t get_set( uint64 addr) const
         {

@@ -1,8 +1,8 @@
 /**
  * func_memory.cpp - the module implementing the concept of
  * programer-visible memory space accesing via memory address.
- * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012 uArchSim iLab project
+ * @author Roman Zavodskikh <roman.zavodskikh@phystech.edu>
+ * Copyright 2015 uArchSim iLab project
  */
 
 // Generic C
@@ -14,6 +14,7 @@
 
 // uArchSim modules
 #include <func_memory.h>
+#include <elf_parser.h>
 
 union uint64_8
 {
@@ -161,6 +162,5 @@ string FuncMemory::dump( string indent) const
             }
         }
     }
-
     return oss.str();
 }
