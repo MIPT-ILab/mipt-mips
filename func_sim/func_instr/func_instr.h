@@ -1,4 +1,5 @@
 #include <func_memory.h>
+#include <string>
 using namespace std;
 class FuncInstr
 {
@@ -94,12 +95,12 @@ public:
             unsigned imm : 16;
             unsigned rt : 5;
             unsigned rs : 5;
-            unsigned op : 6
+            unsigned op : 6;
         }asI;
         struct
         {
             unsigned offset : 26;
-            unsigned op : 6
+            unsigned op : 6;
         }asJ;
         struct
         {
@@ -108,7 +109,7 @@ public:
             unsigned rd : 5;
             unsigned rt : 5;
             unsigned rs : 5;
-            unsigned op : 6
+            unsigned op : 6;
         }asR;
         uint32 raw;
 
@@ -125,11 +126,8 @@ public:
         FuncInstr::Type type;
     };
 
-    static const ISAEntry[] isaTable;
-    static const ISAEntry[] isaTable =
-        // name   opcode    func      format              type
-    { "add  ", 0x0,     0x20, FuncInstr::FORMAT_R, FuncInstr::ADD /*...*/ },
-        // more instructions ...
+    static const ISAEntry isaTable[];
+
 
 
 
