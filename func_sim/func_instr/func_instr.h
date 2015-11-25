@@ -1,5 +1,8 @@
 #include <func_memory.h>
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <fstream>
 using namespace std;
 class FuncInstr
 {
@@ -127,6 +130,7 @@ public:
     };
 
     const char* name;
+    ostringstream disassembled;
 
     static const ISAEntry isaTable[];
 

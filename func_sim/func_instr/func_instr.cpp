@@ -1,8 +1,6 @@
-#include <func_instr.h>
-#include <sstream>
-#include <iostream>
-#include <fstream>
+﻿#include <func_instr.h>
 #include <stdlib.h>
+
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
     // name       opcode  func    format               type
@@ -63,7 +61,10 @@ FuncInstr::FuncInstr(uint32 argument)
 {
     cout << "created\n" << argument;
     this->bytes.raw = argument;
+
+    //getting  format
     uint32 opcode = argument >> 26;
+    cout << "opcode" << opcode;
     if (opcode == 0)
     {
         this->format = FORMAT_R;
@@ -76,12 +77,37 @@ FuncInstr::FuncInstr(uint32 argument)
     {
         this->format = FORMAT_I;
     }
-
     cout << "format:" << this->format;
-    ParseR(bytes.raw);
+    switch (this->format)
+    {
+    case FORMAT_I: 
+        this->ParseI(bytes.raw);
+        break;
+    case FORMAT_J:
+        this->ParseJ(bytes.raw);
+        break;
+    case FORMAT_R:
+        this->ParseR(bytes.raw);
+        break;
+    default:
+        cout << "WRONG FORMAT";
+        abort();
+        break;
+    }
+    
+    //creating disassembled string
+    this->disassembled << "NAME:" << this->name;
 
+    switch (this->format)
+    {
+    case FORMAT_J:
+        this->disassembled << " :" << hex << this->bytes.asJ.offset << "\n";
+        break;
+    case FORMAT_R:
 
-    //getting  format
+    }
+
+    cout << this->disassembled.str();
 
 }
 FuncInstr::~FuncInstr()
@@ -92,11 +118,13 @@ FuncInstr::~FuncInstr()
 void FuncInstr::ParseI(uint32 bytes)
 {
     cout << "parseI\n";
+    cout << "op" << this->bytes.asI.op;
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
         cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asI.op == isaTable[i].opcode
-            && isaTable[i].format == FORMAT_I)
+            && isaTable[i].format == FORMAT_I
+            && this->format == FORMAT_I)
         {
             cout << "applying" << isaTable[i].name;
             this->type = isaTable[i].type;
@@ -116,7 +144,8 @@ void FuncInstr::ParseJ(uint32 bytes)
     {
         cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asJ.op == isaTable[i].opcode
-            && isaTable[i].format == FORMAT_J)
+            && isaTable[i].format == FORMAT_J
+            && this->format == FORMAT_J)
         {
             cout << "applying" << isaTable[i].name;
             this->type = isaTable[i].type;
@@ -132,11 +161,13 @@ void FuncInstr::ParseJ(uint32 bytes)
 void FuncInstr::ParseR(uint32 bytes)
 {
     cout << "parseR\n";
+    cout << "func" << this->bytes.asR.funct;
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
         cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asR.funct == isaTable[i].func
-            && isaTable[i].format == FORMAT_R)
+            && isaTable[i].format == FORMAT_R 
+            && this->format == FORMAT_R)
         {
             cout << "applying" << isaTable[i].name;
             this->type = isaTable[i].type;
@@ -153,6 +184,7 @@ void FuncInstr::ParseR(uint32 bytes)
 
 int main()
 {
-    FuncInstr lol(0x00010203);
+    FuncInstr lol(536870928);
+  //  FuncInstr lol(‭536870912‬);
     //cout << "blabla";
 }
