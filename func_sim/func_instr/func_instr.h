@@ -126,6 +126,8 @@ public:
         FuncInstr::Type type;
     };
 
+    const char* name;
+
     static const ISAEntry isaTable[];
 
 

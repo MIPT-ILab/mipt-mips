@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-
+#include <stdlib.h>
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
     // name       opcode  func    format               type
@@ -86,7 +86,47 @@ FuncInstr::FuncInstr(uint32 argument)
 }
 FuncInstr::~FuncInstr()
 {
-    cout << "died\n";
+    cout << this->name << "died\n";
+}
+
+void FuncInstr::ParseI(uint32 bytes)
+{
+    cout << "parseI\n";
+    for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
+    {
+        cout << isaTable[i].name << "<-tried this\n";
+        if (this->bytes.asI.op == isaTable[i].opcode
+            && isaTable[i].format == FORMAT_I)
+        {
+            cout << "applying" << isaTable[i].name;
+            this->type = isaTable[i].type;
+            this->name = isaTable[i].name;
+            return;
+        }
+
+    }
+    cout << "NO SUCH I COMMAND";
+    abort();
+}
+
+void FuncInstr::ParseJ(uint32 bytes)
+{
+    cout << "parseJ\n";
+    for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
+    {
+        cout << isaTable[i].name << "<-tried this\n";
+        if (this->bytes.asJ.op == isaTable[i].opcode
+            && isaTable[i].format == FORMAT_J)
+        {
+            cout << "applying" << isaTable[i].name;
+            this->type = isaTable[i].type;
+            this->name = isaTable[i].name;
+            return;
+        }
+
+    }
+    cout << "NO SUCH J COMMAND";
+    abort();
 }
 
 void FuncInstr::ParseR(uint32 bytes)
@@ -95,14 +135,24 @@ void FuncInstr::ParseR(uint32 bytes)
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
         cout << isaTable[i].name << "<-tried this\n";
-
+        if (this->bytes.asR.funct == isaTable[i].func
+            && isaTable[i].format == FORMAT_R)
+        {
+            cout << "applying" << isaTable[i].name;
+            this->type = isaTable[i].type;
+            this->name = isaTable[i].name;
+            return;
+        }
 
     }
-
+    cout << "NO SUCH R COMMAND";
+    abort();
 }
+
+
 
 int main()
 {
-    FuncInstr lol(123);
+    FuncInstr lol(0x00010203);
     //cout << "blabla";
 }
