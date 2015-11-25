@@ -103,7 +103,64 @@ FuncInstr::FuncInstr(uint32 argument)
     case FORMAT_J:
         this->disassembled << " :" << hex << this->bytes.asJ.offset << "\n";
         break;
+
+    case FORMAT_I:
+        if (TwoRegsOneOffset(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asI.rt) << ", "
+                         << RegAndOffsetToStr(this->bytes.asI.rs, this->bytes.asI.imm);
+        }
+        else if (TwoRegsOneImm(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asI.rt) << ", "
+                         << RegToStr(this->bytes.asI.rs) << ", "
+                         << "0x" << hex << this->bytes.asI.imm << dec;
+        }
+        else if (OneRegOneImm(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rt) << ", "
+                         << "0x" << hex << this->bytes.asR.rs << dec;
+        }
+        else
+        {
+            cout << "Can't disassembly!";
+            abort();
+        }
+        break;
+
     case FORMAT_R:
+        if (ThreeRegs(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rd) << ", "
+                         << RegToStr(this->bytes.asR.rs) << ", "
+                         << RegToStr(this->bytes.asR.rt);
+        }
+        else if (TwoRegs(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rd) << ", "
+                         << RegToStr(this->bytes.asR.rs);
+        }
+        else if (TwoRegsOneImm(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rd) << ", "
+                         << RegToStr(this->bytes.asR.rs) << ", "
+                         << "0x" << hex << this->bytes.asR.rt << dec;
+        }
+        else if (OneReg(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rt);
+        }
+        else if (OneRegOneImm(this->type))
+        {
+            disassembled << RegToStr(this->bytes.asR.rt) << ", "
+                         << "0x" << hex << this->bytes.asR.rs << dec;
+        }
+        else
+        {
+            cout << "Can't disassembly!";
+            abort();
+        }
+        break;
 
     }
 
@@ -180,11 +237,94 @@ void FuncInstr::ParseR(uint32 bytes)
     abort();
 }
 
+bool FuncInstr::ThreeRegs(Type type)
+{
+    return (type == ADD || type == ADDU || type == SUB || type == SUBU
+        || type == SLLV || type == SRLV || type == SRAV|| type == SLT
+        || type == SLTU || type == AND  || type == OR  || type == XOR 
+        || type == NOR);
+}
+
+bool FuncInstr::TwoRegsOneOffset(Type type)
+{
+    return (type == LB || type == LH || type == LW || type == LBU 
+        || type == LHU || type == SB || type == SH || type == SW);
+}
+
+bool FuncInstr::TwoRegsOneImm(Type type) 
+{
+    return (type == ADDI || type == ADDIU || type == SLL  || type == SRL
+        || type == SRA   || type == SLTI  || type == SLTIU|| type == ANDI 
+        || type == ORI   || type == XORI  || type == BEQ  || type == BNE);
+}
+
+bool FuncInstr::TwoRegs(Type type)
+{
+    return (type == MULT || type == MULTU || type == DIV || type == DIVU);
+}
+
+bool FuncInstr::OneReg(Type type)
+{
+    return (type == MFHI || type == MTHI || type == MFLO || type == MTLO
+        || type == JR    || type == JALR);
+}
+
+bool FuncInstr::OneRegOneImm(Type type)
+{
+    return (type == LUI || type == BLEZ || type == BGTZ);
+}
+
+string FuncInstr::RegToStr(unsigned char reg)
+{
+    switch (reg)
+    {
+    case ZERO: return "$zero"; break;
+    case AT: return "$at"; break;
+    case V0: return "$v0"; break;
+    case V1: return "$v1"; break;
+    case A0: return "$a0"; break;
+    case A1: return "$a1"; break;
+    case A2: return "$a2"; break;
+    case A3: return "$a3"; break;
+    case T0: return "$t0"; break;
+    case T1: return "$t1"; break;
+    case T2: return "$t2"; break;
+    case T3: return "$t3"; break;
+    case T4: return "$t4"; break;
+    case T5: return "$t5"; break;
+    case T6: return "$t6"; break;
+    case T7: return "$t7"; break;
+    case S0: return "$s0"; break;
+    case S1: return "$s1"; break;
+    case S2: return "$s2"; break;
+    case S3: return "$s3"; break;
+    case S4: return "$s4"; break;
+    case S5: return "$s5"; break;
+    case S6: return "$s6"; break;
+    case S7: return "$s7"; break;
+    case T8: return "$t8"; break;
+    case T9: return "$t9"; break;
+    case K0: return "$k0"; break;
+    case K1: return "$k1"; break;
+    case GP: return "$gp"; break;
+    case SP: return "$sp"; break;
+    case S8: return "$s8"; break;
+    case RA: return "$ra"; break;
+    default: abort(); break;
+    }
+}
+
+string FuncInstr::RegAndOffsetToStr(unsigned char reg, uint32 offset)
+{
+    ostringstream temp;
+    temp << "0x" << hex << offset  << dec 
+         << "(" << RegToStr(reg) << ")";
+}
 
 
 int main()
 {
-    FuncInstr lol(536870928);
+    FuncInstr lol(00010203);
   //  FuncInstr lol(‭536870912‬);
     //cout << "blabla";
 }

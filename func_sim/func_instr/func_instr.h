@@ -129,13 +129,20 @@ public:
         FuncInstr::Type type;
     };
 
-    const char* name;
+    string name;
     ostringstream disassembled;
 
     static const ISAEntry isaTable[];
 
+    string RegToStr(unsigned char reg);
+    string RegAndOffsetToStr(unsigned char reg, uint32 offset);
 
-
+    bool TwoRegsOneOffset(Type type);
+    bool TwoRegsOneImm(Type type);
+    bool ThreeRegs(Type type);
+    bool TwoRegs(Type type);
+    bool OneReg(Type type);
+    bool OneRegOneImm(Type type);
 
     void ParseI(uint32 bytes);
     void ParseJ(uint32 bytes);
