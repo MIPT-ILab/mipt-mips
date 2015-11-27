@@ -9,7 +9,6 @@ class FuncInstr
 public:
     FuncInstr(uint32 bytes);
     ~FuncInstr();
-    string Dump(std::string indent = " ") const;
 
     enum Type
     {
@@ -131,6 +130,7 @@ public:
 
     string name;
     ostringstream disassembled;
+    string Dump(std::string indent = " ") const;
 
     static const ISAEntry isaTable[];
 

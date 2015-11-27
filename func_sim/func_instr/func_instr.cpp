@@ -57,19 +57,25 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "trap ",    0x0,    0x1A,   FuncInstr::FORMAT_J, FuncInstr::TRAP }
 };
 
+ostream& operator<< (ostream& out, const FuncInstr& instr)
+{
+    out << instr.Dump("");
+    return out;
+}
+
 FuncInstr::FuncInstr(uint32 argument)
 {
-    cout << "created\n" << argument;
+
     this->bytes.raw = argument;
 
     //getting  format
     uint32 opcode = argument >> 26;
-    cout << "opcode" << opcode;
+
     if (opcode == 0)
     {
         this->format = FORMAT_R;
     }
-    else if (opcode == 2 || opcode == 3 || opcode == 0x1A)
+    else if (opcode == 2 || opcode == 3 || opcode == 26) //26 = 0x1A
     {
         this->format = FORMAT_J;
     }
@@ -77,7 +83,6 @@ FuncInstr::FuncInstr(uint32 argument)
     {
         this->format = FORMAT_I;
     }
-    cout << "format:" << this->format;
     switch (this->format)
     {
     case FORMAT_I: 
@@ -90,18 +95,18 @@ FuncInstr::FuncInstr(uint32 argument)
         this->ParseR(bytes.raw);
         break;
     default:
-        cout << "WRONG FORMAT";
-        abort();
+        cerr << "ERROR.WRONG FORMAT";
+        exit(EXIT_FAILURE);
         break;
     }
     
     //creating disassembled string
-    this->disassembled << "NAME:" << this->name;
+    this->disassembled << this->name;
 
     switch (this->format)
     {
     case FORMAT_J:
-        this->disassembled << " :" << hex << this->bytes.asJ.offset << "\n";
+        this->disassembled << "0x" << hex << this->bytes.asJ.offset;
         break;
 
     case FORMAT_I:
@@ -123,8 +128,8 @@ FuncInstr::FuncInstr(uint32 argument)
         }
         else
         {
-            cout << "Can't disassembly!";
-            abort();
+            cerr << "ERROR.Can't disassembly!";
+            exit(EXIT_FAILURE);
         }
         break;
 
@@ -157,49 +162,43 @@ FuncInstr::FuncInstr(uint32 argument)
         }
         else
         {
-            cout << "Can't disassembly!";
-            abort();
+            cerr << "ERROR.Can't disassembly!";
+            exit(EXIT_FAILURE);
         }
         break;
 
     }
 
-    cout << this->disassembled.str();
+
 
 }
 FuncInstr::~FuncInstr()
 {
-    cout << this->name << "died\n";
+
 }
 
 void FuncInstr::ParseI(uint32 bytes)
 {
-    cout << "parseI\n";
-    cout << "op" << this->bytes.asI.op;
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
-        cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asI.op == isaTable[i].opcode
             && isaTable[i].format == FORMAT_I
             && this->format == FORMAT_I)
         {
-            cout << "applying" << isaTable[i].name;
             this->type = isaTable[i].type;
             this->name = isaTable[i].name;
             return;
         }
 
     }
-    cout << "NO SUCH I COMMAND";
-    abort();
+    cerr << "ERROR.NO SUCH I COMMAND";
+    exit(EXIT_FAILURE);
 }
 
 void FuncInstr::ParseJ(uint32 bytes)
 {
-    cout << "parseJ\n";
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
-        cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asJ.op == isaTable[i].opcode
             && isaTable[i].format == FORMAT_J
             && this->format == FORMAT_J)
@@ -211,30 +210,26 @@ void FuncInstr::ParseJ(uint32 bytes)
         }
 
     }
-    cout << "NO SUCH J COMMAND";
-    abort();
+    cerr << "ERROR.NO SUCH J COMMAND";
+    exit(EXIT_FAILURE);
 }
 
 void FuncInstr::ParseR(uint32 bytes)
 {
-    cout << "parseR\n";
-    cout << "func" << this->bytes.asR.funct;
     for (int i = 0; i < sizeof(isaTable) / sizeof(isaTable[0]); i++)
     {
-        cout << isaTable[i].name << "<-tried this\n";
         if (this->bytes.asR.funct == isaTable[i].func
             && isaTable[i].format == FORMAT_R 
             && this->format == FORMAT_R)
         {
-            cout << "applying" << isaTable[i].name;
             this->type = isaTable[i].type;
             this->name = isaTable[i].name;
             return;
         }
 
     }
-    cout << "NO SUCH R COMMAND";
-    abort();
+    cerr << "ERROR.NO SUCH R COMMAND";
+    exit(EXIT_FAILURE);
 }
 
 bool FuncInstr::ThreeRegs(Type type)
@@ -310,7 +305,8 @@ string FuncInstr::RegToStr(unsigned char reg)
     case SP: return "$sp"; break;
     case S8: return "$s8"; break;
     case RA: return "$ra"; break;
-    default: abort(); break;
+    default: cerr << "ERROR NO SUCH REGISTER";
+             exit(EXIT_FAILURE); break;
     }
 }
 
@@ -321,10 +317,18 @@ string FuncInstr::RegAndOffsetToStr(unsigned char reg, uint32 offset)
          << "(" << RegToStr(reg) << ")";
 }
 
-
-int main()
+string FuncInstr::Dump(string indent) const
 {
-    FuncInstr lol(00010203);
+    ostringstream temp;
+    temp << indent << disassembled.str();
+    return temp.str();
+}
+
+
+/*int main()
+{
+    FuncInstr lol(0x216AFFFFull);
   //  FuncInstr lol(‭536870912‬);
     //cout << "blabla";
 }
+*/
