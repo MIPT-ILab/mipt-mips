@@ -1,3 +1,6 @@
+| This repository has been moved from GoogleCode and it is no longer supported. Please proceed to [the new repository](https://github.com/MIPT-ILab/mipt-mips-2015) |
+|:-------------------------------------------------------------------------------------------------------|
+
 ### Functional and performance simulators for MIPS-based microprocessor ###
 
 This project is a part of [Intel lab's](http://ilab.fizteh.ru) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/about/aboutmipt.html) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
