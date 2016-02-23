@@ -35,9 +35,23 @@ int main( int argc, char* argv[])
         std::exit(EXIT_FAILURE);
     }
 
+    bool skip_mode = false;
     size_t j = 0;
     do
     {
+        uint32 content = ((uint32*) section[i].content)[j];
+        if (content == 0x0) {
+            ++j;
+            if (!skip_mode){
+                std::cout << "        ..." << std::endl;
+                skip_mode = true;
+            }
+            continue;
+        }
+        else {
+            skip_mode = false;
+        }
+
         FuncInstr instr((( uint32*) section[i].content)[j]);
         std::cout << std::hex << std::setfill( '0')
                   << "0x" << std::setw( 8)
