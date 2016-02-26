@@ -19,40 +19,50 @@ class RF
         Reg() : value( 0ull), is_valid( true) {}
     } array[REG_NUM_MAX];
 public:
-    uint32 read( Reg_Num);
-    bool check( Reg_Num num) const { return array[( size_t)num].is_valid; }
-    void invalidate( Reg_Num num)
+    uint32 read( RegNum num) const
     {
+        assert( num != REG_NUM_MAX);
+        return array[num].value;
+    }
+    bool check( RegNum num) const
+    {
+        assert( num != REG_NUM_MAX);
+        return array[num].is_valid;
+    }
+    void invalidate( RegNum num)
+    {
+        assert( num != REG_NUM_MAX);
         if ( num == REG_NUM_ZERO)
             return;
-        array[( size_t) num].is_valid = false;
+        array[num].is_valid = false;
     }
-    void write( Reg_Num num, uint32 val)
+    void write( RegNum num, uint32 val)
     {
+        assert( num != REG_NUM_MAX);
         if ( REG_NUM_ZERO == num)
             return;
-        array[( size_t)num].value = val;
+        array[num].value = val;
         assert( check( num) == false);
-        array[( size_t) num].is_valid = true;
+        array[num].is_valid = true;
     }
-    
-    
+
+
     inline void read_src1( FuncInstr& instr) const
     {
-        size_t reg_num = instr.get_src1_num();
+        RegNum reg_num = instr.get_src1_num();
         instr.set_v_src1( read( reg_num));
     }
-    
+
     inline void read_src2( FuncInstr& instr) const
     {
-        size_t reg_num = instr.get_src2_num();
+        RegNum reg_num = instr.get_src2_num();
         instr.set_v_src2( read( reg_num));
     }
-    
+
     inline void write_dst( const FuncInstr& instr)
     {
-        size_t reg_num = instr.get_dst_num();
-        write( reg num, instr.get_v_dst());
+        RegNum reg_num = instr.get_dst_num();
+        write( reg_num, instr.get_v_dst());
     }
 
     inline void reset( RegNum reg)
@@ -60,13 +70,12 @@ public:
         array[ reg].value = 0;
         array[ reg].is_valid = true;
     }
- 
+
     /* RF()
     {
         for ( size_t i = 0; i < REG_NUM_MAX; ++i)
             reset((RegNum)i);
     } */
 };
-          
+
 #endif
- 

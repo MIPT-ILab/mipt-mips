@@ -8,52 +8,62 @@
 #include <iostream>
 #include <perf_sim.h>
 #include <ports.h>
+#include <string.h>
 
 #define PORT_BW 1
 #define PORT_FANOUT 1
 #define PORT_LATENCY 1
 
-PerfMIPS::PerfMIPS() : is_PC_valid( true), executes_instrs( 0)
+PerfMIPS::PerfMIPS() : is_PC_valid( true), executed_instrs( 0)
 {
     dec_mod = new DecodeModule( this);
-    fetch_mod = new fetch_mod( this);
-    exec_mod = new exec_mod( this);
-    mem_mod = new mem_mod( this);
-    wb_mod = new wb_mod( this);
+    fetch_mod = new FetchModule( this);
+    exec_mod = new ExecuteModule( this);
+    mem_mod = new MemoryModule( this);
+    wb_mod = new WritebackModule( this);
 };
 
 
 FetchModule::FetchModule( PerfMIPS* machine) :
-Module( machine, "DEC_2_FETCH_STALL", NULL)
+Module( machine, "DEC_2_FETCH_STALL", NULL), cur_instr( 0)
 {
-    wp_fetch_2_dec = new WritePort<uint32>( "FETCH_2_DEC", PORT_LATENCY);
+    wp_fetch_2_dec = new WritePort<uint32>( string( "FETCH_2_DEC"),
+                                            PORT_BW, PORT_FANOUT );
+
 }
 
 DecodeModule::DecodeModule( PerfMIPS* machine) :
-Module( machine, "EXEC_2_DEC_STALL", "DEC_2_FETCH_STALL")
+Module( machine, "EXEC_2_DEC_STALL", "DEC_2_FETCH_STALL"), cur_instr( 0)
 {
-    rp_fetch_2_dec = new ReadPort<uint32>( "FETCH_2_DEC", PORT_BW, PORT_FANOUT);
-    wp_dec_2_exec = new WritePort<FuncInstr>( "DEC_2_EXEC", PORT_LATENCY);
+    rp_fetch_2_dec = new ReadPort<uint32>( string( "FETCH_2_DEC"),
+                                           PORT_LATENCY );
+    wp_dec_2_exec = new WritePort<FuncInstr>( string( "DEC_2_EXEC"),
+                                              PORT_BW, PORT_FANOUT );
 }
 
 ExecuteModule::ExecuteModule( PerfMIPS* machine) :
-Module( machine, "MEM_2_EXEC_STALL", "EXEC_2_DEC_STALL")
+Module( machine, "MEM_2_EXEC_STALL", "EXEC_2_DEC_STALL"), cur_instr( 0)
 {
-    rp_dec_2_exec = new ReadPort<FuncInstr>( "DEC_2_EXEC", PORT_BW, PORT_FANOUT);
-    wp_exec_2_mem = new WritePort<FuncInstr>( "EXEC_2_MEM", PORT_LATENCY);
+    rp_dec_2_exec = new ReadPort<FuncInstr>( string( "DEC_2_EXEC"),
+                                             PORT_LATENCY );
+    wp_exec_2_mem = new WritePort<FuncInstr>( string( "EXEC_2_MEM"),
+                                              PORT_BW, PORT_FANOUT );
 }
 
 MemoryModule::MemoryModule( PerfMIPS* machine) :
-Module( machine, "WB_2_MEM_STALL", "MEM_2_EXEC_STALL")
+Module( machine, "WB_2_MEM_STALL", "MEM_2_EXEC_STALL"), cur_instr( 0)
 {
-    rp_exec_2_mem = new ReadPort<FuncInstr>( "EXEC_2_MEM", PORT_BW, PORT_FANOUT);
-    wp_mem_2_wb = new WritePort<FuncInstr>( "MEM_2_WB", PORT_LATENCY);
+    rp_exec_2_mem = new ReadPort<FuncInstr>( string( "EXEC_2_MEM"),
+                                             PORT_LATENCY );
+    wp_mem_2_wb = new WritePort<FuncInstr>( string( "MEM_2_WB"),
+                                            PORT_BW, PORT_FANOUT );
 }
 
 WritebackModule::WritebackModule( PerfMIPS* machine) :
-Module( machine, NULL, "WB_2_MEM_STALL")
+Module( machine, NULL, "WB_2_MEM_STALL"), cur_instr( 0)
 {
-    rp_mem_2_wb = new ReadPort<FuncInstr>( "MEM_2_WB", PORT_BW, PORT_FANOUT);
+    rp_mem_2_wb = new ReadPort<FuncInstr>( string( "MEM_2_WB"),
+                                           PORT_LATENCY );
 }
 
 PerfMIPS::~PerfMIPS()
@@ -98,7 +108,7 @@ void FetchModule::clock( int cycle)
     if ( check_stall( cycle))
         return;
     cur_instr = machine->fetch();
-    
+
     wp_fetch_2_dec->write( cur_instr, cycle);
 }
 
@@ -109,15 +119,15 @@ void DecodeModule::clock( int cycle)
         send_stall( cycle);
         return;
     }
-    
+
     uint32 instr_bytes = 0;
-    if ( rp_fetch_2_dec->read( &instr_bytes, cycle) && machine->is_PC_valid())
-        cur_instr = FuncInstr( instr_bytes, PC);
+    if ( rp_fetch_2_dec->read( &instr_bytes, cycle) && machine->check_PC())
+        cur_instr = FuncInstr( instr_bytes, machine->PC);
 
     if ( cur_instr.is_jump())
         machine->invalidate_PC();
-    
-    if( check_regs( instr.get_src1_num(), instr.get_src2_num()))
+
+    if( check_regs( cur_instr.get_src1_num(), cur_instr.get_src2_num()))
     {
         machine->read_src( cur_instr);
         machine->rf->invalidate( cur_instr.get_dst_num());
@@ -129,10 +139,10 @@ void DecodeModule::clock( int cycle)
     }
 }
 
-bool DecodeModule::check_regs( RegNum reg1, RegNum reg2)
+inline bool DecodeModule::check_regs( RegNum reg1, RegNum reg2)
 {
-    return machine->rf->is_valid( reg1) &&
-           machine->rf->is_valid( reg2) ;
+    return machine->rf->check( reg1) &&
+           machine->rf->check( reg2) ;
 }
 
 void ExecuteModule::clock( int cycle)
@@ -142,12 +152,12 @@ void ExecuteModule::clock( int cycle)
         send_stall( cycle);
         return;
     }
-    
+
     if ( !rp_dec_2_exec->read( &cur_instr, cycle))
         return;
-    
+
     cur_instr.execute();
-    
+
     wp_exec_2_mem->write( cur_instr, cycle);
 }
 
@@ -161,18 +171,17 @@ void MemoryModule::clock( int cycle)
 
     if ( !rp_exec_2_mem->read( &cur_instr, cycle))
         return;
-    
+
     machine->load_store( cur_instr);
-    
-    wp_mem_2_wb->write( instr, cycle);
+
+    wp_mem_2_wb->write( cur_instr, cycle);
 }
 
 void WritebackModule::clock( int cycle)
 {
-    if ( !rp_mem_2_wb->write( &cur_instr, cycle))
+    if ( !rp_mem_2_wb->read( &cur_instr, cycle))
         return;
-    
-    machine->wb( instr);
+    machine->wb( cur_instr);
     machine->PC = cur_instr.get_new_PC();
     machine->validate_PC();
     machine->executed_instrs++;
@@ -182,14 +191,16 @@ Module::Module( PerfMIPS* machine, const char* next_2_me_str,
                 const char* me_2_prev_str) : machine( machine)
 {
     assert( machine);
-    if ( next_2_me)
-        next_2_me_stall = new ReadPort<bool>( next_2_me_str, PORT_LATENCY);
+    if ( next_2_me_str)
+        next_2_me_stall = new ReadPort<bool>( string( next_2_me_str),
+                                              PORT_LATENCY );
     else
         next_2_me_stall = NULL;
-    if ( me_2_prev)
-        me_2_prev_stall = new WritePort<bool>( me_2_prev_str, PORT_BW, PORT_FANOUT);
+    if ( me_2_prev_str)
+        me_2_prev_stall = new WritePort<bool>( string( me_2_prev_str),
+                                               PORT_BW, PORT_FANOUT );
     else
-        prev_2_me_stall = NULL;
+        me_2_prev_stall = NULL;
 }
 
 bool Module::check_stall( int cycle)
@@ -202,16 +213,16 @@ bool Module::check_stall( int cycle)
 
 void Module::send_stall( int cycle)
 {
-    assert( prev_2_me_stall);
+    assert( me_2_prev_stall);
     me_2_prev_stall->write( true, cycle);
 }
 
-Module::~Module
+Module::~Module()
 {
     if ( next_2_me_stall)
         delete next_2_me_stall;
     if ( me_2_prev_stall)
-        delete me_2_prev-stall;
+        delete me_2_prev_stall;
 }
 
 MIPS::MIPS()
@@ -227,7 +238,7 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run)
     {
         // fetch
         uint32 instr_bytes = fetch();
-   
+
         // decode
         FuncInstr instr( instr_bytes, PC);
 
@@ -242,10 +253,10 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run)
 
         // writeback
         wb( instr);
-        
+
         // PC update
         PC = instr.get_new_PC();
-        
+
         // dump
         std::cout << instr << std::endl;
     }

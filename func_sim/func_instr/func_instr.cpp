@@ -24,7 +24,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "addiu",  0x9,   FORMAT_I, OUT_I_ARITHM,  0, &FuncInstr::execute_addiu},
 
     // name    funct    format    operation   memsize           pointer
-    { "mult",   0x18,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_mult}, 
+    { "mult",   0x18,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_mult},
     { "multu",  0x19,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_multu},
 
     // name    funct    format    operation   memsize           pointer
@@ -36,7 +36,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "mflo",   0x12,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_mflo},
     { "mthi",   0x11,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_mthi},
     { "mtlo",   0x13,  FORMAT_R, OUT_R_ARITHM,	0, &FuncInstr::execute_mtlo},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "sll",    0x0,   FORMAT_R, OUT_R_SHAMT,   0, &FuncInstr::execute_sll},
     { "srl",    0x2,   FORMAT_R, OUT_R_SHAMT,   0, &FuncInstr::execute_srl},
@@ -55,12 +55,12 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "or",     0x25,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_or},
     { "xor",    0x26,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_xor},
     { "nor",    0x27,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_nor},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "andi",   0xC,   FORMAT_I, OUT_I_ARITHM,  0, &FuncInstr::execute_andi},
     { "ori",    0xD,   FORMAT_I, OUT_I_ARITHM,  0, &FuncInstr::execute_ori},
     { "xori",   0xE,   FORMAT_I, OUT_I_ARITHM,  0, &FuncInstr::execute_xori},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "beq",    0x4,   FORMAT_I, OUT_I_BRANCH,  0, &FuncInstr::execute_beq},
     { "bne",    0x5,   FORMAT_I, OUT_I_BRANCH,  0, &FuncInstr::execute_bne},
@@ -70,27 +70,27 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "j",      0x2,   FORMAT_J, OUT_J_JUMP,    0, &FuncInstr::execute_j},
     { "jr",     0x8,   FORMAT_R, OUT_R_JUMP,    0, &FuncInstr::execute_jr},
     { "jalr",   0x9,   FORMAT_R, OUT_R_JUMP,    0, &FuncInstr::execute_jalr},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "lb",     0x20,  FORMAT_I, OUT_I_LOAD,    1, &FuncInstr::calculate_load_addr},
     { "lbu",    0x24,  FORMAT_I, OUT_I_LOADU,   1, &FuncInstr::calculate_load_addr},
     { "lh",     0x21,  FORMAT_I, OUT_I_LOAD,    2, &FuncInstr::calculate_load_addr},
     { "lhu",    0x25,  FORMAT_I, OUT_I_LOADU,   2, &FuncInstr::calculate_load_addr},
     { "lw",     0x23,  FORMAT_I, OUT_I_LOAD,    4, &FuncInstr::calculate_load_addr},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "sb",     0x28,  FORMAT_I, OUT_I_STORE,   1, &FuncInstr::calculate_store_addr},
     { "sh",     0x29,  FORMAT_I, OUT_I_STORE,   2, &FuncInstr::calculate_store_addr},
     { "sw",     0x2B,  FORMAT_I, OUT_I_STORE,   4, &FuncInstr::calculate_store_addr},
-    
+
     // name    funct    format    operation   memsize           pointer
     { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break},
     { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall},
     { "trap",   0x1A,  FORMAT_J, OUT_J_SPECIAL, 0, &FuncInstr::execute_trap},
-};                                              
+};
 const uint32 FuncInstr::isaTableSize = sizeof(isaTable) / sizeof(isaTable[0]);
 
-const char *FuncInstr::regTable[REG_NUM_MAX] = 
+const char *FuncInstr::regTable[REG_NUM_MAX] =
 {
     "zero",
     "at",
@@ -98,7 +98,7 @@ const char *FuncInstr::regTable[REG_NUM_MAX] =
     "a0", "a1", "a2", "a3",
     "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
     "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
-    "t8", "t9", 
+    "t8", "t9",
     "k0", "k1",
     "gp",
     "sp",
@@ -114,7 +114,7 @@ FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
 {
     src1 = src2 = dst = REG_NUM_ZERO;
     complete = false;
-    initFormat(); 
+    initFormat();
     switch ( format)
     {
         case FORMAT_R:
@@ -137,13 +137,13 @@ std::string FuncInstr::Dump( std::string indent) const
 {
     ostringstream oss;
     oss << indent << disasm;
-    
+
     if ( dst != REG_NUM_ZERO && complete)
     {
-        oss << "\t [ $" << regTableName(dst) 
+        oss << "\t [ $" << regTableName(dst)
             << " = 0x" << std::hex << v_dst << "]" << std::dec;
     }
- 
+
     return oss.str();
 }
 
@@ -181,7 +181,7 @@ void FuncInstr::initR()
             src1 = (RegNum)instr.asR.rs;
             dst  = (RegNum)instr.asR.rd;
 
-            oss <<  " $" << regTableName(dst) 
+            oss <<  " $" << regTableName(dst)
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
@@ -221,7 +221,7 @@ void FuncInstr::initI()
             oss << regTable[dst] << ", $"
                 << regTable[src1] << ", "
                 << std::hex << "0x" << v_imm << std::dec;
-            
+
             break;
         case OUT_I_BRANCH:
             src1 = (RegNum)instr.asI.rs;
@@ -235,7 +235,7 @@ void FuncInstr::initI()
         case OUT_I_CONST:
             dst  = (RegNum)instr.asI.rt;
 
-            oss << regTable[dst] << std::hex 
+            oss << regTable[dst] << std::hex
                 << ", 0x" << v_imm << std::dec;
             break;
 
@@ -243,16 +243,16 @@ void FuncInstr::initI()
         case OUT_I_LOADU:
             src1 = (RegNum)instr.asI.rs;
             dst  = (RegNum)instr.asI.rt;
-            
+
             oss << regTable[dst] << ", 0x"
                 << std::hex << v_imm
                 << "($" << regTable[src1] << ")" << std::dec;
             break;
-        
+
         case OUT_I_STORE:
             src2 = (RegNum)instr.asI.rt;
             dst  = (RegNum)instr.asI.rs;
-            
+
             oss << regTable[dst] << ", 0x"
                 << std::hex << v_imm
                 << "($" << regTable[src2] << ")" << std::dec;
@@ -286,4 +286,3 @@ std::ostream& operator<< ( std::ostream& out, const FuncInstr& instr)
 {
     return out << instr.Dump( "");
 }
-
