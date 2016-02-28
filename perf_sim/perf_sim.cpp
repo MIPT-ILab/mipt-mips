@@ -9,23 +9,30 @@
 #include <perf_sim.h>
 #include <ports.h>
 #include <string.h>
+#include <sstream>
+#include <iomanip>
+
 
 #define PORT_BW 1
 #define PORT_FANOUT 1
 #define PORT_LATENCY 1
+#define INSTR_SIZE 4
 
-PerfMIPS::PerfMIPS() : is_PC_valid( true), executed_instrs( 0)
+PerfMIPS::PerfMIPS() : is_PC_valid( true), executed_instrs( 0), cycle( 0)
 {
-    dec_mod = new DecodeModule( this);
     fetch_mod = new FetchModule( this);
+    dec_mod = new DecodeModule( this);
     exec_mod = new ExecuteModule( this);
     mem_mod = new MemoryModule( this);
     wb_mod = new WritebackModule( this);
+    Port<FuncInstr>::init();
+    Port<uint32>::init();
+    Port<bool>::init();
 };
 
 
 FetchModule::FetchModule( PerfMIPS* machine) :
-Module( machine, "DEC_2_FETCH_STALL", NULL), cur_instr( 0)
+Module( machine, "DEC_2_FETCH_STALL", NULL), instr_bytes( 0), instr_PC( 0)
 {
     wp_fetch_2_dec = new WritePort<uint32>( string( "FETCH_2_DEC"),
                                             PORT_BW, PORT_FANOUT );
@@ -33,7 +40,8 @@ Module( machine, "DEC_2_FETCH_STALL", NULL), cur_instr( 0)
 }
 
 DecodeModule::DecodeModule( PerfMIPS* machine) :
-Module( machine, "EXEC_2_DEC_STALL", "DEC_2_FETCH_STALL"), cur_instr( 0)
+Module( machine, "EXEC_2_DEC_STALL", "DEC_2_FETCH_STALL"),
+cur_instr( 0), instr_bytes( 0), is_sent( true), instr_PC( 0)
 {
     rp_fetch_2_dec = new ReadPort<uint32>( string( "FETCH_2_DEC"),
                                            PORT_LATENCY );
@@ -103,39 +111,65 @@ WritebackModule::~WritebackModule()
     delete rp_mem_2_wb;
 }
 
-void FetchModule::clock( int cycle)
+void FetchModule::clock()
 {
-    if ( check_stall( cycle))
+    int cycle = machine->cycle;
+    if ( check_stall())
+    {
         return;
-    cur_instr = machine->fetch();
-
-    wp_fetch_2_dec->write( cur_instr, cycle);
+    }
+    instr_PC = machine->PC;
+    instr_bytes = machine->fetch();
+    wp_fetch_2_dec->write( instr_bytes, cycle);
 }
 
-void DecodeModule::clock( int cycle)
+void DecodeModule::clock()
 {
-    if ( check_stall( cycle))
+    bool is_stall_sent = false;
+    int cycle = machine->cycle;
+    if ( check_stall())
     {
-        send_stall( cycle);
+        send_stall();
+        is_stall_sent = true;
         return;
     }
 
-    uint32 instr_bytes = 0;
-    if ( rp_fetch_2_dec->read( &instr_bytes, cycle) && machine->check_PC())
-        cur_instr = FuncInstr( instr_bytes, machine->PC);
+    rp_fetch_2_dec->read( &instr_bytes, cycle);
+    if ( is_sent)
+        cur_instr = FuncInstr( instr_bytes, instr_PC);
+
+    instr_PC = machine->PC;
+    if ( !machine->check_PC())
+    {
+        if ( !is_stall_sent)
+        {
+            send_stall();
+            is_stall_sent = true;
+        }
+    }
 
     if ( cur_instr.is_jump())
+    {
         machine->invalidate_PC();
-
-    if( check_regs( cur_instr.get_src1_num(), cur_instr.get_src2_num()))
+        if( !is_stall_sent)
+        {
+            is_stall_sent = true;
+            send_stall();
+        }
+    }
+    if ( check_regs())
     {
         machine->read_src( cur_instr);
         machine->rf->invalidate( cur_instr.get_dst_num());
-        machine->PC = cur_instr.get_new_PC();
         wp_dec_2_exec->write( cur_instr, cycle);
-    } else
+        machine->PC += INSTR_SIZE;
+        is_sent = true;
+    }
+    else
     {
-        send_stall( cycle);
+        if ( !is_stall_sent)
+            send_stall();
+        is_sent = false;
     }
 }
 
@@ -145,46 +179,110 @@ inline bool DecodeModule::check_regs( RegNum reg1, RegNum reg2)
            machine->rf->check( reg2) ;
 }
 
-void ExecuteModule::clock( int cycle)
+inline bool DecodeModule::check_regs()
 {
-    if( check_stall( cycle))
+    return check_regs( cur_instr.get_src1_num(), cur_instr.get_src2_num());
+}
+
+void ExecuteModule::clock()
+{
+    int cycle = machine->cycle;
+    if( check_stall())
     {
-        send_stall( cycle);
+        send_stall();
         return;
     }
-
     if ( !rp_dec_2_exec->read( &cur_instr, cycle))
+    {
+        cur_instr = FuncInstr( 0);
         return;
-
+    }
     cur_instr.execute();
-
     wp_exec_2_mem->write( cur_instr, cycle);
 }
 
-void MemoryModule::clock( int cycle)
+void MemoryModule::clock()
 {
-    if( check_stall( cycle))
+    int cycle = machine->cycle;
+    if( check_stall())
     {
-        send_stall( cycle);
+        send_stall();
         return;
     }
-
     if ( !rp_exec_2_mem->read( &cur_instr, cycle))
+    {
+        cur_instr = FuncInstr( 0);
         return;
-
+    }
     machine->load_store( cur_instr);
-
     wp_mem_2_wb->write( cur_instr, cycle);
 }
 
-void WritebackModule::clock( int cycle)
+void WritebackModule::clock()
 {
+    int cycle = machine->cycle;
     if ( !rp_mem_2_wb->read( &cur_instr, cycle))
+    {
+        cur_instr = FuncInstr( 0);
         return;
+    }
     machine->wb( cur_instr);
-    machine->PC = cur_instr.get_new_PC();
-    machine->validate_PC();
-    machine->executed_instrs++;
+    if ( cur_instr.is_jump())
+    {
+        machine->PC = cur_instr.get_new_PC() - INSTR_SIZE;
+        machine->validate_PC();
+    }
+    if ( !cur_instr.is_nop())
+        machine->executed_instrs++;
+}
+
+string FetchModule::dump( string indent)
+{
+    ostringstream oss;
+    oss << indent << "fetch:\t\t\t"
+        << "0x" << hex << setfill( '0')
+        << setw( 8) << instr_bytes << "\t["
+        << "0x" << hex << setfill( '0')
+        << setw( 8) << instr_PC << ']';
+    return oss.str();
+}
+
+string DecodeModule::dump( string indent)
+{
+    ostringstream oss;
+    oss << indent << "decode:\t\t"
+        << cur_instr;
+    return oss.str();
+}
+
+string ExecuteModule::dump( string indent)
+{
+    ostringstream oss;
+    oss << indent << "execute:\t\t"
+        << cur_instr;
+    return oss.str();
+}
+
+string MemoryModule::dump( string indent)
+{
+    ostringstream oss;
+    oss << indent << "memory:\t\t"
+        << cur_instr;
+    return oss.str();
+}
+
+string WritebackModule::dump( string indent)
+{
+    ostringstream oss;
+    oss << indent << "writeback:\t\t"
+        << cur_instr;
+    return oss.str();
+}
+
+ostream& operator << ( ostream& stream, Module& module)
+{
+    stream << module.dump();
+    return stream;
 }
 
 Module::Module( PerfMIPS* machine, const char* next_2_me_str,
@@ -225,6 +323,40 @@ Module::~Module()
         delete me_2_prev_stall;
 }
 
+void PerfMIPS::run( const std::string& tr, int instrs_to_run, bool silent)
+{
+    mem = new FuncMemory( tr.c_str());
+    PC = mem->startPC();
+    executed_instrs = 0;
+    cycle = 0;
+    while ( executed_instrs < instrs_to_run)
+    {
+        fetch_mod->clock();
+        if ( !silent)
+            cout << *fetch_mod << endl;
+        dec_mod->clock();
+        if ( !silent)
+            cout << *dec_mod << endl;
+        exec_mod->clock();
+        if ( !silent)
+            cout << *exec_mod << endl;
+        mem_mod->clock();
+        if ( !silent)
+            cout << *mem_mod << endl;
+        wb_mod->clock();
+        if ( !silent)
+            cout << *wb_mod << endl << endl;
+        else
+        {
+            cout << wb_mod->silent_dump();
+        }
+        ++cycle;
+    }
+    if ( !silent)
+        cout << "CPI = " << ( double) cycle/( double) instrs_to_run << endl;
+    delete mem;
+}
+
 MIPS::MIPS()
 {
     rf = new RF();
@@ -261,6 +393,14 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run)
         std::cout << instr << std::endl;
     }
     delete mem;
+}
+
+string WritebackModule::silent_dump( string indent)
+{
+    if( !cur_instr.is_nop())
+        return cur_instr.Dump( indent) + "\n";
+    else
+        return "";
 }
 
 MIPS::~MIPS()

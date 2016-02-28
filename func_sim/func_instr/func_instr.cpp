@@ -202,6 +202,11 @@ void FuncInstr::initR()
         case OUT_R_SPECIAL:
             break;
     }
+    if ( instr.raw == 0)
+    {
+        disasm = "nop";
+        return;
+    }
     disasm = oss.str();
 }
 

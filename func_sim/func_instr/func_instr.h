@@ -143,7 +143,7 @@ class FuncInstr
 
         bool complete;
 
-        const uint32 PC;
+        uint32 PC;
         uint32 new_PC;
 
         std::string disasm;
@@ -212,7 +212,6 @@ class FuncInstr
         uint32 lo;
 
         FuncInstr( uint32 bytes = 0, uint32 PC = 0);
-        FuncInstr& operator = ( FuncInstr& prot);
         std::string Dump( std::string indent = " ") const;
 
         RegNum get_src1_num() const { return src1; }
@@ -228,6 +227,8 @@ class FuncInstr
                    operation == OUT_I_BRANCH;
         }
 
+        bool is_nop() const { return !instr.raw; }
+
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 
@@ -236,6 +237,7 @@ class FuncInstr
         uint32 get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
         uint32 get_new_PC() const { return new_PC; }
+        uint32 get_PC() const { return PC; }
 
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores

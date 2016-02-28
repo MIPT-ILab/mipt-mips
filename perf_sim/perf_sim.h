@@ -21,11 +21,8 @@ class Module;
 
 class MIPS
 {
-private:
-
-    FuncMemory* mem;
-
 protected:
+    FuncMemory* mem;
     uint32 PC;
     RF* rf;
     uint32 fetch() const { return mem->read(PC); }
@@ -79,6 +76,7 @@ private:
     void invalidate_PC() { is_PC_valid = false; };
     void validate_PC() { is_PC_valid = true; };
     int executed_instrs;
+    int cycle;
 
 public:
     void run( const std::string& tr, int instr_to_run,
@@ -91,7 +89,7 @@ public:
     friend class ExecuteModule;
     friend class MemoryModule;
     friend class WritebackModule;
-    //friend class Module;
+    friend class Module;
 };
 
 class Module
@@ -102,11 +100,14 @@ class Module
 protected:
     bool check_stall( int cycle);
     void send_stall( int cycle);
+    bool check_stall() { return check_stall( machine->cycle); }
+    void send_stall()  { send_stall( machine->cycle); }
     PerfMIPS* machine;
 public:
     Module( PerfMIPS* machine, const char* next_2_me_str,
                                const char* me_2_prev_str  );
     ~Module();
+    virtual string dump( string indent = " ") { return indent; }
 };
 
 class DecodeModule : public Module
@@ -114,23 +115,30 @@ class DecodeModule : public Module
     ReadPort<uint32>*     rp_fetch_2_dec;
     WritePort<FuncInstr>* wp_dec_2_exec;
     FuncInstr cur_instr;
+    uint32 instr_bytes;
+    uint32 instr_PC;
     inline bool check_regs( RegNum reg1, RegNum reg2);
+    inline bool check_regs();
     DecodeModule();
+    bool is_sent;
 public:
     DecodeModule( PerfMIPS* machine);
     ~DecodeModule();
-    void clock( int cycle);
+    void clock();
+    string dump( string indent);
 };
 
 class FetchModule : public Module
 {
     WritePort<uint32>*    wp_fetch_2_dec;
-    uint32 cur_instr;
+    uint32 instr_bytes;
     FetchModule();
+    uint32 instr_PC;
 public:
     FetchModule( PerfMIPS* machine);
     ~FetchModule();
-    void clock( int cycle);
+    void clock();
+    string dump( string indent);
 };
 
 class ExecuteModule : public Module
@@ -142,7 +150,8 @@ class ExecuteModule : public Module
 public:
     ExecuteModule( PerfMIPS* machine);
     ~ExecuteModule();
-    void clock( int cycle);
+    void clock();
+    string dump( string indent);
 };
 
 class MemoryModule : public Module
@@ -154,7 +163,8 @@ class MemoryModule : public Module
 public:
     MemoryModule( PerfMIPS* machine);
     ~MemoryModule();
-    void clock( int cycle);
+    void clock();
+    string dump( string indent);
 };
 
 class WritebackModule : public Module
@@ -165,9 +175,9 @@ class WritebackModule : public Module
 public:
     WritebackModule( PerfMIPS* machine);
     ~WritebackModule();
-    void clock( int cycle);
+    void clock();
+    string dump( string indent);
+    string silent_dump( string indent = " ");
 };
-
-
 
 #endif

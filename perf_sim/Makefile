@@ -27,7 +27,7 @@ $(TRUNK)/func_sim/func_memory/ -I $(TRUNK)/func_sim/func_instr \
 #
 # Enter for building func_memory stand alone program
 #
-perf_sim: func_memory.o elf_parser.o func_instr.o perf_sim.o main.o
+perf_sim: func_memory.o elf_parser.o func_instr.o perf_sim.o main.o log.o
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
@@ -36,7 +36,7 @@ perf_sim: func_memory.o elf_parser.o func_instr.o perf_sim.o main.o
 main.o: main.cpp perf_sim.h
 	$(CXX) -c $< $(INCL)
 
-perf_sim.o: perf_sim.cpp perf_sim.h types.h func_instr.h func_memory.h rf.h
+perf_sim.o: perf_sim.cpp perf_sim.h types.h func_instr.h func_memory.h rf.h ports.h
 	$(CXX) -c $< $(INCL)
 
 func_instr.o: func_instr.cpp func_instr.h types.h
@@ -46,6 +46,9 @@ func_memory.o: func_memory.cpp func_memory.h types.h
 	$(CXX) -c $< $(INCL)
 
 elf_parser.o: elf_parser.cpp elf_parser.h types.h
+	$(CXX) -c $< $(INCL)
+
+log.o: log.cpp log.h
 	$(CXX) -c $< $(INCL)
 
 clean:
