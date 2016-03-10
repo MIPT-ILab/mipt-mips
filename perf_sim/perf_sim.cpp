@@ -1,0 +1,126 @@
+#include <iostream> 
+#include <cstdio>
+#include <perf_sim.h>
+
+MIPS::MIPS()
+{
+    executed_instrs = 0;
+
+    wp_fetch_2_decode = new WritePort<uint32>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode = new ReadPort<uint32>("FETCH_2_DECODE", PORT_LATENCY);
+    wp_decode_2_fetch_stall = new WritePort<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
+    rp_decode_2_fetch_stall = new ReadPort<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
+    
+    wp_decode_2_execute = new WritePort<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute = new ReadPort<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
+    wp_execute_2_decode_stall = new WritePort<bool>("EXECUTE_2_DECODE_STALL", PORT_BW, PORT_FANOUT);
+    rp_execute_2_decode_stall = new ReadPort<bool>("EXECUTE_2_DECODE_STALL", PORT_LATENCY);
+    
+    wp_execute_2_memory = new WritePort<FuncInstr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    rp_execute_2_memory = new ReadPort<FuncInstr>("EXECUTE_2_MEMORY", PORT_LATENCY);
+    wp_memory_2_execute_stall = new WritePort<bool>("MEMORY_2_EXECUTE_STALL", PORT_BW, PORT_FANOUT);
+    rp_memory_2_execute_stall = new ReadPort<bool>("MEMORY_2_EXECUTE_STALL", PORT_LATENCY);
+    
+    wp_memory_2_writeback = new WritePort<FuncInstr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    rp_memory_2_writeback = new ReadPort<FuncInstr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
+    wp_writeback_2_memory_stall = new WritePort<bool>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
+    rp_writeback_2_memory_stall = new ReadPort<bool>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
+
+    Port<uint32>::init();
+    Port<FuncInstr>::init();
+    Port<bool>::init();
+    
+    rf = new RF();
+}
+
+void MIPS::run( const std::string& tr, uint32 instrs_to_run, bool silent)
+{ 
+    this->silent = silent;
+    int cycle = 0;
+    executed_instrs = 0;
+
+    decode_next_time = false;
+
+    mem = new FuncMemory( tr.c_str());
+
+    PC = mem->startPC();
+    PC_is_valid = true;
+
+    while (executed_instrs < instrs_to_run)
+    {
+        clock_writeback( cycle);
+        //cout << "PC_is_valid=" << PC_is_valid << endl;
+        //cout << "PC=" << std::hex << PC << endl;
+        clock_decode( cycle);
+        clock_fetch( cycle);
+        clock_execute( cycle);
+        clock_memory( cycle);
+        ++cycle;
+
+        if (silent)
+            cout << writeback_dump;
+        else
+        {
+            cout << fetch_dump << decode_dump << execute_dump << memory_dump << writeback_dump << endl;
+        }
+    }
+
+    delete mem;
+}
+
+//void MIPS::run(const std::string& tr, uint32 instrs_to_run)
+//{
+//    mem = new FuncMemory(tr.c_str());
+//    PC = mem->startPC();
+//    for (uint32 i = 0; i < instrs_to_run; ++i) {
+//        // fetch
+//        uint32 instr_bytes = fetch();
+//   
+//        // decode
+//        FuncInstr instr(instr_bytes, PC);
+//
+//        // read sources
+//        read_src(instr);
+//
+//        // execute
+//        instr.execute();
+//
+//        // load/store
+//        load_store(instr);
+//
+//        // writeback
+//        wb(instr);
+//        
+//        // PC update
+//        PC = instr.get_new_PC();
+//        
+//        // dump
+//        std::cout << instr << std::endl;
+//    }
+//    delete mem;
+//}
+
+MIPS::~MIPS() {
+    delete rf;
+
+    delete wp_fetch_2_decode;
+    delete rp_fetch_2_decode;
+    delete wp_decode_2_fetch_stall;
+    delete rp_decode_2_fetch_stall;
+
+    delete wp_decode_2_execute;
+    delete rp_decode_2_execute;
+    delete wp_execute_2_decode_stall;
+    delete rp_execute_2_decode_stall;
+
+    delete wp_execute_2_memory;
+    delete rp_execute_2_memory;
+    delete wp_memory_2_execute_stall;
+    delete rp_memory_2_execute_stall;
+
+    delete wp_memory_2_writeback;
+    delete rp_memory_2_writeback;
+    delete wp_writeback_2_memory_stall;
+    delete rp_writeback_2_memory_stall;
+
+}
