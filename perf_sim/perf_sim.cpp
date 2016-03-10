@@ -49,8 +49,6 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run, bool silent)
     while (executed_instrs < instrs_to_run)
     {
         clock_writeback( cycle);
-        //cout << "PC_is_valid=" << PC_is_valid << endl;
-        //cout << "PC=" << std::hex << PC << endl;
         clock_decode( cycle);
         clock_fetch( cycle);
         clock_execute( cycle);
@@ -67,38 +65,6 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run, bool silent)
 
     delete mem;
 }
-
-//void MIPS::run(const std::string& tr, uint32 instrs_to_run)
-//{
-//    mem = new FuncMemory(tr.c_str());
-//    PC = mem->startPC();
-//    for (uint32 i = 0; i < instrs_to_run; ++i) {
-//        // fetch
-//        uint32 instr_bytes = fetch();
-//   
-//        // decode
-//        FuncInstr instr(instr_bytes, PC);
-//
-//        // read sources
-//        read_src(instr);
-//
-//        // execute
-//        instr.execute();
-//
-//        // load/store
-//        load_store(instr);
-//
-//        // writeback
-//        wb(instr);
-//        
-//        // PC update
-//        PC = instr.get_new_PC();
-//        
-//        // dump
-//        std::cout << instr << std::endl;
-//    }
-//    delete mem;
-//}
 
 MIPS::~MIPS() {
     delete rf;
