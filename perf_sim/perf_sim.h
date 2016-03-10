@@ -1,109 +1,226 @@
-/**
- * perf_sim.h
- * Header for scalar MIPS CPU simulator.
- * MIPT-MIPS Assignment 4.
- * Ladin Oleg.
+/*
+ * perf_sim.cpp - mips performance simulator
+ * Copyright 2015 MIPT-PerfMIPS 
  */
 
-/* Protection from multi-including. */
 #ifndef PERF_SIM_H
 #define PERF_SIM_H
 
-/* Simulator modules. */
-#include <func_sim/func_memory/func_memory.h>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
+#include <common/log.h>
+#include <func_sim/func_instr/func_instr.h>
+#include <func_sim/func_memory/func_memory.h>
 #include "perf_sim_rf.h"
 #include "ports.h"
 
 class PerfMIPS : protected Log
 {
     private:
-        /** Functional simulator components. */
+        uint64 executed_instrs = 0;
+	uint64 last_writeback_cycle = 0; // to handle possible deadlocks
+
+        uint32 decode_data;
+        bool decode_next_time;
+
         RF* rf;
         uint32 PC;
+        bool PC_is_valid;
         FuncMemory* mem;
 
-        uint32 fetch() const { return mem->read( PC); }
-        void read_src( FuncInstr& instr) const
-        {
-            rf->read_src1( instr);
-            rf->read_src2( instr);
-        }
-        void load( FuncInstr& instr) const
-        {
-            instr.set_v_dst( mem->read( instr.get_mem_addr(), instr.get_mem_size()));
-        }
-        void store( const FuncInstr& instr)
-        {
-            mem->write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
-        }
-        void load_store( FuncInstr& instr)
-        {
-            if ( instr.is_load())
+        WritePort<uint32>* wp_fetch_2_decode;
+        ReadPort<uint32>* rp_fetch_2_decode;
+        WritePort<bool>* wp_decode_2_fetch_stall;
+        ReadPort<bool>* rp_decode_2_fetch_stall;
+       
+        WritePort<FuncInstr>* wp_decode_2_execute;
+        ReadPort<FuncInstr>* rp_decode_2_execute;
+        WritePort<bool>* wp_execute_2_decode_stall;
+        ReadPort<bool>* rp_execute_2_decode_stall;
+        
+        WritePort<FuncInstr>* wp_execute_2_memory;
+        ReadPort<FuncInstr>* rp_execute_2_memory;
+        WritePort<bool>* wp_memory_2_execute_stall;
+        ReadPort<bool>* rp_memory_2_execute_stall;
+
+        WritePort<FuncInstr>* wp_memory_2_writeback;
+        ReadPort<FuncInstr>* rp_memory_2_writeback;
+        WritePort<bool>* wp_writeback_2_memory_stall;
+        ReadPort<bool>* rp_writeback_2_memory_stall;
+
+        void clock_fetch( int cycle) {
+            sout << "fetch   cycle " << std::dec << cycle << ":";
+
+            bool is_stall = false;
+            rp_decode_2_fetch_stall->read( &is_stall, cycle);
+            if ( is_stall) 
             {
-                load( instr);
-            } else if ( instr.is_store())
+                sout << "bubble\n";
+                return;
+            }
+           
+            if (PC_is_valid)
             {
-                store( instr);
+                uint32 module_data = mem->read(PC);
+                wp_fetch_2_decode->write( module_data, cycle);
+                
+                sout << std::hex << "0x" << module_data << std::endl;
+            }
+            else
+            {
+                sout << "bubble\n";
             }
         }
-        void wb( const FuncInstr& instr) { rf->write_dst( instr); }
 
+        void clock_decode( int cycle) {
+            sout << "decode  cycle " << std::dec << cycle << ":";
+            
+            bool is_stall = false;
+            rp_execute_2_decode_stall->read( &is_stall, cycle);
+            if ( is_stall) {
+                wp_decode_2_fetch_stall->write( true, cycle);
+           
+                sout << "bubble\n";
+                return;
+            }
 
-        /** Performance simulator components. */
-        /* Data ports. */
-        ReadPort< uint32>* rp_fetch_2_decode;
-        WritePort< uint32>* wp_fetch_2_decode;
-        ReadPort< FuncInstr>* rp_decode_2_execute;
-        WritePort< FuncInstr>* wp_decode_2_execute;
-        ReadPort< FuncInstr>* rp_execute_2_memory;
-        WritePort< FuncInstr>* wp_execute_2_memory;
-        ReadPort< FuncInstr>* rp_memory_2_writeback;
-        WritePort< FuncInstr>* wp_memory_2_writeback;
+            bool is_anything_from_fetch = rp_fetch_2_decode->read( &decode_data, cycle);
+            
+            FuncInstr instr( decode_data, PC);
+           
+            if ( instr.isJump() && is_anything_from_fetch)
+                PC_is_valid = false;
 
-        /* Stall ports. */
-        ReadPort< bool>* rp_decode_2_fetch_stall;
-        WritePort< bool>* wp_decode_2_fetch_stall;
-        ReadPort< bool>* rp_execute_2_decode_stall;
-        WritePort< bool>* wp_execute_2_decode_stall;
-        ReadPort< bool>* rp_memory_2_execute_stall;
-        WritePort< bool>* wp_memory_2_execute_stall;
-        ReadPort< bool>* rp_writeback_2_memory_stall;
-        WritePort< bool>* wp_writeback_2_memory_stall;
+            if ( !is_anything_from_fetch && !decode_next_time)
+            {
+                sout << "bubble\n";
+                return;
+            }
 
-        int executed_instrs, // executed instructions counter
-            last_writeback_cycle = 0; // to handle possible deadlocks
+            if ( rf->check( instr.get_src1_num()) && rf->check( instr.get_src2_num()))
+            {
+                rf->read_src1( instr);
+                rf->read_src2( instr);
+                rf->invalidate( instr.get_dst_num());
+                wp_decode_2_execute->write( instr, cycle);
+                
+                decode_next_time = false;
+                
+                if (!instr.isJump())
+                    PC += 4;
 
-        /* Here modules stores data. */
-        uint32 fetch_data;
-        uint32 decode_data;
-        FuncInstr execute_data;
-        FuncInstr memory_data;
-        FuncInstr writeback_data;
+                sout << instr << std::endl;
+            }   
+            else
+            {
+                wp_decode_2_fetch_stall->write( true, cycle);
+                decode_next_time = true;
+                sout << "bubble\n";
+            }
+        }
 
-        bool PC_is_valid; // validate flag of PC
+        void clock_execute( int cycle)
+        {
+            std::ostringstream oss;
+            sout << "execute cycle " << std::dec << cycle << ":";
 
-        /* Components for handling data dependency. */
-        uint32 source_stall_data; // storage for data came from Fetch
-        bool source_stall; // is stall flag: wait for sources
-        bool source_stall_end; // stall ended: decode came from Fetch data
-        bool decode_stall; // on start, Decode can generate "nop", prevent it
+            bool is_stall = false;
+            rp_memory_2_execute_stall->read( &is_stall, cycle);
+            if ( is_stall)
+            {
+                wp_execute_2_decode_stall->write( true, cycle);
+                
+                sout << "bubble\n";
+                return;
+            }
 
-        /* Main methods of each modules. */
-        void clockFetch( int cycle);
-        void clockDecode( int cycle);
-        void clockExecute( int cycle);
-        void clockMemory( int cycle);
-        void clockWriteback( int cycle);
+            FuncInstr instr;
+            if ( !rp_decode_2_execute->read( &instr, cycle))
+            {
+                sout << "bubble\n";
+                return;
+            }
 
-        /* Checks instruction could it change PC unusually. */
-        bool isJump( uint32 data);
+            instr.execute();
+            wp_execute_2_memory->write( instr, cycle);
 
-    public:
-        PerfMIPS(bool log);
+            sout << instr << std::endl;
+        }
+
+        void clock_memory( int cycle)
+        {
+            sout << "memory  cycle " << std::dec << cycle << ":"; 
+
+            bool is_stall = false;
+            rp_writeback_2_memory_stall->read( &is_stall, cycle);
+            if ( is_stall)
+            {
+                wp_memory_2_execute_stall->write( true, cycle);
+                sout << "bubble\n";
+                return;
+            }
+
+            FuncInstr instr;
+            if ( !rp_execute_2_memory->read( &instr, cycle))
+            {
+                sout << "bubble\n";
+                return;
+            }
+
+            load_store(instr);
+            wp_memory_2_writeback->write( instr, cycle);
+
+            sout << instr << std::endl;
+        }
+
+        void clock_writeback( int cycle)
+        {
+            sout << "wb      cycle " << std::dec << cycle << ":"; 
+
+            FuncInstr instr;
+            if ( !rp_memory_2_writeback->read( &instr, cycle))
+            {
+                sout << "bubble\n";
+                return;
+            }
+
+            if ( instr.isJump())
+            {
+                PC_is_valid = true;
+                PC = instr.get_new_PC();
+            }
+
+            rf->write_dst( instr);
+
+            sout << instr << std::endl;
+            std::cout << instr << std::endl;
+
+            ++executed_instrs;
+            last_writeback_cycle = cycle;
+        }
+
+        void load( FuncInstr& instr) const {
+            instr.set_v_dst(mem->read(instr.get_mem_addr(), instr.get_mem_size()));
+        }
+
+        void store( const FuncInstr& instr) {
+            mem->write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
+        }
+
+        void load_store( FuncInstr& instr) {
+            if ( instr.is_load())
+                load( instr);
+            else if ( instr.is_store())
+                store( instr);
+        }
+
+   public:
+        PerfMIPS( bool log);
+        void run( const std::string& tr, uint32 instrs_to_run);
         ~PerfMIPS();
-        /* Starts simulator. */
-        void run( const std::string& tr, int instr_to_run);
 };
+            
+#endif
 
-#endif // #ifndef PERF_SIM_H
