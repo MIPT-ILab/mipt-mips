@@ -1,0 +1,4 @@
+g++ -c log.cpp -I ./ -I ..//common/ -I ..//func_sim/elf_parser/ -I ..//func_sim/func_memory/ -I ..//func_sim/func_instr -I ..//func_sim/ -I ..//perf_sim/
+g++ -o perf_sim func_memory.o elf_parser.o func_instr.o perf_sim.o main.o log.o -l elf
+---------------------------------
+perf_sim is built SUCCESSFULLY

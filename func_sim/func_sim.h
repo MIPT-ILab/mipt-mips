@@ -1,7 +1,7 @@
 /*
  * func_sim.cpp - mips single-cycle simulator
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS 
+ * Copyright 2015 MIPT-MIPS
  */
 
 #ifndef FUNC_SIM_H
@@ -20,8 +20,8 @@ class MIPS
 
         uint32 fetch() const { return mem->read(PC); }
         void read_src(FuncInstr& instr) const {
-            rf->read_src1(instr); 
-            rf->read_src2(instr); 
+            rf->read_src1(instr);
+            rf->read_src2(instr);
 	    }
 
         void load(FuncInstr& instr) const {
@@ -47,6 +47,5 @@ class MIPS
         void run(const std::string& tr, uint32 instrs_to_run);
         ~MIPS();
 };
-            
+
 #endif
- 
