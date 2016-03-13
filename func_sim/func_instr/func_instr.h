@@ -4,6 +4,7 @@
  * Copyright 2014 MIPT-MIPS
  */
 
+/** Edited by Ladin Oleg. */
 
 #ifndef FUNC_INSTR_H
 #define FUNC_INSTR_H
@@ -105,6 +106,7 @@ class FuncInstr
             } asJ;
             uint32 raw;
 
+            _instr() {} // constructor w/o arguments for ports
             _instr(uint32 bytes) {
                  raw = bytes;
             }
@@ -143,7 +145,7 @@ class FuncInstr
 
         bool complete;
 
-        const uint32 PC;
+        uint32 PC; // removing "const" keyword to supporting ports
         uint32 new_PC;
 
         std::string disasm;
@@ -193,10 +195,12 @@ class FuncInstr
 
         void execute_beq()    { if (v_src1 == v_src2) new_PC += (v_imm << 2); }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += (v_imm << 2); }
-        void execute_blez()   { if (v_src1 <= 0) new_PC += (v_imm << 2); }; 
+        
+	void execute_blez()   { if (v_src1 <= 0) new_PC += (v_imm << 2); }; 
         void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += (v_imm << 2); }; 
         void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };    
-        void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
+
+	void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
         void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };   
 
@@ -211,6 +215,7 @@ class FuncInstr
         uint32 hi;
         uint32 lo;
 
+        FuncInstr() {} // constructor w/o arguments for ports
         FuncInstr( uint32 bytes, uint32 PC = 0);
         std::string Dump( std::string indent = " ") const;
 
@@ -218,6 +223,10 @@ class FuncInstr
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
       
+        /* Checks if instruction can change PC in unusual way. */
+        bool isJump() const { return operation == OUT_J_JUMP ||
+                                     operation == OUT_R_JUMP ||
+                                     operation == OUT_I_BRANCH; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
 
