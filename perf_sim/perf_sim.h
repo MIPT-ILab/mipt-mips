@@ -1,195 +1,108 @@
-#include <types.h>
-#include <func_instr.h>
+/**
+ * perf_sim.h
+ * Header for scalar MIPS CPU simulator.
+ * MIPT-MIPS Assignment 4.
+ * Ladin Oleg.
+ */
+
+/* Protection from multi-including. */
+#ifndef PERF_SIM_H
+#define PERF_SIM_H
+
+/* Simulator modules. */
 #include <func_memory.h>
-#include <rf.h>
+#include <perf_sim_rf.h>
 #include <ports.h>
-# include <list>
 
-class Fetch;
-class Decode;
-class Execute;
-class Memory;
-class Writeback;
-
-//==============================================================================
-// RefMIPS class ===============================================================
-//==============================================================================
 class PerfMIPS
 {
-    //Simulator objects
-    RF* rf;
-    uint32 PC;
-    bool PC_valid;
-    FuncMemory* mem;
+    private:
+        /** Functional simulator components. */
+        RF* rf;
+        uint32 PC;
+        FuncMemory* mem;
 
-    //data ports
-    ReadPort<uint32>* rp_fetch_2_decode;
-    WritePort<uint32>* wp_fetch_2_decode;
-    ReadPort<FuncInstr>* rp_decode_2_execute;
-    WritePort<FuncInstr>* wp_decode_2_execute;
-    ReadPort<FuncInstr>* rp_execute_2_memory;
-    WritePort<FuncInstr>* wp_execute_2_memory;
-    ReadPort<FuncInstr>* rp_memory_2_writeback;
-    WritePort<FuncInstr>* wp_memory_2_writeback;
+        uint32 fetch() const { return mem->read( PC); }
+        void read_src( FuncInstr& instr) const
+        {
+            rf->read_src1( instr);
+            rf->read_src2( instr);
+        }
+        void load( FuncInstr& instr) const
+        {
+            instr.set_v_dst( mem->read( instr.get_mem_addr(), instr.get_mem_size()));
+        }
+        void store( const FuncInstr& instr)
+        {
+            mem->write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
+        }
+        void load_store( FuncInstr& instr)
+        {
+            if ( instr.is_load())
+            {
+                load( instr);
+            } else if ( instr.is_store())
+            {
+                store( instr);
+            }
+        }
+        void wb( const FuncInstr& instr) { rf->write_dst( instr); }
 
-    //latency ports
-    ReadPort<bool>* rp_decode_2_fetch_stall;
-    WritePort<bool>* wp_decode_2_fetch_stall;
-    ReadPort<bool>* rp_execute_2_decode_stall;
-    WritePort<bool>* wp_execute_2_decode_stall;
-    ReadPort<bool>* rp_memory_2_execute_stall;
-    WritePort<bool>* wp_memory_2_execute_stall;
-    ReadPort<bool>* rp_writeback_2_memory_stall;
-    WritePort<bool>* wp_writeback_2_memory_stall;
 
-    //clock modules
-    void clock_fetch (int cycle);
-    void clock_decode (int cycle);
-    void clock_execute (int cycle);
-    void clock_memory (int cycle);
-    void clock_writeback (int cycle);
+        /** Performance simulator components. */
+        /* Data ports. */
+        ReadPort< uint32>* rp_fetch_2_decode;
+        WritePort< uint32>* wp_fetch_2_decode;
+        ReadPort< FuncInstr>* rp_decode_2_execute;
+        WritePort< FuncInstr>* wp_decode_2_execute;
+        ReadPort< FuncInstr>* rp_execute_2_memory;
+        WritePort< FuncInstr>* wp_execute_2_memory;
+        ReadPort< FuncInstr>* rp_memory_2_writeback;
+        WritePort< FuncInstr>* wp_memory_2_writeback;
 
-    //dump methods
-    void dump_fetch (int cycle);
-    void dump_decode (int cycle);
-    void dump_execute (int cycle);
-    void dump_memory (int cycle);
-    void dump_writeback (int cycle);
+        /* Stall ports. */
+        ReadPort< bool>* rp_decode_2_fetch_stall;
+        WritePort< bool>* wp_decode_2_fetch_stall;
+        ReadPort< bool>* rp_execute_2_decode_stall;
+        WritePort< bool>* wp_execute_2_decode_stall;
+        ReadPort< bool>* rp_memory_2_execute_stall;
+        WritePort< bool>* wp_memory_2_execute_stall;
+        ReadPort< bool>* rp_writeback_2_memory_stall;
+        WritePort< bool>* wp_writeback_2_memory_stall;
 
-    //modules checking methods
-    bool is_fetch_ok ();
-    bool is_decode_ok ();
-    bool is_execute_ok ();
-    bool is_memory_ok ();
-    bool is_writeback_ok ();
+        int executed_instrs; // executed instructions counter
+        bool is_silent; // mode flag
 
-    void dumpString (std::string data);
+        /* Here modules stores data. */
+        uint32 fetch_data;
+        uint32 decode_data;
+        FuncInstr execute_data;
+        FuncInstr memory_data;
+        FuncInstr writeback_data;
 
-    Fetch *fetch;
-    Decode *decode;
-    Execute *execute;
-    Memory *memory;
-    Writeback *writeback;
+        bool PC_is_valid; // validate flag of PC
 
-    int executed_instrs;
-    bool silent;
+        /* Components for handling data dependency. */
+        uint32 source_stall_data; // storage for data came from Fetch
+        bool source_stall; // is stall flag: wait for sources
+        bool source_stall_end; // stall ended: decode came from Fetch data
+        bool decode_stall; // on start, Decode can generate "nop", prevent it
 
-public:
-    PerfMIPS ();
-    ~PerfMIPS ();
+        /* Main methods of each modules. */
+        void clockFetch( int cycle);
+        void clockDecode( int cycle);
+        void clockExecute( int cycle);
+        void clockMemory( int cycle);
+        void clockWriteback( int cycle);
 
-    void run (const std::string& tr, int instrs_to_run, bool silent);
+        /* Checks instruction could it change PC unusually. */
+        bool isJump( uint32 data);
 
-    RF& getRF () const;
-    FuncMemory& getMem () const;
-    uint32& getPC ();
+    public:
+        PerfMIPS();
+        ~PerfMIPS();
+        /* Starts simulator. */
+        void run( const string& tr, int instr_to_run, bool is_silent);
 };
 
-//==============================================================================
-// Fetch class =================================================================
-//==============================================================================
-class Fetch
-{
-    PerfMIPS *_perf_mips;
-    uint32 _current_data;
-
-    bool _is_jump_or_branch;
-    bool _is_branch;
-    bool _is_undo;
-public:
-    Fetch (PerfMIPS *perf_mips);
-    ~Fetch ();
-
-    uint32 getCurrentData () {return _current_data;}
-    void   setCurrentData (uint32 data) {_current_data = data;}
-
-    bool getUndo () {return _is_undo;}
-    void setUndo (bool undo) {_is_undo = undo;}
-
-    bool is_jump_or_branch ();
-
-    void run ();
-};
-
-//==============================================================================
-// Decode class ================================================================
-//==============================================================================
-class Decode
-{
-    PerfMIPS *_perf_mips;
-
-    FuncInstr _current_data;
-public:
-    Decode (PerfMIPS *perf_mips);
-    ~Decode ();
-
-    FuncInstr getCurrentData () {return _current_data;}
-    void   setCurrentData (FuncInstr data) {_current_data = data;}
-
-    bool is_srcs_ready ();
-
-    void run (uint32 data);
-
-    std::list<FuncInstr> decode_queue;
-};
-
-//==============================================================================
-// Execute class ===============================================================
-//==============================================================================
-class Execute
-{
-    PerfMIPS *_perf_mips;
-
-    FuncInstr _current_data;
-
-public:
-    Execute (PerfMIPS *perf_mips);
-    ~Execute ();
-
-    FuncInstr getCurrentData () {return _current_data;}
-    void   setCurrentData (FuncInstr data) {_current_data = data;}
-
-    void run (FuncInstr& instr);
-};
-
-//==============================================================================
-// Memory class ================================================================
-//==============================================================================
-class Memory
-{
-    PerfMIPS *_perf_mips;
-
-    FuncInstr _current_data;
-
-    void load(FuncInstr& instr) const ;
-    void store(const FuncInstr& instr);
-    void load_store(FuncInstr& instr);
-
-public:
-    Memory (PerfMIPS *perf_mips);
-    ~Memory ();
-
-    FuncInstr& getCurrentData () {return _current_data;}
-    void   setCurrentData (FuncInstr data) {_current_data = data;}
-
-    void run (FuncInstr& instr);
-};
-
-//==============================================================================
-// Writeback class =============================================================
-//==============================================================================
-class Writeback
-{
-    PerfMIPS *_perf_mips;
-
-    FuncInstr _current_data;
-
-public:
-    Writeback (PerfMIPS *perf_mips);
-    ~Writeback ();
-
-    FuncInstr& getCurrentData () {return _current_data;}
-    void   setCurrentData (FuncInstr data) {_current_data = data;}
-
-    void run (FuncInstr& instr);
-};
+#endif // #ifndef PERF_SIM_H
