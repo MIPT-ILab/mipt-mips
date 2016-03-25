@@ -35,7 +35,7 @@ int readFunc (char file_input [],
     }
 
     double answ = (double)miss / (double)count;
-    file_out << (double)answ << ",";
+    file_out << (double)answ;
 
     file_in.close ();
 }
@@ -59,24 +59,36 @@ int main (int argc, char* argv [])
 
     std::ofstream file_out (argv[2], std::ios_base::out | std::ios_base::app);
 
-    file_out << ",1KB,2KB,4KB,8KB,16KB,32KB,64KB,128KB,256KB,512KB,1024KB"
-             << std::endl;
+    file_out << ",";
+
+    int max_size = 2048;
+
+    for (int i = 1; i <= max_size; i *= 2)
+		file_out << i <<"KB,";
+    file_out << std::endl;
 
     file_out << "full associative,";
-    for (int i = 1; i <= 1024; i *= 2)
+    for (int i = 1; i <= max_size; i *= 2)
     {
         bool is_input_file_existed = readFunc (argv [1], file_out, i*1024, 1, 4, 32, true);
+        if (i == max_size) 
+        	break;
+        file_out << ",";
+
         if (!is_input_file_existed)
         	exit( EXIT_FAILURE);
     }
     file_out << std::endl;
 
-    for (int ways_count = 1; ways_count <= 16; ways_count *= 2)
+    for (int ways_count = 1; ways_count <= 128; ways_count *= 2)
     {
         file_out << std::dec << ways_count <<" way(s),";
-        for (int i = 1; i <= 1024; i *= 2)
+        for (int i = 1; i <= max_size; i *= 2)
         {
             readFunc (argv [1], file_out, i*1024, ways_count, 4, 32, false);
+            if (i == max_size) 
+            	break;
+        	file_out << ",";
         }
         file_out << std::endl;
     }
