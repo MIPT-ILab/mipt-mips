@@ -73,7 +73,7 @@ int main (int argc, char* argv [])
         file_out << std::dec << ways_count <<" way(s),";
         for (int i = 1; i <= 1024; i *= 2)
         {
-            readFunc (argv [1], file_out, i*1024, 1, 4, 32, false);
+            readFunc (argv [1], file_out, i*1024, ways_count, 4, 32, false);
             std::cout << "======================================" << std::endl;
         }
         file_out << std::endl;
