@@ -8,22 +8,24 @@
 class TagsArray
 {
 public:
+    std::vector<uint64> tag_values;
+
     TagsArray () {}
     TagsArray (uint64 vector_size);
     ~TagsArray () {}
+
     void addTag (uint64 tag, uint32 pos);
+
+    //debug function
     void dump (std::string indent);
 
-    //std::list<uint32> busy_cells;
-    std::vector<uint64> tag_values;
-    //uint32 _set;
 };
 //==============================================================================
 // Class CacheTagArray =========================================================
 //==============================================================================
 class CacheTagArray
 {
-public:
+
     uint16 _addr_size_in_bits;
     bool _is_associative;
 
@@ -37,17 +39,20 @@ public:
     uint32 _set;
     uint32 _offset;
 
+    uint32 findFreeCell ();
+    void parseAddr (uint64 addr);
 
-
+public:
     CacheTagArray (uint32 size_in_bytes,
                    uint32 ways,
                    uint16 block_size_in_bytes,
                    uint16 addr_size_in_bits,
                    bool is_associative = true);
+    ~CacheTagArray () {}
     bool read (uint64 addr);
     void write (uint64 addr);
-    uint32 findFreeCell ();
-    void parseAddr (uint64 addr);
+    
+//debug function
     void listDump (std::list<uint32> list);
     void vectorDump (std::vector<uint64> vec);
 };

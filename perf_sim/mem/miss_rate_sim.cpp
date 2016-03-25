@@ -22,8 +22,8 @@ int readFunc (char file_input [],
 
     if (!file_in.is_open ())
     {
-        std::cout << "ERROR. File doesn't exist" << std::endl;
-        return -1;
+        std::cerr << "ERROR. File doesn't exist" << std::endl;
+        return (EXIT_FAILURE);
     }
 
     uint64 miss = 0;
@@ -32,28 +32,30 @@ int readFunc (char file_input [],
     {
         file_in >> std::hex >> addr;
         miss += (int)(!cache.read (addr));
-        if (count % 500000 == 0)
-            std::cout << std::dec << count << " " << std::hex << addr << std::endl;
     }
-
-    std::cout << std::dec
-              << "size = "
-              << size_in_bytes
-              <<" miss = "
-              << miss
-              << " count = "
-              << count << std::endl;
 
     double answ = (double)miss / (double)count;
     file_out << (double)answ << ",";
-
-    std::cout << "=======================================" << std::endl;
 
     file_in.close ();
 }
 
 int main (int argc, char* argv [])
 {
+
+	switch( argc)
+    {
+        case 3:
+            if ( ( argv[ 1] == nullptr) || ( ( argv[ 2] == nullptr)) )
+            {
+                std::cerr << "ERROR: Wrong arguments!\n";
+                exit( EXIT_FAILURE);
+            }
+            break;
+        default: // wrong number of arguments
+            std::cerr << "ERROR: Wrong number of arguments!\n";
+            exit( EXIT_FAILURE);
+    }
 
     std::ofstream file_out (argv[2], std::ios_base::out | std::ios_base::app);
 
@@ -63,8 +65,9 @@ int main (int argc, char* argv [])
     file_out << "full associative,";
     for (int i = 1; i <= 1024; i *= 2)
     {
-        readFunc (argv [1], file_out, i*1024, 1, 4, 32, true);
-        std::cout << "======================================" << std::endl;
+        bool is_input_file_existed = readFunc (argv [1], file_out, i*1024, 1, 4, 32, true);
+        if (!is_input_file_existed)
+        	exit( EXIT_FAILURE);
     }
     file_out << std::endl;
 
@@ -74,30 +77,10 @@ int main (int argc, char* argv [])
         for (int i = 1; i <= 1024; i *= 2)
         {
             readFunc (argv [1], file_out, i*1024, ways_count, 4, 32, false);
-            std::cout << "======================================" << std::endl;
         }
         file_out << std::endl;
     }
     file_out.close ();
 
-
-/*    CacheTagArray array (24, 3, 4, 32, false);
-    array.read (0b00000000000000000000000000011000);
-    array.read (0b00000000000000000000000000111000);
-                //12345678123456781234567812345678
-    array.read (0b00000000000000000000000001111000);
-    array.read (0b00000000000000000000000011111000);
-
-    std::cout << array.read (0b00000000000000000000000000011000) << std::endl;
-*/
-/*    CacheTagArray array2 (16, 3, 4, 32, true);
-    array2.read (0b00000000000000000000000000011000);
-    array2.read (0b00000000000000000000000000111000);
-    array2.read (0b00000000000000000000000001111000);
-    array2.read (0b00000000000000000000000011111000);
-    array2.read (0b00000000000000000000000111111000);
-
-    std::cout << array2.read (0b00000000000000000000000011111000) << std::endl;
-*/
     return 0;
 }
