@@ -43,7 +43,7 @@ int readFunc (char file_input [],
 int main (int argc, char* argv [])
 {
 
-	switch( argc)
+    switch( argc)
     {
         case 3:
             if ( ( argv[ 1] == nullptr) || ( ( argv[ 2] == nullptr)) )
@@ -59,12 +59,17 @@ int main (int argc, char* argv [])
 
     std::ofstream file_out (argv[2], std::ios_base::out | std::ios_base::app);
 
-    file_out << ",";
+    file_out << "Size,";
 
     int max_size = 2048;
 
     for (int i = 1; i <= max_size; i *= 2)
-		file_out << i <<"KB,";
+    {
+        file_out << i <<"KB";
+           if (i == max_size) 
+            break;
+        file_out << ",";
+    }
     file_out << std::endl;
 
     file_out << "full associative,";
@@ -72,11 +77,11 @@ int main (int argc, char* argv [])
     {
         bool is_input_file_existed = readFunc (argv [1], file_out, i*1024, 1, 4, 32, true);
         if (i == max_size) 
-        	break;
+            break;
         file_out << ",";
 
         if (!is_input_file_existed)
-        	exit( EXIT_FAILURE);
+            exit( EXIT_FAILURE);
     }
     file_out << std::endl;
 
@@ -87,8 +92,8 @@ int main (int argc, char* argv [])
         {
             readFunc (argv [1], file_out, i*1024, ways_count, 4, 32, false);
             if (i == max_size) 
-            	break;
-        	file_out << ",";
+                break;
+            file_out << ",";
         }
         file_out << std::endl;
     }
