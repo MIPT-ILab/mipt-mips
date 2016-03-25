@@ -120,7 +120,7 @@ class FuncInstr
 
             Format format;
             OperationType operation;
- 
+
             uint8 mem_size;
 
             void (FuncInstr::*function)(void);
@@ -149,7 +149,7 @@ class FuncInstr
         uint32 new_PC;
 
         std::string disasm;
-                                                               
+
         void initFormat();
         void initR();
         void initI();
@@ -164,49 +164,49 @@ class FuncInstr
         void execute_addiu() { v_dst = v_src1 + v_imm; }
 
         void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
-        void execute_multu() { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };            
+        void execute_multu() { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
         void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };   
-        void execute_mfhi()  { v_dst = hi; };   
-        void execute_mthi()  { hi = v_src2; };   
-        void execute_mflo()  { v_dst = lo; };   
-        void execute_mtlo()  { lo = v_src2;};   
+        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
+        void execute_mfhi()  { v_dst = hi; };
+        void execute_mthi()  { hi = v_src2; };
+        void execute_mflo()  { v_dst = lo; };
+        void execute_mtlo()  { lo = v_src2;};
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
         void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = v_src1 >> v_imm; };    
-        void execute_sllv()  { v_dst = v_src1 << v_src2; };   
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; };   
-        void execute_srav()  { v_dst = v_src1 >> v_src2; };   
+        void execute_sra()   { v_dst = v_src1 >> v_imm; };
+        void execute_sllv()  { v_dst = v_src1 << v_src2; };
+        void execute_srlv()  { v_dst = v_src1 >> v_src2; };
+        void execute_srav()  { v_dst = v_src1 >> v_src2; };
         void execute_lui()   { v_dst = v_imm  << 0x10; }
-        void execute_slt()   { v_dst = v_src2 < v_src1; };    
-        void execute_sltu()  { v_dst = v_src2 < v_src1; };   
-        void execute_slti()  { v_dst = v_src2 < instr.asI.imm; };   
-        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm; };   
+        void execute_slt()   { v_dst = v_src2 < v_src1; };
+        void execute_sltu()  { v_dst = v_src2 < v_src1; };
+        void execute_slti()  { v_dst = v_src2 < instr.asI.imm; };
+        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm; };
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
         void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
-       
+
         void execute_andi()  { v_dst = v_src1 & v_imm; }
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
 
         void execute_beq()    { if (v_src1 == v_src2) new_PC += (v_imm << 2); }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += (v_imm << 2); }
-        
-	void execute_blez()   { if (v_src1 <= 0) new_PC += (v_imm << 2); }; 
-        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += (v_imm << 2); }; 
-        void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };    
+
+	void execute_blez()   { if (v_src1 <= 0) new_PC += (v_imm << 2); };
+        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += (v_imm << 2); };
+        void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
 
 	void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
-        void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };   
+        void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };
 
         void execute_syscall(){ };
-        void execute_break()  { }; 
-        void execute_trap()   { };   
+        void execute_break()  { };
+        void execute_trap()   { };
 
         void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
         void calculate_store_addr() { mem_addr =  v_dst + v_imm; }
@@ -222,7 +222,7 @@ class FuncInstr
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
-      
+
         /* Checks if instruction can change PC in unusual way. */
         bool isJump() const { return operation == OUT_J_JUMP ||
                                      operation == OUT_R_JUMP ||
@@ -234,18 +234,17 @@ class FuncInstr
         void set_v_src2(uint32 value) { v_src2 = value; }
 
         uint32 get_v_dst() const { return v_dst; }
-        
+
         uint32 get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
         uint32 get_new_PC() const { return new_PC; }
- 
+
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
-	
+
         void execute() { (this->*isaTable[isaNum].function)(); complete = true; };
 };
 
 std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
 
 #endif //FUNC_INSTR_H
-

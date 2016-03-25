@@ -1,5 +1,5 @@
 /**
- * log.h - Header of log class 
+ * log.h - Header of log class
  * includes 2 methods to show warrnings and errors
  * @author Stas Elizarov
  * Copyright 2010 MDSP team

@@ -17,22 +17,22 @@ using namespace std;
 #define DATA_LIMIT 5 // exit when this data value is exceeded
 #define CLOCK_LIMIT 10 // how many cycles to execute
 
-class A 
+class A
 {
         WritePort<int>* _to_B;
         ReadPort<int>* _from_B;
 
         ReadPort<int>* _init;
         WritePort<bool>* _stop;
-        
+
         // process recieved data
         void processData ( int data, int cycle);
 
 public:
-        
+
         A ();
         ~A ();
-        
+
         /* "Clock" A object, i.e. execute all actions
          * that it performs for a cycle: read ports,
          * process data and so on.
@@ -49,7 +49,7 @@ class B
         void processData ( int data,  int cycle);
 
 public:
-        
+
         B ();
         ~B ();
 
@@ -95,7 +95,7 @@ int main()
                 _a.clock( cycle);
                 _b.clock( cycle);
         }
-        
+
         cout << "-------------------------------\n\n"
                  << "Calculation is FINISHED by CLOCK_LIMIT (=" << CLOCK_LIMIT << ").\n\n";
         return 0;
@@ -109,7 +109,7 @@ A::A()
 {
         _to_B = new WritePort<int> ( "A_to_B", PORT_BW, PORT_FANOUT);
         _from_B = new ReadPort<int> ( "B_to_A", PORT_LATENCY);
-                
+
         _init = new ReadPort<int> ( "Init_A", PORT_LATENCY);
         _stop = new WritePort<bool> ( "Stop", PORT_BW, PORT_FANOUT);
 }
@@ -119,16 +119,16 @@ A::~A ()
         delete _to_B;
         delete _from_B;
         delete _init;
-        delete _stop; 
+        delete _stop;
 }
-        
+
 void A::processData ( int data, int cycle)
 {
         // perform calculation
         ++data;
         cout << "\t\tProcess data: new value = " << data << "\n";
 
-        // If data limit is exceeded 
+        // If data limit is exceeded
         // then send a stop signal
         if ( data > DATA_LIMIT)
         {
@@ -148,8 +148,8 @@ void A::clock ( int cycle)
         cout << "Clock of A:\n";
 
         int data;
-                
-        // Read all the port in order 
+
+        // Read all the port in order
         // and break the loop if there is no message to read.
         while( true)
         {
@@ -168,7 +168,7 @@ void A::clock ( int cycle)
                 }
 
                 this->processData( data, cycle);
-        } 
+        }
 }
 
 //=================================================================
@@ -184,15 +184,15 @@ B::B ()
 B::~B ()
 {
         delete _to_A;
-        delete _from_A; 
+        delete _from_A;
 }
-        
+
 void B::processData ( int data, int cycle)
-{       
+{
         // perform calculation
         ++data;
 
-        cout << "\t\tProcess data: new value = " 
+        cout << "\t\tProcess data: new value = "
                         << data << "\n" << "\t\t\tsend it to A\n";
 
         _to_A->write( data, cycle);
@@ -203,7 +203,7 @@ void B::clock ( int cycle)
         cout << "Clock of B:\n";
 
         int data;
-                
+
         if ( _from_A->read( &data, cycle))
         {
                 cout << "\tread the port from A: data = " << data << "\n";

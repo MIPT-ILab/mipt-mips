@@ -52,3 +52,4 @@ main.o: main.cpp
 clean:
 	@-rm *.o
 	@-rm perf_sim
+
