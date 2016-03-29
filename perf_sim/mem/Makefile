@@ -6,7 +6,7 @@
 #
 
 # C++ compiler flags.
-CXXFLAGS= -std=c++11
+CXXFLAGS= -std=c++0x -Dnullptr=0
 
 # Specifying relative path to the trunk.
 TRUNK= ../..

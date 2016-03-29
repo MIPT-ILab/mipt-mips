@@ -57,10 +57,8 @@ bool CacheTagArray::read( uint64 addr)
             {
                 lru->update( set_num, i); // update LRU info
                 return true; // hit
-            } else
-            {
-                return false; // miss, dirty data (or empty)
             }
+            return false; // miss, dirty data (or empty)
         }
     }
     return false; // miss (no data)

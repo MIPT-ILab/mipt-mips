@@ -31,7 +31,8 @@ struct LRUInfo
      * "lru" contains sequences of using for each set. Last number in set list
      * is the last using.
      */
-    std::vector< std::list< unsigned int>> lru;
+    std::vector< std::list< unsigned int> > lru;
+
     LRUInfo( unsigned int ways, unsigned int sets)
     {
         std::list< unsigned int> l;
@@ -39,8 +40,7 @@ struct LRUInfo
         {
             l.push_back( i);
         }
-        std::vector< std::list< unsigned int>> v( sets, l);
-        lru = v;
+        lru = std::vector< std::list< unsigned int> >( sets, l);
     }
     /*
      * On hit - mark (push back) way that contains the set.
@@ -48,13 +48,12 @@ struct LRUInfo
      */
     void update( int set, int way)
     {
-        for ( std::list< unsigned int>::iterator it = lru[ set].end();
-              it != lru[ set].begin(); )
+	// Use reverse iterator for simulation speed
+        for ( auto it = lru[ set].rbegin(); it != lru[ set].rend(); ++it)
         {
-            --it; // alignment
             if ( *it == way)
             {
-                lru[ set].erase( it);
+                lru[ set].erase( std::next( it).base());
                 lru[ set].push_back( way);
                 return;
             }
@@ -63,7 +62,7 @@ struct LRUInfo
     /* Get number of the Least Resently Used way and push back it.*/
     int update( int set)
     {
-        std::list< unsigned int>::iterator it = lru[ set].begin();
+        auto it = lru[ set].begin();
         int way = *it;
         lru[ set].erase( it);
         lru[ set].push_back( way);
