@@ -193,14 +193,14 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
 
-        void execute_beq()    { if (v_src1 == v_src2) new_PC += (v_imm << 2); }
-        void execute_bne()    { if (v_src1 != v_src2) new_PC += (v_imm << 2); }
+        void execute_beq()    { if (v_src1 == v_src2) new_PC += ((int16)v_imm << 2); }
+        void execute_bne()    { if (v_src1 != v_src2) new_PC += ((int16)v_imm << 2); }
         
-	void execute_blez()   { if (v_src1 <= 0) new_PC += (v_imm << 2); }; 
-        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += (v_imm << 2); }; 
+        void execute_blez()   { if (v_src1 <= 0) new_PC += ((int16)v_imm << 2); }; 
+        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += ((int16)v_imm << 2); }; 
         void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };    
 
-	void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
+        void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
         void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };   
 
@@ -209,7 +209,7 @@ class FuncInstr
         void execute_trap()   { };   
 
         void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
-        void calculate_store_addr() { mem_addr =  v_dst + v_imm; }
+        void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
 
     public:
         uint32 hi;

@@ -143,7 +143,6 @@ std::string FuncInstr::Dump( std::string indent) const
         oss << "\t [ $" << regTableName(dst) 
             << " = 0x" << std::hex << v_dst << "]" << std::dec;
     }
- 
     return oss.str();
 }
 
@@ -251,11 +250,12 @@ void FuncInstr::initI()
         
         case OUT_I_STORE:
             src2 = (RegNum)instr.asI.rt;
-            dst  = (RegNum)instr.asI.rs;
-            
-            oss << regTable[dst] << ", 0x"
+            src1  = (RegNum)instr.asI.rs;
+            dst  = REG_NUM_ZERO;
+
+            oss << regTable[src2] << ", 0x"
                 << std::hex << v_imm
-                << "($" << regTable[src2] << ")" << std::dec;
+                << "($" << regTable[src1] << ")" << std::dec;
             break;
     }
     disasm = oss.str();
