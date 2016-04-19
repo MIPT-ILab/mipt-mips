@@ -22,7 +22,7 @@ vpath %.cpp $(TRUNK)/perf_sim/
 # to search for headers
 INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I \
 $(TRUNK)/func_sim/func_memory/ -I $(TRUNK)/func_sim/func_instr \
--I $(TRUNK)/perf_sim/
+-I $(TRUNK)/perf_sim/ -I /usr/local/Cellar/libelf/0.8.13_1/include/libelf
 
 #
 # Enter for building func_memory stand alone program
