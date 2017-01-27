@@ -4,46 +4,7 @@ The aim of the project is to teach the students the computer architecture throug
 
 ## Lectures on Computer Architecture
 
-Here you may find lectures on the computer architecture and simulation practicums of 2015/2016 year.
-
-### Term 1: CS Basics and Components
-
-n | Topic
-:-: | ------------------------------
-L1 | **Project intro**<br/> • [Rus text, Rus audio, 23 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_01__19_Sep__Project_Introduction__Rus_text__Rus_audio.pptx?raw=true) <br/> • [Rus text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_01__19_Sep__Project_Introduction__Rus_text__No_audio.pptx?raw=true) |
-L2 | **Layers of Computer Science, ISA and uArch**<br/> • [Eng text, Rus audio, 77 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_02__20_Sep__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__Rus_audio.pptx?raw=true)<br/> • [Eng text, No audio, 9.2 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_02__20_Sep__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__No_audio.pptx?raw=true) |
-L3 | **Boolean Algebra. Combinational Circuits**<br/> • [Eng text, Rus audio, 66 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_03__10_Oct__Combinational_Circuits__Eng_text__Rus_audio.pptx?raw=true)<br/> • [Eng text, No audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_03__10_Oct__Combinational_Circuits__Eng_text__No_audio.pptx?raw=true)| 
-L4 | **Integrated Circuits Basics**<br/> • [Eng text, Rus audio, 72 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_04__17_Oct__Integrated_Circuits_Basics__Eng_text__Rus_audio.pptx?raw=true)<br/> • [Eng text, No audio, 1.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_04__17_Oct__Integrated_Circuits_Basics__Eng_text__No_audio.pptx?raw=true)|
-L5 | **Sequential Circuits**<br/> • [Eng text, Rus audio, 46 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_05__24_Oct__Sequential_Circuits__Eng_text__Rus_audio.pptx?raw=true)<br/> • [Eng text, No audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_05__24_Oct__Sequential_Circuits__Eng_text__No_audio.pptx?raw=true) |
-
-### Term 2: MIPS as pipeline-friendly ISA
-
-n | Topic
-:-: | ------------------------------
-L6 | **MIPS ISA**<br/> • [Eng text, Rus audio, 12 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_06__07_Nov__Basics_of_MIPS_ISA__Eng_text__Rus_audio.pptx)<br/> • [Eng text, No audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_06__07_Nov__Basics_of_MIPS_ISA__Eng_text__No_audio.pptx)<br/>
-L7 | **Single-Cycle MIPS Implementation**<br/>• [Eng text, Rus audio, 54 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_07__14_Nov__Single_Cycle_Implementation__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_07__14_Nov__Single_Cycle_Implementation__Eng_text__No_audio.pptx?raw=true) |
-L8 | **Pipelining**<br/>• [Eng text, Rus audio, 59 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_08__21_Nov__Pipelining__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_08__21_Nov__Pipelining__Eng_text__No_audio.pptx?raw=true) |
-L9 | **Branch Prediction**<br/>• [Eng text, Rus audio, 77 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_09__28_Nov__Branch_Prediction__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_09__28_Nov__Branch_Prediction__Eng_text__No_audio.pptx?raw=true) |
-L10 | **Advanced Pipelining**<br/>— _Exceptions_<br/>— _Complex Pipeline_<br/>— _Superscalar CPUs_<br/>• [Eng text, Rus audio, 79 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_10__05_Dec__Advanced_Pipelining__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_10__05_Dec__Advanced_Pipelining__Eng_text__No_audio.pptx?raw=true)|
-L11 | **Performance and Power**<br/>• [Eng text, Rus audio, 67 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_11__12_Dec__Performance_and_Power__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 1.0 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_11__12_Dec__Performance_and_Power__Eng_text__No_audio.pptx?raw=true) |
-
-### Term 3: Breaking the Memory Wall
-
-n | Topic
-:-: | ------------------------------
-L12 | **Caches, part 1**<br/>— _General idea_<br/>— _Associativity_<br/>— _Performance metrics_<br/>• [Eng text, Rus audio, 50 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_12__13_Feb__Caches_Part_I__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 1.0 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_12__13_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) |
-L13 | **Caches, part 2**<br/>— _"3C" of misses_<br/>— _Multilevel caches_<br/>— _Writing and Replacement policies_<br/>— _Prefetching_<br/>— _SW optimizations_<br/>• [Eng text, Rus audio, 38 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_13__20_Feb__Caches_Part_II__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_13__20_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) |
-L14 | **Out-of-Order execution, part 1**<br/>— _General idea_<br/>— _False dependencies_<br/>• [Eng text, Rus audio, 74 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_14__27_Feb__Out_Of_Order_Execution_Part_I__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_14__27_Feb__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) |
-L15 | **Out-of-Order execution, part 2**<br/>— _Exceptions_<br/>— _Scheduling_<br/>• [Eng text, Rus audio, 52 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_15__05_Mar__Out_Of_Order_Execution_Part_II__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_15__05_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true)  |
-L16 | **Memory Disambiguation**<br/>• [Eng text, Rus audio, 62 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_16__12_Mar__Memory_Disambiguation__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_16__12_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) |
-
-### Term 4: Performing Multiple Tasks
-
-n | Topic
-:-: | ------------------------------
-L17 | **Virtual Memory**<br/>• [Eng text, Rus audio, 43 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_17__26_Mar__Virtual_Memory__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_17__26_Mar__Virtual_Memory__Eng_text__No_audio.pptx?raw=true) |
-L18 | **Multiprocessor Systems**<br/>• [Eng text, Rus audio, 43 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_18__02_Apr__Multiprocessor_Systems__Eng_text__Rus_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_18__02_Apr__Multiprocessor_Systems__Eng_text__No_audio.pptx?raw=true)  |
-L19 | **Simultaneous Multithreading**<br/>• [Eng text, No audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_19__09_Apr__Simultaneous%20Multithreading__Eng_text__No_audio.pptx?raw=true)<br/>• [Eng text, Rus audio, 22 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Lecture_19__09_Apr__Simultaneous%20Multithreading__Eng_text__Rus_audio.pptx?raw=true) |
+Here you may find lectures on the computer architecture and simulation practicums of 2016/2017 year.
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
