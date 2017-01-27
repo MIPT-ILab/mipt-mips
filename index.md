@@ -16,14 +16,6 @@ In our [production repository](https://github.com/MIPT-ILab/mipt-mips) you may f
 
 That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
-Several simulation-related topics were presented as practicums:
-
-n | Topic
-:-: | ------------------------------
-P1 | **Basics of Simulator Development** <br/> • [Eng text, No audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Practice_1__26_Sep__Basics_of_Simulator_Development__Eng_text__No_audio.pptx?raw=true) |
-P2 | **MIPS Instruction Decoder**<br/> • [Eng text, Rus audio, 2.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Practice_2__07_Nov__MIPS_disassembler__Eng_text__Rus_audio.pptx)<br/> • [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Practice_2__07_Nov__MIPS_disassembler__Eng_text__No_audio.pptx) |
-P3 | **Pipeline Modeling**<br/>• [Eng text, Rus audio, 52 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Practice_3__20_Feb__Pipeline_Modeling___Eng_text__No_audio.pptx?raw=true)<br/>• [Eng text, No audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2015/Practice_3__20_Feb__Pipeline_Modeling___Eng_text__No_audio.pptx?raw=true)<br/> |
-
 ## About us
 
 The project has been started in 2012 year as part of Intel lab's activity in MIPT. Since 2015, it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab) under [Alexander Titov's](https://github.com/alexander-titov) supervising. For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [Intel lab's site](http://ilab.fizteh.ru)
