@@ -6,9 +6,9 @@ The aim of the project is to teach the students the computer architecture throug
 
 Here you may find lectures on the computer architecture and simulation practicums of 2016/2017 year.
 
-n | Date |Topic
-:-: | | ------------------------------
-L1 | 11 Feb | **Introduction. Levels of Computer Science** |
+n | Date |Topic | Hometask
+:-: | | ------------------------------ | ------------------------------
+L1 | 11 Feb | **Introduction. Levels of Computer Science** | |
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
