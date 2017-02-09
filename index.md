@@ -22,4 +22,4 @@ That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-m
 
 ## About us
 
-The project has been started in 2012 year as part of Intel lab's activity in MIPT. Since 2015, it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab) under [Alexander Titov's](https://github.com/alexander-titov) supervising. For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [Intel lab's site](http://ilab.fizteh.ru)
+The project has been started in 2012 year as part of Intel lab's activity in MIPT. Currently it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab). For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [Intel lab's site](http://ilab.fizteh.ru)
