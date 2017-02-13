@@ -9,6 +9,7 @@ Here you may find lectures on the computer architecture and simulation practicum
 n | Date |Topic | Hometask
 :-: | | ------------------------------ | ------------------------------
 L1 | 11 Feb | **Introduction. Levels of Computer Science** <br/> • [Rus and Eng text, No audio, 16 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_01__11_Feb__Introduction__Layers_of_CS_Eng_text__No_audio.pptx?raw=true)  | • Commit your name to members.txt<br> • Assign yourself to the on 'february' issues |
+L2 | 18 Feb | **Sequential Curcuits** <br/> | |
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
