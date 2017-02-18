@@ -6,14 +6,15 @@ The aim of the project is to teach the students the computer architecture throug
 
 Here you may find lectures on the computer architecture and simulation practicums of 2016/2017 year.
 
+
 n | Date |Topic | Hometask
 :-: | | ------------------------------ | ------------------------------
 L1 | 11 Feb | **Introduction** <br/> **Levels of Computer Science** <br/> • [Rus and Eng text, No audio, 16 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_01__11_Feb__Introduction__Layers_of_CS_Eng_text__No_audio.pptx?raw=true)  | • Commit your name to members.txt<br> • Assign yourself to the one of 'february' issues |
-L2 | 18 Feb | **Combinational and Sequential Curcuits** <br/> • [Eng text, No audio, 16 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_02__18_Feb__Combinational_and_Sequential_Circuits__Eng_text__No_audio.pptx) | • Install [Logisim]( http://www.cburch.com/logisim/index.html) and try to reproduce some schemas we discussed |
+L2 | 18 Feb | **Combinational and Sequential Curcuits** <br/> • [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_02__18_Feb__Combinational_and_Sequential_Circuits__Eng_text__No_audio.pptx) | • Install [Logisim]( http://www.cburch.com/logisim/index.html) and try to reproduce some schemas we discussed |
+
+**Please note** that course was reduced this year, you may find more lectures in archive: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2012).
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
-
-Lectures of previous years archive with detailed timelines: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2012).
 
 ## MIPT-MIPS Simulator
 
