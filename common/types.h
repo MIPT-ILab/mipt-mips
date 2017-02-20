@@ -10,26 +10,29 @@
 #ifndef COMMON__TYPES_H
 #define COMMON__TYPES_H
 
+//C++11 fixed width integer types
+#include <cstdint>
+
 /* Signed 8-bit integer type */
-typedef signed char int8;
+using int8 = int8_t;
 /* Signed 16-bit integer type */
-typedef signed short int16;
+using int16 = int16_t;
 /* Signed 32-bit integer type */
-typedef signed int int32;
+using int32 = int32_t;
 /* Signed 64-bit integer type */
-typedef signed long long int64;
+using int64 = int64_t;
 /* Unsigned 8-bit integer type */
-typedef unsigned char uint8;
+using uint8 = uint8_t;
 /* Unsigned 16-bit integer type */
-typedef unsigned short uint16;
+using uint16 = uint16_t;
 /* Unsigned 32-bit integer type */
-typedef unsigned int uint32;
+using uint32 = uint32_t;
 /* Unsigned 64-bit integer type */
-typedef unsigned long long uint64;
+using uint64 = uint64_t;
 /* Single precision 32-bit float type */
-typedef float float32;
+using float32 = float;
 /* Double precision 64-bit float type */
-typedef double float64;
+using float64 = double;
 
 // The following consts are used to initialize some variables
 // as something that has invalid value.
@@ -41,9 +44,9 @@ static const uint16 NO_VAL16 = (uint16) -1;
 static const uint32 NO_VAL32 = (uint32) -1;
 static const uint64 NO_VAL64 = (uint64) -1;
 
-static const uint8  MAX_VAL8  = (uint8)  -1;
-static const uint16 MAX_VAL16 = (uint16) -1;
-static const uint32 MAX_VAL32 = (uint32) -1;
-static const uint64 MAX_VAL64 = (uint64) -1;
+static const uint8  MAX_VAL8  = UINT8_MAX;
+static const uint16 MAX_VAL16 = UINT16_MAX;
+static const uint32 MAX_VAL32 = UINT32_MAX;
+static const uint64 MAX_VAL64 = UINT64_MAX;
 
 #endif // #ifndef COMMON__TYPES_H 
