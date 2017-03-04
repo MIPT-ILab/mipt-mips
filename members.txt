@@ -5,3 +5,4 @@ List of 2016/2017 project members:
 4. Ivan Korostelev
 5. Evgeny Dyachkov
 6. Artem Lukoyanov
+7. Alexander Seppar
