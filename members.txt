@@ -2,7 +2,6 @@ List of 2016/2017 project members:
 1. Pavel Kryukov
 2. Alexey Piskunov
 3. Ivan Nasedkin
-4. Ivan Korostelev
-5. Evgeny Dyachkov
-6. Artem Lukoyanov
-7. Alexander Seppar
+4. Evgeny Dyachkov
+5. Artem Lukoyanov
+6. Alexander Seppar
