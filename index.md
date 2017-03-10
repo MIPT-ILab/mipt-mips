@@ -25,6 +25,13 @@ In our [production repository](https://github.com/MIPT-ILab/mipt-mips) you may f
 
 That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
+## Students Score
+
+N | Name | Score | Comments
+:-: | | ------------------------------ | ------------------------------
+1 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+1 | Alexandr Seppar | 1 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e) |
+
 ## About us
 
 The project has been started in 2012 year as part of Intel lab's activity in MIPT. Currently it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab). For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [Intel lab's site](http://ilab.fizteh.ru)
