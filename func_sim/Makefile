@@ -7,6 +7,9 @@
 # specifying relative path to the TRUNK
 TRUNK= ../
 
+# C++ compiler flags
+CXXFLAGS= -std=c++11
+
 # paths to look for headers
 vpath %.h $(TRUNK)/common
 vpath %.h $(TRUNK)/func_sim/
@@ -36,19 +39,19 @@ func_sim: func_memory.o elf_parser.o func_instr.o func_sim.o main.o
 	@echo "$@ is built SUCCESSFULLY"
 
 main.o: main.cpp func_sim.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 func_sim.o: func_sim.cpp func_sim.h types.h func_instr.h func_memory.h rf.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 func_instr.o: func_instr.cpp func_instr.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
     
 func_memory.o: func_memory.cpp func_memory.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 elf_parser.o: elf_parser.cpp elf_parser.h types.h
-	$(CXX) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 clean:
 	@-rm *.o
