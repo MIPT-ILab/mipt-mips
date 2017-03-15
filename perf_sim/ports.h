@@ -88,9 +88,8 @@ template<class T> class WritePort: public Port<T>, private Log
         uint32 _fanout;
 
         // List of readers
-        typedef std::list<ReadPort<T>* > ReadListType;
-        typedef typename ReadListType::iterator ReadListIt;
-        ReadListType* _destinations;
+        using ReadListType = std::list<ReadPort<T>* >;
+        ReadListType _destinations;
         
         // Variables for counting token in the last cycle
         uint32 _lastCycle;
@@ -104,7 +103,7 @@ template<class T> class WritePort: public Port<T>, private Log
         void write( T, uint64);
         
         // Addes destination ReadPort to list
-        void setDestination( ReadListType*);
+        void setDestination( const ReadListType&);
         
         // Returns fanout for test of connection
         uint32 getFanout() const;
@@ -160,9 +159,9 @@ template<class T> void WritePort<T>::write( T what, uint64 cycle)
     {
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
         _writeCounter++;
-        for ( ReadListIt it = _destinations->begin(); it != _destinations->end(); ++it)
+        for ( auto* dst : this->_destinations)
         {
-            (*it)->pushData(what, cycle);
+            dst->pushData(what, cycle);
         }
     }
     else
@@ -175,9 +174,10 @@ template<class T> void WritePort<T>::write( T what, uint64 cycle)
 /*
  * Shows to WritePort list of his ReadPorts (from PortMap)
 */
-template<class T> void WritePort<T>::setDestination(ReadListType* pointer)
+template<class T> void WritePort<T>::setDestination(const ReadListType& source)
 {
-    _destinations = pointer;
+    _destinations.clear();
+    _destinations.insert(_destinations.end(), source.begin(), source.end());
 }
 
 /*
@@ -302,8 +302,7 @@ template<class T> bool ReadPort<T>::selfTest(uint64 cycle, uint64* wantedCycle) 
 template<class T> class PortMap: public Log
 {
     private:       
-        typedef std::list<ReadPort<T>* > ReadListType;
-        typedef typename ReadListType::iterator ReadListTypeIt;
+        using ReadListType = std::list<ReadPort<T>* >;
         
         // Entry of portMap — one writer and list of readers
         struct Entry
@@ -313,15 +312,14 @@ template<class T> class PortMap: public Log
         };
         
         // Type of map of Entry
-        typedef std::map<std::string, Entry> MapType;
-        typedef typename MapType::iterator MapTypeIt;
+        using MapType = std::map<std::string, Entry>;
         
         // Map itself
         MapType _map;
     public:
         // Adding methods
-        void addWritePort( std::string, WritePort<T>*);
-        void addReadPort( std::string, ReadPort<T>*);        
+        void addWritePort( const std::string&, WritePort<T>*);
+        void addReadPort( const std::string&, ReadPort<T>*);        
         
         // Init method
         void init();
@@ -338,7 +336,7 @@ template<class T> PortMap<T>::PortMap() : Log(true) { }
 /*
  * Adding WritePort to the map.
 */
-template<class T> void PortMap<T>::addWritePort( std::string key, WritePort<T>* pointer)
+template<class T> void PortMap<T>::addWritePort( const std::string& key, WritePort<T>* pointer)
 {
     if ( _map.find( key) == _map.end())
     {
@@ -362,7 +360,7 @@ template<class T> void PortMap<T>::addWritePort( std::string key, WritePort<T>* 
 /*
  * Adding ReadPort to the map.
 */
-template<class T> void PortMap<T>::addReadPort( std::string key, ReadPort<T>* pointer)
+template<class T> void PortMap<T>::addReadPort( const std::string& key, ReadPort<T>* pointer)
 {
     if ( _map.find(key) == _map.end())
     {
@@ -384,35 +382,35 @@ template<class T> void PortMap<T>::addReadPort( std::string key, ReadPort<T>* po
 */ 
 template<class T> void PortMap<T>::init()
 {
-    for ( MapTypeIt it = _map.begin(); it != _map.end(); ++it)
+    for ( auto& entry : _map)
     {
-        if ( !it->second.writer)
+        if ( !entry.second.writer)
         {
-            serr << "No WritePort for " << it->first << " key" << std::endl << critical;
+            serr << "No WritePort for " << entry.first << " key" << std::endl << critical;
         }
         
-        WritePort<T>* writer = it->second.writer;
-        uint32 readersCounter = it->second.readers.size();
+        WritePort<T>* writer = entry.second.writer;
+        uint32 readersCounter = entry.second.readers.size();
         if ( !readersCounter)
         {
-            serr << "No ReadPorts for " << it->first << " key" << std::endl << critical;
+            serr << "No ReadPorts for " << entry.first << " key" << std::endl << critical;
             return;
         }
         if ( readersCounter > writer->getFanout())
         {
-            serr << it->first << " WritePort is overloaded by fanout" << std::endl << critical;
+            serr << entry.first << " WritePort is overloaded by fanout" << std::endl << critical;
             return;
         }
         if ( readersCounter < writer->getFanout())
         {
-            serr << it->first << " WritePort is underloaded by fanout" << std::endl;
+            serr << entry.first << " WritePort is underloaded by fanout" << std::endl;
         }
-        it->second.writer->setDestination( &(it->second.readers));
+        writer->setDestination( entry.second.readers);
 
         // Initializing ports with setting their init flags.
-        for ( ReadListTypeIt jt = it->second.readers.begin(); jt != it->second.readers.end(); ++jt)
+        for ( ReadPort<T>*& reader : entry.second.readers)
         {
-            (*jt)->setInit();
+            reader->setInit();
         }
         writer->setInit();        
     }
@@ -426,14 +424,15 @@ template<class T> void PortMap<T>::init()
 */
 template<class T> void PortMap<T>::lost( uint64 cycle)
 {
-    for ( MapTypeIt it = _map.begin(); it != _map.end(); ++it)
+    for ( auto& entry : _map)
     {
-        for ( ReadListTypeIt jt = it->second.readers.begin(); jt != it->second.readers.end(); ++jt)
+        for ( auto& reader : entry.second.readers)
         {
             uint64 addCycle;
-            if ( !(*jt)->selfTest( cycle, &addCycle))
+            if ( !reader->selfTest( cycle, &addCycle))
             {
-                warning( "In %s port data was added at %d clock and will not be readed\n", it->first.c_str(), addCycle);
+                serr << "In " << entry.first << " port data was added at " << addCycle
+                     << " clock and will not be readed" << std::end;
             }
         }
     }
