@@ -39,4 +39,4 @@ clean:
 help:
 	@echo "  This makefile build all MIPS assembly files in the directory."
 	@echo "  To do that just type 'make' or 'make build_all'."
-	@echo "  Note that assembly files should have '.s' extension."
+	@echo "  Note that assembly files should have '.s.gz' extension."
