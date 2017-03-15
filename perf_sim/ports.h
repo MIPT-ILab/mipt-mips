@@ -22,7 +22,7 @@ template<class T> class WritePort;
 /*
  * Port class
 */
-template<class T> class Port: public log
+template<class T> class Port
 {
     protected:
         // Key of port
@@ -50,7 +50,7 @@ template<class T> class Port: public log
         void setInit();
         
         // Constructor of port
-        Port<T>( std::string);
+        Port<T>( const std::string&);
 };
 
 /*
@@ -61,7 +61,7 @@ template<class T> PortMap<T>* Port<T>::portMap = new PortMap<T>;
 /*
  * Constructor
 */
-template<class T> Port<T>::Port( std::string key)
+template<class T> Port<T>::Port( const std::string& key)
 {
     _key = key;
     _init = false;
@@ -78,7 +78,7 @@ template<class T> void Port<T>::setInit()
 /*
  * WritePort
  */
-template<class T> class WritePort: public Port<T>
+template<class T> class WritePort: public Port<T>, private Log
 {
     private:
         // Number of tokens that can be added in one cycle;
@@ -98,7 +98,7 @@ template<class T> class WritePort: public Port<T>
         
     public:
         // Constructor
-        WritePort<T>( std::string, uint32, uint32);
+        WritePort<T>( const std::string&, uint32, uint32);
         
         // Write Method
         void write( T, uint64);
@@ -119,8 +119,8 @@ template<class T> class WritePort: public Port<T>
  *
  * Adds port to needed PortMap.
 */
-template<class T> WritePort<T>::WritePort( std::string key, uint32 bandwidth, uint32 fanout):
-    Port<T>::Port( key)
+template<class T> WritePort<T>::WritePort( const std::string& key, uint32 bandwidth, uint32 fanout):
+    Port<T>::Port( key), Log(true)
 {
     _bandwidth = bandwidth;
     _fanout = fanout;
@@ -147,7 +147,7 @@ template<class T> void WritePort<T>::write( T what, uint64 cycle)
     if ( !this->_init) 
     {
     // If no init, asserts
-        this->critical( "%s WritePort was not initializated", this->_key.c_str());
+        serr << this->_key << " WritePort was not initializated" << std::endl << critical;
         return;
     }
     if ( _lastCycle != cycle)
@@ -168,7 +168,7 @@ template<class T> void WritePort<T>::write( T what, uint64 cycle)
     else
     {
     // If we overloaded port's bandwidth, assert
-        this->critical( "Port '%s' is overloaded by bandwidth\n", this->_key.c_str());
+        serr << this->_key << " port is overloaded by bandwidth" << std::endl << critical;
     }
 }
 
@@ -191,7 +191,7 @@ template<class T> uint32 WritePort<T>::getFanout() const
 /*
  * Read Port
 */
-template<class T> class ReadPort: public Port<T>
+template<class T> class ReadPort: public Port<T>, private Log
 {
     private:
         // Latency is the number of cycles after which we may take data from port.
@@ -208,7 +208,7 @@ template<class T> class ReadPort: public Port<T>
  
     public:
         // Constructor
-        ReadPort<T>( std::string, uint64);
+        ReadPort<T>( const std::string&, uint64);
         
         // Read method
         bool read( T*, uint64);
@@ -228,8 +228,8 @@ template<class T> class ReadPort: public Port<T>
  *
  * Adds port to needed PortMap.
 */ 
-template<class T> ReadPort<T>::ReadPort( std::string key, uint64 latency):
-    Port<T>::Port( key)
+template<class T> ReadPort<T>::ReadPort( const std::string& key, uint64 latency):
+    Port<T>::Port( key), Log(true)
 {
     _latency = latency;
     
@@ -249,7 +249,7 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 {   
     if ( !this->_init) 
     {
-        this->critical( "%s ReadPort was not initializated", this->_key.c_str());
+        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
         return false;
     }
 
@@ -299,7 +299,7 @@ template<class T> bool ReadPort<T>::selfTest(uint64 cycle, uint64* wantedCycle) 
 /*
  * Map of ports
 */
-template<class T> class PortMap: public log
+template<class T> class PortMap: public Log
 {
     private:       
         typedef std::list<ReadPort<T>* > ReadListType;
@@ -328,7 +328,12 @@ template<class T> class PortMap: public log
         
         // Finding lost elements
         void lost( uint64);
+
+        PortMap();
 }; 
+
+
+template<class T> PortMap<T>::PortMap() : Log(true) { }
 
 /*
  * Adding WritePort to the map.
@@ -348,7 +353,7 @@ template<class T> void PortMap<T>::addWritePort( std::string key, WritePort<T>* 
         if ( _map[key].writer)
         {
         // Warning of double using of same key for WritePort
-            warning( "Reusing of '%s' key for WritePort. Last WritePort will be used.", key.c_str());
+            serr << "Reusing of " << key << " key for WritePort. Last WritePort will be used." << std::endl;
         }
     }
     _map[key].writer = pointer;
@@ -383,24 +388,24 @@ template<class T> void PortMap<T>::init()
     {
         if ( !it->second.writer)
         {
-           this->critical( "No WritePort for '%s' key", it->first.c_str());
+            serr << "No WritePort for " << it->first << " key" << std::endl << critical;
         }
         
         WritePort<T>* writer = it->second.writer;
         uint32 readersCounter = it->second.readers.size();
         if ( !readersCounter)
         {
-           this->critical( "No ReadPorts for '%s' key", it->first.c_str());
-           return;
+            serr << "No ReadPorts for " << it->first << " key" << std::endl << critical;
+            return;
         }
         if ( readersCounter > writer->getFanout())
         {
-            this->critical( "%s WritePort is overloaded by fanout", it->first.c_str());
+            serr << it->first << " WritePort is overloaded by fanout" << std::endl << critical;
             return;
         }
         if ( readersCounter < writer->getFanout())
         {
-            warning( "%s WritePort is underloaded by fanout", it->first.c_str());
+            serr << it->first << " WritePort is underloaded by fanout" << std::endl;
         }
         it->second.writer->setDestination( &(it->second.readers));
 

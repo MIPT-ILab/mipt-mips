@@ -1,28 +1,54 @@
 /**
  * log.h - Header of log class 
  * includes 2 methods to show warrnings and errors
- * @author Stas Elizarov
- * Copyright 2010 MDSP team
+ * @author Pavel Kryukov
+ * Copyright 2017 MIPT-MIPS team
  */
 
 #ifndef LOG_H
 #define LOG_H
 
 #include <iostream>
-#include <cassert>
-#include <stdarg.h>
-#include <cstdio>
+#include <ostream>
 
-using namespace std;
+class LogOstream
+{
+    const bool enable;
+    std::ostream& stream;
 
-class log
+public:
+    struct Critical { };
+
+    LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
+
+    friend LogOstream& operator<<(LogOstream& out, const Critical&) {
+         exit(-1);
+    }
+
+    LogOstream& operator<<(std::ostream& (*F)(std::ostream&)) {
+        if ( enable)
+            F(stream);
+        return *this;
+    }
+
+    template<typename T>
+    friend LogOstream& operator<<(LogOstream& out, const T& v) {
+        if ( out.enable) {
+            out.stream << v;
+        }
+        
+        return out;
+    }
+};
+
+class Log
 {
 public:
-    /* Method to show warning message*/
-    void warning(const char * message, ...) const;
+    LogOstream sout;
+    LogOstream serr;
+    LogOstream::Critical critical;
 
-    /* Method to show error and assert simulator*/
-    void critical(const char * message, ...) const;
+    Log(bool value) : sout(value, std::cout), serr(true, std::cerr) { }
 };
 
 

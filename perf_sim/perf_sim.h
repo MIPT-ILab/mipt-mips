@@ -14,7 +14,7 @@
 #include <perf_sim_rf.h>
 #include <ports.h>
 
-class PerfMIPS
+class PerfMIPS : protected Log
 {
     private:
         /** Functional simulator components. */
@@ -71,7 +71,6 @@ class PerfMIPS
         WritePort< bool>* wp_writeback_2_memory_stall;
 
         int executed_instrs; // executed instructions counter
-        bool is_silent; // mode flag
 
         /* Here modules stores data. */
         uint32 fetch_data;
@@ -99,10 +98,10 @@ class PerfMIPS
         bool isJump( uint32 data);
 
     public:
-        PerfMIPS();
+        PerfMIPS(bool log);
         ~PerfMIPS();
         /* Starts simulator. */
-        void run( const string& tr, int instr_to_run, bool is_silent);
+        void run( const string& tr, int instr_to_run);
 };
 
 #endif // #ifndef PERF_SIM_H

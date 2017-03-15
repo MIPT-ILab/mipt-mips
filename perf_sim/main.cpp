@@ -40,8 +40,8 @@ int main( int argc, char* argv[])
             exit( EXIT_FAILURE);
     }
 
-    PerfMIPS* p_mips = new PerfMIPS;
-    p_mips->run( argv[ 1], atoi( argv[ 2]), is_silent);
+    PerfMIPS* p_mips = new PerfMIPS( !is_silent);
+    p_mips->run( argv[ 1], atoi( argv[ 2]));
     delete p_mips;
     return 0;
 }

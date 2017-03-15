@@ -29,7 +29,7 @@ INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ \
 #
 # Enter for build "perf_sim" programm.
 #
-perf_sim: elf_parser.o func_memory.o func_instr.o log.o perf_sim.o main.o
+perf_sim: elf_parser.o func_memory.o func_instr.o perf_sim.o main.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ -l elf
 	@echo "--------------------------------"
 	@echo "$@ is built successfully."
@@ -39,8 +39,8 @@ func_memory.o: func_memory.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 func_instr.o: func_instr.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCL)
-log.o: log.cpp
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
+#log.o: log.cpp
+#	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 perf_sim.o: perf_sim.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 main.o: main.cpp
