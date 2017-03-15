@@ -5,7 +5,7 @@
  * Copyright 2010 MDSP team
  */
 
-#ifndef	LOG_H
+#ifndef LOG_H
 #define LOG_H
 
 #include <iostream>
@@ -18,11 +18,11 @@ using namespace std;
 class log
 {
 public:
-	/* Method to show warning message*/
-	void warning(const char * message, ...) const;
+    /* Method to show warning message*/
+    void warning(const char * message, ...) const;
 
-	/* Method to show error and assert simulator*/
-	void critical(const char * message, ...) const;
+    /* Method to show error and assert simulator*/
+    void critical(const char * message, ...) const;
 };
 
 
