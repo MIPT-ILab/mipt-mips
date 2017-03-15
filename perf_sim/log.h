@@ -32,12 +32,12 @@ public:
     }
 
     template<typename T>
-    friend LogOstream& operator<<(LogOstream& out, const T& v) {
-        if ( out.enable) {
-            out.stream << v;
+    LogOstream& operator<<(const T& v) {
+        if ( enable) {
+            stream << v;
         }
         
-        return out;
+        return *this;
     }
 };
 
