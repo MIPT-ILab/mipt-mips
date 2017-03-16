@@ -29,10 +29,10 @@ That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-m
 
 ## Students Score
 
-N | Name | Score | Comments
-:-: | | ------------------------------ | ------------------------------
-1 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
-1 | Alexandr Seppar | 1 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e) |
+N | Year | Name | Score | Comments
+:-: | | | ------------------------------ | ------------------------------
+1 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+1 | 2016/2017 | Alexandr Seppar | 1 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e) |
 
 ## About us
 
