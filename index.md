@@ -14,6 +14,8 @@ L2 | 18 Feb | **Combinational and Sequential Curcuits** <br/> • [Eng text, No 
 | 25 Feb | *No lecture* | |
 L3 | 04 Mar | **ISA and uArch. MIPS single-cycle implementation** <br/> • [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_03__04_Mar__ISA_and_uArch_MIPS_single-cycle_implementation__Eng_text__No_audio.pptx)  | |
 L4 | 11 Mar | **Pipeline** <br/> • [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_04__11_Mar__Pipelining__Eng_text__No_audio.pptx) | |
+L5 | 18 Mar | **Branch Prediction** | |
+
 
 **Please note** that course was reduced this year, you may find more lectures in archive: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2012).
 
