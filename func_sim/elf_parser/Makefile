@@ -48,7 +48,7 @@ test: unit_test
 unit_test: unit_test.o elf_parser.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $(CXXFLAGS) $^ -lpthread $(GTEST_LIB) -o $@ -l elf  $(GTEST_LIB)
+	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf  $(GTEST_LIB)
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
