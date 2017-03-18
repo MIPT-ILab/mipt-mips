@@ -60,7 +60,7 @@ test: unit_test
 unit_test: unit_test.o func_memory.o elf_parser.o func_instr.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $(CXXFLAGS) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
+	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
