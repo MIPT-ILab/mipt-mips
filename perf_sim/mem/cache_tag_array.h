@@ -70,7 +70,7 @@ struct LRUInfo
     }
 };
 
-class CacheTagArray
+class CacheTagArray : protected Log
 {
     private:
         const unsigned int size_in_bytes;
@@ -81,7 +81,7 @@ class CacheTagArray
         LRUInfo* lru; // LRU algorithm module
 
         /* Checks if it possiable to create cache. */
-        void chechArgs( unsigned int size_in_bytes,
+        void checkArgs( unsigned int size_in_bytes,
                         unsigned int ways,
                         unsigned short block_size_in_bytes,
                         unsigned short addr_size_in_bits);

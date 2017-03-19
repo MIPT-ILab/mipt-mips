@@ -18,13 +18,14 @@ CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
                               unsigned int ways,
                               unsigned short block_size_in_bytes,
                               unsigned short addr_size_in_bits) :
+                              Log(false),                       //cache should not say anything but error info
                               size_in_bytes( size_in_bytes),
                               ways( ways),
                               block_size_in_bytes( block_size_in_bytes),
                               addr_size_in_bits( addr_size_in_bits)
 {
     /* Check is it possiable to create the cache. */
-    chechArgs( size_in_bytes, ways, block_size_in_bytes, addr_size_in_bits);
+    checkArgs( size_in_bytes, ways, block_size_in_bytes, addr_size_in_bits);
     /* Allocate memory for cache sets and LRU module. */
     set = new CacheSet* [ ways];
     for ( unsigned int i = 0; i < ways; ++i)
@@ -72,7 +73,7 @@ void CacheTagArray::write( uint64 addr)
     set[ way_num][ set_num].is_valid = true; // this set is valid now
 }
 
-void CacheTagArray::chechArgs( unsigned int size_in_bytes,
+void CacheTagArray::checkArgs( unsigned int size_in_bytes,
                                unsigned int ways,
                                unsigned short block_size_in_bytes,
                                unsigned short addr_size_in_bits)
@@ -83,7 +84,7 @@ void CacheTagArray::chechArgs( unsigned int size_in_bytes,
          ( block_size_in_bytes == 0) ||
          ( addr_size_in_bits == 0))
     {
-        std::cerr << "ERROR: Wrong arguments! All arguments should be greater "
+        serr << "ERROR: Wrong arguments! All arguments should be greater "
                   << "than zero." << std::endl;
         exit( EXIT_FAILURE);
     }
@@ -93,7 +94,7 @@ void CacheTagArray::chechArgs( unsigned int size_in_bytes,
      */
     if ( size_in_bytes / ways < block_size_in_bytes)
     {
-        std::cerr << "ERROR: Wrong arguments! Size of each way should be not "
+        serr << "ERROR: Wrong arguments! Size of each way should be not "
                   << "less than size of block (size in bytes of cache should "
                   << "be not less than number of ways and size of block in "
                   << "bytes)." << std::endl;
@@ -105,7 +106,7 @@ void CacheTagArray::chechArgs( unsigned int size_in_bytes,
      */
     if ( ( size_in_bytes % ( block_size_in_bytes * ways)) != 0)
     {
-        std::cerr << "ERROR: Wrong arguments! Size of cache should be a "
+        serr << "ERROR: Wrong arguments! Size of cache should be a "
                   << "multiple of block size in bytes and number of ways."
                   << std::endl;
         exit( EXIT_FAILURE);
@@ -114,13 +115,13 @@ void CacheTagArray::chechArgs( unsigned int size_in_bytes,
     if ( ( ( size_in_bytes / ( ways * block_size_in_bytes)) &
            ( size_in_bytes / ( ways * block_size_in_bytes) - 1)) != 0)
     {
-        std::cerr << "ERROR: Wrong arguments! Number of sets should be a power"
+        serr << "ERROR: Wrong arguments! Number of sets should be a power"
                   << " of 2." << std::endl;
         exit( EXIT_FAILURE);
     }
     if ( ( block_size_in_bytes & ( block_size_in_bytes - 1)) != 0)
     {
-        std::cerr << "ERROR: Wrong arguments! Block size should be a power of "
+        serr << "ERROR: Wrong arguments! Block size should be a power of "
                   << "2." << std::endl;
         exit( EXIT_FAILURE);
     }
