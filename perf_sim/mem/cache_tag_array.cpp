@@ -85,8 +85,7 @@ void CacheTagArray::checkArgs( unsigned int size_in_bytes,
          ( addr_size_in_bits == 0))
     {
         serr << "ERROR: Wrong arguments! All arguments should be greater "
-                  << "than zero." << std::endl;
-        exit( EXIT_FAILURE);
+                  << "than zero." << critical;
     }
     /*
      * It also checks "size_in_bytes < block_size_in_bytes" and "size_in_bytes
@@ -97,8 +96,7 @@ void CacheTagArray::checkArgs( unsigned int size_in_bytes,
         serr << "ERROR: Wrong arguments! Size of each way should be not "
                   << "less than size of block (size in bytes of cache should "
                   << "be not less than number of ways and size of block in "
-                  << "bytes)." << std::endl;
-        exit( EXIT_FAILURE);
+                  << "bytes)." << critical;
     }
     /*
      * It also checks "size_in_bytes % block_size_in_bytes != 0" and
@@ -108,22 +106,19 @@ void CacheTagArray::checkArgs( unsigned int size_in_bytes,
     {
         serr << "ERROR: Wrong arguments! Size of cache should be a "
                   << "multiple of block size in bytes and number of ways."
-                  << std::endl;
-        exit( EXIT_FAILURE);
+                  << critical;
     }
     /* The next two use: "2^a=b"<=>"b=100...000[2]"<=>"(b&(b-1))=0". */
     if ( ( ( size_in_bytes / ( ways * block_size_in_bytes)) &
            ( size_in_bytes / ( ways * block_size_in_bytes) - 1)) != 0)
     {
         serr << "ERROR: Wrong arguments! Number of sets should be a power"
-                  << " of 2." << std::endl;
-        exit( EXIT_FAILURE);
+                  << " of 2." << critical;
     }
     if ( ( block_size_in_bytes & ( block_size_in_bytes - 1)) != 0)
     {
         serr << "ERROR: Wrong arguments! Block size should be a power of "
-                  << "2." << std::endl;
-        exit( EXIT_FAILURE);
+                  << "2." << critical;
     }
 }
 
