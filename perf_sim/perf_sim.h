@@ -80,6 +80,7 @@ class PerfMIPS : protected Log
         FuncInstr writeback_data;
 
         bool PC_is_valid; // validate flag of PC
+        uint64 warning_cycle_num = 1000; // in case of possible deadlocks
 
         /* Components for handling data dependency. */
         uint32 source_stall_data; // storage for data came from Fetch
