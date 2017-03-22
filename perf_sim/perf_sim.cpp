@@ -123,7 +123,7 @@ void PerfMIPS::run( const string& tr, int instrs_to_run)
         if ( cycle > warning_cycle_num) // print warning sign in case of deadlock
         {
             sout << "###Caution! Deadlock possibility! Large cycle number: " << cycle << endl << endl;
-            warning_cycle_num += 10;
+            warning_cycle_num += 10; // in order not to see it every cycle
         }
         sout << "Executed instructions: " << executed_instrs << endl << endl;
     }
