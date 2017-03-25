@@ -23,9 +23,11 @@ vpath %.cpp $(TRUNK)/func_sim/func_memory/
 # to search for headers
 INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I $(TRUNK)/func_sim/func_memory/ 
 
-#options for static linking of boost Unit Test library
-INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
-GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
+
+# googletest directories
+GTEST_DIR= $(TRUNK)/libs/googletest
+GTEST_INCL= -I $(GTEST_DIR)/lib/include
+GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
 
 #
 # Enter for building func_memory stand alone program
@@ -60,12 +62,15 @@ test: unit_test
 unit_test: unit_test.o func_memory.o elf_parser.o func_instr.o
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
+	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf $(GTEST_LIB)
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp func_instr.h
-	$(CXX) $(CXXFLAGS) -c $< $(INCL_GTEST) $(INCL) 
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $<
+
+$(GTEST_LIB):
+	$(MAKE) -C $(GTEST_DIR)
 
 clean:
 	@-rm *.o
