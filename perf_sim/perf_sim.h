@@ -71,7 +71,7 @@ class PerfMIPS : protected Log
         WritePort< bool>* wp_writeback_2_memory_stall;
 
         int executed_instrs, // executed instructions counter
-            last_writeback_cycle; // to handle possible deadlocks
+            last_writeback_cycle = 0; // to handle possible deadlocks
 
         /* Here modules stores data. */
         uint32 fetch_data;
