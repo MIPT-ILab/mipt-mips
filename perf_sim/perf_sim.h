@@ -70,7 +70,8 @@ class PerfMIPS : protected Log
         ReadPort< bool>* rp_writeback_2_memory_stall;
         WritePort< bool>* wp_writeback_2_memory_stall;
 
-        int executed_instrs; // executed instructions counter
+        int executed_instrs, // executed instructions counter
+            last_writeback_cycle; // to handle possible deadlocks
 
         /* Here modules stores data. */
         uint32 fetch_data;
