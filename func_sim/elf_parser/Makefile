@@ -4,6 +4,8 @@
 # Copyright 2012 uArchSim iLab Project
 #
 
+.PHONY: all gtest clean
+
 # specifying relative path to the TRUNK
 TRUNK= ../../
 
@@ -17,9 +19,11 @@ vpath %.h $(TRUNK)/common
 # to search for headers
 INCL= -I ./ -I $(TRUNK)common/
 
-#options for static linking of boost Unit Test library
-INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
-GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
+# googletest directories
+GTEST_DIR= $(TRUNK)/libs/googletest
+GTEST_INCL= -I $(GTEST_DIR)/lib/include
+GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
+
 
 #
 # Enter for building elf_parser stand alone program
@@ -45,15 +49,18 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler ELF parser passed SUCCESSFULLY!"
 
-unit_test: unit_test.o elf_parser.o
+unit_test: unit_test.o elf_parser.o $(GTEST_LIB)
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf  $(GTEST_LIB)
+	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf $(GTEST_LIB)
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-unit_test.o: unit_test.cpp elf_parser.o
-	$(CXX) $(CXXFLAGS) -c $< $(INCL_GTEST) $(INCL) 
+unit_test.o: unit_test.cpp elf_parser.o $(GTEST_LIB)
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $< 
+
+$(GTEST_LIB):
+	$(MAKE) -C $(GTEST_DIR)
 
 clean:
 	@-rm *.o
