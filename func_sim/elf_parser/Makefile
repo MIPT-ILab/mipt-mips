@@ -57,7 +57,7 @@ unit_test: unit_test.o elf_parser.o $(GTEST_LIB)
 	@echo "$@ is built SUCCESSFULLY"
 
 unit_test.o: unit_test.cpp elf_parser.o $(GTEST_LIB)
-	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $< 
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $<
 
 $(GTEST_LIB):
 	$(MAKE) -C $(GTEST_DIR)
