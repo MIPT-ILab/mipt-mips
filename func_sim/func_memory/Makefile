@@ -5,7 +5,7 @@
 #
 
 # specifying relative path to the TRUNK
-TRUNK= ../../
+TRUNK= ../..
 
 # C++ compiler flags
 CXXFLAGS= -std=c++11
@@ -51,14 +51,14 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
 
-unit_test: unit_test.o func_memory.o elf_parser.o
+unit_test: unit_test.o func_memory.o elf_parser.o $(GTEST_LIB)
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf $(GTEST_LIB)
+	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-unit_test.o: unit_test.cpp func_memory.o elf_parser.o
+unit_test.o: unit_test.cpp func_memory.o elf_parser.o $(GTEST_LIB)
 	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $<
 
 $(GTEST_LIB):
@@ -66,4 +66,4 @@ $(GTEST_LIB):
 
 clean:
 	@-rm *.o
-	@-rm func_memory unit_test
+	@-rm -rf func_memory unit_test
