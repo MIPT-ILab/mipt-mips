@@ -19,7 +19,8 @@ L6 | 25 Mar | **Performance and Power** <br/> • [Eng text, No audio, 1.0 MB](h
 L7 | 01 Apr | **Caches** | |
 L8 | 08 Apr | **Out-of-Order execution** | |
 L9 | 15 Apr | **Memory Disamiguation** | |
-| 22 Apr<br/>24 Apr | **Final test**<br/>**Interview** | |
+| 22 Apr | **Final test** | |
+| 24 Apr | **Interview** | |
 L10 | 29 Apr | **Multicore and Multithreading** | |
 
 
