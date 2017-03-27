@@ -16,6 +16,11 @@ L3 | 04 Mar | **ISA and uArch. MIPS single-cycle implementation** <br/> • [Eng
 L4 | 11 Mar | **Pipeline** <br/> • [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_04__11_Mar__Pipelining__Eng_text__No_audio.pptx) | |
 L5 | 18 Mar | **Branch Prediction** <br/> • [Eng text, No audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_05__18_Mar__Branch_Prediction__Eng_text__No_audio.pptx) | |
 L6 | 25 Mar | **Performance and Power** <br/> • [Eng text, No audio, 1.0 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_06__25_Mar__Performance_and_Power__Eng_text__No_audio.pptx) | |
+L7 | 01 Apr | **Caches** | |
+L8 | 08 Apr | **Out-of-Order execution** | |
+L9 | 15 Apr | **Memory Disamiguation** | |
+| 22 Apr<br/>24 Apr | **Final test**<br/>**Interview** | |
+L10 | 29 Apr | **Multicore and Multithreading** | |
 
 
 **Please note** that course was reduced this year, you may find more lectures in archive: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2012).
