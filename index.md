@@ -8,7 +8,7 @@ Here you may find lectures on the computer architecture and simulation practicum
 
 
 n | Date |Topic | Hometask
-:-: | | ------------------------------ | ------------------------------
+:-: | :----: | ------------------------------ | ------------------------------
 L1 | 11 Feb | **Introduction** <br/> **Levels of Computer Science** <br/> • [Rus and Eng text, No audio, 16 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_01__11_Feb__Introduction__Layers_of_CS_Eng_text__No_audio.pptx?raw=true)  | • Commit your name to members.txt<br> • Assign yourself to the one of 'february' issues |
 L2 | 18 Feb | **Combinational and Sequential Curcuits** <br/> • [Eng text, No audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_02__18_Feb__Combinational_and_Sequential_Circuits__Eng_text__No_audio.pptx) | • Install [Logisim]( http://www.cburch.com/logisim/index.html) and try to reproduce some schemas we discussed |
 | 25 Feb | *No lecture* | |
