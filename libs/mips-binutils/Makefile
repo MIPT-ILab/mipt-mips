@@ -1,8 +1,13 @@
-.PHONY: install_libelf uninstall_libelf
+.PHONY: install_libelf install_libelf_mac install_libelf_debian
+.PHONY: uninstall_libelf uninstall_libelf_mac uninstall_libelf_debian
+
 .PHONY: install_mips-binutils uninstall_mips-binutils
+
 .PHONY: install uninstall
 .PHONY: clean
 
+install: install_mips-binutils install_libelf
+uninstall: uninstall_mips-binutils uninstall_libelf
 
 #########################################################################
 #                             MIPS_BINUTILS
