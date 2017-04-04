@@ -11,8 +11,8 @@
 
 # Unignore Makefiles and License
 !LICENSE
-!*/Makefile
-!*/makefile
+!Makefile
+!makefile
 
 # Compiled source #
 ######################
