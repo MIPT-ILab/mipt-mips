@@ -68,7 +68,7 @@ clean:
 	rm -rf $(DIR) $(ARCHIVE)
 
 uninstall_mips-binutils:
-	rm -rf $(ALIASES) $(PREFIX)
+	sudo rm -rf $(ALIASES) $(PREFIX)
 
 
 #########################################################################
@@ -108,7 +108,7 @@ ifeq ($(UNAME),Linux)
 	sudo apt-get purge libelf-dev
 endif
 ifeq ($(UNAME),Darwin)
-	@cd $(ELF_PREFIX) && rm libelf.h gelf.h
+	@cd $(ELF_PREFIX) && sudo rm libelf.h gelf.h
 	brew uninstall libelf
 endif
 
