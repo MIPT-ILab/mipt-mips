@@ -41,10 +41,10 @@ $(ALIAS_OB): $(OB)
 
 # Build and install binutils
 $(MIPS_UTILS): $(DIR)/configure
-	mkdir -p $(PREFIX)
+	sudo mkdir -p $(PREFIX)
 	rm -rf build
 	mkdir build
-	cd build && ../$</$(DIR)/configure --target=mipsel-unknown-linux-gnu --prefix=$(PREFIX) && \
+	cd build && ../$< --target=mipsel-unknown-linux-gnu --prefix=$(PREFIX) && \
 	$(MAKE) && $(MAKE) install
 
 # Unpack archive
