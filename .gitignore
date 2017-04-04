@@ -1,2 +1,20 @@
+# Executables #
+#####################
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Unignore Makefiles and License
+!LICENSE
+!*/Makefile
+!*/makefile
+
+# Compiled source #
+######################
 *.o
 *.d
