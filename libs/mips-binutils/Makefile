@@ -1,13 +1,9 @@
-.PHONY: install_libelf install_libelf_mac install_libelf_debian
-.PHONY: uninstall_libelf uninstall_libelf_mac uninstall_libelf_debian
-
+.PHONY: install_libelf uninstall_libelf
 .PHONY: install_mips-binutils uninstall_mips-binutils
 
 .PHONY: install uninstall
 .PHONY: clean
 
-install: install_mips-binutils install_libelf
-uninstall: uninstall_mips-binutils uninstall_libelf
 
 #########################################################################
 #                             MIPS_BINUTILS
@@ -72,40 +68,50 @@ clean:
 	rm -rf $(DIR) $(ARCHIVE)
 
 uninstall_mips-binutils:
-	rm -rf $(PREFIX)
+	rm -rf $(ALIASES) $(PREFIX)
 
 
 #########################################################################
 #                               LIBELF
 #########################################################################
 
+# This is just a possible way to install libelf on most popular systems
+
 UNAME := $(shell uname -s)
+
 ifeq ($(UNAME),Linux)
-LIBELF_INSTALL= install_libelf_debian
-LIBELF_UNINSTALL= uninstall_libelf_debian
+ELF_PREFIX= /usr/include
 endif
 ifeq ($(UNAME),Darwin)
-LIBELF_INSTALL= install_libelf_mac
-LIBELF_UNINSTALL= uninstall_libelf_mac
+ELF_PREFIX= /usr/local/include
 endif
 
-install_libelf: $(LIBELF_INSTALL)
+ELF_HEADERS= $(ELF_PREFIX)/libelf.h $(ELF_PREFIX)/gelf.h
 
-install_libelf_debian:
+install_libelf: $(ELF_HEADERS)
+
+$(ELF_HEADERS): 
+ifeq ($(UNAME),Linux)
 	@echo This requires apt-get installed (Debian-based systems only) 
 	sudo apt-get install libelf-dev
-
-install_libelf_mac:
+endif
+ifeq ($(UNAME),Darwin)
 	@echo Installing libelf on MacOS...
 	brew install libelf
 	@echo Creating symlinks for headers...
-	@cd /usr/local/include && ln -s libelf/libelf.h libelf.h && ln -s libelf/gelf.h gelf.h
+	@cd $(ELF_PREFIX) && ln -s libelf/libelf.h libelf.h && ln -s libelf/gelf.h gelf.h
+endif
 
-uninstall_libelf: $(LIBELF_UNINSTALL)
 
-uninstall_libelf_debian:
+uninstall_libelf:
+ifeq ($(UNAME),Linux)
 	sudo apt-get purge libelf-dev
-
-uinstall_libelf_mac:
-	rm /usr/local/include/libelf.h /usr/local/include/gelf.h
+endif
+ifeq ($(UNAME),Darwin)
+	@cd $(ELF_PREFIX) && rm libelf.h gelf.h
 	brew uninstall libelf
+endif
+
+
+install: install_mips-binutils install_libelf
+uninstall: uninstall_mips-binutils uninstall_libelf
