@@ -1,9 +1,11 @@
-MIPS binutils are installed at iLab servers and have the following shortcuts:
+MIPS binutils should be installed and have the following shortcuts:
 
     mips-as          is an assembler for MIPS ISA
     mips-ld          is a linker for MIPS object files
-    mips-objdumpt    dumps content of MIPS binary files (also disassebly instructions)
-    mips-gcc         gcc compiler configured for MIPS
+    mips-objdump    dumps content of MIPS binary files (also disassebly instructions)
+
+Please refer to mipt-mips wiki or just run GNU make in libs/mips-binutils.
+
 
 In order to create MIPS binary file do the following steps:
 
