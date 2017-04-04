@@ -45,7 +45,7 @@ $(MIPS_UTILS): $(DIR)/configure
 	rm -rf build
 	mkdir build
 	cd build && ../$< --target=mipsel-unknown-linux-gnu --prefix=$(PREFIX) && \
-	$(MAKE) && $(MAKE) install
+	$(MAKE) && sudo $(MAKE) install
 
 # Unpack archive
 $(DIR)/configure: $(ARCHIVE)
