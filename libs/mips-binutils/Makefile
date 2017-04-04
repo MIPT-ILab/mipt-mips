@@ -42,20 +42,24 @@ $(ALIAS_OB): $(OB)
 # Build and install binutils
 $(MIPS_UTILS): $(DIR)/configure
 	sudo mkdir -p $(PREFIX)
+	@echo CLeaning previous builds...
 	rm -rf build
-	mkdir build
-	cd build && ../$< --target=mipsel-unknown-linux-gnu --prefix=$(PREFIX) && \
+	@mkdir build
+	@echo Building library and installing...
+	@cd build && ../$< --target=mipsel-unknown-linux-gnu --prefix=$(PREFIX) && \
 	$(MAKE) && sudo $(MAKE) install
 
 # Unpack archive
 $(DIR)/configure: $(ARCHIVE)
 	rm -rf $(DIR)
-	tar xjfm $<
-	mv binutils-2.28 binutils
+	@echo Extracting archive...
+	@tar xjfm $<
+	@mv binutils-2.28 binutils
 
 # Download tarball
 $(ARCHIVE):
-	wget $(URL)
+	echo Downloading the source...
+	@wget $(URL)
 
 
 # Cleaning
@@ -64,3 +68,39 @@ clean:
 
 uninstall_mips-binutils:
 	rm -rf $(PREFIX)
+
+
+#########################################################################
+#                               LIBELF
+#########################################################################
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+LIBELF_INSTALL= install_libelf_debian
+LIBELF_UNINSTALL= uninstall_libelf_debian
+endif
+ifeq ($(UNAME),Darwin)
+LIBELF_INSTALL= install_libelf_mac
+LIBELF_UNINSTALL= uninstall_libelf_mac
+endif
+
+install_libelf: $(LIBELF_INSTALL)
+
+install_libelf_debian:
+	@echo This requires apt-get installed (Debian-based systems only) 
+	sudo apt-get install libelf-dev
+
+install_libelf_mac:
+	@echo Installing libelf on MacOS...
+	brew install libelf
+	@echo Creating symlinks for headers...
+	@cd /usr/local/include && ln -s libelf/libelf.h libelf.h && ln -s libelf/gelf.h gelf.h
+
+uninstall_libelf: $(LIBELF_UNINSTALL)
+
+uninstall_libelf_debian:
+	sudo apt-get purge libelf-dev
+
+uinstall_libelf_mac:
+	rm /usr/local/include/libelf.h /usr/local/include/gelf.h
+	brew uninstall libelf
