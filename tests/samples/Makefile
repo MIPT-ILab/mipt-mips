@@ -30,7 +30,7 @@ build_all: $(OUT_FILES)
 
 .PHONY: clean
 clean:
-	-rm -rf *.o *.out *.s
+	-rm -rf *.o *.out
 
 .PHONY: help
 help:
