@@ -9,6 +9,9 @@
 #include <cstdlib>
 #include <cstring>
 
+/* Generic C++ */
+#include <memory>
+
 /* Simulator modules. */
 #include "perf_sim.h"
 
@@ -38,8 +41,7 @@ int main( int argc, char* argv[])
             std::exit( EXIT_FAILURE);
     }
 
-    PerfMIPS* p_mips = new PerfMIPS( !is_silent);
-    p_mips->run( argv[ 1], atoi( argv[ 2]));
-    delete p_mips;
+    PerfMIPS p_mips( !is_silent);
+    p_mips.run( argv[ 1], atoi( argv[ 2]));
     return 0;
 }
