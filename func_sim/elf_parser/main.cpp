@@ -20,8 +20,8 @@ int main ( int argc, char* argv[])
         ElfSection::getAllElfSections( argv[1], sections_array);
         
         // print the information about each section
-        for ( int i = 0; i < sections_array.size(); ++i)
-	     std::cout << sections_array[ i].dump() << std::endl;
+        for ( const auto& section : sections_array)
+	     std::cout << section.dump() << std::endl;
  
     } else if ( argc != num_of_args)
     {

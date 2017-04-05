@@ -21,7 +21,7 @@ public:
 
     LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
 
-    friend LogOstream& operator<<(LogOstream& out, const Critical&) {
+    friend LogOstream& operator<<(LogOstream&, const Critical&) {
          exit(-1);
     }
 

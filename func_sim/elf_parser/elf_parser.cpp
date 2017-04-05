@@ -127,7 +127,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         }
         
         // fill the content by the section data
-        std::fread( content, sizeof( uint8), size, file);
+        auto result = std::fread( content, sizeof( uint8), size, file);
+        (void)(result);
         ElfSection section( name, start_addr, size, content);
 	    sections_array.push_back( ElfSection( name, start_addr, size, content));
         delete [] content;

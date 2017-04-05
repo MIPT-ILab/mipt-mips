@@ -9,7 +9,7 @@
 #include "elf_parser.h"
 
 static const char * valid_elf_file = "./mips_bin_exmpl.out";
-static const char * valid_section_name = ".data";
+//static const char * valid_section_name = ".data";
 
 //
 // Check that all incorect input params of the constructor

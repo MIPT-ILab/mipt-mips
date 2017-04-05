@@ -19,7 +19,7 @@ int main( int argc, char* argv[])
 {
     if ( argc != 3)
     {
-        std::cout << "2 arguments required: mips_exe filename and section name" << endl;
+        std::cout << "2 arguments required: mips_exe filename and section name" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 

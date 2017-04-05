@@ -26,7 +26,7 @@ int main (int argc, char* argv[])
     } else if ( argc - 1 > num_of_args)
     {
         std::cerr << "ERROR: too many arguments!" << std::endl
-             << "Only one argument is required, the name of an executable file." << endl;
+             << "Only one argument is required, the name of an executable file." << std::endl;
         std::exit( EXIT_FAILURE); 
 
     } else

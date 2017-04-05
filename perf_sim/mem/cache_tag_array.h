@@ -47,7 +47,7 @@ struct LRUInfo
      * On hit - mark (push back) way that contains the set.
      * It's an inversed search because of progs usually have time locality.
      */
-    void update( int set, int way)
+    void update( int set, unsigned int way)
     {
 	// Use reverse iterator for simulation speed
         for ( auto it = lru[ set].rbegin(); it != lru[ set].rend(); ++it)

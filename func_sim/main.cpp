@@ -13,7 +13,7 @@ int main( int argc, char* argv[])
 {
     if ( argc != 3)
     {
-        std::cout << "2 arguments required: mips_exe filename and amount of instrs to run" << endl;
+        std::cout << "2 arguments required: mips_exe filename and amount of instrs to run" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 

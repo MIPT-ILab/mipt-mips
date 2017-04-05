@@ -19,8 +19,8 @@ static const uint PORT_LATENCY = 1;
 PerfMIPS::PerfMIPS(bool log) : Log(log)
 {
     /* Zero module storages. */
-    uint32 fetch_data = 0;
-    uint32 decode_data = 0;
+    fetch_data = 0;
+    decode_data = 0;
 
     PC_is_valid = false; // PC unset
     decode_stall = true; // prevent generating "nop" on Decode

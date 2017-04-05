@@ -135,7 +135,7 @@ bool FuncMemory::check( uint64 addr) const
 std::string FuncMemory::dump( std::string indent) const
 {
     std::ostringstream oss;
-    oss << std::setfill( '0') << std::hex;
+    oss << indent << std::setfill( '0') << std::hex;
     
     uint64 set_cnt = 1 << set_bits;
     uint64 page_cnt = 1 << page_bits;

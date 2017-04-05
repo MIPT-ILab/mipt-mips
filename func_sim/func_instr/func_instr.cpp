@@ -200,6 +200,8 @@ void FuncInstr::initR()
             break;
         case OUT_R_SPECIAL:
             break;
+        default:
+            assert(0);
     }
     disasm = oss.str();
 }
@@ -257,6 +259,8 @@ void FuncInstr::initI()
                 << std::hex << v_imm
                 << "($" << regTable[src1] << ")" << std::dec;
             break;
+        default:
+            assert(0);
     }
     disasm = oss.str();
 }
