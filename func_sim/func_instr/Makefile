@@ -7,10 +7,6 @@
 # specifying relative path to the TRUNK
 TRUNK= ../..
 
-# C++ compiler flags
-CXXFLAGS= -std=c++11
-
-
 # Including options and compiler flags
 include $(TRUNK)/options.mk
 
