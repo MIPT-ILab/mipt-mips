@@ -36,7 +36,7 @@ test: unit_test
 	@echo ""
 	@echo "Running ./$<\n"
 	@./$<
-	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
+	@echo "Unit testing for the moduler functional instructions passed SUCCESSFULLY!"
 
 OBJS= unit_test.o func_memory.o elf_parser.o func_instr.o
 DEPS= $(OBJS:.o=.d)
