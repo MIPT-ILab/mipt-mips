@@ -12,7 +12,7 @@
 #include <iostream>
 
 /* Simulator modules. */
-#include <cache_tag_array.h>
+#include "cache_tag_array.h"
 
 CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
                               unsigned int ways,

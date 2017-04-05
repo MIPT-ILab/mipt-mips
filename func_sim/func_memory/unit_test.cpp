@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 // uArchSim modules
-#include <func_memory.h>
+#include "func_memory.h"
 
 static const char * valid_elf_file = "./mips_bin_exmpl.out";
 

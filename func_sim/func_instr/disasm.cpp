@@ -11,8 +11,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <func_instr.h>
-#include <elf_parser.h>
+#include <func_sim/elf_parser/elf_parser.h>
+
+#include "func_instr.h"
 
 int main( int argc, char* argv[])
 {

@@ -17,7 +17,7 @@ OBJS= func_memory.o elf_parser.o main.o
 
 DEPS= $(OBJS:.o=.d)
 
-func_instr: $(OBJS)
+func_memory: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"

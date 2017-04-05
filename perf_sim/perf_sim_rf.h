@@ -10,7 +10,7 @@
 #define PERF_SIM_RF_H
 
 /* Simulator modules. */
-#include <func_instr.h>
+#include <func_sim/func_instr/func_instr.h>
 
 class RF
 {

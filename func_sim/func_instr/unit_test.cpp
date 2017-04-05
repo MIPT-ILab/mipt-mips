@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 // uArchSim modules
-#include <func_instr.h>
+#include "func_instr.h"
 
 //
 // Check that all incorect input params of the constructor

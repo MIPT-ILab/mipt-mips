@@ -13,7 +13,7 @@
 #include <fstream>
 
 /* Simulator modules. */
-#include <cache_tag_array.h>
+#include "cache_tag_array.h"
 
 using namespace std;
 

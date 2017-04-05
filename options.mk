@@ -19,4 +19,5 @@ GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
 
 # option for C++ compiler specifying directories 
 # to search for headers
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I $(TRUNK)/func_sim/func_memory/ -I $(TRUNK)/func_sim/func_instr
+INCL= -I $(TRUNK)/
+

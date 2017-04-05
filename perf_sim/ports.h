@@ -12,8 +12,8 @@
 #include <list>
 #include <string>
 
-#include <log.h>
-#include <types.h>
+#include <common/types.h>
+#include "log.h"
 
 template<class T> class PortMap;
 template<class T> class ReadPort;

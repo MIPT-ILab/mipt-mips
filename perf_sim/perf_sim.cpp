@@ -9,12 +9,12 @@
 #include <cstdlib>
 
 /* Simulator modules. */
-#include <perf_sim.h>
+#include "perf_sim.h"
 
 /* Ports constants. */
-#define PORT_BW 1
-#define PORT_FANOUT 1
-#define PORT_LATENCY 1
+static const uint PORT_BW = 1;
+static const uint PORT_FANOUT = 1;
+static const uint PORT_LATENCY = 1;
 
 PerfMIPS::PerfMIPS(bool log) : Log(log)
 {

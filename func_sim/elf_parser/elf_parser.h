@@ -14,7 +14,7 @@
 class Elf;
 
 // uArchSim modules
-#include <types.h>
+#include <common/types.h>
 
 using namespace std;
 

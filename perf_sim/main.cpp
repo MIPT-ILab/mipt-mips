@@ -10,7 +10,7 @@
 #include <cstring>
 
 /* Simulator modules. */
-#include <perf_sim.h>
+#include "perf_sim.h"
 
 using namespace std;
 

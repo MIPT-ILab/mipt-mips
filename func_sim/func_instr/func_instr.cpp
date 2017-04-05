@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include <func_instr.h>
+#include "func_instr.h"
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
@@ -135,7 +135,7 @@ FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
 
 std::string FuncInstr::Dump( std::string indent) const
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << indent << disasm;
     
     if ( dst != REG_NUM_ZERO && complete)
@@ -171,7 +171,7 @@ void FuncInstr::initFormat()
 
 void FuncInstr::initR()
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << isaTable[isaNum].name;
     switch ( operation)
     {
@@ -191,7 +191,7 @@ void FuncInstr::initR()
 
             oss <<  " $" << regTableName(dst)
                 << ", $" << regTableName(src1)
-                <<  ", " << dec << v_imm;
+                <<  ", " << std::dec << v_imm;
             break;
         case OUT_R_JUMP:
             src1  = (RegNum)instr.asR.rs;

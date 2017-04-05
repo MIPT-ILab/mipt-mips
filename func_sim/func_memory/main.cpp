@@ -5,10 +5,7 @@
 #include <iostream>
 
 // uArchSim modules
-#include <func_memory.h>
-
-using namespace std;
-
+#include "func_memory.h"
 
 int main (int argc, char* argv[])
 {
@@ -24,19 +21,19 @@ int main (int argc, char* argv[])
         FuncMemory func_mem( file_name, 32, 10, 12);
         
         // print content of the memory
-        cout << func_mem.dump() << endl;
+        std::cout << func_mem.dump() << std::endl;
  
     } else if ( argc - 1 > num_of_args)
     {
-        cerr << "ERROR: too many arguments!" << endl
-             << "Only one argumnt is required, the name of an executable file." << endl;
-        exit( EXIT_FAILURE); 
+        std::cerr << "ERROR: too many arguments!" << std::endl
+             << "Only one argument is required, the name of an executable file." << endl;
+        std::exit( EXIT_FAILURE); 
 
     } else
     {
-        cerr << "ERROR: too few arguments!" << endl
-             << "One argument is required, the name of an executable file." << endl;
-        exit( EXIT_FAILURE);
+        std::cerr << "ERROR: too few arguments!" << std::endl
+             << "One argument is required, the name of an executable file." << std::endl;
+        std::exit( EXIT_FAILURE);
     }
 
     return 0;

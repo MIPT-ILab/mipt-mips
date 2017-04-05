@@ -13,7 +13,7 @@
 #include <iomanip>
 
 // uArchSim modules
-#include <func_memory.h>
+#include "func_memory.h"
 
 union uint64_8
 {

@@ -7,9 +7,9 @@
 #ifndef FUNC_SIM_H
 #define FUNC_SIM_H
 
-#include <func_instr.h>
-#include <func_memory.h>
-#include <rf.h>
+#include <func_sim/func_instr/func_instr.h>
+#include <func_sim/func_memory/func_memory.h>
+#include <func_sim/rf.h>
 
 class MIPS
 {

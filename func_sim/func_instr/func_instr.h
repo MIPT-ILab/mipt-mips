@@ -14,8 +14,7 @@
 #include <cassert>
 
 // MIPT-MIPS modules
-#include <types.h>
-#include <elf_parser.h>
+#include <common/types.h>
 
 enum RegNum
 {

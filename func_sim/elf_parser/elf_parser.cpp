@@ -21,7 +21,7 @@
 #include <sstream>
 
 // uArchSim modules
-#include <elf_parser.h>
+#include "elf_parser.h"
 
 using namespace std;
 

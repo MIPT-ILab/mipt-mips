@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <func_sim.h>
+#include "func_sim.h"
 
 int main( int argc, char* argv[])
 {

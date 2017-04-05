@@ -10,9 +10,10 @@
 #define PERF_SIM_H
 
 /* Simulator modules. */
-#include <func_memory.h>
-#include <perf_sim_rf.h>
-#include <ports.h>
+#include <func_sim/func_memory/func_memory.h>
+
+#include "perf_sim_rf.h"
+#include "ports.h"
 
 class PerfMIPS : protected Log
 {

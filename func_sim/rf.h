@@ -7,7 +7,7 @@
 #ifndef RF_H
 #define RF_H
 
-#include <func_instr.h>
+#include <func_sim/func_instr/func_instr.h>
 
 class RF
 {

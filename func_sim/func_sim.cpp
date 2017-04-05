@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <func_sim.h>
+#include "func_sim.h"
 
 MIPS::MIPS()
 {

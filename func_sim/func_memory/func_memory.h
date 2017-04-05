@@ -15,8 +15,8 @@
 #include <cassert>
 
 // uArchSim modules
-#include <types.h>
-#include <elf_parser.h>
+#include <common/types.h>
+#include <func_sim/elf_parser/elf_parser.h>
 
 class FuncMemory
 {

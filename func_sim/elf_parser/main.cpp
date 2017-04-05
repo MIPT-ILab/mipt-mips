@@ -7,7 +7,7 @@
 #include <iostream>
 
 // uArchSim modules
-#include <elf_parser.h>
+#include "elf_parser.h"
 
 using namespace std;
 

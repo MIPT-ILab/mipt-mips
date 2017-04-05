@@ -29,5 +29,5 @@ func_sim: $(OBJS)
 	$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
 
 clean:
-	@-rm *.o *.d
-	@-rm func_sim
+	@-rm *.o *.d -f
+	@-rm func_sim -f
