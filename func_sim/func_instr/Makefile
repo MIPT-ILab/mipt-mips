@@ -10,25 +10,24 @@ TRUNK= ../..
 # Including options and compiler flags
 include $(TRUNK)/options.mk
 
+#
 # Enter for building func_memory standalone program
 #
-disasm: func_memory.o elf_parser.o disasm.o func_instr.o
+OBJS= func_memory.o elf_parser.o disasm.o func_instr.o
+DEPS= $(OBJS:.o=.d)
+
+disasm: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
-	$(CXX) $(CXXFLAGS) -o $@ $^ -l elf
+	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_instr.o: func_instr.cpp func_instr.h types.h
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
-    
-func_memory.o: func_memory.cpp func_memory.h types.h
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
+-include $(DEPS)
 
-elf_parser.o: elf_parser.cpp elf_parser.h types.h
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
 
-disasm.o: disasm.cpp func_memory.h types.h func_instr.h
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 #
 # Enter for building func_memory unit test
@@ -39,19 +38,28 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
 
-unit_test: unit_test.o func_memory.o elf_parser.o func_instr.o $(GTEST_LIB)
+OBJS= unit_test.o func_memory.o elf_parser.o func_instr.o 
+DEPS= $(OBJS:.o=.d)
+
+unit_test: $(OBJS) $(GTEST_LIB)
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
 	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-unit_test.o: unit_test.cpp func_instr.h $(GTEST_LIB)
-	$(CXX) $(CXXFLAGS) $(GTEST_INCL) $(INCL) -c $<
+
+-include $(DEPS)
+
+unit_test.o: unit_test.cpp $(GTEST_LIB)
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
 
 $(GTEST_LIB):
 	$(MAKE) -C $(GTEST_DIR)
 
+
 clean:
-	@-rm *.o
+	@-rm -rf *.o *.d
 	@-rm -rf disasm unit_test
+
