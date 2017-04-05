@@ -1,4 +1,4 @@
-# 
+#
 # Building the disasm for MIPS binaries
 # @author Pavel Kryukov <pavel.kryukov@phystech.com>
 # Copyright 2014 MIPT-MIPS iLab Project
@@ -11,7 +11,7 @@ TRUNK= ../..
 include $(TRUNK)/options.mk
 
 #
-# Enter for building func_memory standalone program
+# Enter for building func_instr standalone program
 #
 OBJS= func_memory.o elf_parser.o disasm.o func_instr.o
 DEPS= $(OBJS:.o=.d)
@@ -30,7 +30,7 @@ disasm: $(OBJS)
 
 
 #
-# Enter for building func_memory unit test
+# Enter for building func_instr unit test
 #
 test: unit_test
 	@echo ""
@@ -38,7 +38,7 @@ test: unit_test
 	@./$<
 	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
 
-OBJS= unit_test.o func_memory.o elf_parser.o func_instr.o 
+OBJS= unit_test.o func_memory.o elf_parser.o func_instr.o
 DEPS= $(OBJS:.o=.d)
 
 unit_test: $(OBJS) $(GTEST_LIB)
@@ -62,4 +62,3 @@ $(GTEST_LIB):
 clean:
 	@-rm -rf *.o *.d
 	@-rm -rf disasm unit_test
-
