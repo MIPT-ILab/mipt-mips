@@ -27,8 +27,9 @@ perf_sim: $(OBJS)
 -include $(DEPS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
-	$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
+	@$(CXX) $(CXXFLAGS) -c $< $(INCL)
+	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
+	@echo "[g++] $@" 
 
 
 #
