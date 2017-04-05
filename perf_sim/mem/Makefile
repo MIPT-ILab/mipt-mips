@@ -11,11 +11,8 @@ CXXFLAGS= -std=c++11
 # Specifying relative path to the trunk.
 TRUNK= ../..
 
-# Paths to look for files.
-vpath %.h $(TRUNK)/common/
-
-# Options for compiler specifuing paths to look for headers.
-INCL= -I ./ -I $(TRUNK)/common/
+# Including options and compiler flags
+include $(TRUNK)/options.mk
 
 #
 # Enter for build "miss_rate_sim" program.

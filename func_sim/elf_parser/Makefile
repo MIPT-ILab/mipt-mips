@@ -9,21 +9,8 @@
 # specifying relative path to the TRUNK
 TRUNK= ../..
 
-# C++ compiler flags
-CXXFLAGS= -std=c++11
-
-# pathes to loop for headers
-vpath %.h $(TRUNK)/common
-
-# option for C++ compiler specifying directories 
-# to search for headers
-INCL= -I ./ -I $(TRUNK)common/
-
-# googletest directories
-GTEST_DIR= $(TRUNK)/libs/googletest
-GTEST_INCL= -I $(GTEST_DIR)/lib/include
-GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
-
+# Including options and compiler flags
+include $(TRUNK)/options.mk
 
 #
 # Enter for building elf_parser stand alone program

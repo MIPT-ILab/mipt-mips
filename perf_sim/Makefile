@@ -5,29 +5,15 @@
 # Ladin Oleg.
 #
 
-# C++ compiler flags
-CXXFLAGS= -std=c++11
 
-# Specifying relative path to the trunk.
+# Specifying relative path to the trunk
 TRUNK= ..
 
-# Paths to look for files.
-vpath %.h $(TRUNK)/common/
-vpath %.h $(TRUNK)/perf_sim/
-vpath %.h $(TRUNK)/func_sim/elf_parser/
-vpath %.h $(TRUNK)/func_sim/func_instr/
-vpath %.h $(TRUNK)/func_sim/func_memory/
-vpath %.cpp $(TRUNK)/perf_sim/
-vpath %.cpp $(TRUNK)/func_sim/elf_parser/
-vpath %.cpp $(TRUNK)/func_sim/func_instr/
-vpath %.cpp $(TRUNK)/func_sim/func_memory/
-
-# Options for compiler specifying paths to look for headers.
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ \
-  -I $(TRUNK)/func_sim/func_memory/  -I $(TRUNK)/func_sim/func_instr/
+# Including options and compiler flags
+include $(TRUNK)/options.mk
 
 #
-# Enter for build "perf_sim" programm.
+# Enter for build "perf_sim" program
 #
 perf_sim: elf_parser.o func_memory.o func_instr.o perf_sim.o main.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ -l elf
@@ -47,7 +33,7 @@ main.o: main.cpp
 	$(CXX) $(CXXFLAGS) -c $< $(INCL)
 
 #
-# Enter to remove all created files.
+# Enter to remove all created files
 #
 clean:
 	@-rm *.o

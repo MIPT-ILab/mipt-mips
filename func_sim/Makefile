@@ -7,30 +7,11 @@
 # specifying relative path to the TRUNK
 TRUNK= ../
 
-# C++ compiler flags
-CXXFLAGS= -std=c++11
-
-# paths to look for headers
-vpath %.h $(TRUNK)/common
-vpath %.h $(TRUNK)/func_sim/
-vpath %.h $(TRUNK)/func_sim/elf_parser/
-vpath %.h $(TRUNK)/func_sim/func_instr/
-vpath %.h $(TRUNK)/func_sim/func_memory/
-vpath %.cpp $(TRUNK)/func_sim/
-vpath %.cpp $(TRUNK)/func_sim/elf_parser/
-vpath %.cpp $(TRUNK)/func_sim/func_instr/
-vpath %.cpp $(TRUNK)/func_sim/func_memory/
-
-# option for C++ compiler specifying directories 
-# to search for headers
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I $(TRUNK)/func_sim/func_memory/ -I $(TRUNK)/func_sim/func_instr
-
-#options for static linking of boost Unit Test library
-INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
-GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
+# Including options and compiler flags
+include $(TRUNK)/options.mk
 
 #
-# Enter for building func_memory stand alone program
+# Enter for building func_memory standalone program
 #
 func_sim: func_memory.o elf_parser.o func_instr.o func_sim.o main.o
 	@# don't forget to link ELF library using "-l elf"
