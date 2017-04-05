@@ -103,7 +103,7 @@ class PerfMIPS : protected Log
         PerfMIPS(bool log);
         ~PerfMIPS();
         /* Starts simulator. */
-        void run( const string& tr, int instr_to_run);
+        void run( const std::string& tr, int instr_to_run);
 };
 
 #endif // #ifndef PERF_SIM_H

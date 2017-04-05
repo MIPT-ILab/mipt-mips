@@ -12,8 +12,6 @@
 /* Simulator modules. */
 #include "perf_sim.h"
 
-using namespace std;
-
 int main( int argc, char* argv[])
 {
     bool is_silent = true; // by default it's silent mode
@@ -22,22 +20,22 @@ int main( int argc, char* argv[])
         case 3: // check arguments (silent mode)
             if ( ( argv[ 1] == nullptr) || ( atoi( argv[ 2]) < 0))
             {
-                cerr << "ERROR: Wrong arguments!\n";
-                exit( EXIT_FAILURE);
+                std::cerr << "ERROR: Wrong arguments!\n";
+                std::exit( EXIT_FAILURE);
             }
             break;
         case 4: // check arguments (normal mode)
             if ( ( argv[ 1] == nullptr) || ( atoi( argv[ 2]) < 0) ||
                  ( strcmp( argv[ 3], "-d")))
             {
-                cerr << "ERROR: Wrong arguments!\n";
-                exit( EXIT_FAILURE);
+                std::cerr << "ERROR: Wrong arguments!\n";
+                std::exit( EXIT_FAILURE);
             }
             is_silent = false; // disable silent mode
             break;
         default: // wrong number of arguments
-            cerr << "ERROR: Wrong number of arguments!\n";
-            exit( EXIT_FAILURE);
+            std::cerr << "ERROR: Wrong number of arguments!\n";
+            std::exit( EXIT_FAILURE);
     }
 
     PerfMIPS* p_mips = new PerfMIPS( !is_silent);

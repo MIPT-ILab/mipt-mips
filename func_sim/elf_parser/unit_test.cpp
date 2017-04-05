@@ -17,7 +17,7 @@ static const char * valid_section_name = ".data";
 //
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
 {   
-    vector<ElfSection> sections_array;
+    std::vector<ElfSection> sections_array;
     
     ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, sections_array));
 

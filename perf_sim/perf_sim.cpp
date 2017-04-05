@@ -105,7 +105,7 @@ PerfMIPS::~PerfMIPS()
     delete wp_writeback_2_memory_stall;
 }
 
-void PerfMIPS::run( const string& tr, int instrs_to_run)
+void PerfMIPS::run( const std::string& tr, int instrs_to_run)
 {
     mem = new FuncMemory( tr.c_str()); // create functional memory
     PC = mem->startPC(); // get starting programm address
@@ -121,8 +121,8 @@ void PerfMIPS::run( const string& tr, int instrs_to_run)
         clockWriteback( cycle);
         ++cycle;
         if ( cycle - last_writeback_cycle >= 1000)
-            serr << "Deadlock was detected. The process will be aborted." << endl << endl << critical;
-        sout << "Executed instructions: " << executed_instrs << endl << endl;
+            serr << "Deadlock was detected. The process will be aborted." << std::endl << std::endl << critical;
+        sout << "Executed instructions: " << executed_instrs << std::endl << std::endl;
     }
 }
 
@@ -133,12 +133,12 @@ void PerfMIPS::clockFetch( int cycle)
     rp_decode_2_fetch_stall->read( &is_stall, cycle);
     if ( is_stall) // if stall
     {
-        sout << "    fetch\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    fetch\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     if ( !PC_is_valid) // if PC invalid just exit
     {
-        sout << "    fetch\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    fetch\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     /* Process data. */
@@ -148,8 +148,8 @@ void PerfMIPS::clockFetch( int cycle)
         PC_is_valid = false;
     }
     wp_fetch_2_decode->write( fetch_data, cycle); // promote data
-    sout << "    fetch\tcycle " << cycle << ":  0x" << hex << fetch_data
-         << dec << endl;
+    sout << "    fetch\tcycle " << cycle << ":  0x" << std::hex << fetch_data
+         << std::dec << std::endl;
 }
 
 void PerfMIPS::clockDecode( int cycle)
@@ -161,14 +161,14 @@ void PerfMIPS::clockDecode( int cycle)
         {
             PC += 4;
         }
-        sout << "    decode\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    decode\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     bool is_stall = false;
     rp_execute_2_decode_stall->read( &is_stall, cycle);
     if ( is_stall) // if stall
     {
-        sout << "    decode\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    decode\tcycle " << cycle << ":  bubble" << std::endl;
         wp_decode_2_fetch_stall->write( true, cycle); // promote stall
         return;
     }
@@ -193,7 +193,7 @@ void PerfMIPS::clockDecode( int cycle)
         {
             PC += 4;
         }
-        sout << "    decode\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    decode\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     if ( !rf->check( decode_data_.get_src1_num()) || // check data dependencies
@@ -201,7 +201,7 @@ void PerfMIPS::clockDecode( int cycle)
     {
         source_stall = true; // it's stall
         wp_decode_2_fetch_stall->write( true, cycle); // make stall
-        sout << "    decode\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    decode\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     if ( source_stall) // if stall was ended, next time load data from storage
@@ -213,7 +213,7 @@ void PerfMIPS::clockDecode( int cycle)
     rf->invalidate( decode_data_.get_dst_num());
     wp_decode_2_execute->write( decode_data_, cycle); // promote data
     PC += 4; // update PC
-    sout << "    decode\tcycle " << cycle << ":  " << decode_data_ << endl;
+    sout << "    decode\tcycle " << cycle << ":  " << decode_data_ << std::endl;
 }
 
 void PerfMIPS::clockExecute( int cycle)
@@ -222,13 +222,13 @@ void PerfMIPS::clockExecute( int cycle)
     rp_memory_2_execute_stall->read( &is_stall, cycle);
     if ( is_stall) // if stall
     {
-        sout << "    execute\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    execute\tcycle " << cycle << ":  bubble" << std::endl;
         wp_execute_2_decode_stall->write( true, cycle); // promote stall
         return;
     }
     if ( !rp_decode_2_execute->read( &execute_data, cycle)) // nothing to read
     {
-        sout << "    execute\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    execute\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     /* Process data. */
@@ -239,7 +239,7 @@ void PerfMIPS::clockExecute( int cycle)
         PC = execute_data.get_new_PC();
         PC_is_valid = true;
     }
-    sout << "    execute\tcycle " << cycle << ":  " << execute_data << endl;
+    sout << "    execute\tcycle " << cycle << ":  " << execute_data << std::endl;
 }
 
 void PerfMIPS::clockMemory( int cycle)
@@ -248,34 +248,34 @@ void PerfMIPS::clockMemory( int cycle)
     rp_writeback_2_memory_stall->read( &is_stall, cycle);
     if ( is_stall) // if stall
     {
-        sout << "    memory\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    memory\tcycle " << cycle << ":  bubble" << std::endl;
         wp_memory_2_execute_stall->write( true, cycle); // promote stall
         return;
     }
     if ( !rp_execute_2_memory->read( &memory_data, cycle)) // nothing to read
     {
-        sout << "    memory\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    memory\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     /* Process data. */
     load_store( memory_data);
     wp_memory_2_writeback->write( memory_data, cycle); // promote data
-    sout << "    memory\tcycle " << cycle << ":  " << memory_data << endl;
+    sout << "    memory\tcycle " << cycle << ":  " << memory_data << std::endl;
 }
 
 void PerfMIPS::clockWriteback( int cycle)
 {
     if ( !rp_memory_2_writeback->read( &writeback_data, cycle)) // nothing to read
     {
-        sout << "    writeback\tcycle " << cycle << ":  bubble" << endl;
+        sout << "    writeback\tcycle " << cycle << ":  bubble" << std::endl;
         return;
     }
     last_writeback_cycle = cycle; // renew last_writeback_cycle
     /* Process data. */
     wb( writeback_data);
     executed_instrs++; // increase number of executed instructions
-    sout << "    writeback\tcycle " << cycle << ":  " << writeback_data << endl;
-    cout << writeback_data << endl;
+    sout << "    writeback\tcycle " << cycle << ":  " << writeback_data << std::endl;
+    std::cout << writeback_data << std::endl;
 }
 
 

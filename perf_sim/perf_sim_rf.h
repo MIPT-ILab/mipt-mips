@@ -30,8 +30,8 @@ class RF
             /* Check register number. */
             if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
             {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
+                std::cerr << "ERROR: Wrong register number!\n";
+                std::exit( EXIT_FAILURE);
             }
             return array[ num].is_valid;
         }
@@ -41,8 +41,8 @@ class RF
             /* Check register number. */
             if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
             {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
+                std::cerr << "ERROR: Wrong register number!\n";
+                std::exit( EXIT_FAILURE);
             }
             if ( num == REG_NUM_ZERO) // "zero" register is always valid
             {
@@ -68,8 +68,8 @@ class RF
             {
                 if ( check( num)) // register to write must be invalid
                 {
-                    cerr << "ERROR: Writing to valid register!\n";
-                    exit( EXIT_FAILURE);
+                    std::cerr << "ERROR: Writing to valid register!\n";
+                    std::exit( EXIT_FAILURE);
                 }
                 /* Write value and make it valid. */
                 array[ num].value = instr.get_v_dst();
@@ -81,8 +81,8 @@ class RF
             /* Check register number. */
             if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
             {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
+                std::cerr << "ERROR: Wrong register number!\n";
+                std::exit( EXIT_FAILURE);
             }
             array[ num].value = 0;
         }

@@ -5,9 +5,7 @@
  */
 
 // Genereic C
-#include <libelf.h>
 #include <cstdio>
-#include <unistd.h>
 #include <cstring>
 #include <fcntl.h>
 #include <gelf.h>
@@ -20,15 +18,15 @@
 #include <string>
 #include <sstream>
 
+#include <unistd.h>
+
 // uArchSim modules
 #include "elf_parser.h"
 
-using namespace std;
-
 ElfSection::ElfSection()
 {
-    cerr << "ERROR: the constructor without parameters "
-         << "of ElfSection class is prohobited" << endl;
+    std::cerr << "ERROR: the constructor without parameters "
+              << "of ElfSection class is prohobited" << std::endl;
     exit( EXIT_FAILURE);
 }
 
@@ -36,22 +34,22 @@ ElfSection::ElfSection( const ElfSection& that)
     : size( that.size), start_addr( that.start_addr)
 {
     this->name = new char[ strlen( that.name) + 1];
-    strcpy( this->name, that.name);
+    std::strcpy( this->name, that.name);
     
     this->content = new uint8[size];
-    memcpy(this->content, that.content, this->size);
+    std::memcpy(this->content, that.content, this->size);
 }
 
 ElfSection& ElfSection::operator=(const ElfSection& that)
 {
     this->name = new char[ strlen( that.name) + 1];
-    strcpy( this->name, that.name);
+    std::strcpy( this->name, that.name);
     
     this->size = that.size;
     this->start_addr = that.start_addr;
 
     this->content = new uint8[ this->size + sizeof( uint64)];
-    memcpy( this->content, that.content, this->size);
+    std::memcpy( this->content, that.content, this->size);
         
     return *this;
 }
@@ -60,44 +58,44 @@ ElfSection::ElfSection( const char* name, uint64 start_addr,
                         uint64 size, const uint8* content)
 {
     this->name = new char[ strlen( name) + 1];
-    strcpy( this->name, name);
+    std::strcpy( this->name, name);
 
     this->size = size;
     this->start_addr = start_addr;
 
     this->content = new uint8[ this->size + sizeof( uint64)];
-    memcpy( this->content, content, size);
+    std::memcpy( this->content, content, size);
 }
 
 void ElfSection::getAllElfSections( const char* elf_file_name,
-                                    vector<ElfSection>& sections_array /*is used as output*/)
+                                    std::vector<ElfSection>& sections_array /*is used as output*/)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
     int file_descr = open( elf_file_name, O_RDONLY); 
     if ( file_descr < 0)
     {
-        cerr << "ERROR: Could not open file " << elf_file_name << ": "
-             << strerror( errno) << endl;
-        exit( EXIT_FAILURE);
+        std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
+                  << std::strerror( errno) << std::endl;
+        std::exit( EXIT_FAILURE);
     }
 
     // set ELF library operating version
     if ( elf_version( EV_CURRENT) == EV_NONE)
     {
-        cerr << "ERROR: Could not set ELF library operating version:"
-             <<  elf_errmsg( elf_errno()) << endl;
-        exit( EXIT_FAILURE);
+        std::cerr << "ERROR: Could not set ELF library operating version:"
+                  <<  elf_errmsg( elf_errno()) << std::endl;
+        std::exit( EXIT_FAILURE);
     }
    
     // open the file in ELF format 
     Elf* elf = elf_begin( file_descr, ELF_C_READ, NULL);
     if ( !elf)
     {
-        cerr << "ERROR: Could not open file " << elf_file_name
-             << " as ELF file: "
-             <<  elf_errmsg( elf_errno()) << endl;
-        exit( EXIT_FAILURE);
+        std::cerr << "ERROR: Could not open file " << elf_file_name
+                  << " as ELF file: "
+                  <<  elf_errmsg( elf_errno()) << std::endl;
+	std::exit( EXIT_FAILURE);
     }
     
     size_t shstrndx;
@@ -123,13 +121,13 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         FILE *file = fdopen( file_descr, "r");
         if ( !file )
         {
-            cerr << "ERROR: Could not open file " << elf_file_name << ": "
-                 << strerror(errno) << endl;
-            exit( EXIT_FAILURE);
+            std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
+                 << std::strerror(errno) << std::endl;
+            std::exit( EXIT_FAILURE);
         }
         
         // fill the content by the section data
-        fread( content, sizeof( uint8), size, file);
+        std::fread( content, sizeof( uint8), size, file);
         ElfSection section( name, start_addr, size, content);
 	    sections_array.push_back( ElfSection( name, start_addr, size, content));
         delete [] content;
@@ -146,36 +144,38 @@ ElfSection::~ElfSection()
     delete [] this->content;
 }
 
-string ElfSection::dump( string indent) const
+std::string ElfSection::dump( std::string indent) const
 {
-    ostringstream oss;
+    std::ostringstream oss;
 
-    oss << indent << "Dump ELF section \"" << this->name << "\"" << endl
-        << indent << "  size = " << this->size << " Bytes" << endl
-        << indent << "  start_addr = 0x" << hex << this->start_addr << dec << endl
-        << indent << "  Content:" << endl;
+    oss << indent << "Dump ELF section \"" << this->name << "\"" << std::endl
+        << indent << "  size = " << this->size << " Bytes" << std::endl
+        << indent << "  start_addr = 0x"
+        << std::hex << this->start_addr << std::dec << std::endl
+        << indent << "  Content:" << std::endl;
      
-    string str = this->strByBytes();
+    std::string str = this->strByBytes();
 
     // split the contents into words of 4 bytes
     bool skip_was_printed = false;
     for ( size_t offset = 0; offset < this->size; offset += sizeof( uint32))
     {
-        string substr =  str.substr( 2 * offset, // 2 hex digits is need per byte
+        std::string substr =  str.substr( 2 * offset, // 2 hex digits is need per byte
                                      sizeof( uint64));
 
         if ( substr.compare( "00000000") == 0)
         {   
             if ( !skip_was_printed)
             {
-                oss << indent << "  ....  " << endl;
+                oss << indent << "  ....  " << std::endl;
                 skip_was_printed = true;
             }
         }
         else
         { 
-            oss << indent << "    0x" << hex << ( this->start_addr + offset) 
-                << indent << ":    " << substr << endl;
+            oss << indent << "    0x"
+                << std::hex << ( this->start_addr + offset) 
+                << indent << ":    " << substr << std::endl;
             skip_was_printed = false;
         }
     }
@@ -183,11 +183,11 @@ string ElfSection::dump( string indent) const
     return oss.str();
 }
 
-string ElfSection::strByBytes() const
+std::string ElfSection::strByBytes() const
 {
     // temp stream is used to convert numbers into the output string
-    ostringstream oss;
-    oss << hex;
+    std::ostringstream oss;
+    oss << std::hex;
 	
     // convert each byte into 2 hex digits 
     for( size_t i = 0; i < this->size; ++i)
@@ -203,11 +203,11 @@ string ElfSection::strByBytes() const
     return oss.str();
 }
 
-string ElfSection::strByWords() const
+std::string ElfSection::strByWords() const
 {
     // temp stream is used to convert numbers into the output string
-    ostringstream oss;
-    oss << hex;
+    std::ostringstream oss;
+    oss << std::hex;
 
     // convert each words of 4 bytes into 8 hex digits
     for( size_t i = 0; i < this->size/sizeof( uint32); ++i)

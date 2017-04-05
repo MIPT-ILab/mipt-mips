@@ -80,7 +80,7 @@ class FuncMemory
         uint64 read( uint64 addr, unsigned short num_of_bytes = 4) const;
         void write( uint64 value, uint64 addr, unsigned short num_of_bytes = 4);
         inline uint64 startPC() const { return startPC_addr; }
-        std::string dump( string indent = "") const;
+        std::string dump( std::string indent = "") const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

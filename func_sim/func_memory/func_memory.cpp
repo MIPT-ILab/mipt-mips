@@ -41,15 +41,15 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     std::vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
 
-    for ( vector<ElfSection>::iterator it = sections_array.begin(); it != sections_array.end(); ++it)
+    for ( const auto& section : sections_array)
     {
-        if ( !strcmp( ".text", it->name))
+        if ( !strcmp( ".text", section.name))
         {
-            startPC_addr = it->start_addr;
+            startPC_addr = section.start_addr;
         }
-        for ( size_t offset = 0; offset < it->size; ++offset)
+        for ( size_t offset = 0; offset < section.size; ++offset)
         {
-            write( it->content[offset], it->start_addr + offset, 1);
+            write( section.content[offset], section.start_addr + offset, 1);
         }
     }
 }
@@ -132,10 +132,10 @@ bool FuncMemory::check( uint64 addr) const
     return set != NULL && set[get_page(addr)] != NULL;
 }
 
-string FuncMemory::dump( string indent) const
+std::string FuncMemory::dump( std::string indent) const
 {
     std::ostringstream oss;
-    oss << std::setfill( '0') << hex;
+    oss << std::setfill( '0') << std::hex;
     
     uint64 set_cnt = 1 << set_bits;
     uint64 page_cnt = 1 << page_bits;
@@ -143,21 +143,20 @@ string FuncMemory::dump( string indent) const
     
     for ( size_t set = 0; set < set_cnt; ++set)
     {
-        if (memory[set] != NULL)
+        if (memory[set] == nullptr)
+            continue;
+
+        for ( size_t page = 0; page < page_cnt; ++page)
         {
-            for ( size_t page = 0; page < page_cnt; ++page)
+            if (memory[set][page] == nullptr)
+                continue;
+
+            for ( size_t offset = 0; offset < offset_cnt; ++offset)
             {
-                if (memory[set][page] != NULL)
-                {
-                    for ( size_t offset = 0; offset < offset_cnt; ++offset)
-                    {
-                        if (memory[set][page][offset])
-                        {
-                            oss << "addr 0x" << get_addr( set, page, offset) 
-                                << ": data 0x" << memory[set][page][offset] << std::endl;
-                        }
-                    }
-                }
+                if (memory[set][page][offset] == 0)
+                    continue;
+                oss << "addr 0x" << get_addr( set, page, offset) 
+                    << ": data 0x" << memory[set][page][offset] << std::endl;
             }
         }
     }
