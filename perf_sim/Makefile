@@ -35,5 +35,5 @@ perf_sim: $(OBJS)
 # Enter to remove all created files
 #
 clean:
-	@-rm -rf *.o *.d
-	@-rm perf_sim
+	@-rm -f *.o *.d
+	@-rm -f perf_sim

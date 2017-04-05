@@ -13,7 +13,7 @@
 #include <string>
 
 #include <common/types.h>
-#include "log.h"
+#include <common/log.h>
 
 template<class T> class PortMap;
 template<class T> class ReadPort;

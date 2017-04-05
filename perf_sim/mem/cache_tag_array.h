@@ -15,7 +15,7 @@
 
 /* Simulator modules. */
 #include <common/types.h>
-#include <perf_sim/log.h>
+#include <common/log.h>
 
 /* The set (line) of the cache. */
 struct CacheSet
