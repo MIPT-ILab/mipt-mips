@@ -31,20 +31,15 @@ ElfSection::ElfSection()
 }
 
 ElfSection::ElfSection( const ElfSection& that)
-    : size( that.size), start_addr( that.start_addr)
+    : name( that.name), size( that.size), start_addr( that.start_addr)
 {
-    this->name = new char[ strlen( that.name) + 1];
-    std::strcpy( this->name, that.name);
-    
     this->content = new uint8[size];
     std::memcpy(this->content, that.content, this->size);
 }
 
 ElfSection& ElfSection::operator=(const ElfSection& that)
 {
-    this->name = new char[ strlen( that.name) + 1];
-    std::strcpy( this->name, that.name);
-    
+    this->name = that.name;
     this->size = that.size;
     this->start_addr = that.start_addr;
 
@@ -54,12 +49,10 @@ ElfSection& ElfSection::operator=(const ElfSection& that)
     return *this;
 }
 
-ElfSection::ElfSection( const char* name, uint64 start_addr,
+ElfSection::ElfSection( const char* name_c, uint64 start_addr,
                         uint64 size, const uint8* content)
+    : name(name_c)
 {
-    this->name = new char[ strlen( name) + 1];
-    std::strcpy( this->name, name);
-
     this->size = size;
     this->start_addr = start_addr;
 
@@ -141,7 +134,6 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 
 ElfSection::~ElfSection()
 {
-    delete [] this->name;
     delete [] this->content;
 }
 

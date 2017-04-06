@@ -26,7 +26,7 @@ class ElfSection
                 uint64 size, const uint8* content);
 
 public:
-    char* name; // name of the elf section (e.g. ".text", ".data", etc)
+    std::string name; // name of the elf section (e.g. ".text", ".data", etc)
     uint64 size; // size of the section in bytes
     uint64 start_addr; // the start address of the section
     uint8* content; // the row data of the section

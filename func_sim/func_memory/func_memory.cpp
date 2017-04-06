@@ -5,9 +5,6 @@
  * Copyright 2012 uArchSim iLab project
  */
 
-// Generic C
-#include <string.h>
-
 // Generic C++
 #include <sstream>
 #include <iomanip>
@@ -39,15 +36,14 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 {
     assert( executable_file_name);
 
-    memory = new uint8** [set_cnt];
-    memset(memory, 0, sizeof(uint8**) * set_cnt);
+    memory = new uint8** [set_cnt]();
     
     std::vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
 
     for ( const auto& section : sections_array)
     {
-        if ( !strcmp( ".text", section.name))
+        if ( section.name == ".text")
         {
             startPC_addr = section.start_addr;
         }
@@ -124,14 +120,12 @@ void FuncMemory::alloc( uint64 addr)
     uint8*** set = &memory[get_set(addr)];
     if ( *set == nullptr)
     {
-        *set = new uint8* [page_cnt];
-    	memset(*set, 0, sizeof(uint8*) * page_cnt);
+        *set = new uint8* [page_cnt]();
     }
     uint8** page = &memory[get_set(addr)][get_page(addr)];
     if ( *page == nullptr)
     {
-        *page = new uint8 [page_size];
-    	memset(*page, 0, sizeof(uint8) * page_size);
+        *page = new uint8 [page_size]();
     }
 }
 
