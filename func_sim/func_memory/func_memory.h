@@ -24,14 +24,19 @@ class FuncMemory
         uint8*** memory;
         uint64 startPC_addr;
     
-        uint64 addr_bits;
-        uint64 page_bits;
-        uint64 offset_bits;
-        uint64 set_bits;
+        const uint64 addr_bits;
+        const uint64 page_bits;
+        const uint64 offset_bits;
+        const uint64 set_bits;
         
-        uint64 offset_mask;        
-        uint64 page_mask;
-        uint64 set_mask;
+        const uint64 addr_mask;
+        const uint64 offset_mask;        
+        const uint64 page_mask;
+        const uint64 set_mask;
+
+        const uint64 page_cnt;
+        const uint64 set_cnt;
+        const uint64 page_size;
         
         inline size_t get_set( uint64 addr) const
         {

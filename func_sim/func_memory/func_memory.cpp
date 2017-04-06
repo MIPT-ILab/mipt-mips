@@ -29,14 +29,18 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),
-    offset_mask( ( 1 << offset_bits) - 1),
-    page_mask ( ( ( 1 << page_bits) - 1) << offset_bits),
-    set_mask ( (( 1 << set_bits) - 1) << ( page_bits + offset_bits))
+    addr_mask( addr_bits >= 64 ? ~(0ull) : ( 1ull << addr_bits) - 1),
+    offset_mask( ( 1ull << offset_bits) - 1),
+    page_mask ( ( ( 1ull << page_bits) - 1) << offset_bits),
+    set_mask ( (( 1ull << set_bits) - 1) << ( page_bits + offset_bits)),
+    page_cnt ( 1ull << page_bits ),
+    set_cnt ( 1ull << set_bits ),
+    page_size ( 1ull << offset_bits)
 {
     assert( executable_file_name);
 
-    memory = new uint8** [1 << set_bits];
-    memset(memory, 0, sizeof(uint8**) * (1 << set_bits));
+    memory = new uint8** [set_cnt];
+    memset(memory, 0, sizeof(uint8**) * set_cnt);
     
     std::vector<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name, sections_array);
@@ -56,16 +60,13 @@ FuncMemory::FuncMemory( const char* executable_file_name,
 
 FuncMemory::~FuncMemory()
 {
-    uint64 set_cnt = 1 << set_bits;
-    uint64 page_cnt = 1 << page_bits;
-
     for ( size_t set = 0; set < set_cnt; ++set)
     {
-        if (memory[set] != NULL)
+        if (memory[set] != nullptr)
         {
             for ( size_t page = 0; page < page_cnt; ++page)
             {
-                if (memory[set][page] != NULL)
+                if (memory[set][page] != nullptr)
                 {
                     delete [] memory[set][page];
                 }
@@ -82,6 +83,10 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     assert( num_of_bytes != 0);
     assert( check( addr));
     assert( check( addr + num_of_bytes - 1));
+    if ( addr > addr_mask)
+    {
+        assert(0);
+    }
 
     uint64_8 value;
     value.val = 0ull;
@@ -100,6 +105,10 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
     assert( num_of_bytes != 0 );
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
+    if ( addr > addr_mask)
+    {
+        assert(0);
+    }
 
     uint64_8 value_;
     value_.val = value;
@@ -113,33 +122,29 @@ void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 void FuncMemory::alloc( uint64 addr)
 {
     uint8*** set = &memory[get_set(addr)];
-    if ( *set == NULL)
+    if ( *set == nullptr)
     {
-        *set = new uint8* [1 << page_bits];
-    	memset(*set, 0, sizeof(uint8*) * (1 << page_bits));
+        *set = new uint8* [page_cnt];
+    	memset(*set, 0, sizeof(uint8*) * page_cnt);
     }
     uint8** page = &memory[get_set(addr)][get_page(addr)];
-    if ( *page == NULL)
+    if ( *page == nullptr)
     {
-        *page = new uint8 [1 << offset_bits];
-    	memset(*page, 0, sizeof(uint8) * (1 << offset_bits));
+        *page = new uint8 [page_size];
+    	memset(*page, 0, sizeof(uint8) * page_size);
     }
 }
 
 bool FuncMemory::check( uint64 addr) const
 {
     uint8** set = memory[get_set(addr)];
-    return set != NULL && set[get_page(addr)] != NULL;
+    return set != nullptr && set[get_page(addr)] != nullptr;
 }
 
 std::string FuncMemory::dump( std::string indent) const
 {
     std::ostringstream oss;
     oss << indent << std::setfill( '0') << std::hex;
-    
-    uint64 set_cnt = 1 << set_bits;
-    uint64 page_cnt = 1 << page_bits;
-    uint64 offset_cnt = 1 << offset_bits;
     
     for ( size_t set = 0; set < set_cnt; ++set)
     {
@@ -151,7 +156,7 @@ std::string FuncMemory::dump( std::string indent) const
             if (memory[set][page] == nullptr)
                 continue;
 
-            for ( size_t offset = 0; offset < offset_cnt; ++offset)
+            for ( size_t offset = 0; offset < page_size; ++offset)
             {
                 if (memory[set][page][offset] == 0)
                     continue;
