@@ -24,7 +24,6 @@ class FuncMemory
         uint8*** memory;
         uint64 startPC_addr;
     
-        const uint64 addr_bits;
         const uint64 page_bits;
         const uint64 offset_bits;
         const uint64 set_bits;

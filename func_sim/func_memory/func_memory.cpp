@@ -22,7 +22,6 @@ FuncMemory::FuncMemory( const char* executable_file_name,
                         uint64 addr_bits,
                         uint64 page_bits,
                         uint64 offset_bits) :
-    addr_bits( addr_bits),
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),
@@ -79,10 +78,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
     assert( num_of_bytes != 0);
     assert( check( addr));
     assert( check( addr + num_of_bytes - 1));
-    if ( addr > addr_mask)
-    {
-        assert(0);
-    }
+    assert( addr <= addr_mask);
 
     uint64_8 value;
     value.val = 0ull;
@@ -98,9 +94,11 @@ uint64 FuncMemory::read( uint64 addr, unsigned short num_of_bytes) const
 void FuncMemory::write( uint64 value, uint64 addr, unsigned short num_of_bytes)
 {
     assert( addr != 0);
+    assert( addr <= addr_mask);
     assert( num_of_bytes != 0 );
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
+
     if ( addr > addr_mask)
     {
         assert(0);
