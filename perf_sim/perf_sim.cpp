@@ -5,17 +5,13 @@
  * Ladin Oleg.
  */
 
-/* Generic C. */
-#include <cstdlib>
-#include <sys/types.h>
-
 /* Simulator modules. */
 #include "perf_sim.h"
 
 /* Ports constants. */
-static const uint PORT_BW = 1;
-static const uint PORT_FANOUT = 1;
-static const uint PORT_LATENCY = 1;
+static const uint32 PORT_BW = 1;
+static const uint32 PORT_FANOUT = 1;
+static const uint32 PORT_LATENCY = 1;
 
 PerfMIPS::PerfMIPS(bool log) : Log(log)
 {
