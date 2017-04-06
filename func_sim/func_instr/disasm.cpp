@@ -27,7 +27,7 @@ int main( int argc, char* argv[])
     ElfSection::getAllElfSections( argv[1], section);
     size_t i;
     for ( i = 0; i < section.size(); i++)
-        if ( !strcmp( section[i].name, argv[2]))
+        if ( !strcmp( section[i].name.c_str(), argv[2]))
             break;
 
     if ( i == section.size())

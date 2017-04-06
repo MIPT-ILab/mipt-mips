@@ -7,6 +7,7 @@
 
 /* Generic C. */
 #include <cstdlib>
+#include <sys/types.h>
 
 /* Simulator modules. */
 #include "perf_sim.h"
