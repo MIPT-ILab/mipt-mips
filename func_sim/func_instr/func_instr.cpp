@@ -88,7 +88,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall},
     { "trap",   0x1A,  FORMAT_J, OUT_J_SPECIAL, 0, &FuncInstr::execute_trap},
 };                                              
-const uint32 FuncInstr::isaTableSize = sizeof(isaTable) / sizeof(isaTable[0]);
+const uint32 FuncInstr::isaTableSize = countof(isaTable);
 
 const char *FuncInstr::regTable[REG_NUM_MAX] = 
 {
