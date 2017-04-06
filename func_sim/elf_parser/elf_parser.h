@@ -11,10 +11,11 @@
 // Generic C++
 #include <string>
 #include <vector>
-class Elf;
 
 // uArchSim modules
 #include <common/types.h>
+
+struct Elf;
 
 class ElfSection
 {

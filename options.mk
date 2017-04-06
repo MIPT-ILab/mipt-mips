@@ -1,5 +1,5 @@
 # C++ compiler flags
-CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wno-sign-compare -O3
+CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wno-sign-compare -Wno-unused-private-field -O3
 
 # Paths to look for headers
 vpath %.h $(TRUNK)/common
