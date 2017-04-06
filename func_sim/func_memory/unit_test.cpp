@@ -32,7 +32,7 @@ TEST( Func_memory, StartPC_Method_Test)
 {
     FuncMemory func_mem( valid_elf_file);
 
-    ASSERT_EQ( func_mem.startPC(), 0x4000b0 /*address of the ".text" section*/);
+    ASSERT_EQ( func_mem.startPC(), 0x4000b0u /*address of the ".text" section*/);
 }
 
 TEST( Func_memory, Read_Method_Test)
