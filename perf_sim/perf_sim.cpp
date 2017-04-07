@@ -102,14 +102,15 @@ PerfMIPS::~PerfMIPS()
     delete wp_writeback_2_memory_stall;
 }
 
-void PerfMIPS::run( const std::string& tr, int instrs_to_run)
+void PerfMIPS::run( const std::string& tr, const int instrs_to_run)
 {
     mem = new FuncMemory( tr.c_str()); // create functional memory
     PC = mem->startPC(); // get starting programm address
     PC_is_valid = true; // now PC is valid
     executed_instrs = 0;
     int cycle = 0;
-    while ( executed_instrs < instrs_to_run) // main loop
+
+    while ( instrs_to_run == -1 || executed_instrs < instrs_to_run) // main loop
     {
         clockFetch( cycle);
         clockDecode( cycle);

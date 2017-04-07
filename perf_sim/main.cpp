@@ -14,34 +14,16 @@
 
 /* Simulator modules. */
 #include "perf_sim.h"
+#include "config.h"
 
-int main( int argc, char* argv[])
+int main( int argc, char** argv)
 {
-    bool is_silent = true; // by default it's silent mode
-    switch( argc)
-    {
-        case 3: // check arguments (silent mode)
-            if ( ( argv[ 1] == nullptr) || ( atoi( argv[ 2]) < 0))
-            {
-                std::cerr << "ERROR: Wrong arguments!\n";
-                std::exit( EXIT_FAILURE);
-            }
-            break;
-        case 4: // check arguments (normal mode)
-            if ( ( argv[ 1] == nullptr) || ( atoi( argv[ 2]) < 0) ||
-                 ( strcmp( argv[ 3], "-d")))
-            {
-                std::cerr << "ERROR: Wrong arguments!\n";
-                std::exit( EXIT_FAILURE);
-            }
-            is_silent = false; // disable silent mode
-            break;
-        default: // wrong number of arguments
-            std::cerr << "ERROR: Wrong number of arguments!\n";
-            std::exit( EXIT_FAILURE);
-    }
+    /* Analysing and handling of inserted arguments */
+    Config handler;
+    handler.handleArgs( argc, argv);
 
-    PerfMIPS p_mips( !is_silent);
-    p_mips.run( argv[ 1], atoi( argv[ 2]));
+    /* running simulation */
+    PerfMIPS p_mips( handler.disassemblyOn());
+    p_mips.run( handler.binaryFilename(), handler.numSteps());
     return 0;
 }

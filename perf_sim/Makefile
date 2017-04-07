@@ -15,12 +15,12 @@ include $(TRUNK)/options.mk
 #
 # Enter for build "perf_sim" program
 #
-OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o main.o
+OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o config.o main.o
 DEPS= $(OBJS:.o=.d)
 
 perf_sim: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
-	$(CXX) -o $@ $^ -l elf
+	$(CXX) -o $@ $^ -l elf -lboost_program_options
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
