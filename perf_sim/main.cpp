@@ -23,7 +23,7 @@ int main( int argc, char** argv)
     handler.handleArgs( argc, argv);
 
     /* running simulation */
-    PerfMIPS p_mips( handler.disassemblyOn());
-    p_mips.run( handler.binaryFilename(), handler.numSteps());
+    PerfMIPS p_mips( handler.disassembly_on);
+    p_mips.run( handler.binary_filename, handler.num_steps);
     return 0;
 }

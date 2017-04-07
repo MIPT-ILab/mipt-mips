@@ -26,11 +26,15 @@ perf_sim: $(OBJS)
 
 -include $(DEPS)
 
+config.o: config.cpp
+	@echo "[$(CXX)] $@"
+	@$(CXX) $(CXXFLAGS) -c $< $(INCL) $(BOOST_INCL)
+	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL) $(BOOST_INCL)
+
 %.o: %.cpp
 	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -c $< $(INCL)
 	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
-
 
 #
 # Enter to remove all created files

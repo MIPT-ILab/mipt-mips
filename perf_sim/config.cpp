@@ -1,6 +1,5 @@
 /*
  * config.cpp - implementation of Config class
- * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2017 MIPT-MIPS
  */
 
@@ -13,13 +12,8 @@
 /* boost - program option parsing */
 #include <boost/program_options.hpp>
 
-using namespace std;
-
 /* constructor and destructor */
-Config::Config() :
-    /* by default, there is no limit of simulation and silent mode is on */
-    num_steps( -1),
-    disassembly_on( false)
+Config::Config()
 {
 
 }
@@ -38,18 +32,18 @@ int Config::handleArgs( int argc, char** argv)
     po::options_description description( "Allowed options");
 
     description.add_options()
-        ( "binary,b",      po::value<string> ( &this->binary_filename),
-                                                            "Input binary file")
+        ( "binary,b",      po::value<std::string>( &this->binary_filename)->required(),
+          "input binary file")
 
-        ( "numsteps,n",    po::value<int>    ( &this->num_steps),
-                               "Number of instructions to run. Defaults to -1,"
-                               " which means there is no limit for simulation.")
+        ( "numsteps,n",    po::value<int>( &this->num_steps)->required(),
+          "number of instructions to run")
 
-        ( "disassembly,d", po::bool_switch   ( &this->disassembly_on),
-                                                            "Print disassembly")
+        /* by default, the silent mode is on */
+        ( "disassembly,d", po::bool_switch( &this->disassembly_on)->default_value( false),
+          "print disassembly")
 
         ( "help,h",
-                                                      "Print this help message");
+          "print this help message");
 
     po::positional_options_description posDescription;
     posDescription.add( "binary", 1).add( "numsteps", 2);
@@ -62,43 +56,29 @@ int Config::handleArgs( int argc, char** argv)
                                     positional(posDescription).
                                     run(),
                                     vm);
+
+
+        /* parsing help */
+        if ( vm.count( "help"))
+        {
+            std::cout << "Functional and performance simulators for MIPS-based CPU.";
+            std::cout << std::endl << std::endl;
+            std::cout << description << std::endl;
+            std::exit( EXIT_SUCCESS);
+        }
+
+        /* calling notify AFTER parsing help, as otherwise
+         * absent required args will cause errors
+         */
         po::notify(vm);
     }
     catch ( const std::exception& e)
     {
-        (void)e;
-        cout << description << endl;
-        exit(0);
-    }
-
-    /* parsing help */
-    if ( vm.count( "help"))
-    {
-         cout << "Functional and performance simulators for MIPS-based CPU.";
-         cout << endl << endl;
-         cout << description << endl;
-         exit(0);
+        std::cout << argv[0] << ": " << e.what();
+        std::cout << std::endl << std::endl;
+        std::cout << description << std::endl;
+        std::exit( EXIT_SUCCESS);
     }
 
     return 0;
 }
-
-
-/* get methods */
-string Config::binaryFilename() const
-{
-    return this->binary_filename;
-}
-
-
-int Config::numSteps() const
-{
-    return this->num_steps;
-}
-
-
-bool Config::disassemblyOn() const
-{
-    return this->disassembly_on;
-}
-
