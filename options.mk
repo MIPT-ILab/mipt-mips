@@ -20,5 +20,5 @@ GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
 
 # option for C++ compiler specifying directories 
 # to search for headers
-INCL= -I $(TRUNK)/
+INCL= -I $(TRUNK)/ -I /usr/local/include/boost/
 
