@@ -18,7 +18,7 @@ L5 | 18 Mar | **Branch Prediction** <br/> • [Eng text, No audio, 0.5 MB](https
 L6 | 25 Mar | **Performance and Power** <br/> • [Eng text, No audio, 1.0 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_06__25_Mar__Performance_and_Power__Eng_text__No_audio.pptx) | |
 L7 | 01 Apr | **Caches** <br/> • [Eng text, No audio, 1.0 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2016/Lecture_07__01_Apr__Caches__Eng_text__No_audio.pptx) | Try to understand how [standalone cache model](https://github.com/MIPT-ILab/mipt-mips/wiki/Assignment-5) works |
 L8 | 08 Apr | **Out-of-Order execution** | |
-L9 | 15 Apr | **Memory Disamiguation** | |
+L9 | 15 Apr | **Memory Disambiguation** | |
 | 22 Apr | **Final test** | |
 | 24 Apr | **Interview** | |
 L10 | 29 Apr | **Multicore and Multithreading** | |
