@@ -10,11 +10,19 @@
 
 class Config
 {
+    template<typename T>
+    class Value {
+        T value;
+        T* get_ptr() { return &value; }
+        friend class Config;
+    public:
+        operator const T&() const { return value; }
+    };
 public:
     /* variables */
-    std::string binary_filename;
-    int         num_steps;
-    bool        disassembly_on;
+    Value<std::string> binary_filename;
+    Value<int>         num_steps;
+    Value<bool>        disassembly_on;
 
     /* constructors */
     Config();

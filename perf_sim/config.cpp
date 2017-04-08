@@ -32,14 +32,14 @@ int Config::handleArgs( int argc, char** argv)
     po::options_description description( "Allowed options");
 
     description.add_options()
-        ( "binary,b",      po::value<std::string>( &this->binary_filename)->required(),
+        ( "binary,b",      po::value<std::string>( this->binary_filename.get_ptr())->required(),
           "input binary file")
 
-        ( "numsteps,n",    po::value<int>( &this->num_steps)->required(),
+        ( "numsteps,n",    po::value<int>( this->num_steps.get_ptr())->required(),
           "number of instructions to run")
 
         /* by default, the silent mode is on */
-        ( "disassembly,d", po::bool_switch( &this->disassembly_on)->default_value( false),
+        ( "disassembly,d", po::bool_switch( this->disassembly_on.get_ptr())->default_value( false),
           "print disassembly")
 
         ( "help,h",
