@@ -26,13 +26,12 @@ class ElfSection
                 uint64 size, const uint8* content);
 
 public:
-    std::string name; // name of the elf section (e.g. ".text", ".data", etc)
+    const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
     uint64 size; // size of the section in bytes
     uint64 start_addr; // the start address of the section
     uint8* content; // the row data of the section
 
     ElfSection( const  ElfSection& old);
-    ElfSection& operator=( const ElfSection& that);
     
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.

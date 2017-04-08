@@ -37,18 +37,6 @@ ElfSection::ElfSection( const ElfSection& that)
     std::memcpy(this->content, that.content, this->size);
 }
 
-ElfSection& ElfSection::operator=(const ElfSection& that)
-{
-    this->name = that.name;
-    this->size = that.size;
-    this->start_addr = that.start_addr;
-
-    this->content = new uint8[ this->size + sizeof( uint64)];
-    std::memcpy( this->content, that.content, this->size);
-        
-    return *this;
-}
-
 ElfSection::ElfSection( const char* name_c, uint64 start_addr,
                         uint64 size, const uint8* content)
     : name(name_c)
