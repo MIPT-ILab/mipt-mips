@@ -10,31 +10,29 @@ PerfMIPS::PerfMIPS(bool log) : Log(log)
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = new WritePort<uint32>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_fetch_2_decode = new ReadPort<uint32>("FETCH_2_DECODE", PORT_LATENCY);
-    wp_decode_2_fetch_stall = new WritePort<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
-    rp_decode_2_fetch_stall = new ReadPort<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
+    wp_fetch_2_decode = std::make_unique<WritePort<uint32>>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode = std::make_unique<ReadPort<uint32>>("FETCH_2_DECODE", PORT_LATENCY);
+    wp_decode_2_fetch_stall = std::make_unique<WritePort<bool>>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
+    rp_decode_2_fetch_stall = std::make_unique<ReadPort<bool>>("DECODE_2_FETCH_STALL", PORT_LATENCY);
     
-    wp_decode_2_execute = new WritePort<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
-    rp_decode_2_execute = new ReadPort<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
-    wp_execute_2_decode_stall = new WritePort<bool>("EXECUTE_2_DECODE_STALL", PORT_BW, PORT_FANOUT);
-    rp_execute_2_decode_stall = new ReadPort<bool>("EXECUTE_2_DECODE_STALL", PORT_LATENCY);
+    wp_decode_2_execute = std::make_unique<WritePort<FuncInstr>>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute = std::make_unique<ReadPort<FuncInstr>>("DECODE_2_EXECUTE", PORT_LATENCY);
+    wp_execute_2_decode_stall = std::make_unique<WritePort<bool>>("EXECUTE_2_DECODE_STALL", PORT_BW, PORT_FANOUT);
+    rp_execute_2_decode_stall = std::make_unique<ReadPort<bool>>("EXECUTE_2_DECODE_STALL", PORT_LATENCY);
     
-    wp_execute_2_memory = new WritePort<FuncInstr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
-    rp_execute_2_memory = new ReadPort<FuncInstr>("EXECUTE_2_MEMORY", PORT_LATENCY);
-    wp_memory_2_execute_stall = new WritePort<bool>("MEMORY_2_EXECUTE_STALL", PORT_BW, PORT_FANOUT);
-    rp_memory_2_execute_stall = new ReadPort<bool>("MEMORY_2_EXECUTE_STALL", PORT_LATENCY);
+    wp_execute_2_memory = std::make_unique<WritePort<FuncInstr>>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    rp_execute_2_memory = std::make_unique<ReadPort<FuncInstr>>("EXECUTE_2_MEMORY", PORT_LATENCY);
+    wp_memory_2_execute_stall = std::make_unique<WritePort<bool>>("MEMORY_2_EXECUTE_STALL", PORT_BW, PORT_FANOUT);
+    rp_memory_2_execute_stall = std::make_unique<ReadPort<bool>>("MEMORY_2_EXECUTE_STALL", PORT_LATENCY);
     
-    wp_memory_2_writeback = new WritePort<FuncInstr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_memory_2_writeback = new ReadPort<FuncInstr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
-    wp_writeback_2_memory_stall = new WritePort<bool>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
-    rp_writeback_2_memory_stall = new ReadPort<bool>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
+    wp_memory_2_writeback = std::make_unique<WritePort<FuncInstr>>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    rp_memory_2_writeback = std::make_unique<ReadPort<FuncInstr>>("MEMORY_2_WRITEBACK", PORT_LATENCY);
+    wp_writeback_2_memory_stall = std::make_unique<WritePort<bool>>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
+    rp_writeback_2_memory_stall = std::make_unique<ReadPort<bool>>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
 
     Port<uint32>::init();
     Port<FuncInstr>::init();
     Port<bool>::init();
-    
-    rf = new RF();
 }
 
 void PerfMIPS::run( const std::string& tr, uint32 instrs_to_run)
@@ -114,11 +112,11 @@ void PerfMIPS::clock_decode( int cycle) {
         return;
     }
 
-    if ( rf->check( instr.get_src1_num()) && rf->check( instr.get_src2_num()))
+    if ( rf.check( instr.get_src1_num()) && rf.check( instr.get_src2_num()))
     {
-        rf->read_src1( instr);
-        rf->read_src2( instr);
-        rf->invalidate( instr.get_dst_num());
+        rf.read_src1( instr);
+        rf.read_src2( instr);
+        rf.invalidate( instr.get_dst_num());
         wp_decode_2_execute->write( instr, cycle);
         
         decode_next_time = false;
@@ -207,7 +205,7 @@ void PerfMIPS::clock_writeback( int cycle)
         PC = instr.get_new_PC();
     }
 
-    rf->write_dst( instr);
+    rf.write_dst( instr);
 
     sout << instr << std::endl;
     std::cout << instr << std::endl;
@@ -217,25 +215,5 @@ void PerfMIPS::clock_writeback( int cycle)
 }
 
 PerfMIPS::~PerfMIPS() {
-    delete rf;
 
-    delete wp_fetch_2_decode;
-    delete rp_fetch_2_decode;
-    delete wp_decode_2_fetch_stall;
-    delete rp_decode_2_fetch_stall;
-
-    delete wp_decode_2_execute;
-    delete rp_decode_2_execute;
-    delete wp_execute_2_decode_stall;
-    delete rp_execute_2_decode_stall;
-
-    delete wp_execute_2_memory;
-    delete rp_execute_2_memory;
-    delete wp_memory_2_execute_stall;
-    delete rp_memory_2_execute_stall;
-
-    delete wp_memory_2_writeback;
-    delete rp_memory_2_writeback;
-    delete wp_writeback_2_memory_stall;
-    delete rp_writeback_2_memory_stall;
 }

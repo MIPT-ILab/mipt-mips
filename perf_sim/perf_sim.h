@@ -25,30 +25,30 @@ class PerfMIPS : protected Log
         uint32 decode_data;
         bool decode_next_time;
 
-        RF* rf;
+        RF rf;
         uint32 PC;
         bool PC_is_valid;
         FuncMemory* mem;
 
-        WritePort<uint32>* wp_fetch_2_decode;
-        ReadPort<uint32>* rp_fetch_2_decode;
-        WritePort<bool>* wp_decode_2_fetch_stall;
-        ReadPort<bool>* rp_decode_2_fetch_stall;
+        std::unique_ptr<WritePort<uint32>> wp_fetch_2_decode;
+        std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode;
+        std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall;
+        std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall;
        
-        WritePort<FuncInstr>* wp_decode_2_execute;
-        ReadPort<FuncInstr>* rp_decode_2_execute;
-        WritePort<bool>* wp_execute_2_decode_stall;
-        ReadPort<bool>* rp_execute_2_decode_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute;
+        std::unique_ptr<WritePort<bool>> wp_execute_2_decode_stall;
+        std::unique_ptr<ReadPort<bool>> rp_execute_2_decode_stall;
         
-        WritePort<FuncInstr>* wp_execute_2_memory;
-        ReadPort<FuncInstr>* rp_execute_2_memory;
-        WritePort<bool>* wp_memory_2_execute_stall;
-        ReadPort<bool>* rp_memory_2_execute_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_execute_2_memory;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_execute_2_memory;
+        std::unique_ptr<WritePort<bool>> wp_memory_2_execute_stall;
+        std::unique_ptr<ReadPort<bool>> rp_memory_2_execute_stall;
 
-        WritePort<FuncInstr>* wp_memory_2_writeback;
-        ReadPort<FuncInstr>* rp_memory_2_writeback;
-        WritePort<bool>* wp_writeback_2_memory_stall;
-        ReadPort<bool>* rp_writeback_2_memory_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_memory_2_writeback;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_memory_2_writeback;
+        std::unique_ptr<WritePort<bool>> wp_writeback_2_memory_stall;
+        std::unique_ptr<ReadPort<bool>> rp_writeback_2_memory_stall;
 
         void clock_fetch( int cycle);
         void clock_decode( int cycle);
