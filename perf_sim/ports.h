@@ -437,5 +437,17 @@ template<class T> void PortMap<T>::lost( uint64 cycle)
         }
     }
 }    
-    
+
+template<typename T, typename ... Args>
+decltype(auto) make_write_port(Args ... args)
+{
+    return std::make_unique<WritePort<T>>(args...);
+}
+
+template<typename T, typename ... Args>
+decltype(auto) make_read_port(Args ... args)
+{
+    return std::make_unique<ReadPort<T>>(args...);
+}
+	
 #endif // PORTS_H
