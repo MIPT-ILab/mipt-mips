@@ -1,6 +1,9 @@
 # C++ compile
 CXX = g++
 CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -O3
+ifeq ($(DEBUG), 1)
+	CXXFLAGS+= -O0 -g
+endif
 
 # Paths to look for headers
 vpath %.h $(TRUNK)/common
