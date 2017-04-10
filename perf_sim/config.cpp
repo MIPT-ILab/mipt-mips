@@ -61,9 +61,9 @@ int Config::handleArgs( int argc, char** argv)
         /* parsing help */
         if ( vm.count( "help"))
         {
-            std::cout << "Functional and performance simulators for MIPS-based CPU.";
-            std::cout << std::endl << std::endl;
-            std::cout << description << std::endl;
+            std::cout << "Functional and performance simulators for MIPS-based CPU."
+                      << std::endl << std::endl
+                      << description << std::endl;
             std::exit( EXIT_SUCCESS);
         }
 
@@ -74,9 +74,9 @@ int Config::handleArgs( int argc, char** argv)
     }
     catch ( const std::exception& e)
     {
-        std::cerr << argv[0] << ": " << e.what();
-        std::cerr << std::endl << std::endl;
-        std::cerr << description << std::endl;
+        std::cerr << argv[0] << ": " << e.what()
+                  << std::endl << std::endl
+                  << description << std::endl;
         std::exit( EXIT_SUCCESS);
     }
 
