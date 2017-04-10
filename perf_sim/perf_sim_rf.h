@@ -1,7 +1,7 @@
 /*
  * rf.h - mips register file
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS 
+ * Copyright 2015 MIPT-MIPS
  */
 
 #ifndef RF_H
@@ -13,6 +13,16 @@ class RF
 {
         struct Reg {
             uint32 value;
+
+            /* The register is called "valid" when it's value is updated with
+             * result of calculation of the latest fetched writing instruction.
+             * For instance, when there is
+             *    add $t0, $s1, $s2
+             * instruction decoded, the register $t0 is marked "not valid".
+             * After writeback it becomes valid again, and till that moment no
+             * instruction with WAW or RAW dependency from register $t0 can be
+             * executed. The WAW dependency is just a workaround for #45 issue.
+             */
             bool is_valid;
         } array[REG_NUM_MAX];
 
@@ -43,7 +53,7 @@ class RF
             }
         }
 
-        void invalidate( RegNum num) 
+        void invalidate( RegNum num)
         {
             if ( num != REG_NUM_ZERO)
                 array[(size_t)num].is_valid = false;
@@ -68,6 +78,6 @@ class RF
             array[(size_t)num].value = val;
         }
 };
-          
+
 #endif
- 
+
