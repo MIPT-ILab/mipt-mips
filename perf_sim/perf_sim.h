@@ -22,7 +22,7 @@ class PerfMIPS : protected Log
         uint64 executed_instrs = 0;
         uint64 last_writeback_cycle = 0; // to handle possible deadlocks
 
-        uint32 decode_data;
+        uint32 decode_data = 0;
         bool decode_next_time;
 
         RF rf;
