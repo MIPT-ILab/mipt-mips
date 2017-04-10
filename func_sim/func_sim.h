@@ -14,14 +14,14 @@
 class MIPS
 {
     private:
-        RF* rf;
-        uint32 PC;
-        FuncMemory* mem;
+        FuncRF rf;
+        uint32 PC = 0;
+        FuncMemory* mem = nullptr;
 
         uint32 fetch() const { return mem->read(PC); }
         void read_src(FuncInstr& instr) const {
-            rf->read_src1(instr); 
-            rf->read_src2(instr); 
+            rf.read_src1(instr); 
+            rf.read_src2(instr); 
 	    }
 
         void load(FuncInstr& instr) const {
@@ -40,12 +40,14 @@ class MIPS
         }
 
         void wb(const FuncInstr& instr) {
-            rf->write_dst(instr);
+            rf.write_dst(instr);
         }
    public:
         MIPS();
-        void run(const std::string& tr, uint32 instrs_to_run);
         ~MIPS();
+        void init( const std::string& tr);
+        void step( std::ostream& out);
+        void run(const std::string& tr, uint32 instrs_to_run);
 };
             
 #endif

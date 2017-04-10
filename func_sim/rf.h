@@ -4,12 +4,12 @@
  * Copyright 2015 MIPT-MIPS 
  */
 
-#ifndef RF_H
-#define RF_H
+#ifndef FUNC_SIM__RF_H
+#define FUNC_SIM__RF_H
 
 #include <func_sim/func_instr/func_instr.h>
 
-class RF
+class FuncRF
 {
         uint32 array[REG_NUM_MAX];
     public:
@@ -37,7 +37,7 @@ class RF
             array[reg] = 0;
         }
  
-        RF()
+        FuncRF()
         {
             for ( size_t i = 0; i < REG_NUM_MAX; ++i)
                 reset((RegNum)i);

@@ -13,6 +13,8 @@
 #include <common/log.h>
 #include <func_sim/func_instr/func_instr.h>
 #include <func_sim/func_memory/func_memory.h>
+#include <func_sim/func_sim.h>
+
 #include "perf_sim_rf.h"
 #include "ports.h"
 
@@ -29,6 +31,8 @@ class PerfMIPS : protected Log
         uint32 PC;
         bool PC_is_valid;
         FuncMemory* mem;
+
+        MIPS checker;
 
         std::unique_ptr<WritePort<uint32>> wp_fetch_2_decode;
         std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode;
@@ -71,6 +75,7 @@ class PerfMIPS : protected Log
                 store( instr);
         }
 
+        void check( const FuncInstr& instr);
    public:
         PerfMIPS( bool log);
         void run( const std::string& tr, uint32 instrs_to_run);
