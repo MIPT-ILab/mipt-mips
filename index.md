@@ -24,7 +24,7 @@ L9 | 15 Apr | **Memory Disambiguation** | |
 L10 | 29 Apr | **Multicore and Multithreading** | |
 
 
-**Please note** that course was reduced this year, you may find more lectures with audio narrations in archive: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures on the computer architecture in 2012).
+**Please note** that course was reduced this year, you may find more lectures with audio narrations in archive: [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
@@ -38,7 +38,7 @@ That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-m
 
 N | Year | Name | Score | Comments
 :-: |:----: |:----: | ------------------------------ | ------------------------------
-1 | 2016/2017 | Georgiy Korepanov | 8 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26) |
+1 | 2016/2017 | Georgiy Korepanov | 10 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#10](https://github.com/MIPT-ILab/mipt-mips/issues/60) |
 2 | 2016/2017 | Alexandr Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 3 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
