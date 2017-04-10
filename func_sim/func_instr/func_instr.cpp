@@ -15,6 +15,8 @@
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
+    { "###",    0xFF,  FORMAT_J, OUT_R_ARITHM,  0, &FuncInstr::execute_unknown},
+
     // name    funct    format    operation   memsize           pointer
     { "add",    0x20,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_add},
     { "addu",   0x21,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_addu},
@@ -282,6 +284,11 @@ void FuncInstr::initUnknown()
     oss << std::hex << std::setfill( '0')
         << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
     disasm = oss.str();
+    isaNum = 0;
+}
+
+void FuncInstr::execute_unknown()
+{
     std::cerr << "ERROR.Incorrect instruction: " << disasm << std::endl;
     exit(EXIT_FAILURE);
 }

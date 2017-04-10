@@ -205,7 +205,9 @@ class FuncInstr
 
         void execute_syscall(){ };
         void execute_break()  { }; 
-        void execute_trap()   { };   
+        void execute_trap()   { };
+
+        void execute_unknown();
 
         void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
         void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
