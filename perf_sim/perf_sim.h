@@ -20,7 +20,7 @@ class PerfMIPS : protected Log
 {
     private:
         uint64 executed_instrs = 0;
-	uint64 last_writeback_cycle = 0; // to handle possible deadlocks
+        uint64 last_writeback_cycle = 0; // to handle possible deadlocks
 
         uint32 decode_data;
         bool decode_next_time;

@@ -10,25 +10,25 @@ PerfMIPS::PerfMIPS(bool log) : Log(log)
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = make_write_port<uint32>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_fetch_2_decode = make_read_port<uint32>("FETCH_2_DECODE", PORT_LATENCY);
-    wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
-    rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
+    wp_fetch_2_decode           = make_write_port <uint32>    ("FETCH_2_DECODE",           PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode           = make_read_port  <uint32>    ("FETCH_2_DECODE",           PORT_LATENCY);
+    wp_decode_2_fetch_stall     = make_write_port <bool>      ("DECODE_2_FETCH_STALL",     PORT_BW, PORT_FANOUT);
+    rp_decode_2_fetch_stall     = make_read_port  <bool>      ("DECODE_2_FETCH_STALL",     PORT_LATENCY);
 
-    wp_decode_2_execute = make_write_port<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
-    rp_decode_2_execute = make_read_port<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
-    wp_execute_2_decode_stall = make_write_port<bool>("EXECUTE_2_DECODE_STALL", PORT_BW, PORT_FANOUT);
-    rp_execute_2_decode_stall = make_read_port<bool>("EXECUTE_2_DECODE_STALL", PORT_LATENCY);
+    wp_decode_2_execute         = make_write_port <FuncInstr> ("DECODE_2_EXECUTE",         PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute         = make_read_port  <FuncInstr> ("DECODE_2_EXECUTE",         PORT_LATENCY);
+    wp_execute_2_decode_stall   = make_write_port <bool>      ("EXECUTE_2_DECODE_STALL",   PORT_BW, PORT_FANOUT);
+    rp_execute_2_decode_stall   = make_read_port  <bool>      ("EXECUTE_2_DECODE_STALL",   PORT_LATENCY);
 
-    wp_execute_2_memory = make_write_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
-    rp_execute_2_memory = make_read_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_LATENCY);
-    wp_memory_2_execute_stall = make_write_port<bool>("MEMORY_2_EXECUTE_STALL", PORT_BW, PORT_FANOUT);
-    rp_memory_2_execute_stall = make_read_port<bool>("MEMORY_2_EXECUTE_STALL", PORT_LATENCY);
+    wp_execute_2_memory         = make_write_port <FuncInstr> ("EXECUTE_2_MEMORY",         PORT_BW, PORT_FANOUT);
+    rp_execute_2_memory         = make_read_port  <FuncInstr> ("EXECUTE_2_MEMORY",         PORT_LATENCY);
+    wp_memory_2_execute_stall   = make_write_port <bool>      ("MEMORY_2_EXECUTE_STALL",   PORT_BW, PORT_FANOUT);
+    rp_memory_2_execute_stall   = make_read_port  <bool>      ("MEMORY_2_EXECUTE_STALL",   PORT_LATENCY);
 
-    wp_memory_2_writeback = make_write_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_memory_2_writeback = make_read_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
-    wp_writeback_2_memory_stall = make_write_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
-    rp_writeback_2_memory_stall = make_read_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
+    wp_memory_2_writeback       = make_write_port <FuncInstr> ("MEMORY_2_WRITEBACK",       PORT_BW, PORT_FANOUT);
+    rp_memory_2_writeback       = make_read_port  <FuncInstr> ("MEMORY_2_WRITEBACK",       PORT_LATENCY);
+    wp_writeback_2_memory_stall = make_write_port <bool>      ("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
+    rp_writeback_2_memory_stall = make_read_port  <bool>      ("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
 
     Port<uint32>::init();
     Port<FuncInstr>::init();
@@ -112,7 +112,9 @@ void PerfMIPS::clock_decode( int cycle) {
         return;
     }
 
-    if ( rf.check( instr.get_src1_num()) && rf.check( instr.get_src2_num()))
+    if ( rf.check( instr.get_src1_num()) &&
+         rf.check( instr.get_src2_num()) &&
+         rf.check( instr.get_dst_num()))
     {
         rf.read_src1( instr);
         rf.read_src2( instr);
