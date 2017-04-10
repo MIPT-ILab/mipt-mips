@@ -42,6 +42,10 @@ int Config::handleArgs( int argc, char** argv)
         ( "disassembly,d", po::bool_switch( this->disassembly_on.get_ptr())->default_value( false),
           "print disassembly")
 
+        /* by default, functional simulator is run */
+        ( "performance,p",  po::bool_switch( this->performance_on.get_ptr())->default_value( false),
+          "run performance simulator")
+
         ( "help,h",
           "print this help message");
 
