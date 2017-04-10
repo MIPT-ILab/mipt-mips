@@ -74,9 +74,9 @@ int Config::handleArgs( int argc, char** argv)
     }
     catch ( const std::exception& e)
     {
-        std::cout << argv[0] << ": " << e.what();
-        std::cout << std::endl << std::endl;
-        std::cout << description << std::endl;
+        std::cerr << argv[0] << ": " << e.what();
+        std::cerr << std::endl << std::endl;
+        std::cerr << description << std::endl;
         std::exit( EXIT_SUCCESS);
     }
 
