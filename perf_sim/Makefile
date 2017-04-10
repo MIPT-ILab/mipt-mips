@@ -42,4 +42,3 @@ config.o: config.cpp
 clean:
 	@-rm -f *.o *.d
 	@-rm -f perf_sim
-	@-rm -f perf_sim.output func_sim.output

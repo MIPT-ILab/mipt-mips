@@ -43,8 +43,8 @@ int Config::handleArgs( int argc, char** argv)
           "print disassembly")
 
         /* by default, functional simulator is run */
-        ( "performance,p",  po::bool_switch( this->performance_on.get_ptr())->default_value( false),
-          "run performance simulator")
+        ( "functional-only,f", po::bool_switch( this->functional_only.get_ptr())->default_value( false),
+          "run functional simulation only")
 
         ( "help,h",
           "print this help message");

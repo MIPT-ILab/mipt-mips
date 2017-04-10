@@ -23,7 +23,7 @@ public:
     Value<std::string> binary_filename;
     Value<int>         num_steps;
     Value<bool>        disassembly_on;
-    Value<bool>        performance_on;
+    Value<bool>        functional_only;
 
     /* constructors */
     Config();
