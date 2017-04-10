@@ -1,8 +1,7 @@
 /**
- * main.cpp
- * Start point of the scalar MIPS CPU simulator.
- * MIPT-MIPS Assignment 4.
- * Ladin Oleg.
+ * main.cpp - entry point of the scalar MIPS CPU simulator
+ * @author Ladin Oleg
+ * Copyright 2017 MIPT-MIPS
  */
 
 /* Generic C. */
@@ -14,6 +13,7 @@
 
 /* Simulator modules. */
 #include "perf_sim.h"
+#include <func_sim/func_sim.h>
 #include "config.h"
 
 int main( int argc, char** argv)
@@ -23,7 +23,16 @@ int main( int argc, char** argv)
     handler.handleArgs( argc, argv);
 
     /* running simulation */
-    PerfMIPS p_mips( handler.disassembly_on);
-    p_mips.run( handler.binary_filename, handler.num_steps);
+    if ( !handler.functional_only)
+    {
+        PerfMIPS p_mips( handler.disassembly_on);
+        p_mips.run( handler.binary_filename, handler.num_steps);
+    }
+    else
+    {
+        MIPS mips;
+        mips.run( handler.binary_filename, handler.num_steps);
+    }
+
     return 0;
 }

@@ -15,7 +15,7 @@ include $(TRUNK)/options.mk
 #
 # Enter for build "perf_sim" program
 #
-OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o config.o main.o
+OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o func_sim.o config.o main.o
 DEPS= $(OBJS:.o=.d)
 
 perf_sim: $(OBJS)
