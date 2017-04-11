@@ -21,6 +21,7 @@
 *.s
 *.so
 *.out
+*.output
 
 # Packages #
 ######################
@@ -42,6 +43,11 @@
 *.sql
 *.sqlite
 
+# Patches #
+###########
+*.patch
+*.diff
+
 # OS generated files #
 ######################
 .DS_Store
@@ -51,3 +57,8 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.swp
+
+# Keep compressed traces #
+##########################
+!*.s.gz
