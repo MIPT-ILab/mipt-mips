@@ -61,6 +61,13 @@ void PerfMIPS::run( const std::string& tr, uint32 instrs_to_run)
         sout << "Executed instructions: " << executed_instrs << std::endl << std::endl;
     }
 
+    auto ipc = (double)executed_instrs / cycle;
+
+    std::cout << std::endl << "****************************"
+              << std::endl << "IPC: " << ipc
+              << std::endl << "****************************"
+              << std::endl;
+
     delete mem;
 }
 
