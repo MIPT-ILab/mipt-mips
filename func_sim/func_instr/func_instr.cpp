@@ -197,11 +197,13 @@ void FuncInstr::initR()
             break;
         case OUT_R_JUMP_LINK:
             dst = REG_NUM_RA;
-        case OUT_R_JUMP:
             src1  = (RegNum)instr.asR.rs;
-
             oss << " $" << regTableName(src1);
             break;
+        case OUT_R_JUMP:
+            dst = REG_NUM_ZERO;
+            src1  = (RegNum)instr.asR.rs;
+            oss << " $" << regTableName(src1);
         case OUT_R_SPECIAL:
             break;
         default:
@@ -279,6 +281,8 @@ void FuncInstr::initJ()
 
     if ( operation == OUT_J_JUMP_LINK)
         dst = REG_NUM_RA;
+    else
+        dst = REG_NUM_ZERO;
 
     disasm = oss.str();
 }
