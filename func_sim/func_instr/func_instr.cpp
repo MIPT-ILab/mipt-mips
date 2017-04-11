@@ -93,6 +93,15 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "ori",    0xD,   FORMAT_I, OUT_I_ARITHM,     0, &FuncInstr::execute_ori},
     { "xori",   0xE,   FORMAT_I, OUT_I_ARITHM,     0, &FuncInstr::execute_xori}, 
     { "lui",    0xF,   FORMAT_I, OUT_I_CONST,      0, &FuncInstr::execute_lui},
+    
+    // Coprocessor operations 0x10 - 0x13
+
+    // Likely branches (MIPS II)
+    // name    opcode    format    operation     memsize           pointer
+    { "beql",   0x14,  FORMAT_I, OUT_I_BRANCH,     0, &FuncInstr::execute_beq},
+    { "bnel",   0x15,  FORMAT_I, OUT_I_BRANCH,     0, &FuncInstr::execute_bne},
+    { "blezl",  0x16,  FORMAT_I, OUT_I_BRANCH,     0, &FuncInstr::execute_blez},
+    { "bgtzl",  0x17,  FORMAT_I, OUT_I_BRANCH,     0, &FuncInstr::execute_bgtz},    
 
     // System calls
     // name    opcode    format    operation     memsize           pointer
@@ -102,15 +111,20 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // name    opcode    format    operation     memsize           pointer
     { "lb",     0x20,  FORMAT_I, OUT_I_LOAD,       1, &FuncInstr::calculate_load_addr},
     { "lh",     0x21,  FORMAT_I, OUT_I_LOAD,       2, &FuncInstr::calculate_load_addr},
+ // { "lwl",    0x22,  FORMAT_I, OUT_I_LOAD,       4, &FuncInstr::calculate_load_addr},
     { "lw",     0x23,  FORMAT_I, OUT_I_LOAD,       4, &FuncInstr::calculate_load_addr},
     { "lbu",    0x24,  FORMAT_I, OUT_I_LOADU,      1, &FuncInstr::calculate_load_addr},
     { "lhu",    0x25,  FORMAT_I, OUT_I_LOADU,      2, &FuncInstr::calculate_load_addr},
+ // { "lwr",    0x26,  FORMAT_I, OUT_I_LOAD,       4, &FuncInstr::calculate_load_addr},
+    { "lwu",    0x27,  FORMAT_I, OUT_I_LOADU,      4, &FuncInstr::calculate_load_addr},
 
     // Stores
     // name    opcode    format    operation     memsize           pointer
     { "sb",     0x28,  FORMAT_I, OUT_I_STORE,      1, &FuncInstr::calculate_store_addr},
     { "sh",     0x29,  FORMAT_I, OUT_I_STORE,      2, &FuncInstr::calculate_store_addr},
+ // { "swl",    0x2A,  FORMAT_I, OUT_I_STORE,      4, &FuncInstr::calculate_store_addr},
     { "sw",     0x2B,  FORMAT_I, OUT_I_STORE,      4, &FuncInstr::calculate_store_addr},
+ // { "swr",    0x2E,  FORMAT_I, OUT_I_STORE,      4, &FuncInstr::calculate_store_addr},
 };
 const uint32 FuncInstr::isaTableSize = countof(isaTable);
 
