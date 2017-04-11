@@ -39,10 +39,10 @@ using float64 = double;
 // Using such values most likely will leads to segmenation fault,
 // which is easy to debug than access by an uninitialize pointer
 // or array index.
-static const uint8  NO_VAL8  = (uint8)  -1;
-static const uint16 NO_VAL16 = (uint16) -1;
-static const uint32 NO_VAL32 = (uint32) -1;
-static const uint64 NO_VAL64 = (uint64) -1;
+static const uint8  NO_VAL8  = 0xBA;
+static const uint16 NO_VAL16 = 0x4b1d;
+static const uint32 NO_VAL32 = 0xdeadbeeful;
+static const uint64 NO_VAL64 = 0xfeedfacecafebeefull;
 
 static const uint8  MAX_VAL8  = UINT8_MAX;
 static const uint16 MAX_VAL16 = UINT16_MAX;

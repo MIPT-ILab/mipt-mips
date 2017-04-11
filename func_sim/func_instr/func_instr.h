@@ -217,8 +217,8 @@ class FuncInstr
         void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
 
     public:
-        uint32 hi;
-        uint32 lo;
+        uint32 hi = NO_VAL32;
+        uint32 lo = NO_VAL32;
 
         FuncInstr() {} // constructor w/o arguments for ports
         FuncInstr( uint32 bytes, uint32 PC = 0);
