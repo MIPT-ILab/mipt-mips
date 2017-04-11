@@ -8,11 +8,11 @@
 TRUNK= ../../
 
 # create a list of all assembly files in the current folder
-ASM_FILES= $(wildcard *.s)
+ASM_FILES = $(wildcard *.s.gz)
 
 # using names of the assembly files create a list of output 
 # execution files 
-OUT_FILES= $(patsubst %.s,%.out,$(ASM_FILES))
+OUT_FILES= $(patsubst %.s.gz,%.out,$(ASM_FILES))
 
 # assemble all the object files 
 build_all: $(OUT_FILES)
@@ -24,16 +24,19 @@ build_all: $(OUT_FILES)
 %.o: %.s
 	@mips-as $< -o $@
 
+%.s: %.s.gz
+	@gunzip -c $< > $@
+
 # it is needed to preven make from 
 # deleting .o files automatically
 .PRECIOUS: %.o
 
 .PHONY: clean
 clean:
-	-rm *.o *.out
+	-rm *.o *.out *.s -rf
 
 .PHONY: help
 help:
 	@echo "  This makefile build all MIPS assembly files in the directory."
 	@echo "  To do that just type 'make' or 'make build_all'."
-	@echo "  Note that assembly files should have '.s' extension."
+	@echo "  Note that assembly files should have '.s.gz' extension."

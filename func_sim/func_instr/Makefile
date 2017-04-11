@@ -1,69 +1,64 @@
-# 
+#
 # Building the disasm for MIPS binaries
 # @author Pavel Kryukov <pavel.kryukov@phystech.com>
 # Copyright 2014 MIPT-MIPS iLab Project
 #
 
 # specifying relative path to the TRUNK
-TRUNK= ../../
+TRUNK= ../..
 
-# paths to look for headers
-vpath %.h $(TRUNK)/common
-vpath %.h $(TRUNK)/func_sim/elf_parser/
-vpath %.h $(TRUNK)/func_sim/func_instr/
-vpath %.h $(TRUNK)/func_sim/func_memory/
-vpath %.cpp $(TRUNK)/func_sim/elf_parser/
-vpath %.cpp $(TRUNK)/func_sim/func_instr/
-vpath %.cpp $(TRUNK)/func_sim/func_memory/
-
-# option for C++ compiler specifying directories 
-# to search for headers
-INCL= -I ./ -I $(TRUNK)/common/ -I $(TRUNK)/func_sim/elf_parser/ -I $(TRUNK)/func_sim/func_memory/ 
-
-#options for static linking of boost Unit Test library
-INCL_GTEST= -I $(TRUNK)/libs/gtest-1.6.0/include
-GTEST_LIB= $(TRUNK)/libs/gtest-1.6.0/libgtest.a
+# Including options and compiler flags
+include $(TRUNK)/options.mk
 
 #
-# Enter for building func_memory stand alone program
+# Enter for building func_instr standalone program
 #
-disasm: func_memory.o elf_parser.o disasm.o func_instr.o
+OBJS= func_memory.o elf_parser.o disasm.o func_instr.o
+DEPS= $(OBJS:.o=.d)
+
+disasm: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-func_instr.o: func_instr.cpp func_instr.h types.h
-	$(CXX) -c $< $(INCL)
-    
-func_memory.o: func_memory.cpp func_memory.h types.h
-	$(CXX) -c $< $(INCL)
+-include $(DEPS)
 
-elf_parser.o: elf_parser.cpp elf_parser.h types.h
-	$(CXX) -c $< $(INCL)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
 
-disasm.o: disasm.cpp func_memory.h types.h func_instr.h
-	$(CXX) -c $< $(INCL)
 
 #
-# Enter for building func_memory unit test
+# Enter for building func_instr unit test
 #
 test: unit_test
 	@echo ""
 	@echo "Running ./$<\n"
 	@./$<
-	@echo "Unit testing for the moduler functional memory passed SUCCESSFULLY!"
+	@echo "Unit testing for the moduler functional instructions passed SUCCESSFULLY!"
 
-unit_test: unit_test.o func_memory.o elf_parser.o func_instr.o
+OBJS= unit_test.o func_memory.o elf_parser.o func_instr.o
+DEPS= $(OBJS:.o=.d)
+
+unit_test: $(OBJS) $(GTEST_LIB)
 	@# don't forget to link ELF library using "-l elf"
 	@# and use "-lpthread" options for Google Test
-	$(CXX) $^ -lpthread $(GTEST_LIB) -o $@ -l elf
+	$(CXX) $(GTEST_INCL) -pthread -lpthread $^ -o $@ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-unit_test.o: unit_test.cpp func_instr.h
-	$(CXX) -c $< $(INCL_GTEST) $(INCL) 
+
+-include $(DEPS)
+
+unit_test.o: unit_test.cpp $(GTEST_LIB)
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) $(GTEST_INCL) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
+
+$(GTEST_LIB):
+	$(MAKE) -C $(GTEST_DIR)
+
 
 clean:
-	@-rm *.o
-	@-rm disasm unit_test
+	@-rm -rf *.o *.d
+	@-rm -rf disasm unit_test

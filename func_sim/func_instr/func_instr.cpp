@@ -11,10 +11,12 @@
 #include <sstream>
 #include <iomanip>
 
-#include <func_instr.h>
+#include "func_instr.h"
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
+    { "###",    0xFF,  FORMAT_UNKNOWN, OUT_R_ARITHM,  0, &FuncInstr::execute_unknown},
+
     // name    funct    format    operation   memsize           pointer
     { "add",    0x20,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_add},
     { "addu",   0x21,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_addu},
@@ -88,7 +90,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall},
     { "trap",   0x1A,  FORMAT_J, OUT_J_SPECIAL, 0, &FuncInstr::execute_trap},
 };                                              
-const uint32 FuncInstr::isaTableSize = sizeof(isaTable) / sizeof(isaTable[0]);
+const uint32 FuncInstr::isaTableSize = countof(isaTable);
 
 const char *FuncInstr::regTable[REG_NUM_MAX] = 
 {
@@ -135,7 +137,7 @@ FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
 
 std::string FuncInstr::Dump( std::string indent) const
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << indent << disasm;
     
     if ( dst != REG_NUM_ZERO && complete)
@@ -171,7 +173,7 @@ void FuncInstr::initFormat()
 
 void FuncInstr::initR()
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << isaTable[isaNum].name;
     switch ( operation)
     {
@@ -191,7 +193,7 @@ void FuncInstr::initR()
 
             oss <<  " $" << regTableName(dst)
                 << ", $" << regTableName(src1)
-                <<  ", " << dec << v_imm;
+                <<  ", " << std::dec << v_imm;
             break;
         case OUT_R_JUMP:
             src1  = (RegNum)instr.asR.rs;
@@ -200,6 +202,8 @@ void FuncInstr::initR()
             break;
         case OUT_R_SPECIAL:
             break;
+        default:
+            assert(0);
     }
     disasm = oss.str();
 }
@@ -257,6 +261,8 @@ void FuncInstr::initI()
                 << std::hex << v_imm
                 << "($" << regTable[src1] << ")" << std::dec;
             break;
+        default:
+            assert(0);
     }
     disasm = oss.str();
 }
@@ -278,6 +284,11 @@ void FuncInstr::initUnknown()
     oss << std::hex << std::setfill( '0')
         << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
     disasm = oss.str();
+    isaNum = 0;
+}
+
+void FuncInstr::execute_unknown()
+{
     std::cerr << "ERROR.Incorrect instruction: " << disasm << std::endl;
     exit(EXIT_FAILURE);
 }

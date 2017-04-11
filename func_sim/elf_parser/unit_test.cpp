@@ -6,10 +6,10 @@
 #include <gtest/gtest.h>
 
 // uArchSim modules
-#include <elf_parser.h>
+#include "elf_parser.h"
 
 static const char * valid_elf_file = "./mips_bin_exmpl.out";
-static const char * valid_section_name = ".data";
+//static const char * valid_section_name = ".data";
 
 //
 // Check that all incorect input params of the constructor
@@ -17,7 +17,7 @@ static const char * valid_section_name = ".data";
 //
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
 {   
-    vector<ElfSection> sections_array;
+    std::vector<ElfSection> sections_array;
     
     ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, sections_array));
 

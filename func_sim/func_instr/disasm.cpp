@@ -4,62 +4,58 @@
  * Copyright 2015 MIPT-MIPS 
  */
 
-
-#include <cstring>
-#include <cstdlib>
-
 #include <iostream>
 #include <iomanip>
 
-#include <func_instr.h>
-#include <elf_parser.h>
+#include <func_sim/elf_parser/elf_parser.h>
+
+#include "func_instr.h"
 
 int main( int argc, char* argv[])
 {
     if ( argc != 3)
     {
-        std::cout << "2 arguments required: mips_exe filename and section name" << endl;
+        std::cout << "2 arguments required: mips_exe filename and section name" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
-    std::vector<ElfSection> section;
-    ElfSection::getAllElfSections( argv[1], section);
-    size_t i;
-    for ( i = 0; i < section.size(); i++)
-        if ( !strcmp( section[i].name, argv[2]))
-            break;
-
-    if ( i == section.size())
-    {
-        std::cout << "Section was not found" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-
-    bool skip_mode = false;
-    size_t j = 0;
-    do
-    {
-        uint32 content = ((uint32*) section[i].content)[j];
-        if (content == 0x0) {
-            ++j;
-            if (!skip_mode){
-                std::cout << "        ..." << std::endl;
-                skip_mode = true;
-            }
+    const std::string section_name( argv[2]);
+    std::vector<ElfSection> sections;
+    ElfSection::getAllElfSections( argv[1], sections);
+    for ( const auto section : sections) {
+        if ( section.name != section_name)
             continue;
-        }
-        else {
-            skip_mode = false;
-        }
 
-        FuncInstr instr((( uint32*) section[i].content)[j]);
-        std::cout << std::hex << std::setfill( '0')
-                  << "0x" << std::setw( 8)
-		  << ( section[i].start_addr + ( j * 4))
-	          << '\t' << instr << std::dec << std::endl;
-	    ++j;
-    } while (j < section[i].size / 4);
+        bool skip_mode = false;
+        size_t j = 0;
+        do
+        {
+            uint32 content = ((uint32*) section.content)[j];
+            if (content == 0x0) {
+                ++j;
+                if (!skip_mode){
+                    std::cout << "        ..." << std::endl;
+                    skip_mode = true;
+                }
+                continue;
+            }
+            else {
+                skip_mode = false;
+            }
 
-    return 0;
+            FuncInstr instr((( uint32*) section.content)[j]);
+            std::cout << std::hex << std::setfill( '0')
+                      << "0x" << std::setw( 8)
+                      << ( section.start_addr + ( j * 4))
+                      << '\t' << instr << std::dec << std::endl;
+            ++j;
+       } while (j < section.size / 4);
+       return 0;
+    }
+
+    std::cerr << "Section was not found" << std::endl;
+    std::exit(EXIT_FAILURE);
+
+    return -1;
 }
 

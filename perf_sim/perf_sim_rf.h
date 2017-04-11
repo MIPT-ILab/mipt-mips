@@ -1,94 +1,83 @@
-/**
- * perf_sim_rf.h
- * Register file for scalar MIPS CPU simulator.
- * MIPT-MIPS Assignment 4.
- * Ladin Oleg.
+/*
+ * rf.h - mips register file
+ * @author Pavel Kryukov pavel.kryukov@phystech.edu
+ * Copyright 2015 MIPT-MIPS
  */
 
-/* Protection from multi-including. */
-#ifndef PERF_SIM_RF_H
-#define PERF_SIM_RF_H
+#ifndef RF_H
+#define RF_H
 
-/* Simulator modules. */
-#include <func_instr.h>
+#include <func_sim/func_instr/func_instr.h>
 
 class RF
 {
-    private:
-        /* Array of registers. */
-        struct Reg
-        {
+        struct Reg {
             uint32 value;
+
+            /* The register is called "valid" when it's value is updated with
+             * result of calculation of the latest fetched writing instruction.
+             * For instance, when there is
+             *    add $t0, $s1, $s2
+             * instruction decoded, the register $t0 is marked "not valid".
+             * After writeback it becomes valid again, and till that moment no
+             * instruction with WAW or RAW dependency from register $t0 can be
+             * executed. The WAW dependency is just a workaround for #45 issue.
+             */
             bool is_valid;
-            Reg() : value( 0ull), is_valid( true) {}
-        } array [ REG_NUM_MAX];
+        } array[REG_NUM_MAX];
 
     public:
-        /* Check validate of register. */
-        bool check( RegNum num) const
+        inline void read_src1( FuncInstr& instr)
         {
-            /* Check register number. */
-            if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
-            {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
-            }
-            return array[ num].is_valid;
-        }
-        /* Makes register invalid. It cannot be used as source. */
-        void invalidate( RegNum num)
-        {
-            /* Check register number. */
-            if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
-            {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
-            }
-            if ( num == REG_NUM_ZERO) // "zero" register is always valid
-            {
-                return;
-            }
-            array[ num].is_valid = false;
+           instr.set_v_src1( read(instr.get_src1_num()));
         }
 
-        inline void read_src1( FuncInstr& instr) const
+        inline void read_src2( FuncInstr& instr)
         {
-            RegNum num = instr.get_src1_num();
-            instr.set_v_src1( array[ num].value);
+           instr.set_v_src2( read(instr.get_src2_num()));
         }
-        inline void read_src2( FuncInstr& instr) const
-        {
-            RegNum num = instr.get_src2_num();
-            instr.set_v_src2( array[ num].value);
-        }
+
         inline void write_dst( const FuncInstr& instr)
         {
-            RegNum num = instr.get_dst_num();
-            if ( num != REG_NUM_ZERO) // "zero" register is unchangable
-            {
-                if ( check( num)) // register to write must be invalid
-                {
-                    cerr << "ERROR: Writing to valid register!\n";
-                    exit( EXIT_FAILURE);
-                }
-                /* Write value and make it valid. */
-                array[ num].value = instr.get_v_dst();
-                array[ num].is_valid = true;
-            }
-        }
-        inline void reset( RegNum num)
-        {
-            /* Check register number. */
-            if ( ( num < REG_NUM_ZERO) || ( num >= REG_NUM_MAX))
-            {
-                cerr << "ERROR: Wrong register number!\n";
-                exit( EXIT_FAILURE);
-            }
-            array[ num].value = 0;
+            RegNum reg_num = instr.get_dst_num();
+            if ( REG_NUM_ZERO != reg_num)
+                write( reg_num, instr.get_v_dst());
         }
 
-        /* Registers will be zeroed and valid according Reg() constructor. */
-        RF() {}
+        RF()
+        {
+            for ( size_t i = 0; i < REG_NUM_MAX; ++i)
+            {
+                array[i].is_valid = true;
+                array[i].value = 0;
+            }
+        }
+
+        void invalidate( RegNum num)
+        {
+            if ( num != REG_NUM_ZERO)
+                array[(size_t)num].is_valid = false;
+        }
+
+        bool check( RegNum num) const
+        {
+            return array[(size_t)num].is_valid;
+        }
+
+        uint32 read( RegNum num)
+        {
+            return array[(size_t)num].value;
+        }
+
+        void write( RegNum num, uint32 val)
+        {
+            if ( num == REG_NUM_ZERO)
+                return;
+            assert( array[(size_t)num].is_valid == false);
+            array[(size_t)num].is_valid = true;
+            array[(size_t)num].value = val;
+        }
 };
 
-#endif // #ifndef PERF_SIM_RF_H
+#endif
+

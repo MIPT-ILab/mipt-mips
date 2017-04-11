@@ -14,7 +14,8 @@
 #include <vector>
 
 /* Simulator modules. */
-#include <types.h>
+#include <common/types.h>
+#include <common/log.h>
 
 /* The set (line) of the cache. */
 struct CacheSet
@@ -46,7 +47,7 @@ struct LRUInfo
      * On hit - mark (push back) way that contains the set.
      * It's an inversed search because of progs usually have time locality.
      */
-    void update( int set, int way)
+    void update( int set, unsigned int way)
     {
 	// Use reverse iterator for simulation speed
         for ( auto it = lru[ set].rbegin(); it != lru[ set].rend(); ++it)
@@ -70,7 +71,7 @@ struct LRUInfo
     }
 };
 
-class CacheTagArray
+class CacheTagArray : protected Log
 {
     private:
         const unsigned int size_in_bytes;
@@ -81,7 +82,7 @@ class CacheTagArray
         LRUInfo* lru; // LRU algorithm module
 
         /* Checks if it possiable to create cache. */
-        void chechArgs( unsigned int size_in_bytes,
+        void checkArgs( unsigned int size_in_bytes,
                         unsigned int ways,
                         unsigned short block_size_in_bytes,
                         unsigned short addr_size_in_bits);

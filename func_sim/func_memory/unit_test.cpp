@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 // uArchSim modules
-#include <func_memory.h>
+#include "func_memory.h"
 
 static const char * valid_elf_file = "./mips_bin_exmpl.out";
 
@@ -18,8 +18,10 @@ TEST( Func_memory_init, Process_Wrong_Args_Of_Constr)
 {  
     // check memory initialization with default parameters 
     ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file));
-    // check memory initialization with custom parameters 
-    ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file, 64, 15, 32));
+    // check memory initialization with custom parameters
+    ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file, 48, 15, 10));
+    // check memory initialization with 4GB page
+    ASSERT_THROW( FuncMemory func_mem( valid_elf_file, 64, 15, 32), std::bad_alloc);
 
     // test behavior when the file name does not exist
     const char * wrong_file_name = "./1234567890/qwertyuiop";
@@ -32,7 +34,7 @@ TEST( Func_memory, StartPC_Method_Test)
 {
     FuncMemory func_mem( valid_elf_file);
 
-    ASSERT_EQ( func_mem.startPC(), 0x4000b0 /*address of the ".text" section*/);
+    ASSERT_EQ( func_mem.startPC(), 0x4000b0u /*address of the ".text" section*/);
 }
 
 TEST( Func_memory, Read_Method_Test)

@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 // uArchSim modules
-#include <func_instr.h>
+#include "func_instr.h"
 
 //
 // Check that all incorect input params of the constructor
@@ -17,7 +17,7 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
     ASSERT_NO_THROW( FuncInstr fi(0x0));
 
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( FuncInstr fi2(~0x0ull),
+    ASSERT_EXIT( FuncInstr fi2(0xFFFFFFFFull),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
