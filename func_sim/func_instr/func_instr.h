@@ -125,6 +125,8 @@ class FuncInstr
             uint8 mem_size;
 
             void (FuncInstr::*function)(void);
+
+            uint8 mips_version;
         };
         uint32 isaNum;
 
