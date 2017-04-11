@@ -5,7 +5,6 @@
 # Ladin Oleg.
 #
 
-
 # Specifying relative path to the trunk
 TRUNK= ..
 
@@ -18,7 +17,7 @@ include $(TRUNK)/options.mk
 OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o func_sim.o config.o main.o
 DEPS= $(OBJS:.o=.d)
 
-perf_sim: $(OBJS)
+mipt-mips: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
 	$(CXX) -o $@ $^ -l elf -lboost_program_options
 	@echo "---------------------------------"
@@ -41,4 +40,4 @@ config.o: config.cpp
 #
 clean:
 	@-rm -f *.o *.d
-	@-rm -f perf_sim
+	@-rm -f mipt-mips
