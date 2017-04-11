@@ -43,8 +43,8 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // HI/LO manipulations
     // name    funct   format    operation     memsize           pointer
     { "mfhi",   0x10,  FORMAT_R, OUT_R_ARITHM,     0, &FuncInstr::execute_mfhi},
-    { "mflo",   0x12,  FORMAT_R, OUT_R_ARITHM,     0, &FuncInstr::execute_mflo},
     { "mthi",   0x11,  FORMAT_R, OUT_R_ARITHM,     0, &FuncInstr::execute_mthi},
+    { "mflo",   0x12,  FORMAT_R, OUT_R_ARITHM,     0, &FuncInstr::execute_mflo},
     { "mtlo",   0x13,  FORMAT_R, OUT_R_ARITHM,     0, &FuncInstr::execute_mtlo},
     
     // Multiplication/Division
