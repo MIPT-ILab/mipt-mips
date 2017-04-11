@@ -57,15 +57,15 @@ int main( int argc, char* argv[])
     }
 
     /* Cache parametres. */
-    int associativity[ 5] = { 1, 2, 4, 8, 16 };
-    int cache_size[ 11] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+    std::list<int> associativities = { 1, 2, 4, 8, 16 };
+    std::list<int> cache_sizes = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
     uint32 addr; // storage for address
 
-    for ( int i = 0; i < 5; ++i) // by associativity (excluding full-as.)
+    for ( auto associativity : associativities)
     {
-        for ( int j = 0; j < 11; ++j) // by cache size
+        for ( auto cache_size : cache_sizes) // by cache size
         {
-            CacheTagArray cta( 1024 * cache_size[ j], associativity[ i]);
+            CacheTagArray cta( 1024 * cache_size, associativity);
             uint64 hit = 0, miss = 0;
             while ( file_in >> hex >> addr) // while file contains addresses
             {
@@ -87,9 +87,9 @@ int main( int argc, char* argv[])
         file_out << endl;
     }
     /* Same as previous for full-associative cache. */
-    for ( int i = 0; i < 11; ++i)
+    for ( auto cache_size : cache_sizes)
     {
-        CacheTagArray cta( 1024 * cache_size[ i], 1024 * cache_size[ i] / 4);
+        CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4);
         uint64 hit = 0, miss = 0;
         while ( file_in >> hex >> addr)
         {
