@@ -15,7 +15,7 @@
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
-    { "###",    0xFF,  FORMAT_J, OUT_R_ARITHM,  0, &FuncInstr::execute_unknown},
+    { "###",    0xFF,  FORMAT_UNKNOWN, OUT_R_ARITHM,  0, &FuncInstr::execute_unknown},
 
     // name    funct    format    operation   memsize           pointer
     { "add",    0x20,  FORMAT_R, OUT_R_ARITHM,  0, &FuncInstr::execute_add},
