@@ -1,8 +1,11 @@
 # C++ compile
 CXX = g++
-CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -O3
+CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
+else
+	CXXFLAGS+= -O3
+	LDFLAGS = -flto
 endif
 
 # Paths to look for headers
