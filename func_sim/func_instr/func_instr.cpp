@@ -29,7 +29,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sllv", 0x4, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sllv, 1},
     { "srlv", 0x6, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srlv, 1},
     { "srav", 0x7, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srav, 1},
-    
+
     // Indirect branches
     // name  funct    format    operation     memsize           pointer
     { "jr",   0x8,   FORMAT_R, OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1},
@@ -39,28 +39,28 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // name    funct    format    operation     memsize           pointer
     { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
     { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
-    
+
     // HI/LO manipulations
     // name   funct   format    operation     memsize           pointer
     { "mfhi", 0x10,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mfhi, 1},
     { "mthi", 0x11,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mthi, 1},
     { "mflo", 0x12,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mflo, 1},
     { "mtlo", 0x13,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mtlo, 1},
-    
+
     // Multiplication/Division
     // name    funct    format    operation  memsize           pointer
     { "mult",  0x18,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1},
     { "multu", 0x19,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_multu, 1},
     { "div",   0x1A,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1},
     { "divu",  0x1B,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1},
-    
+
     // Addition/Subtraction
     // name    funct    format    operation  memsize           pointer
     { "add",  0x20, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1},
     { "addu", 0x21, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_addu, 1},
     { "sub",  0x22, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sub,  1},
     { "subu", 0x23, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_subu, 1},
-    
+
     // Logical operations
     // name    funct    format    operation  memsize           pointer
     { "and",  0x24, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_and,  1},
@@ -78,8 +78,8 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "beq",  0x4, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1},
     { "bne",  0x5, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1},
     { "blez", 0x6, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_blez, 1},
-    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bgtz, 1},    
-        
+    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bgtz, 1},
+
     // Addition/Subtraction
     // name   opcode    format    operation  memsize           pointer
     { "addi",  0x8,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1},
@@ -91,9 +91,9 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sltiu", 0xB,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_sltiu, 1},
     { "andi",  0xC,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_andi,  1},
     { "ori",   0xD,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_ori,   1},
-    { "xori",  0xE,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1}, 
+    { "xori",  0xE,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1},
     { "lui",   0xF,   FORMAT_I, OUT_I_CONST,  0, &FuncInstr::execute_lui,   1},
-    
+
     // Coprocessor operations 0x10 - 0x13
 
     // Likely branches (MIPS II)
@@ -101,7 +101,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "beql",  0x14,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_beq,  2},
     { "bnel",  0x15,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bne,  2},
     { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_blez, 2},
-    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bgtz, 2},    
+    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bgtz, 2},
 
     // System calls
     // name  opcode    format    operation  memsize           pointer

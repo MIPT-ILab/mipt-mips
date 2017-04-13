@@ -229,7 +229,7 @@ void PerfMIPS::check( const FuncInstr& instr)
 {
     std::ostringstream perf_dump_s;
     perf_dump_s << instr << std::endl;
-    std::string perf_dump = perf_dump_s.str(); 
+    std::string perf_dump = perf_dump_s.str();
 
     std::ostringstream checker_dump_s;
     checker.step(checker_dump_s);
@@ -243,7 +243,7 @@ void PerfMIPS::check( const FuncInstr& instr)
              << "PerfSim output: " << perf_dump
              << critical;
     }
-} 
+}
 
 PerfMIPS::~PerfMIPS() {
 

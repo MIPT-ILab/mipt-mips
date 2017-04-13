@@ -13,7 +13,7 @@
 // are properly handled.
 //
 TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
-{   
+{
     ASSERT_NO_THROW( FuncInstr fi(0x0));
 
     // must exit and return EXIT_FAILURE
@@ -22,7 +22,7 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
 }
 
 TEST( Func_instr_R, Process_Disasm)
-{   
+{
     // R-type
     FuncInstr fi(0x016A4821ull);
     std::string result = fi.Dump("");

@@ -53,7 +53,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    int file_descr = open( elf_file_name, O_RDONLY); 
+    int file_descr = open( elf_file_name, O_RDONLY);
     if ( file_descr < 0)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
@@ -68,8 +68,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
                   <<  elf_errmsg( elf_errno()) << std::endl;
         std::exit( EXIT_FAILURE);
     }
-   
-    // open the file in ELF format 
+
+    // open the file in ELF format
     Elf* elf = elf_begin( file_descr, ELF_C_READ, NULL);
     if ( !elf)
     {
@@ -78,26 +78,26 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
                   <<  elf_errmsg( elf_errno()) << std::endl;
 	std::exit( EXIT_FAILURE);
     }
-    
+
     size_t shstrndx;
     elf_getshdrstrndx( elf, &shstrndx);
-    
+
     Elf_Scn *section = NULL;
     while ( (section = elf_nextscn( elf, section)) != NULL)
-    {        
+    {
         GElf_Shdr shdr;
         gelf_getshdr( section, &shdr);
 
         char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
         uint64 start_addr = ( uint64)shdr.sh_addr;
-        
+
         if ( start_addr == 0)
             continue;
 
         uint64 size = ( uint64)shdr.sh_size;
         uint64 offset = ( uint64)shdr.sh_offset;
 	    uint8* content = new uint8[ size];
-        
+
         lseek( file_descr, offset, SEEK_SET);
         FILE *file = fdopen( file_descr, "r");
         if ( !file )
@@ -106,7 +106,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
                  << std::strerror(errno) << std::endl;
             std::exit( EXIT_FAILURE);
         }
-        
+
         // fill the content by the section data
         auto result = std::fread( content, sizeof( uint8), size, file);
         (void)(result);
@@ -114,7 +114,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 	    sections_array.push_back( ElfSection( name, start_addr, size, content));
         delete [] content;
     }
-    
+
     // close all used files
     elf_end( elf);
     close( file_descr);
@@ -134,7 +134,7 @@ std::string ElfSection::dump( std::string indent) const
         << indent << "  start_addr = 0x"
         << std::hex << this->start_addr << std::dec << std::endl
         << indent << "  Content:" << std::endl;
-     
+
     std::string str = this->strByBytes();
 
     // split the contents into words of 4 bytes
@@ -145,7 +145,7 @@ std::string ElfSection::dump( std::string indent) const
                                      sizeof( uint64));
 
         if ( substr.compare( "00000000") == 0)
-        {   
+        {
             if ( !skip_was_printed)
             {
                 oss << indent << "  ....  " << std::endl;
@@ -153,9 +153,9 @@ std::string ElfSection::dump( std::string indent) const
             }
         }
         else
-        { 
+        {
             oss << indent << "    0x"
-                << std::hex << ( this->start_addr + offset) 
+                << std::hex << ( this->start_addr + offset)
                 << indent << ":    " << substr << std::endl;
             skip_was_printed = false;
         }
@@ -169,18 +169,18 @@ std::string ElfSection::strByBytes() const
     // temp stream is used to convert numbers into the output string
     std::ostringstream oss;
     oss << std::hex;
-	
-    // convert each byte into 2 hex digits 
+
+    // convert each byte into 2 hex digits
     for( size_t i = 0; i < this->size; ++i)
     {
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
-        
-        // print a value of 
+
+        // print a value of
         oss << (uint16) *( this->content + i); // need converting to uint16
-                                               // to be not preinted as an alphabet symbol	
+                                               // to be not preinted as an alphabet symbol
     }
-    
+
     return oss.str();
 }
 
@@ -195,10 +195,10 @@ std::string ElfSection::strByWords() const
     {
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
-        
+
         oss << *( ( uint32*)this->content + i);
     }
-    
+
     return oss.str();
 }
 

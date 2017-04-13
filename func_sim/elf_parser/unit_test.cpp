@@ -16,9 +16,9 @@ static const char * valid_elf_file = "./mips_bin_exmpl.out";
 // are properly handled.
 //
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
-{   
+{
     std::vector<ElfSection> sections_array;
-    
+
     ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, sections_array));
 
     // test behavior when the file name does not exist

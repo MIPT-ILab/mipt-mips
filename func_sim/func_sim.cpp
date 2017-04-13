@@ -30,10 +30,10 @@ void MIPS::step( std::ostream& out)
 
     // writeback
     wb(instr);
-    
+
     // PC update
     PC = instr.get_new_PC();
-    
+
     // dump
     out << instr << std::endl;
 }

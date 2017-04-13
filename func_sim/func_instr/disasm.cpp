@@ -1,7 +1,7 @@
 /*
  * disasm.cpp - mips disassembler implemented using elf_parser
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS 
+ * Copyright 2015 MIPT-MIPS
  */
 
 #include <iostream>
