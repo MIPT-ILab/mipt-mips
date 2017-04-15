@@ -60,14 +60,6 @@ public:
     int handleArgs( int argc, char** argv);
 };
 
-class PerfConfig : public Config {
-public:
-    /* variables */
-    Value<std::string> binary_filename = { this, "binary,b", "", "input binary file", true};
-    Value<uint64> num_steps = { this, "numsteps,n", 1, "number of instructions to run", true};
-    Value<bool> disassembly_on = { this, "disassembly,d", false, "print disassembly"};
-    Value<bool> functional_only = { this, "functional-only,f", false, "run functional simulation only"};
-};
 
 template<>
 void Config::Value<bool>::reg(bod& d);

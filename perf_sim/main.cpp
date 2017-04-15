@@ -12,9 +12,8 @@
 #include <memory>
 
 /* Simulator modules. */
-#include "perf_sim.h"
 #include <func_sim/func_sim.h>
-#include "config.h"
+#include "perf_sim.h"
 
 int main( int argc, char** argv)
 {

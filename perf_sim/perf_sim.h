@@ -11,12 +11,22 @@
 #include <iomanip>
 
 #include <common/log.h>
+#include <common/config.h>
 #include <func_sim/func_instr/func_instr.h>
 #include <func_sim/func_memory/func_memory.h>
 #include <func_sim/func_sim.h>
 
 #include "perf_sim_rf.h"
 #include "ports.h"
+
+class PerfConfig : public Config {
+public:
+    /* variables */
+    Value<std::string> binary_filename = { this, "binary,b", "", "input binary file", true};
+    Value<uint64> num_steps = { this, "numsteps,n", 1, "number of instructions to run", true};
+    Value<bool> disassembly_on = { this, "disassembly,d", false, "print disassembly"};
+    Value<bool> functional_only = { this, "functional-only,f", false, "run functional simulation only"};
+};
 
 class PerfMIPS : protected Log
 {
