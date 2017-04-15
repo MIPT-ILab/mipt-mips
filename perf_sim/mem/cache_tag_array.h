@@ -28,7 +28,7 @@ struct CacheSet
 /* Replacement algorithm modules (LRU). */
 struct LRUInfo
 {
-    /* 
+    /*
      * "lru" contains sequences of using for each set. Last number in set list
      * is the last using.
      */

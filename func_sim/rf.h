@@ -1,7 +1,7 @@
 /*
  * rf.h - mips register file
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS 
+ * Copyright 2015 MIPT-MIPS
  */
 
 #ifndef FUNC_SIM__RF_H
@@ -36,13 +36,13 @@ class FuncRF
         {
             array[reg] = 0;
         }
- 
+
         FuncRF()
         {
             for ( size_t i = 0; i < REG_NUM_MAX; ++i)
                 reset((RegNum)i);
         }
 };
-          
+
 #endif
- 
+

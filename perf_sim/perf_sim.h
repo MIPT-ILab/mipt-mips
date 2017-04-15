@@ -1,6 +1,6 @@
 /*
  * perf_sim.cpp - mips performance simulator
- * Copyright 2015 MIPT-PerfMIPS 
+ * Copyright 2015 MIPT-PerfMIPS
  */
 
 #ifndef PERF_SIM_H
@@ -38,12 +38,12 @@ class PerfMIPS : protected Log
         std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode;
         std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall;
         std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall;
-       
+
         std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute;
         std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute;
         std::unique_ptr<WritePort<bool>> wp_execute_2_decode_stall;
         std::unique_ptr<ReadPort<bool>> rp_execute_2_decode_stall;
-        
+
         std::unique_ptr<WritePort<FuncInstr>> wp_execute_2_memory;
         std::unique_ptr<ReadPort<FuncInstr>> rp_execute_2_memory;
         std::unique_ptr<WritePort<bool>> wp_memory_2_execute_stall;
@@ -81,6 +81,6 @@ class PerfMIPS : protected Log
         void run( const std::string& tr, uint32 instrs_to_run);
         ~PerfMIPS();
 };
-            
+
 #endif
 

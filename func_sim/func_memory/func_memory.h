@@ -1,5 +1,5 @@
 /**
- * func_memory.h - Header of module implementing the concept of 
+ * func_memory.h - Header of module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012 uArchSim iLab project
@@ -23,25 +23,25 @@ class FuncMemory
     private:
         uint8*** memory;
         uint64 startPC_addr;
-    
+
         const uint64 page_bits;
         const uint64 offset_bits;
         const uint64 set_bits;
-        
+
         const uint64 addr_mask;
-        const uint64 offset_mask;        
+        const uint64 offset_mask;
         const uint64 page_mask;
         const uint64 set_mask;
 
         const uint64 page_cnt;
         const uint64 set_cnt;
         const uint64 page_size;
-        
+
         inline size_t get_set( uint64 addr) const
         {
             return ( addr & set_mask) >> ( page_bits + offset_bits);
         }
-        
+
         inline size_t get_page( uint64 addr) const
         {
             return ( addr & page_mask) >> offset_bits;
@@ -51,12 +51,12 @@ class FuncMemory
         {
             return ( addr & offset_mask);
         }
-        
+
         inline uint64 get_addr( uint64 set, uint64 page, uint64 offset) const
         {
             return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
         }
-        
+
         inline uint8* get_host_addr( uint64 addr) const
         {
             return &memory[get_set(addr)][get_page(addr)][get_offset(addr)];
@@ -66,12 +66,12 @@ class FuncMemory
         {
             return *get_host_addr(addr);
         }
-        
+
         inline void write_byte( uint64 addr, uint8 value)
         {
            *get_host_addr(addr) = value;
         }
-        
+
         void alloc( uint64 addr);
         bool check( uint64 addr) const;
 

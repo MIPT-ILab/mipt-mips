@@ -21,7 +21,7 @@ class ElfSection
 {
     // You cannot use this constructor to create an object.
     // Use the static function getAllElfSections.
-    ElfSection(); 
+    ElfSection();
     ElfSection( const char* name, uint64 start_addr,
                 uint64 size, const uint8* content);
 
@@ -32,14 +32,14 @@ public:
     uint8* content; // the row data of the section
 
     ElfSection( const  ElfSection& old);
-    
+
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.
     static void getAllElfSections( const char* elf_file_name,
                                    std::vector<ElfSection>& sections_array /*used as output*/);
-    
+
     virtual ~ElfSection();
-    
+
     std::string dump( std::string indent = "") const;
     std::string strByBytes() const;
     std::string strByWords() const;

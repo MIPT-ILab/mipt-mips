@@ -1,7 +1,7 @@
 /**
  * types.h - Implementation of types that are independent of host system
  * The types are used in algorithms affected by size of a variable
- * 
+ *
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012 uArchSim iLab project
  */
@@ -52,4 +52,4 @@ static const uint64 MAX_VAL64 = UINT64_MAX;
 template<typename T, size_t N>
 constexpr size_t countof( const T (&)[N]) { return N; }
 
-#endif // #ifndef COMMON__TYPES_H 
+#endif // #ifndef COMMON__TYPES_H

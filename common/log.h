@@ -1,5 +1,5 @@
 /**
- * log.h - Header of log class 
+ * log.h - Header of log class
  * includes 2 methods to show warrnings and errors
  * @author Pavel Kryukov
  * Copyright 2017 MIPT-MIPS team
@@ -36,7 +36,7 @@ public:
         if ( enable) {
             stream << v;
         }
-        
+
         return *this;
     }
 };
