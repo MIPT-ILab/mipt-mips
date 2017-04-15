@@ -20,11 +20,9 @@ class Config
 {
     class BasicValue {
         friend class Config;
-        static std::list<BasicValue*> values;
         virtual void reg( bod& d) = 0;
     public:
-        static std::list<BasicValue*>& get_values() { return values; }
-        BasicValue() { values.push_back( this); }
+        BasicValue(Config*);
     };
 
     template<typename T>
@@ -39,8 +37,8 @@ class Config
         void reg( bod&) final;
         Value<T>() = delete;
     public:
-        Value<T>( const char* name, const T& val, const char* desc, bool is_req = false)
-            : BasicValue()
+        Value<T>( Config* c, const char* name, const T& val, const char* desc, bool is_req = false)
+            : BasicValue( c)
             , name( name)
             , desc( desc)
             , default_value( val)
@@ -50,12 +48,9 @@ class Config
         operator const T&() const { return value; }
     };
 
+    friend class BasicValue;
+    std::list<BasicValue*> values;
 public:
-    /* variables */
-    Value<std::string> binary_filename = { "binary,b", "", "input binary file", true};
-    Value<uint64>      num_steps = { "numsteps,n", 1, "number of instructions to run", true};
-    Value<bool>        disassembly_on = { "disassembly,d", false, "print disassembly"};
-    Value<bool>        functional_only = { "functional-only,f", false, "run functional simulation only"};
 
     /* constructors */
     Config()  { }
@@ -63,6 +58,15 @@ public:
 
     /* methods */
     int handleArgs( int argc, char** argv);
+};
+
+class PerfConfig : public Config {
+public:
+    /* variables */
+    Value<std::string> binary_filename = { this, "binary,b", "", "input binary file", true};
+    Value<uint64> num_steps = { this, "numsteps,n", 1, "number of instructions to run", true};
+    Value<bool> disassembly_on = { this, "disassembly,d", false, "print disassembly"};
+    Value<bool> functional_only = { this, "functional-only,f", false, "run functional simulation only"};
 };
 
 template<>

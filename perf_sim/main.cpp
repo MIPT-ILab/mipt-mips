@@ -19,7 +19,7 @@
 int main( int argc, char** argv)
 {
     /* Analysing and handling of inserted arguments */
-    Config handler;
+    PerfConfig handler;
     handler.handleArgs( argc, argv);
 
     /* running simulation */

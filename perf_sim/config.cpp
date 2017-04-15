@@ -11,7 +11,10 @@
 
 namespace po = boost::program_options;
 
-std::list<Config::BasicValue*> Config::BasicValue::values;
+Config::BasicValue::BasicValue(Config* c)
+{
+    c->values.push_back(this);
+}
 
 template<>
 void Config::Value<bool>::reg(bod& d)
@@ -27,7 +30,7 @@ int Config::handleArgs( int argc, char** argv)
 {
     po::options_description description( "Allowed options");
 
-    for ( Config::BasicValue* value : Config::BasicValue::get_values())
+    for ( auto value : values)
          value->reg(description);
 
     po::variables_map vm;
@@ -59,7 +62,7 @@ int Config::handleArgs( int argc, char** argv)
         std::cerr << argv[0] << ": " << e.what()
                   << std::endl << std::endl
                   << description << std::endl;
-        std::exit( EXIT_SUCCESS);
+        std::exit( EXIT_FAILURE);
     }
 
     return 0;
