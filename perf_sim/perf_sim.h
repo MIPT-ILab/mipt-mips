@@ -78,7 +78,7 @@ class PerfMIPS : protected Log
         void check( const FuncInstr& instr);
    public:
         PerfMIPS( bool log);
-        void run( const std::string& tr, uint32 instrs_to_run);
+        void run( const std::string& tr, uint64 instrs_to_run);
         ~PerfMIPS();
 };
 

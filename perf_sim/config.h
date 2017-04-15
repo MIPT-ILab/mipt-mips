@@ -9,6 +9,8 @@
 #include <string>
 #include <list>
 
+#include <common/types.h>
+
 /* boost - program option parsing */
 #include <boost/program_options.hpp>
 
@@ -34,7 +36,7 @@ class Config
 
         T value;
 
-
+        void reg( bod&) final;
         Value<T>() = delete;
     public:
         Value<T>( const char* name, const T& val, const char* desc, bool is_req = false)
@@ -46,13 +48,12 @@ class Config
         { }
 
         operator const T&() const { return value; }
-        void reg( bod&) final;
     };
 
 public:
     /* variables */
     Value<std::string> binary_filename = { "binary,b", "", "input binary file", true};
-    Value<int>         num_steps = { "numsteps,n", 1, "number of instructions to run", true};
+    Value<uint64>      num_steps = { "numsteps,n", 1, "number of instructions to run", true};
     Value<bool>        disassembly_on = { "disassembly,d", false, "print disassembly"};
     Value<bool>        functional_only = { "functional-only,f", false, "run functional simulation only"};
 

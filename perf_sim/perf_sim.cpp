@@ -35,9 +35,10 @@ PerfMIPS::PerfMIPS(bool log) : Log(log)
     Port<bool>::init();
 }
 
-void PerfMIPS::run( const std::string& tr, uint32 instrs_to_run)
+void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
 {
-    int cycle = 0;
+    assert( instrs_to_run < MAX_VAL32);
+    uint64 cycle = 0;
 
     decode_next_time = false;
 
