@@ -85,10 +85,10 @@ template<class T> class WritePort: public Port<T>, private Log
         WritePort<T>( const std::string&, uint32, uint32);
 
         // Write Method
-        void write( T, uint64);
+        void write( const T&, uint64);
 
         // Returns fanout for test of connection
-        uint32 getFanout() const;
+        uint32 getFanout() const { return _fanout; }
 };
 
 /*
@@ -117,7 +117,7 @@ template<class T> WritePort<T>::WritePort( const std::string& key, uint32 bandwi
  * If port wasn't initialized, asserts.
  * If port is overloaded by bandwidth (more than _bandwidth token during one cycle, asserts).
 */
-template<class T> void WritePort<T>::write( T what, uint64 cycle)
+template<class T> void WritePort<T>::write( const T& what, uint64 cycle)
 {
     if ( !this->_init)
     {
@@ -157,14 +157,6 @@ template<class T> void WritePort<T>::setDestination(const ReadListType& source)
 }
 
 /*
- * Returns fanout
-*/
-template<class T> uint32 WritePort<T>::getFanout() const
-{
-    return _fanout;
-}
-
-/*
  * Read Port
 */
 template<class T> class ReadPort: public Port<T>, private Log
@@ -190,7 +182,7 @@ template<class T> class ReadPort: public Port<T>, private Log
         DataQueue _dataQueue;
 
         // Pushes data from WritePort
-        void pushData( T, uint64);
+        void pushData( const T&, uint64);
 
         // Tests if there is any ungot data
         bool selfTest( uint64, uint64*) const;
@@ -250,7 +242,7 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 /*
  * Receive data from WritePort.
 */
-template<class T> void ReadPort<T>::pushData( T what, uint64 cycle)
+template<class T> void ReadPort<T>::pushData( const T& what, uint64 cycle)
 {
     _dataQueue.emplace(what, cycle + _latency);
 }
