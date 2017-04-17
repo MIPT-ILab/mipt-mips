@@ -41,21 +41,13 @@ template<class T> class Port
         PortMap<T>& portMap = PortMap<T>::get_instance();
 
         // Sets init flag as true.
-        void setInit();
+        void setInit() { _init = true; }
 
         // Constructor of port
         Port( const std::string& key) : _key( key) { }
     public:
         virtual ~Port() { };
 };
-
-/*
- * Setting init flag as true.
-*/
-template<class T> void Port<T>::setInit()
-{
-    _init = true;
-}
 
 /*
  * WritePort
@@ -178,8 +170,7 @@ template<class T> class ReadPort: public Port<T>, private Log
             const T& get_data() const { return data; }
             uint64 get_cycle() const { return cycle; }
         };
-        using DataQueue = std::queue<DataCage>;
-        DataQueue _dataQueue;
+        std::queue<DataCage> _dataQueue;
 
         // Pushes data from WritePort
         void pushData( const T&, uint64);
