@@ -40,7 +40,7 @@ class FuncRF
         FuncRF()
         {
             for ( size_t i = 0; i < REG_NUM_MAX; ++i)
-                reset((RegNum)i);
+                reset(static_cast<RegNum>(i));
         }
 };
 

@@ -214,17 +214,17 @@ void FuncInstr::initR()
     switch ( operation)
     {
         case OUT_R_ARITHM:
-            src2 = (RegNum)instr.asR.rt;
-            src1 = (RegNum)instr.asR.rs;
-            dst  = (RegNum)instr.asR.rd;
+            src2 = static_cast<RegNum>(instr.asR.rt);
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            dst  = static_cast<RegNum>(instr.asR.rd);
 
             oss <<  " $" << regTableName(dst)
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
         case OUT_R_SHAMT:
-            src1  = (RegNum)instr.asR.rs;
-            dst   = (RegNum)instr.asR.rd;
+            src1  = static_cast<RegNum>(instr.asR.rs);
+            dst   = static_cast<RegNum>(instr.asR.rd);
             v_imm = instr.asR.shamt;
 
             oss <<  " $" << regTableName(dst)
@@ -233,12 +233,12 @@ void FuncInstr::initR()
             break;
         case OUT_R_JUMP_LINK:
             dst = REG_NUM_RA;
-            src1  = (RegNum)instr.asR.rs;
+            src1  = static_cast<RegNum>(instr.asR.rs);
             oss << " $" << regTableName(src1);
             break;
         case OUT_R_JUMP:
             dst = REG_NUM_ZERO;
-            src1  = (RegNum)instr.asR.rs;
+            src1  = static_cast<RegNum>(instr.asR.rs);
             oss << " $" << regTableName(src1);
         case OUT_R_SPECIAL:
             break;
@@ -258,8 +258,8 @@ void FuncInstr::initI()
     switch ( operation)
     {
         case OUT_I_ARITHM:
-            src1 = (RegNum)instr.asI.rs;
-            dst  = (RegNum)instr.asI.rt;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+            dst  = static_cast<RegNum>(instr.asI.rt);
 
             oss << regTable[dst] << ", $"
                 << regTable[src1] << ", "
@@ -267,8 +267,8 @@ void FuncInstr::initI()
 
             break;
         case OUT_I_BRANCH:
-            src1 = (RegNum)instr.asI.rs;
-            src2 = (RegNum)instr.asI.rt;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+            src2 = static_cast<RegNum>(instr.asI.rt);
 
             oss << regTable[src1] << ", $"
                 << regTable[src2] << ", "
@@ -276,7 +276,7 @@ void FuncInstr::initI()
             break;
 
         case OUT_I_CONST:
-            dst  = (RegNum)instr.asI.rt;
+            dst  = static_cast<RegNum>(instr.asI.rt);
 
             oss << regTable[dst] << std::hex
                 << ", 0x" << v_imm << std::dec;
@@ -284,8 +284,8 @@ void FuncInstr::initI()
 
         case OUT_I_LOAD:
         case OUT_I_LOADU:
-            src1 = (RegNum)instr.asI.rs;
-            dst  = (RegNum)instr.asI.rt;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+            dst  = static_cast<RegNum>(instr.asI.rt);
 
             oss << regTable[dst] << ", 0x"
                 << std::hex << v_imm
@@ -293,8 +293,8 @@ void FuncInstr::initI()
             break;
 
         case OUT_I_STORE:
-            src2 = (RegNum)instr.asI.rt;
-            src1  = (RegNum)instr.asI.rs;
+            src2 = static_cast<RegNum>(instr.asI.rt);
+            src1 = static_cast<RegNum>(instr.asI.rs);
             dst  = REG_NUM_ZERO;
 
             oss << regTable[src2] << ", 0x"

@@ -26,6 +26,9 @@ class RF
             bool is_valid;
         } array[REG_NUM_MAX];
 
+        Reg& get_entry( RegNum num) { return array[static_cast<size_t>( num)]; }
+        const Reg& get_entry( RegNum num) const { return array[static_cast<size_t>( num)]; }
+
     public:
         inline void read_src1( FuncInstr& instr)
         {
@@ -56,26 +59,27 @@ class RF
         void invalidate( RegNum num)
         {
             if ( num != REG_NUM_ZERO)
-                array[(size_t)num].is_valid = false;
+                get_entry( num).is_valid = false;
         }
 
         bool check( RegNum num) const
         {
-            return array[(size_t)num].is_valid;
+            return get_entry( num).is_valid;
         }
 
         uint32 read( RegNum num)
         {
-            return array[(size_t)num].value;
+            return get_entry( num).value;
         }
 
         void write( RegNum num, uint32 val)
         {
             if ( num == REG_NUM_ZERO)
                 return;
-            assert( array[(size_t)num].is_valid == false);
-            array[(size_t)num].is_valid = true;
-            array[(size_t)num].value = val;
+            auto& entry = get_entry(num);
+            assert( !entry.is_valid);
+            entry.is_valid = true;
+            entry.value = val;
         }
 };
 

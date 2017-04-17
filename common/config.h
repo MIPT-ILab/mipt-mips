@@ -9,7 +9,7 @@
 #include <string>
 #include <list>
 
-#include <common/types.h>
+#include "types.h"
 
 /* boost - program option parsing */
 #include <boost/program_options.hpp>

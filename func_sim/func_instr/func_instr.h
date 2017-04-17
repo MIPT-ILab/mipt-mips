@@ -159,11 +159,11 @@ class FuncInstr
         void initJ();
         void initUnknown();
 
-        void execute_add()   { v_dst = (int32)v_src1 + (int32)v_src2; }
+        void execute_add()   { v_dst = static_cast<int32>(v_src1) + static_cast<int32>(v_src2); }
         void execute_addu()  { v_dst = v_src1 + v_src2; }
-        void execute_sub()   { v_dst = (int32)v_src1 - (int32)v_src2; }
+        void execute_sub()   { v_dst = static_cast<int32>(v_src1) - static_cast<int32>(v_src2); }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addi()  { v_dst = (int32)v_src1 + (int16)v_imm; }
+        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + static_cast<int16>(v_imm); }
         void execute_addiu() { v_dst = v_src1 + v_imm; }
 
         void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
@@ -196,11 +196,11 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
 
-        void execute_beq()    { if (v_src1 == v_src2) new_PC += ((int16)v_imm << 2); }
-        void execute_bne()    { if (v_src1 != v_src2) new_PC += ((int16)v_imm << 2); }
+        void execute_beq()    { if (v_src1 == v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
+        void execute_bne()    { if (v_src1 != v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
 
-        void execute_blez()   { if (v_src1 <= 0) new_PC += ((int16)v_imm << 2); };
-        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += ((int16)v_imm << 2); };
+        void execute_blez()   { if (v_src1 <= 0) new_PC += static_cast<int16>(v_imm) << 2; }
+        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
         void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
 
         void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }

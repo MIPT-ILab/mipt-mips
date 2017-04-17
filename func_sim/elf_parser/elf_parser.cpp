@@ -89,13 +89,13 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         gelf_getshdr( section, &shdr);
 
         char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
-        uint64 start_addr = ( uint64)shdr.sh_addr;
+        uint64 start_addr = static_cast<uint64>( shdr.sh_addr);
 
         if ( start_addr == 0)
             continue;
 
-        uint64 size = ( uint64)shdr.sh_size;
-        uint64 offset = ( uint64)shdr.sh_offset;
+        uint64 size = static_cast<uint64>( shdr.sh_size);
+        uint64 offset = static_cast<uint64>( shdr.sh_offset);
 	    uint8* content = new uint8[ size];
 
         lseek( file_descr, offset, SEEK_SET);
@@ -175,10 +175,11 @@ std::string ElfSection::strByBytes() const
     {
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
+        uint16 value = *( this->content + i); // need converting to uint16
+                                              // to be not preinted as an alphabet symbol
 
         // print a value of
-        oss << (uint16) *( this->content + i); // need converting to uint16
-                                               // to be not preinted as an alphabet symbol
+        oss << value;
     }
 
     return oss.str();
@@ -196,7 +197,7 @@ std::string ElfSection::strByWords() const
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
 
-        oss << *( ( uint32*)this->content + i);
+        oss << *( reinterpret_cast<uint32*>(this->content) + i);
     }
 
     return oss.str();
