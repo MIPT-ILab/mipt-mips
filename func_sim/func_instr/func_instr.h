@@ -62,7 +62,7 @@ class FuncInstr
             FORMAT_I,
             FORMAT_J,
             FORMAT_UNKNOWN
-        } format;
+        } format = FORMAT_UNKNOWN;
 
         enum OperationType
         {
@@ -79,8 +79,9 @@ class FuncInstr
             OUT_I_STORE,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
-            OUT_J_SPECIAL
-        } operation;
+            OUT_J_SPECIAL,
+            OUT_UNKNOWN
+        } operation = OUT_UNKNOWN;
 
         union _instr
         {
@@ -111,7 +112,7 @@ class FuncInstr
             _instr(uint32 bytes) {
                  raw = bytes;
             }
-        } instr;
+        } instr = NO_VAL32;
 
         struct ISAEntry
         {
@@ -128,30 +129,30 @@ class FuncInstr
 
             uint8 mips_version;
         };
-        uint32 isaNum;
+        uint32 isaNum = NO_VAL32;
 
         static const ISAEntry isaTable[];
         static const uint32 isaTableSize;
         static const char *regTableName(RegNum);
         static const char *regTable[];
 
-	RegNum src1;
-        RegNum src2;
-        RegNum dst;
+        RegNum src1 = REG_NUM_ZERO;
+        RegNum src2 = REG_NUM_ZERO;
+        RegNum dst = REG_NUM_ZERO;
 
-        uint32 v_imm;
-	uint32 v_src1;
-        uint32 v_src2;
-        uint32 v_dst;
-        uint32 mem_addr;
-        uint32 mem_size;
+        uint32 v_imm = NO_VAL32;
+        uint32 v_src1 = NO_VAL32;
+        uint32 v_src2 = NO_VAL32;
+        uint32 v_dst = NO_VAL32;
+        uint32 mem_addr = NO_VAL32;
+        uint32 mem_size = NO_VAL32;
 
-        bool complete;
+        bool complete = false;
 
-        uint32 PC; // removing "const" keyword to supporting ports
-        uint32 new_PC;
+        uint32 PC = NO_VAL32; // removing "const" keyword to supporting ports
+        uint32 new_PC = NO_VAL32;
 
-        std::string disasm;
+        std::string disasm = "";
 
         void initFormat();
         void initR();

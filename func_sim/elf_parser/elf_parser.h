@@ -21,15 +21,16 @@ class ElfSection
 {
     // You cannot use this constructor to create an object.
     // Use the static function getAllElfSections.
-    ElfSection();
+    ElfSection() = delete;
     ElfSection( const char* name, uint64 start_addr,
                 uint64 size, const uint8* content);
 
+    ElfSection& operator= (const ElfSection&) = delete;
 public:
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
-    uint64 size; // size of the section in bytes
-    uint64 start_addr; // the start address of the section
-    uint8* content; // the row data of the section
+    const uint64 size; // size of the section in bytes
+    const uint64 start_addr; // the start address of the section
+    uint8* const content; // the row data of the section
 
     ElfSection( const  ElfSection& old);
 

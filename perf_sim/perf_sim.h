@@ -36,34 +36,34 @@ class PerfMIPS : protected Log
         uint64 last_writeback_cycle = 0; // to handle possible deadlocks
 
         uint32 decode_data = 0;
-        bool decode_next_time;
+        bool decode_next_time = false;
 
         RF rf;
-        uint32 PC;
-        bool PC_is_valid;
-        FuncMemory* mem;
+        uint32 PC = NO_VAL32;
+        bool PC_is_valid = false;
+        FuncMemory* mem = nullptr;
 
         MIPS checker;
 
-        std::unique_ptr<WritePort<uint32>> wp_fetch_2_decode;
-        std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode;
-        std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall;
-        std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall;
+        std::unique_ptr<WritePort<uint32>> wp_fetch_2_decode = nullptr;
+        std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode = nullptr;
+        std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
 
-        std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute;
-        std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute;
-        std::unique_ptr<WritePort<bool>> wp_execute_2_decode_stall;
-        std::unique_ptr<ReadPort<bool>> rp_execute_2_decode_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute = nullptr;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute = nullptr;
+        std::unique_ptr<WritePort<bool>> wp_execute_2_decode_stall = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_execute_2_decode_stall = nullptr;
 
-        std::unique_ptr<WritePort<FuncInstr>> wp_execute_2_memory;
-        std::unique_ptr<ReadPort<FuncInstr>> rp_execute_2_memory;
-        std::unique_ptr<WritePort<bool>> wp_memory_2_execute_stall;
-        std::unique_ptr<ReadPort<bool>> rp_memory_2_execute_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_execute_2_memory = nullptr;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_execute_2_memory = nullptr;
+        std::unique_ptr<WritePort<bool>> wp_memory_2_execute_stall = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_memory_2_execute_stall = nullptr;
 
-        std::unique_ptr<WritePort<FuncInstr>> wp_memory_2_writeback;
-        std::unique_ptr<ReadPort<FuncInstr>> rp_memory_2_writeback;
-        std::unique_ptr<WritePort<bool>> wp_writeback_2_memory_stall;
-        std::unique_ptr<ReadPort<bool>> rp_writeback_2_memory_stall;
+        std::unique_ptr<WritePort<FuncInstr>> wp_memory_2_writeback = nullptr;
+        std::unique_ptr<ReadPort<FuncInstr>> rp_memory_2_writeback = nullptr;
+        std::unique_ptr<WritePort<bool>> wp_writeback_2_memory_stall = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_writeback_2_memory_stall = nullptr;
 
         void clock_fetch( int cycle);
         void clock_decode( int cycle);
@@ -87,6 +87,9 @@ class PerfMIPS : protected Log
         }
 
         void check( const FuncInstr& instr);
+
+        PerfMIPS& operator=( const PerfMIPS&) = delete;
+        PerfMIPS( const PerfMIPS&) = delete;
    public:
         PerfMIPS( bool log);
         void run( const std::string& tr, uint64 instrs_to_run);

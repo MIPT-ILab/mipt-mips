@@ -15,7 +15,7 @@
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 {
-    { "###", 0xFF, FORMAT_UNKNOWN, OUT_R_ARITHM, 0, &FuncInstr::execute_unknown, 1},
+    { "###", 0xFF, FORMAT_UNKNOWN, OUT_UNKNOWN, 0, &FuncInstr::execute_unknown, 1},
 
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
@@ -150,8 +150,6 @@ const char *FuncInstr::regTableName(RegNum reg) {
 
 FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
 {
-    src1 = src2 = dst = REG_NUM_ZERO;
-    complete = false;
     initFormat();
     switch ( format)
     {

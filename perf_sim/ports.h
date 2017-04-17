@@ -32,29 +32,22 @@ template<class T> class Port
         friend class PortMap<T>;
     protected:
         // Key of port
-        std::string _key;
+        const std::string _key;
 
         // Init flag
-        bool _init;
+        bool _init = false;
  
-    // ports Map to connect ports between for themselves;
+        // ports Map to connect ports between for themselves;
         PortMap<T>& portMap = PortMap<T>::get_instance();
 
         // Sets init flag as true.
         void setInit();
 
         // Constructor of port
-        Port<T>( const std::string&);
+        Port( const std::string& key) : _key( key) { }
+    public:
+        virtual ~Port() { };
 };
-
-/*
- * Constructor
-*/
-template<class T> Port<T>::Port( const std::string& key)
-{
-    _key = key;
-    _init = false;
-}
 
 /*
  * Setting init flag as true.
@@ -72,18 +65,18 @@ template<class T> class WritePort: public Port<T>, private Log
         friend class PortMap<T>;
     private:
         // Number of tokens that can be added in one cycle;
-        uint32 _bandwidth;
+        const uint32 _bandwidth;
 
         // Number of reader that can read from this port
-        uint32 _fanout;
+        const uint32 _fanout;
 
         // List of readers
         using ReadListType = std::list<ReadPort<T>* >;
-        ReadListType _destinations;
+        ReadListType _destinations = {};
 
         // Variables for counting token in the last cycle
-        uint32 _lastCycle;
-        uint32 _writeCounter;
+        uint32 _lastCycle = 0;
+        uint32 _writeCounter = 0;
 
         // Addes destination ReadPort to list
         void setDestination( const ReadListType&);
@@ -108,14 +101,8 @@ template<class T> class WritePort: public Port<T>, private Log
  * Adds port to needed PortMap.
 */
 template<class T> WritePort<T>::WritePort( const std::string& key, uint32 bandwidth, uint32 fanout):
-    Port<T>::Port( key), Log(true)
+    Port<T>::Port( key), Log(true), _bandwidth(bandwidth), _fanout(fanout)
 {
-    _bandwidth = bandwidth;
-    _fanout = fanout;
-
-    _lastCycle = 0;
-    _writeCounter = 0;
-
     this->portMap.addWritePort( this->_key, this);
 }
 
@@ -186,7 +173,7 @@ template<class T> class ReadPort: public Port<T>, private Log
         friend class PortMap<T>;
     private:
         // Latency is the number of cycles after which we may take data from port.
-        uint64 _latency;
+        const uint64 _latency;
 
         // Queue of data that should be released
         class DataCage
@@ -224,10 +211,8 @@ template<class T> class ReadPort: public Port<T>, private Log
  * Adds port to needed PortMap.
 */
 template<class T> ReadPort<T>::ReadPort( const std::string& key, uint64 latency):
-    Port<T>::Port( key), Log(true)
+    Port<T>::Port( key), Log( true), _latency( latency), _dataQueue()
 {
-    _latency = latency;
-
     this->portMap.addReadPort( this->_key, this);
 }
 
@@ -313,15 +298,15 @@ template<class T> class PortMap : public GlobalPortMap
         // Entry of portMap — one writer and list of readers
         struct Entry
         {
-            WritePort<T>* writer;
-            ReadListType readers;
+            WritePort<T>* writer = nullptr;
+            ReadListType readers = {};
         };
 
         // Type of map of Entry
         using MapType = std::map<std::string, Entry>;
 
         // Map itself
-        MapType _map;
+        MapType _map = {};
 
         // Adding methods
         void addWritePort( const std::string&, WritePort<T>*);

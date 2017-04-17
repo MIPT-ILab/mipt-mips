@@ -48,7 +48,8 @@ public:
     LogOstream serr;
     LogOstream::Critical critical;
 
-    Log(bool value) : sout(value, std::cout), serr(true, std::cerr) { }
+    Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
+    virtual ~Log() { }
 };
 
 

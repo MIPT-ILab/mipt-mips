@@ -42,6 +42,9 @@ class MIPS
         void wb(const FuncInstr& instr) {
             rf.write_dst(instr);
         }
+
+        MIPS( const MIPS&) = delete;
+        MIPS& operator=( const MIPS&) = delete;
    public:
         MIPS();
         ~MIPS();

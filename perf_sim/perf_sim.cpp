@@ -6,7 +6,7 @@ static const uint32 PORT_LATENCY = 1;
 static const uint32 PORT_FANOUT = 1;
 static const uint32 PORT_BW = 1;
 
-PerfMIPS::PerfMIPS(bool log) : Log(log)
+PerfMIPS::PerfMIPS(bool log) : Log(log), rf(), checker()
 {
     executed_instrs = 0;
 

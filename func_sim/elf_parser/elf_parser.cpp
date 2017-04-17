@@ -23,29 +23,18 @@
 // uArchSim modules
 #include "elf_parser.h"
 
-ElfSection::ElfSection()
-{
-    std::cerr << "ERROR: the constructor without parameters "
-              << "of ElfSection class is prohobited" << std::endl;
-    exit( EXIT_FAILURE);
-}
-
 ElfSection::ElfSection( const ElfSection& that)
-    : name( that.name), size( that.size), start_addr( that.start_addr)
+    : name( that.name), size( that.size), start_addr( that.start_addr), content( new uint8[size])
 {
-    this->content = new uint8[size];
     std::memcpy(this->content, that.content, this->size);
 }
 
-ElfSection::ElfSection( const char* name_c, uint64 start_addr,
-                        uint64 size, const uint8* content)
-    : name(name_c)
+ElfSection::ElfSection( const char* name_c, uint64 start_addr_c,
+                        uint64 size_c, const uint8* content_c)
+    : name( name_c), size( size_c)
+    , start_addr( start_addr_c), content( new uint8[ size + sizeof( uint64)])
 {
-    this->size = size;
-    this->start_addr = start_addr;
-
-    this->content = new uint8[ this->size + sizeof( uint64)];
-    std::memcpy( this->content, content, size);
+    std::memcpy( this->content, content_c, size);
 }
 
 void ElfSection::getAllElfSections( const char* elf_file_name,

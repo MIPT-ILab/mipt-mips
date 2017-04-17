@@ -2,7 +2,7 @@
 
 #include "func_sim.h"
 
-MIPS::MIPS()
+MIPS::MIPS() : rf()
 {
 }
 

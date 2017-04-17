@@ -21,9 +21,6 @@
 class FuncMemory
 {
     private:
-        uint8*** memory;
-        uint64 startPC_addr;
-
         const uint64 page_bits;
         const uint64 offset_bits;
         const uint64 set_bits;
@@ -36,6 +33,9 @@ class FuncMemory
         const uint64 page_cnt;
         const uint64 set_cnt;
         const uint64 page_size;
+
+        uint8*** memory = nullptr;
+        uint64 startPC_addr = NO_VAL32;
 
         inline size_t get_set( uint64 addr) const
         {
@@ -75,6 +75,8 @@ class FuncMemory
         void alloc( uint64 addr);
         bool check( uint64 addr) const;
 
+        FuncMemory& operator=( const FuncMemory&) = delete;
+        FuncMemory( const FuncMemory&) = delete;
     public:
         FuncMemory ( const char* executable_file_name,
                      uint64 addr_size = 32,

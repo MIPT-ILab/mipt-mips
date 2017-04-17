@@ -23,6 +23,7 @@ class Config
         virtual void reg( bod& d) = 0;
     public:
         BasicValue(Config*);
+        virtual ~BasicValue() { }
     };
 
     template<typename T>
@@ -43,13 +44,15 @@ class Config
             , desc( desc)
             , default_value( val)
             , is_required( is_req)
+            , value( val)
         { }
 
         operator const T&() const { return value; }
+        ~Value() final { }
     };
 
     friend class BasicValue;
-    std::list<BasicValue*> values;
+    std::list<BasicValue*> values = { };
 public:
 
     /* constructors */

@@ -1,6 +1,6 @@
 # C++ compile
 CXX = g++
-CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic -Wold-style-cast
+CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
 else
