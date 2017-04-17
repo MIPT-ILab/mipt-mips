@@ -37,7 +37,7 @@ template<class T> class Port
         // Init flag
         bool _init;
  
-	// ports Map to connect ports between for themselves;
+    // ports Map to connect ports between for themselves;
         PortMap<T>& portMap = PortMap<T>::get_instance();
 
         // Sets init flag as true.
@@ -247,16 +247,14 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 
     if ( _dataQueue.front().cycle == cycle)
     {
-		// data is successfully read
+        // data is successfully read
         *address = _dataQueue.front().data;
         _dataQueue.pop();
         return true;
     }
-    else
-    {
-        // there are some entries, but they are not ready to read
-	return false;
-    }
+
+    // there are some entries, but they are not ready to read
+    return false;
 }
 
 /*
