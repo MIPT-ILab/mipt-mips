@@ -203,7 +203,7 @@ template<class T> class ReadPort: public Port<T>, private Log
             T data;
             uint64 cycle;
         };
-        typedef std::queue<DataCage> DataQueue;
+        using DataQueue = std::queue<DataCage>;
         DataQueue _dataQueue;
 
     public:
@@ -304,7 +304,7 @@ template<class T> class PortMap: public Log
     private:
         using ReadListType = std::list<ReadPort<T>* >;
 
-        // Entry of portMap — one writer and list of readers
+        // Entry of portMap â€” one writer and list of readers
         struct Entry
         {
             WritePort<T>* writer;
