@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <ports.h>
+#include "ports.h"
 
 using namespace std;
 
@@ -71,8 +71,7 @@ int main()
         // Connect all the ports.
         // MUST be after declaration of all ports!
         // MUST be for each port type!
-        Port<int>::init();
-        Port<bool>::init();
+        init_ports();
 
         // Init A object by 0 value
         _init.write(0, 0);
@@ -214,3 +213,4 @@ void B::clock ( int cycle)
                 cout << "\tnothing to read\n";
         }
 }
+

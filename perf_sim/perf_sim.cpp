@@ -30,9 +30,7 @@ PerfMIPS::PerfMIPS(bool log) : Log(log)
     wp_writeback_2_memory_stall = make_write_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
     rp_writeback_2_memory_stall = make_read_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
 
-    Port<uint32>::init();
-    Port<FuncInstr>::init();
-    Port<bool>::init();
+    init_ports();
 }
 
 void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
@@ -60,6 +58,8 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
         if ( cycle - last_writeback_cycle >= 1000)
             serr << "Deadlock was detected. The process will be aborted.\n\n" << critical;
         sout << "Executed instructions: " << executed_instrs << std::endl << std::endl;
+
+        check_ports( cycle);
     }
 
     auto ipc = 1.0 * executed_instrs / cycle;
