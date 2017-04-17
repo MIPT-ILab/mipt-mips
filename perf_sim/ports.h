@@ -189,10 +189,15 @@ template<class T> class ReadPort: public Port<T>, private Log
         uint64 _latency;
 
         // Queue of data that should be released
-        struct DataCage
+        class DataCage
         {
             T data;
             uint64 cycle;
+            DataCage() = delete;
+        public:
+            DataCage( const T& d, uint64 cyc) : data( d), cycle( cyc) { }
+            const T& get_data() const { return data; }
+            uint64 get_cycle() const { return cycle; }
         };
         using DataQueue = std::queue<DataCage>;
         DataQueue _dataQueue;
@@ -245,10 +250,10 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 
     if ( _dataQueue.empty()) return false; // the port is empty
 
-    if ( _dataQueue.front().cycle == cycle)
+    if ( _dataQueue.front().get_cycle() == cycle)
     {
         // data is successfully read
-        *address = _dataQueue.front().data;
+        *address = _dataQueue.front().get_data();
         _dataQueue.pop();
         return true;
     }
@@ -262,10 +267,7 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 */
 template<class T> void ReadPort<T>::pushData( T what, uint64 cycle)
 {
-    DataCage buffer;
-    buffer.data = what;
-    buffer.cycle = cycle + _latency;
-    _dataQueue.push( buffer);
+    _dataQueue.emplace(what, cycle + _latency);
 }
 
 /*
@@ -276,9 +278,9 @@ template<class T> void ReadPort<T>::pushData( T what, uint64 cycle)
 template<class T> bool ReadPort<T>::selfTest(uint64 cycle, uint64* wantedCycle) const
 {
     if ( _dataQueue.empty()) return true;
-    if ( _dataQueue.front().cycle < cycle)
+    if ( _dataQueue.front().get_cycle() < cycle)
     {
-        *wantedCycle = _dataQueue.front().cycle - _latency;
+        *wantedCycle = _dataQueue.front().get_cycle() - _latency;
         return false;
     }
     return true;
