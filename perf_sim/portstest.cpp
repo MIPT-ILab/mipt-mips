@@ -69,8 +69,6 @@ int main()
         ReadPort<bool> _stop( "Stop", PORT_LATENCY);
 
         // Connect all the ports.
-        // MUST be after declaration of all ports!
-        // MUST be for each port type!
         init_ports();
 
         // Init A object by 0 value

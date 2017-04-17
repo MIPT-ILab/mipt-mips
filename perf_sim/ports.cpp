@@ -1,7 +1,7 @@
 /**
  * ports.cpp - template for simulation of ports.
  * @author Pavel Kryukov
- * Copyright 2017 MDSP team
+ * Copyright 2017 MIPT-MIPS team
  */
 
 #include "ports.h"
