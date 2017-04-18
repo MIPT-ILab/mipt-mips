@@ -49,12 +49,12 @@ struct LRUInfo
     void update( int set, unsigned int way)
     {
 	// Use reverse iterator for simulation speed
-        for ( auto it = lru[ set].rbegin(); it != lru[ set].rend(); ++it)
+        auto& list = lru[ set];
+        for ( auto it = list.rbegin(); it != list.rend(); ++it)
         {
             if ( *it == way)
             {
-                lru[ set].erase( std::next( it).base());
-                lru[ set].push_back( way);
+                list.splice( list.end(), list, std::next( it).base());
                 return;
             }
         }
@@ -62,11 +62,9 @@ struct LRUInfo
     /* Get number of the Least Resently Used way and push back it.*/
     int update( int set)
     {
-        auto it = lru[ set].begin();
-        int way = *it;
-        lru[ set].erase( it);
-        lru[ set].push_back( way);
-        return way;
+        auto& list = lru[ set];
+        list.splice( list.end(), list, list.begin());
+        return list.back();
     }
 };
 
