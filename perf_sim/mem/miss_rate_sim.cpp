@@ -80,7 +80,7 @@ int main( int argc, char* argv[])
             }
             file_in.clear(); // reset "EOF" flag on file stream
             file_in.seekg( ifstream::beg); // set file pointer to the beginning
-            double rate = ( double)miss / ( hit + miss);
+            double rate = 1.0 * miss / ( hit + miss);
             file_out << rate << ", ";
             file_out.flush(); // immidiate print to the file (to avoid delays)
         }
@@ -104,7 +104,7 @@ int main( int argc, char* argv[])
         }
         file_in.clear();
         file_in.seekg( ifstream::beg);
-        double rate = ( double)miss / ( hit + miss);
+        double rate = 1.0 * miss / ( hit + miss);
         file_out << rate << ", ";
         file_out.flush();
     }

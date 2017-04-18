@@ -20,9 +20,8 @@
 /* The set (line) of the cache. */
 struct CacheSet
 {
-    uint64 line; // data
-    bool is_valid; // validaty
-    CacheSet() : line( 0), is_valid( false) {} // at first it's empty
+    uint64 line = 0; // data
+    bool is_valid = false; // validaty
 };
 
 /* Replacement algorithm modules (LRU). */
@@ -32,7 +31,7 @@ struct LRUInfo
      * "lru" contains sequences of using for each set. Last number in set list
      * is the last using.
      */
-    std::vector< std::list< unsigned int> > lru;
+    std::vector< std::list< unsigned int> > lru = {};
 
     LRUInfo( unsigned int ways, unsigned int sets)
     {
@@ -78,8 +77,8 @@ class CacheTagArray : protected Log
         const unsigned int ways;
         const unsigned short block_size_in_bytes;
         const unsigned short addr_size_in_bits;
-        CacheSet** set; // array of tags
-        LRUInfo* lru; // LRU algorithm module
+        CacheSet** set = nullptr; // array of tags
+        LRUInfo* lru = nullptr; // LRU algorithm module
 
         /* Checks if it possiable to create cache. */
         void checkArgs( unsigned int size_in_bytes,
@@ -88,6 +87,8 @@ class CacheTagArray : protected Log
                         unsigned short addr_size_in_bits);
         unsigned int getSetNum( uint64 addr);
         uint64 getTagNum( uint64 addr);
+        CacheTagArray& operator=( const CacheTagArray&) = delete;
+        CacheTagArray( const CacheTagArray&) = delete;
 
     public:
         CacheTagArray( unsigned int size_in_bytes,
