@@ -28,8 +28,8 @@ struct CacheSet
 struct LRUInfo
 {
     /*
-     * "lru" contains sequences of using for each set. Last number in set list
-     * is the last using.
+     * "lru" contains sequences of using for each set. First number in set list
+     * is the least used.
      */
     std::vector< std::list< unsigned int> > lru = {};
 
@@ -38,33 +38,31 @@ struct LRUInfo
         std::list< unsigned int> l;
         for ( unsigned int i = 0; i < ways; ++i)
         {
-            l.push_back( i);
+            l.push_front( i);
         }
         lru = std::vector< std::list< unsigned int> >( sets, l);
     }
     /*
-     * On hit - mark (push back) way that contains the set.
-     * It's an inversed search because of progs usually have time locality.
+     * On hit - mark (push front) way that contains the set.
      */
     void update( int set, unsigned int way)
     {
-	// Use reverse iterator for simulation speed
         auto& list = lru[ set];
-        for ( auto it = list.rbegin(); it != list.rend(); ++it)
+        for ( auto it = list.begin(); it != list.end(); ++it)
         {
             if ( *it == way)
             {
-                list.splice( list.end(), list, std::next( it).base());
+                list.splice( list.begin(), list, it);
                 return;
             }
         }
     }
-    /* Get number of the Least Resently Used way and push back it.*/
+    /* Get number of the Least Resently Used way and push front it.*/
     int update( int set)
     {
         auto& list = lru[ set];
-        list.splice( list.end(), list, list.begin());
-        return list.back();
+        list.splice( list.begin(), list, std::prev( list.end()));
+        return list.front();
     }
 };
 
