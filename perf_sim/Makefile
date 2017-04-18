@@ -19,7 +19,7 @@ DEPS= $(OBJS:.o=.d)
 
 mipt-mips: $(OBJS)
 	@# don't forget to link ELF library using "-l elf"
-	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf -l boost_program_options
+	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf -l boost_program_options -l boost_timer
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 

@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <boost/timer/timer.hpp>
+
 #include "perf_sim.h"
 
 static const uint32 PORT_LATENCY = 1;
@@ -46,6 +48,8 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
     PC = mem->startPC();
     PC_is_valid = true;
 
+    boost::timer::cpu_timer timer;
+
     while (executed_instrs < instrs_to_run)
     {
         clock_writeback( cycle);
@@ -62,10 +66,16 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
         check_ports( cycle);
     }
 
+    auto time = timer.elapsed().wall;
+    auto frequency = 1e6 * cycle / time;
     auto ipc = 1.0 * executed_instrs / cycle;
+    auto simips = 1e6 * executed_instrs / time;
 
     std::cout << std::endl << "****************************"
-              << std::endl << "IPC: " << ipc
+              << std::endl << "cycles:   " << cycle
+              << std::endl << "IPC:      " << ipc
+              << std::endl << "sim freq: " << frequency << " kHz"
+              << std::endl << "sim IPS:  " << simips    << " kips"
               << std::endl << "****************************"
               << std::endl;
 
