@@ -17,13 +17,6 @@
 #include <common/types.h>
 #include <common/log.h>
 
-/* The set (line) of the cache. */
-struct CacheSet
-{
-    uint64 line = 0; // data
-    bool is_valid = false; // validaty
-};
-
 /* Replacement algorithm modules (LRU). */
 class LRUInfo
 {
@@ -34,42 +27,20 @@ class LRUInfo
     std::vector< std::list< unsigned int> > lru = {};
 
 public:
-    LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
-    {
-        std::list< unsigned int> l;
-        for ( unsigned int i = 0; i < ways; ++i)
-        {
-            l.push_front( i);
-        }
-        std::fill_n( lru.begin(), sets, l);
-    }
-    /*
-     * On hit - mark (push front) way that contains the set.
-     */
-    void update( int set, unsigned int way)
-    {
-        auto& list = lru[ set];
-        for ( auto it = list.begin(); it != list.end(); ++it)
-        {
-            if ( *it == way)
-            {
-                list.splice( list.begin(), list, it);
-                return;
-            }
-        }
-    }
-    /* Get number of the Least Resently Used way and push front it.*/
-    int update( int set)
-    {
-        auto& list = lru[ set];
-        list.splice( list.begin(), list, std::prev( list.end()));
-        return list.front();
-    }
+    LRUInfo( unsigned int ways, unsigned int sets);
+    void touch( int set, unsigned int way);
+    int update( int set);
 };
 
 class CacheTagArray : protected Log
 {
     private:
+        /* The set (line) of the cache. */
+        struct CacheSet
+        {
+            uint64 line = 0; // data
+            bool is_valid = false; // validity
+        };
         const unsigned int size_in_bytes;
         const unsigned int ways;
         const unsigned short block_size_in_bytes;

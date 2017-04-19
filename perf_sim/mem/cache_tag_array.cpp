@@ -14,6 +14,40 @@
 /* Simulator modules. */
 #include "cache_tag_array.h"
 
+LRUInfo::LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
+{
+    std::list< unsigned int> l;
+    for ( unsigned int i = 0; i < ways; ++i)
+    {
+        l.push_front( i);
+    }
+    std::fill_n( lru.begin(), sets, l);
+}
+
+/*
+ * On hit - mark (push front) way that contains the set.
+ */
+void LRUInfo::touch( int set, unsigned int way)
+{
+    auto& list = lru[ set];
+    for ( auto it = list.begin(); it != list.end(); ++it)
+    {
+        if ( *it == way)
+        {
+            list.splice( list.begin(), list, it);
+            return;
+        }
+    }
+}
+
+/* Get number of the Least Resently Used way and push front it.*/
+int LRUInfo::update( int set)
+{
+    auto& list = lru[ set];
+    list.splice( list.begin(), list, std::prev( list.end()));
+    return list.front();
+}
+
 CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
                               unsigned int ways,
                               unsigned short block_size_in_bytes,
@@ -48,18 +82,15 @@ CacheTagArray::~CacheTagArray()
 
 bool CacheTagArray::read( uint64 addr)
 {
-    unsigned int set_num = getSetNum( addr);
-    uint64 tag_num = getTagNum( addr);
+    const auto set_num = getSetNum( addr);
+    const auto tag_num = getTagNum( addr);
     for ( unsigned int i = 0; i < ways; ++i) // search into each way
     {
-        if ( set[ i][ set_num].line == tag_num) // check tag
+        const auto& entry = set[ i][ set_num];
+        if ( entry.is_valid && entry.line == tag_num) // check tag
         {
-            if ( set[ i][ set_num].is_valid) // check validaty
-            {
-                lru->update( set_num, i); // update LRU info
-                return true; // hit
-            }
-            return false; // miss, dirty data (or empty)
+	    lru->touch( set_num, i); // update LRU info
+            return true; // hit
         }
     }
     return false; // miss (no data)
