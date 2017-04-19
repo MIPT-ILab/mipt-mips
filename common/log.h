@@ -44,9 +44,9 @@ public:
 class Log
 {
 public:
-    LogOstream sout;
-    LogOstream serr;
-    LogOstream::Critical critical;
+    mutable LogOstream sout;
+    mutable LogOstream serr;
+    const LogOstream::Critical critical;
 
     Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
     virtual ~Log() { }
