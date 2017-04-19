@@ -6,17 +6,17 @@
 
 #include "ports.h"
 
-std::list<GlobalPortMap*> GlobalPortMap::all_maps;
+std::list<BasePort::BaseMap*> BasePort::BaseMap::all_maps;
 
 void init_ports()
 {
-    for ( auto map : GlobalPortMap::all_maps)
+    for ( auto map : BasePort::BaseMap::all_maps)
         map->init();
 }
 
 void check_ports( uint64 cycle)
 {
-    for ( auto map : GlobalPortMap::all_maps)
+    for ( auto map : BasePort::BaseMap::all_maps)
         map->check( cycle);
 }
 
