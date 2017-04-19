@@ -25,7 +25,7 @@ struct CacheSet
 };
 
 /* Replacement algorithm modules (LRU). */
-struct LRUInfo
+class LRUInfo
 {
     /*
      * "lru" contains sequences of using for each set. First number in set list
@@ -33,14 +33,15 @@ struct LRUInfo
      */
     std::vector< std::list< unsigned int> > lru = {};
 
-    LRUInfo( unsigned int ways, unsigned int sets)
+public:
+    LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
     {
         std::list< unsigned int> l;
         for ( unsigned int i = 0; i < ways; ++i)
         {
             l.push_front( i);
         }
-        lru = std::vector< std::list< unsigned int> >( sets, l);
+        std::fill_n( lru.begin(), sets, l);
     }
     /*
      * On hit - mark (push front) way that contains the set.
