@@ -7,8 +7,6 @@
 // Genereic C
 #include <cstdio>
 #include <cstring>
-#include <fcntl.h>
-#include <gelf.h>
 #include <cstdlib>
 #include <cerrno>
 #include <cassert>
@@ -18,7 +16,12 @@
 #include <string>
 #include <sstream>
 
+// Unix
 #include <unistd.h>
+#include <fcntl.h>
+
+// LibELF
+#include <gelf.h>
 
 // uArchSim modules
 #include "elf_parser.h"

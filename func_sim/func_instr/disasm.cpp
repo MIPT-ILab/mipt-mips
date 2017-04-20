@@ -30,7 +30,7 @@ int main( int argc, char* argv[])
         size_t j = 0;
         do
         {
-            uint32 content = ((uint32*) section.content)[j];
+            uint32 content = reinterpret_cast<uint32*>(section.content)[j];
             if (content == 0x0) {
                 ++j;
                 if (!skip_mode){
@@ -43,7 +43,7 @@ int main( int argc, char* argv[])
                 skip_mode = false;
             }
 
-            FuncInstr instr((( uint32*) section.content)[j]);
+            FuncInstr instr(content);
             std::cout << std::hex << std::setfill( '0')
                       << "0x" << std::setw( 8)
                       << ( section.start_addr + ( j * 4))
