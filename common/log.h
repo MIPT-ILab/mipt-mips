@@ -52,5 +52,5 @@ public:
     virtual ~Log() { }
 };
 
-
 #endif /* LOG_H */
+

@@ -9,15 +9,15 @@
 /* Generic C++ */
 #include <iostream>
 
+/* Boost */
+#include <boost/program_options.hpp>
+
+namespace config {
+
 namespace po = boost::program_options;
 
-Config::BasicValue::BasicValue(Config* c)
-{
-    c->values.push_back(this);
-}
-
 template<>
-void Config::Value<bool>::reg(bod& d)
+void Value<bool>::reg(bod& d)
 {
     namespace po = boost::program_options;
     d.add_options()(name.c_str(),
@@ -25,12 +25,34 @@ void Config::Value<bool>::reg(bod& d)
                     desc.c_str());
 }
 
+template<typename T>
+void Value<T>::reg(bod& d)
+{
+    namespace po = boost::program_options;
+    if (is_required)
+    {
+        d.add_options()(name.c_str(),
+                    po::value<T>( &value)->default_value( default_value)->required(),
+                    desc.c_str());
+    }
+    else {
+        d.add_options()(name.c_str(),
+                    po::value<T>( &value)->default_value( default_value),
+                    desc.c_str());
+    }
+}
+
+template class Value<std::string>;
+template class Value<uint64>;
+template class Value<uint32>;
+template class Value<int32>;
+
 /* basic method */
-int Config::handleArgs( int argc, char** argv)
+void handleArgs( int argc, char** argv)
 {
     po::options_description description( "Allowed options");
 
-    for ( auto value : values)
+    for ( auto value : BaseValue::values())
          value->reg(description);
 
     po::variables_map vm;
@@ -64,6 +86,7 @@ int Config::handleArgs( int argc, char** argv)
                   << description << std::endl;
         std::exit( EXIT_FAILURE);
     }
-
-    return 0;
 }
+
+}
+

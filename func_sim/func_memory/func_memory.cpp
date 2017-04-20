@@ -18,7 +18,7 @@ union uint64_8
     uint64 val;
 };
 
-FuncMemory::FuncMemory( const char* executable_file_name,
+FuncMemory::FuncMemory( const std::string& executable_file_name,
                         uint64 addr_bits,
                         uint64 page_bits,
                         uint64 offset_bits) :
@@ -33,12 +33,10 @@ FuncMemory::FuncMemory( const char* executable_file_name,
     set_cnt ( 1ull << set_bits ),
     page_size ( 1ull << offset_bits)
 {
-    assert( executable_file_name);
-
     memory = new uint8** [set_cnt]();
 
     std::vector<ElfSection> sections_array;
-    ElfSection::getAllElfSections( executable_file_name, sections_array);
+    ElfSection::getAllElfSections( executable_file_name.c_str(), sections_array);
 
     for ( const auto& section : sections_array)
     {

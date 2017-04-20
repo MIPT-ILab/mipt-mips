@@ -11,77 +11,59 @@
 
 #include "types.h"
 
-/* boost - program option parsing */
-#include <boost/program_options.hpp>
+// small hack to include boost only in config.cpp
+namespace boost { namespace program_options {
+    class options_description;
+}}
+
+namespace config {
 
 using bod = boost::program_options::options_description;
 
-class Config
+class BaseValue
 {
-    class BasicValue {
-        friend class Config;
-        virtual void reg( bod& d) = 0;
-    public:
-        BasicValue(Config*);
-        virtual ~BasicValue() { }
-    };
+    friend void handleArgs( int, char**);
+    virtual void reg( bod& d) = 0;
 
-    template<typename T>
-    class Value : public BasicValue {
-        const std::string name;
-        const std::string desc;
-        const T default_value;
-        const bool is_required;
+    static std::list<BaseValue*>& values() {
+        static std::list<BaseValue*> instance;
+        return instance;
+    }
 
-        T value;
-
-        void reg( bod&) final;
-        Value<T>() = delete;
-    public:
-        Value<T>( Config* c, const char* name, const T& val, const char* desc, bool is_req = false)
-            : BasicValue( c)
-            , name( name)
-            , desc( desc)
-            , default_value( val)
-            , is_required( is_req)
-            , value( val)
-        { }
-
-        operator const T&() const { return value; }
-        ~Value() final { }
-    };
-
-    friend class BasicValue;
-    std::list<BasicValue*> values = { };
-public:
-
-    /* constructors */
-    Config()  { }
-    ~Config() { }
-
-    /* methods */
-    int handleArgs( int argc, char** argv);
+protected:
+    BaseValue() { values().push_back( this); }
+    virtual ~BaseValue() { }
 };
 
-
-template<>
-void Config::Value<bool>::reg(bod& d);
-
 template<typename T>
-void Config::Value<T>::reg(bod& d)
-{
-    namespace po = boost::program_options;
-    if (is_required)
-    {
-        d.add_options()(name.c_str(),
-                    po::value<T>( &value)->default_value( default_value)->required(),
-                    desc.c_str());
-    }
-    else {
-        d.add_options()(name.c_str(),
-                    po::value<T>( &value)->default_value( default_value),
-                    desc.c_str());
-    }
+class Value : public BaseValue {
+    const std::string name;
+    const std::string desc;
+    const T default_value;
+    const bool is_required;
+
+    T value;
+
+    void reg( bod&) final;
+    Value<T>() = delete;
+public:
+    Value<T>( const char* name, const T& val, const char* desc, bool is_req = false)
+        : BaseValue( )
+        , name( name)
+        , desc( desc)
+        , default_value( val)
+        , is_required( is_req)
+        , value( val)
+    { }
+
+    operator const T&() const { return value; }
+    ~Value() final { }
+};
+
+/* methods */
+void handleArgs( int argc, char** argv);
+
 }
 
 #endif  // CONFIG_H
+

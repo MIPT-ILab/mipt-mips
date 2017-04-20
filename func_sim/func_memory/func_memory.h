@@ -78,7 +78,7 @@ class FuncMemory
         FuncMemory& operator=( const FuncMemory&) = delete;
         FuncMemory( const FuncMemory&) = delete;
     public:
-        FuncMemory ( const char* executable_file_name,
+        FuncMemory ( const std::string& executable_file_name,
                      uint64 addr_size = 32,
                      uint64 page_num_size = 10,
                      uint64 offset_size = 12);
