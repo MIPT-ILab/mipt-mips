@@ -9,11 +9,6 @@ else
 endif
 
 # Paths to look for headers
-vpath %.h $(TRUNK)/common
-vpath %.h $(TRUNK)/func_sim/
-vpath %.h $(TRUNK)/func_sim/elf_parser/
-vpath %.h $(TRUNK)/func_sim/func_instr/
-vpath %.h $(TRUNK)/func_sim/func_memory/
 vpath %.cpp $(TRUNK)/common
 vpath %.cpp $(TRUNK)/common/ports
 vpath %.cpp $(TRUNK)/func_sim/

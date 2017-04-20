@@ -14,7 +14,9 @@ include $(TRUNK)/options.mk
 #
 # Enter for build "perf_sim" program
 #
-OBJS= elf_parser.o func_memory.o func_instr.o perf_sim.o func_sim.o config.o ports.o main.o
+OBJ_DIR:=obj
+CPPS= elf_parser.cpp func_memory.cpp func_instr.cpp perf_sim.cpp func_sim.cpp config.cpp ports.cpp cache_tag_array.cpp main.cpp
+OBJS= $(CPPS:%.cpp=$(OBJ_DIR)/%.o)
 DEPS= $(OBJS:.o=.d)
 
 mipt-mips: $(OBJS)
@@ -25,19 +27,15 @@ mipt-mips: $(OBJS)
 
 -include $(DEPS)
 
-config.o: config.cpp
-	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -c $< $(INCL) $(BOOST_INCL)
-	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL) $(BOOST_INCL)
-
-%.o: %.cpp
-	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -c $< $(INCL)
-	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(OBJ_DIR)
+	@echo "[$(CXX)] $<"
+	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL)
+	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
 #
 # Enter to remove all created files
 #
 clean:
-	@-rm -f *.o *.d
-	@-rm -f mipt-mips
+	rm -rf obj
+	rm -f mipt-mips
