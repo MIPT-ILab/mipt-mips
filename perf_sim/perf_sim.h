@@ -1,6 +1,6 @@
 /*
  * perf_sim.cpp - mips performance simulator
- * Copyright 2015 MIPT-PerfMIPS
+ * Copyright 2015 MIPT-MIPS
  */
 
 #ifndef PERF_SIM_H
@@ -11,13 +11,13 @@
 #include <iomanip>
 
 #include <common/log.h>
+#include <common/ports/ports.h>
 
 #include <func_sim/func_instr/func_instr.h>
 #include <func_sim/func_memory/func_memory.h>
 #include <func_sim/func_sim.h>
 
 #include "perf_sim_rf.h"
-#include "ports.h"
 
 class PerfMIPS : protected Log
 {

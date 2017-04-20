@@ -13,8 +13,8 @@
 #include <string>
 #include <memory>
 
-#include <common/types.h>
-#include <common/log.h>
+#include "../types.h"
+#include "../log.h"
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name

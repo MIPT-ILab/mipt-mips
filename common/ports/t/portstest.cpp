@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "ports.h"
+#include "../ports.h"
 
 static uint PORT_LATENCY = 1;
 static uint PORT_FANOUT = 1;
