@@ -16,7 +16,11 @@
 #include <common/types.h>
 #include <common/log.h>
 
-template<class T> class Map;
+/*
+ * Known bugs: it is possible to create a pair of ports with the same name
+ * but different type
+ */
+
 template<class T> class ReadPort;
 template<class T> class WritePort;
 
@@ -190,7 +194,7 @@ template<class T> class ReadPort: public Port<T>
         // Pushes data from WritePort
         void pushData( const T& what, uint64 cycle)
         {
-             _dataQueue.emplace(what, cycle + _latency);
+             _dataQueue.emplace(what, cycle + _latency); // NOTE: we copy data here
         }
 
         // Tests if there is any ungot data
@@ -305,7 +309,7 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
     if ( _dataQueue.front().cycle == cycle)
     {
         // data is successfully read
-        *address = _dataQueue.front().data;
+        *address = _dataQueue.front().data; // NOTE: we copy data here
         _dataQueue.pop();
         return true;
     }
