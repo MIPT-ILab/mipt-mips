@@ -48,13 +48,15 @@ class CacheTagArray : protected Log
         CacheSet** set = nullptr; // array of tags
         LRUInfo* lru = nullptr; // LRU algorithm module
 
-        /* Checks if it possiable to create cache. */
+        /* Checks if it possible to create cache. */
         void checkArgs( unsigned int size_in_bytes,
                         unsigned int ways,
                         unsigned short block_size_in_bytes,
                         unsigned short addr_size_in_bits);
-        unsigned int getSetNum( uint64 addr);
-        uint64 getTagNum( uint64 addr);
+
+        unsigned int getSetNum( addr_t addr) const;
+        uint64 getTagNum( addr_t addr) const;
+
         CacheTagArray& operator=( const CacheTagArray&) = delete;
         CacheTagArray( const CacheTagArray&) = delete;
 
@@ -64,8 +66,13 @@ class CacheTagArray : protected Log
                        unsigned short block_size_in_bytes = 4,
                        unsigned short addr_size_in_bits = 32);
         ~CacheTagArray();
-        bool read( uint64 addr); // find in the cache
-        void write( uint64 addr); // add to the cache
+
+        /* lookup the cache and update LRU info */
+        bool read( addr_t addr, unsigned int* way = nullptr);
+        /* find in the cache but do not update LRU info */
+        bool read_no_touch( addr_t addr, unsigned int* way = nullptr) const;
+        /* create new entry in cache */
+        void write( uint64 addr, unsigned int* way = nullptr);
 };
 
 #endif // #ifndef CACHE_TAG_ARRAY_H
