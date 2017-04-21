@@ -7,6 +7,7 @@
 static const uint32 PORT_LATENCY = 1;
 static const uint32 PORT_FANOUT = 1;
 static const uint32 PORT_BW = 1;
+static const uint32 FLUSHED_STAGES_NUM = 4;
 
 PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
 {
@@ -19,18 +20,19 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
 
     wp_decode_2_execute = make_write_port<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
     rp_decode_2_execute = make_read_port<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
-    wp_execute_2_decode_stall = make_write_port<bool>("EXECUTE_2_DECODE_STALL", PORT_BW, PORT_FANOUT);
-    rp_execute_2_decode_stall = make_read_port<bool>("EXECUTE_2_DECODE_STALL", PORT_LATENCY);
 
     wp_execute_2_memory = make_write_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     rp_execute_2_memory = make_read_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_LATENCY);
-    wp_memory_2_execute_stall = make_write_port<bool>("MEMORY_2_EXECUTE_STALL", PORT_BW, PORT_FANOUT);
-    rp_memory_2_execute_stall = make_read_port<bool>("MEMORY_2_EXECUTE_STALL", PORT_LATENCY);
 
     wp_memory_2_writeback = make_write_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_memory_2_writeback = make_read_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
-    wp_writeback_2_memory_stall = make_write_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_BW, PORT_FANOUT);
-    rp_writeback_2_memory_stall = make_read_port<bool>("WRITEBACK_2_MEMORY_STALL", PORT_LATENCY);
+
+    /* branch misprediction unit ports */
+    wp_memory_2_all_flush = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    rp_fetch_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_decode_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_execute_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_memory_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
     init_ports();
 }
@@ -38,15 +40,14 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
 void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
-    uint64 cycle = 0;
+    cycles_t cycle = 0;
 
-    decode_next_time = false;
+    is_anything_to_decode = 0;
 
     mem = new FuncMemory( tr.c_str());
     checker.init( tr);
 
-    PC = mem->startPC();
-    PC_is_valid = true;
+    new_PC = mem->startPC();
 
     boost::timer::cpu_timer timer;
 
@@ -60,8 +61,10 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
         ++cycle;
 
         if ( cycle - last_writeback_cycle >= 1000)
-            serr << "Deadlock was detected. The process will be aborted.\n\n" << critical;
-        sout << "Executed instructions: " << executed_instrs << std::endl << std::endl;
+            serr << "Deadlock was detected. The process will be aborted."
+                 << std::endl << critical;
+        sout << "Executed instructions: " << executed_instrs 
+             << std::endl << std::endl;
 
         check_ports( cycle);
     }
@@ -85,101 +88,145 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
 void PerfMIPS::clock_fetch( int cycle) {
     sout << "fetch   cycle " << std::dec << cycle << ":";
 
+    /* updating PC */
+    PC = new_PC;
+
+    /* creating structure to be sent to decode stage */
+    IfIdData data;
+
+    /* receive flush and stall signals */
+    bool is_flush = false;
+    rp_fetch_flush->read( &is_flush, cycle);
+
     bool is_stall = false;
     rp_decode_2_fetch_stall->read( &is_stall, cycle);
-    if ( is_stall)
-    {
-        sout << "bubble\n";
-        return;
-    }
 
-    if (PC_is_valid)
-    {
-        uint32 module_data = mem->read(PC);
-        wp_fetch_2_decode->write( module_data, cycle);
+    if ( is_flush)
+        targetport_from_mem->read( &PC, cycle); // fixing PC
 
-        sout << std::hex << "0x" << module_data << std::endl;
+    /* fetching instruction */
+    data.raw = memory.read( PC);
+
+    /* saving predictions and updating PC according to them */
+    data.PC = PC;
+    if ( bp.getDirection( PC) == TAKEN)
+    {
+        data.predicted_taken = true;
+        data.predicted_target = bp.getTarget( PC);
     }
     else
     {
-        sout << "bubble\n";
+        data.predicted_taken = false;
+        data.predicted_target = PC + 4;
     }
+        
+    /* sending to decode */
+    dataport_to_id->write( data, cycle);
+
+    /* if stall, do not update new_PC this time */
+    if ( is_stall)
+    {
+        sout << "bubble (stall)" << std::endl;
+        return; 
+    }
+
+    /* updating PC according to prediction */
+    new_PC = data.predicted_target;
+
+    /* log */
+    sout << std::hex << "0x" << data.raw << std::endl;
 }
 
 void PerfMIPS::clock_decode( int cycle) {
     sout << "decode  cycle " << std::dec << cycle << ":";
 
-    bool is_stall = false;
-    rp_execute_2_decode_stall->read( &is_stall, cycle);
-    if ( is_stall) {
-        wp_decode_2_fetch_stall->write( true, cycle);
+    /* receieve flush signal */
+    bool is_flush = false;
+    rp_decode_flush->read( &is_flush, cycle);
 
-        sout << "bubble\n";
+    /* branch misprediction */
+    if ( is_flush)
+    {
+        /* ignoring the upcoming instruction as it is invalid */
+        rp_fetch_2_decode->read( &decode_data, cycle);
+
+        is_anything_to_decode = false;
+        sout << "flush\n";
         return;
     }
 
-    bool is_anything_from_fetch = rp_fetch_2_decode->read( &decode_data, cycle);
+    if ( !is_anything_to_decode)
+        /* acquiring data from fetch */
+        is_anything_to_decode = dataport_from_if->read( &decode_data, cycle);
 
-    FuncInstr instr( decode_data, PC);
-
-    if ( instr.isJump() && is_anything_from_fetch)
-        PC_is_valid = false;
-
-    if ( !is_anything_from_fetch && !decode_next_time)
+    /* check if there is something to process */
+    if ( !is_anything_to_decode)
     {
         sout << "bubble\n";
         return;
     }
 
+    FuncInstr instr( decode_data.raw, 
+                     decode_data.PC,
+                     decode_data.predicted_taken,
+                     decode_data.predicted_target);
+
+    /* TODO: replace all this code by introducing Forwarding unit */
     if ( rf.check( instr.get_src1_num()) &&
          rf.check( instr.get_src2_num()) &&
-         rf.check( instr.get_dst_num()))
+         rf.check( instr.get_dst_num())) // no data hazard
     {
         rf.read_src1( instr);
         rf.read_src2( instr);
-        rf.invalidate( instr.get_dst_num());
+        srf.invalidate( instr.get_dst_num());
+
+        is_anything_to_decode = false; // successfully decoded
+
         wp_decode_2_execute->write( instr, cycle);
 
-        decode_next_time = false;
-
-        if (!instr.isJump())
-            PC += 4;
-
+        /* log */
         sout << instr << std::endl;
     }
-    else
+    else // data hazard, stalling pipeline
     {
         wp_decode_2_fetch_stall->write( true, cycle);
-        decode_next_time = true;
-        sout << "bubble\n";
+        sout << "bubble (data hazard)\n";
     }
 }
 
 void PerfMIPS::clock_execute( int cycle)
 {
-    std::ostringstream oss;
     sout << "execute cycle " << std::dec << cycle << ":";
 
-    bool is_stall = false;
-    rp_memory_2_execute_stall->read( &is_stall, cycle);
-    if ( is_stall)
-    {
-        wp_execute_2_decode_stall->write( true, cycle);
+    FuncInstr instr;
 
-        sout << "bubble\n";
+    /* receive flush signal */
+    bool is_flush = false;
+    rp_execute_flush->read( &is_flush, cycle);
+
+    /* branch misprediction */
+    if ( is_flush)
+    {
+        /* ignoring the upcoming instruction as it is invalid */
+        rp_decode_2_execute->read( &instr, cycle);
+        sout << "flush\n";
         return;
     }
 
-    FuncInstr instr;
+    if ( ( a( b( c( k jdshjgdsjsdhjsg skj == =dsiohf fa )) ) ) ) ) ) ) ) )
+    /* check if there is something to process */
     if ( !rp_decode_2_execute->read( &instr, cycle))
     {
         sout << "bubble\n";
         return;
     }
 
+    /* preform execution */
     instr.execute();
+
     wp_execute_2_memory->write( instr, cycle);
 
+    /* log */
     sout << instr << std::endl;
 }
 
@@ -187,25 +234,67 @@ void PerfMIPS::clock_memory( int cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ":";
 
-    bool is_stall = false;
-    rp_writeback_2_memory_stall->read( &is_stall, cycle);
-    if ( is_stall)
+    FuncInstr instr;
+
+    /* receieve flush signal */
+    bool is_flush = false;
+    rp_memory_flush->read( &is_flush, cycle);
+
+    /* branch misprediction */
+    if ( is_flush)
     {
-        wp_memory_2_execute_stall->write( true, cycle);
-        sout << "bubble\n";
+        /* ignoring the upcoming instruction as it is invalid */
+        rp_execute_2_memory->read( &instr, cycle);
+        sout << "flush\n";
         return;
     }
 
-    FuncInstr instr;
+    /* check if there is something to process */
     if ( !rp_execute_2_memory->read( &instr, cycle))
     {
         sout << "bubble\n";
         return;
     }
 
-    load_store(instr);
+    /* acquiring real information */
+    bool actually_taken = instr.is Jump() && instr.jumpExe cuted();
+    addr_t real_target = instr.get_new_PC();
+
+    /* updating BTB */
+    bp.update( actually_taken, instr.get_PC(), real_target);
+
+    /* branch misprediction unit */
+    if ( instr.misprediction())
+    {
+        /* flushing the pipeline */
+        wp_memory_2_all_flush->write( true, cycle);
+
+        /* sending valid PC to fetch stage */
+        wp_memory_2_fetch_target->write( real_target, cycle);
+
+        /* if the register was marked invalid in decode stage, revert it */
+        rf.validate( instr.get_dst_num());
+
+        sout << "misprediction\n";
+        return;
+    }
+
+    /* load/store */
+    if ( instr.is_load())
+    {
+        instr.set_v_dst( memory.read( instr.get_mem_addr(), 
+                                          instr.get_mem_size()));
+    }
+    else if ( instr.is_store())
+    {
+        memory.write( instr.get_v_src2(),
+                          instr.get_mem_addr(),
+                          instr.get_mem_size());
+    }
+
     wp_memory_2_writeback->write( instr, cycle);
 
+    /* log */
     sout << instr << std::endl;
 }
 
@@ -214,24 +303,24 @@ void PerfMIPS::clock_writeback( int cycle)
     sout << "wb      cycle " << std::dec << cycle << ":";
 
     FuncInstr instr;
+
+    /* check if there is something to process */
     if ( !rp_memory_2_writeback->read( &instr, cycle))
     {
         sout << "bubble\n";
         return;
     }
 
-    if ( instr.isJump())
-    {
-        PC_is_valid = true;
-        PC = instr.get_new_PC();
-    }
-
+    /* perform writeback */
     rf.write_dst( instr);
 
+    /* log */
     sout << instr << std::endl;
 
-    check(instr);
+    /* perform checks */
+    check( instr);
 
+    /* update simulator cycles info */
     ++executed_instrs;
     last_writeback_cycle = cycle;
 }
@@ -256,6 +345,7 @@ void PerfMIPS::check( const FuncInstr& instr)
     }
 }
 
-PerfMIPS::~PerfMIPS() {
+PerfMIPS::~PerfMIPS() 
+{
 
 }
