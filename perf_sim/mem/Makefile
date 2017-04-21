@@ -5,30 +5,35 @@
 # Ladin Oleg.
 #
 
-# C++ compiler flags.
-CXXFLAGS= -std=c++11
-
 # Specifying relative path to the trunk.
 TRUNK= ../..
 
 # Including options and compiler flags
 include $(TRUNK)/options.mk
 
+# Clang
+CXXFLAGS += -Wno-unused-private-field
+
+OBJS= cache_tag_array.o miss_rate_sim.o
+DEPS= $(OBJS:.o=.d)
+
 #
 # Enter for build "miss_rate_sim" program.
 #
-miss_rate_sim: cache_tag_array.o miss_rate_sim.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
-	@echo "--------------------------------"
-	@echo "$@ is built successfully."
-cache_tag_array.o: cache_tag_array.cpp
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
-miss_rate_sim.o: miss_rate_sim.cpp
-	$(CXX) $(CXXFLAGS) -c $< $(INCL)
+miss_rate_sim: $(OBJS)
+	$(CXX) -o $@ $^
+	@echo "---------------------------------"
+	@echo "$@ is built SUCCESSFULLY"
+
+
+%.o: %.cpp
+	@echo "[$(CXX)] $@"
+	@$(CXX) $(CXXFLAGS) -c $< $(INCL)
+	@$(CXX) $(CXXFLAGS) -MM -o $(patsubst %.o, %.d, $@) $< $(INCL)
 
 #
 # Enter to remove all created files.
 #
 clean:
-	@-rm *.o
-	@-rm miss_rate_sim
+	@-rm -f *.o *.d
+	@-rm -f miss_rate_sim

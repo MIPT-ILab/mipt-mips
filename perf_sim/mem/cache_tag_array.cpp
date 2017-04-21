@@ -1,17 +1,17 @@
-/**
+/*
  * cache_tag_array.cpp
  * Implementation of the cache tag array model.
  * MIPT-MIPS Assignment 5.
  * Ladin Oleg.
  */
 
-/* C libraries. */
+/* C generic modules */
 #include <cstdlib>
 
-/* C++ libraries. */
+/* C++ generic modules */
 #include <iostream>
 
-/* Simulator modules. */
+/* MIPT-MIPS modules */
 #include "cache_tag_array.h"
 
 LRUInfo::LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
@@ -24,9 +24,7 @@ LRUInfo::LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
     std::fill_n( lru.begin(), sets, l);
 }
 
-/*
- * On hit - mark (push front) way that contains the set.
- */
+/* On hit - mark (push front) way that contains the set */
 void LRUInfo::touch( int set, unsigned int way)
 {
     auto& list = lru[ set];
@@ -40,7 +38,7 @@ void LRUInfo::touch( int set, unsigned int way)
     }
 }
 
-/* Get number of the Least Resently Used way and push front it.*/
+/* Get number of the Least Resently Used way and push front it */
 int LRUInfo::update( int set)
 {
     auto& list = lru[ set];
@@ -80,26 +78,50 @@ CacheTagArray::~CacheTagArray()
     delete lru;
 }
 
-bool CacheTagArray::read( uint64 addr)
+bool CacheTagArray::read( addr_t addr, unsigned int* way)
+{
+    unsigned int way_num;
+    const auto set_num = getSetNum( addr);
+
+    if ( read_no_touch( addr, &way_num))
+    {
+        lru->touch( set_num, way_num); // update LRU info
+        if ( way != nullptr)
+            *way = way_num;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CacheTagArray::read_no_touch( addr_t addr, unsigned int* way) const
 {
     const auto set_num = getSetNum( addr);
     const auto tag_num = getTagNum( addr);
-    for ( unsigned int i = 0; i < ways; ++i) // search into each way
+
+    /* search into each way */
+    for ( unsigned int i = 0; i < ways; ++i) 
     {
         const auto& entry = set[ i][ set_num];
-        if ( entry.is_valid && entry.line == tag_num) // check tag
+
+        if ( entry.is_valid && entry.line == tag_num) // hit
         {
-	    lru->touch( set_num, i); // update LRU info
-            return true; // hit
+            if ( way != nullptr)
+                *way = i;
+            return true;
         }
     }
     return false; // miss (no data)
 }
 
-void CacheTagArray::write( uint64 addr)
+void CacheTagArray::write( addr_t addr, unsigned int* way)
 {
     unsigned int set_num = getSetNum( addr);
     unsigned int way_num = lru->update( set_num); // get l.r.u. way
+    if ( way != nullptr)
+        *way = way_num;
+
     set[ way_num][ set_num].line = getTagNum( addr); // write it
     set[ way_num][ set_num].is_valid = true; // this set is valid now
 }
@@ -153,7 +175,7 @@ void CacheTagArray::checkArgs( unsigned int size_in_bytes,
     }
 }
 
-unsigned int CacheTagArray::getSetNum( uint64 addr)
+unsigned int CacheTagArray::getSetNum( addr_t addr) const
 {
     /* Cut "logbin(block_size_in_bytes)" bits from the end. */
     int set_num = addr / block_size_in_bytes;
@@ -162,7 +184,7 @@ unsigned int CacheTagArray::getSetNum( uint64 addr)
     return set_num;
 }
 
-uint64 CacheTagArray::getTagNum( uint64 addr)
+uint64 CacheTagArray::getTagNum( addr_t addr) const
 {
     /* Cut "logbin(block_size_in_bytes)" bits from the end. */
     return ( addr / block_size_in_bytes);
