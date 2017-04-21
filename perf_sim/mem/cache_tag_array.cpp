@@ -11,13 +11,16 @@
 /* C++ generic modules */
 #include <iostream>
 
+/* MIPT-MIPS infra */
+#include <common/macro.h>
+
 /* MIPT-MIPS modules */
 #include "cache_tag_array.h"
 
-LRUInfo::LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
+LRUInfo::LRUInfo( uint32 ways, uint32 sets) : lru( sets)
 {
-    std::list< unsigned int> l;
-    for ( unsigned int i = 0; i < ways; ++i)
+    std::list< uint32> l;
+    for ( uint32 i = 0; i < ways; ++i)
     {
         l.push_front( i);
     }
@@ -25,7 +28,7 @@ LRUInfo::LRUInfo( unsigned int ways, unsigned int sets) : lru( sets)
 }
 
 /* On hit - mark (push front) way that contains the set */
-void LRUInfo::touch( int set, unsigned int way)
+void LRUInfo::touch( uint32 set, uint32 way)
 {
     auto& list = lru[ set];
     for ( auto it = list.begin(); it != list.end(); ++it)
@@ -39,49 +42,97 @@ void LRUInfo::touch( int set, unsigned int way)
 }
 
 /* Get number of the Least Resently Used way and push front it */
-int LRUInfo::update( int set)
+uint32 LRUInfo::update( uint32 set)
 {
     auto& list = lru[ set];
     list.splice( list.begin(), list, std::prev( list.end()));
     return list.front();
 }
 
-CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
-                              unsigned int ways,
-                              unsigned short block_size_in_bytes,
-                              unsigned short addr_size_in_bits) :
-                              Log(false),                       //cache should not say anything but error info
-                              size_in_bytes( size_in_bytes),
-                              ways( ways),
-                              block_size_in_bytes( block_size_in_bytes),
-                              addr_size_in_bits( addr_size_in_bits)
+CacheTagArrayCheck::CacheTagArrayCheck(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits) : Log( false),
+		      size_in_bytes( size_in_bytes),
+		      ways( ways),
+		      line_size( line_size),
+		      addr_size_in_bits( addr_size_in_bits)
+
 {
-    /* Check is it possiable to create the cache. */
-    checkArgs( size_in_bytes, ways, block_size_in_bytes, addr_size_in_bits);
+    /* All args are not less than zero because of "unsigned" keyword. */
+    if ( size_in_bytes == 0)
+        serr << "ERROR: Wrong arguments! Cache size should be greater than zero"
+             << std::endl << critical;
+
+    if ( ways == 0)
+        serr << "ERROR: Wrong arguments! Num of ways should be greater than zero"
+             << std::endl << critical;
+
+    if ( line_size == 0)
+        serr << "ERROR: Wrong arguments! Line size should be greater than zero"
+             << std::endl << critical;
+
+    if ( addr_size_in_bits == 0)
+        serr << "ERROR: Wrong arguments! Address size should be greater than zero"
+             << std::endl << critical;
+
+    /*
+     * It also checks "size_in_bytes < line_size" and "size_in_bytes
+     * < ways".
+     */
+    if ( size_in_bytes / ways < line_size)
+        serr << "ERROR: Wrong arguments! Size of each way should be not "
+                  << "less than size of block (size in bytes of cache should "
+                  << "be not less than number of ways and size of block in "
+                  << "bytes)." << critical;
+
+    /*
+     * It also checks "size_in_bytes % line_size != 0" and
+     * "size_in_bytes % ways != 0".
+     */
+    if ( ( size_in_bytes % ( line_size * ways)) != 0)
+        serr << "ERROR: Wrong arguments! Size of cache should be a "
+                  << "multiple of block size in bytes and number of ways."
+                  << critical;
+
+    /* The next two use: "2^a=b"<=>"b=100...000[2]"<=>"(b&(b-1))=0". */
+    if ( !is_power_of_two( size_in_bytes / ( line_size * ways)))
+        serr << "ERROR: Wrong arguments! Number of sets should be a power"
+                  << " of 2." << critical;
+
+    if ( !is_power_of_two( line_size))
+        serr << "ERROR: Wrong arguments! Block size should be a power of "
+                  << "2." << critical;
+}
+
+CacheTagArray::CacheTagArray( uint32 size_in_bytes,
+                              uint32 ways,
+                              uint32 line_size,
+                              uint32 addr_size_in_bits) :
+                              CacheTagArrayCheck( size_in_bytes, ways,
+                                                  line_size, addr_size_in_bits),
+                              num_sets( size_in_bytes / ( line_size * ways))
+{
     /* Allocate memory for cache sets and LRU module. */
-    set = new CacheSet* [ ways];
-    for ( unsigned int i = 0; i < ways; ++i)
+    array.resize( num_sets);
+    for ( auto& entry : array)
     {
-        set[ i] = new CacheSet [ size_in_bytes / ( ways * block_size_in_bytes)];
+        entry.resize( ways);
     }
-    lru = new LRUInfo( ways, size_in_bytes / ( ways * block_size_in_bytes));
+    lru = new LRUInfo( ways, num_sets);
 }
 
 CacheTagArray::~CacheTagArray()
 {
-    /* Free memory used by cache sets and LRU module. */
-    for ( unsigned int i = 0; i < ways; ++i)
-    {
-        delete [] set[ i];
-    }
-    delete [] set;
+    /* Free memory used by LRU module. */
     delete lru;
 }
 
-bool CacheTagArray::read( addr_t addr, unsigned int* way)
+bool CacheTagArray::read( Addr addr, uint32* way)
 {
-    unsigned int way_num;
-    const auto set_num = getSetNum( addr);
+    uint32 way_num;
+    const auto set_num = set( addr);
 
     if ( read_no_touch( addr, &way_num))
     {
@@ -95,15 +146,15 @@ bool CacheTagArray::read( addr_t addr, unsigned int* way)
     return false;
 }
 
-bool CacheTagArray::read_no_touch( addr_t addr, unsigned int* way) const
+bool CacheTagArray::read_no_touch( Addr addr, uint32* way) const
 {
-    const auto set_num = getSetNum( addr);
-    const auto tag_num = getTagNum( addr);
+    const auto set_num = set( addr);
+    const auto tag_num = tag( addr);
 
     /* search into each way */
-    for ( unsigned int i = 0; i < ways; ++i) 
+    for ( uint32 i = 0; i < ways; ++i)
     {
-        const auto& entry = set[ i][ set_num];
+        const auto& entry = array[ set_num][ i];
 
         if ( entry.is_valid && entry.line == tag_num) // hit
         {
@@ -115,77 +166,26 @@ bool CacheTagArray::read_no_touch( addr_t addr, unsigned int* way) const
     return false; // miss (no data)
 }
 
-void CacheTagArray::write( addr_t addr, unsigned int* way)
+void CacheTagArray::write( Addr addr, uint32* way)
 {
-    unsigned int set_num = getSetNum( addr);
-    unsigned int way_num = lru->update( set_num); // get l.r.u. way
+    uint32 set_num = set( addr);
+    uint32 way_num = lru->update( set_num); // get l.r.u. way
     if ( way != nullptr)
         *way = way_num;
 
-    set[ way_num][ set_num].line = getTagNum( addr); // write it
-    set[ way_num][ set_num].is_valid = true; // this set is valid now
+    array[ set_num][ way_num].line = tag( addr); // write it
+    array[ set_num][ way_num].is_valid = true; // this set is valid now
 }
 
-void CacheTagArray::checkArgs( unsigned int size_in_bytes,
-                               unsigned int ways,
-                               unsigned short block_size_in_bytes,
-                               unsigned short addr_size_in_bits)
+uint32 CacheTagArray::set( Addr addr) const
 {
-    /* All args are not less than zero because of "unsigned" keyword. */
-    if ( ( size_in_bytes == 0) ||
-         ( ways == 0) ||
-         ( block_size_in_bytes == 0) ||
-         ( addr_size_in_bits == 0))
-    {
-        serr << "ERROR: Wrong arguments! All arguments should be greater "
-                  << "than zero." << critical;
-    }
-    /*
-     * It also checks "size_in_bytes < block_size_in_bytes" and "size_in_bytes
-     * < ways".
-     */
-    if ( size_in_bytes / ways < block_size_in_bytes)
-    {
-        serr << "ERROR: Wrong arguments! Size of each way should be not "
-                  << "less than size of block (size in bytes of cache should "
-                  << "be not less than number of ways and size of block in "
-                  << "bytes)." << critical;
-    }
-    /*
-     * It also checks "size_in_bytes % block_size_in_bytes != 0" and
-     * "size_in_bytes % ways != 0".
-     */
-    if ( ( size_in_bytes % ( block_size_in_bytes * ways)) != 0)
-    {
-        serr << "ERROR: Wrong arguments! Size of cache should be a "
-                  << "multiple of block size in bytes and number of ways."
-                  << critical;
-    }
-    /* The next two use: "2^a=b"<=>"b=100...000[2]"<=>"(b&(b-1))=0". */
-    if ( ( ( size_in_bytes / ( ways * block_size_in_bytes)) &
-           ( size_in_bytes / ( ways * block_size_in_bytes) - 1)) != 0)
-    {
-        serr << "ERROR: Wrong arguments! Number of sets should be a power"
-                  << " of 2." << critical;
-    }
-    if ( ( block_size_in_bytes & ( block_size_in_bytes - 1)) != 0)
-    {
-        serr << "ERROR: Wrong arguments! Block size should be a power of "
-                  << "2." << critical;
-    }
+    /* Cut "logbin(line_size)" bits from the end. */
+    return (addr / line_size) & (num_sets - 1);
 }
 
-unsigned int CacheTagArray::getSetNum( addr_t addr) const
+Addr CacheTagArray::tag( Addr addr) const
 {
-    /* Cut "logbin(block_size_in_bytes)" bits from the end. */
-    int set_num = addr / block_size_in_bytes;
-    /* Get bits that are responsible for set number. */
-    set_num &= ( ( size_in_bytes / ( ways * block_size_in_bytes)) - 1);
-    return set_num;
+    /* Cut "logbin(line_size)" bits from the end. */
+    return addr / line_size;
 }
 
-uint64 CacheTagArray::getTagNum( addr_t addr) const
-{
-    /* Cut "logbin(block_size_in_bytes)" bits from the end. */
-    return ( addr / block_size_in_bytes);
-}
