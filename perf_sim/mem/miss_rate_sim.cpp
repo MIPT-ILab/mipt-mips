@@ -69,7 +69,7 @@ int main( int argc, char* argv[])
             uint64 hit = 0, miss = 0;
             while ( file_in >> hex >> addr) // while file contains addresses
             {
-                if ( cta.read( addr)) // hit
+                if ( cta.read( addr).first) // hit
                 {
                     hit++;
                 } else // miss
@@ -93,7 +93,7 @@ int main( int argc, char* argv[])
         uint64 hit = 0, miss = 0;
         while ( file_in >> hex >> addr)
         {
-            if ( cta.read( addr))
+            if ( cta.read( addr).first)
             {
                 hit++;
             } else
