@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <common/macro.h>
+
 #include "func_instr.h"
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =

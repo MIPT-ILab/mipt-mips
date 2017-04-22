@@ -49,7 +49,4 @@ static const uint16 MAX_VAL16 = UINT16_MAX;
 static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
-template<typename T, size_t N>
-constexpr size_t countof( const T (&)[N]) { return N; }
-
 #endif // #ifndef COMMON__TYPES_H
