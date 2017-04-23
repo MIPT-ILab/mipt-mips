@@ -48,8 +48,8 @@ int LRUInfo::update( int set)
 
 CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
                               unsigned int ways,
-                              unsigned short block_size_in_bytes,
-                              unsigned short addr_size_in_bits) :
+                              unsigned int block_size_in_bytes,
+                              unsigned int addr_size_in_bits) :
                               Log(false),                       //cache should not say anything but error info
                               size_in_bytes( size_in_bytes),
                               ways( ways),
@@ -128,8 +128,8 @@ void CacheTagArray::write( Addr addr, unsigned int* way)
 
 void CacheTagArray::checkArgs( unsigned int size_in_bytes,
                                unsigned int ways,
-                               unsigned short block_size_in_bytes,
-                               unsigned short addr_size_in_bits)
+                               unsigned int block_size_in_bytes,
+                               unsigned int addr_size_in_bits)
 {
     /* All args are not less than zero because of "unsigned" keyword. */
     if ( ( size_in_bytes == 0) ||

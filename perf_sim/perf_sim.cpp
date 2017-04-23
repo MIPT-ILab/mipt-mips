@@ -3,11 +3,18 @@
 #include <boost/timer/timer.hpp>
 
 #include "perf_sim.h"
+#include <common/config.h>
 
 static const uint32 PORT_LATENCY = 1;
 static const uint32 PORT_FANOUT = 1;
 static const uint32 PORT_BW = 1;
 static const uint32 FLUSHED_STAGES_NUM = 4;
+
+namespace config {
+    static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
+    static Value<unsigned int> bp_size = { "bp-size", 128, "BTB size in entries"};
+    static Value<unsigned int> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
+}
 
 PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
 {
@@ -38,22 +45,20 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
     init_ports();
+
+    BPFactory bp_factory;
+    bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 }
 
 void PerfMIPS::run( const std::string& tr,
-                    Cycles instrs_to_run,
-                    std::string bp_mode,
-                    unsigned int bp_size,
-                    unsigned int bp_ways)
+                    uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
     Cycles cycle = 0;
 
     is_anything_to_decode = 0;
 
-    memory = std::make_unique<FuncMemory>( tr.c_str());
-    BPFactory bp_factory;
-    bp = bp_factory.create( bp_mode, bp_size, bp_ways);
+    memory = new FuncMemory( tr.c_str());
 
     checker.init( tr);
 
@@ -63,11 +68,11 @@ void PerfMIPS::run( const std::string& tr,
 
     while (executed_instrs < instrs_to_run)
     {
+        clock_writeback( cycle);
         clock_fetch( cycle);
         clock_decode( cycle);
         clock_execute( cycle);
         clock_memory( cycle);
-        clock_writeback( cycle);
         ++cycle;
 
         if ( cycle - last_writeback_cycle >= 1000)
@@ -156,8 +161,10 @@ void PerfMIPS::clock_decode( int cycle) {
     }
 
     if ( !is_anything_to_decode)
+    {
         /* acquiring data from fetch */
         is_anything_to_decode = rp_fetch_2_decode->read( &decode_data, cycle);
+    }
     else
     {
         /* ignore data from port -- to suppress loss messages */
@@ -284,18 +291,8 @@ void PerfMIPS::clock_memory( int cycle)
         return;
     }
 
-    /* load/store */
-    if ( instr.is_load())
-    {
-        instr.set_v_dst( memory->read( instr.get_mem_addr(),
-                                          instr.get_mem_size()));
-    }
-    else if ( instr.is_store())
-    {
-        memory->write( instr.get_v_src2(),
-                          instr.get_mem_addr(),
-                          instr.get_mem_size());
-    }
+    /* perform required loads and stores */
+    load_store( instr);
 
     wp_memory_2_writeback->write( instr, cycle);
 

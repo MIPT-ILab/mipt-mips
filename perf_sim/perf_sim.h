@@ -82,6 +82,22 @@ private:
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
 
+    /* memory management helpers */
+    void load( FuncInstr& instr) const {
+        instr.set_v_dst(mem->read(instr.get_mem_addr(), instr.get_mem_size()));
+    }
+
+    void store( const FuncInstr& instr) {
+        mem->write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
+    }
+
+    void load_store( FuncInstr& instr) {
+        if ( instr.is_load())
+            load( instr);
+        else if ( instr.is_store())
+            store( instr);
+    }
+
     /* forbid copies */
     PerfMIPS& operator=( const PerfMIPS&) = delete;
     PerfMIPS( const PerfMIPS&) = delete;
@@ -89,10 +105,7 @@ private:
 public:
     PerfMIPS( bool log);
     void run( const std::string& tr,
-              Cycles instrs_to_run,
-              std::string bp_mode,
-              unsigned int bp_size,
-              unsigned int bp_ways);
+              uint64 instrs_to_run);
     ~PerfMIPS();
 };
 

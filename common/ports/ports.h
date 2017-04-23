@@ -32,7 +32,7 @@ class BasePort : protected Log
 {
         friend void init_ports();
         friend void check_ports( uint64);
-    public:
+    protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
@@ -79,7 +79,7 @@ template<class T> class Port : public BasePort
         /*
          * Map of ports
         */
-    public:
+    protected:
         class Map : public BasePort::BaseMap
         {
         private:

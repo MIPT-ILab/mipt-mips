@@ -51,7 +51,7 @@ class BP : public BaseBP
 public:
     BP( unsigned int   size_in_entries,
         unsigned int   ways,
-        unsigned short branch_ip_size_in_bits) :
+        unsigned int branch_ip_size_in_bits) :
 
         set_mask( ( size_in_entries / ways ) - 1),
         data( ways, std::vector<T>( size_in_entries / ways)),
@@ -103,7 +103,7 @@ class BPFactory {
     public:
         virtual std::unique_ptr<BaseBP> create(unsigned int   size_in_entries,
                                                unsigned int   ways,
-                                               unsigned short branch_ip_size_in_bits) const = 0;
+                                               unsigned int branch_ip_size_in_bits) const = 0;
         virtual ~BaseBPCreator() { }
     };
 
@@ -112,7 +112,7 @@ class BPFactory {
     public:
         virtual std::unique_ptr<BaseBP> create(unsigned int   size_in_entries,
                                                unsigned int   ways,
-                                               unsigned short branch_ip_size_in_bits) const final
+                                               unsigned int branch_ip_size_in_bits) const final
         {
             return std::unique_ptr<BaseBP>{ std::make_unique<BP<T>>( size_in_entries,
                                                                      ways,
@@ -135,7 +135,7 @@ public:
     std::unique_ptr<BaseBP> create( const std::string& name,
                     unsigned int   size_in_entries,
                     unsigned int   ways,
-                    unsigned short branch_ip_size_in_bits = 32) const
+                    unsigned int branch_ip_size_in_bits = 32) const
     {
         /* TODO: make this check user-friendly */
         assert( map.count(name));
@@ -144,8 +144,8 @@ public:
 
     ~BPFactory()
     {
-        std::for_each( map.begin(), map.end(),
-        []( auto elem){ delete elem.second; });
+        for(auto& elem : map)
+            delete elem.second;
     }
 };
 

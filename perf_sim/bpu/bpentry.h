@@ -166,7 +166,7 @@ public:
 
 class BPEntryAdaptive final : BPEntryTwoBit
 {
-    static const unsigned short default_pattern = 0;
+    static const unsigned int default_pattern = 0;
 
     /* The index is a pattern, and the value is prediction state,
      * so the table might look like this:
@@ -180,13 +180,13 @@ class BPEntryAdaptive final : BPEntryTwoBit
     std::vector<State> state_table;
 
     /* two-level predictor */
-    static const unsigned short pattern_depth = 2;
+    static const unsigned int pattern_depth = 2;
     class PredictionPattern
     {
-        static const unsigned short pattern_mask = ( 1ull << 2) - 1;
+        static const unsigned int pattern_mask = ( 1ull << 2) - 1;
 
-        static const unsigned short default_pattern = 0;
-        unsigned short value = default_pattern;
+        static const unsigned int default_pattern = 0;
+        unsigned int value = default_pattern;
 
     public:
         /* for vector indexing */
@@ -196,7 +196,7 @@ class BPEntryAdaptive final : BPEntryTwoBit
         {
             /* updating pattern, simulating shift register */
             value <<= 1;
-            value += static_cast<unsigned short>( is_taken);
+            value += static_cast<unsigned int>( is_taken);
             value &= pattern_mask;
         }
 
@@ -221,8 +221,8 @@ public:
     {
         if ( is_taken && _target != target)
         {
-            std::for_each( state_table.begin(), state_table.end(),
-                       []( State& s){ s.reset(); });
+            for(auto& elem : state_table)
+                elem.reset();
 
             current_pattern.reset();
             _target = target;
