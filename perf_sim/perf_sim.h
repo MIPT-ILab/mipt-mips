@@ -28,8 +28,8 @@ private:
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
         bool predicted_taken;    // Predicted direction
-        addr_t predicted_target; // PC, predicted by BPU
-        addr_t PC;               // current PC
+        Addr predicted_target; // PC, predicted by BPU
+        Addr PC;               // current PC
         uint32 raw;              // fetched instruction code
     };
 
@@ -40,7 +40,7 @@ private:
 
     /* simulator units */
     RF rf;
-    addr_t PC = NO_VAL32;
+    Addr PC = NO_VAL32;
     FuncMemory* mem = nullptr;
 
     /* MIPS functional simulator for internal checks */
@@ -66,8 +66,8 @@ private:
     std::unique_ptr<WritePort<bool>> wp_memory_2_all_flush = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_memory_2_all_flush = nullptr;
 
-    std::unique_ptr<WritePort<addr_t>> wp_memory_2_fetch_target = nullptr;
-    std::unique_ptr<ReadPort<addr_t>> rp_memory_2_fetch_target = nullptr;
+    std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
 
     /* main stages functions */
     void clock_fetch( int cycle);
@@ -76,7 +76,7 @@ private:
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
 
-    /* forbid copies */ 
+    /* forbid copies */
     PerfMIPS& operator=( const PerfMIPS&) = delete;
     PerfMIPS( const PerfMIPS&) = delete;
 
@@ -88,4 +88,3 @@ public:
 };
 
 #endif
-

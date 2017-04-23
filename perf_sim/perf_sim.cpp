@@ -34,6 +34,9 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
     rp_execute_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
     rp_memory_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
+    wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
+
     init_ports();
 }
 
@@ -63,7 +66,7 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
         if ( cycle - last_writeback_cycle >= 1000)
             serr << "Deadlock was detected. The process will be aborted."
                  << std::endl << critical;
-        sout << "Executed instructions: " << executed_instrs 
+        sout << "Executed instructions: " << executed_instrs
              << std::endl << std::endl;
 
         check_ports( cycle);
@@ -109,17 +112,9 @@ void PerfMIPS::clock_fetch( int cycle) {
 
     /* saving predictions and updating PC according to them */
     data.PC = PC;
-    if ( bp.getDirection( PC) == TAKEN)
-    {
-        data.predicted_taken = true;
-        data.predicted_target = bp.getTarget( PC);
-    }
-    else
-    {
-        data.predicted_taken = false;
-        data.predicted_target = PC + 4;
-    }
-        
+    data.predicted_taken = bp.isTaken( PC);
+    data.predicted_target = bp.getTarget( PC);
+
     /* sending to decode */
     dataport_to_id->write( data, cycle);
 
@@ -127,7 +122,7 @@ void PerfMIPS::clock_fetch( int cycle) {
     if ( is_stall)
     {
         sout << "bubble (stall)" << std::endl;
-        return; 
+        return;
     }
 
     /* updating PC according to prediction */
@@ -166,7 +161,7 @@ void PerfMIPS::clock_decode( int cycle) {
         return;
     }
 
-    FuncInstr instr( decode_data.raw, 
+    FuncInstr instr( decode_data.raw,
                      decode_data.PC,
                      decode_data.predicted_taken,
                      decode_data.predicted_target);
@@ -258,13 +253,13 @@ void PerfMIPS::clock_memory( int cycle)
 
     /* acquiring real information */
     bool actually_taken = instr.is Jump() && instr.jumpExe cuted();
-    addr_t real_target = instr.get_new_PC();
+    Addr real_target = instr.get_new_PC();
 
     /* updating BTB */
     bp.update( actually_taken, instr.get_PC(), real_target);
 
     /* branch misprediction unit */
-    if ( instr.misprediction())
+    if ( instr.is_misprediction())
     {
         /* flushing the pipeline */
         wp_memory_2_all_flush->write( true, cycle);
@@ -282,7 +277,7 @@ void PerfMIPS::clock_memory( int cycle)
     /* load/store */
     if ( instr.is_load())
     {
-        instr.set_v_dst( memory.read( instr.get_mem_addr(), 
+        instr.set_v_dst( memory.read( instr.get_mem_addr(),
                                           instr.get_mem_size()));
     }
     else if ( instr.is_store())
@@ -345,7 +340,7 @@ void PerfMIPS::check( const FuncInstr& instr)
     }
 }
 
-PerfMIPS::~PerfMIPS() 
+PerfMIPS::~PerfMIPS()
 {
 
 }

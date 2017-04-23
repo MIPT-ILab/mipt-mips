@@ -150,8 +150,16 @@ const char *FuncInstr::regTableName(RegNum reg) {
     return regTable[static_cast<size_t>(reg)];
 }
 
-FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
+FuncInstr::FuncInstr( uint32 bytes, Addr PC,
+                      bool predicted_taken,
+                      Addr predicted_target) :
+    instr( bytes),
+    PC( PC),
+    predicted_taken( predicted_taken),
+    predicted_target( predicted_target)
 {
+    src1 = src2 = dst = REG_NUM_ZERO;
+    complete = false;
     initFormat();
     switch ( format)
     {

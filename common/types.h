@@ -52,8 +52,8 @@ static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
 // semantics
-using Addr = uint64;
-using Cycles = uint32;
+using Addr = uint32;
+using Cycles = uint64;
 
 template<typename T, size_t N>
 constexpr size_t countof( const T (&)[N]) { return N; }

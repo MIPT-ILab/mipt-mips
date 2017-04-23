@@ -54,8 +54,8 @@ class CacheTagArray : protected Log
                         unsigned short block_size_in_bytes,
                         unsigned short addr_size_in_bits);
 
-        unsigned int getSetNum( addr_t addr) const;
-        uint64 getTagNum( addr_t addr) const;
+        unsigned int getSetNum( Addr addr) const;
+        uint64 getTagNum( Addr addr) const;
 
         CacheTagArray& operator=( const CacheTagArray&) = delete;
         CacheTagArray( const CacheTagArray&) = delete;
@@ -68,11 +68,11 @@ class CacheTagArray : protected Log
         ~CacheTagArray();
 
         /* lookup the cache and update LRU info */
-        bool read( addr_t addr, unsigned int* way = nullptr);
+        bool read( Addr addr, unsigned int* way = nullptr);
         /* find in the cache but do not update LRU info */
-        bool read_no_touch( addr_t addr, unsigned int* way = nullptr) const;
+        bool read_no_touch( Addr addr, unsigned int* way = nullptr) const;
         /* create new entry in cache */
-        void write( uint64 addr, unsigned int* way = nullptr);
+        void write( Addr addr, unsigned int* way = nullptr);
 };
 
 #endif // #ifndef CACHE_TAG_ARRAY_H
