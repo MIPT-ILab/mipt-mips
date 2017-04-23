@@ -32,7 +32,7 @@ class BasePort : protected Log
 {
         friend void init_ports();
         friend void check_ports( uint64);
-
+    public:
         class BaseMap : public Log
         {
                 friend void init_ports();
@@ -46,14 +46,14 @@ class BasePort : protected Log
                 BaseMap() : Log(true) { all_maps.push_back( this); }
                 virtual ~BaseMap() { }
         };
- 
-    protected: 
+
+    protected:
         // Key of port
         const std::string _key;
 
         // Init flag
         bool _init = false;
-   
+
         // Constructor of port
         BasePort( const std::string& key) : Log( true), _key( key) { }
 
@@ -79,6 +79,7 @@ template<class T> class Port : public BasePort
         /*
          * Map of ports
         */
+    public:
         class Map : public BasePort::BaseMap
         {
         private:

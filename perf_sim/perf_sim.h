@@ -18,12 +18,13 @@
 #include <func_sim/func_sim.h>
 
 #include "perf_sim_rf.h"
+#include "bpu/bpu.h"
 
 class PerfMIPS : protected Log
 {
 private:
-    cycles_t executed_instrs = 0;
-    cycles_t last_writeback_cycle = 0; // to handle possible deadlocks
+    Cycles executed_instrs = 0;
+    Cycles last_writeback_cycle = 0; // to handle possible deadlocks
 
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
@@ -41,15 +42,17 @@ private:
     /* simulator units */
     RF rf;
     Addr PC = NO_VAL32;
-    FuncMemory* mem = nullptr;
+    Addr new_PC = NO_VAL32;
+    std::unique_ptr<FuncMemory> memory;
+    std::unique_ptr<BaseBP> bp;
 
     /* MIPS functional simulator for internal checks */
     MIPS checker;
     void check( const FuncInstr& instr);
 
     /* all ports */
-    std::unique_ptr<WritePort<uint32>> wp_fetch_2_decode = nullptr;
-    std::unique_ptr<ReadPort<uint32>> rp_fetch_2_decode = nullptr;
+    std::unique_ptr<WritePort<IfIdData>> wp_fetch_2_decode = nullptr;
+    std::unique_ptr<ReadPort<IfIdData>> rp_fetch_2_decode = nullptr;
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
 
@@ -64,7 +67,10 @@ private:
     std::unique_ptr<ReadPort<FuncInstr>> rp_memory_2_writeback = nullptr;
 
     std::unique_ptr<WritePort<bool>> wp_memory_2_all_flush = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_memory_2_all_flush = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_fetch_flush = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_decode_flush = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_execute_flush = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_memory_flush = nullptr;
 
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
@@ -82,8 +88,11 @@ private:
 
 public:
     PerfMIPS( bool log);
-    void run( const std::string& trace,
-              uint64 instrs_to_run);
+    void run( const std::string& tr,
+              Cycles instrs_to_run,
+              std::string bp_mode,
+              unsigned int bp_size,
+              unsigned int bp_ways);
     ~PerfMIPS();
 };
 

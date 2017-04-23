@@ -154,12 +154,10 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
                       bool predicted_taken,
                       Addr predicted_target) :
     instr( bytes),
-    PC( PC),
     predicted_taken( predicted_taken),
-    predicted_target( predicted_target)
+    predicted_target( predicted_target),
+    PC( PC)
 {
-    src1 = src2 = dst = REG_NUM_ZERO;
-    complete = false;
     initFormat();
     switch ( format)
     {

@@ -111,8 +111,8 @@ class BPFactory {
     class BPCreator : public BaseBPCreator {
     public:
         virtual std::unique_ptr<BaseBP> create(unsigned int   size_in_entries,
-                                       unsigned int   ways,
-                                       unsigned short branch_ip_size_in_bits) const final
+                                               unsigned int   ways,
+                                               unsigned short branch_ip_size_in_bits) const final
         {
             return std::unique_ptr<BaseBP>{ std::make_unique<BP<T>>( size_in_entries,
                                                                      ways,

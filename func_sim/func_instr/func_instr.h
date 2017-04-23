@@ -261,7 +261,7 @@ class FuncInstr
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = 0,
                    Addr predicted_target = 0);
-                   
+
         std::string Dump( std::string indent = " ") const;
 
         RegNum get_src1_num() const { return src1; }
@@ -287,6 +287,7 @@ class FuncInstr
         uint32 get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
         uint32 get_new_PC() const { return new_PC; }
+        uint32 get_PC() const { return PC; }
 
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores

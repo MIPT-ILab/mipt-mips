@@ -22,6 +22,9 @@ namespace config {
     static Value<std::string> binary_filename = { "binary,b", "", "input binary file", true};
     static Value<uint64> num_steps = { "numsteps,n", 1, "number of instructions to run", true};
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
+    static Value<std::string> bp_mode = { "bp-mode,m", "dynamic_two_bit", "branch prediction mode"};
+    static Value<unsigned int> bp_size = { "bp-size,s", 128, "BTB size in entries"};
+    static Value<unsigned int> bp_ways = { "bp-ways,w", 16, "number of ways in BTB"};
 }
 
 int main( int argc, char** argv)
@@ -33,7 +36,11 @@ int main( int argc, char** argv)
     if ( !config::functional_only)
     {
         PerfMIPS p_mips( config::disassembly_on);
-        p_mips.run( config::binary_filename, config::num_steps);
+        p_mips.run( config::binary_filename,
+                    config::num_steps,
+                    config::bp_mode,
+                    config::bp_size,
+                    config::bp_ways);
     }
     else
     {
@@ -43,4 +50,3 @@ int main( int argc, char** argv)
 
     return 0;
 }
-

@@ -13,8 +13,8 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = make_write_port<uint32>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_fetch_2_decode = make_read_port<uint32>("FETCH_2_DECODE", PORT_LATENCY);
+    wp_fetch_2_decode = make_write_port<IfIdData>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode = make_read_port<IfIdData>("FETCH_2_DECODE", PORT_LATENCY);
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
     rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
@@ -40,27 +40,34 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf(), checker()
     init_ports();
 }
 
-void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
+void PerfMIPS::run( const std::string& tr,
+                    Cycles instrs_to_run,
+                    std::string bp_mode,
+                    unsigned int bp_size,
+                    unsigned int bp_ways)
 {
     assert( instrs_to_run < MAX_VAL32);
-    cycles_t cycle = 0;
+    Cycles cycle = 0;
 
     is_anything_to_decode = 0;
 
-    mem = new FuncMemory( tr.c_str());
+    memory = std::make_unique<FuncMemory>( tr.c_str());
+    BPFactory bp_factory;
+    bp = bp_factory.create( bp_mode, bp_size, bp_ways);
+
     checker.init( tr);
 
-    new_PC = mem->startPC();
+    new_PC = memory->startPC();
 
     boost::timer::cpu_timer timer;
 
     while (executed_instrs < instrs_to_run)
     {
-        clock_writeback( cycle);
-        clock_decode( cycle);
         clock_fetch( cycle);
+        clock_decode( cycle);
         clock_execute( cycle);
         clock_memory( cycle);
+        clock_writeback( cycle);
         ++cycle;
 
         if ( cycle - last_writeback_cycle >= 1000)
@@ -84,8 +91,6 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
               << std::endl << "sim IPS:  " << simips    << " kips"
               << std::endl << "****************************"
               << std::endl;
-
-    delete mem;
 }
 
 void PerfMIPS::clock_fetch( int cycle) {
@@ -105,18 +110,18 @@ void PerfMIPS::clock_fetch( int cycle) {
     rp_decode_2_fetch_stall->read( &is_stall, cycle);
 
     if ( is_flush)
-        targetport_from_mem->read( &PC, cycle); // fixing PC
+        rp_memory_2_fetch_target->read( &PC, cycle); // fixing PC
 
     /* fetching instruction */
-    data.raw = memory.read( PC);
+    data.raw = memory->read( PC);
 
     /* saving predictions and updating PC according to them */
     data.PC = PC;
-    data.predicted_taken = bp.isTaken( PC);
-    data.predicted_target = bp.getTarget( PC);
+    data.predicted_taken = bp->isTaken( PC);
+    data.predicted_target = bp->getTarget( PC);
 
     /* sending to decode */
-    dataport_to_id->write( data, cycle);
+    wp_fetch_2_decode->write( data, cycle);
 
     /* if stall, do not update new_PC this time */
     if ( is_stall)
@@ -135,7 +140,7 @@ void PerfMIPS::clock_fetch( int cycle) {
 void PerfMIPS::clock_decode( int cycle) {
     sout << "decode  cycle " << std::dec << cycle << ":";
 
-    /* receieve flush signal */
+    /* receive flush signal */
     bool is_flush = false;
     rp_decode_flush->read( &is_flush, cycle);
 
@@ -152,7 +157,13 @@ void PerfMIPS::clock_decode( int cycle) {
 
     if ( !is_anything_to_decode)
         /* acquiring data from fetch */
-        is_anything_to_decode = dataport_from_if->read( &decode_data, cycle);
+        is_anything_to_decode = rp_fetch_2_decode->read( &decode_data, cycle);
+    else
+    {
+        /* ignore data from port -- to suppress loss messages */
+        IfIdData data;
+        rp_fetch_2_decode->read( &data, cycle);
+    }
 
     /* check if there is something to process */
     if ( !is_anything_to_decode)
@@ -173,7 +184,7 @@ void PerfMIPS::clock_decode( int cycle) {
     {
         rf.read_src1( instr);
         rf.read_src2( instr);
-        srf.invalidate( instr.get_dst_num());
+        rf.invalidate( instr.get_dst_num());
 
         is_anything_to_decode = false; // successfully decoded
 
@@ -208,7 +219,6 @@ void PerfMIPS::clock_execute( int cycle)
         return;
     }
 
-    if ( ( a( b( c( k jdshjgdsjsdhjsg skj == =dsiohf fa )) ) ) ) ) ) ) ) )
     /* check if there is something to process */
     if ( !rp_decode_2_execute->read( &instr, cycle))
     {
@@ -252,11 +262,11 @@ void PerfMIPS::clock_memory( int cycle)
     }
 
     /* acquiring real information */
-    bool actually_taken = instr.is Jump() && instr.jumpExe cuted();
+    bool actually_taken = instr.is_jump_taken();
     Addr real_target = instr.get_new_PC();
 
     /* updating BTB */
-    bp.update( actually_taken, instr.get_PC(), real_target);
+    bp->update( actually_taken, instr.get_PC(), real_target);
 
     /* branch misprediction unit */
     if ( instr.is_misprediction())
@@ -277,12 +287,12 @@ void PerfMIPS::clock_memory( int cycle)
     /* load/store */
     if ( instr.is_load())
     {
-        instr.set_v_dst( memory.read( instr.get_mem_addr(),
+        instr.set_v_dst( memory->read( instr.get_mem_addr(),
                                           instr.get_mem_size()));
     }
     else if ( instr.is_store())
     {
-        memory.write( instr.get_v_src2(),
+        memory->write( instr.get_v_src2(),
                           instr.get_mem_addr(),
                           instr.get_mem_size());
     }

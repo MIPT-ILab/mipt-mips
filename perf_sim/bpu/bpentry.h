@@ -7,6 +7,8 @@
  #ifndef BRANCH_PREDICTION_ENTRY
  #define BRANCH_PREDICTION_ENTRY
 
+/* TODO: move implemetations to .cpp file */
+
 /* each inherited class has to implement three methods:
  * 1. constructor();
  * 2. bool isTaken( PC);
