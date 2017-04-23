@@ -33,6 +33,7 @@ class BasePort : protected Log
         friend void init_ports();
         friend void check_ports( uint64);
 
+    protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
@@ -46,8 +47,7 @@ class BasePort : protected Log
                 BaseMap() : Log(true) { all_maps.push_back( this); }
                 virtual ~BaseMap() { }
         };
- 
-    protected: 
+
         // Key of port
         const std::string _key;
 
@@ -68,20 +68,19 @@ template<class T> class Port : public BasePort
     protected:
         using ReadListType = std::list<ReadPort<T>* >;
 
-    private:
-        // Cluster of portMap — one writer and list of readers
-        struct Cluster
-        {
-            WritePort<T>* writer = nullptr;
-            ReadListType readers = {};
-        };
-
         /*
          * Map of ports
         */
         class Map : public BasePort::BaseMap
         {
         private:
+        // Cluster of portMap — one writer and list of readers
+            struct Cluster
+            {
+                WritePort<T>* writer = nullptr;
+                ReadListType readers = {};
+            };
+
             std::map<std::string, Cluster> _map = { };
 
             // Init method
@@ -104,7 +103,7 @@ template<class T> class Port : public BasePort
                 return instance;
             }
         };
-    protected:
+
         Port( const std::string& key) : BasePort( key) { }
 
         // ports Map to connect ports between for themselves;
