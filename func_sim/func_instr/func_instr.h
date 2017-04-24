@@ -133,8 +133,6 @@ class FuncInstr
             uint8 mips_version;
         };
 
-        size_t isaNum = 0;
-
         static const ISAEntry isaTable[];
         static const uint32 isaTableSize;
         static const char *regTableName(RegNum);
@@ -223,6 +221,7 @@ class FuncInstr
         void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
         void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
 
+        Execute function = &FuncInstr::execute_unknown;
     public:
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
@@ -256,7 +255,7 @@ class FuncInstr
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
-        void execute() { (this->*isaTable[isaNum].function)(); complete = true; };
+        void execute() { (this->*function)(); complete = true; };
 };
 
 std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
