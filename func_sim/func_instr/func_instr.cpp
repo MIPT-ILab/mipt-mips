@@ -196,6 +196,7 @@ void FuncInstr::initFormat()
             operation = isaTable[i].operation;
             mem_size  = isaTable[i].mem_size;
             name      = isaTable[i].name.c_str();
+            isaNum    = i;
             if ( FORMAT_R == format)
                assert( instr.asR.opcode == 0x0);
             return;
@@ -327,6 +328,7 @@ void FuncInstr::initUnknown()
     oss << std::hex << std::setfill( '0')
         << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
     disasm = oss.str();
+    isaNum = 0;
 }
 
 void FuncInstr::execute_unknown()
