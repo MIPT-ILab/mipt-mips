@@ -53,7 +53,7 @@ class BasePort : protected Log
 
         // Init flag
         bool _init = false;
-   
+
         // Constructor of port
         BasePort( const std::string& key) : Log( true), _key( key) { }
 
@@ -71,6 +71,7 @@ template<class T> class Port : public BasePort
         /*
          * Map of ports
         */
+    protected:
         class Map : public BasePort::BaseMap
         {
         private:

@@ -153,6 +153,11 @@ class FuncInstr
 
         bool complete = false;
 
+        /* info for branch misprediction unit */
+        bool predicted_taken;        // Predicted direction
+        Addr predicted_target;     // PC, predicted by BPU
+        bool _is_jump_taken = false; // actual result
+
         uint32 PC = NO_VAL32; // removing "const" keyword to supporting ports
         uint32 new_PC = NO_VAL32;
 
@@ -201,16 +206,47 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
 
-        void execute_beq()    { if (v_src1 == v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
-        void execute_bne()    { if (v_src1 != v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
+        void execute_beq()
+        {
+            if (v_src1 == v_src2)
+            {
+                new_PC += static_cast<int16>(v_imm) << 2;
+                _is_jump_taken = true;
+            }
+        }
 
-        void execute_blez()   { if (v_src1 <= 0) new_PC += static_cast<int16>(v_imm) << 2; }
-        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
-        void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
+        void execute_bne()
+        {
+            if (v_src1 != v_src2)
+            {
+                new_PC += static_cast<int16>(v_imm) << 2;
+                _is_jump_taken = true;
+            }
+        }
 
-        void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { new_PC = v_src1; }
-        void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };
+        void execute_blez()
+        {
+            if (v_src1 <= 0)
+            {
+                new_PC += static_cast<int16>(v_imm) << 2;
+                _is_jump_taken = true;
+            }
+        }
+
+        void execute_bgtz()
+        {
+            if (v_src1 <= v_src2)
+            {
+                new_PC += static_cast<int16>(v_imm) << 2;
+                _is_jump_taken = true;
+            }
+        }
+
+        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
+
+        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
+        void execute_jr()     { _is_jump_taken = true; new_PC = v_src1; }
+        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = v_src2; };
 
         void execute_syscall(){ };
         void execute_break()  { };
@@ -227,7 +263,10 @@ class FuncInstr
         uint32 lo = NO_VAL32;
 
         FuncInstr() {} // constructor w/o arguments for ports
-        FuncInstr( uint32 bytes, uint32 PC = 0);
+        FuncInstr( uint32 bytes, Addr PC = 0,
+                   bool predicted_taken = 0,
+                   Addr predicted_target = 0);
+
         std::string Dump( std::string indent = " ") const;
 
         RegNum get_src1_num() const { return src1; }
@@ -240,6 +279,8 @@ class FuncInstr
                                      operation == OUT_R_JUMP      ||
                                      operation == OUT_R_JUMP_LINK ||
                                      operation == OUT_I_BRANCH; }
+        bool is_jump_taken() const { return  _is_jump_taken; }
+        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
 
@@ -251,6 +292,7 @@ class FuncInstr
         uint32 get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
         uint32 get_new_PC() const { return new_PC; }
+        uint32 get_PC() const { return PC; }
 
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores

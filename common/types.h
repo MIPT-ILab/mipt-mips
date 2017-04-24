@@ -10,7 +10,7 @@
 #ifndef COMMON__TYPES_H
 #define COMMON__TYPES_H
 
-//C++11 fixed width integer types
+// C++11 fixed width integer types
 #include <cstdint>
 
 /* Signed 8-bit integer type */
@@ -48,5 +48,9 @@ static const uint8  MAX_VAL8  = UINT8_MAX;
 static const uint16 MAX_VAL16 = UINT16_MAX;
 static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
+
+// semantics
+using Addr = uint32;
+using Cycles = uint64;
 
 #endif // #ifndef COMMON__TYPES_H

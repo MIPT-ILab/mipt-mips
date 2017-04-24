@@ -48,8 +48,8 @@ int LRUInfo::update( int set)
 
 CacheTagArray::CacheTagArray( unsigned int size_in_bytes,
                               unsigned int ways,
-                              unsigned short block_size_in_bytes,
-                              unsigned short addr_size_in_bits) :
+                              unsigned int block_size_in_bytes,
+                              unsigned int addr_size_in_bits) :
                               Log(false),                       //cache should not say anything but error info
                               size_in_bytes( size_in_bytes),
                               ways( ways),
@@ -78,7 +78,7 @@ CacheTagArray::~CacheTagArray()
     delete lru;
 }
 
-bool CacheTagArray::read( addr_t addr, unsigned int* way)
+bool CacheTagArray::read( Addr addr, unsigned int* way)
 {
     unsigned int way_num;
     const auto set_num = getSetNum( addr);
@@ -95,7 +95,7 @@ bool CacheTagArray::read( addr_t addr, unsigned int* way)
     return false;
 }
 
-bool CacheTagArray::read_no_touch( addr_t addr, unsigned int* way) const
+bool CacheTagArray::read_no_touch( Addr addr, unsigned int* way) const
 {
     const auto set_num = getSetNum( addr);
     const auto tag_num = getTagNum( addr);
@@ -115,7 +115,7 @@ bool CacheTagArray::read_no_touch( addr_t addr, unsigned int* way) const
     return false; // miss (no data)
 }
 
-void CacheTagArray::write( addr_t addr, unsigned int* way)
+void CacheTagArray::write( Addr addr, unsigned int* way)
 {
     unsigned int set_num = getSetNum( addr);
     unsigned int way_num = lru->update( set_num); // get l.r.u. way
@@ -128,8 +128,8 @@ void CacheTagArray::write( addr_t addr, unsigned int* way)
 
 void CacheTagArray::checkArgs( unsigned int size_in_bytes,
                                unsigned int ways,
-                               unsigned short block_size_in_bytes,
-                               unsigned short addr_size_in_bits)
+                               unsigned int block_size_in_bytes,
+                               unsigned int addr_size_in_bits)
 {
     /* All args are not less than zero because of "unsigned" keyword. */
     if ( ( size_in_bytes == 0) ||
@@ -175,7 +175,7 @@ void CacheTagArray::checkArgs( unsigned int size_in_bytes,
     }
 }
 
-unsigned int CacheTagArray::getSetNum( addr_t addr) const
+unsigned int CacheTagArray::getSetNum( Addr addr) const
 {
     /* Cut "logbin(block_size_in_bytes)" bits from the end. */
     int set_num = addr / block_size_in_bytes;
@@ -184,7 +184,7 @@ unsigned int CacheTagArray::getSetNum( addr_t addr) const
     return set_num;
 }
 
-uint64 CacheTagArray::getTagNum( addr_t addr) const
+uint64 CacheTagArray::getTagNum( Addr addr) const
 {
     /* Cut "logbin(block_size_in_bytes)" bits from the end. */
     return ( addr / block_size_in_bytes);

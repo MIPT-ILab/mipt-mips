@@ -22,7 +22,7 @@ public:
     LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
 
     friend LogOstream& operator<<(LogOstream&, const Critical&) {
-         exit(-1);
+         exit(EXIT_FAILURE);
     }
 
     LogOstream& operator<<(std::ostream& (*F)(std::ostream&)) {
