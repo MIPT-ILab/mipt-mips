@@ -98,26 +98,26 @@ protected:
 
     public:
         /* updating state */
-        void update (bool is_taken)
+        void update ( bool is_taken)
         {
             if ( is_taken)
             {
                 switch ( value)
                 {
-                    case NT: value = WNT;
-                    case WNT: value = WT;
-                    case WT: value = T;
-                    case T: value = T; // saturation
+                    case NT:  value = WNT; break;
+                    case WNT: value = WT;  break;
+                    case WT:  value = T;   break;
+                    case T:   value = T;   break; // saturation
                 }
             }
             else
             {
                 switch ( value)
                 {
-                    case NT: value = NT; // saturation
-                    case WNT: value = NT;
-                    case WT: value = WNT;
-                    case T: value = WT;
+                    case NT:  value = NT;  break; // saturation
+                    case WNT: value = NT;  break;
+                    case WT:  value = WNT; break;
+                    case T:   value = WT;  break;
                 }
             }
         }
@@ -164,7 +164,7 @@ public:
 
 /* adaptive predictors */
 
-class BPEntryAdaptive final : BPEntryTwoBit
+class BPEntryAdaptive final : public BPEntryTwoBit
 {
     static const unsigned int default_pattern = 0;
 

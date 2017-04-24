@@ -74,7 +74,7 @@ public:
     {
         unsigned int way;
         if ( tags.read_no_touch( PC, &way)) // hit
-            return data[ way][ set(PC)].isTaken();
+            return data[ way][ set(PC)].getTarget();
         else // miss
             return PC + 4;
     }
