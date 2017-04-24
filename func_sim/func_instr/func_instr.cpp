@@ -11,8 +11,6 @@
 #include <sstream>
 #include <iomanip>
 
-#include <common/macro.h>
-
 #include "func_instr.h"
 
 const FuncInstr::ISAEntry FuncInstr::isaTable[] =
@@ -197,7 +195,7 @@ void FuncInstr::initFormat()
             format    = isaTable[i].format;
             operation = isaTable[i].operation;
             mem_size  = isaTable[i].mem_size;
-            isaNum    = i;
+            name      = isaTable[i].name.c_str();
             if ( FORMAT_R == format)
                assert( instr.asR.opcode == 0x0);
             return;
@@ -210,7 +208,7 @@ void FuncInstr::initFormat()
 void FuncInstr::initR()
 {
     std::ostringstream oss;
-    oss << isaTable[isaNum].name;
+    oss << name;
     switch ( operation)
     {
         case OUT_R_ARITHM:
@@ -254,7 +252,7 @@ void FuncInstr::initI()
     v_imm = instr.asI.imm;
 
     std::ostringstream oss;
-    oss << isaTable[isaNum].name << " $";
+    oss << name << " $";
     switch ( operation)
     {
         case OUT_I_ARITHM:
@@ -312,7 +310,7 @@ void FuncInstr::initJ()
     v_imm = instr.asJ.imm;
 
     std::ostringstream oss;
-    oss << isaTable[isaNum].name << " "
+    oss << name << " "
         << std::hex << "0x" << v_imm;
 
     if ( operation == OUT_J_JUMP_LINK)
@@ -329,7 +327,6 @@ void FuncInstr::initUnknown()
     oss << std::hex << std::setfill( '0')
         << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
     disasm = oss.str();
-    isaNum = 0;
 }
 
 void FuncInstr::execute_unknown()
