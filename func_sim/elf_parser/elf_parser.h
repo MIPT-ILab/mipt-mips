@@ -10,7 +10,7 @@
 
 // Generic C++
 #include <string>
-#include <vector>
+#include <list>
 
 // uArchSim modules
 #include <common/types.h>
@@ -22,14 +22,12 @@ class ElfSection
     // You cannot use this constructor to create an object.
     // Use the static function getAllElfSections.
     ElfSection() = delete;
-    ElfSection( const char* name, uint64 start_addr,
-                uint64 size, const uint8* content);
 
     ElfSection& operator= (const ElfSection&) = delete;
 public:
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
-    const uint64 size; // size of the section in bytes
-    const uint64 start_addr; // the start address of the section
+    const uint32 size; // size of the section in bytes
+    const Addr start_addr; // the start address of the section
     uint8* const content; // the row data of the section
 
     ElfSection( const  ElfSection& old);
@@ -37,7 +35,10 @@ public:
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.
     static void getAllElfSections( const char* elf_file_name,
-                                   std::vector<ElfSection>& sections_array /*used as output*/);
+                                   std::list<ElfSection>& sections_array /*used as output*/);
+
+    ElfSection( const char* name, Addr start_addr,
+	    Addr size, const uint8* content);
 
     virtual ~ElfSection();
 

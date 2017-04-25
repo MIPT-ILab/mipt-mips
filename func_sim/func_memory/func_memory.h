@@ -21,70 +21,70 @@
 class FuncMemory
 {
     private:
-        const uint64 page_bits;
-        const uint64 offset_bits;
-        const uint64 set_bits;
+        const uint32 page_bits;
+        const uint32 offset_bits;
+        const uint32 set_bits;
 
-        const uint64 addr_mask;
-        const uint64 offset_mask;
-        const uint64 page_mask;
-        const uint64 set_mask;
+        const Addr addr_mask;
+        const Addr offset_mask;
+        const Addr page_mask;
+        const Addr set_mask;
 
-        const uint64 page_cnt;
-        const uint64 set_cnt;
-        const uint64 page_size;
+        const size_t page_cnt;
+        const size_t set_cnt;
+        const size_t page_size;
 
         uint8*** memory = nullptr;
-        uint64 startPC_addr = NO_VAL32;
+        Addr startPC_addr = NO_VAL32;
 
-        inline size_t get_set( uint64 addr) const
+        inline size_t get_set( Addr addr) const
         {
             return ( addr & set_mask) >> ( page_bits + offset_bits);
         }
 
-        inline size_t get_page( uint64 addr) const
+        inline size_t get_page( Addr addr) const
         {
             return ( addr & page_mask) >> offset_bits;
         }
 
-        inline size_t get_offset( uint64 addr) const
+        inline size_t get_offset( Addr addr) const
         {
             return ( addr & offset_mask);
         }
 
-        inline uint64 get_addr( uint64 set, uint64 page, uint64 offset) const
+        inline Addr get_addr( Addr set, Addr page, Addr offset) const
         {
             return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
         }
 
-        inline uint8* get_host_addr( uint64 addr) const
+        inline uint8* get_host_addr( Addr addr) const
         {
             return &memory[get_set(addr)][get_page(addr)][get_offset(addr)];
         }
 
-        inline uint8 read_byte( uint64 addr) const
+        inline uint8 read_byte( Addr addr) const
         {
             return *get_host_addr(addr);
         }
 
-        inline void write_byte( uint64 addr, uint8 value)
+        inline void write_byte( Addr addr, uint8 value)
         {
            *get_host_addr(addr) = value;
         }
 
-        void alloc( uint64 addr);
-        bool check( uint64 addr) const;
+        void alloc( Addr addr);
+        bool check( Addr addr) const;
 
         FuncMemory& operator=( const FuncMemory&) = delete;
         FuncMemory( const FuncMemory&) = delete;
     public:
         FuncMemory ( const std::string& executable_file_name,
-                     uint64 addr_size = 32,
-                     uint64 page_num_size = 10,
-                     uint64 offset_size = 12);
+                     uint32 addr_size = 32,
+                     uint32 page_num_size = 10,
+                     uint32 offset_size = 12);
         virtual ~FuncMemory();
-        uint64 read( uint64 addr, uint32 num_of_bytes = 4) const;
-        void write( uint64 value, uint64 addr, uint32 num_of_bytes = 4);
+        uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
+        void write( uint64 value, Addr addr, uint32 num_of_bytes = 4);
         inline uint64 startPC() const { return startPC_addr; }
         std::string dump( std::string indent = "") const;
 };

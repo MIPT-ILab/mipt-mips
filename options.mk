@@ -20,6 +20,7 @@ vpath %.cpp $(TRUNK)/func_sim/
 vpath %.cpp $(TRUNK)/func_sim/elf_parser/
 vpath %.cpp $(TRUNK)/func_sim/func_instr/
 vpath %.cpp $(TRUNK)/func_sim/func_memory/
+vpath %.cpp $(TRUNK)/perf_sim/mem/
 
 # GoogleTest directories
 GTEST_DIR= $(TRUNK)/libs/googletest

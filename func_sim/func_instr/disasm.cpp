@@ -20,7 +20,7 @@ int main( int argc, char* argv[])
     }
 
     const std::string section_name( argv[2]);
-    std::vector<ElfSection> sections;
+    std::list<ElfSection> sections;
     ElfSection::getAllElfSections( argv[1], sections);
     for ( const auto section : sections) {
         if ( section.name != section_name)

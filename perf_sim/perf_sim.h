@@ -29,7 +29,7 @@ class PerfMIPS : protected Log
         bool decode_next_time = false;
 
         RF rf;
-        uint32 PC = NO_VAL32;
+        Addr PC = NO_VAL32;
         bool PC_is_valid = false;
         FuncMemory* mem = nullptr;
 

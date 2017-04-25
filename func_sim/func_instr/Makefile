@@ -10,6 +10,8 @@ TRUNK= ../..
 # Including options and compiler flags
 include $(TRUNK)/options.mk
 
+CXXFLAGS+=-Wno-effc++
+
 #
 # Enter for building func_instr standalone program
 #

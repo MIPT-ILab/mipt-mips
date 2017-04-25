@@ -15,7 +15,7 @@ class MIPS
 {
     private:
         FuncRF rf;
-        uint32 PC = 0;
+        Addr PC = NO_VAL32;
         FuncMemory* mem = nullptr;
 
         uint32 fetch() const { return mem->read(PC); }

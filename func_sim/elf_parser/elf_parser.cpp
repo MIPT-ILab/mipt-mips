@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <memory>
 
 // Unix
 #include <unistd.h>
@@ -24,6 +25,7 @@
 #include <gelf.h>
 
 // uArchSim modules
+#include <common/macro.h>
 #include "elf_parser.h"
 
 ElfSection::ElfSection( const ElfSection& that)
@@ -32,8 +34,8 @@ ElfSection::ElfSection( const ElfSection& that)
     std::memcpy(this->content, that.content, this->size);
 }
 
-ElfSection::ElfSection( const char* name_c, uint64 start_addr_c,
-                        uint64 size_c, const uint8* content_c)
+ElfSection::ElfSection( const char* name_c, Addr start_addr_c,
+                        Addr size_c, const uint8* content_c)
     : name( name_c), size( size_c)
     , start_addr( start_addr_c), content( new uint8[ size + sizeof( uint64)])
 {
@@ -41,7 +43,7 @@ ElfSection::ElfSection( const char* name_c, uint64 start_addr_c,
 }
 
 void ElfSection::getAllElfSections( const char* elf_file_name,
-                                    std::vector<ElfSection>& sections_array /*is used as output*/)
+                                    std::list<ElfSection>& sections_array /*is used as output*/)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
@@ -81,14 +83,14 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         gelf_getshdr( section, &shdr);
 
         char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
-        uint64 start_addr = static_cast<uint64>( shdr.sh_addr);
+        Addr start_addr = shdr.sh_addr;
 
         if ( start_addr == 0)
             continue;
 
-        uint64 size = static_cast<uint64>( shdr.sh_size);
-        uint64 offset = static_cast<uint64>( shdr.sh_offset);
-	    uint8* content = new uint8[ size];
+        size_t size = shdr.sh_size;
+        auto offset = shdr.sh_offset;
+        std::unique_ptr<uint8[]> content(new uint8[ size]);
 
         lseek( file_descr, offset, SEEK_SET);
         FILE *file = fdopen( file_descr, "r");
@@ -100,11 +102,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         }
 
         // fill the content by the section data
-        auto result = std::fread( content, sizeof( uint8), size, file);
-        (void)(result);
-        ElfSection section( name, start_addr, size, content);
-	    sections_array.push_back( ElfSection( name, start_addr, size, content));
-        delete [] content;
+        ignored( std::fread( content.get(), sizeof( uint8), size, file));
+        sections_array.emplace( sections_array.end(), name, start_addr, size, content.get());
     }
 
     // close all used files

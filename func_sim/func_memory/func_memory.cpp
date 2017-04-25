@@ -19,9 +19,9 @@ union uint64_8
 };
 
 FuncMemory::FuncMemory( const std::string& executable_file_name,
-                        uint64 addr_bits,
-                        uint64 page_bits,
-                        uint64 offset_bits) :
+                        uint32 addr_bits,
+                        uint32 page_bits,
+                        uint32 offset_bits) :
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),
@@ -35,7 +35,7 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
 {
     memory = new uint8** [set_cnt]();
 
-    std::vector<ElfSection> sections_array;
+    std::list<ElfSection> sections_array;
     ElfSection::getAllElfSections( executable_file_name.c_str(), sections_array);
 
     for ( const auto& section : sections_array)
@@ -70,7 +70,7 @@ FuncMemory::~FuncMemory()
     delete [] memory;
 }
 
-uint64 FuncMemory::read( uint64 addr, uint32 num_of_bytes) const
+uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
 {
     assert( num_of_bytes <= 8);
     assert( num_of_bytes != 0);
@@ -89,7 +89,7 @@ uint64 FuncMemory::read( uint64 addr, uint32 num_of_bytes) const
     return value.val;
 }
 
-void FuncMemory::write( uint64 value, uint64 addr, uint32 num_of_bytes)
+void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
@@ -111,7 +111,7 @@ void FuncMemory::write( uint64 value, uint64 addr, uint32 num_of_bytes)
     }
 }
 
-void FuncMemory::alloc( uint64 addr)
+void FuncMemory::alloc( Addr addr)
 {
     uint8*** set = &memory[get_set(addr)];
     if ( *set == nullptr)
@@ -125,7 +125,7 @@ void FuncMemory::alloc( uint64 addr)
     }
 }
 
-bool FuncMemory::check( uint64 addr) const
+bool FuncMemory::check( Addr addr) const
 {
     uint8** set = memory[get_set(addr)];
     return set != nullptr && set[get_page(addr)] != nullptr;

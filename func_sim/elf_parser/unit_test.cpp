@@ -17,7 +17,7 @@ static const char * valid_elf_file = "./mips_bin_exmpl.out";
 //
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
 {
-    std::vector<ElfSection> sections_array;
+    std::list<ElfSection> sections_array;
 
     ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, sections_array));
 

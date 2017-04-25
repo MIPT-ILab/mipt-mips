@@ -126,7 +126,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sw",  0x2B,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
  // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
 };
-const uint32 FuncInstr::isaTableSize = countof(isaTable);
+const size_t FuncInstr::isaTableSize = countof(isaTable);
 
 const char *FuncInstr::regTable[REG_NUM_MAX] =
 {
@@ -148,7 +148,7 @@ const char *FuncInstr::regTableName(RegNum reg) {
     return regTable[static_cast<size_t>(reg)];
 }
 
-FuncInstr::FuncInstr( uint32 bytes, uint32 PC) : instr(bytes), PC(PC)
+FuncInstr::FuncInstr( uint32 bytes, Addr PC) : instr(bytes), PC(PC)
 {
     initFormat();
     switch ( format)
