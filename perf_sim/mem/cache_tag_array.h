@@ -24,55 +24,63 @@ class LRUInfo
      * "lru" contains sequences of using for each set. First number in set list
      * is the least used.
      */
-    std::vector< std::list< unsigned int> > lru = {};
+    std::vector< std::list< uint32>> lru = {};
 
 public:
-    LRUInfo( unsigned int ways, unsigned int sets);
-    void touch( int set, unsigned int way);
-    int update( int set);
+    LRUInfo( uint32 ways, uint32 sets);
+    void touch( uint32 set, uint32 way);
+    uint32 update( uint32 set);
 };
 
-class CacheTagArray : protected Log
+class CacheTagArrayCheck : private Log
+{
+protected:
+    CacheTagArrayCheck( uint32 size_in_bytes,
+                        uint32 ways,
+                        uint32 line_size,
+                        uint32 addr_size_in_bits);
+public:
+        const uint32 size_in_bytes;
+        const uint32 ways;
+        const uint32 line_size;
+        const uint32 addr_size_in_bits;
+
+};
+
+class CacheTagArray : public CacheTagArrayCheck
 {
     private:
         /* The set (line) of the cache. */
-        struct CacheSet
+        struct CacheTag
         {
-            uint64 line = 0; // data
+            Addr line = 0; // data
             bool is_valid = false; // validity
         };
-        const unsigned int size_in_bytes;
-        const unsigned int ways;
-        const unsigned int block_size_in_bytes;
-        const unsigned int addr_size_in_bits;
-        CacheSet** set = nullptr; // array of tags
+
+        std::vector<std::vector<CacheTag>> array = {}; // array of tags
         LRUInfo* lru = nullptr; // LRU algorithm module
 
-        /* Checks if it possible to create cache. */
-        void checkArgs( unsigned int size_in_bytes,
-                        unsigned int ways,
-                        unsigned int block_size_in_bytes,
-                        unsigned int addr_size_in_bits);
+        const uint32 num_sets;
 
-        unsigned int getSetNum( Addr addr) const;
-        uint64 getTagNum( Addr addr) const;
+        uint32 set( Addr addr) const;
+        Addr tag( Addr addr) const;
 
         CacheTagArray& operator=( const CacheTagArray&) = delete;
         CacheTagArray( const CacheTagArray&) = delete;
 
     public:
-        CacheTagArray( unsigned int size_in_bytes,
-                       unsigned int ways,
-                       unsigned int block_size_in_bytes = 4,
-                       unsigned int addr_size_in_bits = 32);
+        CacheTagArray( uint32 size_in_bytes,
+                       uint32 ways,
+                       uint32 line_size = 4,
+                       uint32 addr_size_in_bits = 32);
         ~CacheTagArray();
 
         /* lookup the cache and update LRU info */
-        bool read( Addr addr, unsigned int* way = nullptr);
+        bool read( Addr addr, uint32* way = nullptr);
         /* find in the cache but do not update LRU info */
-        bool read_no_touch( Addr addr, unsigned int* way = nullptr) const;
+        bool read_no_touch( Addr addr, uint32* way = nullptr) const;
         /* create new entry in cache */
-        void write( Addr addr, unsigned int* way = nullptr);
+        void write( Addr addr, uint32* way = nullptr);
 };
 
 #endif // #ifndef CACHE_TAG_ARRAY_H
