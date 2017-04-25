@@ -83,8 +83,8 @@ class FuncMemory
                      uint64 page_num_size = 10,
                      uint64 offset_size = 12);
         virtual ~FuncMemory();
-        uint64 read( uint64 addr, unsigned int num_of_bytes = 4) const;
-        void write( uint64 value, uint64 addr, unsigned int num_of_bytes = 4);
+        uint64 read( uint64 addr, uint32 num_of_bytes = 4) const;
+        void write( uint64 value, uint64 addr, uint32 num_of_bytes = 4);
         inline uint64 startPC() const { return startPC_addr; }
         std::string dump( std::string indent = "") const;
 };

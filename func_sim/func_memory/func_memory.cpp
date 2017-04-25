@@ -70,7 +70,7 @@ FuncMemory::~FuncMemory()
     delete [] memory;
 }
 
-uint64 FuncMemory::read( uint64 addr, unsigned int num_of_bytes) const
+uint64 FuncMemory::read( uint64 addr, uint32 num_of_bytes) const
 {
     assert( num_of_bytes <= 8);
     assert( num_of_bytes != 0);
@@ -89,7 +89,7 @@ uint64 FuncMemory::read( uint64 addr, unsigned int num_of_bytes) const
     return value.val;
 }
 
-void FuncMemory::write( uint64 value, uint64 addr, unsigned int num_of_bytes)
+void FuncMemory::write( uint64 value, uint64 addr, uint32 num_of_bytes)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);

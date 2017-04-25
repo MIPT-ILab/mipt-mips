@@ -15,6 +15,7 @@
 
 // MIPT-MIPS modules
 #include <common/types.h>
+#include <common/macro.h>
 
 enum RegNum
 {
@@ -114,6 +115,8 @@ class FuncInstr
             }
         } instr = NO_VAL32;
 
+        using Execute = void (FuncInstr::*)(void);
+
         struct ISAEntry
         {
             std::string name;
@@ -125,16 +128,17 @@ class FuncInstr
 
             uint8 mem_size;
 
-            void (FuncInstr::*function)(void);
+            FuncInstr::Execute function;
 
             uint8 mips_version;
         };
-        uint32 isaNum = NO_VAL32;
 
         static const ISAEntry isaTable[];
         static const uint32 isaTableSize;
         static const char *regTableName(RegNum);
         static const char *regTable[];
+
+        StringView name = nullptr;
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -253,6 +257,7 @@ class FuncInstr
         void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
         void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
 
+        Execute function = &FuncInstr::execute_unknown;
     public:
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
@@ -292,7 +297,7 @@ class FuncInstr
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
-        void execute() { (this->*isaTable[isaNum].function)(); complete = true; };
+        void execute() { (this->*function)(); complete = true; };
 };
 
 std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
