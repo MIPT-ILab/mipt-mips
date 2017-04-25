@@ -34,6 +34,8 @@ using float32 = float;
 /* Double precision 64-bit float type */
 using float64 = double;
 
+using Addr = uint32;
+
 // The following consts are used to initialize some variables
 // as something that has invalid value.
 // Using such values most likely will leads to segmenation fault,

@@ -25,7 +25,6 @@ vpath %.cpp $(TRUNK)/func_sim/func_memory/
 vpath %.cpp $(TRUNK)/perf_sim/mem/
 vpath %.cpp $(TRUNK)/perf_sim/bpu/
 
-
 # GoogleTest directories
 GTEST_DIR= $(TRUNK)/libs/googletest
 GTEST_INCL= -I $(GTEST_DIR)/lib/include

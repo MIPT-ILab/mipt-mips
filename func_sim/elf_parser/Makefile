@@ -12,6 +12,8 @@ TRUNK= ../..
 # Including options and compiler flags
 include $(TRUNK)/options.mk
 
+CXXFLAGS+=-Wno-effc++
+
 #
 # Enter for building elf_parser stand alone program
 #

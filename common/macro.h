@@ -17,6 +17,10 @@ constexpr size_t countof( const T (&)[N]) noexcept { return N; }
 template<typename T>
 constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }
 
+/* Ignore return value */
+template<typename T>
+void ignored( const T&) { }
+
 // It should be replaced with std::string_view
 class StringView
 {

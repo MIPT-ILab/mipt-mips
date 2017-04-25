@@ -134,7 +134,7 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const uint32 isaTableSize;
+        static const size_t isaTableSize;
         static const char *regTableName(RegNum);
         static const char *regTable[];
 
@@ -148,7 +148,7 @@ class FuncInstr
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
         uint32 v_dst = NO_VAL32;
-        uint32 mem_addr = NO_VAL32;
+        Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
         bool complete = false;
@@ -158,8 +158,8 @@ class FuncInstr
         Addr predicted_target;     // PC, predicted by BPU
         bool _is_jump_taken = false; // actual result
 
-        uint32 PC = NO_VAL32; // removing "const" keyword to supporting ports
-        uint32 new_PC = NO_VAL32;
+        Addr PC = NO_VAL32; // removing "const" keyword to supporting ports
+        Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
 
@@ -289,10 +289,10 @@ class FuncInstr
 
         uint32 get_v_dst() const { return v_dst; }
 
-        uint32 get_mem_addr() const { return mem_addr; }
+        Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
-        uint32 get_new_PC() const { return new_PC; }
-        uint32 get_PC() const { return PC; }
+        Addr get_new_PC() const { return new_PC; }
+        Addr get_PC() const { return PC; }
 
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
