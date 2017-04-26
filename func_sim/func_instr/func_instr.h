@@ -234,7 +234,7 @@ class FuncInstr
 
         FuncInstr() {} // constructor w/o arguments for ports
         FuncInstr( uint32 bytes, Addr PC = 0);
-        std::string Dump( std::string indent = " ") const;
+        const std::string& Dump() const { return disasm; }
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
@@ -261,9 +261,12 @@ class FuncInstr
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
-        void execute() { (this->*function)(); complete = true; };
+        void execute();
 };
 
-std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
+static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
+{
+    return out << instr.Dump();
+}
 
 #endif //FUNC_INSTR_H

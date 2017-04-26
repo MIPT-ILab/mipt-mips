@@ -192,19 +192,6 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC) : instr(bytes), PC(PC)
     new_PC = PC + 4;
 }
 
-std::string FuncInstr::Dump( std::string indent) const
-{
-    std::ostringstream oss;
-    oss << indent << disasm;
-
-    if ( dst != REG_NUM_ZERO && complete)
-    {
-        oss << "\t [ $" << regTableName(dst)
-            << " = 0x" << std::hex << v_dst << "]" << std::dec;
-    }
-    return oss.str();
-}
-
 void FuncInstr::initFormat()
 {
     bool is_R = ( instr.asR.opcode == 0x0);
@@ -379,7 +366,17 @@ void FuncInstr::execute_unknown()
     exit(EXIT_FAILURE);
 }
 
-std::ostream& operator<< ( std::ostream& out, const FuncInstr& instr)
+void FuncInstr::execute()
 {
-    return out << instr.Dump( "");
+    (this->*function)();
+    complete = true;
+
+    if ( dst != REG_NUM_ZERO && complete)
+    {
+        std::ostringstream oss;
+        oss << "\t [ $" << regTableName(dst)
+            << " = 0x" << std::hex << v_dst << "]";
+        disasm += oss.str();
+    }
 }
+
