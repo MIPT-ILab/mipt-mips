@@ -371,7 +371,7 @@ void FuncInstr::execute()
     (this->*function)();
     complete = true;
 
-    if ( dst != REG_NUM_ZERO && complete)
+    if ( dst != REG_NUM_ZERO)
     {
         std::ostringstream oss;
         oss << "\t [ $" << regTableName(dst)
