@@ -27,10 +27,10 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 
     // Variable shifts
     // name  funct   format    operation  memsize           pointer
-    { "sllv", 0x4, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sllv, 1},
+    { "sllv", 0x4, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_sllv, 1},
     //        0x5 reserved
-    { "srlv", 0x6, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srlv, 1},
-    { "srav", 0x7, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srav, 1},
+    { "srlv", 0x6, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_srlv, 1},
+    { "srav", 0x7, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_srav, 1},
 
     // Indirect branches
     // name  funct  format    operation     memsize           pointer
@@ -97,8 +97,8 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "jal",  0x3, FORMAT_J, OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1},
     { "beq",  0x4, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1},
     { "bne",  0x5, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1},
-    { "blez", 0x6, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_blez, 1},
-    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bgtz, 1},
+    { "blez", 0x6, FORMAT_I, OUT_I_BRANCH_0,  0, &FuncInstr::execute_blez, 1},
+    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH_0,  0, &FuncInstr::execute_bgtz, 1},
 
     // Addition/Subtraction
     // name   opcode  format    operation  memsize           pointer
@@ -118,10 +118,10 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 
     // Likely branches (MIPS II)
     // name  opcode    format    operation memsize           pointer
-    { "beql",  0x14,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_beq,  2},
-    { "bnel",  0x15,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bne,  2},
-    { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_blez, 2},
-    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bgtz, 2},
+    { "beql",  0x14,  FORMAT_I, OUT_I_BRANCH,   0, &FuncInstr::execute_beq,  2},
+    { "bnel",  0x15,  FORMAT_I, OUT_I_BRANCH,   0, &FuncInstr::execute_bne,  2},
+    { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH_0, 0, &FuncInstr::execute_blez, 2},
+    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH_0, 0, &FuncInstr::execute_bgtz, 2},
 
     // 0x18 - 0x19 double width addition
     // 0x1A - 0x1B load double word left/right
@@ -245,8 +245,18 @@ void FuncInstr::initR()
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
+        case OUT_R_SHIFT:
+            src2 = static_cast<RegNum>(instr.asR.rs);
+            src1 = static_cast<RegNum>(instr.asR.rt);
+            dst  = static_cast<RegNum>(instr.asR.rd);
+
+            oss <<  " $" << regTableName(dst)
+                << ", $" << regTableName(src1)
+                << ", $" << regTableName(src2);
+            break;
+
         case OUT_R_SHAMT:
-            src1  = static_cast<RegNum>(instr.asR.rs);
+            src1  = static_cast<RegNum>(instr.asR.rt);
             dst   = static_cast<RegNum>(instr.asR.rd);
             v_imm = instr.asR.shamt;
 
@@ -255,9 +265,10 @@ void FuncInstr::initR()
                 <<  ", " << std::dec << v_imm;
             break;
         case OUT_R_JUMP_LINK:
-            dst = REG_NUM_RA;
             src1  = static_cast<RegNum>(instr.asR.rs);
-            oss << " $" << regTableName(src1);
+            dst   = static_cast<RegNum>(instr.asR.rd);
+            oss <<  " $" << regTableName(dst)
+                << ", $" << regTableName(src1);
             break;
         case OUT_R_JUMP:
             dst = REG_NUM_ZERO;
@@ -268,7 +279,10 @@ void FuncInstr::initR()
         default:
             assert(0);
     }
-    disasm = oss.str();
+    if ( instr.raw == 0x0ul)
+        disasm = "nop ";
+    else
+        disasm = oss.str();
 }
 
 
@@ -295,7 +309,13 @@ void FuncInstr::initI()
 
             oss << regTable[src1] << ", $"
                 << regTable[src2] << ", "
-                << std::hex << "0x" << v_imm << std::dec;
+                << std::dec << static_cast<int16>(v_imm);
+            break;
+        case OUT_I_BRANCH_0:
+            src1 = static_cast<RegNum>(instr.asI.rs);
+
+            oss << regTable[src1] << ", "
+                << std::dec << static_cast<int16>(v_imm);
             break;
 
         case OUT_I_CONST:
@@ -335,8 +355,8 @@ void FuncInstr::initJ()
     v_imm = instr.asJ.imm;
 
     std::ostringstream oss;
-    oss << name << " "
-        << std::hex << "0x" << v_imm;
+    oss << name << " 0x"
+        << std::hex << static_cast<uint16>(v_imm) << std::dec;
 
     if ( operation == OUT_J_JUMP_LINK)
         dst = REG_NUM_RA;

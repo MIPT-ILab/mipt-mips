@@ -68,12 +68,14 @@ class FuncInstr
         enum OperationType
         {
             OUT_R_ARITHM,
+            OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
+            OUT_I_BRANCH_0,
             OUT_I_LOAD,
             OUT_I_LOADU,
             OUT_I_CONST,
