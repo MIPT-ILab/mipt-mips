@@ -31,14 +31,19 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "srav", 0x7, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srav, 1},
 
     // Indirect branches
-    // name  funct    format    operation     memsize           pointer
-    { "jr",   0x8,   FORMAT_R, OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1},
-    { "jalr", 0x9,   FORMAT_R, OUT_R_JUMP_LINK, 0, &FuncInstr::execute_jalr, 1},
+    // name  funct  format    operation     memsize           pointer
+    { "jr",   0x8, FORMAT_R, OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1},
+    { "jalr", 0x9, FORMAT_R, OUT_R_JUMP_LINK, 0, &FuncInstr::execute_jalr, 1},
+
+    // Conditional moves (MIPS IV)
+    // name  funct  format    operation  memsize          pointer
+    { "movz", 0xA, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_movz, 4},
+    { "movn", 0xB, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_movn, 4},
 
     // System calls
     // name    funct    format    operation     memsize           pointer
-    { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
     { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
+    { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
 
     // HI/LO manipulations
     // name   funct   format    operation     memsize           pointer
