@@ -21,12 +21,14 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // Constant shifts
     // name funct   format    operation memsize           pointer
     { "sll", 0x0, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_sll, 1},
+    //       0x1 movci
     { "srl", 0x2, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_srl, 1},
     { "sra", 0x3, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_sra, 1},
 
     // Variable shifts
     // name  funct   format    operation  memsize           pointer
     { "sllv", 0x4, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sllv, 1},
+    //        0x5 reserved
     { "srlv", 0x6, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srlv, 1},
     { "srav", 0x7, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srav, 1},
 
@@ -41,9 +43,11 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "movn", 0xB, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_movn, 4},
 
     // System calls
-    // name    funct    format    operation     memsize           pointer
-    { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
-    { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
+    // name    funct format    operation     memsize           pointer
+    { "syscall",0xC, FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
+    { "break",  0xD, FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
+    //          0xE reserved
+    //          0xF SYNC    
 
     // HI/LO manipulations
     // name   funct   format    operation     memsize           pointer
@@ -52,12 +56,16 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "mflo", 0x12,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mflo, 1},
     { "mtlo", 0x13,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mtlo, 1},
 
+    // 0x14 - 0x17 double width shifts
+
     // Multiplication/Division
     // name    funct    format    operation  memsize           pointer
     { "mult",  0x18,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1},
     { "multu", 0x19,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_multu, 1},
     { "div",   0x1A,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1},
     { "divu",  0x1B,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1},
+
+    // 0x1C - 0x1F double width multiplication/division
 
     // Addition/Subtraction
     // name    funct    format    operation  memsize           pointer
@@ -72,12 +80,19 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "or",   0x25, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_or,   1},
     { "xor",  0x26, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_xor,  1},
     { "nor",  0x27, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_nor,  1},
+    //        0x28 reserved
+    //        0x29 reserved
     { "slt",  0x2A, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_slt,  1},
     { "sltu", 0x2B, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1},
 
+    // 0x2C - 0x2F double width addition/substraction
+    // 0x30 - 0x3F double width shifts and conditional traps
+
+    // ********************** REGIMM INSTRUCTIONS *************************
+
     // ********************* I and J INSTRUCTIONS *************************
     // Branches
-    // name    opcode    format    operation     memsize           pointer
+    // name opcode  format    operation     memsize           pointer
     { "j",    0x2, FORMAT_J, OUT_J_JUMP,      0, &FuncInstr::execute_j,    1},
     { "jal",  0x3, FORMAT_J, OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1},
     { "beq",  0x4, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1},
@@ -86,7 +101,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bgtz, 1},
 
     // Addition/Subtraction
-    // name   opcode    format    operation  memsize           pointer
+    // name   opcode  format    operation  memsize           pointer
     { "addi",  0x8,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1},
     { "addiu", 0x9,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_addiu, 1},
 
@@ -99,7 +114,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "xori",  0xE,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1},
     { "lui",   0xF,   FORMAT_I, OUT_I_CONST,  0, &FuncInstr::execute_lui,   1},
 
-    // Coprocessor operations 0x10 - 0x13
+    // 0x10 - 0x13 coprocessor operations 
 
     // Likely branches (MIPS II)
     // name  opcode    format    operation memsize           pointer
@@ -108,9 +123,8 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_blez, 2},
     { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bgtz, 2},
 
-    // System calls
-    // name  opcode    format    operation  memsize           pointer
-    { "trap", 0x1A,  FORMAT_J, OUT_J_SPECIAL, 0, &FuncInstr::execute_trap, 1},
+    // 0x18 - 0x19 double width addition
+    // 0x1A - 0x1B load double word left/right
 
     // Loads
     // name opcode    format    operation memsize           pointer
@@ -129,7 +143,12 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sh",  0x29,  FORMAT_I, OUT_I_STORE, 2, &FuncInstr::calculate_store_addr, 1},
  // { "swl", 0x2A,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
     { "sw",  0x2B,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
- // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
+    //       0x2C   store double word left
+    //       0x2D   store double word right
+ // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1}
+    //       0x2F   coprocessor
+    
+    // 0x30 - 0x3F atomic load/stores
 };
 const size_t FuncInstr::isaTableSize = countof(isaTable);
 
