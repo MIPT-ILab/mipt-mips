@@ -13,6 +13,8 @@
 #include <string>
 #include <cassert>
 
+#include <boost/utility/string_ref.hpp>
+
 // MIPT-MIPS modules
 #include <common/types.h>
 #include <common/macro.h>
@@ -139,7 +141,7 @@ class FuncInstr
         static const char *regTableName(RegNum);
         static const char *regTable[];
 
-        StringView name = nullptr;
+        boost::string_ref name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
