@@ -200,6 +200,9 @@ class FuncInstr
         void execute_andi()  { v_dst = v_src1 & v_imm; }
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
+    
+        void execute_movn()  { }
+        void execute_movz()  { }
 
         void execute_beq()    { if (v_src1 == v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
