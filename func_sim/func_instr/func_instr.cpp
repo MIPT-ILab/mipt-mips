@@ -150,7 +150,6 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     
     // 0x30 - 0x3F atomic load/stores
 };
-const size_t FuncInstr::isaTableSize = countof(isaTable);
 
 const char *FuncInstr::regTable[REG_NUM_MAX] =
 {
@@ -211,18 +210,18 @@ void FuncInstr::initFormat()
     bool is_R = ( instr.asR.opcode == 0x0);
     uint8 ident = is_R ? instr.asR.funct : instr.asR.opcode;
 
-    for ( size_t i = 0; i < isaTableSize; i++)
+    for ( const auto& entry : isaTable)
     {
-        bool is_i_R = ( isaTable[i].format == FORMAT_R);
-        if ( isaTable[i].opcode == ident && ( is_i_R == is_R))
+        bool is_i_R = ( entry.format == FORMAT_R);
+        if ( entry.opcode == ident && ( is_i_R == is_R))
         {
-            format    = isaTable[i].format;
-            operation = isaTable[i].operation;
-            mem_size  = isaTable[i].mem_size;
-            name      = isaTable[i].name.c_str();
-            function  = isaTable[i].function;
+            format    = entry.format;
+            operation = entry.operation;
+            mem_size  = entry.mem_size;
+            name      = entry.name.c_str();
+            function  = entry.function;
             if ( FORMAT_R == format)
-               assert( instr.asR.opcode == 0x0);
+               assert( is_R);
             return;
         }
     }

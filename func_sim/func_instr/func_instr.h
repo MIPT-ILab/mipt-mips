@@ -136,7 +136,6 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const size_t isaTableSize;
         static const char *regTableName(RegNum);
         static const char *regTable[];
 
