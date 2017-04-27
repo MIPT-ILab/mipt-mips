@@ -42,7 +42,7 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
 
     decode_next_time = false;
 
-    mem = new FuncMemory( tr.c_str());
+    mem = new FuncMemory( tr);
     checker.init( tr);
 
     PC = mem->startPC();
@@ -241,22 +241,14 @@ void PerfMIPS::clock_writeback( int cycle)
 
 void PerfMIPS::check( const FuncInstr& instr)
 {
-    std::ostringstream perf_dump_s;
-    perf_dump_s << instr << std::endl;
-    std::string perf_dump = perf_dump_s.str();
+    const std::string func_dump = checker.step();
 
-    std::ostringstream checker_dump_s;
-    checker.step(checker_dump_s);
-    std::string checker_dump = checker_dump_s.str();
-
-    if (checker_dump != perf_dump)
-    {
+    if ( func_dump != instr.Dump())
         serr << "****************************" << std::endl
              << "Mismatch: " << std::endl
-             << "Checker output: " << checker_dump
-             << "PerfSim output: " << perf_dump
+             << "Checker output: " << func_dump    << std::endl
+             << "PerfSim output: " << instr.Dump() << std::endl
              << critical;
-    }
 }
 
 PerfMIPS::~PerfMIPS() {

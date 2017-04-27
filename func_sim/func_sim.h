@@ -51,7 +51,7 @@ class MIPS
         ~MIPS() { delete mem; }
 
         void init( const std::string& tr);
-        void step( std::ostream& out);
+        std::string step();
         void run(const std::string& tr, uint32 instrs_to_run);
 };
 
