@@ -2,7 +2,7 @@
 
 #include "func_sim.h"
 
-void MIPS::step( std::ostream& out)
+std::string MIPS::step()
 {
     // fetch
     uint32 instr_bytes = fetch();
@@ -26,7 +26,7 @@ void MIPS::step( std::ostream& out)
     PC = instr.get_new_PC();
 
     // dump
-    out << instr << std::endl;
+    return instr.Dump();
 }
 
 void MIPS::init( const std::string& tr)
@@ -40,6 +40,6 @@ void MIPS::run(const std::string& tr, uint32 instrs_to_run)
 {
     init( tr);
     for (uint32 i = 0; i < instrs_to_run; ++i)
-        step( std::cout);
+        std::cout << step() << std::endl;
 }
 
