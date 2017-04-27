@@ -33,7 +33,8 @@ int main( int argc, char** argv)
     if ( !config::functional_only)
     {
         PerfMIPS p_mips( config::disassembly_on);
-        p_mips.run( config::binary_filename, config::num_steps);
+        p_mips.run( config::binary_filename,
+                    config::num_steps);
     }
     else
     {
@@ -43,4 +44,3 @@ int main( int argc, char** argv)
 
     return 0;
 }
-

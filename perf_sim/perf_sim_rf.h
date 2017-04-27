@@ -62,6 +62,12 @@ class RF
                 get_entry( num).is_valid = false;
         }
 
+        void validate( RegNum num)
+        {
+            if ( num != REG_NUM_ZERO)
+                get_entry( num).is_valid = true;
+        }
+
         bool check( RegNum num) const
         {
             return get_entry( num).is_valid;
@@ -84,4 +90,3 @@ class RF
 };
 
 #endif
-
