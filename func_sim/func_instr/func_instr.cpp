@@ -21,24 +21,33 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // Constant shifts
     // name funct   format    operation memsize           pointer
     { "sll", 0x0, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_sll, 1},
+    //       0x1 movci
     { "srl", 0x2, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_srl, 1},
     { "sra", 0x3, FORMAT_R, OUT_R_SHAMT, 0, &FuncInstr::execute_sra, 1},
 
     // Variable shifts
     // name  funct   format    operation  memsize           pointer
-    { "sllv", 0x4, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sllv, 1},
-    { "srlv", 0x6, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srlv, 1},
-    { "srav", 0x7, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_srav, 1},
+    { "sllv", 0x4, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_sllv, 1},
+    //        0x5 reserved
+    { "srlv", 0x6, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_srlv, 1},
+    { "srav", 0x7, FORMAT_R, OUT_R_SHIFT, 0, &FuncInstr::execute_srav, 1},
 
     // Indirect branches
-    // name  funct    format    operation     memsize           pointer
-    { "jr",   0x8,   FORMAT_R, OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1},
-    { "jalr", 0x9,   FORMAT_R, OUT_R_JUMP_LINK, 0, &FuncInstr::execute_jalr, 1},
+    // name  funct  format    operation     memsize           pointer
+    { "jr",   0x8, FORMAT_R, OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1},
+    { "jalr", 0x9, FORMAT_R, OUT_R_JUMP_LINK, 0, &FuncInstr::execute_jalr, 1},
+
+    // Conditional moves (MIPS IV)
+    // name  funct  format    operation  memsize          pointer
+    { "movz", 0xA, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_movz, 4},
+    { "movn", 0xB, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_movn, 4},
 
     // System calls
-    // name    funct    format    operation     memsize           pointer
-    { "break",  0xD,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
-    { "syscall",0xC,   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
+    // name    funct format    operation     memsize           pointer
+    { "syscall",0xC, FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1},
+    { "break",  0xD, FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1},
+    //          0xE reserved
+    //          0xF SYNC    
 
     // HI/LO manipulations
     // name   funct   format    operation     memsize           pointer
@@ -47,12 +56,16 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "mflo", 0x12,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mflo, 1},
     { "mtlo", 0x13,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mtlo, 1},
 
+    // 0x14 - 0x17 double width shifts
+
     // Multiplication/Division
     // name    funct    format    operation  memsize           pointer
     { "mult",  0x18,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1},
     { "multu", 0x19,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_multu, 1},
     { "div",   0x1A,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1},
     { "divu",  0x1B,  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1},
+
+    // 0x1C - 0x1F double width multiplication/division
 
     // Addition/Subtraction
     // name    funct    format    operation  memsize           pointer
@@ -67,21 +80,28 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "or",   0x25, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_or,   1},
     { "xor",  0x26, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_xor,  1},
     { "nor",  0x27, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_nor,  1},
+    //        0x28 reserved
+    //        0x29 reserved
     { "slt",  0x2A, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_slt,  1},
     { "sltu", 0x2B, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1},
 
+    // 0x2C - 0x2F double width addition/substraction
+    // 0x30 - 0x3F double width shifts and conditional traps
+
+    // ********************** REGIMM INSTRUCTIONS *************************
+
     // ********************* I and J INSTRUCTIONS *************************
     // Branches
-    // name    opcode    format    operation     memsize           pointer
+    // name opcode  format    operation     memsize           pointer
     { "j",    0x2, FORMAT_J, OUT_J_JUMP,      0, &FuncInstr::execute_j,    1},
     { "jal",  0x3, FORMAT_J, OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1},
     { "beq",  0x4, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1},
     { "bne",  0x5, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1},
-    { "blez", 0x6, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_blez, 1},
-    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bgtz, 1},
+    { "blez", 0x6, FORMAT_I, OUT_I_BRANCH_0,  0, &FuncInstr::execute_blez, 1},
+    { "bgtz", 0x7, FORMAT_I, OUT_I_BRANCH_0,  0, &FuncInstr::execute_bgtz, 1},
 
     // Addition/Subtraction
-    // name   opcode    format    operation  memsize           pointer
+    // name   opcode  format    operation  memsize           pointer
     { "addi",  0x8,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1},
     { "addiu", 0x9,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_addiu, 1},
 
@@ -94,18 +114,17 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "xori",  0xE,   FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1},
     { "lui",   0xF,   FORMAT_I, OUT_I_CONST,  0, &FuncInstr::execute_lui,   1},
 
-    // Coprocessor operations 0x10 - 0x13
+    // 0x10 - 0x13 coprocessor operations 
 
     // Likely branches (MIPS II)
     // name  opcode    format    operation memsize           pointer
-    { "beql",  0x14,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_beq,  2},
-    { "bnel",  0x15,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bne,  2},
-    { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_blez, 2},
-    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH, 0, &FuncInstr::execute_bgtz, 2},
+    { "beql",  0x14,  FORMAT_I, OUT_I_BRANCH,   0, &FuncInstr::execute_beq,  2},
+    { "bnel",  0x15,  FORMAT_I, OUT_I_BRANCH,   0, &FuncInstr::execute_bne,  2},
+    { "blezl", 0x16,  FORMAT_I, OUT_I_BRANCH_0, 0, &FuncInstr::execute_blez, 2},
+    { "bgtzl", 0x17,  FORMAT_I, OUT_I_BRANCH_0, 0, &FuncInstr::execute_bgtz, 2},
 
-    // System calls
-    // name  opcode    format    operation  memsize           pointer
-    { "trap", 0x1A,  FORMAT_J, OUT_J_SPECIAL, 0, &FuncInstr::execute_trap, 1},
+    // 0x18 - 0x19 double width addition
+    // 0x1A - 0x1B load double word left/right
 
     // Loads
     // name opcode    format    operation memsize           pointer
@@ -124,9 +143,13 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sh",  0x29,  FORMAT_I, OUT_I_STORE, 2, &FuncInstr::calculate_store_addr, 1},
  // { "swl", 0x2A,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
     { "sw",  0x2B,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
- // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
+    //       0x2C   store double word left
+    //       0x2D   store double word right
+ // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1}
+    //       0x2F   coprocessor
+    
+    // 0x30 - 0x3F atomic load/stores
 };
-const size_t FuncInstr::isaTableSize = countof(isaTable);
 
 const char *FuncInstr::regTable[REG_NUM_MAX] =
 {
@@ -175,36 +198,23 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     new_PC = PC + 4;
 }
 
-std::string FuncInstr::Dump( std::string indent) const
-{
-    std::ostringstream oss;
-    oss << indent << disasm;
-
-    if ( dst != REG_NUM_ZERO && complete)
-    {
-        oss << "\t [ $" << regTableName(dst)
-            << " = 0x" << std::hex << v_dst << "]" << std::dec;
-    }
-    return oss.str();
-}
-
 void FuncInstr::initFormat()
 {
     bool is_R = ( instr.asR.opcode == 0x0);
     uint8 ident = is_R ? instr.asR.funct : instr.asR.opcode;
 
-    for ( size_t i = 0; i < isaTableSize; i++)
+    for ( const auto& entry : isaTable)
     {
-        bool is_i_R = ( isaTable[i].format == FORMAT_R);
-        if ( isaTable[i].opcode == ident && ( is_i_R == is_R))
+        bool is_i_R = ( entry.format == FORMAT_R);
+        if ( entry.opcode == ident && ( is_i_R == is_R))
         {
-            format    = isaTable[i].format;
-            operation = isaTable[i].operation;
-            mem_size  = isaTable[i].mem_size;
-            name      = isaTable[i].name.c_str();
-            function  = isaTable[i].function;
+            format    = entry.format;
+            operation = entry.operation;
+            mem_size  = entry.mem_size;
+            name      = entry.name.c_str();
+            function  = entry.function;
             if ( FORMAT_R == format)
-               assert( instr.asR.opcode == 0x0);
+               assert( is_R);
             return;
         }
     }
@@ -227,8 +237,18 @@ void FuncInstr::initR()
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
+        case OUT_R_SHIFT:
+            src2 = static_cast<RegNum>(instr.asR.rs);
+            src1 = static_cast<RegNum>(instr.asR.rt);
+            dst  = static_cast<RegNum>(instr.asR.rd);
+
+            oss <<  " $" << regTableName(dst)
+                << ", $" << regTableName(src1)
+                << ", $" << regTableName(src2);
+            break;
+
         case OUT_R_SHAMT:
-            src1  = static_cast<RegNum>(instr.asR.rs);
+            src1  = static_cast<RegNum>(instr.asR.rt);
             dst   = static_cast<RegNum>(instr.asR.rd);
             v_imm = instr.asR.shamt;
 
@@ -237,9 +257,10 @@ void FuncInstr::initR()
                 <<  ", " << std::dec << v_imm;
             break;
         case OUT_R_JUMP_LINK:
-            dst = REG_NUM_RA;
             src1  = static_cast<RegNum>(instr.asR.rs);
-            oss << " $" << regTableName(src1);
+            dst   = static_cast<RegNum>(instr.asR.rd);
+            oss <<  " $" << regTableName(dst)
+                << ", $" << regTableName(src1);
             break;
         case OUT_R_JUMP:
             dst = REG_NUM_ZERO;
@@ -250,7 +271,10 @@ void FuncInstr::initR()
         default:
             assert(0);
     }
-    disasm = oss.str();
+    if ( instr.raw == 0x0ul)
+        disasm = "nop ";
+    else
+        disasm = oss.str();
 }
 
 
@@ -277,7 +301,13 @@ void FuncInstr::initI()
 
             oss << regTable[src1] << ", $"
                 << regTable[src2] << ", "
-                << std::hex << "0x" << v_imm << std::dec;
+                << std::dec << static_cast<int16>(v_imm);
+            break;
+        case OUT_I_BRANCH_0:
+            src1 = static_cast<RegNum>(instr.asI.rs);
+
+            oss << regTable[src1] << ", "
+                << std::dec << static_cast<int16>(v_imm);
             break;
 
         case OUT_I_CONST:
@@ -317,8 +347,8 @@ void FuncInstr::initJ()
     v_imm = instr.asJ.imm;
 
     std::ostringstream oss;
-    oss << name << " "
-        << std::hex << "0x" << v_imm;
+    oss << name << " 0x"
+        << std::hex << static_cast<uint16>(v_imm) << std::dec;
 
     if ( operation == OUT_J_JUMP_LINK)
         dst = REG_NUM_RA;
@@ -342,7 +372,17 @@ void FuncInstr::execute_unknown()
     exit(EXIT_FAILURE);
 }
 
-std::ostream& operator<< ( std::ostream& out, const FuncInstr& instr)
+void FuncInstr::execute()
 {
-    return out << instr.Dump( "");
+    (this->*function)();
+    complete = true;
+
+    if ( dst != REG_NUM_ZERO)
+    {
+        std::ostringstream oss;
+        oss << "\t [ $" << regTableName(dst)
+            << " = 0x" << std::hex << v_dst << "]";
+        disasm += oss.str();
+    }
 }
+

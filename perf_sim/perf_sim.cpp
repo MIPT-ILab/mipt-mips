@@ -75,9 +75,6 @@ void PerfMIPS::run( const std::string& tr,
         clock_memory( cycle);
         ++cycle;
 
-        if ( cycle - last_writeback_cycle >= 1000)
-            serr << "Deadlock was detected. The process will be aborted."
-                 << std::endl << critical;
         sout << "Executed instructions: " << executed_instrs
              << std::endl << std::endl;
 
@@ -310,6 +307,11 @@ void PerfMIPS::clock_writeback( int cycle)
     if ( !rp_memory_2_writeback->read( &instr, cycle))
     {
         sout << "bubble\n";
+        if ( cycle - last_writeback_cycle >= 1000)
+        {
+            serr << "Deadlock was detected. The process will be aborted."
+                 << std::endl << std::endl << critical;
+        }
         return;
     }
 

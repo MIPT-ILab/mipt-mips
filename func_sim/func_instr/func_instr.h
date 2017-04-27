@@ -13,6 +13,8 @@
 #include <string>
 #include <cassert>
 
+#include <boost/utility/string_ref.hpp>
+
 // MIPT-MIPS modules
 #include <common/types.h>
 #include <common/macro.h>
@@ -68,12 +70,14 @@ class FuncInstr
         enum OperationType
         {
             OUT_R_ARITHM,
+            OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
+            OUT_I_BRANCH_0,
             OUT_I_LOAD,
             OUT_I_LOADU,
             OUT_I_CONST,
@@ -134,11 +138,10 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const size_t isaTableSize;
         static const char *regTableName(RegNum);
         static const char *regTable[];
 
-        StringView name = nullptr;
+        boost::string_ref name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -205,6 +208,9 @@ class FuncInstr
         void execute_andi()  { v_dst = v_src1 & v_imm; }
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
+    
+        void execute_movn()  { }
+        void execute_movz()  { }
 
         void execute_beq()
         {
@@ -263,11 +269,12 @@ class FuncInstr
         uint32 lo = NO_VAL32;
 
         FuncInstr() {} // constructor w/o arguments for ports
+
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = 0,
                    Addr predicted_target = 0);
 
-        std::string Dump( std::string indent = " ") const;
+        const std::string& Dump() const { return disasm; }
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
@@ -297,9 +304,12 @@ class FuncInstr
         void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
-        void execute() { (this->*function)(); complete = true; };
+        void execute();
 };
 
-std::ostream& operator<<( std::ostream& out, const FuncInstr& instr);
+static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
+{
+    return out << instr.Dump();
+}
 
 #endif //FUNC_INSTR_H

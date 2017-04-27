@@ -1,5 +1,5 @@
 /*
- * func_sim.cpp - mips single-cycle simulator
+ * func_sim.cpp - extremely simple MIPS simulator
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2015 MIPT-MIPS
  */
@@ -19,10 +19,11 @@ class MIPS
         FuncMemory* mem = nullptr;
 
         uint32 fetch() const { return mem->read(PC); }
+
         void read_src(FuncInstr& instr) const {
             rf.read_src1(instr);
             rf.read_src2(instr);
-	    }
+        }
 
         void load(FuncInstr& instr) const {
             instr.set_v_dst(mem->read(instr.get_mem_addr(), instr.get_mem_size()));
@@ -32,11 +33,11 @@ class MIPS
             mem->write(instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
         }
 
-	    void load_store(FuncInstr& instr) {
-            if (instr.is_load())
-                load(instr);
-            else if (instr.is_store())
-                store(instr);
+       void load_store(FuncInstr& instr) {
+           if (instr.is_load())
+               load(instr);
+           else if (instr.is_store())
+               store(instr);
         }
 
         void wb(const FuncInstr& instr) {
@@ -46,8 +47,9 @@ class MIPS
         MIPS( const MIPS&) = delete;
         MIPS& operator=( const MIPS&) = delete;
    public:
-        MIPS();
-        ~MIPS();
+        MIPS() : rf() { }
+        ~MIPS() { delete mem; }
+
         void init( const std::string& tr);
         void step( std::ostream& out);
         void run(const std::string& tr, uint32 instrs_to_run);
