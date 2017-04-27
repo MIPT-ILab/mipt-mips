@@ -11,7 +11,7 @@ std::string MIPS::step()
     FuncInstr instr(instr_bytes, PC);
 
     // read sources
-    read_src(instr);
+    rf.read_sources( instr);
 
     // execute
     instr.execute();
@@ -20,7 +20,7 @@ std::string MIPS::step()
     load_store(instr);
 
     // writeback
-    wb(instr);
+    rf.write_dst( instr);
 
     // PC update
     PC = instr.get_new_PC();

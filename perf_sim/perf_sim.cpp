@@ -129,13 +129,9 @@ void PerfMIPS::clock_decode( int cycle) {
         return;
     }
 
-    if ( rf.check( instr.get_src1_num()) &&
-         rf.check( instr.get_src2_num()) &&
-         rf.check( instr.get_dst_num()))
+    if ( rf.check_sources( instr))
     {
-        rf.read_src1( instr);
-        rf.read_src2( instr);
-        rf.invalidate( instr.get_dst_num());
+        rf.read_sources( instr);
         wp_decode_2_execute->write( instr, cycle);
 
         decode_next_time = false;

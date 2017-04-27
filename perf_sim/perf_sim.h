@@ -17,8 +17,6 @@
 #include <func_sim/func_memory/func_memory.h>
 #include <func_sim/func_sim.h>
 
-#include "perf_sim_rf.h"
-
 class PerfMIPS : protected Log
 {
     private:
