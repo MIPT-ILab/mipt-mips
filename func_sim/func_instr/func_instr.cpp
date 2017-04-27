@@ -207,8 +207,6 @@ void FuncInstr::initFormat()
             mem_size  = entry.mem_size;
             name      = entry.name.c_str();
             function  = entry.function;
-            if ( FORMAT_R == format)
-               assert( is_R);
             return;
         }
     }
