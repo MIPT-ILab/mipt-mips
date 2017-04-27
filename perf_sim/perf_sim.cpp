@@ -2,6 +2,8 @@
 
 #include <boost/timer/timer.hpp>
 
+#include <func_sim/mips_memory.h>
+
 #include "perf_sim.h"
 
 static const uint32 PORT_LATENCY = 1;
@@ -42,7 +44,7 @@ void PerfMIPS::run( const std::string& tr, uint64 instrs_to_run)
 
     decode_next_time = false;
 
-    mem = new FuncMemory( tr);
+    mem = new MIPSMemory( tr);
     checker.init( tr);
 
     PC = mem->startPC();
@@ -93,7 +95,7 @@ void PerfMIPS::clock_fetch( int cycle) {
 
     if (PC_is_valid)
     {
-        uint32 module_data = mem->read(PC);
+        uint32 module_data = mem->fetch( PC);
         wp_fetch_2_decode->write( module_data, cycle);
 
         sout << std::hex << "0x" << module_data << std::endl;
@@ -197,7 +199,7 @@ void PerfMIPS::clock_memory( int cycle)
         return;
     }
 
-    load_store(instr);
+    mem->load_store( instr);
     wp_memory_2_writeback->write( instr, cycle);
 
     sout << instr << std::endl;
