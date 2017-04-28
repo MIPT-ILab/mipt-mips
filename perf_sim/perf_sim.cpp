@@ -2,6 +2,8 @@
 
 #include <boost/timer/timer.hpp>
 
+#include <func_sim/mips_memory.h>
+
 #include "perf_sim.h"
 #include <common/config.h>
 
@@ -58,7 +60,7 @@ void PerfMIPS::run( const std::string& tr,
 
     is_anything_to_decode = 0;
 
-    memory = new FuncMemory( tr);
+    memory = new MIPSMemory( tr);
 
     checker.init( tr);
 
@@ -115,7 +117,7 @@ void PerfMIPS::clock_fetch( int cycle) {
         rp_memory_2_fetch_target->read( &PC, cycle); // fixing PC
 
     /* fetching instruction */
-    data.raw = memory->read( PC);
+    data.raw = memory->fetch( PC);
 
     /* saving predictions and updating PC according to them */
     data.PC = PC;
@@ -182,13 +184,10 @@ void PerfMIPS::clock_decode( int cycle) {
                      decode_data.predicted_target);
 
     /* TODO: replace all this code by introducing Forwarding unit */
-    if ( rf.check( instr.get_src1_num()) &&
-         rf.check( instr.get_src2_num()) &&
-         rf.check( instr.get_dst_num())) // no data hazard
+    if ( rf.check_sources( instr))
     {
-        rf.read_src1( instr);
-        rf.read_src2( instr);
-        rf.invalidate( instr.get_dst_num());
+        rf.read_sources( instr);
+        wp_decode_2_execute->write( instr, cycle);
 
         is_anything_to_decode = false; // successfully decoded
 
@@ -289,7 +288,7 @@ void PerfMIPS::clock_memory( int cycle)
     }
 
     /* perform required loads and stores */
-    load_store( instr);
+    mem->load_store( instr);
 
     wp_memory_2_writeback->write( instr, cycle);
 

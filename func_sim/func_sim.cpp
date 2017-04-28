@@ -1,26 +1,30 @@
 #include <iostream>
 
+#include <func_sim/mips_memory.h>
+
 #include "func_sim.h"
+
+MIPS::~MIPS() { delete mem; }
 
 std::string MIPS::step()
 {
     // fetch
-    uint32 instr_bytes = fetch();
+    uint32 instr_bytes = mem->fetch( PC);
 
     // decode
     FuncInstr instr(instr_bytes, PC);
 
     // read sources
-    read_src(instr);
+    rf.read_sources( instr);
 
     // execute
     instr.execute();
 
     // load/store
-    load_store(instr);
+    mem->load_store(instr);
 
     // writeback
-    wb(instr);
+    rf.write_dst( instr);
 
     // PC update
     PC = instr.get_new_PC();
@@ -32,7 +36,7 @@ std::string MIPS::step()
 void MIPS::init( const std::string& tr)
 {
     assert( mem == nullptr);
-    mem = new FuncMemory(tr.c_str());
+    mem = new MIPSMemory(tr.c_str());
     PC = mem->startPC();
 }
 

@@ -14,10 +14,8 @@
 #include <common/ports/ports.h>
 
 #include <func_sim/func_instr/func_instr.h>
-#include <func_sim/func_memory/func_memory.h>
 #include <func_sim/func_sim.h>
 
-#include "perf_sim_rf.h"
 #include "bpu/bpu.h"
 
 class PerfMIPS : protected Log
@@ -81,22 +79,6 @@ private:
     void clock_execute( int cycle);
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
-
-    /* memory management helpers */
-    void load( FuncInstr& instr) const {
-        instr.set_v_dst(mem->read(instr.get_mem_addr(), instr.get_mem_size()));
-    }
-
-    void store( const FuncInstr& instr) {
-        mem->write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
-    }
-
-    void load_store( FuncInstr& instr) {
-        if ( instr.is_load())
-            load( instr);
-        else if ( instr.is_store())
-            store( instr);
-    }
 
     /* forbid copies */
     PerfMIPS& operator=( const PerfMIPS&) = delete;
