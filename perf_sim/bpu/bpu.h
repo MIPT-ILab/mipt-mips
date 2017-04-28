@@ -65,7 +65,9 @@ public:
     bool isTaken( Addr PC) final
     {
         unsigned int way;
-        if ( tags.read_no_touch( PC, &way)) // hit
+        bool is_hit;
+        std::tie( is_hit, way) = tags.read_no_touch( PC);
+        if ( is_hit) // hit
             return data[ way][ set(PC)].isTaken();
 
         return false;
@@ -73,7 +75,9 @@ public:
     Addr getTarget( Addr PC) final
     {
         unsigned int way;
-        if ( tags.read_no_touch( PC, &way)) // hit
+        bool is_hit;
+        std::tie( is_hit, way) = tags.read_no_touch( PC);
+        if ( is_hit) // hit
             return data[ way][ set(PC)].getTarget();
         else // miss
             return PC + 4;
@@ -85,8 +89,10 @@ public:
                  Addr target = NO_VAL32) final
     {
         unsigned int way;
-        if ( !tags.read( branch_ip, &way)) // miss
-            tags.write( branch_ip, &way); // add new entry to cache
+        bool is_hit;
+        std::tie( is_hit, way) = tags.read( branch_ip);
+        if ( !is_hit) // miss
+            way = tags.write( branch_ip); // add new entry to cache
 
         data[ way][ set( branch_ip)].update( is_taken, target);
     }
