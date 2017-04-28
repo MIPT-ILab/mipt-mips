@@ -26,23 +26,22 @@ private:
 
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
-        bool predicted_taken;    // Predicted direction
-        Addr predicted_target; // PC, predicted by BPU
-        Addr PC;               // current PC
-        uint32 raw;              // fetched instruction code
+        bool predicted_taken = false;     // Predicted direction
+        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        Addr PC = NO_VAL32;               // current PC
+        uint32 raw = NO_VAL32;            // fetched instruction code
     };
 
     /* decode stage variables */
-    IfIdData decode_data;
+    IfIdData decode_data = {};
     bool is_anything_to_decode = false;
-
 
     /* simulator units */
     RF rf;
     Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
-    std::unique_ptr<FuncMemory> memory;
-    std::unique_ptr<BaseBP> bp;
+    MIPSMemory* memory = nullptr;
+    std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
     MIPS checker;

@@ -281,14 +281,14 @@ void PerfMIPS::clock_memory( int cycle)
         wp_memory_2_fetch_target->write( real_target, cycle);
 
         /* if the register was marked invalid in decode stage, revert it */
-        rf.validate( instr.get_dst_num());
+        rf.cancel( instr);
 
         sout << "misprediction\n";
         return;
     }
 
     /* perform required loads and stores */
-    mem->load_store( instr);
+    memory->load_store( instr);
 
     wp_memory_2_writeback->write( instr, cycle);
 

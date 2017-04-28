@@ -17,7 +17,7 @@
 class BPEntry
 {
 protected:
-    Addr _target;
+    Addr _target = NO_VAL32;
 
 public:
     Addr getTarget() const { return _target; }
@@ -123,7 +123,7 @@ protected:
         }
 
         /* casting to result */
-        operator const bool() const
+        operator bool() const
         {
             switch ( value)
             {
@@ -133,13 +133,14 @@ protected:
                 case WT:
                 case T: return true;
             }
+            return false;
         }
 
         void reset() { value = default_value; }
     };
 
 private:
-    State state;
+    State state = {};
 
 public:
     /* prediction */
@@ -190,7 +191,7 @@ class BPEntryAdaptive final : public BPEntryTwoBit
 
     public:
         /* for vector indexing */
-        operator const size_t() const { return value; }
+        operator size_t() const { return value; }
 
         void update( bool is_taken)
         {
@@ -203,7 +204,7 @@ class BPEntryAdaptive final : public BPEntryTwoBit
         void reset() { value = default_pattern; }
     };
 
-    PredictionPattern current_pattern;
+    PredictionPattern current_pattern = {};
 
 public:
     BPEntryAdaptive() :

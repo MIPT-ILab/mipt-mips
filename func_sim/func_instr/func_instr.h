@@ -157,9 +157,9 @@ class FuncInstr
         bool complete = false;
 
         /* info for branch misprediction unit */
-        bool predicted_taken;        // Predicted direction
-        Addr predicted_target;     // PC, predicted by BPU
-        bool _is_jump_taken = false; // actual result
+        bool predicted_taken = false;     // Predicted direction
+        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        bool _is_jump_taken = false;      // actual result
 
         Addr PC = NO_VAL32; // removing "const" keyword to supporting ports
         Addr new_PC = NO_VAL32;

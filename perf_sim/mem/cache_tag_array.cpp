@@ -189,9 +189,3 @@ Addr CacheTagArray::tag( Addr addr) const
     return addr / line_size;
 }
 
-uint64 CacheTagArray::getTagNum( Addr addr) const
-{
-    /* Cut "logbin(block_size_in_bytes)" bits from the end. */
-    return ( addr / block_size_in_bytes);
-}
-
