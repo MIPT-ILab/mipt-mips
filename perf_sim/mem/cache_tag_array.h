@@ -76,11 +76,11 @@ class CacheTagArray : public CacheTagArrayCheck
         ~CacheTagArray();
 
         /* lookup the cache and update LRU info */
-        bool read( Addr addr, uint32* way = nullptr);
+        std::pair<bool, uint32> read( Addr addr);
         /* find in the cache but do not update LRU info */
-        bool read_no_touch( Addr addr, uint32* way = nullptr) const;
+        std::pair<bool, uint32> read_no_touch( Addr addr) const;
         /* create new entry in cache */
-        void write( Addr addr, uint32* way = nullptr);
+        uint32 write( Addr addr);
 };
 
 #endif // #ifndef CACHE_TAG_ARRAY_H

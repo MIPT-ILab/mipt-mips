@@ -129,24 +129,21 @@ CacheTagArray::~CacheTagArray()
     delete lru;
 }
 
-bool CacheTagArray::read( Addr addr, uint32* way)
+std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
-    uint32 way_num;
-    const auto set_num = set( addr);
+    const auto lookup_result = read_no_touch( addr);
 
-    if ( read_no_touch( addr, &way_num))
+    if ( lookup_result.first)
     {
+        const auto set_num = set( addr);
+        const auto way_num = lookup_result.second;
         lru->touch( set_num, way_num); // update LRU info
-        if ( way != nullptr)
-            *way = way_num;
-
-        return true;
     }
 
-    return false;
+    return lookup_result;
 }
 
-bool CacheTagArray::read_no_touch( Addr addr, uint32* way) const
+std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 {
     const auto set_num = set( addr);
     const auto tag_num = tag( addr);
@@ -157,24 +154,20 @@ bool CacheTagArray::read_no_touch( Addr addr, uint32* way) const
         const auto& entry = array[ set_num][ i];
 
         if ( entry.is_valid && entry.line == tag_num) // hit
-        {
-            if ( way != nullptr)
-                *way = i;
-            return true;
-        }
+            return std::make_pair(true, i);
     }
-    return false; // miss (no data)
+    return std::make_pair(false, NO_VAL32); // miss (no data)
 }
 
-void CacheTagArray::write( Addr addr, uint32* way)
+uint32 CacheTagArray::write( Addr addr)
 {
     uint32 set_num = set( addr);
     uint32 way_num = lru->update( set_num); // get l.r.u. way
-    if ( way != nullptr)
-        *way = way_num;
 
     array[ set_num][ way_num].line = tag( addr); // write it
     array[ set_num][ way_num].is_valid = true; // this set is valid now
+
+    return way_num;
 }
 
 uint32 CacheTagArray::set( Addr addr) const
