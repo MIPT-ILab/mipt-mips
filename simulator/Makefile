@@ -6,10 +6,8 @@
 # Ladin Oleg.
 #
 
-TRUNK=.
-
 # Including options and compiler flags
-include $(TRUNK)/options.mk
+include ./options.mk
 
 # Clang
 CXXFLAGS += -Wno-unused-private-field
@@ -17,23 +15,37 @@ CXXFLAGS += -Wno-unused-private-field
 #
 # Enter for build "perf_sim" program
 #
-OBJ_DIR:=obj
-CPPS= elf_parser.cpp memory.cpp mips_instr.cpp perf_sim.cpp func_sim.cpp config.cpp ports.cpp cache_tag_array.cpp main.cpp
-OBJS= $(CPPS:%.cpp=$(OBJ_DIR)/%.o)
+OBJ_DIR=obj
+CPPS= \
+    infra/elf_parser/elf_parser.cpp \
+    infra/memory/memory.cpp \
+    infra/config/config.cpp \
+    infra/ports/ports.cpp \
+    infra/cache/cache_tag_array.cpp \
+    mips/mips_instr.cpp \
+    func_sim/func_sim.cpp \
+    perf_sim.cpp \
+    main.cpp
+OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
+LIBS= elf boost_program_options boost_timer
 
+vpath %.cpp $(dir $(CPPS))
 
 mipt-mips: $(OBJS)
-	@# don't forget to link ELF library using "-l elf"
-	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf -l boost_program_options -l boost_timer
+	@$(CXX) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS))
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-DISASM_CPPS= memory.cpp elf_parser.cpp disasm.cpp func_instr.cpp
+DISASM_CPPS= \
+    infra/memory/memory.cpp \
+    infra/elf_parser/elf_parser.cpp \
+    func_sim/func_sim.cpp \
+    mips/mips_instr.cpp \
+    disasm.cpp
 DISASM_OBJS= $(DISASM_CPPS:%.cpp=$(OBJ_DIR)/%.o)
 
 disasm: $(DISASM_OBJS)
-	@# don't forget to link ELF library using "-l elf"
 	$(CXX) $(LDFLAGS) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
@@ -48,7 +60,6 @@ $(OBJ_DIR)/%.o: %.cpp
 
 #
 # Enter to remove all created files
-#
 clean:
 	rm -rf obj
 	rm -f mipt-mips

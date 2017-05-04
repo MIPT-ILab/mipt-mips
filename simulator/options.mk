@@ -8,23 +8,17 @@ else
 	LDFLAGS = -flto
 endif
 
-# Paths to look for headers
-vpath %.cpp $(TRUNK)/infra
-vpath %.cpp $(TRUNK)/infra/ports
-vpath %.cpp $(TRUNK)/infra/config
-vpath %.cpp $(TRUNK)/infra/memory/
-vpath %.cpp $(TRUNK)/infra/cache/
-vpath %.cpp $(TRUNK)/infra/elf_parser/
-vpath %.cpp $(TRUNK)/mips/
-vpath %.cpp $(TRUNK)/func_sim/
-vpath %.cpp $(TRUNK)/bpu/
-
 # GoogleTest directories
 GTEST_DIR= $(TRUNK)/../libs/googletest
-GTEST_INCL= -I $(GTEST_DIR)/lib/include
-GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
+GTEST_INCL=  -I $(GTEST_DIR)/lib/include
+GTEST_LPATH= -L $(GTEST_DIR)/lib
+
+# Boost directories
+BOOST_INCL=  -I /usr/local/include/boost/
+BOOST_LPATH= -L /usr/local/lib
 
 # option for C++ compiler specifying directories
-# to search for headers
-INCL= -I $(TRUNK)/
-BOOST_INCL= -I /usr/local/include/boost/
+# to search for headers and libraries
+INCL= -I ./
+INCL+= $(BOOST_INCL) $(GTEST_INCL)
+LPATH= $(BOOST_LIB)  $(GTEST_LIB)
