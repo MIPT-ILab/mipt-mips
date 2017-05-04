@@ -8,7 +8,7 @@
 #include <iomanip>
 
 #include <infra/elf_parser/elf_parser.h>
-#include <func_instr/func_instr.h>
+#include <mips/mips_instr.h>
 
 int main( int argc, char* argv[])
 {

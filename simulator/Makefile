@@ -69,7 +69,7 @@ DISASM_CPPS= \
     func_sim/func_sim.cpp \
     mips/mips_instr.cpp \
     disasm.cpp
-DISASM_OBJS= $(DISASM_CPPS:%.cpp=$(OBJ_DIR)/%.o)
+DISASM_OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
 
 disasm: $(DISASM_OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^ -l elf
