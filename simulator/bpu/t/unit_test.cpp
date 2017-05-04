@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 // MIPT-MIPS modules
-#include "bpu.h"
+#include "../bpu.h"
 
 
 TEST( Initialization, WrongParameters)

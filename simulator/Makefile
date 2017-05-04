@@ -48,7 +48,8 @@ $(GTEST_LIB):
 TESTS= \
     infra/elf_parser \
     infra/memory \
-    mips
+    mips \
+    bpu
 
 test: $(addsuffix /t/test.run, $(TESTS))
 
