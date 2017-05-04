@@ -10,11 +10,15 @@ endif
 
 # GoogleTest directories
 GTEST_DIR= $(TRUNK)/../libs/googletest
-GTEST_INCL= -I $(GTEST_DIR)/lib/include
-GTEST_LIB= $(GTEST_DIR)/lib/libgtest.a
+GTEST_INCL=  -I $(GTEST_DIR)/lib/include
+GTEST_LPATH= -L $(GTEST_DIR)/lib
 
-# option for C++ compiler specifying directories 
-# to search for headers
+# Boost directories
+BOOST_INCL=  -I /usr/local/include/boost/
+BOOST_LPATH= -L /usr/local/lib
+
+# option for C++ compiler specifying directories
+# to search for headers and libraries
 INCL= -I ./
-BOOST_INCL= -I /usr/local/include/boost/
-
+INCL+= $(BOOST_INCL) $(GTEST_INCL)
+LPATH= $(BOOST_LIB)  $(GTEST_LIB)

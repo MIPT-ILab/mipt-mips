@@ -29,7 +29,7 @@ LIBS= elf boost_program_options boost_timer
 vpath %.cpp $(dir $(CPPS))
 
 mipt-mips: $(OBJS)
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(addprefix -l,$(LIBS))
+	@$(CXX) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS))
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
