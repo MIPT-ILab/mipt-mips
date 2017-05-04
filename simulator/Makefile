@@ -35,7 +35,8 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-# Rules to get GTest
+###### Rules to get GTest #######
+
 GTEST_LIB= $(GTEST_LPATH)/libgtest.a
 $(GTEST_LIB):
 	@$(MAKE) -C $(GTEST_DIR)
@@ -50,6 +51,8 @@ TESTS= \
 test: $(addsuffix /t/test.run, $(TESTS))
 
 clean-tests: $(addsuffix /t/test.clean, $(TESTS))
+
+-include $(addsuffix /t/test.d, $(TESTS))
 
 %/t/test.o: %/t/unit_test.cpp
 	@echo "[$(CXX)] $@"
@@ -76,9 +79,8 @@ DISASM_CPPS= \
     func_sim/func_sim.cpp \
     mips/mips_instr.cpp \
     disasm.cpp
-DISASM_OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
 
-disasm: $(DISASM_OBJS)
+disasm: $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
 	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
