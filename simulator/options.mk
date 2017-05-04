@@ -1,11 +1,12 @@
 # C++ compile
-CXX = g++
+CXX ?= g++
 CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
+LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
 else
 	CXXFLAGS+= -O3
-	LDFLAGS = -flto
+	LDFLAGS+= -flto
 endif
 
 # GoogleTest directories

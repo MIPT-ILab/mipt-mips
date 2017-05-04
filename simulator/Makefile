@@ -1,4 +1,3 @@
-#
 # Makefile
 # Building the scalar MIPS CPU simulator.
 # MIPT-MIPS Assignment 4.
