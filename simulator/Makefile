@@ -52,13 +52,13 @@ test: $(addsuffix /t/test.run, $(TESTS))
 clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 %/t/test.o: %/t/unit_test.cpp
-	@echo "[$(CXX)] $<"
+	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $@ -c $< $(INCL) -I $(GTEST_INCL)
 	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -I $(GTEST_INCL)
 
 # TODO: remove dependencies from ALL objs
 %/t/test.out: $(OBJS) %/t/test.o $(GTEST_LIB)
-	@echo "[$(CXX)] $<"
+	@echo "[ld] $@"
 	@$(CXX) $(LDFLAGS) $(LPATH) -pthread -o $@ $^ $(addprefix -l,$(LIBS)) -l pthread
 
 %/t/test.run: %/t/test.out
@@ -79,7 +79,7 @@ DISASM_CPPS= \
 DISASM_OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
 
 disasm: $(DISASM_OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^ -l elf
+	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
@@ -89,7 +89,7 @@ disasm: $(DISASM_OBJS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
-	@echo "[$(CXX)] $<"
+	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL)
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
