@@ -11,9 +11,9 @@
 #include <vector>
 
 // MIPT_MIPS modules
-#include <perf_sim/mem/cache_tag_array.h>
-#include <common/log.h>
-#include <common/types.h>
+#include <infra/cache/cache_tag_array.h>
+#include <infra/log.h>
+#include <infra/types.h>
 
 #include "bpentry.h"
 

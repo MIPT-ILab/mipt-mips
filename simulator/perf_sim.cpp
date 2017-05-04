@@ -2,11 +2,12 @@
 
 #include <boost/timer/timer.hpp>
 
+#include <infra/config/config.h>
+
 #include <mips/mips_memory.h>
 #include <mips/mips_rf.h>
 
 #include "perf_sim.h"
-#include <common/config.h>
 
 static const uint32 PORT_LATENCY = 1;
 static const uint32 PORT_FANOUT = 1;
@@ -282,7 +283,7 @@ void PerfMIPS::clock_memory( int cycle)
         wp_memory_2_fetch_target->write( real_target, cycle);
 
         /* if the register was marked invalid in decode stage, revert it */
-        rf.cancel( instr);
+        rf->cancel( instr);
 
         sout << "misprediction\n";
         return;
