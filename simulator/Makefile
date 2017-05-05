@@ -91,9 +91,10 @@ disasm: $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
+	@echo $(CXXVERSION)
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL)
-	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
+	$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
 clean: clean-tests
 	rm -rf obj
