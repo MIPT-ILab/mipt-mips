@@ -16,4 +16,4 @@ addons:
     - libboost-all-dev
 
 install: 
-  - if [ $CXX == clang++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
