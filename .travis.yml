@@ -2,7 +2,7 @@ language: cpp
 sudo: required
 compiler: gcc
 os: linux
-script: cd simulator; make test
+script: cd simulator; make mipt-mips disasm test
 
 before_install:
   # C++14
