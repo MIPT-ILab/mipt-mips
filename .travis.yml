@@ -2,6 +2,7 @@ language: cpp
 sudo: required
 compiler:
   - gcc
+  - clang
 os: linux
 script: cd simulator; make mipt-mips disasm test
 
