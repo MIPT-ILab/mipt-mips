@@ -1,9 +1,9 @@
 # C++ compile
 CXX ?= g++
 CXXFLAGS= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
-CXXVERSION = $(shell $(CXX) -dumpversion)
 
 ifeq ($(CXX), "clang++")
+	CXXVERSION = $(shell clang++ -dumpversion)
 	ifeq ($(CXXVERSION), "3.4")
 		CXXFLAGS+= --std=c++1y
 	else
