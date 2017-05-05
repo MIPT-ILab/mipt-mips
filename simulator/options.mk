@@ -9,7 +9,7 @@ ifeq ($(CXX), clang++)
 	else
 		CXXFLAGS+= --std=c++14
 	endif
-elif ($(CXX), g++)
+else ifeq ($(CXX), g++)
 	CXXVERSION= $(shell g++ -dumpversion)
 	CXXFLAGS+=  --std=c++14
 endif
