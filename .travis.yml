@@ -14,6 +14,7 @@ addons:
     - g++-6
     - libelf-dev
     - libboost-all-dev
+    - libc++-dev
 
 install: 
   - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
