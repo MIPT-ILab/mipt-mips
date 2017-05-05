@@ -22,11 +22,11 @@ TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
     ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, sections_array));
 
     // test behavior when the file name does not exist
-//  const char * wrong_file_name = "./1234567890/qwertyuiop";
+    const char * wrong_file_name = "./1234567890/qwertyuiop";
 
     // must exit and return EXIT_FAILURE
-//  ASSERT_EXIT( ElfSection::getAllElfSections( wrong_file_name, sections_array),
-//               ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+    ASSERT_EXIT( ElfSection::getAllElfSections( wrong_file_name, sections_array),
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
 int main( int argc, char* argv[])
