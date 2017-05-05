@@ -2,14 +2,14 @@
 CXX ?= g++
 CXXFLAGS= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 
-ifeq ($(CXX), "clang++")
+ifeq ($(CXX), clang++)
 	CXXVERSION= $(shell clang++ -dumpversion)
 	ifeq ($(CXXVERSION), "3.4")
 		CXXFLAGS+= --std=c++1y
 	else
 		CXXFLAGS+= --std=c++14
 	endif
-elif ($(CXX), "g++")
+elif ($(CXX), g++)
 	CXXVERSION= $(shell g++ -dumpversion)
 	CXXFLAGS+=  --std=c++14
 endif
