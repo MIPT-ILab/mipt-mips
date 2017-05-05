@@ -1,6 +1,19 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
+CXXFLAGS= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
+
+ifeq ($(CXX), clang++)
+	CXXVERSION:= $(shell clang++ --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
+	ifeq ($(CXXVERSION), 3.4)
+		CXXFLAGS+= --std=c++1y
+	else
+		CXXFLAGS+= --std=c++14
+	endif
+else ifeq ($(CXX), g++)
+	CXXVERSION:= $(shell g++ -dumpversion)
+	CXXFLAGS+=  --std=c++14
+endif
+
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g

@@ -1,17 +1,18 @@
 language: cpp
 sudo: required
-compiler: gcc
+compiler:
+  - gcc
 os: linux
 script: cd simulator; make mipt-mips disasm test
 
-before_install:
-  # C++14
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-6
+    - libelf-dev
+    - libboost-all-dev
 
 install: 
-  # C++14
-  - sudo apt-get install -qq g++-6
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
-  - sudo apt-get install libelf-dev
-  - sudo apt-get install libboost-all-dev
+  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
