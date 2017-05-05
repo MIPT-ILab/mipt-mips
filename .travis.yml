@@ -1,4 +1,7 @@
 language: cpp
+sudo: required
 compiler: gcc
 os: linux
 script: cd simulator; make test
+before_install:
+  - sudo apt-get install gcc-4.8 -y
