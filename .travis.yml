@@ -12,9 +12,8 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-6
-    - g++-4.8
     - libelf-dev
     - libboost-all-dev
 
 install: 
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+  - if [ $CXX == clang++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
