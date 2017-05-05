@@ -29,6 +29,8 @@ Instructions to use downloaded material can be found on [wiki page](https://gith
 
 ## MIPT-MIPS Simulator
 
+[![Build Status](https://travis-ci.org/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.org/MIPT-ILab/mipt-mips)
+
 In our [production repository](https://github.com/MIPT-ILab/mipt-mips) you may find C++ sources required to complete this year course assignments — step-by-step implementation of MIPS simulator.
 
 That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
