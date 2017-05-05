@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.org/MIPT-ILab/mipt-mips)
+
 # MIPT-MIPS
 
 This project is a part of [Intel lab's](http://ilab.fizteh.ru/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
