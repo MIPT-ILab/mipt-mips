@@ -71,7 +71,6 @@ TEST( Func_memory, Read_Method_Test)
                  ::testing::KilledBySignal( SIGABRT), ".*");
 }
 
-/*
 TEST( Func_memory, Write_Read_Initialized_Mem_Test)
 {
     Memory func_mem( valid_elf_file);
@@ -98,7 +97,6 @@ TEST( Func_memory, Write_Read_Initialized_Mem_Test)
     ASSERT_EXIT( func_mem.write( 1, data_sect_addr, 0),
                  ::testing::KilledBySignal( SIGABRT), ".*");
 }
-*/
 
 TEST( Func_memory, Write_Read_Not_Initialized_Mem_Test)
 {
