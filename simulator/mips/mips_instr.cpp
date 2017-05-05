@@ -377,4 +377,3 @@ void FuncInstr::execute()
         disasm += oss.str();
     }
 }
-
