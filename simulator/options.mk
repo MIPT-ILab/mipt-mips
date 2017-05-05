@@ -9,9 +9,15 @@ ifeq ($(CXX), clang++)
 	else
 		CXXFLAGS+= --std=c++14
 	endif
+	CXXFLAGS+= -stdlib=libc++
 else ifeq ($(CXX), g++)
 	CXXVERSION:= $(shell g++ -dumpversion)
-	CXXFLAGS+=  --std=c++14
+	GCCVERSIONGTEQ4 := $(shell expr `g++ -dumpversion | cut -f1 -d.` \> 4)
+	ifeq "$(GCCVERSIONGTEQ4)" "1"
+		CXXFLAGS+=  --std=c++14
+	else
+		CXXFLAGS+=  --std=c++1y
+	endif
 endif
 
 LDFLAGS= # -static

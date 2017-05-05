@@ -1,7 +1,8 @@
 language: cpp
-sudo: required
+sudo: false
 compiler:
   - gcc
+  - clang
 os: linux
 script: cd simulator; make mipt-mips disasm test
 
@@ -10,9 +11,7 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-6
+    - g++-4.9
     - libelf-dev
     - libboost-all-dev
-
-install: 
-  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+    - libc++-dev
