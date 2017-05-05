@@ -1,6 +1,18 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS= -std=c++14 -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
+CXXFLAGS= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
+VERSION = $(shell $(CXX) -dumpversion)
+
+ifeq ($(CXX), "clang")
+	ifeq ($(VERSION), "3.4")
+		CXXFLAGS+= --std=c++1y
+	else
+		CXXFLAGS+= --std=c++14
+	endif
+else
+	CXXFLAGS+=  --std=c++14
+endif
+
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
