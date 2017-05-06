@@ -12,6 +12,8 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
+    - os: osx
+      compiler: clang
 
 script: cd simulator; make mipt-mips disasm test
 
