@@ -12,7 +12,6 @@ addons:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-4.0
     packages:
-    - clang-3.5
     - g++-6
     - libelf-dev
     - libboost-all-dev
