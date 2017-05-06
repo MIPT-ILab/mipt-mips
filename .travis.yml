@@ -1,5 +1,5 @@
 language: cpp
-sudo: required
+sudo: false
 compiler:
   - gcc
   - clang
@@ -18,4 +18,4 @@ addons:
     - libboost-all-dev
 
 install: 
-  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+  - if [ $CXX == g++ ]; then CXX = g++-6; fi
