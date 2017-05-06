@@ -21,7 +21,6 @@ addons:
     - llvm-4.0-dev
 
 install: 
-  - if [ $CXX == g++ ]; then CXX=g++-6; fi
-  - if [ $CXX == clang++ ]; then CXX=clang++-4.0; fi
+  - if [ $CXX == g++ ] && [$TRAVIS_OS_NAME == 'linux']; then CXX=g++-6; fi
+  - if [ $CXX == clang++ ] && [$TRAVIS_OS_NAME == 'linux']; then CXX=clang++-4.0; fi
   - $CXX --version
-
