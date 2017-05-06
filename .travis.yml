@@ -19,3 +19,4 @@ addons:
 install: 
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
   - g++ --version
+  - locate cstdio
