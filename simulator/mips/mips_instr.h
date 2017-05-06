@@ -246,6 +246,7 @@ class FuncInstr
                                      operation == OUT_I_BRANCH; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
+        bool is_nop() const { return instr.raw == 0x0u; }
 
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
