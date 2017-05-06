@@ -2,6 +2,7 @@ language: cpp
 sudo: false
 compiler:
   - gcc
+  - clang
 os: linux
 script: cd simulator; make mipt-mips disasm test
 
@@ -17,3 +18,4 @@ addons:
 
 install: 
   - if [ $CXX == g++ ]; then CXX=g++-6; fi
+  - if [ $CXX == clang++ ]; then CXX=clang++-3.5; fi
