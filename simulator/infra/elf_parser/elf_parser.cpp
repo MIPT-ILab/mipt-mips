@@ -79,7 +79,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     Elf_Scn *section = NULL;
     while ( (section = elf_nextscn( elf, section)) != NULL)
     {
-        Elf64_Shdr shdr = *elf64_getshdr( section);
+        Elf32_Shdr shdr = *elf32_getshdr( section);
 
         char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
         Addr start_addr = shdr.sh_addr;
