@@ -2,6 +2,7 @@ language: cpp
 sudo: required
 compiler:
   - gcc
+  - clang
 os: linux
 script: cd simulator; make mipt-mips disasm test
 
@@ -15,4 +16,4 @@ addons:
     - libboost-all-dev
 
 install: 
-  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
