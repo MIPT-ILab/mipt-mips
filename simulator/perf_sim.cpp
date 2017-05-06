@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <boost/timer/timer.hpp>
+//#include <boost/timer/timer.hpp>
 
 #include <infra/config/config.h>
 
@@ -68,7 +68,7 @@ void PerfMIPS::run( const std::string& tr,
 
     new_PC = memory->startPC();
 
-    boost::timer::cpu_timer timer;
+//  boost::timer::cpu_timer timer;
 
     while (executed_instrs < instrs_to_run)
     {
@@ -85,7 +85,7 @@ void PerfMIPS::run( const std::string& tr,
         check_ports( cycle);
     }
 
-    auto time = timer.elapsed().wall;
+    auto time = 1.0;//timer.elapsed().wall;
     auto frequency = 1e6 * cycle / time;
     auto ipc = 1.0 * executed_instrs / cycle;
     auto simips = 1e6 * executed_instrs / time;

@@ -1,0 +1,25 @@
+language: cpp
+sudo: false
+compiler:
+  - gcc
+  - clang
+os: linux
+script: cd simulator; make mipt-mips disasm test
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-trusty-4.0
+    packages:
+    - g++-6
+    - libelf-dev
+    - libboost-all-dev
+    - clang-4.0
+    - llvm-4.0-dev
+
+install: 
+  - if [ $CXX == g++ ]; then CXX=g++-6; fi
+  - if [ $CXX == clang++ ]; then CXX=clang++-4.0; fi
+  - $CXX --version
+
