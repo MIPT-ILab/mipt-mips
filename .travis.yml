@@ -16,6 +16,7 @@ addons:
     - libelf-dev
     - libboost-all-dev
     - clang-4.0
+    - llvm-4.0-dev
 
 install: 
   - if [ $CXX == g++ ]; then CXX=g++-6; fi
