@@ -10,8 +10,9 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - h-rayflood/llvm
     packages:
-    - g++-4.9
+    - clang-3.5
     - g++-6
     - libelf-dev
     - libboost-all-dev
