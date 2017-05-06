@@ -20,4 +20,4 @@ addons:
 install: 
   - if [ $CXX == g++ ]; then CXX=g++-6; fi
   - if [ $CXX == clang++ ]; then CXX=clang++-4.0; fi
-  - $CXX -version
+  - $CXX --version
