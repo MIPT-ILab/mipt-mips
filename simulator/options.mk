@@ -23,6 +23,6 @@ BOOST_LPATH= /usr/local/lib
 
 # option for C++ compiler specifying directories
 # to search for headers and libraries
-INCL= -I ./
+INCL+= -I ./
 INCL+= -I $(BOOST_INCL)
 LPATH= -L $(BOOST_LPATH) -L $(GTEST_LPATH)
