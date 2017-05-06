@@ -1,20 +1,9 @@
 language: cpp
 sudo: false
-
 compiler:
   - gcc
   - clang
-os:
-  - linux
-  - osx
-
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
-    - os: osx
-      compiler: clang
-
+os: linux
 script: cd simulator; make mipt-mips disasm test
 
 addons:
@@ -30,8 +19,7 @@ addons:
     - llvm-4.0-dev
 
 install: 
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-4.0; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf; fi
+  - if [ $CXX == g++ ]; then CXX=g++-6; fi
+  - if [ $CXX == clang++ ]; then CXX=clang++-4.0; fi
   - $CXX --version
 
