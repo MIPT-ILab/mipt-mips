@@ -1,5 +1,5 @@
 language: cpp
-sudo: required
+sudo: false
 compiler:
   - gcc
 os: linux
@@ -10,9 +10,10 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
+    - clang-3.5
     - g++-6
     - libelf-dev
     - libboost-all-dev
 
 install: 
-  - if [ $CXX == g++ ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+  - if [ $CXX == g++ ]; then CXX=g++-6; fi
