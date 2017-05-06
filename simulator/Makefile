@@ -93,7 +93,7 @@ $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
 	@echo "[$(CXX)] $@"
 	$(CXX) $(CXXFLAGS) $< $(INCL) -v
-	$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(INCL) -c
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
 clean: clean-tests
