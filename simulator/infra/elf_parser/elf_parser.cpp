@@ -81,14 +81,14 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     {
         Elf32_Shdr shdr = *elf32_getshdr( section);
 
-        char* name = elf_strptr( elf, shstrndx, shdr->sh_name);
-        Addr start_addr = shdr->sh_addr;
+        char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
+        Addr start_addr = shdr.sh_addr;
 
         if ( start_addr == 0)
             continue;
 
-        size_t size = shdr->sh_size;
-        auto offset = shdr->sh_offset;
+        size_t size = shdr.sh_size;
+        auto offset = shdr.sh_offset;
         std::unique_ptr<uint8[]> content(new uint8[ size]);
 
         lseek( file_descr, offset, SEEK_SET);
