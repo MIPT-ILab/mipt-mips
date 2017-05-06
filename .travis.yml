@@ -1,11 +1,18 @@
 language: cpp
 sudo: false
+
 compiler:
   - gcc
   - clang
 os:
   - linux
   - osx
+
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+
 script: cd simulator; make mipt-mips disasm test
 
 addons:
