@@ -31,6 +31,6 @@ install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-4.0; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ls /usr/local/Cellar/libelf/0.8.13_1/include/; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp /usr/local/Cellar/libelf/0.8.13_1/include/*.h /usr/include; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ls /usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cp /usr/local/Cellar/libelf/0.8.13_1/include/libelf/*.h /usr/include; fi
   - $CXX --version
