@@ -79,16 +79,16 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     Elf_Scn *section = NULL;
     while ( (section = elf_nextscn( elf, section)) != NULL)
     {
-        Elf64_Shdr *shdr = elf64_getshdr( section);
+        Elf64_Shdr shdr = *elf64_getshdr( section);
 
-        char* name = elf_strptr( elf, shstrndx, shdr->sh_name);
-        Addr start_addr = shdr->sh_addr;
+        char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
+        Addr start_addr = shdr.sh_addr;
 
         if ( start_addr == 0)
             continue;
 
-        size_t size = shdr->sh_size;
-        auto offset = shdr->sh_offset;
+        size_t size = shdr.sh_size;
+        auto offset = shdr.sh_offset;
         std::unique_ptr<uint8[]> content(new uint8[ size]);
 
         lseek( file_descr, offset, SEEK_SET);
