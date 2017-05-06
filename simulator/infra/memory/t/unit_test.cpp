@@ -21,8 +21,9 @@ TEST( Func_memory_init, Process_Wrong_Args_Of_Constr)
     ASSERT_NO_THROW( Memory func_mem( valid_elf_file));
     // check memory initialization with custom parameters
     ASSERT_NO_THROW( Memory func_mem( valid_elf_file, 48, 15, 10));
-    // check memory initialization with 1TB page
-    ASSERT_THROW( Memory func_mem( valid_elf_file, 64, 15, 40), std::bad_alloc);
+    // check memory initialization with 4GB page
+    ASSERT_EXIT( Memory func_mem( valid_elf_file, 64, 15, 32),
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 
     // test behavior when the file name does not exist
     const char * wrong_file_name = "./1234567890/qwertyuiop";
