@@ -23,5 +23,5 @@ addons:
 install: 
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-4.0; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update && brew install libelf-dev; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update && brew install libelf; fi
   - $CXX --version
