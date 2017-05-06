@@ -3,7 +3,9 @@ sudo: false
 compiler:
   - gcc
   - clang
-os: linux
+os:
+  - linux
+  - osx
 script: cd simulator; make mipt-mips disasm test
 
 addons:
