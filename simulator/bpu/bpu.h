@@ -139,7 +139,7 @@ public:
     {
         if ( map.find(name) == map.end())
         {
-             std::cerr << "ERROR. Invalid prediction mode " << name << std::endl
+             std::cerr << "ERROR. Invalid branch prediction mode " << name << std::endl
                        << "Supported modes:" << std::endl;
              for ( const auto& name : map)
                  std::cerr << "\t" << name.first << std::endl;
