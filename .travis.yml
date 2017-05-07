@@ -23,7 +23,7 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-4.0
-    - boost-latest-ppa
+    - boost-latest
     packages:
     - g++-6
     - libelf-dev
