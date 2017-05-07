@@ -121,10 +121,9 @@ class BPFactory {
         }
     };
 
-    std::map<std::string, BaseBPCreator*> map;
+    const std::map<std::string, BaseBPCreator*> map;
 
 public:
-    /* TODO: create specialisations for static predictors which functions has different parameter list */
     BPFactory() :
         map({ { "static_always_taken",   new BPCreator<BPEntryAlwaysTaken>},
               { "static_backward_jumps", new BPCreator<BPEntryBackwardJumps>},
@@ -138,14 +137,22 @@ public:
                     uint32 ways,
                     uint32 branch_ip_size_in_bits = 32) const
     {
-        /* TODO: make this check user-friendly */
-        assert( map.count(name));
-        return map.at(name)->create( size_in_entries, ways, branch_ip_size_in_bits);
+        if ( map.find(name) == map.end())
+        {
+             std::cerr << "ERROR. Invalid prediction mode " << name << std::endl
+                       << "Supported modes:" << std::endl;
+             for ( const auto& name : map)
+                 std::cerr << "\t" << name.first << std::endl;
+
+             std::exit( EXIT_FAILURE);
+        }
+
+        return map.at( name)->create( size_in_entries, ways, branch_ip_size_in_bits);
     }
 
     ~BPFactory()
     {
-        for(auto& elem : map)
+        for ( auto& elem : map)
             delete elem.second;
     }
 };
