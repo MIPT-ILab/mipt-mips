@@ -99,15 +99,8 @@ void PerfMIPS::run( const std::string& tr,
               << std::endl;
 }
 
-void PerfMIPS::clock_fetch( int cycle) {
-    sout << "fetch   cycle " << std::dec << cycle << ":";
-
-    /* updating PC */
-    PC = new_PC;
-
-    /* creating structure to be sent to decode stage */
-    IfIdData data;
-
+void PerfMIPS::clock_fetch( int cycle)
+{
     /* receive flush and stall signals */
     bool is_flush = false;
     rp_fetch_flush->read( &is_flush, cycle);
@@ -115,8 +108,14 @@ void PerfMIPS::clock_fetch( int cycle) {
     bool is_stall = false;
     rp_decode_2_fetch_stall->read( &is_stall, cycle);
 
+    /* updating PC */
     if ( is_flush)
         rp_memory_2_fetch_target->read( &PC, cycle); // fixing PC
+    else if ( !is_stall)
+        PC = new_PC;
+
+    /* creating structure to be sent to decode stage */
+    IfIdData data;
 
     /* fetching instruction */
     data.raw = memory->fetch( PC);
@@ -126,25 +125,19 @@ void PerfMIPS::clock_fetch( int cycle) {
     data.predicted_taken = bp->isTaken( PC);
     data.predicted_target = bp->getTarget( PC);
 
-    /* sending to decode */
-    wp_fetch_2_decode->write( data, cycle);
-
-    /* if stall, do not update new_PC this time */
-    if ( is_stall)
-    {
-        sout << "bubble (stall)" << std::endl;
-        return;
-    }
-
     /* updating PC according to prediction */
     new_PC = data.predicted_target;
 
+    /* sending to decode */
+    wp_fetch_2_decode->write( data, cycle);
+
     /* log */
-    sout << std::hex << "0x" << data.raw << std::endl;
+    sout << "fetch   cycle " << std::dec << cycle << ": 0x"
+         << std::hex << PC << ": 0x" << data.raw << std::endl;
 }
 
 void PerfMIPS::clock_decode( int cycle) {
-    sout << "decode  cycle " << std::dec << cycle << ":";
+    sout << "decode  cycle " << std::dec << cycle << ": ";
 
     /* receive flush signal */
     bool is_flush = false;
@@ -200,13 +193,13 @@ void PerfMIPS::clock_decode( int cycle) {
     else // data hazard, stalling pipeline
     {
         wp_decode_2_fetch_stall->write( true, cycle);
-        sout << "bubble (data hazard)\n";
+        sout << instr << " (data hazard)\n";
     }
 }
 
 void PerfMIPS::clock_execute( int cycle)
 {
-    sout << "execute cycle " << std::dec << cycle << ":";
+    sout << "execute cycle " << std::dec << cycle << ": ";
 
     FuncInstr instr;
 
@@ -219,6 +212,7 @@ void PerfMIPS::clock_execute( int cycle)
     {
         /* ignoring the upcoming instruction as it is invalid */
         rp_decode_2_execute->read( &instr, cycle);
+        rf->cancel( instr);
         sout << "flush\n";
         return;
     }
@@ -241,7 +235,7 @@ void PerfMIPS::clock_execute( int cycle)
 
 void PerfMIPS::clock_memory( int cycle)
 {
-    sout << "memory  cycle " << std::dec << cycle << ":";
+    sout << "memory  cycle " << std::dec << cycle << ": ";
 
     FuncInstr instr;
 
@@ -254,6 +248,7 @@ void PerfMIPS::clock_memory( int cycle)
     {
         /* ignoring the upcoming instruction as it is invalid */
         rp_execute_2_memory->read( &instr, cycle);
+        rf->cancel( instr);
         sout << "flush\n";
         return;
     }
@@ -269,23 +264,19 @@ void PerfMIPS::clock_memory( int cycle)
     bool actually_taken = instr.is_jump_taken();
     Addr real_target = instr.get_new_PC();
 
-    /* updating BTB */
-    bp->update( actually_taken, instr.get_PC(), real_target);
-
     /* branch misprediction unit */
     if ( instr.is_misprediction())
     {
+        /* updating BTB */
+        bp->update( actually_taken, instr.get_PC(), real_target);
+
         /* flushing the pipeline */
         wp_memory_2_all_flush->write( true, cycle);
 
         /* sending valid PC to fetch stage */
         wp_memory_2_fetch_target->write( real_target, cycle);
 
-        /* if the register was marked invalid in decode stage, revert it */
-        rf->cancel( instr);
-
         sout << "misprediction\n";
-        return;
     }
 
     /* perform required loads and stores */
@@ -299,7 +290,7 @@ void PerfMIPS::clock_memory( int cycle)
 
 void PerfMIPS::clock_writeback( int cycle)
 {
-    sout << "wb      cycle " << std::dec << cycle << ":";
+    sout << "wb      cycle " << std::dec << cycle << ": ";
 
     FuncInstr instr;
 
@@ -307,7 +298,7 @@ void PerfMIPS::clock_writeback( int cycle)
     if ( !rp_memory_2_writeback->read( &instr, cycle))
     {
         sout << "bubble\n";
-        if ( cycle - last_writeback_cycle >= 1000)
+        if ( cycle - last_writeback_cycle >= 10)
         {
             serr << "Deadlock was detected. The process will be aborted."
                  << std::endl << std::endl << critical;
