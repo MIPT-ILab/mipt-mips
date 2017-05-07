@@ -7,6 +7,10 @@
  #ifndef BRANCH_PREDICTION_ENTRY
  #define BRANCH_PREDICTION_ENTRY
 
+#include <array>
+
+#include <infra/types.h>
+
 /* TODO: move implemetations to .cpp file */
 
 /* each inherited class has to implement three methods:
