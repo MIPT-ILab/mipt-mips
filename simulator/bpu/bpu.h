@@ -25,8 +25,8 @@
 class BaseBP
 {
 public:
-    virtual bool isTaken( Addr PC) = 0;
-    virtual Addr getTarget( Addr PC) = 0;
+    virtual bool is_taken( Addr PC) = 0;
+    virtual Addr get_target( Addr PC) = 0;
     virtual void update( bool is_taken,
                          Addr branch_ip,
                          Addr target = NO_VAL32) = 0;
@@ -37,64 +37,59 @@ public:
 template<typename T>
 class BP : public BaseBP
 {
-    Addr set_mask;
     std::vector<std::vector<T>> data;
     CacheTagArray tags;
 
-
-    /* acquire set number from address */
-    inline unsigned int set( Addr addr)
-    {
-        return addr & set_mask;
-    }
-
 public:
-    BP( unsigned int   size_in_entries,
-        unsigned int   ways,
-        unsigned int branch_ip_size_in_bits) :
+    BP( uint32   size_in_entries,
+        uint32   ways,
+        uint32 branch_ip_size_in_bits) :
 
-        set_mask( ( size_in_entries / ways ) - 1),
         data( ways, std::vector<T>( size_in_entries / ways)),
         tags( size_in_entries,
               ways,
-              1,
+              4,
               branch_ip_size_in_bits)
         { }
 
     /* prediction */
-    bool isTaken( Addr PC) final
+    bool is_taken( Addr PC) final
     {
-        unsigned int way;
+        uint32 way;
         bool is_hit;
         std::tie( is_hit, way) = tags.read_no_touch( PC);
         if ( is_hit) // hit
-            return data[ way][ set(PC)].isTaken();
+            return data[ way][ tags.set(PC)].is_taken( PC);
 
         return false;
     }
-    Addr getTarget( Addr PC) final
+
+    Addr get_target( Addr PC) final
     {
-        unsigned int way;
+        uint32 way;
         bool is_hit;
         std::tie( is_hit, way) = tags.read_no_touch( PC);
         if ( is_hit) // hit
-            return data[ way][ set(PC)].getTarget();
-        else // miss
-            return PC + 4;
+            return data[ way][ tags.set(PC)].getTarget();
+
+        return PC + 4;
     }
 
     /* update */
     void update( bool is_taken,
                  Addr branch_ip,
-                 Addr target = NO_VAL32) final
+                 Addr target) final
     {
-        unsigned int way;
+        uint32 set = tags.set( branch_ip);
+        uint32 way;
         bool is_hit;
         std::tie( is_hit, way) = tags.read( branch_ip);
-        if ( !is_hit) // miss
+        if ( !is_hit) { // miss
             way = tags.write( branch_ip); // add new entry to cache
+            data[ way][ set].reset();
+        }
 
-        data[ way][ set( branch_ip)].update( is_taken, target);
+        data[ way][ set].update( is_taken, target);
     }
 };
 
@@ -107,22 +102,22 @@ public:
 class BPFactory {
     class BaseBPCreator {
     public:
-        virtual std::unique_ptr<BaseBP> create(unsigned int   size_in_entries,
-                                               unsigned int   ways,
-                                               unsigned int branch_ip_size_in_bits) const = 0;
+        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
+                                               uint32 ways,
+                                               uint32 branch_ip_size_in_bits) const = 0;
         virtual ~BaseBPCreator() { }
     };
 
     template<typename T>
     class BPCreator : public BaseBPCreator {
     public:
-        virtual std::unique_ptr<BaseBP> create(unsigned int   size_in_entries,
-                                               unsigned int   ways,
-                                               unsigned int branch_ip_size_in_bits) const final
+        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
+                                               uint32 ways,
+                                               uint32 branch_ip_size_in_bits) const final
         {
-            return std::unique_ptr<BaseBP>{ std::make_unique<BP<T>>( size_in_entries,
-                                                                     ways,
-                                                                     branch_ip_size_in_bits)};
+            return std::make_unique<BP<T>>( size_in_entries,
+                                            ways,
+                                            branch_ip_size_in_bits);
         }
     };
 
@@ -131,17 +126,17 @@ class BPFactory {
 public:
     /* TODO: create specialisations for static predictors which functions has different parameter list */
     BPFactory() :
-        map({ //{ "static_always_taken",   new BPCreator<BPEntryAlwaysTaken>},
-              //{ "static_backward_jumps", new BPCreator<BPEntryBackwardJumps>},
+        map({ { "static_always_taken",   new BPCreator<BPEntryAlwaysTaken>},
+              { "static_backward_jumps", new BPCreator<BPEntryBackwardJumps>},
               { "dynamic_one_bit",       new BPCreator<BPEntryOneBit>},
               { "dynamic_two_bit",       new BPCreator<BPEntryTwoBit>},
-              { "adaptive_two_level",    new BPCreator<BPEntryAdaptive>}})
+              { "adaptive_two_level",    new BPCreator<BPEntryAdaptive<2>>}})
     { }
 
     std::unique_ptr<BaseBP> create( const std::string& name,
-                    unsigned int   size_in_entries,
-                    unsigned int   ways,
-                    unsigned int branch_ip_size_in_bits = 32) const
+                    uint32 size_in_entries,
+                    uint32 ways,
+                    uint32 branch_ip_size_in_bits = 32) const
     {
         /* TODO: make this check user-friendly */
         assert( map.count(name));

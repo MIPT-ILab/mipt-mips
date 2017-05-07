@@ -16,8 +16,8 @@ static const uint32 FLUSHED_STAGES_NUM = 4;
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
-    static Value<unsigned int> bp_size = { "bp-size", 128, "BTB size in entries"};
-    static Value<unsigned int> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
+    static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
+    static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 }
 
 PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker()
@@ -122,8 +122,8 @@ void PerfMIPS::clock_fetch( int cycle)
 
     /* saving predictions and updating PC according to them */
     data.PC = PC;
-    data.predicted_taken = bp->isTaken( PC);
-    data.predicted_target = bp->getTarget( PC);
+    data.predicted_taken = bp->is_taken( PC);
+    data.predicted_target = bp->get_target( PC);
 
     /* updating PC according to prediction */
     new_PC = data.predicted_target;

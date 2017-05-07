@@ -11,7 +11,7 @@
 
 /* each inherited class has to implement three methods:
  * 1. constructor();
- * 2. bool isTaken( PC);
+ * 2. bool is_taken( PC);
  * 3. void update( bool is_taken, Addr target)
  */
 class BPEntry
@@ -21,6 +21,7 @@ protected:
 
 public:
     Addr getTarget() const { return _target; }
+    void reset() { _target = NO_VAL32; }
 };
 
 
@@ -30,21 +31,21 @@ class BPEntryStatic : public BPEntry
 {
 public:
     /* update */
-    void update( Addr target) { _target = target; }
+    void update( bool, Addr target) { _target = target; }
 };
 
 class BPEntryAlwaysTaken final : public BPEntryStatic
 {
 public:
     /* prediction */
-    bool isTaken() const { return true; }
+    bool is_taken( Addr) const { return true; }
 };
 
 class BPEntryBackwardJumps final : public BPEntryStatic
 {
 public:
     /* prediction */
-    bool isTaken( Addr PC) const { return _target < PC ; }
+    bool is_taken( Addr PC) const { return _target < PC ; }
 };
 
 
@@ -53,18 +54,18 @@ public:
 class BPEntryOneBit final : public BPEntry
 {
 private:
-    enum State
+    enum class State
     {
         NT = 0,
         T = 1
     };
-    static const State default_state = NT;
+    static const State default_state = State::NT;
 
     State state = default_state;
 
 public:
     /* prediction */
-    bool isTaken() const { return state; }
+    bool is_taken( Addr) const { return state == State::T; }
 
     /* update */
     void update( bool is_taken, Addr target)
@@ -78,14 +79,16 @@ public:
 
         state = static_cast<State>( is_taken);
     }
+
+    void reset() { BPEntry::reset(); state = default_state; }
 };
 
 class BPEntryTwoBit : public BPEntry
 {
-protected:
+public:
     class State
     {
-        enum StateValue
+        enum class StateValue
         {
             NT  = 0, // NOT TAKEN
             WNT = 1, // WEAKLY NOT TAKEN
@@ -93,7 +96,7 @@ protected:
             T   = 3  // TAKEN
         };
 
-        static const StateValue default_value = WNT;
+        static const StateValue default_value = StateValue::WNT;
         StateValue value = default_value;
 
     public:
@@ -104,36 +107,28 @@ protected:
             {
                 switch ( value)
                 {
-                    case NT:  value = WNT; break;
-                    case WNT: value = WT;  break;
-                    case WT:  value = T;   break;
-                    case T:   value = T;   break; // saturation
+                    case StateValue::NT:  value = StateValue::WNT; break;
+                    case StateValue::WNT: value = StateValue::WT;  break;
+                    case StateValue::WT:  value = StateValue::T;   break;
+                    case StateValue::T:   value = StateValue::T;   break; // saturation
                 }
             }
             else
             {
                 switch ( value)
                 {
-                    case NT:  value = NT;  break; // saturation
-                    case WNT: value = NT;  break;
-                    case WT:  value = WNT; break;
-                    case T:   value = WT;  break;
+                    case StateValue::NT:  value = StateValue::NT;  break; // saturation
+                    case StateValue::WNT: value = StateValue::NT;  break;
+                    case StateValue::WT:  value = StateValue::WNT; break;
+                    case StateValue::T:   value = StateValue::WT;  break;
                 }
             }
         }
 
         /* casting to result */
-        operator bool() const
+        bool is_taken() const
         {
-            switch ( value)
-            {
-                case NT:
-                case WNT: return false;
-
-                case WT:
-                case T: return true;
-            }
-            return false;
+            return value == StateValue::WT || value == StateValue::T;
         }
 
         void reset() { value = default_value; }
@@ -144,9 +139,9 @@ private:
 
 public:
     /* prediction */
-    bool isTaken() const
+    bool is_taken( Addr) const
     {
-        return state;
+        return state.is_taken();
     }
 
     /* update */
@@ -160,15 +155,20 @@ public:
 
         state.update( is_taken);
     }
+
+    void reset()
+    {
+        BPEntry::reset();
+        state.reset();
+    }
 };
 
 
 /* adaptive predictors */
-
-class BPEntryAdaptive final : public BPEntryTwoBit
+template<size_t DEPTH>
+class BPEntryAdaptive final : public BPEntry
 {
-    static const unsigned int default_pattern = 0;
-
+    static const constexpr uint32 default_pattern = 0;
     /* The index is a pattern, and the value is prediction state,
      * so the table might look like this:
      * ---------
@@ -178,26 +178,25 @@ class BPEntryAdaptive final : public BPEntryTwoBit
      * 11 -- WNT
      * ---------
      */
-    std::vector<State> state_table;
+    std::array<BPEntryTwoBit::State, (1ull << DEPTH)> state_table = {};
 
     /* two-level predictor */
-    static const unsigned int pattern_depth = 2;
     class PredictionPattern
     {
-        static const unsigned int pattern_mask = ( 1ull << 2) - 1;
+        static const constexpr uint32 pattern_mask = ( 1ull << DEPTH) - 1;
 
-        static const unsigned int default_pattern = 0;
-        unsigned int value = default_pattern;
+        static const constexpr uint32 default_pattern = 0;
+        uint32 value = default_pattern;
 
     public:
         /* for vector indexing */
-        operator size_t() const { return value; }
+        size_t get_value() const { return value; }
 
         void update( bool is_taken)
         {
             /* updating pattern, simulating shift register */
             value <<= 1;
-            value += static_cast<unsigned int>( is_taken);
+            value += static_cast<uint32>( is_taken);
             value &= pattern_mask;
         }
 
@@ -207,14 +206,12 @@ class BPEntryAdaptive final : public BPEntryTwoBit
     PredictionPattern current_pattern = {};
 
 public:
-    BPEntryAdaptive() :
-        state_table( 1ull << pattern_depth, State())
-    {}
+    BPEntryAdaptive() = default;
 
     /* prediction */
-    bool isTaken() const
+    bool is_taken( Addr) const
     {
-        return state_table[ current_pattern];
+        return state_table[ current_pattern.get_value()].is_taken();
     }
 
     /* update */
@@ -229,8 +226,14 @@ public:
             _target = target;
         }
 
-        state_table[ current_pattern].update( is_taken);
+        state_table[ current_pattern.get_value()].update( is_taken);
         current_pattern.update( is_taken);
+    }
+
+    void reset()
+    {
+        BPEntry::reset();
+        current_pattern.reset();
     }
 };
 

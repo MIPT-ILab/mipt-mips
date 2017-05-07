@@ -62,9 +62,6 @@ class CacheTagArray : public CacheTagArrayCheck
 
         const uint32 num_sets;
 
-        uint32 set( Addr addr) const;
-        Addr tag( Addr addr) const;
-
         CacheTagArray& operator=( const CacheTagArray&) = delete;
         CacheTagArray( const CacheTagArray&) = delete;
 
@@ -81,6 +78,9 @@ class CacheTagArray : public CacheTagArrayCheck
         std::pair<bool, uint32> read_no_touch( Addr addr) const;
         /* create new entry in cache */
         uint32 write( Addr addr);
+
+        uint32 set( Addr addr) const;
+        Addr tag( Addr addr) const;
 };
 
 #endif // #ifndef CACHE_TAG_ARRAY_H
