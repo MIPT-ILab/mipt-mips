@@ -10,10 +10,12 @@
 #include <memory>
 #include <string>
 
+#include <infra/log.h>
+
 class MIPSMemory;
 class RF;
 
-class MIPS
+class MIPS : public Log
 {
     private:
         std::unique_ptr<RF> rf;
@@ -23,7 +25,7 @@ class MIPS
         MIPS( const MIPS&) = delete;
         MIPS& operator=( const MIPS&) = delete;
     public:
-        MIPS();
+        explicit MIPS( bool log = false);
         ~MIPS();
 
         void init( const std::string& tr);
