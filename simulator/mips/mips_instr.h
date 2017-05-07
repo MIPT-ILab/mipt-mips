@@ -256,7 +256,7 @@ class FuncInstr
 
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { _is_jump_taken = true; new_PC = v_src1; }
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = v_src2; };
+        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = v_src1; };
 
         void execute_syscall(){ };
         void execute_break()  { };
