@@ -18,9 +18,10 @@
 #include "perf_sim.h"
 
 namespace config {
+    static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
+    static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
+
     static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
-    static Value<std::string> binary_filename = { "binary,b", "", "input binary file", true};
-    static Value<uint64> num_steps = { "numsteps,n", 1, "number of instructions to run", true};
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
 } // namespace config
 

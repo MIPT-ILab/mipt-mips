@@ -37,27 +37,39 @@ protected:
 };
 
 template<typename T>
-class Value : public BaseValue {
+class RequiredValue : public BaseValue {
+protected:
     const std::string name;
     const std::string desc;
-    const T default_value;
-    const bool is_required;
 
     T value;
-
-    void reg( bod& d) final;
-    Value<T>() = delete;
+    
+    void reg( bod& d) override;
+    RequiredValue<T>() = delete;
 public:
-    Value<T>( const char* name, const T& val, const char* desc, bool is_req = false) noexcept
+    RequiredValue<T>( const char* name, const char* desc) noexcept
         : BaseValue( )
         , name( name)
         , desc( desc)
-        , default_value( val)
-        , is_required( is_req)
-        , value( val)
+        , value( )
     { }
-
+    
     operator const T&() const { return value; }
+    ~RequiredValue() override = default;
+};
+
+template<typename T>
+class Value : public RequiredValue<T> {
+    const T default_value;
+
+    void reg( bod& d) override;
+    Value<T>() = delete;
+public:
+    Value<T>( const char* name, const T& val, const char* desc) noexcept
+        : RequiredValue<T>( name, desc)
+        , default_value( val)
+    { this->value = val; }
+
     ~Value() final = default;
 };
 

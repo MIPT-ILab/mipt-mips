@@ -17,31 +17,41 @@ namespace config {
 namespace po = boost::program_options;
 
 template<>
+void RequiredValue<bool>::reg(bod& d)
+{
+    d.add_options()(name.c_str(),
+                    po::bool_switch( &value),
+                    desc.c_str());
+}
+
+template<>
 void Value<bool>::reg(bod& d)
 {
-    namespace po = boost::program_options;
     d.add_options()(name.c_str(),
                     po::bool_switch( &value)->default_value( default_value),
                     desc.c_str());
 }
 
 template<typename T>
-void Value<T>::reg(bod& d)
+void RequiredValue<T>::reg(bod& d)
 {
-    namespace po = boost::program_options;
-    if (is_required)
-    {
-        d.add_options()(name.c_str(),
-                    po::value<T>( &value)->default_value( default_value)->required(),
-                    desc.c_str());
-    }
-    else {
-        d.add_options()(name.c_str(),
-                    po::value<T>( &value)->default_value( default_value),
-                    desc.c_str());
-    }
+    d.add_options()(name.c_str(),
+                po::value<T>( &value)->required(),
+                desc.c_str());
 }
 
+template<typename T>
+void Value<T>::reg(bod& d)
+{
+    d.add_options()(this->name.c_str(),
+                po::value<T>( &this->value)->default_value( default_value),
+                this->desc.c_str());
+}
+
+template class RequiredValue<std::string>;
+template class RequiredValue<uint64>;
+template class RequiredValue<uint32>;
+template class RequiredValue<int32>;
 template class Value<std::string>;
 template class Value<uint64>;
 template class Value<uint32>;
