@@ -68,8 +68,7 @@ TEST( Func_memory, Read_Method_Test)
 
     // check hadling the situation when read
     // from not initialized or written data
-    ASSERT_EXIT( func_mem.read( 0x300000),
-                 ::testing::KilledBySignal( SIGABRT), ".*");
+    ASSERT_EQ( func_mem.read( 0x300000), NO_VAL64);
 }
 
 TEST( Func_memory, Write_Read_Initialized_Mem_Test)
