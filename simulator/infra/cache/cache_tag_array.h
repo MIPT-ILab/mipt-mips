@@ -73,7 +73,7 @@ class CacheTagArray : public CacheTagArrayCheck
                        uint32 ways,
                        uint32 line_size = 4,
                        uint32 addr_size_in_bits = 32);
-        ~CacheTagArray();
+        ~CacheTagArray() override;
 
         /* lookup the cache and update LRU info */
         std::pair<bool, uint32> read( Addr addr);

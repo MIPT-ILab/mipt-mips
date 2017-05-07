@@ -15,6 +15,7 @@
 
 #include "func_sim/func_sim.h"
 #include "mips/mips_instr.h"
+#include "mips/mips_rf.h"
 
 class PerfMIPS : protected Log
 {
@@ -63,9 +64,9 @@ class PerfMIPS : protected Log
         PerfMIPS& operator=( const PerfMIPS&) = delete;
         PerfMIPS( const PerfMIPS&) = delete;
    public:
-        PerfMIPS( bool log);
+        explicit PerfMIPS( bool log);
         void run( const std::string& tr, uint64 instrs_to_run);
-        ~PerfMIPS();
+        ~PerfMIPS() final = default;
 };
 
 #endif

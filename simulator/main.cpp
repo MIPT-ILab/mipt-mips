@@ -22,7 +22,7 @@ namespace config {
     static Value<std::string> binary_filename = { "binary,b", "", "input binary file", true};
     static Value<uint64> num_steps = { "numsteps,n", 1, "number of instructions to run", true};
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
-}
+} // namespace config
 
 int main( int argc, char** argv)
 {

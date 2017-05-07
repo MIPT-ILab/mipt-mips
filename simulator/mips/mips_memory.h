@@ -13,7 +13,7 @@
 class MIPSMemory : private Memory
 {
 public:
-    MIPSMemory( const std::string& tr) : Memory( tr) { }
+    explicit MIPSMemory( const std::string& tr) : Memory( tr) { }
 
     using Memory::startPC;
 

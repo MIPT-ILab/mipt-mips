@@ -66,7 +66,7 @@ void handleArgs( int argc, char** argv)
 
 
         /* parsing help */
-        if ( vm.count( "help"))
+        if ( vm.count( "help") != 0u)
         {
             std::cout << "Functional and performance simulators for MIPS-based CPU."
                       << std::endl << std::endl
@@ -88,5 +88,5 @@ void handleArgs( int argc, char** argv)
     }
 }
 
-}
+} // namespace config
 

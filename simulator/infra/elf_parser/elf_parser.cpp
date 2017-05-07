@@ -13,7 +13,6 @@
 
 // Generic C++
 #include <iostream>
-#include <string>
 #include <sstream>
 #include <memory>
 
@@ -34,12 +33,12 @@ ElfSection::ElfSection( const ElfSection& that)
     std::memcpy(this->content, that.content, this->size);
 }
 
-ElfSection::ElfSection( const char* name_c, Addr start_addr_c,
-                        Addr size_c, const uint8* content_c)
-    : name( name_c), size( size_c)
-    , start_addr( start_addr_c), content( new uint8[ size + sizeof( uint64)])
+ElfSection::ElfSection( const char* name, Addr start_addr,
+                        Addr size, const uint8* content_that)
+    : name( name), size( size)
+    , start_addr( start_addr), content( new uint8[ size + sizeof( uint64)])
 {
-    std::memcpy( this->content, content_c, size);
+    std::memcpy( this->content, content_that, size);
 }
 
 void ElfSection::getAllElfSections( const char* elf_file_name,
@@ -64,8 +63,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     }
 
     // open the file in ELF format
-    Elf* elf = elf_begin( file_descr, ELF_C_READ, NULL);
-    if ( !elf)
+    Elf* elf = elf_begin( file_descr, ELF_C_READ, nullptr);
+    if ( elf == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name
                   << " as ELF file: "
@@ -76,8 +75,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     size_t shstrndx;
     elf_getshdrstrndx( elf, &shstrndx);
 
-    Elf_Scn *section = NULL;
-    while ( (section = elf_nextscn( elf, section)) != NULL)
+    Elf_Scn *section = nullptr;
+    while ( (section = elf_nextscn( elf, section)) != nullptr)
     {
         Elf32_Shdr shdr = *elf32_getshdr( section);
 
@@ -93,7 +92,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 
         lseek( file_descr, offset, SEEK_SET);
         FILE *file = fdopen( file_descr, "r");
-        if ( !file )
+        if ( file == nullptr)
         {
             std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
                  << std::strerror(errno) << std::endl;
@@ -187,7 +186,7 @@ std::string ElfSection::strByWords() const
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
 
-        oss << *( reinterpret_cast<uint32*>(this->content) + i);
+        oss << *( reinterpret_cast<uint32*>(this->content) + i); // NOLINT
     }
 
     return oss.str();

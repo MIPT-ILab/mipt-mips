@@ -31,21 +31,21 @@ extern void check_ports( uint64 cycle);
 class BasePort : protected Log
 {
         friend void init_ports();
-        friend void check_ports( uint64);
+        friend void check_ports( uint64 cycle);
 
     protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
-                friend void check_ports( uint64);
+                friend void check_ports( uint64 cycle);
 
                 virtual void init() const = 0;
-                virtual void check( uint64) const = 0;
+                virtual void check( uint64 cycle) const = 0;
 
                 static std::list<BaseMap*> all_maps;
             protected:
                 BaseMap() : Log(true) { all_maps.push_back( this); }
-                virtual ~BaseMap() { }
+                ~BaseMap() override = default;
         };
 
         // Key of port
@@ -55,9 +55,9 @@ class BasePort : protected Log
         bool _init = false;
    
         // Constructor of port
-        BasePort( const std::string& key) : Log( true), _key( key) { }
+        explicit BasePort( const std::string& key) : Log( true), _key( key) { }
 
-        virtual ~BasePort() { };
+        ~BasePort() override = default;
 };
 
 /*
@@ -87,11 +87,11 @@ template<class T> class Port : public BasePort
             void init() const final;
 
             // Finding lost elements
-            void check( uint64) const final;
+            void check( uint64 cycle) const final;
 
             // Constructors
-            Map() : BaseMap() { }
-            virtual ~Map() { }
+            Map() noexcept : BaseMap() { }
+            ~Map() final = default;
 
         public:
             decltype(auto) operator[]( const std::string& v) { return _map.operator[]( v); }
@@ -104,7 +104,7 @@ template<class T> class Port : public BasePort
             }
         };
 
-        Port( const std::string& key) : BasePort( key) { }
+        explicit Port( const std::string& key) : BasePort( key) { }
 
         // ports Map to connect ports between for themselves;
         Map& portMap = Map::get_instance();
@@ -134,7 +134,7 @@ template<class T> class WritePort : public Port<T>
         uint32 _lastCycle = 0;
         uint32 _writeCounter = 0;
 
-        void init( const ReadListType&);
+        void init( const ReadListType& readers);
 
         void check( uint64 cycle) const {
             for ( const auto& reader : _destinations)
@@ -161,7 +161,7 @@ template<class T> class WritePort : public Port<T>
         }
 
         // Write Method
-        void write( const T&, uint64);
+        void write( const T& what, uint64 cycle);
 
         // Returns fanout for test of connection
         uint32 getFanout() const { return _fanout; }
@@ -197,7 +197,7 @@ template<class T> class ReadPort: public Port<T>
         }
 
         // Tests if there is any ungot data
-        void check( uint64) const;
+        void check( uint64 cycle) const;
     public:
         /*
          * Constructor
@@ -214,7 +214,7 @@ template<class T> class ReadPort: public Port<T>
         }
 
         // Read method
-        bool read( T*, uint64);
+        bool read( T* address, uint64 cycle);
 };
 
 /*

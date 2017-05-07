@@ -250,6 +250,3 @@ void PerfMIPS::check( const FuncInstr& instr)
              << critical;
 }
 
-PerfMIPS::~PerfMIPS() {
-}
-

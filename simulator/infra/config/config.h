@@ -14,7 +14,8 @@
 // small hack to include boost only in config.cpp
 namespace boost { namespace program_options {
     class options_description;
-}}
+} // namespace program_options 
+} // namespace boost
 
 namespace config {
 
@@ -22,7 +23,7 @@ using bod = boost::program_options::options_description;
 
 class BaseValue
 {
-    friend void handleArgs( int, char**);
+    friend void handleArgs( int argc, char** argv);
     virtual void reg( bod& d) = 0;
 
     static std::list<BaseValue*>& values() {
@@ -32,7 +33,7 @@ class BaseValue
 
 protected:
     BaseValue() { values().push_back( this); }
-    virtual ~BaseValue() { }
+    virtual ~BaseValue() = default;
 };
 
 template<typename T>
@@ -44,10 +45,10 @@ class Value : public BaseValue {
 
     T value;
 
-    void reg( bod&) final;
+    void reg( bod& d) final;
     Value<T>() = delete;
 public:
-    Value<T>( const char* name, const T& val, const char* desc, bool is_req = false)
+    Value<T>( const char* name, const T& val, const char* desc, bool is_req = false) noexcept
         : BaseValue( )
         , name( name)
         , desc( desc)
@@ -57,13 +58,13 @@ public:
     { }
 
     operator const T&() const { return value; }
-    ~Value() final { }
+    ~Value() final = default;
 };
 
 /* methods */
 void handleArgs( int argc, char** argv);
 
-}
+} // namespace config
 
 #endif  // CONFIG_H
 

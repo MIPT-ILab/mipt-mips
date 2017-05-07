@@ -111,15 +111,17 @@ class FuncInstr
             } asJ;
             uint32 raw;
 
-            _instr() {} // constructor w/o arguments for ports
-            _instr(uint32 bytes) {
+            _instr() { // constructor w/o arguments for ports
+                 raw = NO_VAL32;
+            }
+            explicit _instr(uint32 bytes) {
                  raw = bytes;
             }
-        } instr = NO_VAL32;
+        } instr = {};
 
         using Execute = void (FuncInstr::*)(void);
 
-        struct ISAEntry
+        struct ISAEntry // NOLINT
         {
             std::string name;
 
@@ -136,10 +138,10 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const char *regTableName(RegNum);
+        static const char *regTableName(RegNum reg);
         static const char *regTable[];
 
-        StringView name = nullptr;
+        StringView name = { };
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -183,15 +185,17 @@ class FuncInstr
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
         void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = v_src1 >> v_imm; };
-        void execute_sllv()  { v_dst = v_src1 << v_src2; };
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; };
-        void execute_srav()  { v_dst = v_src1 >> v_src2; };
+        void execute_sra()   { v_dst = v_src1 >> v_imm; }
+        void execute_sllv()  { v_dst = v_src1 << v_src2; }
+        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
+        void execute_srav()  { v_dst = v_src1 >> v_src2; }
         void execute_lui()   { v_dst = v_imm  << 0x10; }
-        void execute_slt()   { v_dst = v_src2 < v_src1; };
-        void execute_sltu()  { v_dst = v_src2 < v_src1; };
-        void execute_slti()  { v_dst = v_src2 < instr.asI.imm; };
-        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm; };
+        void execute_slt()   { v_dst = static_cast<int32>(v_src2) < static_cast<int32>(v_src1) ? 1u : 0u; }
+        void execute_sltu()  { v_dst = v_src2 < v_src1 ? 1u : 0u; }
+        void execute_slti()  {
+	     v_dst = static_cast<int32>(v_src2) < static_cast<int32>(instr.asI.imm) ? 1u : 0u;
+        }
+        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm ? 1u : 0u; };
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -231,7 +235,7 @@ class FuncInstr
         uint32 lo = NO_VAL32;
 
         FuncInstr() {} // constructor w/o arguments for ports
-        FuncInstr( uint32 bytes, Addr PC = 0);
+        explicit FuncInstr( uint32 bytes, Addr PC = 0);
         const std::string& Dump() const { return disasm; }
 
         RegNum get_src1_num() const { return src1; }
