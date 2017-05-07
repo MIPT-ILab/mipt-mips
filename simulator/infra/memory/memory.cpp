@@ -88,9 +88,9 @@ uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
 {
     assert( num_of_bytes <= 8);
     assert( num_of_bytes != 0);
-    assert( check( addr));
-    assert( check( addr + num_of_bytes - 1));
     assert( addr <= addr_mask);
+    if ( !check( addr) || !check( addr + num_of_bytes - 1))
+         return NO_VAL64;
 
     uint64_8 value;
     value.val = 0ull;
