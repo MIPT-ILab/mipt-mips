@@ -11,6 +11,9 @@
 # Including options and compiler flags
 include ./options.mk
 
+# Clang
+CXXFLAGS += -Wno-unused-private-field
+
 #
 # Enter for build "perf_sim" program
 OBJ_DIR=obj
@@ -51,6 +54,7 @@ TESTS:= \
     infra/elf_parser \
     infra/memory \
     mips \
+    bpu \
     $(shell pwd) \
 
 

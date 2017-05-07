@@ -35,6 +35,12 @@ class RF
                 get_entry( num).is_valid = false;
         }
 
+        void validate( RegNum num)
+        {
+            if ( num != REG_NUM_ZERO)
+                get_entry( num).is_valid = true;
+        }
+
         bool check( RegNum num) const
         {
             return get_entry( num).is_valid;
@@ -76,6 +82,11 @@ class RF
             RegNum reg_num = instr.get_dst_num();
             if ( REG_NUM_ZERO != reg_num)
                 write( reg_num, instr.get_v_dst());
+        }
+
+        inline void cancel( const FuncInstr& instr)
+        {
+            validate( instr.get_dst_num());
         }
 };
 
