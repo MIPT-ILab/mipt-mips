@@ -5,7 +5,7 @@
 
 #include "func_sim.h"
 
-MIPS::MIPS() : rf( new RF) { }
+MIPS::MIPS( bool log) : Log( log), rf( new RF) { }
 
 MIPS::~MIPS()
 {
@@ -50,6 +50,6 @@ void MIPS::run( const std::string& tr, uint32 instrs_to_run)
 {
     init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i)
-        std::cout << step() << std::endl;
+        sout << step() << std::endl;
 }
 
