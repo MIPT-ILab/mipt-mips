@@ -66,7 +66,7 @@ class PerfMIPS : protected Log
    public:
         explicit PerfMIPS( bool log);
         void run( const std::string& tr, uint64 instrs_to_run);
-        ~PerfMIPS() final = default;
+        ~PerfMIPS() final { destroy_ports(); }
 };
 
 #endif

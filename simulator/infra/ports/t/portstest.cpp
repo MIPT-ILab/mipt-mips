@@ -82,17 +82,22 @@ int main()
                 {
                         std::cout << "-------------------------------\n\n"
                                  << "A stop signal is recieved.\n"
-                             << "Calculation is COMPLETED in cycle " << cycle << ".\n\n";
+                                 << "Calculation is COMPLETED in cycle " << cycle << ".\n\n";
                         return 0;
                 }
 
                 // execute each module
                 _a.clock( cycle);
                 _b.clock( cycle);
+
+                check_ports( cycle);
         }
 
         std::cout << "-------------------------------\n\n"
                  << "Calculation is FINISHED by CLOCK_LIMIT (=" << CLOCK_LIMIT << ").\n\n";
+
+        destroy_ports();
+
         return 0;
 }
 
@@ -120,7 +125,7 @@ void A::processData ( int data, int cycle)
         if ( data > DATA_LIMIT)
         {
                 std::cout << "\t\t\t data limit is exceeded => "
-                     << "send a stop signal\n";
+                         << "send a stop signal\n";
                 _stop->write( true, cycle);
 
                 return;

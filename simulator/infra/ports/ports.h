@@ -27,20 +27,24 @@ template<class T> class WritePort;
 // Global port handlers
 extern void init_ports();
 extern void check_ports( uint64 cycle);
+extern void destroy_ports();
 
 class BasePort : protected Log
 {
         friend void init_ports();
         friend void check_ports( uint64 cycle);
+        friend void destroy_ports();
 
     protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
                 friend void check_ports( uint64 cycle);
+                friend void destroy_ports();
 
                 virtual void init() const = 0;
                 virtual void check( uint64 cycle) const = 0;
+                virtual void destroy() = 0;
 
                 static std::list<BaseMap*> all_maps;
             protected:
@@ -88,6 +92,9 @@ template<class T> class Port : public BasePort
 
             // Finding lost elements
             void check( uint64 cycle) const final;
+
+            // Destroy connections
+            void destroy() final;
 
             // Constructors
             Map() noexcept : BaseMap() { }
@@ -140,6 +147,9 @@ template<class T> class WritePort : public Port<T>
             for ( const auto& reader : _destinations)
                 reader->check( cycle);
         }
+
+        // destroy all ports
+        void destroy();
     public:
         /*
          * Constructor
@@ -286,6 +296,29 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
 }
 
 /*
+ * Destroy map of ports.
+ *
+ * Iterates all map and de-initalizes all port trees
+ * Then destroys content of map
+*/
+template<class T> void WritePort<T>::destroy()
+{
+    if ( this->_init == false)
+        serr << "Destroying uninitialized WritePort " << this->_key << std::endl << critical;
+
+    this->_init = false;
+
+    for ( const auto reader : _destinations)
+    {
+        if ( reader->_init == false) 
+            serr << "Destroying uninitialized ReadPort " << this->_key << std::endl << critical;
+
+        reader->_init = false;
+    }
+    _destinations.clear();
+}
+
+/*
  * Read method
  *
  * First arguments is address, second is the number of cycle
@@ -345,6 +378,20 @@ template<class T> void Port<T>::Map::init() const
 
         writer->init( cluster.second.readers);
     }
+}
+
+/*
+ * Destroy map of ports.
+ *
+ * Iterates all map and de-initalizes all port trees
+ * Then destroys content of map
+*/
+template<class T> void Port<T>::Map::destroy()
+{
+    for ( const auto& cluster : _map)
+        cluster.second.writer->destroy();
+
+    _map.clear();
 }
 
 /*
