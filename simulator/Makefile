@@ -22,7 +22,8 @@ CPPS= \
     infra/cache/cache_tag_array.cpp \
     mips/mips_instr.cpp \
     func_sim/func_sim.cpp \
-    perf_sim.cpp
+    perf_sim.cpp \
+
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
@@ -46,11 +47,12 @@ $(GTEST_LIB):
 
 ####### TESTS #######
 
-TESTS= \
+TESTS:= \
     infra/elf_parser \
     infra/memory \
     mips \
-    ../simulator
+    $(shell pwd) \
+
 
 test: $(addsuffix /t/test.run, $(TESTS))
 

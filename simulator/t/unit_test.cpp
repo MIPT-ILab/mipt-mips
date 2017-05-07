@@ -43,13 +43,13 @@ TEST( Func_Sim, Run_Full_Trace)
 TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
     // Just call a constructor
-    ASSERT_NO_THROW( PerfMIPS mips( false) );
+    GTEST_ASSERT_NO_DEATH( PerfMIPS mips( false); );
 }
 
 TEST( Perf_Sim_init, Make_A_Step)
 {
     // Call constructor and run one instr
-    ASSERT_NO_THROW( PerfMIPS( false).run( valid_elf_file, 1) );
+    GTEST_ASSERT_NO_DEATH( PerfMIPS( false).run( valid_elf_file, 1); );
 }
 
 TEST( Perf_Sim_init, Process_Wrong_Args) 
