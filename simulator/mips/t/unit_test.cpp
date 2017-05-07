@@ -21,13 +21,54 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
+/*
+ * Tests by Orvar Segerstrom
+ * Copyright 2015 GNU GPL 3.0
+ * https://github.com/awestroke/mips-dasm/blob/master/instructions_test.c
+ */
+
+#define TEST_BAD_OPCODE( opcode) \
+    ASSERT_EQ(FuncInstr( opcode).Dump(), std::string(#opcode) + "\tUnknown");
+
+TEST( Func_instr_disasm, Process_Unknown_Instruction)
+{
+    TEST_BAD_OPCODE(0x71208821)
+    TEST_BAD_OPCODE(0x71208820)
+    TEST_BAD_OPCODE(0x71398802)
+    TEST_BAD_OPCODE(0x72290000)
+    TEST_BAD_OPCODE(0x72290001)
+    TEST_BAD_OPCODE(0x72290004)
+    TEST_BAD_OPCODE(0x062c04d2)
+    TEST_BAD_OPCODE(0x062cfb2e)
+    TEST_BAD_OPCODE(0x062e04d2)
+    TEST_BAD_OPCODE(0x062efb2e)
+    TEST_BAD_OPCODE(0x062804d2)
+    TEST_BAD_OPCODE(0x0628fb2e)
+    TEST_BAD_OPCODE(0x062904d2)
+    TEST_BAD_OPCODE(0x0629fb2e)
+    TEST_BAD_OPCODE(0x062a04d2)
+    TEST_BAD_OPCODE(0x062afb2e)
+    TEST_BAD_OPCODE(0x062b04d2)
+    TEST_BAD_OPCODE(0x062bfb2e)
+    TEST_BAD_OPCODE(0x72290005)
+    TEST_BAD_OPCODE(0x893104d2)
+    TEST_BAD_OPCODE(0x8931fb2e)
+    TEST_BAD_OPCODE(0x993104d2)
+    TEST_BAD_OPCODE(0x9931fb2e)
+    TEST_BAD_OPCODE(0xc13104d2)
+    TEST_BAD_OPCODE(0xc131fb2e)
+    TEST_BAD_OPCODE(0x0630fff5)
+    TEST_BAD_OPCODE(0x06300004)
+    TEST_BAD_OPCODE(0x0620fff3)
+    TEST_BAD_OPCODE(0x06200002)
+    TEST_BAD_OPCODE(0x0621fffd)
+    TEST_BAD_OPCODE(0x0621000c)
+    TEST_BAD_OPCODE(0x0631fffb)
+    TEST_BAD_OPCODE(0x0631000a)
+}
+
 TEST( Func_instr_disasm, Process_Disasm)
 {
-    /*
-     * Tests by Orvar Segerstrom
-     * Copyright 2015 GNU GPL 3.0
-     * https://github.com/awestroke/mips-dasm/blob/master/instructions_test.c
-     */
     ASSERT_EQ(FuncInstr(0x01398820).Dump(), "add $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x01398821).Dump(), "addu $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x01398824).Dump(), "and $s1, $t1, $t9");

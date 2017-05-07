@@ -361,7 +361,7 @@ void FuncInstr::initUnknown()
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
     oss << std::hex << std::setfill( '0')
-        << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
+        << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown";
     disasm = oss.str();
 }
 
