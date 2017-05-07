@@ -189,7 +189,6 @@ void PerfMIPS::clock_decode( int cycle) {
     if ( rf->check_sources( instr))
     {
         rf->read_sources( instr);
-        wp_decode_2_execute->write( instr, cycle);
 
         is_anything_to_decode = false; // successfully decoded
 
