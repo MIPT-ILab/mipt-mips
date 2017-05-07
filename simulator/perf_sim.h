@@ -15,6 +15,7 @@
 
 #include "func_sim/func_sim.h"
 #include "mips/mips_instr.h"
+#include "mips/mips_rf.h"
 
 #include "bpu/bpu.h"
 
@@ -87,7 +88,7 @@ public:
     PerfMIPS( bool log);
     void run( const std::string& tr,
               uint64 instrs_to_run);
-    ~PerfMIPS();
+    ~PerfMIPS() final { destroy_ports(); }
 };
 
 #endif

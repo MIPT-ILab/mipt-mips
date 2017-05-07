@@ -78,10 +78,10 @@ class Memory
         Memory& operator=( const Memory&) = delete;
         Memory( const Memory&) = delete;
     public:
-        Memory ( const std::string& executable_file_name,
-                     uint32 addr_size = 32,
-                     uint32 page_num_size = 10,
-                     uint32 offset_size = 12);
+        explicit Memory ( const std::string& executable_file_name,
+                     uint32 addr_bits = 32,
+                     uint32 page_bits = 10,
+                     uint32 offset_bits = 12);
         virtual ~Memory();
         uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
         void write( uint64 value, Addr addr, uint32 num_of_bytes = 4);

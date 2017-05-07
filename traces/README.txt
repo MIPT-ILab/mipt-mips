@@ -21,3 +21,7 @@ In order to create MIPS binary file do the following steps:
           mips-objdump -D <test name>.out
 
 Or you can use the makefile in this directory.
+
+tt.core.s.gz is a part of SPIM S20 MIPS Simulator distributed under Free BSD license (see file header)
+Copyright (c) 1990-2010, James R. Larus. All rights reserved.
+

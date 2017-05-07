@@ -13,6 +13,8 @@
 #include <string>
 #include <cassert>
 
+#include <boost/utility/string_ref.hpp>
+
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
@@ -53,6 +55,8 @@ enum RegNum
     REG_NUM_RA,
     REG_NUM_MAX
 };
+
+inline int32 sign_extend(int16 v) { return static_cast<int32>(v); }
 
 class FuncInstr
 {
@@ -111,15 +115,17 @@ class FuncInstr
             } asJ;
             uint32 raw;
 
-            _instr() {} // constructor w/o arguments for ports
-            _instr(uint32 bytes) {
+            _instr() { // constructor w/o arguments for ports
+                 raw = NO_VAL32;
+            }
+            explicit _instr(uint32 bytes) {
                  raw = bytes;
             }
-        } instr = NO_VAL32;
+        } instr = {};
 
         using Execute = void (FuncInstr::*)(void);
 
-        struct ISAEntry
+        struct ISAEntry // NOLINT
         {
             std::string name;
 
@@ -136,10 +142,10 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const char *regTableName(RegNum);
+        static const char *regTableName(RegNum reg);
         static const char *regTable[];
 
-        StringView name = nullptr;
+        boost::string_ref name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -174,8 +180,8 @@ class FuncInstr
         void execute_addu()  { v_dst = v_src1 + v_src2; }
         void execute_sub()   { v_dst = static_cast<int32>(v_src1) - static_cast<int32>(v_src2); }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + static_cast<int16>(v_imm); }
-        void execute_addiu() { v_dst = v_src1 + v_imm; }
+        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + sign_extend(v_imm); }
+        void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
         void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
         void execute_multu() { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
@@ -188,15 +194,15 @@ class FuncInstr
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
         void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = v_src1 >> v_imm; };
-        void execute_sllv()  { v_dst = v_src1 << v_src2; };
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; };
-        void execute_srav()  { v_dst = v_src1 >> v_src2; };
+        void execute_sra()   { v_dst = static_cast<int32>(v_src1) >> v_imm; }
+        void execute_sllv()  { v_dst = v_src1 << v_src2; }
+        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
+        void execute_srav()  { v_dst = static_cast<int32>(v_src1) >> v_src2; }
         void execute_lui()   { v_dst = v_imm  << 0x10; }
-        void execute_slt()   { v_dst = v_src2 < v_src1; };
-        void execute_sltu()  { v_dst = v_src2 < v_src1; };
-        void execute_slti()  { v_dst = v_src2 < instr.asI.imm; };
-        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm; };
+        void execute_slt()   { v_dst = static_cast<int32>(v_src1) < static_cast<int32>(v_src2) ? 1u : 0u; }
+        void execute_sltu()  { v_dst = v_src1                     <                    v_src2 ? 1u : 0u; }
+        void execute_slti()  { v_dst = static_cast<int32>(v_src1) < sign_extend(v_imm)  ? 1u : 0u; }
+        void execute_sltiu() { v_dst = v_src1 < static_cast<uint32>(sign_extend(v_imm)) ? 1u : 0u; };
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -230,7 +236,7 @@ class FuncInstr
 
         void execute_blez()
         {
-            if (v_src1 <= 0)
+            if (static_cast<int32>(v_src1) <= 0)
             {
                 new_PC += static_cast<int16>(v_imm) << 2;
                 _is_jump_taken = true;
@@ -239,7 +245,7 @@ class FuncInstr
 
         void execute_bgtz()
         {
-            if (v_src1 <= v_src2)
+            if (static_cast<int32>(v_src1) > 0)
             {
                 new_PC += static_cast<int16>(v_imm) << 2;
                 _is_jump_taken = true;
@@ -258,8 +264,8 @@ class FuncInstr
 
         void execute_unknown();
 
-        void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
-        void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
+        void calculate_load_addr()  { mem_addr = v_src1 + sign_extend(v_imm); }
+        void calculate_store_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
 
         Execute function = &FuncInstr::execute_unknown;
     public:
@@ -268,6 +274,7 @@ class FuncInstr
 
         FuncInstr() {} // constructor w/o arguments for ports
 
+        explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = 0,
                    Addr predicted_target = 0);
@@ -283,11 +290,13 @@ class FuncInstr
                                      operation == OUT_J_JUMP_LINK ||
                                      operation == OUT_R_JUMP      ||
                                      operation == OUT_R_JUMP_LINK ||
+                                     operation == OUT_I_BRANCH_0  ||
                                      operation == OUT_I_BRANCH; }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
+        bool is_nop() const { return instr.raw == 0x0u; }
 
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
@@ -299,7 +308,7 @@ class FuncInstr
         Addr get_new_PC() const { return new_PC; }
         Addr get_PC() const { return PC; }
 
-        void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
+        void set_v_dst(uint32 value); // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
         void execute();

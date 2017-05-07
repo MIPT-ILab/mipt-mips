@@ -1,3 +1,6 @@
+notifications:
+  email: false
+
 language: cpp
 sudo: false
 
@@ -18,14 +21,15 @@ script: cd simulator; make mipt-mips disasm test
 addons:
   apt:
     sources:
+    - boost-latest
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-4.0
     packages:
     - g++-6
-    - libelf-dev
-    - libboost-all-dev
     - clang-4.0
     - llvm-4.0-dev
+    - libelf-dev
+    - libboost1.55-all-dev
 
 install: 
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi

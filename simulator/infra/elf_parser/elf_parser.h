@@ -30,7 +30,7 @@ public:
     const Addr start_addr; // the start address of the section
     uint8* const content; // the row data of the section
 
-    ElfSection( const  ElfSection& old);
+    ElfSection( const  ElfSection& that);
 
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.
@@ -38,7 +38,7 @@ public:
                                    std::list<ElfSection>& sections_array /*used as output*/);
 
     ElfSection( const char* name, Addr start_addr,
-	    Addr size, const uint8* content);
+	    Addr size, const uint8* content_that);
 
     virtual ~ElfSection();
 

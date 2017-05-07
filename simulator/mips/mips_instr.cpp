@@ -219,10 +219,11 @@ void FuncInstr::initFormat()
     initUnknown();
 }
 
-
 void FuncInstr::initR()
 {
     std::ostringstream oss;
+    if ( PC != 0)
+        oss << std::hex << "0x" << PC << ": ";
     oss << name;
     switch ( operation)
     {
@@ -281,6 +282,8 @@ void FuncInstr::initI()
     v_imm = instr.asI.imm;
 
     std::ostringstream oss;
+    if ( PC != 0)
+        oss << std::hex << "0x" << PC << ": ";
     oss << name << " $";
     switch ( operation)
     {
@@ -345,6 +348,8 @@ void FuncInstr::initJ()
     v_imm = instr.asJ.imm;
 
     std::ostringstream oss;
+    if ( PC != 0)
+        oss << std::hex << "0x" << PC << ": ";
     oss << name << " 0x"
         << std::hex << static_cast<uint16>(v_imm) << std::dec;
 
@@ -359,8 +364,10 @@ void FuncInstr::initJ()
 void FuncInstr::initUnknown()
 {
     std::ostringstream oss;
+    if ( PC != 0)
+        oss << std::hex << "0x" << PC << ": ";
     oss << std::hex << std::setfill( '0')
-        << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown" << std::endl;
+        << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown";
     disasm = oss.str();
 }
 
@@ -374,6 +381,36 @@ void FuncInstr::execute()
 {
     (this->*function)();
     complete = true;
+
+    if ( dst != REG_NUM_ZERO && !is_load())
+    {
+        std::ostringstream oss;
+        oss << "\t [ $" << regTableName(dst)
+            << " = 0x" << std::hex << v_dst << "]";
+        disasm += oss.str();
+    }
+}
+
+void FuncInstr::set_v_dst( uint32 value)
+{
+    if ( operation == OUT_I_LOAD)
+    {
+        switch ( get_mem_size())
+        {
+            case 1: v_dst = static_cast<int32>( static_cast<int8>( value)); break;
+            case 2: v_dst = static_cast<int32>( static_cast<int16>( value)); break;
+            case 4: v_dst = value; break;
+            default: assert(0);
+        }
+    }
+    else if ( operation == OUT_I_LOADU)
+    {
+        v_dst = value;
+    }
+    else
+    {
+        assert( 0);
+    }
 
     if ( dst != REG_NUM_ZERO)
     {

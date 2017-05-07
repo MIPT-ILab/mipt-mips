@@ -21,7 +21,7 @@ public:
 
     LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
 
-    friend LogOstream& operator<<(LogOstream&, const Critical&) {
+    friend LogOstream& operator<<(LogOstream& /*stream*/, const Critical& /* dummy */) {
          exit( EXIT_FAILURE);
     }
 
@@ -48,8 +48,8 @@ public:
     mutable LogOstream serr;
     const LogOstream::Critical critical;
 
-    Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
-    virtual ~Log() { }
+    explicit Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
+    virtual ~Log() = default;
 };
 
 #endif /* LOG_H */

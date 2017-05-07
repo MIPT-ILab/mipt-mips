@@ -25,11 +25,12 @@ CPPS= \
     infra/cache/cache_tag_array.cpp \
     mips/mips_instr.cpp \
     func_sim/func_sim.cpp \
-    perf_sim.cpp
+    perf_sim.cpp \
+
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options # boost_timer
+LIBS= elf boost_program_options boost_timer
 
 vpath %.cpp $(dir $(CPPS))
 
@@ -37,6 +38,9 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 	@$(CXX) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS))
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
+
+tidy: $(CPPS) main.cpp
+	@clang-tidy $^ $(TIDYFLAGS) -- -std=c++14 $(INCL)
 
 ###### Rules to get GTest #######
 
@@ -46,11 +50,13 @@ $(GTEST_LIB):
 
 ####### TESTS #######
 
-TESTS= \
+TESTS:= \
     infra/elf_parser \
     infra/memory \
     mips \
-    bpu
+    bpu \
+    $(shell pwd) \
+
 
 test: $(addsuffix /t/test.run, $(TESTS))
 

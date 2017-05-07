@@ -20,3 +20,9 @@ void check_ports( uint64 cycle)
         map->check( cycle);
 }
 
+void destroy_ports()
+{
+    for ( auto map : BasePort::BaseMap::all_maps)
+        map->destroy();
+}
+
