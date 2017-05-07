@@ -63,7 +63,7 @@ void handleArgs( int argc, char** argv)
     po::options_description description( "Allowed options");
 
     for ( auto value : BaseValue::values())
-         value->reg(description);
+         value.second->reg(description);
 
     po::variables_map vm;
 
