@@ -23,12 +23,14 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-4.0
+    - boost-latest-ppa
     packages:
     - g++-6
     - libelf-dev
     - libboost-all-dev
     - clang-4.0
     - llvm-4.0-dev
+    - libboost-timer-dev
 
 install: 
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
