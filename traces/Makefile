@@ -22,7 +22,7 @@ build_all: $(OUT_FILES)
 	@echo $@ is built
 
 %.o: %.s
-	@mips-as $< -o $@
+	@mips-as $< -o $@ -O0
 
 %.s: %.s.gz
 	@gunzip -c $< > $@

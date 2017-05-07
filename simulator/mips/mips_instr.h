@@ -54,6 +54,8 @@ enum RegNum
     REG_NUM_MAX
 };
 
+inline int32 sign_extend(int16 v) { return static_cast<int32>(v); }
+
 class FuncInstr
 {
     private:
@@ -171,8 +173,8 @@ class FuncInstr
         void execute_addu()  { v_dst = v_src1 + v_src2; }
         void execute_sub()   { v_dst = static_cast<int32>(v_src1) - static_cast<int32>(v_src2); }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + static_cast<int16>(v_imm); }
-        void execute_addiu() { v_dst = v_src1 + v_imm; }
+        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + sign_extend(v_imm); }
+        void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
         void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
         void execute_multu() { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
@@ -185,17 +187,15 @@ class FuncInstr
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
         void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = v_src1 >> v_imm; }
+        void execute_sra()   { v_dst = static_cast<int32>(v_src1) >> v_imm; }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = v_src1 >> v_src2; }
+        void execute_srav()  { v_dst = static_cast<int32>(v_src1) >> v_src2; }
         void execute_lui()   { v_dst = v_imm  << 0x10; }
-        void execute_slt()   { v_dst = static_cast<int32>(v_src2) < static_cast<int32>(v_src1) ? 1u : 0u; }
-        void execute_sltu()  { v_dst = v_src2 < v_src1 ? 1u : 0u; }
-        void execute_slti()  {
-	     v_dst = static_cast<int32>(v_src2) < static_cast<int32>(instr.asI.imm) ? 1u : 0u;
-        }
-        void execute_sltiu() { v_dst = v_src2 < instr.asI.imm ? 1u : 0u; };
+        void execute_slt()   { v_dst = static_cast<int32>(v_src1) < static_cast<int32>(v_src2) ? 1u : 0u; }
+        void execute_sltu()  { v_dst = v_src1                     <                    v_src2 ? 1u : 0u; }
+        void execute_slti()  { v_dst = static_cast<int32>(v_src1) < sign_extend(v_imm)  ? 1u : 0u; }
+        void execute_sltiu() { v_dst = v_src1 < static_cast<uint32>(sign_extend(v_imm)) ? 1u : 0u; };
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -212,13 +212,13 @@ class FuncInstr
         void execute_beq()    { if (v_src1 == v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
         void execute_bne()    { if (v_src1 != v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
 
-        void execute_blez()   { if (v_src1 <= 0) new_PC += static_cast<int16>(v_imm) << 2; }
-        void execute_bgtz()   { if (v_src1 <= v_src2) new_PC += static_cast<int16>(v_imm) << 2; }
+        void execute_blez()   { if (static_cast<int32>(v_src1) <= 0) new_PC += static_cast<int16>(v_imm) << 2; }
+        void execute_bgtz()   { if (static_cast<int32>(v_src1) >  0) new_PC += static_cast<int16>(v_imm) << 2; }
         void execute_jal()    { v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
 
         void execute_j()      { new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { new_PC = v_src1; }
-        void execute_jalr()   { v_dst = new_PC; new_PC = v_src2; };
+        void execute_jalr()   { v_dst = new_PC; new_PC = v_src1; };
 
         void execute_syscall(){ };
         void execute_break()  { };
@@ -226,8 +226,8 @@ class FuncInstr
 
         void execute_unknown();
 
-        void calculate_load_addr()  { mem_addr = v_src1 + v_imm; }
-        void calculate_store_addr() { mem_addr = v_src1 + v_imm; }
+        void calculate_load_addr()  { mem_addr = v_src1 + sign_extend(v_imm); }
+        void calculate_store_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
 
         Execute function = &FuncInstr::execute_unknown;
     public:
@@ -247,6 +247,7 @@ class FuncInstr
                                      operation == OUT_J_JUMP_LINK ||
                                      operation == OUT_R_JUMP      ||
                                      operation == OUT_R_JUMP_LINK ||
+                                     operation == OUT_I_BRANCH_0  ||
                                      operation == OUT_I_BRANCH; }
         bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
         bool is_store() const { return operation == OUT_I_STORE; }
@@ -261,7 +262,7 @@ class FuncInstr
         uint32 get_mem_size() const { return mem_size; }
         Addr get_new_PC() const { return new_PC; }
 
-        void set_v_dst(uint32 value)  { v_dst  = value; } // for loads
+        void set_v_dst(uint32 value); // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
         void execute();
