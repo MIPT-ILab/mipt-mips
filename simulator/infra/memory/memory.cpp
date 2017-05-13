@@ -33,15 +33,18 @@ Memory::Memory( const std::string& executable_file_name,
     set_cnt ( 1ull << set_bits ),
     page_size ( 1ull << offset_bits)
 {
-    if ( set_cnt > MAX_VAL32) {
+	const uint64 set_cnt_test = 1ull << set_bits;
+	const uint64 page_cnt_test = 1ull << page_bits;
+	const uint64 page_size_test = 1ull << offset_bits;
+    if ( set_cnt_test > MAX_VAL32) {
         std::cerr << "ERROR. Memory is divided to too many (" << set_cnt << ") sets\n";
         std::exit( EXIT_FAILURE);
     }
-    if ( page_cnt > MAX_VAL32) {
+    if ( page_cnt_test > MAX_VAL32) {
         std::cerr << "ERROR. Each set is divided to too many (" << page_cnt << ") pages\n";
         std::exit( EXIT_FAILURE);
     }
-    if ( page_size > MAX_VAL32) {
+    if ( page_size_test > MAX_VAL32) {
         std::cerr << "ERROR. Each page is too large (" << page_cnt << " bytes)\n";
         std::exit( EXIT_FAILURE);
     }
