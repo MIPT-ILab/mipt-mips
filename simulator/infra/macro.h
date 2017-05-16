@@ -9,6 +9,8 @@
 #ifndef COMMON__MACRO_H
 #define COMMON__MACRO_H
 
+#include <algorithm>
+
 /* Returns size of a static array */
 template<typename T, size_t N>
 constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
@@ -21,5 +23,12 @@ constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0
 template<typename T>
 void ignored( const T& /* unused */) noexcept { }
 
-#endif
+/* Find minimal sizeof */
+template<typename ... Args>
+constexpr size_t min_sizeof() noexcept { return std::min(sizeof(Args)...); }
 
+/* Find maximal sizeof */
+template<typename ... Args>
+constexpr size_t max_sizeof() noexcept { return std::max(sizeof(Args)...); }
+
+#endif
