@@ -19,10 +19,11 @@ build_all: $(OUT_FILES)
 
 %.out: %.o
 	@mips-ld $< -o $@
+	@chmod -x $@
 	@echo $@ is built
 
 %.o: %.s
-	@mips-as $< -o $@ -O0
+	@mips-as $< -o $@ -O0 -mips2
 
 %.s: %.s.gz
 	@gunzip -c $< > $@

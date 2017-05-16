@@ -32,6 +32,9 @@ std::string MIPS::step()
     // writeback
     rf->write_dst( instr);
 
+    // trap check
+    instr.check_trap();
+
     // PC update
     PC = instr.get_new_PC();
 

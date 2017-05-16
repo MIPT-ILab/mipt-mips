@@ -94,6 +94,12 @@ class FuncInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
+        enum class TrapType
+        {
+            NO_TRAP,
+            EXPLICIT_TRAP,
+        } trap = TrapType::NO_TRAP;
+
         union _instr
         {
             struct
@@ -180,11 +186,36 @@ class FuncInstr
         void initJ();
         void initUnknown();
 
-        void execute_add()   { v_dst = static_cast<int32>(v_src1) + static_cast<int32>(v_src2); }
+        // Predicate helpers - unary
+        bool lez() const { return static_cast<int32>( v_src1) <= 0; }
+        bool gez() const { return static_cast<int32>( v_src1) >= 0; }
+        bool ltz() const { return static_cast<int32>( v_src1) < 0; }
+        bool gtz() const { return static_cast<int32>( v_src1) > 0; }
+
+        // Predicate helpers - binary
+        bool eq()  const { return v_src1 == v_src2; }
+        bool ne()  const { return v_src1 != v_src2; }
+        bool geu() const { return v_src1 >= v_src2; }
+        bool ltu() const { return v_src1 <  v_src2; }
+        bool ge()  const { return static_cast<int32>( v_src1) >= static_cast<int32>( v_src2); }
+        bool lt()  const { return static_cast<int32>( v_src1) <  static_cast<int32>( v_src2); }
+
+        // Predicate helpers - immediate
+        bool eqi() const { return static_cast<int32>( v_src1) == sign_extend( v_imm); }
+        bool nei() const { return static_cast<int32>( v_src1) != sign_extend( v_imm); }
+        bool lti() const { return static_cast<int32>( v_src1) <  sign_extend( v_imm); }
+        bool gei() const { return static_cast<int32>( v_src1) >= sign_extend( v_imm); }
+
+        // Predicate helpers - immediate unsigned
+        bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
+        bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
+
+        void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
+        void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
+        void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
+
         void execute_addu()  { v_dst = v_src1 + v_src2; }
-        void execute_sub()   { v_dst = static_cast<int32>(v_src1) - static_cast<int32>(v_src2); }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addi()  { v_dst = static_cast<int32>(v_src1) + sign_extend(v_imm); }
         void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
         void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
@@ -198,15 +229,16 @@ class FuncInstr
 
         void execute_sll()   { v_dst = v_src1 << v_imm; }
         void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = static_cast<int32>(v_src1) >> v_imm; }
+        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> v_imm; }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>(v_src1) >> v_src2; }
-        void execute_lui()   { v_dst = v_imm  << 0x10; }
-        void execute_slt()   { v_dst = static_cast<int32>(v_src1) < static_cast<int32>(v_src2) ? 1u : 0u; }
-        void execute_sltu()  { v_dst = v_src1                     <                    v_src2 ? 1u : 0u; }
-        void execute_slti()  { v_dst = static_cast<int32>(v_src1) < sign_extend(v_imm)  ? 1u : 0u; }
-        void execute_sltiu() { v_dst = v_src1 < static_cast<uint32>(sign_extend(v_imm)) ? 1u : 0u; };
+        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
+        void execute_lui()   { v_dst = v_imm << 0x10; }
+
+        void execute_slt()   { v_dst = static_cast<uint32>( lt()); }
+        void execute_sltu()  { v_dst = static_cast<uint32>( ltu()); }
+        void execute_slti()  { v_dst = static_cast<uint32>( lti()); }
+        void execute_sltiu() { v_dst = static_cast<uint32>( ltiu()); }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -220,58 +252,49 @@ class FuncInstr
         void execute_movn()  { }
         void execute_movz()  { }
     
-        void execute_tge()  { }
-        void execute_tgeu() { }
-        void execute_tlt()  { }
-        void execute_tltu() { }
-        void execute_teq()  { }
-        void execute_tne()  { }
+        void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_tlt()  { if ( lt() ) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_tltu() { if ( ltu()) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_teq()  { if ( eq() ) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_tne()  { if ( ne() ) trap = TrapType::EXPLICIT_TRAP; }
     
         void execute_beq()
         {
-            if (v_src1 == v_src2)
-            {
-                new_PC += static_cast<int16>(v_imm) << 2;
-                _is_jump_taken = true;
-            }
+            _is_jump_taken = eq();
+            if ( _is_jump_taken)
+                new_PC += static_cast<int16>( v_imm) << 2;
         }
 
         void execute_bne()
         {
-            if (v_src1 != v_src2)
-            {
-                new_PC += static_cast<int16>(v_imm) << 2;
-                _is_jump_taken = true;
-            }
+            _is_jump_taken = ne();
+            if ( _is_jump_taken)
+                new_PC += static_cast<int16>( v_imm) << 2;
         }
 
         void execute_blez()
         {
-            if (static_cast<int32>(v_src1) <= 0)
-            {
-                new_PC += static_cast<int16>(v_imm) << 2;
-                _is_jump_taken = true;
-            }
+            _is_jump_taken = lez();
+            if ( _is_jump_taken)
+                new_PC += static_cast<int16>( v_imm) << 2;
         }
 
         void execute_bgtz()
         {
-            if (static_cast<int32>(v_src1) > 0)
-            {
-                new_PC += static_cast<int16>(v_imm) << 2;
-                _is_jump_taken = true;
-            }
+            _is_jump_taken = gtz();
+            if ( _is_jump_taken)
+                new_PC += static_cast<int16>( v_imm) << 2;
         }
-
-        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
 
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
+
+        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
         void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
 
         void execute_syscall(){ };
         void execute_break()  { };
-        void execute_trap()   { };
 
         void execute_unknown();
 
@@ -309,6 +332,8 @@ class FuncInstr
         bool is_store() const { return operation == OUT_I_STORE; }
         bool is_nop() const { return instr.raw == 0x0u; }
 
+        bool has_trap() const { return trap != TrapType::NO_TRAP; }
+
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 
@@ -323,6 +348,7 @@ class FuncInstr
         uint32 get_v_src2() const { return v_src2; } // for stores
 
         void execute();
+        void check_trap();
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)

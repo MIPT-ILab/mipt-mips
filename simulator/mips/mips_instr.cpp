@@ -441,3 +441,14 @@ void FuncInstr::set_v_dst( uint32 value)
         disasm += oss.str();
     }
 }
+
+void FuncInstr::check_trap()
+{
+    if ( trap != TrapType::NO_TRAP)
+    {
+        std::ostringstream oss;
+        oss << "\t trap";
+        disasm += oss.str();
+    }
+}
+
