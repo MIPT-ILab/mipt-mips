@@ -279,8 +279,8 @@ void FuncInstr::initR()
             oss << " $" << regTableName(src1);
             break;
         case OUT_R_TRAP:
-            src2 = static_cast<RegNum>(instr.asR.rs);
-            src1 = static_cast<RegNum>(instr.asR.rt);
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            src2 = static_cast<RegNum>(instr.asR.rt);
 
             oss <<  " $" << regTableName(src1)
                 << ", $" << regTableName(src2);
