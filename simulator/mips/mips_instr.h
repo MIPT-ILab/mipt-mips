@@ -58,6 +58,9 @@ enum RegNum
 
 inline int32 sign_extend(int16 v) { return static_cast<int32>(v); }
 
+template<size_t N, typename T>
+T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
+
 class FuncInstr
 {
     private:
@@ -263,8 +266,8 @@ class FuncInstr
         void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
 
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { _is_jump_taken = true; new_PC = v_src1; }
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = v_src1; };
+        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
+        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
 
         void execute_syscall(){ };
         void execute_break()  { };
