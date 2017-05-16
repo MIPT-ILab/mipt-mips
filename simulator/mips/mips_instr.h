@@ -77,6 +77,7 @@ class FuncInstr
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
+            OUT_R_TRAP,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_I_BRANCH_0,
@@ -215,7 +216,14 @@ class FuncInstr
     
         void execute_movn()  { }
         void execute_movz()  { }
-
+    
+        void execute_tge()  { }
+        void execute_tgeu() { }
+        void execute_tlt()  { }
+        void execute_tltu() { }
+        void execute_teq()  { }
+        void execute_tne()  { }
+    
         void execute_beq()
         {
             if (v_src1 == v_src2)
