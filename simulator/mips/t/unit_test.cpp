@@ -96,6 +96,12 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x01398826).Dump(), "xor $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x0139882a).Dump(), "slt $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x0139882b).Dump(), "sltu $s1, $t1, $t9");
+    ASSERT_EQ(FuncInstr(0x01398830).Dump(), "tge $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x01398831).Dump(), "tgeu $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x01398832).Dump(), "tlt $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x01398833).Dump(), "tltu $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x01398834).Dump(), "teq $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x01398835).Dump(), "tne $s1, $t1");
     ASSERT_EQ(FuncInstr(0x01208809).Dump(), "jalr $s1, $t1");
     ASSERT_EQ(FuncInstr(0x00000000).Dump(), "nop ");
     
