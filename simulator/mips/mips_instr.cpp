@@ -86,7 +86,19 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     { "sltu", 0x2B, FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1},
 
     // 0x2C - 0x2F double width addition/substraction
-    // 0x30 - 0x3F double width shifts and conditional traps
+    
+    // Conditional traps (MIPS II)
+    // name  funct    format operation  memsize           pointer
+    { "tge",  0x30, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tge,  2},
+    { "tgeu", 0x31, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tgeu, 2},
+    { "tlt",  0x32, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tlt,  2},
+    { "tltu", 0x33, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tltu, 2},
+    { "teq",  0x34, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_teq,  2},
+    //        0x35 reserved
+    { "tne",  0x36, FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tne,  2},
+    //        0x37 reserved
+
+    // 0x38 - 0x3F double width shifts
 
     // ********************** REGIMM INSTRUCTIONS *************************
 
@@ -265,6 +277,15 @@ void FuncInstr::initR()
             dst = REG_NUM_ZERO;
             src1  = static_cast<RegNum>(instr.asR.rs);
             oss << " $" << regTableName(src1);
+            break;
+        case OUT_R_TRAP:
+            dst = REG_NUM_ZERO;
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            src2 = static_cast<RegNum>(instr.asR.rt);
+
+            oss <<  " $" << regTableName(src1)
+                << ", $" << regTableName(src2);
+            break;
         case OUT_R_SPECIAL:
             break;
         default:
