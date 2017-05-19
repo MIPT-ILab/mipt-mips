@@ -6,11 +6,9 @@ before_build:
 - cd C:/libelf
 - echo ./configure --host i686-pc-mingw32; make; make install > script.sh
 - sh --login .\script.sh
-- set C_INCLUDE_PATH=%C_INCLUDE_PATH%;C:\libelf\lib;C:\Libraries\boost
-- set LIBRARY_PATH=%LIBRARY_PATH%;C:\libelf\lib;C:\Libraries\boost\stage\lib
 
 build_script:
-- echo cd /c/projects/mipt-mips/simulator/; make mipt-mips disasm test > script.sh
+- echo cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib BOOST_INCL=/c/Libraries/boost mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
 environment:
