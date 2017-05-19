@@ -142,22 +142,22 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // name opcode    format    operation memsize           pointer
     { "lb",  0x20,  FORMAT_I, OUT_I_LOAD,  1, &FuncInstr::calculate_load_addr, 1},
     { "lh",  0x21,  FORMAT_I, OUT_I_LOAD,  2, &FuncInstr::calculate_load_addr, 1},
- // { "lwl", 0x22,  FORMAT_I, OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1},
+    { "lwl", 0x22,  FORMAT_I, OUT_I_LOADL, 4, &FuncInstr::calculate_load_addr, 1},
     { "lw",  0x23,  FORMAT_I, OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1},
     { "lbu", 0x24,  FORMAT_I, OUT_I_LOADU, 1, &FuncInstr::calculate_load_addr, 1},
     { "lhu", 0x25,  FORMAT_I, OUT_I_LOADU, 2, &FuncInstr::calculate_load_addr, 1},
- // { "lwr", 0x26,  FORMAT_I, OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1},
+    { "lwr", 0x26,  FORMAT_I, OUT_I_LOADR, 4, &FuncInstr::calculate_load_addr, 1},
     { "lwu", 0x27,  FORMAT_I, OUT_I_LOADU, 4, &FuncInstr::calculate_load_addr, 1},
 
     // Store
     // name opcode    format    operation memsize           pointer
-    { "sb",  0x28,  FORMAT_I, OUT_I_STORE, 1, &FuncInstr::calculate_store_addr, 1},
-    { "sh",  0x29,  FORMAT_I, OUT_I_STORE, 2, &FuncInstr::calculate_store_addr, 1},
- // { "swl", 0x2A,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
-    { "sw",  0x2B,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1},
+    { "sb",  0x28,  FORMAT_I, OUT_I_STORE,  1, &FuncInstr::calculate_store_addr, 1},
+    { "sh",  0x29,  FORMAT_I, OUT_I_STORE,  2, &FuncInstr::calculate_store_addr, 1},
+    { "swl", 0x2A,  FORMAT_I, OUT_I_STOREL, 4, &FuncInstr::calculate_store_addr, 1},
+    { "sw",  0x2B,  FORMAT_I, OUT_I_STORE,  4, &FuncInstr::calculate_store_addr, 1},
     //       0x2C   store double word left
     //       0x2D   store double word right
- // { "swr", 0x2E,  FORMAT_I, OUT_I_STORE, 4, &FuncInstr::calculate_store_addr, 1}
+    { "swr", 0x2E,  FORMAT_I, OUT_I_STORER, 4, &FuncInstr::calculate_store_addr, 1}
     //       0x2F   coprocessor
     
     // 0x30 - 0x3F atomic load/stores
@@ -341,6 +341,8 @@ void FuncInstr::initI()
 
         case OUT_I_LOAD:
         case OUT_I_LOADU:
+        case OUT_I_LOADL:
+        case OUT_I_LOADR:
             src1 = static_cast<RegNum>(instr.asI.rs);
             dst  = static_cast<RegNum>(instr.asI.rt);
 
@@ -350,6 +352,8 @@ void FuncInstr::initI()
             break;
 
         case OUT_I_STORE:
+        case OUT_I_STOREL:
+        case OUT_I_STORER:
             src2 = static_cast<RegNum>(instr.asI.rt);
             src1 = static_cast<RegNum>(instr.asI.rs);
             dst  = REG_NUM_ZERO;
