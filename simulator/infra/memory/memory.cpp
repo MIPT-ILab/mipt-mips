@@ -48,7 +48,6 @@ Memory::Memory( const std::string& executable_file_name,
         std::exit( EXIT_FAILURE);
     }
 
-
     memory = new uint8** [set_cnt]();
 
     std::list<ElfSection> sections_array;
