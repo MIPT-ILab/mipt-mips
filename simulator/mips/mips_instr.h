@@ -90,6 +90,8 @@ class FuncInstr
             OUT_I_LOADL,
             OUT_I_CONST,
             OUT_I_STORE,
+            OUT_I_STOREL,
+            OUT_I_STORER,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_J_SPECIAL,
@@ -330,8 +332,13 @@ class FuncInstr
                                      operation == OUT_I_BRANCH; }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
-        bool is_load()  const { return operation == OUT_I_LOAD || operation == OUT_I_LOADU; }
-        bool is_store() const { return operation == OUT_I_STORE; }
+        bool is_load()  const { return operation == OUT_I_LOAD  ||
+                                       operation == OUT_I_LOADU ||
+                                       operation == OUT_I_LOADR ||
+                                       operation == OUT_I_LOADL; }
+        bool is_store() const { return operation == OUT_I_STORE  ||
+                                       operation == OUT_I_STORER ||
+                                       operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
