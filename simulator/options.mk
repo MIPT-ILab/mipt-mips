@@ -14,7 +14,7 @@ else
 endif
 
 ifeq ($(UNAME), Msys)
-    CXXFLAGS+= -U__STRICT_ANSI__ -D__STDC_LIMIT_MACROS
+    CXXFLAGS+= -U__STRICT_ANSI__ -D__STDC_LIMIT_MACROS -D__LIBELF_INTERNAL__=1
     ifeq ($(CXX), clang++)
         CXXFLAGS+= --target=i386-w32-mingw32
         CXXFLAGS+= -D__float128=void
