@@ -3,14 +3,15 @@
  * Copyright 2017 MIPT-MIPS
  */
 
-/* Simulator modules */
-#include "config.h"
-
 /* Generic C++ */
 #include <iostream>
+#include <cstdlib>
 
 /* Boost */
 #include <boost/program_options.hpp>
+
+/* Simulator modules */
+#include "config.h"
 
 namespace config {
 
