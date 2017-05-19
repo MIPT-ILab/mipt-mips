@@ -86,6 +86,8 @@ class FuncInstr
             OUT_I_BRANCH_0,
             OUT_I_LOAD,
             OUT_I_LOADU,
+            OUT_I_LOADR,
+            OUT_I_LOADL,
             OUT_I_CONST,
             OUT_I_STORE,
             OUT_J_JUMP,
@@ -249,8 +251,8 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | v_imm; }
         void execute_xori()  { v_dst = v_src1 ^ v_imm; }
     
-        void execute_movn()  { }
-        void execute_movz()  { }
+        void execute_movn()  { execute_unknown(); }
+        void execute_movz()  { execute_unknown(); }
     
         void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
         void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
