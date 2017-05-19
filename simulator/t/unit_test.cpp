@@ -9,7 +9,7 @@
 #include "../perf_sim.h"
 
 static const std::string valid_elf_file = "./all_mips.out";
-static const int64 num_steps = 1498;
+static const int64 num_steps = 2013;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")

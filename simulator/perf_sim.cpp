@@ -309,6 +309,9 @@ void PerfMIPS::clock_writeback( int cycle)
     /* perform writeback */
     rf->write_dst( instr);
 
+    /* check for traps */
+    instr.check_trap();
+
     /* log */
     sout << instr << std::endl;
 

@@ -51,10 +51,6 @@ TEST( Func_instr_disasm, Process_Unknown_Instruction)
     TEST_BAD_OPCODE(0x062b04d2)
     TEST_BAD_OPCODE(0x062bfb2e)
     TEST_BAD_OPCODE(0x72290005)
-    TEST_BAD_OPCODE(0x893104d2)
-    TEST_BAD_OPCODE(0x8931fb2e)
-    TEST_BAD_OPCODE(0x993104d2)
-    TEST_BAD_OPCODE(0x9931fb2e)
     TEST_BAD_OPCODE(0xc13104d2)
     TEST_BAD_OPCODE(0xc131fb2e)
     TEST_BAD_OPCODE(0x0630fff5)
@@ -96,6 +92,12 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x01398826).Dump(), "xor $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x0139882a).Dump(), "slt $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x0139882b).Dump(), "sltu $s1, $t1, $t9");
+    ASSERT_EQ(FuncInstr(0x02290030).Dump(), "tge $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x02290031).Dump(), "tgeu $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x02290032).Dump(), "tlt $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x02290033).Dump(), "tltu $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x02290034).Dump(), "teq $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x02290036).Dump(), "tne $s1, $t1");
     ASSERT_EQ(FuncInstr(0x01208809).Dump(), "jalr $s1, $t1");
     ASSERT_EQ(FuncInstr(0x00000000).Dump(), "nop ");
     
@@ -133,10 +135,10 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x9531fb2e).Dump(), "lhu $s1, 0xfb2e($t1)");
     ASSERT_EQ(FuncInstr(0x8d3104d2).Dump(), "lw $s1, 0x4d2($t1)");
     ASSERT_EQ(FuncInstr(0x8d31fb2e).Dump(), "lw $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(FuncInstr(0x893104d2).Dump(), "lwl $s1, 0x4d2($t1)");
-//  ASSERT_EQ(FuncInstr(0x8931fb2e).Dump(), "lwl $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(FuncInstr(0x993104d2).Dump(), "lwr $s1, 0x4d2($t1)");
-//  ASSERT_EQ(FuncInstr(0x9931fb2e).Dump(), "lwr $s1, 0xfb2e($t1)");
+    ASSERT_EQ(FuncInstr(0x893104d2).Dump(), "lwl $s1, 0x4d2($t1)");
+    ASSERT_EQ(FuncInstr(0x8931fb2e).Dump(), "lwl $s1, 0xfb2e($t1)");
+    ASSERT_EQ(FuncInstr(0x993104d2).Dump(), "lwr $s1, 0x4d2($t1)");
+    ASSERT_EQ(FuncInstr(0x9931fb2e).Dump(), "lwr $s1, 0xfb2e($t1)");
 //  ASSERT_EQ(FuncInstr(0xc13104d2).Dump(), "ll $s1, 0x4d2($t1)");
 //  ASSERT_EQ(FuncInstr(0xc131fb2e).Dump(), "ll $s1, 0xfb2e($t1)");
     ASSERT_EQ(FuncInstr(0xa13104d2).Dump(), "sb $s1, 0x4d2($t1)");
@@ -145,10 +147,10 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0xa531fb2e).Dump(), "sh $s1, 0xfb2e($t1)");
     ASSERT_EQ(FuncInstr(0xad3104d2).Dump(), "sw $s1, 0x4d2($t1)");
     ASSERT_EQ(FuncInstr(0xad31fb2e).Dump(), "sw $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(FuncInstr(0xa93104d2).Dump(), "swl $s1, 0x4d2($t1)");
-//  ASSERT_EQ(FuncInstr(0xa931fb2e).Dump(), "swl $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(FuncInstr(0xb93104d2).Dump(), "swr $s1, 0x4d2($t1)");
-//  ASSERT_EQ(FuncInstr(0xb931fb2e).Dump(), "swr $s1, 0xfb2e($t1)");
+    ASSERT_EQ(FuncInstr(0xa93104d2).Dump(), "swl $s1, 0x4d2($t1)");
+    ASSERT_EQ(FuncInstr(0xa931fb2e).Dump(), "swl $s1, 0xfb2e($t1)");
+    ASSERT_EQ(FuncInstr(0xb93104d2).Dump(), "swr $s1, 0x4d2($t1)");
+    ASSERT_EQ(FuncInstr(0xb931fb2e).Dump(), "swr $s1, 0xfb2e($t1)");
 //  ASSERT_EQ(FuncInstr(0xe13104d2).Dump(), "sc $s1, 0x4d2($t1)");
 //  ASSERT_EQ(FuncInstr(0xe131fb2e).Dump(), "sc $s1, 0xfb2e($t1)");
     ASSERT_EQ(FuncInstr(0x1229ffff).Dump(), "beq $s1, $t1, -1");

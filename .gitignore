@@ -22,6 +22,7 @@
 *.so
 *.out
 *.output
+*.exe
 
 # Packages #
 ######################

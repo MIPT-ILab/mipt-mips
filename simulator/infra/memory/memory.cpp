@@ -9,7 +9,9 @@
 #include <sstream>
 #include <iomanip>
 
-// uArchSim modules
+// MIPT-MIPS modules
+#include <infra/macro.h>
+
 #include "memory.h"
 
 union uint64_8
@@ -33,22 +35,18 @@ Memory::Memory( const std::string& executable_file_name,
     set_cnt ( 1ull << set_bits ),
     page_size ( 1ull << offset_bits)
 {
-	const uint64 set_cnt_test = 1ull << set_bits;
-	const uint64 page_cnt_test = 1ull << page_bits;
-	const uint64 page_size_test = 1ull << offset_bits;
-    if ( set_cnt_test > MAX_VAL32) {
+    if ( set_bits >= min_sizeof<uint32, size_t>() * 8) {
         std::cerr << "ERROR. Memory is divided to too many (" << set_cnt << ") sets\n";
         std::exit( EXIT_FAILURE);
     }
-    if ( page_cnt_test > MAX_VAL32) {
+    if ( page_bits >= min_sizeof<uint32, size_t>() * 8) {
         std::cerr << "ERROR. Each set is divided to too many (" << page_cnt << ") pages\n";
         std::exit( EXIT_FAILURE);
     }
-    if ( page_size_test > MAX_VAL32) {
-        std::cerr << "ERROR. Each page is too large (" << page_cnt << " bytes)\n";
+    if ( offset_bits >= min_sizeof<uint32, size_t>() * 8) {
+        std::cerr << "ERROR. Each page is too large (" << page_size << " bytes)\n";
         std::exit( EXIT_FAILURE);
     }
-
 
     memory = new uint8** [set_cnt]();
 
@@ -89,8 +87,10 @@ Memory::~Memory()
 
 uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
 {
-    assert( num_of_bytes <= 8);
-    assert( num_of_bytes != 0);
+    if ( num_of_bytes == 0 || num_of_bytes > 8) {
+        std::cerr << "ERROR. Reading " << num_of_bytes << " bytes)\n";
+        std::exit( EXIT_FAILURE);
+    }
     assert( addr <= addr_mask);
     if ( !check( addr) || !check( addr + num_of_bytes - 1))
          return NO_VAL64;
@@ -110,7 +110,10 @@ void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
-    assert( num_of_bytes != 0 );
+    if ( num_of_bytes == 0 || num_of_bytes > 8) {
+        std::cerr << "ERROR. Writing " << num_of_bytes << " bytes)\n";
+        std::exit( EXIT_FAILURE);
+    }
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
 

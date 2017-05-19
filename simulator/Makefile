@@ -27,7 +27,7 @@ CPPS= \
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options boost_timer boost_system
+LIBS= elf boost_program_options boost_timer boost_chrono boost_system
 
 vpath %.cpp $(dir $(CPPS))
 
@@ -69,7 +69,7 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 # TODO: remove dependencies from ALL objs
 %/t/test.out: $(OBJS) %/t/test.o $(GTEST_LIB)
 	@echo "[ld] $@"
-	@$(CXX) $(LDFLAGS) $(LPATH) -pthread -o $@ $^ $(addprefix -l,$(LIBS)) -l pthread
+	@$(CXX) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS)) -lpthread
 
 %/t/test.run: %/t/test.out
 	@echo "[$<]"
