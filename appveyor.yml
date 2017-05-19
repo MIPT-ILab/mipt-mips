@@ -1,8 +1,15 @@
 image: Visual Studio 2015
 
-build_script:
-- cd C:\MinGW\msys\1.0
+before_build:
 - set PATH=%PATH%;C:\MinGW\msys\1.0\bin;C:\MinGW\bin
+- git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
+- cd C:/libelf
+- echo ./configure; make; make install > script.sh
+- sh --login .\script.sh
+- set C_INCLUDE_PATH=%C_INCLUDE_PATH%:C:/libelf/lib
+- set LIBRARY_PATH=%LIBRARY_PATH%:C:/libelf/lib
+
+build_script:
 - echo cd /c/projects/mipt-mips/simulator/; make mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
