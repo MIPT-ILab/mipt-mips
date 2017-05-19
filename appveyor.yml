@@ -8,7 +8,7 @@ before_build:
 - sh --login .\script.sh
 
 build_script:
-- echo cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib BOOST_INCL=/c/Libraries/boost mipt-mips disasm test > script.sh
+- echo cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib BOOST_INCL=/c/Libraries/boost_1_63_0 mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
 environment:
