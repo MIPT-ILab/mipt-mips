@@ -1,7 +1,7 @@
-image: Visual Studio 2013
+image: Visual Studio 2015
 
 build_script:
-- cd C:\msys\1.0\bin\
+- cd C:\MinGW\msys\1.0
 - echo cd /c/projects/mipt-mips/simulator/; make mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
