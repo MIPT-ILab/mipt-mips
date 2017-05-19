@@ -63,8 +63,8 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 %/t/test.o: %/t/unit_test.cpp
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $@ -c $< $(INCL) -I $(GTEST_INCL)
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -I $(GTEST_INCL)
+	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL)
+	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -isystem $(GTEST_INCL)
 
 # TODO: remove dependencies from ALL objs
 %/t/test.out: $(OBJS) %/t/test.o $(GTEST_LIB)
