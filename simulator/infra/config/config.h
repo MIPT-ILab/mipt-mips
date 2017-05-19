@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <map>
