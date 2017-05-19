@@ -182,7 +182,7 @@ class BPEntryAdaptive final : public BPEntry
      * 11 -- WNT
      * ---------
      */
-    std::array<BPEntryTwoBit::State, (1ull << DEPTH)> state_table = {};
+    std::array<BPEntryTwoBit::State, (1ull << DEPTH)> state_table = {{}};
 
     /* two-level predictor */
     class PredictionPattern

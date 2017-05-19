@@ -64,7 +64,7 @@ TEST( Func_memory, Read_Method_Test)
 
     // check hadling the situation when 0 number of bytes is requested
     ASSERT_EXIT( func_mem.read( dataSectAddr, 0),
-                 ::testing::KilledBySignal( SIGABRT), ".*");
+                 ::testing::ExitedWithCode( EXIT_FAILURE), ".*");
 
     // check hadling the situation when read
     // from not initialized or written data
@@ -95,7 +95,7 @@ TEST( Func_memory, Write_Read_Initialized_Mem_Test)
 
     // check hadling the situation when 0 number of bytes is written
     ASSERT_EXIT( func_mem.write( 1, data_sect_addr, 0),
-                 ::testing::KilledBySignal( SIGABRT), ".*");
+                 ::testing::ExitedWithCode( EXIT_FAILURE), ".*");
 }
 
 TEST( Func_memory, Write_Read_Not_Initialized_Mem_Test)

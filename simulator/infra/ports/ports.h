@@ -281,7 +281,7 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
     this->_init = true;
 
     // Initializing ports with setting their init flags.
-    uint readersCounter = 0;
+    uint32 readersCounter = 0;
     for ( const auto reader : _destinations)
     {
         reader->_init = true;
