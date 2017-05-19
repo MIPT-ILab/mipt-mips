@@ -2,6 +2,7 @@ image: Visual Studio 2015
 
 build_script:
 - cd C:\MinGW\msys\1.0
+- set PATH=%PATH%;C:\MinGW\msys\1.0
 - echo cd /c/projects/mipt-mips/simulator/; make mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
