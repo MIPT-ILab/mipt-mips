@@ -4,11 +4,11 @@ before_build:
 - set PATH=%PATH%;C:\MinGW\msys\1.0\bin;C:\MinGW\bin
 - git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
 - cd C:/libelf
-- echo ./configure --host i686-pc-mingw32; make; make install > script.sh
+- echo ./configure --host i686-pc-mingw32; make > script.sh
 - sh --login .\script.sh
 
 build_script:
-- echo cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib BOOST_INCL=/c/Libraries/boost_1_63_0 mipt-mips disasm test > script.sh
+- echo cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib BOOST_INCL=/c/Libraries/boost mipt-mips disasm test > script.sh
 - sh --login .\script.sh
 
 environment:
