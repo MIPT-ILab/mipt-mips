@@ -3,12 +3,22 @@ CXX ?= g++
 CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ --std=c++14
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
 
+UNAME:= $(shell uname -o)
+
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
 else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
+endif
+
+ifeq ($(UNAME), Msys)
+    CXXFLAGS+= -U__STRICT_ANSI__ -D__STDC_LIMIT_MACROS
+    ifeq ($(CXX), clang++)
+        CXXFLAGS+= --target=i386-w32-mingw32
+        CXXFLAGS+= -D__float128=void
+    endif
 endif
 
 # GoogleTest directories

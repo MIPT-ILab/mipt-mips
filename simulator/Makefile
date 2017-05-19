@@ -27,12 +27,12 @@ CPPS= \
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options boost_timer boost_system
+LIBS= elf boost_program_options boost_timer boost_chrono boost_system
 
 vpath %.cpp $(dir $(CPPS))
 
 mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
-	@$(CXX) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS))
+	@$(LD) $(LDFLAGS) $(LPATH) -o $@ $^ $(addprefix -l,$(LIBS))
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
@@ -69,7 +69,7 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 # TODO: remove dependencies from ALL objs
 %/t/test.out: $(OBJS) %/t/test.o $(GTEST_LIB)
 	@echo "[ld] $@"
-	@$(CXX) $(LDFLAGS) $(LPATH) -pthread -o $@ $^ $(addprefix -l,$(LIBS)) -l pthread
+	@$(LD) $(LDFLAGS) $(LPATH) -pthread -o $@ $^ $(addprefix -l,$(LIBS)) -l pthread
 
 %/t/test.run: %/t/test.out
 	@echo "[$<]"
@@ -88,7 +88,7 @@ DISASM_CPPS= \
     disasm.cpp
 
 disasm: $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
-	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf
+	@$(LD) $(LDFLAGS) -o $@ $^ -l elf
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
