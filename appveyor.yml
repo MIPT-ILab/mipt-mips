@@ -1,6 +1,8 @@
 image: Visual Studio 2013
 
-build_script: cd simulator; make mipt-mips disasm tests
+build_script:
+- cd simulator
+- make mipt-mips disasm tests
 
 environment:
   matrix:
