@@ -10,11 +10,10 @@ environment:
     BOOST_ROOT: C:\msys64\mingw32
 
 before_build:
+- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
 - git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
 - cd C:/libelf
-- echo ./configure --host %MINGW_ARCH%-pc-mingw32; make > script.sh
-- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
-- sh --login .\script.sh
+- bash -lc "./configure --host %MINGW_ARCH%-pc-mingw32; make"
 - gem install bundle
 - bundle install
 - bundle env
