@@ -27,6 +27,10 @@
 #include <infra/macro.h>
 #include "elf_parser.h"
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 ElfSection::ElfSection( const ElfSection& that)
     : name( that.name), size( that.size), start_addr( that.start_addr), content( new uint8[size])
 {
