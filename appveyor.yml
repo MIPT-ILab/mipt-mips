@@ -12,7 +12,7 @@ environment:
 before_build:
 - set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
 - git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
-- bash --lc "cd /c/libelf; ./configure --host %MINGW_ARCH%-pc-mingw32; make"
+- bash -lc "cd /c/libelf; ./configure --host %MINGW_ARCH%-pc-mingw32; make"
 - gem install bundle
 - bundle install
 - bundle env
