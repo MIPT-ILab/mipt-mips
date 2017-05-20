@@ -10,7 +10,7 @@ environment:
     BOOST_ROOT: C:\msys64\mingw32
 
 before_build:
-- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+- set PATH=%PATH%;%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\
 - git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
 - cd C:/libelf
 - bash -lc "./configure --host %MINGW_ARCH%-pc-mingw32; make"
