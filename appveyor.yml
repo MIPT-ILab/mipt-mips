@@ -2,8 +2,10 @@ image: Visual Studio 2015
 
 environment:
   matrix:
-  - Compiler: mingw
-    Build: static
+  - build: mingw
+    platform: x86
+    MINGW_ARCH: i686
+    MSYSTEM: MINGW32
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
     MINGW_ROOT: C:\msys64\mingw32
@@ -15,6 +17,9 @@ before_build:
 - cd C:/libelf
 - echo ./configure --host %MINGW_ARCH%-pc-mingw32; make > script.sh
 - sh --login .\script.sh
+- gem install bundle
+- bundle install
+- bundle env
 - bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 
 build_script:
