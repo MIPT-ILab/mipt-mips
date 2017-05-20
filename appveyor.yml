@@ -13,7 +13,8 @@ before_build:
 - set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
 - git clone -q https://github.com/WolfgangSt/libelf.git C:/libelf
 - bash -lc "cd /c/libelf; ./configure --host %MINGW_ARCH%-pc-mingw32; make"
+- bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
 - bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/simulator/ make LIBELF_INCL=/c/libelf/lib LIBELF_LPATH=/c/libelf/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib mipt-mips disasm test"
+- bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/libelf/lib LIBELF_LPATH=/c/libelf/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib mipt-mips disasm test"
