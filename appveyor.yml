@@ -6,8 +6,6 @@ environment:
     platform: x86
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
-    MINGW_ARCH: i686
-    MSYSTEM: MINGW32
     MINGW_ROOT: C:\msys64\mingw32
     BOOST_ROOT: C:\msys64\mingw32
 
