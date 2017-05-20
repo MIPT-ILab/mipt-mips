@@ -46,7 +46,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    int file_descr = open( elf_file_name, O_RDONLY);
+    int file_descr = open( elf_file_name, O_RDONLY|O_BINARY);
     if ( file_descr < 0)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
@@ -69,7 +69,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         std::cerr << "ERROR: Could not open file " << elf_file_name
                   << " as ELF file: "
                   <<  elf_errmsg( elf_errno()) << std::endl;
-	std::exit( EXIT_FAILURE);
+        std::exit( EXIT_FAILURE);
     }
 
     size_t shstrndx;
