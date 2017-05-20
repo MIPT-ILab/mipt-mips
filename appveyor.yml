@@ -16,4 +16,4 @@ before_build:
 
 build_script:
 - dir %BOOST_ROOT%\lib
-- bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf LIBELF_LPATH=/c/msys64/mingw32/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib mipt-mips disasm test"
+- bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf LIBELF_LPATH=/c/msys64/mingw32/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib BOOST_POSTFIX=-mt mipt-mips disasm test"
