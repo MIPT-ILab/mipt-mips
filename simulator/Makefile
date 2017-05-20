@@ -27,7 +27,7 @@ CPPS= \
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options boost_timer boost_chrono boost_system
+LIBS= elf boost_program_options$(BOOST_POSTFIX) boost_timer$(BOOST_POSTFIX) boost_chrono$(BOOST_POSTFIX) boost_system$(BOOST_POSTFIX)
 
 vpath %.cpp $(dir $(CPPS))
 
