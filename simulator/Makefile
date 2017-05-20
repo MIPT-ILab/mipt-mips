@@ -27,7 +27,7 @@ CPPS= \
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options boost_timer boost_chrono boost_system
+LIBS= elf boost_program_options$(BOOST_POSTFIX) boost_timer$(BOOST_POSTFIX) boost_chrono$(BOOST_POSTFIX) boost_system$(BOOST_POSTFIX)
 
 vpath %.cpp $(dir $(CPPS))
 
@@ -63,8 +63,8 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 %/t/test.o: %/t/unit_test.cpp
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $@ -c $< $(INCL) -I $(GTEST_INCL)
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -I $(GTEST_INCL)
+	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL)
+	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -isystem $(GTEST_INCL)
 
 # TODO: remove dependencies from ALL objs
 %/t/test.out: $(OBJS) %/t/test.o $(GTEST_LIB)
