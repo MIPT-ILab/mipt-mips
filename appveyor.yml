@@ -16,5 +16,4 @@ before_build:
 - bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 
 build_script:
-- echo cd /c/projects/mipt-mips/simulator/ make LIBELF_INCL=/c/libelf/lib LIBELF_LPATH=/c/libelf/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib mipt-mips disasm test > script.sh
-- sh --login .\script.sh
+- bash -lc "cd /c/projects/mipt-mips/simulator/ make LIBELF_INCL=/c/libelf/lib LIBELF_LPATH=/c/libelf/lib BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_LPATH=/c/msys64/mingw32/lib mipt-mips disasm test"
