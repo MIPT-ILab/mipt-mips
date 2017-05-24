@@ -11,15 +11,15 @@ environment:
     platform: x86
     BOOST_ROOT: C:\Libraries\boost_1_59_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
-    BOOST_INCLUDEDIR: C:\Libraries\boost_1_59_0\boost
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_59_0
 
 before_build:
-- cmd: if "%build%"=="mingw" set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
-- cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
+- cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
 - cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: if "%build%"=="msvc"  set LIBRARY=%BOOST_LIBRARYDIR%;%LIBRARY%
-- cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_INCLUDEDIR%;%INCLUDE%
+- cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_INCLUDEDIR%;C:/msys64/mingw32/include/libelf;%INCLUDE%
 
 build_script:
 - cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_POSTFIX=-mt mipt-mips disasm"
