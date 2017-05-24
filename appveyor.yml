@@ -3,23 +3,17 @@ image: Visual Studio 2015
 environment:
   matrix:
   - build: mingw
-    platform: x86
-    MINGW_ARCH: i686
-    MSYSTEM: MINGW32
     MINGW_ROOT: C:\msys64\mingw32
   - build: msvc
-    platform: x86
     BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
-    BOOST_INCLUDEDIR: C:\Libraries\boost_1_59_0
 
 before_build:
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
-- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
-- cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-i686-libelf"
+- cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-i686-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
-- cmd: if "%build%"=="msvc"  set LIBRARY=%BOOST_LIBRARYDIR%;%LIBRARY%
-- cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_INCLUDEDIR%;C:/msys64/mingw32/include/libelf;%INCLUDE%
+- cmd: if "%build%"=="msvc"  set LIBRARY=%BOOST_ROOT%\lib32-msvc-14.0;%LIBRARY%
+- cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_ROOT%;C:/msys64/mingw32/include/libelf;%INCLUDE%
 
 build_script:
 - cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_POSTFIX=-mt mipt-mips disasm"
