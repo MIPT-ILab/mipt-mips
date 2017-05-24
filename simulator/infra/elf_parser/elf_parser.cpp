@@ -16,9 +16,6 @@
 #include <sstream>
 #include <memory>
 
-// Unix
-#include <unistd.h>
-
 // LibELF
 #include <libelf.h>
 
