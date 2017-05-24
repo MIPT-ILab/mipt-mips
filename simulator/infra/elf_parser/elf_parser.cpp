@@ -18,7 +18,6 @@
 
 // Unix
 #include <unistd.h>
-#include <fcntl.h>
 
 // LibELF
 #include <libelf.h>
@@ -26,10 +25,6 @@
 // uArchSim modules
 #include <infra/macro.h>
 #include "elf_parser.h"
-
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
 
 ElfSection::ElfSection( const ElfSection& that)
     : name( that.name), size( that.size), start_addr( that.start_addr), content( new uint8[size])
@@ -50,8 +45,8 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    int file_descr = open( elf_file_name, O_RDONLY|O_BINARY);
-    if ( file_descr < 0)
+    FILE* file_descr = fopen( elf_file_name, "rb");
+    if ( file_descr == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
                   << std::strerror( errno) << std::endl;
@@ -63,16 +58,18 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     {
         std::cerr << "ERROR: Could not set ELF library operating version:"
                   <<  elf_errmsg( elf_errno()) << std::endl;
+        std::fclose( file_descr);
         std::exit( EXIT_FAILURE);
     }
 
     // open the file in ELF format
-    Elf* elf = elf_begin( file_descr, ELF_C_READ, nullptr);
+    Elf* elf = elf_begin( fileno( file_descr), ELF_C_READ, nullptr);
     if ( elf == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name
                   << " as ELF file: "
                   <<  elf_errmsg( elf_errno()) << std::endl;
+        std::fclose( file_descr);
         std::exit( EXIT_FAILURE);
     }
 
@@ -94,23 +91,16 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         auto offset = shdr.sh_offset;
         std::unique_ptr<uint8[]> content(new uint8[ size]);
 
-        lseek( file_descr, offset, SEEK_SET);
-        FILE *file = fdopen( file_descr, "r");
-        if ( file == nullptr)
-        {
-            std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
-                 << std::strerror(errno) << std::endl;
-            std::exit( EXIT_FAILURE);
-        }
+        fseek( file_descr, offset, SEEK_SET);
 
         // fill the content by the section data
-        ignored( std::fread( content.get(), sizeof( uint8), size, file));
+        ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
         sections_array.emplace( sections_array.end(), name, start_addr, size, content.get());
     }
 
     // close all used files
     elf_end( elf);
-    close( file_descr);
+    fclose( file_descr);
 }
 
 ElfSection::~ElfSection()
