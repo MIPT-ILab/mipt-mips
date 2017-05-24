@@ -141,8 +141,8 @@ public:
         {
              std::cerr << "ERROR. Invalid branch prediction mode " << name << std::endl
                        << "Supported modes:" << std::endl;
-             for ( const auto& name : map)
-                 std::cerr << "\t" << name.first << std::endl;
+             for ( const auto& map_name : map)
+                 std::cerr << "\t" << map_name.first << std::endl;
 
              std::exit( EXIT_FAILURE);
         }
