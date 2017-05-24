@@ -46,7 +46,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
     FILE* file_descr = fopen( elf_file_name, "rb");
-    if ( file_descr < 0)
+    if ( file_descr == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
                   << std::strerror( errno) << std::endl;
