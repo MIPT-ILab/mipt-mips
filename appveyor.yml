@@ -3,7 +3,10 @@ image: Visual Studio 2015
 environment:
   matrix:
   - build: mingw
+    platform: x86
     MINGW_ROOT: C:\msys64\mingw32
+    MINGW_ARCH: i686		
+    MSYSTEM: MINGW32
   - build: msvc
     BOOST_ROOT: C:\Libraries\boost_1_59_0
 
