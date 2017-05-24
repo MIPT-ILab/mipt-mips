@@ -7,12 +7,21 @@ environment:
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
     MINGW_ROOT: C:\msys64\mingw32
-    BOOST_ROOT: C:\msys64\mingw32
+  - build: msvc
+    platform: x86
+    BOOST_ROOT: C:\Libraries\boost_1_59_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_59_0\boost
 
 before_build:
-- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
-- bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
-- bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- if "%build%"=="mingw" set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+- if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf
+- if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- if "%build%"=="msvc"  set PATH=%BOOST_LIBRARYDIR%;%PATH%
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_POSTFIX=-mt mipt-mips disasm test"
+- cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_POSTFIX=-mt mipt-mips disasm"
+- cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
+
+test_script:
+- if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost test"
