@@ -63,7 +63,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
     }
 
     // open the file in ELF format
-    Elf* elf = elf_begin( file_descr, ELF_C_READ, nullptr);
+    Elf* elf = elf_begin_b( file_descr, ELF_C_READ, nullptr);
     if ( elf == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name
@@ -91,7 +91,7 @@ void ElfSection::getAllElfSections( const char* elf_file_name,
         auto offset = shdr.sh_offset;
         std::unique_ptr<uint8[]> content(new uint8[ size]);
 
-        lseek( file_descr, offset, SEEK_SET);
+        fseek( file_descr, offset, SEEK_SET);
 
         // fill the content by the section data
         ignored( std::fread( content.get(), sizeof( uint8), size, file));
