@@ -32,8 +32,8 @@ before_build:
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
-- cmd: if "%build%"=="msvc"  set LIB=%BOOST_LIBRARYDIR%;%LIB%
-- cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
+- cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
+- cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
 
 build_script:
 - cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=%MINGW_INCLUDEDIR%/libelf BOOST_INCL=%MINGW_INCLUDEDIR%/boost BOOST_POSTFIX=-mt mipt-mips disasm"
