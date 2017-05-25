@@ -17,6 +17,7 @@ before_build:
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: if "%build%"=="msvc"  set LIBRARY=%BOOST_ROOT%\lib32-msvc-14.0;%LIBRARY%
 - cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_ROOT%;C:/msys64/mingw32/include/libelf;%INCLUDE%
+- cmd: dir %BOOST_ROOT%
 
 build_script:
 - cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=/c/msys64/mingw32/include/libelf BOOST_INCL=/c/msys64/mingw32/include/boost BOOST_POSTFIX=-mt mipt-mips disasm"
