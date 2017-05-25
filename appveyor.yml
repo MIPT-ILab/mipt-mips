@@ -12,13 +12,13 @@ environment:
   - build: clang++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\msys64\mingw32\include\boost
+    BOOST_ROOT: C:\msys64\mingw64\include\boost
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
   - build: g++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\msys64\mingw32\include\boost
+    BOOST_ROOT: C:\msys64\mingw64\include\boost
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
   - build: msvc
@@ -41,7 +41,8 @@ before_build:
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
-- cmd: set CPLUS_INCLUDE_PATH=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%MINGW_ROOT%/include;%CPLUS_INCLUDE_PATH%
+- cmd: set C_INCLUDE_PATH=%MINGW_ROOT%/include/;%C_INCLUDE_PATH%
+- cmd: set CPLUS_INCLUDE_PATH=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%CPLUS_INCLUDE_PATH%
 - cmd: if not "%build%"=="msvc" set CXX=%build%
 
 build_script:
