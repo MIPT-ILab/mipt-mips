@@ -16,7 +16,7 @@ before_build:
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-i686-libelf"
 - cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-i686-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
-- cmd: if "%build%"=="msvc"  set LIBPATH=%BOOST_ROOT%\lib32-msvc-14.0;%LIBPATH%
+- cmd: if "%build%"=="msvc"  set LIB=%BOOST_ROOT%\lib32-msvc-14.0;%LIB%
 - cmd: if "%build%"=="msvc"  set INCLUDE=%BOOST_ROOT%;C:/msys64/mingw32/include/libelf;%INCLUDE%
 
 build_script:
