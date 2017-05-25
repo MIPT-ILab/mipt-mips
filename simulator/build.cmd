@@ -1,5 +1,6 @@
 cl /I. /EHsc ^
    libelf.lib /D__LIBELF_INTERNAL__=1 ^
+   /DBOOST_ALL_DYN_LINK
    /Femipt-mips ^
    /W4 /WX /wd4505 /wd4244 /wd4996 ^
    infra/elf_parser/elf_parser.cpp ^
@@ -10,5 +11,4 @@ cl /I. /EHsc ^
    mips/mips_instr.cpp ^
    func_sim/func_sim.cpp ^
    perf_sim.cpp ^
-   main.cpp ^
-
+   main.cpp
