@@ -21,17 +21,17 @@ environment:
     BOOST_ROOT: C:\Libraries\boost_1_59_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
     MINGW_ARCH: i686
-  - build: msvc
-    platform: x64
-    MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
-    MINGW_ARCH: x86_64
+#  - build: msvc
+#    platform: x64
+#    MINGW_ROOT: C:\msys64\mingw64
+#    BOOST_ROOT: C:\Libraries\boost_1_59_0
+#    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
+#    MINGW_ARCH: x86_64
 
 before_build:
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
-- cmd: if "%build%"=="mingw" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
