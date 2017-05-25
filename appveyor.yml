@@ -9,7 +9,7 @@ environment:
     MINGW_ARCH: i686
     MINGW_INCLUDEDIR: /c/msys64/mingw32/include
     MSYSTEM: MINGW32
-  - build: clang
+  - build: clang++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     MINGW_ARCH: x86_64
@@ -47,4 +47,4 @@ build_script:
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 
 test_script:
-- cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make CXX=%build% LIBELF_INCL=%MINGW_INCLUDEDIR%/libelf BOOST_INCL=%MINGW_INCLUDEDIR%/boost BOOST_POSTFIX=-mt test"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make CXX=%build% LIBELF_INCL=%MINGW_INCLUDEDIR%/libelf BOOST_INCL=%MINGW_INCLUDEDIR%/boost BOOST_POSTFIX=-mt test"
