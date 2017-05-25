@@ -41,7 +41,8 @@ before_build:
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
-- cmd: dir %MINGW_ROOT%\include
+- cmd: cd %MINGW_ROOT%
+- cmd: dir /b/s stdio.h 
 - cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include;%MINGW_ROOT%/include/c++/6.3.0;%MINGW_ROOT%/include/c++/6.3.0/%MINGW_ARCH%-w64-mingw32;%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 - cmd: if not "%build%"=="msvc" set CXX=%build%
 
