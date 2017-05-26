@@ -28,11 +28,11 @@ GTEST_LPATH:= $(GTEST_DIR)/lib
 GTEST_LIB:= $(GTEST_LPATH)/libgtest.a
 
 # Boost directories
-BOOST_INCL?=  /usr/local/include/boost/
+BOOST_INCL?=  /usr/local/include
 BOOST_LPATH?= /usr/local/lib
 
 # LibELF directories
-LIBELF_INCL?=./
+LIBELF_INCL?= /usr/local/include
 LIBELF_LPATH?=/usr/local/lib
 
 # option for C++ compiler specifying directories
