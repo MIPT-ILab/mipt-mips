@@ -19,7 +19,7 @@ matrix:
 script:
   - cd simulator
   - make mipt-mips disasm test
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make tidy; fi
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
 
 addons:
   apt:
