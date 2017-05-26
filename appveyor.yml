@@ -39,6 +39,8 @@ before_build:
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
+- cmd: cd C:\Program Files\LLVM
+- cmd: dir /d/s stdio.h
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
 - cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/%MINGW_ARCH%-w64-mingw32/include;%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
