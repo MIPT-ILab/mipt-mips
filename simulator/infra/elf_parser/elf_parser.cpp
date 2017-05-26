@@ -29,7 +29,7 @@ ElfSection::ElfSection( const ElfSection& that)
     std::memcpy(this->content, that.content, this->size);
 }
 
-ElfSection::ElfSection( const char* name, Addr start_addr,
+ElfSection::ElfSection( const std::string& name, Addr start_addr,
                         Addr size, const uint8* content_that)
     : name( name), size( size)
     , start_addr( start_addr), content( new uint8[ size + sizeof( uint64)])
@@ -37,12 +37,12 @@ ElfSection::ElfSection( const char* name, Addr start_addr,
     std::memcpy( this->content, content_that, size);
 }
 
-void ElfSection::getAllElfSections( const char* elf_file_name,
+void ElfSection::getAllElfSections( const std::string& elf_file_name,
                                     std::list<ElfSection>& sections_array /*is used as output*/)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    FILE* file_descr = fopen( elf_file_name, "rb");
+    FILE* file_descr = fopen( elf_file_name.c_str(), "rb");
     if ( file_descr == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "

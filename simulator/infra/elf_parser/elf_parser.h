@@ -34,10 +34,10 @@ public:
 
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.
-    static void getAllElfSections( const char* elf_file_name,
+    static void getAllElfSections( const std::string& elf_file_name,
                                    std::list<ElfSection>& sections_array /*used as output*/);
 
-    ElfSection( const char* name, Addr start_addr,
+    ElfSection( const std::string& name, Addr start_addr,
 	    Addr size, const uint8* content_that);
 
     virtual ~ElfSection();

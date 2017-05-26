@@ -51,7 +51,7 @@ Memory::Memory( const std::string& executable_file_name,
     memory = new uint8** [set_cnt]();
 
     std::list<ElfSection> sections_array;
-    ElfSection::getAllElfSections( executable_file_name.c_str(), sections_array);
+    ElfSection::getAllElfSections( executable_file_name, sections_array);
 
     for ( const auto& section : sections_array)
     {
