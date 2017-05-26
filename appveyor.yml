@@ -35,6 +35,8 @@ environment:
 #    MINGW_ARCH: x86_64
 
 before_build:
+- cmd: git submodule init
+- cmd: git submodule update
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost

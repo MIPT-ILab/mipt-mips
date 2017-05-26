@@ -41,9 +41,18 @@ tidy: $(CPPS) main.cpp
 
 ###### Rules to get GTest #######
 
-GTEST_LIB= $(GTEST_LPATH)/libgtest.a
-$(GTEST_LIB):
-	@$(MAKE) -C $(GTEST_DIR)
+GTEST_DIR:=../googletest/googletest
+GTEST_LIB:=libgtest.a
+GTEST_INCL:=$(GTEST_DIR)/include
+GTEST_OBJ:=$(OBJ_DIR)/gtest-all.o
+
+$(GTEST_OBJ): $(GTEST_DIR)/src/gtest-all.cc
+	@echo "[$(CXX)] $@"
+	@$(CXX) $(CXXFLAGS) -Wno-effc++ -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
+
+$(GTEST_LIB): $(GTEST_OBJ)
+	@echo "[ar] $@"
+	@ar -rv $@ $<
 
 ####### TESTS #######
 
@@ -105,5 +114,5 @@ $(OBJ_DIR)/%.o: %.cpp
 
 clean: clean-tests
 	rm -rf obj
-	rm -f mipt-mips disasm
+	rm -f mipt-mips disasm $(GTEST_LIB)
 
