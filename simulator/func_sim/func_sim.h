@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 
+#include <infra/types.h>
 #include <infra/log.h>
 
 class MIPSMemory;

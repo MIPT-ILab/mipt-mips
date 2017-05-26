@@ -22,7 +22,7 @@ CPPS= \
     infra/cache/cache_tag_array.cpp \
     mips/mips_instr.cpp \
     func_sim/func_sim.cpp \
-    perf_sim.cpp \
+    core/perf_sim.cpp \
 
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
@@ -52,7 +52,8 @@ TESTS:= \
     infra/memory \
     mips \
     bpu \
-    $(shell pwd) \
+    func_sim \
+    core \
 
 
 test: $(addsuffix /t/test.run, $(TESTS))
