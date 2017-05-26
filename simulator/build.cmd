@@ -9,5 +9,5 @@ cl /I. /EHsc ^
    infra/cache/cache_tag_array.cpp ^
    mips/mips_instr.cpp ^
    func_sim/func_sim.cpp ^
-   perf_sim.cpp ^
+   core/perf_sim.cpp ^
    main.cpp
