@@ -27,7 +27,7 @@ class MIPS : public Log
         MIPS& operator=( const MIPS&) = delete;
     public:
         explicit MIPS( bool log = false);
-        ~MIPS();
+        ~MIPS() final;
 
         void init( const std::string& tr);
         std::string step();

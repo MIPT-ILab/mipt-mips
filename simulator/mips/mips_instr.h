@@ -314,7 +314,7 @@ class FuncInstr
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
-                   bool predicted_taken = 0,
+                   bool predicted_taken = false,
                    Addr predicted_target = 0);
 
         const std::string& Dump() const { return disasm; }

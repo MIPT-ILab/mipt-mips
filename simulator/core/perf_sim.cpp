@@ -19,7 +19,7 @@ namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
     static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
-}
+} // namespace config
 
 PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker()
 {
@@ -49,10 +49,10 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker()
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
-    init_ports();
-
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
+    
+    init_ports();
 }
 
 void PerfMIPS::run( const std::string& tr,
@@ -61,7 +61,7 @@ void PerfMIPS::run( const std::string& tr,
     assert( instrs_to_run < MAX_VAL32);
     Cycles cycle = 0;
 
-    is_anything_to_decode = 0;
+    is_anything_to_decode = false;
 
     memory = new MIPSMemory( tr);
 

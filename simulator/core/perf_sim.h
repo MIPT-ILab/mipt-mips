@@ -85,7 +85,7 @@ private:
     PerfMIPS( const PerfMIPS&) = delete;
 
 public:
-    PerfMIPS( bool log);
+    explicit PerfMIPS( bool log);
     void run( const std::string& tr,
               uint64 instrs_to_run);
     ~PerfMIPS() final { destroy_ports(); }

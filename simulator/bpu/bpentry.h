@@ -35,14 +35,14 @@ class BPEntryStatic : public BPEntry
 {
 public:
     /* update */
-    void update( bool, Addr target) { _target = target; }
+    void update( bool /* unused */, Addr target) { _target = target; }
 };
 
 class BPEntryAlwaysTaken final : public BPEntryStatic
 {
 public:
     /* prediction */
-    bool is_taken( Addr) const { return true; }
+    bool is_taken( Addr /* unused */) const { return true; }
 };
 
 class BPEntryBackwardJumps final : public BPEntryStatic
@@ -69,7 +69,7 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr) const { return state == State::T; }
+    bool is_taken( Addr /* unused */) const { return state == State::T; }
 
     /* update */
     void update( bool is_taken, Addr target)
@@ -143,7 +143,7 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr) const
+    bool is_taken( Addr /* unused */) const
     {
         return state.is_taken();
     }
@@ -213,7 +213,7 @@ public:
     BPEntryAdaptive() = default;
 
     /* prediction */
-    bool is_taken( Addr) const
+    bool is_taken( Addr /* unused */) const
     {
         return state_table[ current_pattern.get_value()].is_taken();
     }

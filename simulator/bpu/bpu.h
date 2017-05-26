@@ -31,7 +31,7 @@ public:
                          Addr branch_ip,
                          Addr target = NO_VAL32) = 0;
 
-    virtual ~BaseBP() { }
+    virtual ~BaseBP() = default;
 };
 
 template<typename T>
@@ -105,15 +105,15 @@ class BPFactory {
         virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
                                                uint32 ways,
                                                uint32 branch_ip_size_in_bits) const = 0;
-        virtual ~BaseBPCreator() { }
+        virtual ~BaseBPCreator() = default;
     };
 
     template<typename T>
     class BPCreator : public BaseBPCreator {
     public:
-        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
-                                               uint32 ways,
-                                               uint32 branch_ip_size_in_bits) const final
+        std::unique_ptr<BaseBP> create(uint32 size_in_entries,
+                                       uint32 ways,
+                                       uint32 branch_ip_size_in_bits) const final
         {
             return std::make_unique<BP<T>>( size_in_entries,
                                             ways,
