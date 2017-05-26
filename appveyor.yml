@@ -3,18 +3,24 @@ image: Visual Studio 2015
 
 environment:
   matrix:
-  - build: mingw
+  - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
+    BOOST_ROOT: C:\msys64\mingw32\include\boost
     MINGW_ARCH: i686
-    MINGW_INCLUDEDIR: /c/msys64/mingw32/include
     MSYSTEM: MINGW32
-  - build: mingw
+  - build: g++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
+    BOOST_ROOT: C:\msys64\mingw64\include\boost
     MINGW_ARCH: x86_64
-    MINGW_INCLUDEDIR: /c/msys64/mingw64/include
     MSYSTEM: MINGW64
+#  - build: clang++
+#    platform: x64
+#    MINGW_ROOT: C:\msys64\mingw64
+#    BOOST_ROOT: C:\msys64\mingw64\include\boost
+#    MINGW_ARCH: x86_64
+#    MSYSTEM: MINGW64
   - build: msvc
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
@@ -29,16 +35,18 @@ environment:
 #    MINGW_ARCH: x86_64
 
 before_build:
-- cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+- cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
-- cmd: set INCLUDE=%BOOST_ROOT%;%MINGW_ROOT%/include/libelf;%INCLUDE%
+- cmd: set INCLUDE=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%INCLUDE%
+- cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
+- cmd: set CXX=%build%
 
 build_script:
-- cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=%MINGW_INCLUDEDIR%/libelf BOOST_INCL=%MINGW_INCLUDEDIR%/boost BOOST_POSTFIX=-mt mipt-mips disasm"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips disasm"
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 
 test_script:
-- cmd: if "%build%"=="mingw" bash -lc "cd /c/projects/mipt-mips/simulator/; make LIBELF_INCL=%MINGW_INCLUDEDIR%/libelf BOOST_INCL=%MINGW_INCLUDEDIR%/boost BOOST_POSTFIX=-mt test"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt test"
