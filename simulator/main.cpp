@@ -14,8 +14,8 @@
 /* Simulator modules. */
 #include <infra/config/config.h>
 
-#include "func_sim/func_sim.h"
-#include "perf_sim.h"
+#include <func_sim/func_sim.h>
+#include <core/perf_sim.h>
 
 namespace config {
     static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
