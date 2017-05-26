@@ -19,19 +19,22 @@ public:
 
     uint32 fetch( Addr pc) const { return read( pc); }
 
-    void load( FuncInstr& instr) const {
-        instr.set_v_dst(read(instr.get_mem_addr(), instr.get_mem_size()));
+    void load( FuncInstr* instr) const
+    {
+        instr->set_v_dst(read(instr->get_mem_addr(), instr->get_mem_size()));
     }
 
-    void store( const FuncInstr& instr) {
+    void store( const FuncInstr& instr)
+    {
         write(instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
     }
 
-    void load_store(FuncInstr& instr) {
-        if (instr.is_load())
+    void load_store(FuncInstr* instr)
+    {
+        if (instr->is_load())
             load(instr);
-        else if (instr.is_store())
-            store(instr);
+        else if (instr->is_store())
+            store(*instr);
     }
 };
 

@@ -26,7 +26,7 @@ using bod = boost::program_options::options_description;
 class BaseValue
 {
     friend void handleArgs( int argc, char** argv);
-    virtual void reg( bod& d) = 0;
+    virtual void reg( bod* d) = 0;
 
     static std::map<std::string, BaseValue*>& values() {
         static std::map<std::string, BaseValue*> instance;
@@ -54,30 +54,31 @@ class RequiredValue : public BaseValue {
 protected:
     T value;
     
-    void reg( bod& d) override;
-    RequiredValue<T>() = delete;
+    void reg( bod* d) override;
 public:
     RequiredValue<T>( const char* name, const char* desc) noexcept
         : BaseValue( name, desc)
         , value( )
     { }
     
-    operator const T&() const { return value; }
+    RequiredValue<T>() = delete;
     ~RequiredValue() override = default;
+
+    operator const T&() const { return value; } // NOLINT
 };
 
 template<typename T>
 class Value : public RequiredValue<T> {
     const T default_value;
 
-    void reg( bod& d) override;
-    Value<T>() = delete;
+    void reg( bod* d) override;
 public:
     Value<T>( const char* name, const T& val, const char* desc) noexcept
         : RequiredValue<T>( name, desc)
         , default_value( val)
     { this->value = val; }
 
+    Value<T>() = delete;
     ~Value() final = default;
 };
 

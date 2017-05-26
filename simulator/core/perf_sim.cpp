@@ -182,7 +182,7 @@ void PerfMIPS::clock_decode( int cycle) {
     /* TODO: replace all this code by introducing Forwarding unit */
     if ( rf->check_sources( instr))
     {
-        rf->read_sources( instr);
+        rf->read_sources( &instr);
 
         is_anything_to_decode = false; // successfully decoded
 
@@ -281,7 +281,7 @@ void PerfMIPS::clock_memory( int cycle)
     }
 
     /* perform required loads and stores */
-    memory->load_store( instr);
+    memory->load_store( &instr);
 
     wp_memory_2_writeback->write( instr, cycle);
 

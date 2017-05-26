@@ -80,15 +80,16 @@ private:
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
 
+public:
+    explicit PerfMIPS( bool log);
+    ~PerfMIPS() final { destroy_ports(); }
+
     /* forbid copies */
     PerfMIPS& operator=( const PerfMIPS&) = delete;
     PerfMIPS( const PerfMIPS&) = delete;
 
-public:
-    explicit PerfMIPS( bool log);
     void run( const std::string& tr,
               uint64 instrs_to_run);
-    ~PerfMIPS() final { destroy_ports(); }
 };
 
 #endif

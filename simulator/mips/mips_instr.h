@@ -137,7 +137,7 @@ class FuncInstr
             }
         } instr = {};
 
-        using Execute = void (FuncInstr::*)(void);
+        using Execute = void (FuncInstr::*)();
 
         struct ISAEntry // NOLINT
         {
@@ -222,8 +222,20 @@ class FuncInstr
         void execute_subu()  { v_dst = v_src1 - v_src2; }
         void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
-        void execute_mult()  { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
-        void execute_multu() { uint64 mult_res = v_src1 * v_src2; lo = mult_res & 0xFFFFFFFF; hi = mult_res >> 0x20; };
+        void execute_multu()
+        {
+             uint64 mult_res = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2);
+             lo = mult_res & 0xFFFFFFFF;
+             hi = mult_res >> 0x20;
+        }
+
+        void execute_mult()
+        {
+             uint64 mult_res = static_cast<int64>(v_src1) * static_cast<int64>(v_src2);
+             lo = mult_res & 0xFFFFFFFF;
+             hi = mult_res >> 0x20;
+        }
+
         void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
         void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
         void execute_mfhi()  { v_dst = hi; };
@@ -310,7 +322,7 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() {} // constructor w/o arguments for ports
+        FuncInstr() = default; // constructor w/o arguments for ports
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,

@@ -29,7 +29,7 @@ public:
     virtual Addr get_target( Addr PC) = 0;
     virtual void update( bool is_taken,
                          Addr branch_ip,
-                         Addr target = NO_VAL32) = 0;
+                         Addr target) = 0;
 
     virtual ~BaseBP() = default;
 };

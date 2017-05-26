@@ -51,7 +51,7 @@ Memory::Memory( const std::string& executable_file_name,
     memory = new uint8** [set_cnt]();
 
     std::list<ElfSection> sections_array;
-    ElfSection::getAllElfSections( executable_file_name, sections_array);
+    ElfSection::getAllElfSections( executable_file_name, &sections_array);
 
     for ( const auto& section : sections_array)
     {
@@ -110,17 +110,16 @@ void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
-    if ( num_of_bytes == 0 || num_of_bytes > 8) {
+    if ( num_of_bytes == 0 || num_of_bytes > 8)
+    {
         std::cerr << "ERROR. Writing " << num_of_bytes << " bytes)\n";
         std::exit( EXIT_FAILURE);
     }
+    if ( addr > addr_mask)
+        assert( false);
+
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
-
-    if ( addr > addr_mask)
-    {
-        assert(0);
-    }
 
     uint64_8 value_;
     value_.val = value;
@@ -151,10 +150,10 @@ bool Memory::check( Addr addr) const
     return set != nullptr && set[get_page(addr)] != nullptr;
 }
 
-std::string Memory::dump( std::string indent) const
+std::string Memory::dump() const
 {
     std::ostringstream oss;
-    oss << indent << std::setfill( '0') << std::hex;
+    oss << std::setfill( '0') << std::hex;
 
     for ( size_t set = 0; set < set_cnt; ++set)
     {

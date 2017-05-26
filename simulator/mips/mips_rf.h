@@ -61,13 +61,13 @@ class RF
             entry.value = val;
         }
     public:
-        RF() { }
+        RF() = default;
 
-        inline void read_sources( FuncInstr& instr)
+        inline void read_sources( FuncInstr* instr)
         {
-            instr.set_v_src1( read(instr.get_src1_num()));
-            instr.set_v_src2( read(instr.get_src2_num()));
-            invalidate( instr.get_dst_num());
+            instr->set_v_src1( read(instr->get_src1_num()));
+            instr->set_v_src2( read(instr->get_src2_num()));
+            invalidate( instr->get_dst_num());
         }
 
         inline bool check_sources( const FuncInstr& instr) const

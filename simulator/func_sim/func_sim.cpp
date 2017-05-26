@@ -21,13 +21,13 @@ std::string MIPS::step()
     FuncInstr instr( instr_bytes, PC);
 
     // read sources
-    rf->read_sources( instr);
+    rf->read_sources( &instr);
 
     // execute
     instr.execute();
 
     // load/store
-    mem->load_store( instr);
+    mem->load_store( &instr);
 
     // writeback
     rf->write_dst( instr);

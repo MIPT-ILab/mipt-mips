@@ -104,6 +104,9 @@ template<class T> class Port : public BasePort
             ~Map() final = default;
 
         public:
+            Map( const Map&) = delete;
+            Map& operator=(const Map&) = delete;
+
             decltype(auto) operator[]( const std::string& v) { return _map.operator[]( v); }
 
             // Singletone
@@ -341,16 +344,14 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
     if ( _dataQueue.empty())
         return false; // the port is empty
 
-    if ( _dataQueue.front().cycle == cycle)
-    {
-        // data is successfully read
-        *address = _dataQueue.front().data; // NOTE: we copy data here
-        _dataQueue.pop();
-        return true;
-    }
-
     // there are some entries, but they are not ready to read
-    return false;
+    if ( _dataQueue.front().cycle != cycle)
+        return false;
+
+    // data is successfully read
+    *address = _dataQueue.front().data; // NOTE: we copy data here
+    _dataQueue.pop();
+    return true;
 }
 
 /*

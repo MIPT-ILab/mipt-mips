@@ -14,33 +14,33 @@ namespace config {
 namespace po = boost::program_options;
 
 template<>
-void RequiredValue<bool>::reg(bod& d)
+void RequiredValue<bool>::reg(bod* d)
 {
-    d.add_options()(name.c_str(),
+    d->add_options()(name.c_str(),
                     po::bool_switch( &value),
                     desc.c_str());
 }
 
 template<>
-void Value<bool>::reg(bod& d)
+void Value<bool>::reg(bod* d)
 {
-    d.add_options()(name.c_str(),
+    d->add_options()(name.c_str(),
                     po::bool_switch( &value)->default_value( default_value),
                     desc.c_str());
 }
 
 template<typename T>
-void RequiredValue<T>::reg(bod& d)
+void RequiredValue<T>::reg(bod* d)
 {
-    d.add_options()(name.c_str(),
+    d->add_options()(name.c_str(),
                 po::value<T>( &value)->required(),
                 desc.c_str());
 }
 
 template<typename T>
-void Value<T>::reg(bod& d)
+void Value<T>::reg(bod* d)
 {
-    d.add_options()(this->name.c_str(),
+    d->add_options()(this->name.c_str(),
                 po::value<T>( &this->value)->default_value( default_value),
                 this->desc.c_str());
 }
@@ -60,7 +60,7 @@ void handleArgs( int argc, char** argv)
     po::options_description description( "Allowed options");
 
     for ( auto value : BaseValue::values())
-         value.second->reg(description);
+         value.second->reg(&description);
 
     po::variables_map vm;
 

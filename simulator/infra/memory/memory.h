@@ -74,19 +74,20 @@ class Memory
 
         void alloc( Addr addr);
         bool check( Addr addr) const;
-
-        Memory& operator=( const Memory&) = delete;
-        Memory( const Memory&) = delete;
     public:
         explicit Memory ( const std::string& executable_file_name,
                      uint32 addr_bits = 32,
                      uint32 page_bits = 10,
                      uint32 offset_bits = 12);
         virtual ~Memory();
+
+        Memory& operator=( const Memory&) = delete;
+        Memory( const Memory&) = delete;
+
         uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
         void write( uint64 value, Addr addr, uint32 num_of_bytes = 4);
         inline uint64 startPC() const { return startPC_addr; }
-        std::string dump( std::string indent = "") const;
+        std::string dump() const;
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

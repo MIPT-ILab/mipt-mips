@@ -22,12 +22,12 @@ class MIPS : public Log
         std::unique_ptr<RF> rf;
         Addr PC = NO_VAL32;
         MIPSMemory* mem = nullptr;
-
-        MIPS( const MIPS&) = delete;
-        MIPS& operator=( const MIPS&) = delete;
     public:
         explicit MIPS( bool log = false);
         ~MIPS() final;
+
+        MIPS( const MIPS&) = delete;
+        MIPS& operator=( const MIPS&) = delete;
 
         void init( const std::string& tr);
         std::string step();

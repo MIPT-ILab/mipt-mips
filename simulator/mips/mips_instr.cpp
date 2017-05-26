@@ -289,7 +289,7 @@ void FuncInstr::initR()
         case OUT_R_SPECIAL:
             break;
         default:
-            assert(0);
+            assert( false);
     }
     if ( instr.raw == 0x0ul)
         disasm = "nop ";
@@ -363,7 +363,7 @@ void FuncInstr::initI()
                 << "($" << regTable[src1] << ")" << std::dec;
             break;
         default:
-            assert(0);
+            assert( false);
     }
     disasm = oss.str();
 }
@@ -425,7 +425,7 @@ void FuncInstr::set_v_dst( uint32 value)
             case 1: v_dst = static_cast<int32>( static_cast<int8>( value)); break;
             case 2: v_dst = static_cast<int32>( static_cast<int16>( value)); break;
             case 4: v_dst = value; break;
-            default: assert(0);
+            default: assert( false);
         }
     }
     else if ( operation == OUT_I_LOADU)
@@ -434,7 +434,7 @@ void FuncInstr::set_v_dst( uint32 value)
     }
     else
     {
-        assert( 0);
+        assert( false);
     }
 
     if ( dst != REG_NUM_ZERO)

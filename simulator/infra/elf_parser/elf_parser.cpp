@@ -38,7 +38,7 @@ ElfSection::ElfSection( const std::string& name, Addr start_addr,
 }
 
 void ElfSection::getAllElfSections( const std::string& elf_file_name,
-                                    std::list<ElfSection>& sections_array /*is used as output*/)
+                                    std::list<ElfSection>* sections_array /*is used as output*/)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
@@ -92,7 +92,7 @@ void ElfSection::getAllElfSections( const std::string& elf_file_name,
 
         // fill the content by the section data
         ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
-        sections_array.emplace( sections_array.end(), name, start_addr, size, content.get());
+        sections_array->emplace( sections_array->end(), name, start_addr, size, content.get());
     }
 
     // close all used files

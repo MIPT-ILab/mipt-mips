@@ -19,12 +19,12 @@ struct Elf;
 
 class ElfSection
 {
+public:
     // You cannot use this constructor to create an object.
     // Use the static function getAllElfSections.
     ElfSection() = delete;
 
     ElfSection& operator= (const ElfSection&) = delete;
-public:
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
     const uint32 size; // size of the section in bytes
     const Addr start_addr; // the start address of the section
@@ -35,7 +35,7 @@ public:
     // Use this function to extract all sections from the ELF binary file.
     // Note that the 2nd parameter is used as output.
     static void getAllElfSections( const std::string& elf_file_name,
-                                   std::list<ElfSection>& sections_array /*used as output*/);
+                                   std::list<ElfSection>* sections_array /*used as output*/);
 
     ElfSection( const std::string& name, Addr start_addr,
 	    Addr size, const uint8* content_that);
