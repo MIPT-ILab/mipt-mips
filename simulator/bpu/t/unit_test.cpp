@@ -64,14 +64,14 @@ TEST( Main, PredictingBits)
     ASSERT_EQ( bp->get_target(PC), target);
 
     // "Un" - teaching
-    bp->update( false, PC);
+    bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 1);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // Strong "un" - teaching
-    bp->update( false, PC);
-    bp->update( false, PC);
-    bp->update( false, PC);
+    bp->update( false, PC, NO_VAL32);
+    bp->update( false, PC, NO_VAL32);
+    bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 0);
 
     bp->update( false, PC);
@@ -104,7 +104,7 @@ TEST( Overload, LRU)
     // Trying to make it forget the PCconst
     for ( int i = 0; i < 1000; i++)
     {
-        bp->update( false, i);
+        bp->update( false, i, NO_VAL32);
         if ( !( i % 50))
             bp->update( true, PCconst, target);
     }
