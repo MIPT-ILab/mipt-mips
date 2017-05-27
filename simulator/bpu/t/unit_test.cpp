@@ -74,13 +74,13 @@ TEST( Main, PredictingBits)
     bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 0);
 
-    bp->update( false, PC);
+    bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 0);
 
-    bp->update( false, PC);
+    bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 0);
 
-    bp->update( false, PC);
+    bp->update( false, PC, NO_VAL32);
     ASSERT_EQ( bp->is_taken(PC), 0);
 
     // Teaching again

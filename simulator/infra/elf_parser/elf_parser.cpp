@@ -105,11 +105,11 @@ ElfSection::~ElfSection()
     delete [] this->content;
 }
 
-std::string ElfSection::dump( std::string indent) const
+std::string ElfSection::dump( const std::string& indent) const
 {
     std::ostringstream oss;
 
-    oss << indent << "Dump ELF section \"" << this->name << "\"" << std::endl
+    oss << indent << R"("Dump ELF section ")" << this->name << R"(")" << std::endl
         << indent << "  size = " << this->size << " Bytes" << std::endl
         << indent << "  start_addr = 0x"
         << std::hex << this->start_addr << std::dec << std::endl
@@ -124,7 +124,7 @@ std::string ElfSection::dump( std::string indent) const
         std::string substr =  str.substr( 2 * offset, // 2 hex digits is need per byte
                                      sizeof( uint64));
 
-        if ( substr.compare( "00000000") == 0)
+        if ( substr == "00000000")
         {
             if ( !skip_was_printed)
             {

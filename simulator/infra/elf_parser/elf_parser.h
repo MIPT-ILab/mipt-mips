@@ -42,7 +42,7 @@ public:
 
     virtual ~ElfSection();
 
-    std::string dump( std::string indent = "") const;
+    std::string dump( const std::string& indent) const;
     std::string strByBytes() const;
     std::string strByWords() const;
 };
