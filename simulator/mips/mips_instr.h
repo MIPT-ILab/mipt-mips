@@ -10,8 +10,9 @@
 #define FUNC_INSTR_H
 
 // Generic C++
-#include <string>
 #include <cassert>
+#include <string>
+#include <array>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -156,8 +157,8 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static const char *regTableName(RegNum reg);
-        static const char *regTable[];
+        static boost::string_ref regTableName(RegNum reg);
+        static std::array<std::string, REG_NUM_MAX> regTable;
 
         boost::string_ref name = {};
 

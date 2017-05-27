@@ -21,7 +21,7 @@ namespace config {
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
 
-PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker()
+PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 

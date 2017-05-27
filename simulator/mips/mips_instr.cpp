@@ -163,7 +163,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // 0x30 - 0x3F atomic load/stores
 };
 
-const char *FuncInstr::regTable[REG_NUM_MAX] =
+std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
 {
     "zero",
     "at",
@@ -179,8 +179,8 @@ const char *FuncInstr::regTable[REG_NUM_MAX] =
     "ra"
 };
 
-const char *FuncInstr::regTableName(RegNum reg) {
-    return regTable[static_cast<size_t>(reg)];
+boost::string_ref FuncInstr::regTableName(RegNum reg) {
+    return regTable.at(static_cast<size_t>( reg));
 }
 
 FuncInstr::FuncInstr( uint32 bytes, Addr PC,

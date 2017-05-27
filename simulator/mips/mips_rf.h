@@ -7,6 +7,8 @@
 #ifndef RF_H
 #define RF_H
 
+#include <array>
+
 #include "mips_instr.h"
 
 class RF
@@ -24,10 +26,11 @@ class RF
              * executed. The WAW dependency is just a workaround for #45 issue.
              */
             bool is_valid = true; 
-        } array[REG_NUM_MAX];
+        };
+        std::array<Reg, REG_NUM_MAX> array = {};
 
-        Reg& get_entry( RegNum num) { return array[static_cast<size_t>( num)]; }
-        const Reg& get_entry( RegNum num) const { return array[static_cast<size_t>( num)]; }
+        Reg& get_entry( RegNum num) { return array.at( static_cast<size_t>( num)); }
+        const Reg& get_entry( RegNum num) const { return array.at( static_cast<size_t>( num)); }
 
         void invalidate( RegNum num)
         {
