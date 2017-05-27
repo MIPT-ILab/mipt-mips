@@ -164,7 +164,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
 };
 
 std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
-{
+{{
     "zero",
     "at",
     "v0", "v1",
@@ -177,7 +177,7 @@ std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
     "sp",
     "fp",
     "ra"
-};
+}};
 
 boost::string_ref FuncInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
