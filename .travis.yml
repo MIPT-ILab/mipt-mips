@@ -19,9 +19,6 @@ matrix:
 script:
   - cd simulator
   - make mipt-mips
-  - cd ../binutils
-  - ./configure --target=mipsel-unknown-linux-gnu
-  - make
   - cd ../simulator
   - make test
   - if [ $CXX == clang++-4.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
@@ -48,4 +45,9 @@ install:
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-4.0; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
-  - $CXX --version
+  - OLD_CC=$CC
+  - CC=gcc
+  - cd ../binutils
+  - ./configure --target=mipsel-unknown-linux-gnu
+  - make
+  - CC=$OLD_CC
