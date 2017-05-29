@@ -8,7 +8,7 @@
 // uArchSim modules
 #include "../elf_parser.h"
 
-static const std::string valid_elf_file = "./mips_bin_exmpl.out";
+static const std::string valid_elf_file = TEST_PATH;
 //static const std::string valid_section_name = ".data";
 
 //
