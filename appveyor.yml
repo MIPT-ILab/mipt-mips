@@ -48,10 +48,10 @@ before_build:
 - cmd: set CXX=%build%
 
 build_script:
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips"
-- cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips test"
+- cmd: if "%build%"=="msvc"  cd simulator && call build.cmd
 
 test_script:
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt test"
-- cmd: if "%build%"=="msvc" .\mipt-mips -b ..\traces\tt.core.out -n 2013
+- cmd: cd C:\projects\MIPT-MIPS\simulator
+- cmd: dir mipt-mips.exe

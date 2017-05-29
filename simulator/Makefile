@@ -13,7 +13,7 @@ include ./options.mk
 
 #
 # Enter for build "perf_sim" program
-OBJ_DIR=obj
+OBJ_DIR=obj-$(CXX)-$(DEBUG)
 CPPS= \
     infra/elf_parser/elf_parser.cpp \
     infra/memory/memory.cpp \

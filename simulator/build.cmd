@@ -1,6 +1,14 @@
-cl /I. /EHsc ^
-   ../libs/libelf.lib /D__LIBELF_INTERNAL__=1 ^
-   /Femipt-mips ^
+@echo off
+rem Batch file to build MIPT-MIPS with Visual Studio
+rem Copyright 2017 (C) MIPT-MIPS
+rem Pavel Kryukov
+
+rem Clean up
+del *.obj
+
+rem Build object files
+cl /I. /EHsc /c /nologo ^
+    /D__LIBELF_INTERNAL__=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
    infra/elf_parser/elf_parser.cpp ^
    infra/memory/memory.cpp ^
@@ -9,5 +17,30 @@ cl /I. /EHsc ^
    infra/cache/cache_tag_array.cpp ^
    mips/mips_instr.cpp ^
    func_sim/func_sim.cpp ^
-   core/perf_sim.cpp ^
-   main.cpp
+   core/perf_sim.cpp || exit /b
+
+rem Build GoogleTest
+cl /EHsc /c /nologo ^
+   ..\googletest\googletest\src\gtest-all.cc ^
+   /I ..\googletest\googletest\ /I ..\googletest\googletest\include\ || exit /b
+
+set TRUNK=%cd%
+set TRUNKX=%TRUNK:\=\\%
+
+rem Build and run all the tests
+for %%G in (infra\elf_parser infra\memory mips func_sim bpu core) do (
+    echo Testing %%G
+    cd %%G\t
+    cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libs\libelf.lib  /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" || exit /b
+    .\test.exe || exit /b
+    cd %TRUNK%
+)
+
+rem Build main.cpp
+cl /I. /EHsc /c /nologo ^
+   /D__LIBELF_INTERNAL__=1 ^
+   /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
+   main.cpp || exit /b
+
+rem Build MIPT-MIPS
+cl ..\libs\libelf.lib *.obj /Femipt-mips /nologo || exit /b
