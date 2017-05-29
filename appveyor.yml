@@ -54,4 +54,4 @@ build_script:
 
 test_script:
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt test"
-- cmd: if "%build%"=="msvc" .\mipt-mips -b traces\tt.core.out -n 2013
+- cmd: if "%build%"=="msvc" .\mipt-mips -b ..\traces\tt.core.out -n 2013
