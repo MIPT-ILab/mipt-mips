@@ -50,15 +50,15 @@ install:
   - OLD_CC=$CC
   - OLD_CXX=$CXX
   - CC=gcc-6
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CC=gcc-4.8; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CC=gcc-4.9; fi
   - CXX=g++-6
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CXX=g++-4.8; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CXX=g++-4.9; fi
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips
   - make
   - make install
   - CC=$OLD_CC
   - CXX=$OLD_CXX
-  - alias mipt-as=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as
-  - alias mipt-ld=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
-  - alias mips-objdump=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-objdump
+  - alias mipt-as="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as"
+  - alias mipt-ld="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
+  - alias mips-objdump="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-objdump"
