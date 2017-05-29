@@ -41,6 +41,7 @@ addons:
     - texinfo
 
 install:
+  - shopt -s expand_aliases
   - git submodule init
   - git submodule update
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
