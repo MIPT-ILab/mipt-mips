@@ -47,7 +47,7 @@ before_build:
 - cmd: set CXX=%build%
 
 build_script:
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips disasm"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips"
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 
 test_script:

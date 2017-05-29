@@ -18,7 +18,8 @@ matrix:
 
 script:
   - cd simulator
-  - make mipt-mips disasm test
+  - make mipt-mips
+  - make test
   - if [ $CXX == clang++-4.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
 
 addons:

@@ -88,20 +88,6 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 %/t/test.clean:
 	rm -f $(dir $@)test.*
 
-####### DISASM #######
-
-DISASM_CPPS= \
-    infra/memory/memory.cpp \
-    infra/elf_parser/elf_parser.cpp \
-    func_sim/func_sim.cpp \
-    mips/mips_instr.cpp \
-    disasm.cpp
-
-disasm: $(addprefix $(OBJ_DIR)/, $(notdir $(DISASM_CPPS:%.cpp=%.o)))
-	@$(CXX) $(LDFLAGS) -o $@ $^ -l elf
-	@echo "---------------------------------"
-	@echo "$@ is built SUCCESSFULLY"
-
 ####### COMMON #######
 
 -include $(DEPS)
