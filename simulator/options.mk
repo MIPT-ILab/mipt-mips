@@ -5,9 +5,12 @@ CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -
 
 UNAME:= $(shell uname -o)
 
+OBJ_DIR:=obj-$(CXX)-$(UNAME)
+
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
+    OBJDIR:=-DEBUG
 else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto

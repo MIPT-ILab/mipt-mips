@@ -21,6 +21,7 @@
 *.s
 *.so
 *.out
+*.obj
 *.output
 *.exe
 
