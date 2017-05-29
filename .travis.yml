@@ -45,8 +45,11 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
   - OLD_CC=$CC
+  - OLD_CXX=$CXX
   - CC=gcc
+  - CC=g++
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu
   - make
   - CC=$OLD_CC
+  - CXX=$OLD_CXX
