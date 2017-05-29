@@ -20,7 +20,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator
   - make mipt-mips
   - cd $TRAVIS_BUILD_DIR/traces
-  - make
+  - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
   - cd $TRAVIS_BUILD_DIR/simulator
   - make test
   - if [ $CXX == clang++-4.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
@@ -41,7 +41,6 @@ addons:
     - texinfo
 
 install:
-  - shopt -s expand_aliases
   - git submodule init
   - git submodule update
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
@@ -61,6 +60,3 @@ install:
   - make install
   - CC=$OLD_CC
   - CXX=$OLD_CXX
-  - alias mipt-as="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as"
-  - alias mipt-ld="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
-  - alias mips-objdump="$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-objdump"
