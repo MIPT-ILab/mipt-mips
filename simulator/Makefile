@@ -65,7 +65,6 @@ TESTS:= \
     core \
 
 TEST_PATH:=$(shell pwd)/../traces/tt.core.out
-IMAGE_PATH:=$(shell pwd)/../traces/add.out
 
 test: $(addsuffix /t/test.run, $(TESTS))
 
