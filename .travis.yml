@@ -21,6 +21,7 @@ script:
   - make mipt-mips
   - cd $TRAVIS_BUILD_DIR/traces
   - make
+  - cd $TRAVIS_BUILD_DIR/simulator
   - make test
   - if [ $CXX == clang++-4.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
 
