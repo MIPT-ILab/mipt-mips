@@ -14,16 +14,19 @@ ASM_FILES = $(wildcard *.s.gz)
 # execution files 
 OUT_FILES= $(patsubst %.s.gz,%.out,$(ASM_FILES))
 
+MIPS_AS?=mips-as
+MIPS_LD?=mips-ld
+
 # assemble all the object files 
 build_all: $(OUT_FILES)
 
 %.out: %.o
-	@mips-ld $< -o $@
+	@$(MIPS_LD) $< -o $@
 	@chmod -x $@
 	@echo $@ is built
 
 %.o: %.s
-	@mips-as $< -o $@ -O0 -mips2
+	@$(MIPS_AS) $< -o $@ -O0 -mips2
 
 %.s: %.s.gz
 	@gunzip -c $< > $@
