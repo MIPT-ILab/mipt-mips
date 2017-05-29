@@ -49,9 +49,9 @@ install:
   - echo "Installing GNU binutils for MIPS"
   - OLD_CC=$CC
   - OLD_CXX=$CXX
-  - CC=gcc
+  - CC=gcc-6
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CC=gcc-4.8; fi
-  - CXX=g++
+  - CXX=g++-6
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CXX=g++-4.8; fi
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips
