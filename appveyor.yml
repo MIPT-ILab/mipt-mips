@@ -50,7 +50,8 @@ build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb; make all install"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips"
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
+- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPT_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPT_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 
 test_script:
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt test"
-- cmd: if "%build%"=="msvc" .\mipt-mips -b core\t\all_mips.out -n 2013
+- cmd: if "%build%"=="msvc" .\mipt-mips -b traces\tt.core.out -n 2013
