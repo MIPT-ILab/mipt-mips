@@ -40,7 +40,6 @@ before_build:
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
-- cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%INCLUDE%
 - cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
@@ -48,6 +47,7 @@ before_build:
 
 build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb --disable-gprof; make all install"
+- cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips"
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
