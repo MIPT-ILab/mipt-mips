@@ -74,7 +74,7 @@ clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 %/t/test.o: %/t/unit_test.cpp
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL) -DTEST_PATH=\"$TEST_PATH\"
+	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL) -DTEST_PATH=\"$(TEST_PATH)\"
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -isystem $(GTEST_INCL)
 
 # TODO: remove dependencies from ALL objs
