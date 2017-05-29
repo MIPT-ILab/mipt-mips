@@ -47,6 +47,7 @@ before_build:
 - cmd: set CXX=%build%
 
 build_script:
+- cmd: cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb; make all install"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips"
 - cmd: if "%build%"=="msvc"  cd simulator & call build.cmd
 
