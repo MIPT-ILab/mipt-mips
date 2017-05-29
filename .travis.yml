@@ -47,7 +47,9 @@ install:
   - OLD_CC=$CC
   - OLD_CXX=$CXX
   - CC=gcc
-  - CC=g++
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CC=gcc-4.8; fi
+  - CXX=g++
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CXX=g++-4.8; fi
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu
   - make
