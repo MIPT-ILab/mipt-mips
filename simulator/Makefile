@@ -64,7 +64,7 @@ TESTS:= \
     func_sim \
     core \
 
-TEST_PATH:=$(shell pwd)/../tt.core.out
+TEST_PATH:=$(shell pwd)/../traces/tt.core.out
 
 test: $(addsuffix /t/test.run, $(TESTS))
 
