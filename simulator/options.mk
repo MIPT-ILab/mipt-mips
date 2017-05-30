@@ -10,7 +10,7 @@ OBJ_DIR:=obj-$(CXX)-$(UNAME)
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
-    OBJDIR:=-DEBUG
+	OBJDIR+=-DEBUG
 else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
