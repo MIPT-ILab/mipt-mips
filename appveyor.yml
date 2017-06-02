@@ -10,6 +10,13 @@ environment:
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
+  - build: msvc
+    platform: x64
+    MINGW_ROOT: C:\msys64\mingw64
+    BOOST_ROOT: C:\Libraries\boost_1_59_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
+    LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
+    MINGW_ARCH: x86_64
   - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
@@ -30,12 +37,7 @@ environment:
 #    BOOST_ROOT: C:\msys64\mingw64\include\boost
 #    MINGW_ARCH: x86_64
 #    MSYSTEM: MINGW64
-#  - build: msvc
-#    platform: x64
-#    MINGW_ROOT: C:\msys64\mingw64
-#    BOOST_ROOT: C:\Libraries\boost_1_59_0
-#    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
-#    MINGW_ARCH: x86_64
+
 
 before_build:
 # install submodules
