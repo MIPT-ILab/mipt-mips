@@ -71,7 +71,7 @@ void ElfSection::getAllElfSections( const std::string& elf_file_name,
     }
 
     size_t shstrndx;
-    elf_getshstrndx( elf, &shstrndx);
+    elf_getshdrstrndx( elf, &shstrndx);
 
     Elf_Scn *section = nullptr;
     while ( (section = elf_nextscn( elf, section)) != nullptr)

@@ -51,7 +51,7 @@ before_build:
 # set variables for MSVC
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 # build LibELF for MSVC
-- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/WolfgangSt/libelf.git
+- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 # build binutils
 - cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
