@@ -3,6 +3,12 @@ image: Visual Studio 2015
 
 environment:
   matrix:
+  - build: msvc
+    platform: x86
+    MINGW_ROOT: C:\msys64\mingw32
+    BOOST_ROOT: C:\Libraries\boost_1_59_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+    MINGW_ARCH: i686
   - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
@@ -21,12 +27,7 @@ environment:
 #    BOOST_ROOT: C:\msys64\mingw64\include\boost
 #    MINGW_ARCH: x86_64
 #    MSYSTEM: MINGW64
-  - build: msvc
-    platform: x86
-    MINGW_ROOT: C:\msys64\mingw32
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
-    MINGW_ARCH: i686
+
 #  - build: msvc
 #    platform: x64
 #    MINGW_ROOT: C:\msys64\mingw64
@@ -35,18 +36,25 @@ environment:
 #    MINGW_ARCH: x86_64
 
 before_build:
+# install submodules
 - cmd: git submodule init
 - cmd: git submodule update
+# configure variable
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
+# install Boost and LibELF for MINGW
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb --disable-gprof; make all install"
+# set variables for MSVC
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
+# build LibELF for MSVC
+- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
+# build binutils
+- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb --disable-gprof; make all install"
+# update environment
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%INCLUDE%
 - cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 - cmd: set CXX=%build%
-- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 
 build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
