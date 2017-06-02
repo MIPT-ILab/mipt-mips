@@ -8,17 +8,20 @@ environment:
     MINGW_ROOT: C:\msys64\mingw32
     BOOST_ROOT: C:\Libraries\boost_1_59_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+    LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
   - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
     BOOST_ROOT: C:\msys64\mingw32\include\boost
+    LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
   - build: g++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     BOOST_ROOT: C:\msys64\mingw64\include\boost
+    LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
 #  - build: clang++
@@ -51,13 +54,14 @@ before_build:
 - cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb --disable-gprof; make all install"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
-- cmd: set INCLUDE=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%INCLUDE%
-- cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
-- cmd: set PATH=C:\Projects\mipt-mips\libelf\lib;%PATH%
+- cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
+- cmd: set CPLUS_INCLUDE_PATH=%LIBELF_INCLUDE%;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
+- cmd: set PATH=%LIBELF_INCLUDE%;%PATH%
 - cmd: set CXX=%build%
 
 build_script:
-- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
+- cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips/bin
+- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/mipsel-unknown-linux-gnu-ld"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips test"
 - cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
