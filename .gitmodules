@@ -4,3 +4,6 @@
 [submodule "binutils"]
 	path = binutils
 	url = https://github.com/bminor/binutils-gdb.git
+[submodule "libelf"]
+	path = libelf
+	url = https://github.com/MIPT-ILab/libelf.git

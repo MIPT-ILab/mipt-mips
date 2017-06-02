@@ -46,11 +46,12 @@ before_build:
 - cmd: set INCLUDE=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%INCLUDE%
 - cmd: set CPLUS_INCLUDE_PATH=%MINGW_ROOT%/include/libelf;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 - cmd: set CXX=%build%
+- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 
 build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=/c/projects/mipt-mips/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips test"
-- cmd: if "%build%"=="msvc"  cd simulator && call build.cmd
+- cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
 test_script:
 - cmd: cd C:\projects\MIPT-MIPS\simulator

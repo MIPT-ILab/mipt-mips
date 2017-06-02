@@ -31,7 +31,7 @@ rem Build and run all the tests
 for %%G in (infra\elf_parser infra\memory mips func_sim bpu core) do (
     echo Testing %%G
     cd %%G\t
-    cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libs\libelf.lib  /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" || exit /b
+    cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib  /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" || exit /b
     .\test.exe || exit /b
     cd %TRUNK%
 )
@@ -43,4 +43,4 @@ cl /I. /EHsc /c /nologo ^
    main.cpp || exit /b
 
 rem Build MIPT-MIPS
-cl ..\libs\libelf.lib *.obj /Femipt-mips /nologo || exit /b
+cl ..\libelf\lib\libelf.lib *.obj /Femipt-mips /nologo || exit /b
