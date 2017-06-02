@@ -19,11 +19,15 @@
 *.o
 *.d
 *.s
+*.a
 *.so
 *.out
 *.obj
 *.output
 *.exe
+*.dll
+*.exp
+*.lib
 
 # Packages #
 ######################

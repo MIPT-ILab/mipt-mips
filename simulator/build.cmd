@@ -7,7 +7,7 @@ rem Clean up
 del *.obj
 
 rem Build object files
-cl /I. /EHsc /c /nologo ^
+cl /I. /EHsc /c /nologo /MD ^
     /D__LIBELF_INTERNAL__=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
    infra/elf_parser/elf_parser.cpp ^
@@ -20,7 +20,7 @@ cl /I. /EHsc /c /nologo ^
    core/perf_sim.cpp || exit /b
 
 rem Build GoogleTest
-cl /EHsc /c /nologo ^
+cl /EHsc /c /nologo /MD ^
    ..\googletest\googletest\src\gtest-all.cc ^
    /I ..\googletest\googletest\ /I ..\googletest\googletest\include\ || exit /b
 
@@ -31,16 +31,16 @@ rem Build and run all the tests
 for %%G in (infra\elf_parser infra\memory mips func_sim bpu core) do (
     echo Testing %%G
     cd %%G\t
-    cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libs\libelf.lib  /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" || exit /b
+    cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib  /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" /MD || exit /b
     .\test.exe || exit /b
     cd %TRUNK%
 )
 
 rem Build main.cpp
-cl /I. /EHsc /c /nologo ^
+cl /I. /EHsc /c /nologo /MD ^
    /D__LIBELF_INTERNAL__=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
    main.cpp || exit /b
 
 rem Build MIPT-MIPS
-cl ..\libs\libelf.lib *.obj /Femipt-mips /nologo || exit /b
+cl ..\libelf\lib\libelf.lib *.obj /Femipt-mips /nologo /MD || exit /b
