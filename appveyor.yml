@@ -47,7 +47,8 @@ before_build:
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 # install Boost and LibELF for MINGW
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
-- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
+- cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-zlib"
 # set variables for MSVC
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 # build LibELF for MSVC
@@ -55,7 +56,7 @@ before_build:
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 # build binutils
 - cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof; make all install"
+- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof --with-system-zlib; make all install"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
