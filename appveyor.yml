@@ -21,7 +21,7 @@ environment:
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     BOOST_ROOT: C:\msys64\mingw64\include\boost
-    LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
+    LIBELF_INCLUDE: C:\msys64\mingw64\include\libelf
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
 #  - build: clang++
@@ -51,7 +51,8 @@ before_build:
 # build LibELF for MSVC
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 # build binutils
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=/c/projects/mipt-mips/binutils/cross/mips --disable-gdb --disable-gprof; make all install"
+- cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
+- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof; make all install"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
@@ -60,8 +61,7 @@ before_build:
 - cmd: set CXX=%build%
 
 build_script:
-- cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips/bin
-- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/mipsel-unknown-linux-gnu-ld"
+- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips test"
 - cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
