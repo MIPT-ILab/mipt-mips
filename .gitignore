@@ -1,7 +1,7 @@
 # Executables #
 #####################
 # Ignore all
-
+*
 
 # Unignore all with extensions
 !*.*
@@ -19,11 +19,15 @@
 *.o
 *.d
 *.s
+*.a
 *.so
 *.out
 *.obj
 *.output
 *.exe
+*.dll
+*.exp
+*.lib
 
 # Packages #
 ######################
