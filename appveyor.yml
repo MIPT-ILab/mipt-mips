@@ -49,7 +49,7 @@ before_build:
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
 - cmd: bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-zlib"
-- cmd: set CPATH=%MINGW_ROOT%/include/zlib;%LIBELF_INCLUDE%;%CPATH%
+- cmd: set CPATH=%MINGW_ROOT%/include;%LIBELF_INCLUDE%;%CPATH%
 - cmd: set CPLUS_INCLUDE_PATH=%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 # set variables for MSVC
 - cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
