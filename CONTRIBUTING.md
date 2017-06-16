@@ -4,8 +4,8 @@ The aim of the project is to teach the students the computer architecture throug
 
 ## Non-MIPT contributions
 
-We expect MIPT students to be the main contributors to the projects. If you are not a MIPT student, but you want to make a contribution, please mentors by e-mail first.
-Please keep in mind that students get points for each closed issue, therefore you may 'steal' points from students.
+We expect MIPT students to be the main contributors to the projects. If you are not a MIPT student, but you want to make a contribution, please contact mentors by e-mail first.
+Please keep in mind that students get points for each closed issue, therefore you may 'steal' some points from students.
 
 ## Contribution rules
 
