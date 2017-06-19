@@ -4,9 +4,6 @@
  * Copyright 2015 MIPT-MIPS
  */
 
-#include <cstdlib>
-#include <cstdio>
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>
