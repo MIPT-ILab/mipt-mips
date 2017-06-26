@@ -35,6 +35,12 @@ In our [production repository](https://github.com/MIPT-ILab/mipt-mips) you may f
 
 That repo has a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
+There are some additional repositories:
+* [MIPS traces](https://github.com/MIPT-ILab/mips-traces)
+* [Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)
+* [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
+* [MSVC-compatible LibELF](https://github.com/MIPT-ILab/libelf)
+
 ## Students Score
 
 N | Year | Name | Score | Comments
