@@ -57,7 +57,8 @@ enum RegNum
     REG_NUM_MAX
 };
 
-inline int32 sign_extend(int16 v) { return static_cast<int32>(v); }
+inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
+inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
@@ -262,9 +263,9 @@ class FuncInstr
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
         void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
 
-        void execute_andi()  { v_dst = v_src1 & v_imm; }
-        void execute_ori()   { v_dst = v_src1 | v_imm; }
-        void execute_xori()  { v_dst = v_src1 ^ v_imm; }
+        void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
+        void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
+        void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
     
         void execute_movn()  { execute_unknown(); }
         void execute_movz()  { execute_unknown(); }
@@ -280,28 +281,28 @@ class FuncInstr
         {
             _is_jump_taken = eq();
             if ( _is_jump_taken)
-                new_PC += static_cast<int16>( v_imm) << 2;
+                new_PC += sign_extend( v_imm) << 2;
         }
 
         void execute_bne()
         {
             _is_jump_taken = ne();
             if ( _is_jump_taken)
-                new_PC += static_cast<int16>( v_imm) << 2;
+                new_PC += sign_extend( v_imm) << 2;
         }
 
         void execute_blez()
         {
             _is_jump_taken = lez();
             if ( _is_jump_taken)
-                new_PC += static_cast<int16>( v_imm) << 2;
+                new_PC += sign_extend( v_imm) << 2;
         }
 
         void execute_bgtz()
         {
             _is_jump_taken = gtz();
             if ( _is_jump_taken)
-                new_PC += static_cast<int16>( v_imm) << 2;
+                new_PC += sign_extend( v_imm) << 2;
         }
 
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
