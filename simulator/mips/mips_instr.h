@@ -171,6 +171,7 @@ class FuncInstr
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
         uint32 v_dst = NO_VAL32;
+        uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
@@ -245,13 +246,13 @@ class FuncInstr
         void execute_mflo()  { v_dst = lo; };
         void execute_mtlo()  { lo = v_src2;};
 
-        void execute_sll()   { v_dst = v_src1 << v_imm; }
-        void execute_srl()   { v_dst = v_src1 >> v_imm; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> v_imm; }
+        void execute_sll()   { v_dst = v_src1 << shamt; }
+        void execute_srl()   { v_dst = v_src1 >> shamt; }
+        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
         void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
-        void execute_lui()   { v_dst = v_imm << 0x10; }
+        void execute_lui()   { v_dst = sign_extend( v_imm) << 0x10; }
 
         void execute_slt()   { v_dst = static_cast<uint32>( lt()); }
         void execute_sltu()  { v_dst = static_cast<uint32>( ltu()); }

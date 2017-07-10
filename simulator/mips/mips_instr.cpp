@@ -258,11 +258,11 @@ void FuncInstr::initR()
         case OUT_R_SHAMT:
             src1  = static_cast<RegNum>(instr.asR.rt);
             dst   = static_cast<RegNum>(instr.asR.rd);
-            v_imm = instr.asR.shamt;
+            shamt = instr.asR.shamt;
 
             oss <<  " $" << regTableName(dst)
                 << ", $" << regTableName(src1)
-                <<  ", " << std::dec << v_imm;
+                <<  ", " << std::dec << shamt;
             break;
         case OUT_R_JUMP_LINK:
             src1  = static_cast<RegNum>(instr.asR.rs);
