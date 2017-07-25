@@ -17,6 +17,15 @@ More details about the project are available on [Wiki](https://github.com/MIPT-I
 1. On Linux, OSX, and Msys you can build MIPT-MIPS just by `make mipt-mips` command
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
 
+### C++ requirements
+
+MIPT-MIPS is written in C++14. Thus, you have to use one of these compilers:
+1. GCC 5 or higher
+1. MS Visual Studio 2015 or higher
+1. Clang 3.4 or higher
+
+Required version of Boost is 1.55.
+
 ## Basic command line options
 
 * `-b <filename>` — provide path to ELF binary file to execute
