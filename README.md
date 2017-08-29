@@ -14,7 +14,7 @@ More details about the project are available on [Wiki](https://github.com/MIPT-I
 
 1. [Install MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
 1. MIPT-MIPS requires LibELF and Boost. We have [an instruction how to get them](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries)
-1. On Linux, OSX, and Msys you can build MIPT-MIPS just by `make mipt-mips` command
+1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) you can build MIPT-MIPS just by `make mipt-mips` command
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
 
 ### C++ requirements
