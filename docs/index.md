@@ -4,7 +4,11 @@ The aim of the project is to teach the students the computer architecture throug
 
 ## Lectures on Computer Architecture
 
-We will start lectures on the computer architecture and simulation practicums in September 2017.
+N | Date | Event | Hometask
+:-: | :-: |:---- |:----------------
+0 | 15 Sep | **Promotion lecture** | 
+1 | 22 Sep | **L1: Project intro** | 
+
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
