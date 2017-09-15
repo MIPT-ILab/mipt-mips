@@ -6,7 +6,7 @@ The aim of the project is to teach the students the computer architecture throug
 
 N | Date | Event | Hometask
 :-: | :-: |:---- |:----------------
-0 | 15 Sep | **Promotion lecture** | 
+0 | 15 Sep | **Promotion event**<br/>• [Rus text, no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true) | 
 1 | 22 Sep | **L1: Project intro** | 
 
 
