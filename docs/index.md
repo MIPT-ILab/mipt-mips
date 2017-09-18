@@ -4,6 +4,8 @@ The aim of the project is to teach the students the computer architecture throug
 
 ## Lectures on Computer Architecture
 
+Lectures are delivered every Friday at 18:30 in 108 RT building.
+
 N | Date | Event | Hometask
 :-: | :-: |:---- |:----------------
 0 | 15 Sep | **Promotion event**<br/>• [Rus text, no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true) | 
