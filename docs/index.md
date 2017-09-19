@@ -1,10 +1,10 @@
-This project is a part of [Intel lab's](http://ilab.fizteh.ru) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
+This project is a part of [MIPT ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
 
 The aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
 ## Lectures on Computer Architecture
 
-Lectures are delivered every Friday at 18:30 in 108 RT building.
+Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
 
 N | Date | Event | Hometask
 :-: | :-: |:---- |:----------------
@@ -40,4 +40,4 @@ N | Year | Name | Score | Comments
 
 ## About us
 
-The project has been started in 2012 year as part of Intel lab's activity in MIPT. Currently it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab). For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [Intel lab's site](http://ilab.fizteh.ru)
+The project has been started in 2012. Currently it is mentored by [Pavel Kryukov](https://github.com/pavelkryukov) and [Igor Smirnov](https://github.com/igorsmir-ilab). For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [MIPT ILab site](https://mipt.ru/drec/about/ilab/) 
