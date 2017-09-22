@@ -176,7 +176,7 @@ std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
     "ra"
 }};
 
-boost::string_ref FuncInstr::regTableName(RegNum reg) {
+std::string_view FuncInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 

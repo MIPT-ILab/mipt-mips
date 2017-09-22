@@ -13,8 +13,8 @@
 #include <cassert>
 #include <string>
 #include <array>
+#include <string_view>
 
-#include <boost/utility/string_ref.hpp>
 
 // MIPT-MIPS modules
 #include <infra/types.h>
@@ -158,10 +158,10 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
-        static boost::string_ref regTableName(RegNum reg);
+        static std::string_view regTableName(RegNum reg);
         static std::array<std::string, REG_NUM_MAX> regTable;
 
-        boost::string_ref name = {};
+        std::string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;

@@ -1,6 +1,6 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ --std=c++14
+CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++17
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
 
 UNAME:= $(shell uname -o)
