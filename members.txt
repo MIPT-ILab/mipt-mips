@@ -4,3 +4,4 @@ List of 2017/2018 MIPT-MIPS project members:
 3. Roman Glushenkov
 4. Alexey Steksov
 5. Alexandr Misevich
+6. Vadim Gizatulin
