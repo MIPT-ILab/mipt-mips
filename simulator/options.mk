@@ -1,12 +1,12 @@
 # C++ compile
 CXX ?= g++
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
-
+CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 UNAME:= $(shell uname -o)
-ifeq ($(UNAME), Darwin)
-        CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++1z
+ifeq ($(shell uname), Darwin)
+        CXXFLAGS+= -std=c++1z
 else
-        CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++17
+        CXXFLAGS+= -std=c++17
 endif
 
 OBJ_DIR:=obj-$(CXX)-$(UNAME)
