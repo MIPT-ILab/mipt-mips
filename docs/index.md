@@ -8,7 +8,7 @@ Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
 
  Date | Event | Hometask
  :-: |:---- |:----------------
- 15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)  | 
+ 15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)<br/>• [Eng text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep_Eng.pptx?raw=true)  | 
  22<br/>Sep | **L1: Project intro. Basics of Simulator Development**<br/>• [Rus/Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_01__22_Sep__Project_Introduction__Rus_text__No_audio.pptx?raw=true) | • Add your name to members.txt. Follow [this instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet). Do not use online GitHub interface, try to do everything in the command line.<br/>• Start reading of 1st and 2nd chapters of [Schildt C++ manual](http://lib.mipt.ru/book/27518/).
  29<br/>Sep | **L2: Layers of Computer Science. ISA and uArch** | 
 
