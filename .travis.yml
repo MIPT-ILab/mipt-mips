@@ -23,19 +23,19 @@ script:
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
   - cd $TRAVIS_BUILD_DIR/simulator
   - make test
-  - if [ $CXX == clang++-4.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-4.0 tidy; fi
+  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy; fi
 
 addons:
   apt:
     sources:
     - boost-latest
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-4.0
+    - llvm-toolchain-trusty-5.0
     packages:
-    - g++-6
-    - clang-4.0
-    - clang-tidy-4.0
-    - llvm-4.0-dev
+    - g++-7
+    - clang-5.0
+    - clang-tidy-5.0
+    - llvm-5.0-dev
     - libelf-dev
     - libboost1.55-all-dev
     - texinfo
@@ -44,16 +44,16 @@ addons:
 install:
   - git submodule init
   - git submodule update
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-6; fi
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-4.0; fi
+  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-5.0; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
   - echo "Installing GNU binutils for MIPS"
   - OLD_CC=$CC
   - OLD_CXX=$CXX
-  - CC=gcc-6
+  - CC=gcc-7
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CC=gcc-4.9; fi
-  - CXX=g++-6
+  - CXX=g++-7
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then CXX=g++-4.9; fi
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib

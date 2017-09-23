@@ -1,9 +1,13 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ --std=c++14
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
-
+CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 UNAME:= $(shell uname -o)
+ifeq ($(shell uname), Darwin)	#OSX uses older version of clang which does not support std=c++17
+        CXXFLAGS+= -std=c++1z
+else
+        CXXFLAGS+= -std=c++17
+endif
 
 OBJ_DIR:=obj-$(CXX)-$(UNAME)
 
@@ -15,7 +19,6 @@ else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
 endif
-
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)

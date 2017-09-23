@@ -6,10 +6,11 @@ The aim of the project is to teach the students the computer architecture throug
 
 Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
 
-N | Date | Event | Hometask
-:-: | :-: |:---- |:----------------
-0 | 15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)  | 
-1 | 22<br/>Sep | **L1: Project intro. Basics of Simulator Development**<br/>• [Rus/Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_01__22_Sep__Project_Introduction__Rus_text__No_audio.pptx?raw=true)<br/>• [Rus/Eng text, Rus audio, ??? MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_01__22_Sep__Project_Introduction__Rus_text__Rus_audio.pptx?raw=true) | • Add your name to members.txt. Follow [this instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet). Do not use online GitHub interface, try to do everything in the command line.<br/>• Start reading of 1st and 2nd chapters of [Schildt C++ manual](http://lib.mipt.ru/book/27518/).
+ Date | Event | Hometask
+ :-: |:---- |:----------------
+ 15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)<br/>• [Eng text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep_Eng.pptx?raw=true)  | 
+ 22<br/>Sep | **L1: Project intro. Basics of Simulator Development**<br/>• [Rus/Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_01__22_Sep__Project_Introduction__Rus_text__No_audio.pptx?raw=true) | • Add your name to members.txt. Follow [this instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet). Do not use online GitHub interface, try to do everything in the command line.<br/>• Start reading of 1st and 2nd chapters of [Schildt C++ manual](http://lib.mipt.ru/book/27518/).
+ 29<br/>Sep | **L2: Layers of Computer Science. ISA and uArch** | 
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
@@ -35,7 +36,8 @@ N | Year | Name | Score | Comments
 :-: |:----: |:----: | ------------------------------ | ------------------------------
 1 | 2016/2017 | Georgiy Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
 2 | 2016/2017 | Alexandr Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
-3 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+3 | 2017/2018 | Alexey Steksov | 1 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152) |
+4 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
 ## About us
 
