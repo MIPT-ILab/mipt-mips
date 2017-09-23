@@ -8,3 +8,4 @@ List of 2017/2018 MIPT-MIPS project members:
 7. Vadim Gizatulin
 8. Kirill Nedostoev
 9. Andrey Afonin
+10. Danil Yarovoy
