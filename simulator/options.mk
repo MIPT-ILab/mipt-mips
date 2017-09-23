@@ -1,9 +1,13 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++17
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
 
 UNAME:= $(shell uname -o)
+ifeq ($(UNAME), Darwin)
+        CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++1z
+else
+        CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ -std=c++17
+endif
 
 OBJ_DIR:=obj-$(CXX)-$(UNAME)
 
@@ -15,7 +19,6 @@ else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
 endif
-
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)
