@@ -13,8 +13,11 @@
 #include <cassert>
 #include <string>
 #include <array>
+#if __has_include("string_view")
 #include <string_view>
-
+#else
+#include <experimental/string_view>
+#endif
 
 // MIPT-MIPS modules
 #include <infra/types.h>
