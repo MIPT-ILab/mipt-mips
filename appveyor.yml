@@ -6,15 +6,15 @@ environment:
   - build: msvc
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+    BOOST_ROOT: C:\Libraries\boost_1_64_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib32-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
+    BOOST_ROOT: C:\Libraries\boost_1_64_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
   - build: g++
