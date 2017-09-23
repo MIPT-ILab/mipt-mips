@@ -19,7 +19,7 @@ More details about the project are available on [Wiki](https://github.com/MIPT-I
 
 ### C++ requirements
 
-MIPT-MIPS is written in C++14. Thus, you have to use one of these compilers:
+MIPT-MIPS is written in C++17. Thus, you have to use one of these compilers:
 1. GCC 7 or higher
 1. MS Visual Studio 2017 or higher
 1. Clang 5.0 or higher
