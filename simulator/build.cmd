@@ -10,7 +10,7 @@ rem Build object files
 cl /I. /EHsc /c /nologo /MD ^
     /D__LIBELF_INTERNAL__=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
-    /std:c++17 ^
+   /std:c++17 ^
    infra/elf_parser/elf_parser.cpp ^
    infra/memory/memory.cpp ^
    infra/config/config.cpp ^
@@ -41,6 +41,7 @@ rem Build main.cpp
 cl /I. /EHsc /c /nologo /MD ^
    /D__LIBELF_INTERNAL__=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
+   /std:c++17 ^
    main.cpp || exit /b
 
 rem Build MIPT-MIPS
