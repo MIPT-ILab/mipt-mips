@@ -309,14 +309,14 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
 */
 template<class T> void WritePort<T>::destroy()
 {
-    if ( this->_init == false)
+    if ( !this->_init)
         serr << "Destroying uninitialized WritePort " << this->_key << std::endl << critical;
 
     this->_init = false;
 
     for ( const auto reader : _destinations)
     {
-        if ( reader->_init == false) 
+        if ( !reader->_init) 
             serr << "Destroying uninitialized ReadPort " << this->_key << std::endl << critical;
 
         reader->_init = false;
@@ -399,7 +399,7 @@ template<class T> void Port<T>::Map::destroy()
 }
 
 /*
- * Function for founding lost elements at port
+ * Find lost elements inside port
  *
  * Argument is the number of current cycle.
  * If some token couldn't be get in future, warnings
@@ -411,14 +411,14 @@ template<class T> void Port<T>::Map::check( uint64 cycle) const
 }
 
 // External methods
-template<typename T, typename ... Args>
-decltype(auto) make_write_port(Args ... args)
+template<typename T, typename... Args>
+decltype(auto) make_write_port(Args... args)
 {
     return std::make_unique<WritePort<T>>(args...);
 }
 
-template<typename T, typename ... Args>
-decltype(auto) make_read_port(Args ... args)
+template<typename T, typename... Args>
+decltype(auto) make_read_port(Args... args)
 {
     return std::make_unique<ReadPort<T>>(args...);
 }
