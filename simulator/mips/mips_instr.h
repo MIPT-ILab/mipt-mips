@@ -17,6 +17,7 @@
 #include <string_view>
 #else
 #include <experimental/string_view>
+#define __STRING_VIEW_EXPERIMENTAL__
 #endif
 
 // MIPT-MIPS modules
@@ -161,10 +162,15 @@ class FuncInstr
         };
 
         static const ISAEntry isaTable[];
+	#ifdef __STRING_VIEW_EXPERIMENTAL__
+	static std::experimental::string_view regTableName(RegNum reg);
+	std::experimental::string_view name = {};
+	#else
         static std::string_view regTableName(RegNum reg);
+	std::string_view name = {};
+	#endif
         static std::array<std::string, REG_NUM_MAX> regTable;
 
-        std::string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
