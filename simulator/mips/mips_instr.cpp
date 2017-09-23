@@ -175,11 +175,9 @@ std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
     "fp",
     "ra"
 }};
-#ifdef __STRING_VIEW_EXPERIMENTAL__
-std::experimental::string_view FuncInstr::regTableName(RegNum reg) {
-#else
-std::string_view FuncInstr::regTableName(RegNum reg) {
-#endif
+
+string_view FuncInstr::regTableName(RegNum reg) {
+
 
     return regTable.at(static_cast<size_t>( reg));
 }

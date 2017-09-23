@@ -7,14 +7,14 @@ environment:
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
     BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-15.3
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-15.3
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
   - build: g++
@@ -51,7 +51,8 @@ before_build:
 - cmd: set CPATH=%LIBELF_INCLUDE%;%CPATH%
 - cmd: set CPLUS_INCLUDE_PATH=%LIBELF_INCLUDE%;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 # set variables for MSVC
-- cmd: if "%build%"=="msvc"  call "%VS153COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
+- cmd: if "%build%"=="msvc"  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+- cmd: if "%build%"=="msvc"  call "%VS150COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
 # build LibELF for MSVC
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
