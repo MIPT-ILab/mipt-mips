@@ -36,7 +36,7 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 	@echo "$@ is built SUCCESSFULLY"
 
 tidy: $(CPPS) main.cpp
-	@$(TIDY) $^ $(TIDYFLAGS) -- -std=c++1z $(INCL)
+	@$(TIDY) $^ $(TIDYFLAGS) -- -std=c++17 $(INCL)
 
 ###### Rules to get GTest #######
 

@@ -3,7 +3,7 @@ CXX ?= g++
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
 CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 UNAME:= $(shell uname -o)
-ifeq ($(shell uname), Darwin)
+ifeq ($(shell uname), Darwin)	#OSX uses older version of clang which does not support std=c++17
         CXXFLAGS+= -std=c++1z
 else
         CXXFLAGS+= -std=c++17
