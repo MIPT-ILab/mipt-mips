@@ -59,7 +59,7 @@ before_build:
 - cmd: set PATH=%LIBELF_INCLUDE%;%PATH%
 # build binutils
 - cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof; make all install"
+- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof > /dev/null; make all install > /dev/null"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set CXX=%build%
