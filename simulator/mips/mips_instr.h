@@ -136,12 +136,8 @@ class FuncInstr
             } asJ;
             uint32 raw;
 
-            _instr() { // constructor w/o arguments for ports
-                 raw = NO_VAL32;
-            }
-            explicit _instr(uint32 bytes) {
-                 raw = bytes;
-            }
+            _instr() : raw( NO_VAL32) { } // constructor w/o arguments for ports
+            explicit _instr(uint32 bytes) : raw( bytes) { }
         } instr = {};
 
         using Execute = void (FuncInstr::*)();

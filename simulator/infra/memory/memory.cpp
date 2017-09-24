@@ -95,7 +95,7 @@ uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
     if ( !check( addr) || !check( addr + num_of_bytes - 1))
          return NO_VAL64;
 
-    uint64_8 value;
+    uint64_8 value = {};
     value.val = 0ull;
 
     for ( size_t i = 0; i < num_of_bytes; ++i)
@@ -121,7 +121,7 @@ void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
 
-    uint64_8 value_;
+    uint64_8 value_ = {};
     value_.val = value;
 
     for ( size_t i = 0; i < num_of_bytes; ++i)
