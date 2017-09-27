@@ -46,7 +46,7 @@ install:
   - git submodule update
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-5.0; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib gcc@7; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
   - echo "Installing GNU binutils for MIPS"
   - cd $TRAVIS_BUILD_DIR/binutils
