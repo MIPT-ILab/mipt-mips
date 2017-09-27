@@ -4,6 +4,10 @@ notifications:
 language: cpp
 sudo: false
 
+branches:
+  only:
+  - master
+
 compiler:
   - gcc
   - clang
