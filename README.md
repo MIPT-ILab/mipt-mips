@@ -37,7 +37,7 @@ Required versions of Boost:
 * `-d` — enables detailed output of each cycle
 
 ## Known issues
-* Reduced subset of MIPS instructions is supported at the moment.
+* Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
 
 ## May I contribute?
 
