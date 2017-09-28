@@ -13,4 +13,6 @@ List of 2017/2018 MIPT-MIPS project members:
 12. Vyacheslav Kompan
 13. Konstantin Soshin
 14. Nikita Nikonov
-15. Alexander Timofeev
+15. Ivan Tetyushkin
+16. Alexander Timofeev
+
