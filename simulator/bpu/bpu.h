@@ -35,21 +35,25 @@ public:
     virtual ~BaseBP() = default;
 };
 
+
 template<typename T>
-class BP : public BaseBP
+class BP final: public BaseBP
 {
     std::vector<std::vector<T>> data;
     CacheTagArray tags;
 
 public:
-    BP( uint32   size_in_entries,
-        uint32   ways,
+    BP( uint32 size_in_entries,
+        uint32 ways,
         uint32 branch_ip_size_in_bits) :
 
         data( ways, std::vector<T>( size_in_entries / ways)),
         tags( size_in_entries,
               ways,
-              4,
+              // we're reusing existing CacheTagArray functionality,
+              // but here we don't split memory in blocks, storing
+              // IP's only, so hardcoding here the granularity of 4 bytes:
+              4, 
               branch_ip_size_in_bits)
         { }
 
@@ -58,6 +62,8 @@ public:
     {
         uint32 way;
         bool is_hit;
+        // do not update LRU information on prediction,
+        // so "no_touch" version of "tags.read" is used:
         std::tie( is_hit, way) = tags.read_no_touch( PC);
         if ( is_hit) // hit
             return data[ way][ tags.set(PC)].is_taken( PC);
