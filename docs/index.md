@@ -6,6 +6,8 @@ The aim of the project is to teach the students the computer architecture throug
 
 Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
 
+### Term 1: CS Basics and Components
+
  Date | Event | Hometask
  :-: |:---- |:----------------
  15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)<br/>• [Eng text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep_Eng.pptx?raw=true)  | 
