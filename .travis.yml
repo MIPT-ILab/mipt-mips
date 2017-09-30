@@ -58,7 +58,7 @@ install:
   - CC=gcc-7
   - CXX=g++-7
   - cd $TRAVIS_BUILD_DIR/binutils
-  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib
+  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib --disable-werror
   - make
   - make install
   - CC=$OLD_CC
