@@ -261,23 +261,23 @@ void PerfMIPS::clock_memory( int cycle)
         return;
     }
 
-    /* acquiring real information */
-    bool actually_taken = instr.is_jump_taken();
-    Addr real_target = instr.get_new_PC();
-
-    /* branch misprediction unit */
-    if ( instr.is_misprediction())
-    {
-        /* updating BTB */
+    if (instr.isJump()) {
+        /* acquiring real information for BPU */
+        bool actually_taken = instr.is_jump_taken();
+        Addr real_target = instr.get_new_PC();
         bp->update( actually_taken, instr.get_PC(), real_target);
 
-        /* flushing the pipeline */
-        wp_memory_2_all_flush->write( true, cycle);
+        /* handle misprediction */
+        if ( instr.is_misprediction())
+        {
+            /* flushing the pipeline */
+            wp_memory_2_all_flush->write( true, cycle);
 
-        /* sending valid PC to fetch stage */
-        wp_memory_2_fetch_target->write( real_target, cycle);
+            /* sending valid PC to fetch stage */
+            wp_memory_2_fetch_target->write( real_target, cycle);
 
-        sout << "misprediction\n";
+            sout << "misprediction on\n";
+        }
     }
 
     /* perform required loads and stores */

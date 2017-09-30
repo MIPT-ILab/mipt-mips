@@ -13,11 +13,11 @@
 
 /* TODO: move implemetations to .cpp file */
 
-/* each inherited class has to implement three methods:
- * 1. constructor();
- * 2. bool is_taken( PC);
- * 3. void update( bool is_taken, Addr target)
+/* each inherited class has to implement at least these methods:
+ * 1. bool is_taken( PC);
+ * 2. void update( bool is_taken, Addr target)
  */
+
 class BPEntry
 {
 protected:
@@ -25,7 +25,7 @@ protected:
 
 public:
     Addr getTarget() const { return _target; }
-    void reset() { _target = NO_VAL32; }
+    void reset( Addr PC = NO_VAL32) { _target = PC; }
 };
 
 
@@ -34,14 +34,12 @@ public:
 class BPEntryStatic : public BPEntry
 {
 public:
-    /* update */
-    void update( bool /* unused */, Addr target) { _target = target; }
+    void update( bool is_taken, Addr target) {if (is_taken) _target = target; }
 };
 
 class BPEntryAlwaysTaken final : public BPEntryStatic
 {
 public:
-    /* prediction */
     bool is_taken( Addr /* unused */) const { return true; }
 };
 
@@ -75,16 +73,13 @@ public:
     void update( bool is_taken, Addr target)
     {
         if ( is_taken && _target != target)
-        {
-            /* reset */
-            state = default_state;
-            _target = target;
-        }
+            /* if the address has somehow changed, we should update it appropriately */
+            reset( target);
 
         state = static_cast<State>( is_taken);
     }
 
-    void reset() { BPEntry::reset(); state = default_state; }
+    void reset(Addr PC = NO_VAL32) { BPEntry::reset( PC); state = default_state; }
 };
 
 class BPEntryTwoBit : public BPEntry
@@ -152,17 +147,15 @@ public:
     void update( bool is_taken, Addr target)
     {
         if ( is_taken && _target != target)
-        {
-            state.reset();
-            _target = target;
-        }
+            /* if the address has somehow changed, we should update it appropriately */
+            reset( target);
 
         state.update( is_taken);
     }
 
-    void reset()
+    void reset( Addr PC = NO_VAL32)
     {
-        BPEntry::reset();
+        BPEntry::reset( PC);
         state.reset();
     }
 };
@@ -222,21 +215,19 @@ public:
     void update( bool is_taken, Addr target)
     {
         if ( is_taken && _target != target)
-        {
-            for(auto& elem : state_table)
-                elem.reset();
-
-            current_pattern.reset();
-            _target = target;
-        }
+            reset( target);
 
         state_table[ current_pattern.get_value()].update( is_taken);
         current_pattern.update( is_taken);
     }
 
-    void reset()
+    void reset( Addr PC = NO_VAL32)
     {
-        BPEntry::reset();
+        BPEntry::reset( PC);
+
+        for(auto& elem : state_table)
+            elem.reset();
+
         current_pattern.reset();
     }
 };

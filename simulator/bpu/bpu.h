@@ -73,11 +73,13 @@ public:
 
     Addr get_target( Addr PC) final
     {
-        uint32 way;
-        bool is_hit;
-        std::tie( is_hit, way) = tags.read_no_touch( PC);
-        if ( is_hit) // hit
+        // return saved target only in case it is predicted taken
+        if ( is_taken( PC)) {
+            uint32 way;
+            std::tie( std::ignore, way) = tags.read_no_touch( PC);
+
             return data[ way][ tags.set(PC)].getTarget();
+        }
 
         return PC + 4;
     }
@@ -91,9 +93,10 @@ public:
         uint32 way;
         bool is_hit;
         std::tie( is_hit, way) = tags.read( branch_ip);
+
         if ( !is_hit) { // miss
             way = tags.write( branch_ip); // add new entry to cache
-            data[ way][ set].reset();
+            data[ way][ set].reset( target);
         }
 
         data[ way][ set].update( is_taken, target);
