@@ -73,13 +73,15 @@ public:
 
     Addr get_target( Addr PC) final
     {
-        // return saved target only in case it is predicted taken
-        if ( is_taken( PC)) {
-            uint32 way;
-            std::tie( std::ignore, way) = tags.read_no_touch( PC);
+        uint32 way;
+        bool is_hit;
+        // do not update LRU information on prediction,
+        // so "no_touch" version of "tags.read" is used:
+        std::tie( is_hit, way) = tags.read_no_touch( PC);
 
+        // return saved target only in case it is predicted taken
+        if ( is_hit && is_taken( PC))
             return data[ way][ tags.set(PC)].getTarget();
-        }
 
         return PC + 4;
     }
@@ -96,7 +98,9 @@ public:
 
         if ( !is_hit) { // miss
             way = tags.write( branch_ip); // add new entry to cache
-            data[ way][ set].reset( target);
+            T& entry = data[ way][ set];
+            entry.reset();
+            entry.update_target( target);
         }
 
         data[ way][ set].update( is_taken, target);

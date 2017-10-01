@@ -25,7 +25,8 @@ protected:
 
 public:
     Addr getTarget() const { return _target; }
-    void reset( Addr PC = NO_VAL32) { _target = PC; }
+    void reset() { _target = NO_VAL32; }
+    void update_target(Addr target) { _target = target; }
 };
 
 
@@ -72,14 +73,16 @@ public:
     /* update */
     void update( bool is_taken, Addr target)
     {
-        if ( is_taken && _target != target)
+        if ( is_taken && _target != target) {
             /* if the address has somehow changed, we should update it appropriately */
-            reset( target);
+            reset();
+            update_target(target);
+        }
 
         state = static_cast<State>( is_taken);
     }
 
-    void reset(Addr PC = NO_VAL32) { BPEntry::reset( PC); state = default_state; }
+    void reset() { BPEntry::reset(); state = default_state; }
 };
 
 class BPEntryTwoBit : public BPEntry
@@ -146,16 +149,18 @@ public:
     /* update */
     void update( bool is_taken, Addr target)
     {
-        if ( is_taken && _target != target)
+        if ( is_taken && _target != target) {
             /* if the address has somehow changed, we should update it appropriately */
-            reset( target);
+            reset();
+            update_target( target);
+        }
 
         state.update( is_taken);
     }
 
-    void reset( Addr PC = NO_VAL32)
+    void reset()
     {
-        BPEntry::reset( PC);
+        BPEntry::reset();
         state.reset();
     }
 };
@@ -214,16 +219,18 @@ public:
     /* update */
     void update( bool is_taken, Addr target)
     {
-        if ( is_taken && _target != target)
-            reset( target);
+        if ( is_taken && _target != target) {
+            reset();
+            update_target( target);
+        }
 
         state_table[ current_pattern.get_value()].update( is_taken);
         current_pattern.update( is_taken);
     }
 
-    void reset( Addr PC = NO_VAL32)
+    void reset()
     {
-        BPEntry::reset( PC);
+        BPEntry::reset();
 
         for(auto& elem : state_table)
             elem.reset();
