@@ -18,4 +18,4 @@ List of 2017/2018 MIPT-MIPS project members:
 17. Alexander Timofeev
 18. Andrei Sultan
 19. Denis Los
-20. Logovskiy Yan
+20. Yan Logovskiy
