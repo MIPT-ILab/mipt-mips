@@ -1,4 +1,4 @@
-This project is a part of [MIPT ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
+This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
 
 The aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
