@@ -53,8 +53,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
   - echo "Installing GNU binutils for MIPS"
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export BINUTILS_OSX_OPT=--disable-werror; fi
   - cd $TRAVIS_BUILD_DIR/binutils
-  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib $BINUTILS_OSX_OPT
+  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib
   - make
   - make install
