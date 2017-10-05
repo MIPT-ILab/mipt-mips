@@ -27,7 +27,7 @@ MIPT-MIPS uses C++17. Thus, you have to use compilers of these versions or newer
 
 Required versions of Boost:
 * 1.55 for GCC and Clang
-* 1.64 for MS Visual Studio
+* 1.65.1 for MS Visual Studio
 
 ## Basic command line options
 
