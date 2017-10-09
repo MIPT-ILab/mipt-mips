@@ -1,10 +1,10 @@
-This project is a part of [MIPT ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
+This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees.
 
 The aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
 ## Lectures on Computer Architecture
 
-Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
+Lectures are delivered every Friday at 18:30 in **_521 Main building_** of MIPT.
 
 ### Term 1: CS Basics and Components
 
@@ -13,7 +13,8 @@ Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
  15<br/>Sep | **Promotion event**<br/>• [Rus text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep.pptx?raw=true)<br/>• [Eng text, no audio, 8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Promotion__15_Sep_Eng.pptx?raw=true)  | 
  22<br/>Sep | **L1: Project intro.<br/>Basics of Simulator Development**<br/>• [Rus/Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_01__22_Sep__Project_Introduction__Rus_text__No_audio.pptx?raw=true) | • Add your name to members.txt. Follow [this instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet).<br/>• Start reading of 1st and 2nd chapters of [Schildt C++ manual](http://lib.mipt.ru/book/27518/).
  29<br/>Sep | **L2: Layers of Computer Science.<br/>ISA and uArch**<br/>• [Eng text, no audio, 9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_02__29_Sep__Layers_of_Computer_Science__ISA_and_uArch___Eng_text__No_audio.pptx?raw=true) | • Read our [README.md](https://github.com/MIPT-ILab/mipt-mips/blob/master/README.md), build MIPT-MIPS, and run some traces.<br/>• Take a look at [MIPS ISA](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
- 06<br/>Oct | **L3: Boolean Algebra.<br/>Combinational Circuits** |
+ 06<br/>Oct | **L3: Combinational Circuits**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_03__06_Oct__Combinational_Circuits__Eng_text__No_audio.pptx?raw=true) | • Install [Logisim](http://www.cburch.com/logisim/index.html), reproduce some schemes we discussed, look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) example
+ 13<br/>Oct | **L4: Integrated Circuits Basics**<br/> | |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
