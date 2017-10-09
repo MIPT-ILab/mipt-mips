@@ -339,12 +339,12 @@ class FuncInstr
         RegNum get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
-        bool isJump() const { return operation == OUT_J_JUMP      ||
-                                     operation == OUT_J_JUMP_LINK ||
-                                     operation == OUT_R_JUMP      ||
-                                     operation == OUT_R_JUMP_LINK ||
-                                     operation == OUT_I_BRANCH_0  ||
-                                     operation == OUT_I_BRANCH; }
+        bool is_jump() const { return operation == OUT_J_JUMP      ||
+                                      operation == OUT_J_JUMP_LINK ||
+                                      operation == OUT_R_JUMP      ||
+                                      operation == OUT_R_JUMP_LINK ||
+                                      operation == OUT_I_BRANCH_0  ||
+                                      operation == OUT_I_BRANCH; }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
