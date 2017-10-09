@@ -261,7 +261,7 @@ void PerfMIPS::clock_memory( int cycle)
         return;
     }
 
-    if (instr.isJump()) {
+    if (instr.is_jump()) {
         /* acquiring real information for BPU */
         bool actually_taken = instr.is_jump_taken();
         Addr real_target = instr.get_new_PC();
