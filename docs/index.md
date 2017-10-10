@@ -4,7 +4,7 @@ The aim of the project is to teach the students the computer architecture throug
 
 ## Lectures on Computer Architecture
 
-Lectures are delivered every Friday at 18:30 in **_521 Main building_** of MIPT.
+Lectures are delivered every Friday at 18:30 in 108 RT building of MIPT.
 
 ### Term 1: CS Basics and Components
 
