@@ -113,7 +113,7 @@ class FuncInstr
 
         union _instr
         {
-            struct
+            const struct
             {
                 unsigned funct  :6;
                 unsigned shamt  :5;
@@ -122,19 +122,19 @@ class FuncInstr
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asR;
-            struct
+            const struct
             {
                 unsigned imm    :16;
                 unsigned rt     :5;
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asI;
-            struct
+            const struct
             {
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
-            uint32 raw;
+            const uint32 raw;
 
             _instr() : raw( NO_VAL32) { } // constructor w/o arguments for ports
             explicit _instr(uint32 bytes) : raw( bytes) { }
