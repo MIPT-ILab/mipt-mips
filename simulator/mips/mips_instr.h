@@ -144,7 +144,7 @@ class FuncInstr
 
         struct ISAEntry // NOLINT
         {
-            std::string name;
+            string_view name;
 
             uint8 opcode;
 
@@ -160,7 +160,7 @@ class FuncInstr
 
         static const ISAEntry isaTable[];
         static string_view regTableName(RegNum reg);
-        static std::array<std::string, REG_NUM_MAX> regTable;
+        static std::array<string_view, REG_NUM_MAX> regTable;
         string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
