@@ -111,7 +111,7 @@ class FuncInstr
             EXPLICIT_TRAP,
         } trap = TrapType::NO_TRAP;
 
-        union _instr
+        const union _instr
         {
             const struct
             {
@@ -178,11 +178,11 @@ class FuncInstr
         bool complete = false;
 
         /* info for branch misprediction unit */
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        const bool predicted_taken = false;     // Predicted direction
+        const Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        Addr PC = NO_VAL32; // removing "const" keyword to supporting ports
+        const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
