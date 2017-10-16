@@ -136,9 +136,9 @@ class FuncInstr
             } asJ;
             const uint32 raw;
 
-            _instr() : raw( NO_VAL32) { } // constructor w/o arguments for ports
+            _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
-        } instr = {};
+        } instr;
 
         using Execute = void (FuncInstr::*)();
 
@@ -325,7 +325,7 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = default; // constructor w/o arguments for ports
+        FuncInstr() = delete; // constructor w/o arguments for ports
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
