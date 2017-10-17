@@ -111,9 +111,9 @@ class FuncInstr
             EXPLICIT_TRAP,
         } trap = TrapType::NO_TRAP;
 
-        union _instr
+        const union _instr
         {
-            struct
+            const struct
             {
                 unsigned funct  :6;
                 unsigned shamt  :5;
@@ -122,29 +122,29 @@ class FuncInstr
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asR;
-            struct
+            const struct
             {
                 unsigned imm    :16;
                 unsigned rt     :5;
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asI;
-            struct
+            const struct
             {
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
-            uint32 raw;
+            const uint32 raw;
 
-            _instr() : raw( NO_VAL32) { } // constructor w/o arguments for ports
+            _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
-        } instr = {};
+        } instr;
 
         using Execute = void (FuncInstr::*)();
 
         struct ISAEntry // NOLINT
         {
-            std::string name;
+            string_view name;
 
             uint8 opcode;
 
@@ -160,7 +160,7 @@ class FuncInstr
 
         static const ISAEntry isaTable[];
         static string_view regTableName(RegNum reg);
-        static std::array<std::string, REG_NUM_MAX> regTable;
+        static std::array<string_view, REG_NUM_MAX> regTable;
         string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
@@ -178,11 +178,11 @@ class FuncInstr
         bool complete = false;
 
         /* info for branch misprediction unit */
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        const bool predicted_taken = false;     // Predicted direction
+        const Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        Addr PC = NO_VAL32; // removing "const" keyword to supporting ports
+        const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
@@ -325,7 +325,7 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = default; // constructor w/o arguments for ports
+        FuncInstr() = delete; // constructor w/o arguments for ports
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
