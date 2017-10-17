@@ -229,8 +229,14 @@ template<class T> class ReadPort: public Port<T>
             this->portMap[ key].readers.push_front( this);
         }
 
+        // Is ready? method
+        bool is_ready( uint64 cycle) const;
+
         // Read method
-        bool read( T* address, uint64 cycle);
+        T read( uint64 cycle);
+
+        // Read but ignore the data
+        void ignore( uint64 cycle);
 };
 
 /*
@@ -325,15 +331,15 @@ template<class T> void WritePort<T>::destroy()
 }
 
 /*
- * Read method
+ * Ready method
  *
- * First arguments is address, second is the number of cycle
+ * Checks if there is something to read in this cycle
  *
  * If there's nothing in port to give, returns false
  * If succesful, returns true
- * If uninitalized, asserts
+ * If uninitalized, generates error
 */
-template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
+template<class T> bool ReadPort<T>::is_ready( uint64 cycle) const
 {
     if ( !this->_init)
     {
@@ -341,17 +347,55 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
         return false;
     }
 
-    if ( _dataQueue.empty())
-        return false; // the port is empty
+    // there are some entries and they are ready to be read
+    return !_dataQueue.empty() && _dataQueue.front().cycle == cycle;
+}
 
-    // there are some entries, but they are not ready to read
-    if ( _dataQueue.front().cycle != cycle)
-        return false;
+/*
+ * Read method
+ *
+ * Returns data which should be read in this cycle
+ *
+ * If there was nothing to read, generates error (use is_ready before reading)
+*/
+template<class T> T ReadPort<T>::read( uint64 cycle)
+{
+    if ( !this->_init)
+    {
+        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
+    }
+
+    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
+    {
+        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
+    }
 
     // data is successfully read
-    *address = _dataQueue.front().data; // NOTE: we copy data here
+    auto tmp = _dataQueue.front().data; // NOTE: we copy data here
     _dataQueue.pop();
-    return true;
+    return tmp;
+}
+
+/*
+ * Ignoring read method
+ *
+ * Reads data which should be read in this cycle but does not copy it
+ *
+ * If there was nothing to read, generates error (use is_ready before reading)
+*/
+template<class T> void ReadPort<T>::ignore( uint64 cycle)
+{
+    if ( !this->_init)
+    {
+        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
+    }
+
+    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
+    {
+        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
+    }
+
+    _dataQueue.pop();
 }
 
 /*

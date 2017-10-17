@@ -103,15 +103,12 @@ void PerfMIPS::run( const std::string& tr,
 void PerfMIPS::clock_fetch( int cycle)
 {
     /* receive flush and stall signals */
-    bool is_flush = false;
-    rp_fetch_flush->read( &is_flush, cycle);
-
-    bool is_stall = false;
-    rp_decode_2_fetch_stall->read( &is_stall, cycle);
+    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
+    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
 
     /* updating PC */
     if ( is_flush)
-        rp_memory_2_fetch_target->read( &PC, cycle); // fixing PC
+        PC = rp_memory_2_fetch_target->read( cycle); // fixing PC
     else if ( !is_stall)
         PC = new_PC;
 
@@ -137,18 +134,18 @@ void PerfMIPS::clock_fetch( int cycle)
          << std::hex << PC << ": 0x" << data.raw << std::endl;
 }
 
-void PerfMIPS::clock_decode( int cycle) {
+void PerfMIPS::clock_decode( int cycle)
+{
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
     /* receive flush signal */
-    bool is_flush = false;
-    rp_decode_flush->read( &is_flush, cycle);
+    const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
 
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        rp_fetch_2_decode->read( &decode_data, cycle);
+        decode_data = rp_fetch_2_decode->read( cycle);
 
         is_anything_to_decode = false;
         sout << "flush\n";
@@ -158,13 +155,16 @@ void PerfMIPS::clock_decode( int cycle) {
     if ( !is_anything_to_decode)
     {
         /* acquiring data from fetch */
-        is_anything_to_decode = rp_fetch_2_decode->read( &decode_data, cycle);
+        is_anything_to_decode = rp_fetch_2_decode->is_ready( cycle);
+        if ( is_anything_to_decode)
+        {
+            decode_data = rp_fetch_2_decode->read( cycle);
+        }
     }
     else
     {
         /* ignore data from port -- to suppress loss messages */
-        IfIdData data;
-        rp_fetch_2_decode->read( &data, cycle);
+        rp_fetch_2_decode->ignore( cycle);
     }
 
     /* check if there is something to process */
@@ -202,28 +202,30 @@ void PerfMIPS::clock_execute( int cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
-    FuncInstr instr;
-
     /* receive flush signal */
-    bool is_flush = false;
-    rp_execute_flush->read( &is_flush, cycle);
+    const bool is_flush = rp_execute_flush->is_ready( cycle) && rp_execute_flush->read( cycle);
 
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        rp_decode_2_execute->read( &instr, cycle);
-        rf->cancel( instr);
+        if ( rp_decode_2_execute->is_ready( cycle))
+        {
+            const auto& instr = rp_decode_2_execute->read( cycle);
+            rf->cancel( instr);
+        }
         sout << "flush\n";
         return;
     }
 
     /* check if there is something to process */
-    if ( !rp_decode_2_execute->read( &instr, cycle))
+    if ( !rp_decode_2_execute->is_ready( cycle))
     {
         sout << "bubble\n";
         return;
     }
+
+    auto instr = rp_decode_2_execute->read( cycle);
 
     /* preform execution */
     instr.execute();
@@ -238,30 +240,32 @@ void PerfMIPS::clock_memory( int cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
-    FuncInstr instr;
-
     /* receieve flush signal */
-    bool is_flush = false;
-    rp_memory_flush->read( &is_flush, cycle);
+    const bool is_flush = rp_memory_flush->is_ready( cycle) && rp_memory_flush->read( cycle);
 
     /* branch misprediction */
     if ( is_flush)
     {
-        /* ignoring the upcoming instruction as it is invalid */
-        rp_execute_2_memory->read( &instr, cycle);
-        rf->cancel( instr);
+        /* drop instruction as it is invalid */
+        if ( rp_execute_2_memory->is_ready( cycle))
+        {
+            const auto& instr = rp_execute_2_memory->read( cycle);
+            rf->cancel( instr);
+        }
         sout << "flush\n";
         return;
     }
 
     /* check if there is something to process */
-    if ( !rp_execute_2_memory->read( &instr, cycle))
+    if ( !rp_execute_2_memory->is_ready( cycle))
     {
         sout << "bubble\n";
         return;
     }
 
-    if (instr.isJump()) {
+    auto instr = rp_execute_2_memory->read( cycle);
+
+    if (instr.is_jump()) {
         /* acquiring real information for BPU */
         bool actually_taken = instr.is_jump_taken();
         Addr real_target = instr.get_new_PC();
@@ -293,10 +297,8 @@ void PerfMIPS::clock_writeback( int cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
-    FuncInstr instr;
-
     /* check if there is something to process */
-    if ( !rp_memory_2_writeback->read( &instr, cycle))
+    if ( !rp_memory_2_writeback->is_ready( cycle))
     {
         sout << "bubble\n";
         if ( cycle - last_writeback_cycle >= 10)
@@ -306,6 +308,8 @@ void PerfMIPS::clock_writeback( int cycle)
         }
         return;
     }
+
+    FuncInstr instr = rp_memory_2_writeback->read( cycle);
 
     /* perform writeback */
     rf->write_dst( instr);
