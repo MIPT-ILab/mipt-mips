@@ -46,6 +46,7 @@ before_build:
 # install submodules
 - cmd: git submodule update --init
 # use Arkady Shapkin's patch to build GoogleTest with VS 2017
+- cmd: cd googletest
 - cmd: git pull https://github.com/KindDragon/googletest.git vs-build-fix
 # configure variable
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
