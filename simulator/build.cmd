@@ -35,7 +35,7 @@ for %%G in (infra\elf_parser infra\memory mips func_sim bpu core) do (
     cd %%G\t
     cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib ^
        /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest ^
-       /D_HAS_AUTO_PTR_ETC=1 /DGTEST_HAS_TR1_TUPLE=0 ^
+       /D_HAS_AUTO_PTR_ETC=1 ^
        /std:c++17 ^
        /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" /MD || exit /b
     .\test.exe || exit /b
