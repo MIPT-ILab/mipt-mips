@@ -46,10 +46,10 @@ public:
     std::string strByBytes() const;
     std::string strByWords() const;
 
-    const std::string& get_name()  const { return name; }
-    Addr   get_size()              const { return size; }
-    Addr   get_start_addr()        const { return start_addr; }
-    uint8  get_byte(size_t offset) const { return content.get()[offset]; }
+    const std::string& get_name() const { return name; }
+    Addr  get_size()              const { return size; }
+    Addr  get_start_addr()        const { return start_addr; }
+    uint8 get_byte(size_t offset) const { return content.get()[offset]; }
 };
 
 #endif // #ifndef ELF_PARSER__ELF_PARSER_H

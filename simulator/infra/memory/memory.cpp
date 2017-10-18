@@ -6,8 +6,10 @@
  */
 
 // Generic C++
+#include <cassert>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 // MIPT-MIPS modules
 #include <infra/macro.h>
@@ -55,7 +57,7 @@ Memory::Memory( const std::string& executable_file_name,
 
     for ( const auto& section : sections_array)
     {
-        if ( section.name == ".text")
+        if ( section.get_name() == ".text")
             startPC_addr = section.get_start_addr();
 
         for ( size_t offset = 0; offset < section.get_size(); ++offset)
@@ -124,7 +126,7 @@ std::string Memory::dump() const
 
     for ( size_t set_n = 0; set_n < memory.size(); ++set_n)
     {
-        const auto set& = memory[ set_n];
+        const auto& set = memory[ set_n];
         for ( size_t page_n = 0; page_n < set.size(); ++page_n)
         {
             const auto& page = set[ page_n];
@@ -132,7 +134,7 @@ std::string Memory::dump() const
             {
                 const auto& byte = page[ byte_n];
                 if ( byte != 0)
-                    oss << "addr 0x" << get_addr( set_n, page_n, offset_n)
+                    oss << "addr 0x" << get_addr( set_n, page_n, byte_n)
                         << ": data 0x" << byte << std::endl;
             }
         }

@@ -11,8 +11,7 @@
 
 // Generic C++
 #include <string>
-#include <iostream>
-#include <cassert>
+#include <vector>
 
 // uArchSim modules
 #include <infra/types.h>
