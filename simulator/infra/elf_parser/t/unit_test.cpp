@@ -17,7 +17,7 @@ static const std::string valid_elf_file = TEST_PATH;
 //
 TEST( Elf_parser_init, Process_Args_Of_Constr)
 {
-    ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, &sections_array));
+    ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file));
 }
 
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
