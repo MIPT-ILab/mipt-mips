@@ -269,9 +269,7 @@ template<class T> void WritePort<T>::write( const T& what, uint64 cycle)
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
         _writeCounter++;
         for ( auto dst : this->_destinations)
-        {
             dst->pushData(what, cycle);
-        }
     }
     else
     {
@@ -292,12 +290,9 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
     this->_init = true;
 
     // Initializing ports with setting their init flags.
-    uint32 readersCounter = 0;
+    uint32 readersCounter = _destinations.size();
     for ( const auto reader : _destinations)
-    {
         reader->_init = true;
-        readersCounter++;
-    }
 
     if ( readersCounter == 0)
         serr << "No ReadPorts for " << this->_key << " key" << std::endl << critical;
@@ -361,14 +356,10 @@ template<class T> bool ReadPort<T>::is_ready( uint64 cycle) const
 template<class T> T ReadPort<T>::read( uint64 cycle)
 {
     if ( !this->_init)
-    {
         serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
-    }
 
     if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
-    {
         serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
-    }
 
     // data is successfully read
     auto tmp = _dataQueue.front().data; // NOTE: we copy data here
@@ -386,14 +377,10 @@ template<class T> T ReadPort<T>::read( uint64 cycle)
 template<class T> void ReadPort<T>::ignore( uint64 cycle)
 {
     if ( !this->_init)
-    {
         serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
-    }
 
     if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
-    {
         serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
-    }
 
     _dataQueue.pop();
 }
@@ -404,11 +391,9 @@ template<class T> void ReadPort<T>::ignore( uint64 cycle)
 template<class T> void ReadPort<T>::check(uint64 cycle) const
 {
     if ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle)
-    {
         serr << "In " << this->_key << " port data was added at "
              << (_dataQueue.front().cycle - _latency)
              << " clock and will not be readed" << std::endl << critical;
-    }
 }
 
 /*

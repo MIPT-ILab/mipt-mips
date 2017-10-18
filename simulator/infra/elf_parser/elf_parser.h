@@ -18,12 +18,6 @@
 
 class ElfSection
 {
-    // You cannot use this constructor to create an object.
-    // Use the static function getAllElfSections.
-    ElfSection() = delete;
-    ElfSection& operator= ( const ElfSection&) = delete;
-    ElfSection& operator= ( ElfSection&&) = delete;
-
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
     const size_t size; // size of the section in bytes
     const Addr start_addr; // the start address of the section
@@ -32,9 +26,12 @@ public:
     ElfSection( const std::string& name, Addr start_addr, Addr size, std::unique_ptr<uint8[]> ptr)
         : name( name), size( size), start_addr( start_addr), content( std::move(ptr))
     { }
-
     virtual ~ElfSection() = default;
-    
+
+    // No assignment
+    ElfSection& operator= ( const ElfSection&) = delete;
+    ElfSection& operator= ( ElfSection&&) = delete;
+
     // copy and move ctors
     ElfSection( const ElfSection& that);
     ElfSection( ElfSection&& that) = default;

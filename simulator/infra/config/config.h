@@ -83,7 +83,7 @@ public:
 };
 
 /* methods */
-void handleArgs( int argc, char** argv);
+void handleArgs( int argc, char *argv[]);
 
 } // namespace config
 

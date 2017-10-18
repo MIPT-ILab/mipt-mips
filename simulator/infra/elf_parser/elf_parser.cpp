@@ -161,9 +161,8 @@ std::string ElfSection::strByWords() const
     union uint64_8
     {
         uint8 bytes[ sizeof( uint64) / sizeof( uint8)];
-        uint64 val;
+        uint64 val = 0ull;
     } value;
-    value.val = 0ull;
 
     // convert each words of 4 bytes into 8 hex digits
     for ( size_t i = 0; i < this->size; ++i)
