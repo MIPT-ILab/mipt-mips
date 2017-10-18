@@ -60,24 +60,18 @@ public:
     /* prediction */
     bool is_taken( Addr PC) final
     {
-        uint32 way;
-        bool is_hit;
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
-        std::tie( is_hit, way) = tags.read_no_touch( PC);
-        if ( is_hit) // hit
-            return data[ way][ tags.set(PC)].is_taken( PC);
+        const auto[ is_hit, way] = tags.read_no_touch( PC);
 
-        return false;
+        return is_hit && data[ way][ tags.set(PC)].is_taken( PC);
     }
 
     Addr get_target( Addr PC) final
     {
-        uint32 way;
-        bool is_hit;
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
-        std::tie( is_hit, way) = tags.read_no_touch( PC);
+        const auto[ is_hit, way] = tags.read_no_touch( PC);
 
         // return saved target only in case it is predicted taken
         if ( is_hit && is_taken( PC))
@@ -91,14 +85,12 @@ public:
                  Addr branch_ip,
                  Addr target) final
     {
-        uint32 set = tags.set( branch_ip);
-        uint32 way;
-        bool is_hit;
-        std::tie( is_hit, way) = tags.read( branch_ip);
+        const auto set = tags.set( branch_ip);
+        auto[ is_hit, way] = tags.read( branch_ip);
 
         if ( !is_hit) { // miss
             way = tags.write( branch_ip); // add new entry to cache
-            T& entry = data[ way][ set];
+            auto& entry = data[ way][ set];
             entry.reset();
             entry.update_target( target);
         }
@@ -146,10 +138,10 @@ public:
               { "adaptive_two_level",    new BPCreator<BPEntryAdaptive<2>>}})
     { }
 
-    std::unique_ptr<BaseBP> create( const std::string& name,
-                    uint32 size_in_entries,
-                    uint32 ways,
-                    uint32 branch_ip_size_in_bits = 32) const
+    auto create( const std::string& name,
+                 uint32 size_in_entries,
+                 uint32 ways,
+                 uint32 branch_ip_size_in_bits = 32) const
     {
         if ( map.find(name) == map.end())
         {
