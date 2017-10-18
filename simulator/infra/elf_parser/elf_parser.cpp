@@ -85,7 +85,7 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
 
         // fill the content by the section data
         ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
-        sections.emplace( sections.end(), name, start_addr, size, content);
+        sections.emplace( sections.end(), name, start_addr, size, std::move(content));
     }
 
     // close all used files
@@ -146,7 +146,7 @@ std::string ElfSection::strByBytes() const
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
         // need converting to uint16 to be not preinted as an alphabet symbol
-        oss << (uint16)(get_byte(i));
+        oss << static_cast<uint16>(get_byte(i));
     }
 
     return oss.str();
@@ -160,10 +160,10 @@ std::string ElfSection::strByWords() const
 
     union uint64_8
     {
-        uint8 bytes[sizeof( uint64) / sizeof( uint8)];
+        uint8 bytes[ sizeof( uint64) / sizeof( uint8)];
         uint64 val;
-        explicit uint64_8( uint64 value) : val( value) { }
     } value;
+    value.val = 0ull;
 
     // convert each words of 4 bytes into 8 hex digits
     for ( size_t i = 0; i < this->size; ++i)
@@ -178,4 +178,3 @@ std::string ElfSection::strByWords() const
 
     return oss.str();
 }
-

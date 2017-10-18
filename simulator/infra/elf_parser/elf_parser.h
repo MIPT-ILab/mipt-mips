@@ -29,11 +29,10 @@ class ElfSection
     const Addr start_addr; // the start address of the section
     std::unique_ptr<uint8[]> content; // the row data of the section
 public:
-    ElfSection( const std::string& name, Addr start_addr, Addr size, std::unique_ptr<uint8[]>&& ptr)
-        : name( name), size( size)
-        , start_addr( start_addr)
-        , content( std::move(ptr)) { }
-    
+    ElfSection( const std::string& name, Addr start_addr, Addr size, std::unique_ptr<uint8[]> ptr)
+        : name( name), size( size), start_addr( start_addr), content( std::move(ptr))
+    { }
+
     virtual ~ElfSection() = default;
     
     // copy and move ctors
@@ -49,7 +48,7 @@ public:
 
     const std::string& get_name()  const { return name; }
     Addr   get_size()              const { return size; }
-    Addr   get_start_addr()        const { return addr; }
+    Addr   get_start_addr()        const { return start_addr; }
     uint8  get_byte(size_t offset) const { return content.get()[offset]; }
 };
 
