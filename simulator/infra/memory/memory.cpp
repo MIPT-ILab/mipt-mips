@@ -18,6 +18,7 @@ union uint64_8
 {
     uint8 bytes[sizeof(uint64) / sizeof(uint8)];
     uint64 val;
+    explicit uint64_8( uint64 value) : val( value) { }
 };
 
 Memory::Memory( const std::string& executable_file_name,
@@ -48,41 +49,18 @@ Memory::Memory( const std::string& executable_file_name,
         std::exit( EXIT_FAILURE);
     }
 
-    memory = new uint8** [set_cnt]();
+    memory.resize(set_cnt);
 
-    std::list<ElfSection> sections_array;
-    ElfSection::getAllElfSections( executable_file_name, &sections_array);
+    const auto& sections_array = ElfSection::getAllElfSections( executable_file_name);
 
     for ( const auto& section : sections_array)
     {
         if ( section.name == ".text")
-        {
-            startPC_addr = section.start_addr;
-        }
-        for ( size_t offset = 0; offset < section.size; ++offset)
-        {
-            write( section.content[offset], section.start_addr + offset, 1);
-        }
-    }
-}
+            startPC_addr = section.get_start_addr();
 
-Memory::~Memory()
-{
-    for ( size_t set = 0; set < set_cnt; ++set)
-    {
-        if (memory[set] != nullptr)
-        {
-            for ( size_t page = 0; page < page_cnt; ++page)
-            {
-                if (memory[set][page] != nullptr)
-                {
-                    delete [] memory[set][page];
-                }
-            }
-            delete [] memory[set];
-        }
+        for ( size_t offset = 0; offset < section.get_size(); ++offset)
+            write( section[offset], section.get_start_addr() + offset, 1);
     }
-    delete [] memory;
 }
 
 uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
@@ -95,13 +73,10 @@ uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
     if ( !check( addr) || !check( addr + num_of_bytes - 1))
          return NO_VAL64;
 
-    uint64_8 value = {};
-    value.val = 0ull;
+    uint64_8 value(0ull);
 
     for ( size_t i = 0; i < num_of_bytes; ++i)
-    {
         value.bytes[i] = read_byte( addr + i);
-    }
 
     return value.val;
 }
@@ -115,39 +90,31 @@ void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
         std::cerr << "ERROR. Writing " << num_of_bytes << " bytes)\n";
         std::exit( EXIT_FAILURE);
     }
-    if ( addr > addr_mask)
-        assert( false);
 
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
 
-    uint64_8 value_ = {};
-    value_.val = value;
+    const uint64_8 value_( value);
 
     for ( size_t i = 0; i < num_of_bytes; ++i)
-    {
         write_byte( addr + i, value_.bytes[i]);
-    }
 }
 
 void Memory::alloc( Addr addr)
 {
-    uint8*** set = &memory[get_set(addr)];
-    if ( *set == nullptr)
-    {
-        *set = new uint8* [page_cnt]();
-    }
-    uint8** page = &memory[get_set(addr)][get_page(addr)];
-    if ( *page == nullptr)
-    {
-        *page = new uint8 [page_size]();
-    }
+    auto& set = memory[get_set(addr)];
+    if ( set.empty())
+        set.resize(page_cnt);
+
+    auto& page = set[get_page(addr)];
+    if ( page.empty())
+        page.resize(page_size, 0);
 }
 
 bool Memory::check( Addr addr) const
 {
-    uint8** set = memory[get_set(addr)];
-    return set != nullptr && set[get_page(addr)] != nullptr;
+    const auto& set = memory[get_set(addr)];
+    return !set.empty() && !set[get_page(addr)].empty();
 }
 
 std::string Memory::dump() const
@@ -155,22 +122,18 @@ std::string Memory::dump() const
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;
 
-    for ( size_t set = 0; set < set_cnt; ++set)
+    for ( size_t set_n = 0; set_n < memory.size(); ++set_n)
     {
-        if (memory[set] == nullptr)
-            continue;
-
-        for ( size_t page = 0; page < page_cnt; ++page)
+        const auto set& = memory[ set_n];
+        for ( size_t page_n = 0; page_n < set.size(); ++page_n)
         {
-            if (memory[set][page] == nullptr)
-                continue;
-
-            for ( size_t offset = 0; offset < page_size; ++offset)
+            const auto& page = set[ page_n];
+            for ( size_t byte_n = 0; byte_n < page.size(); ++byte_n)
             {
-                if (memory[set][page][offset] == 0)
-                    continue;
-                oss << "addr 0x" << get_addr( set, page, offset)
-                    << ": data 0x" << memory[set][page][offset] << std::endl;
+                const auto& byte = page[ byte_n];
+                if ( byte != 0)
+                    oss << "addr 0x" << get_addr( set_n, page_n, offset_n)
+                        << ": data 0x" << byte << std::endl;
             }
         }
     }
