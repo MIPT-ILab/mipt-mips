@@ -38,6 +38,7 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 tidy: $(CPPS) main.cpp
 	@$(TIDY) $^ $(TIDYFLAGS) -- -std=c++14 $(INCL)
 
+
 ###### Rules to get GTest #######
 
 GTEST_DIR:=../googletest/googletest
@@ -70,8 +71,7 @@ test: $(addsuffix /t/test.run, $(TESTS))
 clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 -include $(addsuffix /t/test.d, $(TESTS))
-
-%/t/test.o: %/t/unit_test.cpp
+%/t/test.o: %/t/unit_test.cpp 
 	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL) -DTEST_PATH=\"$(TEST_PATH)\" -DIMAGE_PATH=\"$(IMAGE_PATH)\"
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL) -isystem $(GTEST_INCL)
