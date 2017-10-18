@@ -32,7 +32,7 @@ public:
     ElfSection( const std::string& name, Addr start_addr, Addr size, std::unique_ptr<uint8[]>&& ptr)
         : name( name), size( size)
         , start_addr( start_addr)
-        , content( ptr) { }
+        , content( std::move(ptr)) { }
     
     virtual ~ElfSection() = default;
     
@@ -47,10 +47,10 @@ public:
     std::string strByBytes() const;
     std::string strByWords() const;
 
-    const std::string& get_name()   const { return name; }
-    const Addr   get_size()         const { return size; }
-    const Addr   get_start_addr()   const { return addr; }
-    uint8 operator[](size_t offset) const { return content.get()[offset]; }
+    const std::string& get_name()  const { return name; }
+    Addr   get_size()              const { return size; }
+    Addr   get_start_addr()        const { return addr; }
+    uint8  get_byte(size_t offset) const { return content.get()[offset]; }
 };
 
 #endif // #ifndef ELF_PARSER__ELF_PARSER_H

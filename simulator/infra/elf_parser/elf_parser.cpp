@@ -79,13 +79,13 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
 
         size_t size = shdr.sh_size;
         auto offset = shdr.sh_offset;
-        auto content = std::make_unique<uint8[]>(new uint8[ size]);
+        auto content = std::make_unique<uint8[]>( size);
 
         fseek( file_descr, offset, SEEK_SET);
 
         // fill the content by the section data
         ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
-        sections->emplace( sections_array->end(), name, start_addr, size, content);
+        sections.emplace( sections.end(), name, start_addr, size, content);
     }
 
     // close all used files
@@ -145,11 +145,8 @@ std::string ElfSection::strByBytes() const
     {
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
-        uint16 value = *( this->content + i); // need converting to uint16
-                                              // to be not preinted as an alphabet symbol
-
-        // print a value of
-        oss << value;
+        // need converting to uint16 to be not preinted as an alphabet symbol
+        oss << (uint16)(get_byte(i));
     }
 
     return oss.str();
@@ -161,13 +158,22 @@ std::string ElfSection::strByWords() const
     std::ostringstream oss;
     oss << std::hex;
 
+    union uint64_8
+    {
+        uint8 bytes[sizeof( uint64) / sizeof( uint8)];
+        uint64 val;
+        explicit uint64_8( uint64 value) : val( value) { }
+    } value;
+
     // convert each words of 4 bytes into 8 hex digits
-    for( size_t i = 0; i < this->size/sizeof( uint32); ++i)
+    for ( size_t i = 0; i < this->size; ++i)
     {
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
-
-        oss << *( reinterpret_cast<uint32*>(this->content) + i); // NOLINT
+        auto mask = sizeof( uint64) / sizeof( uint8) - 1;
+        value.bytes[ i & mask] = get_byte(i);
+        if ( ( i & mask) == mask)
+            oss << value.val;
     }
 
     return oss.str();

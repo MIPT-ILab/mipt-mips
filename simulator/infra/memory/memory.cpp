@@ -59,7 +59,7 @@ Memory::Memory( const std::string& executable_file_name,
             startPC_addr = section.get_start_addr();
 
         for ( size_t offset = 0; offset < section.get_size(); ++offset)
-            write( section[offset], section.get_start_addr() + offset, 1);
+            write( section.get_byte(offset), section.get_start_addr() + offset, 1);
     }
 }
 
