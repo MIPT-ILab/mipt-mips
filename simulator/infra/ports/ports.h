@@ -51,7 +51,6 @@ class BasePort : protected Log
                 static std::list<BaseMap*> all_maps;
             protected:
                 BaseMap() : Log(true) { all_maps.push_back( this); }
-                ~BaseMap() override = default;
         };
 
         // Key of port
@@ -62,8 +61,6 @@ class BasePort : protected Log
 
         // Constructor of port
         explicit BasePort( const std::string& key) : Log( true), _key( key) { }
-
-        ~BasePort() override = default;
 };
 
 /*
@@ -101,12 +98,7 @@ template<class T> class Port : public BasePort
 
             // Constructors
             Map() noexcept : BaseMap() { }
-            ~Map() final = default;
-
         public:
-            Map( const Map&) = delete;
-            Map& operator=(const Map&) = delete;
-
             decltype(auto) operator[]( const std::string& v) { return _map.operator[]( v); }
 
             // Singletone

@@ -47,6 +47,12 @@ protected:
         values()[name] = this;
     }
     virtual ~BaseValue() = default;
+public:
+    // Do not move or copy
+    BaseValue( const BaseValue&) = delete;
+    BaseValue( BaseValue&&) = delete;
+    BaseValue& operator=( const BaseValue&) = delete;
+    BaseValue& operator=( BaseValue&&) = delete;
 };
 
 template<typename T>
@@ -62,7 +68,6 @@ public:
     { }
     
     RequiredValue<T>() = delete;
-    ~RequiredValue() override = default;
 
     operator const T&() const { return value; } // NOLINT
 };
@@ -71,7 +76,7 @@ template<typename T>
 class Value : public RequiredValue<T> {
     const T default_value;
 
-    void reg( bod* d) override;
+    void reg( bod* d) final;
 public:
     Value<T>( const char* name, const T& val, const char* desc) noexcept
         : RequiredValue<T>( name, desc)
@@ -79,7 +84,6 @@ public:
     { this->value = val; }
 
     Value<T>() = delete;
-    ~Value() final = default;
 };
 
 /* methods */

@@ -26,8 +26,11 @@ class MIPS : public Log
         explicit MIPS( bool log = false);
         ~MIPS() final;
 
+        // Rule of five
         MIPS( const MIPS&) = delete;
+        MIPS( MIPS&&) = delete;
         MIPS& operator=( const MIPS&) = delete;
+        MIPS& operator=( MIPS&&) = delete;
 
         void init( const std::string& tr);
         std::string step();
