@@ -1,0 +1,2 @@
+www.viva64.com/en/w:1:1: error: Help: The documentation for all analyzer warnings is available here: https://www.viva64.com/en/w/.
+/home/alex/mipt-mips/simulator/bpu/bpentry.h:84:1: warning: V519 The 'state' variable is assigned values twice successively. Perhaps this is a mistake. Check lines: 80, 84.
