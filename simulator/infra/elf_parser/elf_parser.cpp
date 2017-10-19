@@ -26,19 +26,10 @@
 ElfSection::ElfSection( const ElfSection& that)
     : name( that.name), size( that.size), start_addr( that.start_addr), content( new uint8[size])
 {
-    std::memcpy(this->content, that.content, this->size);
+    std::memcpy(this->content.get(), that.content.get(), this->size);
 }
 
-ElfSection::ElfSection( const std::string& name, Addr start_addr,
-                        Addr size, const uint8* content_that)
-    : name( name), size( size)
-    , start_addr( start_addr), content( new uint8[ size + sizeof( uint64)])
-{
-    std::memcpy( this->content, content_that, size);
-}
-
-void ElfSection::getAllElfSections( const std::string& elf_file_name,
-                                    std::list<ElfSection>* sections_array /*is used as output*/)
+std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file_name)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
@@ -73,6 +64,8 @@ void ElfSection::getAllElfSections( const std::string& elf_file_name,
     size_t shstrndx;
     elf_getshdrstrndx( elf, &shstrndx);
 
+    std::list<ElfSection> sections;
+
     Elf_Scn *section = nullptr;
     while ( (section = elf_nextscn( elf, section)) != nullptr)
     {
@@ -86,23 +79,20 @@ void ElfSection::getAllElfSections( const std::string& elf_file_name,
 
         size_t size = shdr.sh_size;
         auto offset = shdr.sh_offset;
-        std::unique_ptr<uint8[]> content(new uint8[ size]);
+        auto content = std::make_unique<uint8[]>( size);
 
         fseek( file_descr, offset, SEEK_SET);
 
         // fill the content by the section data
         ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
-        sections_array->emplace( sections_array->end(), name, start_addr, size, content.get());
+        sections.emplace( sections.end(), name, start_addr, size, std::move(content));
     }
 
     // close all used files
     elf_end( elf);
     fclose( file_descr);
-}
 
-ElfSection::~ElfSection()
-{
-    delete [] this->content;
+    return sections;
 }
 
 std::string ElfSection::dump( const std::string& indent) const
@@ -155,11 +145,8 @@ std::string ElfSection::strByBytes() const
     {
         oss.width( 2); // because we need two hex symbols to print a byte (e.g. "ff")
         oss.fill( '0'); // thus, number 8 will be printed as "08"
-        uint16 value = *( this->content + i); // need converting to uint16
-                                              // to be not preinted as an alphabet symbol
-
-        // print a value of
-        oss << value;
+        // need converting to uint16 to be not preinted as an alphabet symbol
+        oss << static_cast<uint16>(get_byte(i));
     }
 
     return oss.str();
@@ -171,15 +158,22 @@ std::string ElfSection::strByWords() const
     std::ostringstream oss;
     oss << std::hex;
 
+    union uint64_8
+    {
+        uint8 bytes[ sizeof( uint64) / sizeof( uint8)];
+        uint64 val = 0ull;
+    } value;
+
     // convert each words of 4 bytes into 8 hex digits
-    for( size_t i = 0; i < this->size/sizeof( uint32); ++i)
+    for ( size_t i = 0; i < this->size; ++i)
     {
         oss.width( 8); // because we need 8 hex symbols to print a word (e.g. "ffffffff")
         oss.fill( '0'); // thus, number a44f will be printed as "0000a44f"
-
-        oss << *( reinterpret_cast<uint32*>(this->content) + i); // NOLINT
+        auto mask = sizeof( uint64) / sizeof( uint8) - 1;
+        value.bytes[ i & mask] = get_byte(i);
+        if ( ( i & mask) == mask)
+            oss << value.val;
     }
 
     return oss.str();
 }
-

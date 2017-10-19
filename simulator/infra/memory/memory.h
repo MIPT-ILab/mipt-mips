@@ -11,8 +11,7 @@
 
 // Generic C++
 #include <string>
-#include <iostream>
-#include <cassert>
+#include <vector>
 
 // uArchSim modules
 #include <infra/types.h>
@@ -34,7 +33,10 @@ class Memory
         const size_t set_cnt;
         const size_t page_size;
 
-        uint8*** memory = nullptr;
+        using Page = std::vector<uint8>;
+        using Set  = std::vector<Page>;
+        using Mem  = std::vector<Set>;
+        Mem memory = {};
         Addr startPC_addr = NO_VAL32;
 
         inline size_t get_set( Addr addr) const
@@ -57,19 +59,14 @@ class Memory
             return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
         }
 
-        inline uint8* get_host_addr( Addr addr) const
-        {
-            return &memory[get_set(addr)][get_page(addr)][get_offset(addr)];
-        }
-
         inline uint8 read_byte( Addr addr) const
         {
-            return *get_host_addr(addr);
+            return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
         }
 
         inline void write_byte( Addr addr, uint8 value)
         {
-           *get_host_addr(addr) = value;
+            memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
         }
 
         void alloc( Addr addr);
@@ -79,10 +76,6 @@ class Memory
                      uint32 addr_bits = 32,
                      uint32 page_bits = 10,
                      uint32 offset_bits = 12);
-        virtual ~Memory();
-
-        Memory& operator=( const Memory&) = delete;
-        Memory( const Memory&) = delete;
 
         uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
         void write( uint64 value, Addr addr, uint32 num_of_bytes = 4);

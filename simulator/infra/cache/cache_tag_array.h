@@ -58,9 +58,10 @@ class CacheTagArray : public CacheTagArrayCheck
         };
 
         const uint32 num_sets;
-        
-        std::vector<std::vector<CacheTag>> array = {}; // array of tags
+
+        std::vector<std::vector<CacheTag>> array; // array of tags
         LRUInfo lru; // LRU algorithm module
+
     public:
         CacheTagArray( uint32 size_in_bytes,
                        uint32 ways,

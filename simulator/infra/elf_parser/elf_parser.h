@@ -11,40 +11,42 @@
 // Generic C++
 #include <string>
 #include <list>
+#include <memory>
 
 // uArchSim modules
 #include <infra/types.h>
 
-struct Elf;
-
 class ElfSection
 {
-public:
-    // You cannot use this constructor to create an object.
-    // Use the static function getAllElfSections.
-    ElfSection() = delete;
-
-    ElfSection& operator= (const ElfSection&) = delete;
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)
-    const uint32 size; // size of the section in bytes
+    const size_t size; // size of the section in bytes
     const Addr start_addr; // the start address of the section
-    uint8* const content; // the row data of the section
+    std::unique_ptr<uint8[]> content; // the row data of the section
+public:
+    ElfSection( const std::string& name, Addr start_addr, Addr size, std::unique_ptr<uint8[]> ptr)
+        : name( name), size( size), start_addr( start_addr), content( std::move(ptr))
+    { }
+    virtual ~ElfSection() = default;
 
-    ElfSection( const  ElfSection& that);
+    // No assignment
+    ElfSection& operator= ( const ElfSection&) = delete;
+    ElfSection& operator= ( ElfSection&&) = delete;
+
+    // copy and move ctors
+    ElfSection( const ElfSection& that);
+    ElfSection( ElfSection&& that) = default;
 
     // Use this function to extract all sections from the ELF binary file.
-    // Note that the 2nd parameter is used as output.
-    static void getAllElfSections( const std::string& elf_file_name,
-                                   std::list<ElfSection>* sections_array /*used as output*/);
-
-    ElfSection( const std::string& name, Addr start_addr,
-	    Addr size, const uint8* content_that);
-
-    virtual ~ElfSection();
+    static std::list<ElfSection> getAllElfSections( const std::string& elf_file_name);
 
     std::string dump( const std::string& indent) const;
     std::string strByBytes() const;
     std::string strByWords() const;
+
+    const std::string& get_name() const { return name; }
+    Addr  get_size()              const { return size; }
+    Addr  get_start_addr()        const { return start_addr; }
+    uint8 get_byte(size_t offset) const { return content.get()[offset]; }
 };
 
 #endif // #ifndef ELF_PARSER__ELF_PARSER_H

@@ -28,11 +28,14 @@ class BaseBP
 public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
-    virtual void update( bool is_taken,
-                         Addr branch_ip,
-                         Addr target) = 0;
+    virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
 
+    BaseBP() = default;
     virtual ~BaseBP() = default;
+    BaseBP( const BaseBP&) = default;
+    BaseBP( BaseBP&&) = default;
+    BaseBP& operator=( const BaseBP&) = default;
+    BaseBP& operator=( BaseBP&&) = default;
 };
 
 
@@ -111,7 +114,12 @@ class BPFactory {
         virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
                                                uint32 ways,
                                                uint32 branch_ip_size_in_bits) const = 0;
+        BaseBPCreator() = default;
         virtual ~BaseBPCreator() = default;
+        BaseBPCreator( const BaseBPCreator&) = delete;
+        BaseBPCreator( BaseBPCreator&&) = delete;
+        BaseBPCreator& operator=( const BaseBPCreator&) = delete;
+        BaseBPCreator& operator=( BaseBPCreator&&) = delete;
     };
 
     template<typename T>
@@ -125,6 +133,7 @@ class BPFactory {
                                             ways,
                                             branch_ip_size_in_bits);
         }
+        BPCreator() = default;
     };
 
     const std::map<std::string, BaseBPCreator*> map;
@@ -161,6 +170,11 @@ public:
         for ( auto& elem : map)
             delete elem.second;
     }
+    
+    BPFactory( const BPFactory&) = delete;
+    BPFactory( BPFactory&&) = delete;
+    BPFactory& operator=( const BPFactory&) = delete;
+    BPFactory& operator=( BPFactory&&) = delete;
 };
 
 #endif
