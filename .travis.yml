@@ -4,6 +4,8 @@ notifications:
 language: cpp
 sudo: false
 
+osx_image: xcode9.1
+
 branches:
   only:
   - master
