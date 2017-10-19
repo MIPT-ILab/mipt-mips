@@ -112,21 +112,11 @@ CacheTagArray::CacheTagArray( uint32 size_in_bytes,
                               uint32 addr_size_in_bits) :
                               CacheTagArrayCheck( size_in_bytes, ways,
                                                   line_size, addr_size_in_bits),
-                              num_sets( size_in_bytes / ( line_size * ways))
+                              num_sets( size_in_bytes / ( line_size * ways)),
+                              array( num_sets, std::vector<CacheTag>(ways)),
+                              lru( ways, num_sets)
 {
-    /* Allocate memory for cache sets and LRU module. */
-    array.resize( num_sets);
-    for ( auto& entry : array)
-    {
-        entry.resize( ways);
-    }
-    lru = new LRUInfo( ways, num_sets);
-}
 
-CacheTagArray::~CacheTagArray()
-{
-    /* Free memory used by LRU module. */
-    delete lru;
 }
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
@@ -137,7 +127,7 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
     {
         const auto set_num = set( addr);
         const auto way_num = lookup_result.second;
-        lru->touch( set_num, way_num); // update LRU info
+        lru.touch( set_num, way_num); // update LRU info
     }
 
     return lookup_result;
@@ -162,7 +152,7 @@ std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 uint32 CacheTagArray::write( Addr addr)
 {
     uint32 set_num = set( addr);
-    uint32 way_num = lru->update( set_num); // get l.r.u. way
+    uint32 way_num = lru.update( set_num); // get l.r.u. way
 
     array[ set_num][ way_num].line = tag( addr); // write it
     array[ set_num][ way_num].is_valid = true; // this set is valid now
