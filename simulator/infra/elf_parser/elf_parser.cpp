@@ -33,7 +33,7 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    FILE* file_descr = fopen( elf_file_name.c_str(), "rb");
+    FILE* file_descr = fopen( elf_file_name.c_str(), "rbe");
     if ( file_descr == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
