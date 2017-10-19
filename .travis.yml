@@ -29,7 +29,7 @@ script:
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
   - cd $TRAVIS_BUILD_DIR/simulator
   - make test
-  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy; fi
+  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Run PVS
   - make clean
   - if [ $CXX == g++-7 ]; then pvs-studio-analyzer trace -- make mipt-mips; fi
