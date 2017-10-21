@@ -80,9 +80,9 @@ public:
             state = default_state;
             _target = target;
         } else 
-	{ 
-		state = static_cast<State>( is_taken);
-	}
+        {
+            state = static_cast<State>( is_taken);
+        }
     }
 
     void reset() { BPEntry::reset(); state = default_state; }
