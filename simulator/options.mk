@@ -1,9 +1,13 @@
 # C++ compile
 CXX ?= g++
-CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++ --std=c++14
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
-
+CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 UNAME:= $(shell uname -o)
+ifeq ($(shell uname), Darwin)	#OSX uses older version of clang which does not support std=c++17
+        CXXFLAGS+= -std=c++1z
+else
+        CXXFLAGS+= -std=c++17
+endif
 
 OBJ_DIR:=obj-$(CXX)-$(UNAME)
 
@@ -15,7 +19,6 @@ else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
 endif
-
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)
@@ -38,4 +41,4 @@ INCL+= -I. -isystem $(BOOST_INCL) -isystem $(LIBELF_INCL)
 LPATH:= -L $(BOOST_LPATH) -L $(LIBELF_LPATH)
 
 TIDY?=clang-tidy
-TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-vararg,-llvm-header-guard,-llvm-include-order,-modernize-pass-by-value,-cppcoreguidelines-pro-type-member-init,-cppcoreguidelines-special-member-functions,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-constant-array-index
+TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-modernize-pass-by-value,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-android-cloexec-fopen

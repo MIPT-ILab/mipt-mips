@@ -81,9 +81,9 @@ int main()
                 std::cout << "\n--- cycle " << cycle << "----\n";
 
                 // check the stop port from A object
-                bool tmp;
-                if ( _stop.read( &tmp, cycle))
+                if ( _stop.is_ready( cycle))
                 {
+                        _stop.read( cycle);
                         std::cout << "-------------------------------\n\n"
                                  << "A stop signal is recieved.\n"
                                  << "Calculation is COMPLETED in cycle " << cycle << ".\n\n";
@@ -149,12 +149,14 @@ void A::clock ( int cycle)
         // and break the loop if there is no message to read.
         while( true)
         {
-                if( _init->read( &data, cycle))
+                if( _init->is_ready( cycle))
                 {
+                        data = _init->read( cycle);
                         std::cout << "\tread the init port: data = " << data << "\n";
 
-                } else if ( _from_B->read( &data, cycle))
+                } else if ( _from_B->is_ready( cycle))
                 {
+                        data = _from_B->read( cycle);
                         std::cout << "\tread the port from B: data = " << data << "\n";
 
                 } else
@@ -192,10 +194,9 @@ void B::clock ( int cycle)
 {
         std::cout << "Clock of B:\n";
 
-        int data;
-
-        if ( _from_A->read( &data, cycle))
+        if ( _from_A->is_ready( cycle))
         {
+                int data = _from_A->read( cycle);
                 std::cout << "\tread the port from A: data = " << data << "\n";
                 this->processData( data, cycle);
 

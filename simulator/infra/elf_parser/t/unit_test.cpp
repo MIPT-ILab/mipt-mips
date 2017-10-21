@@ -21,16 +21,13 @@ static const std::string valid_elf_file = TEST_PATH;
 //
 TEST( Elf_parser_init, Process_Args_Of_Constr)
 {
-    std::list<ElfSection> sections_array;
-    ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file, &sections_array));
+    ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file));
 }
 
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
 {
-    std::list<ElfSection> sections_array;
-
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop"), &sections_array),
+    ASSERT_EXIT( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 

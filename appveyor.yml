@@ -1,20 +1,24 @@
 version: "{branch}-ci-{build}"
-image: Visual Studio 2015
+image: Visual Studio 2017
+
+branches:
+  only:
+  - master
 
 environment:
   matrix:
   - build: msvc
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+    BOOST_ROOT: C:\Libraries\boost_1_64_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib32-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\Libraries\boost_1_59_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
+    BOOST_ROOT: C:\Libraries\boost_1_64_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
   - build: g++
@@ -38,11 +42,12 @@ environment:
 #    MINGW_ARCH: x86_64
 #    MSYSTEM: MINGW64
 
-
 before_build:
 # install submodules
-- cmd: git submodule init
-- cmd: git submodule update
+- cmd: git submodule update --init
+# use Arkady Shapkin's patch to build GoogleTest with VS 2017
+- cmd: cd googletest
+- cmd: git pull https://github.com/KindDragon/googletest.git vs-build-fix
 # configure variable
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 # install Boost and LibELF for MINGW
@@ -51,7 +56,7 @@ before_build:
 - cmd: set CPATH=%LIBELF_INCLUDE%;%CPATH%
 - cmd: set CPLUS_INCLUDE_PATH=%LIBELF_INCLUDE%;%BOOST_ROOT%;%CPLUS_INCLUDE_PATH%
 # set variables for MSVC
-- cmd: if "%build%"=="msvc"  call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
+- cmd: if "%build%"=="msvc"  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
 # build LibELF for MSVC
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
@@ -59,7 +64,7 @@ before_build:
 - cmd: set PATH=%LIBELF_INCLUDE%;%PATH%
 # build binutils
 - cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof; make all install"
+- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof > /dev/null; make all install > /dev/null"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set CXX=%build%

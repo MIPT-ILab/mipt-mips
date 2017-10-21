@@ -49,10 +49,13 @@ public:
     const LogOstream::Critical critical;
 
     explicit Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
-    virtual ~Log() = default;
 
+    // Rule of five
+    virtual ~Log() = default;
     Log( const Log&) = delete;
+    Log( Log&&) = delete;
     Log& operator=( const Log&) = delete;
+    Log& operator=( Log&&) = delete;
 };
 
 #endif /* LOG_H */

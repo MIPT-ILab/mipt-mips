@@ -1,5 +1,5 @@
 title: MIPT-MIPS
-description: Functional and performance simulators for MIPS-based microprocessor
+description: Cycle-accurate pre-silicon simulator of MIPS CPU
 google_analytics: 
 show_downloads: true
 theme: jekyll-theme-slate

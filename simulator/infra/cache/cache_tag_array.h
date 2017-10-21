@@ -57,20 +57,15 @@ class CacheTagArray : public CacheTagArrayCheck
             bool is_valid = false; // validity
         };
 
-        std::vector<std::vector<CacheTag>> array = {}; // array of tags
-        LRUInfo* lru = nullptr; // LRU algorithm module
-
         const uint32 num_sets;
+        std::vector<std::vector<CacheTag>> array; // array of tags
+        LRUInfo lru; // LRU algorithm module
 
     public:
         CacheTagArray( uint32 size_in_bytes,
                        uint32 ways,
                        uint32 line_size = 4,
                        uint32 addr_size_in_bits = 32);
-        ~CacheTagArray() override;
-
-        CacheTagArray& operator=( const CacheTagArray&) = delete;
-        CacheTagArray( const CacheTagArray&) = delete;
 
         /* lookup the cache and update LRU info */
         std::pair<bool, uint32> read( Addr addr);

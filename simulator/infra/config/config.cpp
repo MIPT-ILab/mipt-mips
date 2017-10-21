@@ -92,7 +92,7 @@ void handleArgs( int argc, char** argv)
     }
     catch ( const std::exception& e)
     {
-        std::cerr << argv[0] << ": " << e.what()
+        std::cerr << *argv << ": " << e.what()
                   << std::endl << std::endl
                   << description << std::endl;
         std::exit( EXIT_FAILURE);

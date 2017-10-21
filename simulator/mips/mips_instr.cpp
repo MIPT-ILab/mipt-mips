@@ -164,7 +164,7 @@ const FuncInstr::ISAEntry FuncInstr::isaTable[] =
     // 0x30 - 0x3F atomic load/stores
 };
 
-std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
+std::array<string_view, REG_NUM_MAX> FuncInstr::regTable =
 {{
     "zero",
     "at",
@@ -180,7 +180,9 @@ std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
     "ra"
 }};
 
-boost::string_ref FuncInstr::regTableName(RegNum reg) {
+string_view FuncInstr::regTableName(RegNum reg) {
+
+
     return regTable.at(static_cast<size_t>( reg));
 }
 
@@ -224,7 +226,7 @@ void FuncInstr::initFormat()
             format    = entry.format;
             operation = entry.operation;
             mem_size  = entry.mem_size;
-            name      = entry.name.c_str();
+            name      = entry.name;
             function  = entry.function;
             return;
         }
