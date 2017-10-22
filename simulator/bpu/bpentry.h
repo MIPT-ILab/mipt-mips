@@ -81,12 +81,6 @@ public:
         {
             state = static_cast<State>( is_taken);
         }
-        if ( is_taken && _target != target) {
-            /* if the address has somehow changed, we should update it appropriately */
-            reset();
-            update_target(target);
-
-        }
     }
 
     void reset() { BPEntry::reset(); state = default_state; }
