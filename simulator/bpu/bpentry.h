@@ -73,12 +73,10 @@ public:
     /* update */
     void update( bool is_taken, Addr target)
     {
-
-        if ( is_taken && _target != target)
-        {
-            /* reset */
-            state = default_state;
-            _target = target;
+        if ( is_taken && _target != target) {
+            /* if the address has somehow changed, we should update it appropriately */
+            reset();
+            update_target(target);
         } else 
         {
             state = static_cast<State>( is_taken);
