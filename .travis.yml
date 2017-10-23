@@ -32,9 +32,10 @@ script:
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy; fi
 # Run PVS
   - make clean
-  - if [ $CXX == g++-7] then pvs-studio-analyzer trace -- make mipt-mips; fi
-  - if [ $CXX == g++-7] then pvs-studio-analyzer analyze -o ./project.log --compiler $(CXX); plog-converter -a GA:1,2 -t tasklist -o ./project.tasks ./project.log; fi
-  - if [ $CXX == g++-7] then cat ./project.tasks; fi
+  - if [ $CXX == g++-7]; then pvs-studio-analyzer trace -- make mipt-mips; fi
+  - if [ $CXX == g++-7]; then pvs-studio-analyzer analyze -o ./project.log --compiler $(CXX); fi
+  - if [ $CXX == g++-7]; then plog-converter -a GA:1,2 -t tasklist -o ./project.tasks ./project.log; fi
+  - if [ $CXX == g++-7]; then cat ./project.tasks; fi
 
 addons:
   apt:
@@ -53,8 +54,6 @@ addons:
     - zlib1g-dev
 
 install:
-  - git submodule init
-  - git submodule update
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-5.0; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
