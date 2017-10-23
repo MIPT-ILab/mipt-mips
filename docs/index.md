@@ -22,7 +22,7 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
 
  Date | Event | Hometask
  :-: |:---- |:----------------
- 03<br/>Nov | **Single-Cycle Implementation of MIPS CPU** | |
+ 03<br/>Nov | **L6: Single-Cycle Implementation of MIPS CPU** | |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
