@@ -71,6 +71,7 @@ test: $(addsuffix /t/test.run, $(TESTS))
 clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 -include $(addsuffix /t/test.d, $(TESTS))
+
 %/t/test.o: %/t/unit_test.cpp 
 	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL) -DTEST_PATH=\"$(TEST_PATH)\" -DIMAGE_PATH=\"$(IMAGE_PATH)\"
@@ -99,6 +100,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
 clean: clean-tests
-	rm -rf obj
+	rm -rf $(OBJ_DIR)
 	rm -f mipt-mips disasm $(GTEST_LIB)
 
