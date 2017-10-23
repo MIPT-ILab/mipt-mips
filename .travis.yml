@@ -65,7 +65,7 @@ install:
   - export PVS=pvs-studio-6.18.23098.1541-x86_64
   - wget http://files.viva64.com/$PVS.tgz
   - tar -xvzf $PVS.tgz
-  - export PATH=$PATH;$TRAVIS_BUILD_DIR/$PVS/bin
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/$PVS/bin
 # Install GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
