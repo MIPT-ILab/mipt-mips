@@ -117,7 +117,7 @@ CacheTagArray::CacheTagArray( uint32 size_in_bytes,
                               CacheTagArrayCheck( size_in_bytes, ways,
                                                   line_size, addr_size_in_bits),
                               num_sets( size_in_bytes / ( line_size * ways)),
-                              array( num_sets, std::vector<CacheTag>(ways)),
+                              array( num_sets, std::vector<CacheTag>( ways)),
                               lru( ways, num_sets)
 {
 
@@ -126,11 +126,11 @@ CacheTagArray::CacheTagArray( uint32 size_in_bytes,
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
     const auto lookup_result = read_no_touch( addr);
+    const auto&[ is_hit, way_num] = lookup_result;
 
-    if ( lookup_result.first)
+    if ( is_hit)
     {
         const auto set_num = set( addr);
-        const auto way_num = lookup_result.second;
         lru.touch( set_num, way_num); // update LRU info
     }
 
