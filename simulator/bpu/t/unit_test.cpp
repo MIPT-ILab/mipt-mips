@@ -109,7 +109,7 @@ TEST( Overload, LRU)
     for ( int i = 0; i < 1000; i++)
     {
         bp->update( false, i, NO_VAL32);
-        if ( i % 50 != 0)
+        if ( i % 50 == 0)
             bp->update( true, PCconst, target);
     }
 
