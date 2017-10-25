@@ -15,10 +15,10 @@
 #include <array>
 #if __has_include("string_view")
 #include <string_view>
-using std::string_view;
+using std::string_view; // NOLINT
 #else
 #include <experimental/string_view>
-using std::experimental::string_view;
+using std::experimental::string_view; // NOLINT
 #endif
 
 // MIPT-MIPS modules

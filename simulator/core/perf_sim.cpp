@@ -1,3 +1,7 @@
+/*
+* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+*/
 #include <iostream>
 
 #include <boost/chrono.hpp>
@@ -92,6 +96,7 @@ void PerfMIPS::run( const std::string& tr,
     auto simips = 1e6 * executed_instrs / time;
 
     std::cout << std::endl << "****************************"
+              << std::endl << "instrs:   " << executed_instrs
               << std::endl << "cycles:   " << cycle
               << std::endl << "IPC:      " << ipc
               << std::endl << "sim freq: " << frequency << " kHz"
