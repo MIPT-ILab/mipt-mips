@@ -117,7 +117,7 @@ CacheTagArray::CacheTagArray( uint32 size_in_bytes,
                               CacheTagArrayCheck( size_in_bytes, ways,
                                                   line_size, addr_size_in_bits),
                               num_sets( size_in_bytes / ( line_size * ways)),
-                              array( num_sets, std::vector( ways, CacheTag())),
+                              array( num_sets, std::vector<CacheTag>( ways)),
                               lru( ways, num_sets)
 {
 
@@ -148,9 +148,9 @@ std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
         const auto& entry = array[ set_num][ i];
 
         if ( entry.is_valid && entry.line == tag_num) // hit
-            return std::pair(true, i);
+            return std::make_pair(true, i);
     }
-    return std::pair(false, NO_VAL32); // miss (no data)
+    return std::make_pair(false, NO_VAL32); // miss (no data)
 }
 
 uint32 CacheTagArray::write( Addr addr)
