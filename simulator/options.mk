@@ -41,4 +41,4 @@ INCL+= -I. -isystem $(BOOST_INCL) -isystem $(LIBELF_INCL)
 LPATH:= -L $(BOOST_LPATH) -L $(LIBELF_LPATH)
 
 TIDY?=clang-tidy
-TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-modernize-pass-by-value,-cppcoreguidelines-pro-type-member-init,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-hicpp-special-member-functions,-android-cloexec-fopen
+TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-modernize-pass-by-value,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-android-cloexec-fopen
