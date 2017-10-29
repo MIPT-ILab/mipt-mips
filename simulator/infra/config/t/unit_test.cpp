@@ -26,7 +26,16 @@ static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions
 
 static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
 static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
+
+namespace utils {    
+template <typename T, std :: size_t size>
+constexpr std :: size_t countof( T (&)[ size]) { return size; } 
+} // namespace utils
+
+
 } // namespace config
+
+
 
 
 
@@ -36,8 +45,8 @@ static Value<bool> functional_only = { "functional-only,f", false, "run function
 //
 TEST( config_parse, Pass_Valid_Args_1)
 {
-    const uint64 num_steps = 145;
-    const std :: string binary_filename{ "file.elf"};
+    const uint64 mandatory_int_value = 145;
+    const std::string mandatory_string_value{ "file.elf"};
 
     const char* argv[] = 
     {
@@ -50,16 +59,16 @@ TEST( config_parse, Pass_Valid_Args_1)
         "--bp-ways", "16"
 
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should not throw any exceptions
-    ASSERT_NO_THROW(config :: handleArgs( argc, const_cast<char**>(argv)));
+    ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
 
-    ASSERT_EQ( config :: num_steps, num_steps);
-    ASSERT_FALSE( binary_filename.compare( config :: binary_filename));
-    ASSERT_EQ( config :: disassembly_on, false);
-    ASSERT_EQ( config :: functional_only, true);
+    ASSERT_EQ( config::num_steps, mandatory_int_value);
+    ASSERT_FALSE( mandatory_string_value.compare( config::binary_filename));
+    ASSERT_EQ( config::disassembly_on, false);
+    ASSERT_EQ( config::functional_only, true);
 }
 
 
@@ -70,8 +79,8 @@ TEST( config_parse, Pass_Valid_Args_1)
 //
 TEST( config_parse,  Pass_Valid_Args_2)
 {
-    const uint64 num_steps = 356;
-    const std :: string binary_filename{ "run_test.elf"};
+    const uint64 mandatory_int_value = 356;
+    const std::string mandatory_string_value{ "run_test.elf"};
 
     const char* argv[] = 
     {
@@ -80,16 +89,16 @@ TEST( config_parse,  Pass_Valid_Args_2)
         "-n", "356",
         "-d"
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should not throw any exceptions
-    ASSERT_NO_THROW( config :: handleArgs( argc, const_cast<char**>(argv)));
+    ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
 
-    ASSERT_EQ( config :: num_steps, num_steps);
-    ASSERT_FALSE( binary_filename.compare( config :: binary_filename));
-    ASSERT_EQ( config :: disassembly_on, true);
-    ASSERT_EQ( config :: functional_only, false);
+    ASSERT_EQ( config::num_steps, mandatory_int_value);
+    ASSERT_FALSE( mandatory_string_value.compare( config::binary_filename));
+    ASSERT_EQ( config::disassembly_on, true);
+    ASSERT_EQ( config::functional_only, false);
 }
 
 
@@ -103,11 +112,11 @@ TEST( config_parse,  Pass_No_Args)
     {
         "mipt-mips"
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
-    
+    const int argc = config::utils::countof(argv);
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -122,11 +131,11 @@ TEST( config_parse,  Pass_Args_Without_Binary_Option)
         "mipt-mips",
         "--numsteps", "356",
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -141,11 +150,11 @@ TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
         "mipt-mips",
         "--binary", "test.elf", 
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -162,11 +171,11 @@ TEST( config_parse,  Pass_Args_With_Unrecognised_Option)
         "-n", "356",
         "-koption"
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -183,11 +192,11 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
         "--binary", "run_test_2.elf",
         "-n", "412",
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -203,11 +212,11 @@ TEST( config_parse,  Pass_Binary_Option_Without_Arg)
         "-b",
         "-n", "412",
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
@@ -225,18 +234,19 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
         "-f",
         "-d"
     };
-    const int argc = static_cast<int>( sizeof( argv) / sizeof( char*));
+    const int argc = config::utils::countof(argv);
     
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config :: handleArgs( argc, const_cast<char**>(argv)), 
-                 :: testing :: ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_EXIT( config::handleArgs( argc, argv), 
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
+
 
 
 
 int main( int argc, char** argv)
 {
-    :: testing :: InitGoogleTest( &argc, argv);
-    :: testing :: FLAGS_gtest_death_test_style = "threadsafe";
+    ::testing::InitGoogleTest( &argc, argv);
+    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     return RUN_ALL_TESTS();
 }
