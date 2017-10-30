@@ -20,19 +20,16 @@
 #include "../config.h"
 
 
+#include "infra/macro.h"
+
+
+
 namespace config {
-static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
-static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
+RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
+RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
 
-static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
-static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
-
-namespace utils {    
-template <typename T, std :: size_t size>
-constexpr std :: size_t countof( T (&)[ size]) { return size; } 
-} // namespace utils
-
-
+Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
+Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
 } // namespace config
 
 
@@ -59,7 +56,7 @@ TEST( config_parse, Pass_Valid_Args_1)
         "--bp-ways", "16"
 
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
@@ -89,7 +86,7 @@ TEST( config_parse,  Pass_Valid_Args_2)
         "-n", "356",
         "-d"
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
@@ -112,7 +109,7 @@ TEST( config_parse,  Pass_No_Args)
     {
         "mipt-mips"
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
 
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -131,7 +128,7 @@ TEST( config_parse,  Pass_Args_Without_Binary_Option)
         "mipt-mips",
         "--numsteps", "356",
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -150,7 +147,7 @@ TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
         "mipt-mips",
         "--binary", "test.elf", 
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -171,7 +168,7 @@ TEST( config_parse,  Pass_Args_With_Unrecognised_Option)
         "-n", "356",
         "-koption"
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -192,7 +189,7 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
         "--binary", "run_test_2.elf",
         "-n", "412",
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -212,7 +209,7 @@ TEST( config_parse,  Pass_Binary_Option_Without_Arg)
         "-b",
         "-n", "412",
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
@@ -234,13 +231,44 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
         "-f",
         "-d"
     };
-    const int argc = config::utils::countof(argv);
+    const int argc = countof(argv);
     
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( config::handleArgs( argc, argv), 
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
+
+
+//
+// To check whether providing configuration parser
+// with the same option is a failure
+//
+TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
+{
+    const char* argv[] =
+    {
+        "mipt-mips",
+        "-b", "test.elf",
+        "-n", "100"
+    };
+    const int argc = countof(argv);
+
+    // should not throw any exceptions
+    ASSERT_NO_THROW( config::handleArgs( argc, argv));
+
+
+    auto test_function = []() 
+    { 
+        config::RequiredValue<std::string> second_binary_file_option = 
+            {
+                "binary,b", 
+                "input binary file"
+            }; 
+    }; 
+    // should exit with EXIT_FAILURE
+    ASSERT_EXIT( test_function(), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+}
 
 
 
@@ -250,3 +278,4 @@ int main( int argc, char** argv)
     ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     return RUN_ALL_TESTS();
 }
+
