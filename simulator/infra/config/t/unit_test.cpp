@@ -8,18 +8,16 @@
  */
 
 
-// generic C
-#include <cstdlib>
-#include <cassert>
-
 
 // Google test library
 #include <gtest/gtest.h>
 
 
+// Testing module 
 #include "../config.h"
 
 
+// Utils
 #include "infra/macro.h"
 
 
