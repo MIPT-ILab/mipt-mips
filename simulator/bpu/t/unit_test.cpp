@@ -29,16 +29,16 @@ TEST( HitAndMiss, Miss)
 
     // Check default cache miss behaviour
     Addr PC = 12;
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     PC = 16;
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     PC = 20;
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     PC = 12;
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 }
 
 TEST( Main, PredictingBits)
@@ -49,50 +49,50 @@ TEST( Main, PredictingBits)
     Addr PC = 12;
     Addr target = 28;
 
-    // Teaching
+    // Learn
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    // "Over" - teaching
+    // "Over" - learning
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    // "Un" - teaching
+    // Moderate "Un" - learning
     bp->update( false, PC, NO_VAL32);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    // Strong "un" - teaching
+    // Strong "un" - learning
     bp->update( false, PC, NO_VAL32);
     bp->update( false, PC, NO_VAL32);
     bp->update( false, PC, NO_VAL32);
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     bp->update( false, PC, NO_VAL32);
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     bp->update( false, PC, NO_VAL32);
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     bp->update( false, PC, NO_VAL32);
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
-    // Teaching again
+    // Learn again
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 0);
+    ASSERT_EQ( bp->is_taken(PC), false);
 
     bp->update( true, PC, target);
-    ASSERT_EQ( bp->is_taken(PC), 1);
+    ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 }
 
@@ -109,14 +109,14 @@ TEST( Overload, LRU)
     for ( int i = 0; i < 1000; i++)
     {
         bp->update( false, i, NO_VAL32);
-        if ( !( i % 50))
+        if ( i % 50 == 0)
             bp->update( true, PCconst, target);
     }
 
     // Checking some random PC and PCConst
     Addr PC = 4;
-    ASSERT_EQ( bp->is_taken(PC), 0);
-    ASSERT_EQ( bp->is_taken(PCconst), 1);
+    ASSERT_EQ( bp->is_taken(PC), false);
+    ASSERT_EQ( bp->is_taken(PCconst), true);
     ASSERT_EQ( bp->get_target(PCconst), target);
 }
 

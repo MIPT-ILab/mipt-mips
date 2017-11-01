@@ -29,7 +29,7 @@ namespace config {
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
 } // namespace config
 
-int main( int argc, char** argv)
+int main( int argc, const char* argv[])
 {
     /* Analysing and handling of inserted arguments */
     config::handleArgs( argc, argv);

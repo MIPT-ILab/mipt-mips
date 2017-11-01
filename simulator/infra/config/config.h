@@ -25,7 +25,7 @@ using bod = boost::program_options::options_description;
 
 class BaseValue
 {
-    friend void handleArgs( int argc, char** argv);
+    friend void handleArgs( int argc, const char* argv[]);
     virtual void reg( bod* d) = 0;
 
     static std::map<std::string, BaseValue*>& values() {
@@ -87,7 +87,7 @@ public:
 };
 
 /* methods */
-void handleArgs( int argc, char *argv[]);
+void handleArgs( int argc, const char* argv[]);
 
 } // namespace config
 

@@ -59,6 +59,7 @@ $(GTEST_LIB): $(GTEST_OBJ)
 TESTS:= \
     infra/elf_parser \
     infra/memory \
+    infra/config \
     mips \
     bpu \
     func_sim \
