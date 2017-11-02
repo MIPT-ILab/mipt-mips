@@ -9,16 +9,21 @@ else
         CXXFLAGS+= -std=c++17
 endif
 
-OBJ_DIR:=obj-$(CXX)-$(UNAME)
+OBJ_DIR:=obj-$(CXX)-$(UNAME)-D$(DEBUG)-P$(GPROF)
 
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
-	OBJDIR+=-DEBUG
 else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
 endif
+
+ifeq ($(GPROF), 1)
+	CXXFLAGS+= -pg -g
+	LDFLAGS+= -pg
+endif
+	
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)
