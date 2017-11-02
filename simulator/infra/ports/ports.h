@@ -60,7 +60,7 @@ class BasePort : protected Log
         bool _init = false;
 
         // Constructor of port
-        explicit BasePort( const std::string& key) : Log( true), _key( key) { }
+        explicit BasePort( std::string key) : Log( true), _key( std::move( key)) { }
 };
 
 /*
@@ -109,7 +109,7 @@ template<class T> class Port : public BasePort
             }
         };
 
-        explicit Port( const std::string& key) : BasePort( key) { }
+        explicit Port( std::string key) : BasePort( std::move( key)) { }
 
         // ports Map to connect ports between for themselves;
         Map& portMap = Map::get_instance();
@@ -158,14 +158,14 @@ template<class T> class WritePort : public Port<T>
          *
          * Adds port to needed Map.
         */
-        WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout) :
-            Port<T>::Port( key), _bandwidth(bandwidth), _fanout(fanout)
+        WritePort<T>( std::string key, uint32 bandwidth, uint32 fanout) :
+            Port<T>::Port( std::move( key)), _bandwidth(bandwidth), _fanout(fanout)
         {
-            if ( this->portMap[ key].writer != nullptr)
+            if ( this->portMap[ this->_key].writer != nullptr)
                 serr << "Reusing of " << key
                      << " key for WritePort. Last WritePort will be used." << std::endl;
 
-            this->portMap[ key].writer = this;
+            this->portMap[ this->_key].writer = this;
         }
 
         // Write Method
@@ -194,14 +194,14 @@ template<class T> class ReadPort: public Port<T>
             T data = T();
             uint64 cycle = 0;
             Cell() = delete;
-            Cell( const T& v, uint64 c) : data( v), cycle( c) { }
+            Cell( T v, uint64 c) : data( std::move( v)), cycle( c) { }
         };
         std::queue<Cell> _dataQueue;
 
         // Pushes data from WritePort
         void pushData( const T& what, uint64 cycle)
         {
-             _dataQueue.emplace(what, cycle + _latency); // NOTE: we copy data here
+             _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
         }
 
         // Tests if there is any ungot data
@@ -215,10 +215,10 @@ template<class T> class ReadPort: public Port<T>
          *
          * Adds port to needed Map.
         */
-        ReadPort<T>( const std::string& key, uint64 latency) :
-            Port<T>::Port( key), _latency( latency), _dataQueue()
+        ReadPort<T>( std::string key, uint64 latency) :
+            Port<T>::Port( std::move( key)), _latency( latency), _dataQueue()
         {
-            this->portMap[ key].readers.push_front( this);
+            this->portMap[ this->_key].readers.push_front( this);
         }
 
         // Is ready? method
@@ -261,7 +261,7 @@ template<class T> void WritePort<T>::write( const T& what, uint64 cycle)
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
         _writeCounter++;
         for ( auto dst : this->_destinations)
-            dst->pushData(what, cycle);
+            dst->pushData( what, cycle);
     }
     else
     {

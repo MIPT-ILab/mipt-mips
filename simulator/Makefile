@@ -35,9 +35,11 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-tidy: $(CPPS) main.cpp
+tidy-check: $(CPPS) main.cpp
 	@$(TIDY) $^ $(TIDYFLAGS) -- -std=c++17 $(INCL)
 
+tidy: $(CPPS) main.cpp
+	@$(TIDY) $^ $(TIDYFLAGS) -fix -- -std=c++17 $(INCL)
 
 ###### Rules to get GTest #######
 
@@ -103,4 +105,3 @@ $(OBJ_DIR)/%.o: %.cpp
 clean: clean-tests
 	rm -rf $(OBJ_DIR)
 	rm -f mipt-mips disasm $(GTEST_LIB)
-
