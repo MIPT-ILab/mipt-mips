@@ -186,58 +186,6 @@ string_view FuncInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 
-FuncInstr::FuncInstr( const FuncInstr& cached_instr, Addr PC,
-                      bool predicted_taken,
-                      Addr predicted_target)
-    : format( cached_instr.format)
-    , operation( cached_instr.operation)
-    , trap( cached_instr.trap)
-    , instr( cached_instr.instr)
-
-    , name( cached_instr.name)
-
-    , src1( cached_instr.src1)
-    , src2( cached_instr.src2)
-    , dst( cached_instr.dst)
-
-    , v_imm( cached_instr.v_imm)
-    , v_src1( cached_instr.v_src1)
-    , v_src2( cached_instr.v_src2)
-    , v_dst( cached_instr.v_dst)
-    , shamt( cached_instr.shamt)
-    , mem_addr( cached_instr.mem_addr)
-    , mem_size( cached_instr.mem_size)
-
-    , predicted_taken( predicted_taken)
-    , predicted_target( predicted_target)
-    , PC( PC)
-    , new_PC( PC + 4)
-    , disasm( cached_instr.disasm)
-
-    , function( cached_instr.function)
-{ 
-    if ( PC != cached_instr.PC && instr.raw != 0x0ul)
-    {            
-        std::ostringstream oss;
-        oss << std::hex << "0x" << PC;
-
-        if ( !cached_instr.PC)
-        {
-            oss << ": ";
-            disasm.insert(0, oss.str());
-        }
-        else
-        {
-            std::size_t pos = disasm.find_first_of( ':');
-
-            if ( !PC)
-                disasm.erase( 0, pos + 2);
-            else
-                disasm.replace( 0, pos, oss.str());    
-        }
-    }
-}
-
 FuncInstr::FuncInstr( uint32 bytes, Addr PC,
                       bool predicted_taken,
                       Addr predicted_target) :
