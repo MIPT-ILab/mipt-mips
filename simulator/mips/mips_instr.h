@@ -111,9 +111,9 @@ class FuncInstr
             EXPLICIT_TRAP,
         } trap = TrapType::NO_TRAP;
 
-        const union _instr
+        union _instr
         {
-            const struct
+            struct
             {
                 unsigned funct  :6;
                 unsigned shamt  :5;
@@ -122,19 +122,19 @@ class FuncInstr
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asR;
-            const struct
+            struct
             {
                 unsigned imm    :16;
                 unsigned rt     :5;
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asI;
-            const struct
+            struct
             {
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
-            const uint32 raw;
+            uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
@@ -178,11 +178,11 @@ class FuncInstr
         bool complete = false;
 
         /* info for branch misprediction unit */
-        const bool predicted_taken = false;     // Predicted direction
-        const Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        bool predicted_taken = false;     // Predicted direction
+        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        const Addr PC = NO_VAL32;
+        Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
@@ -326,12 +326,17 @@ class FuncInstr
         uint32 lo = NO_VAL32;
 
         FuncInstr() = delete; // constructor w/o arguments for ports
-
-        explicit
+ 
+        explicit   
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
-
+        
+        explicit    
+        FuncInstr( const FuncInstr& cached_instr, Addr PC,
+                   bool predicted_taken = false,
+                   Addr predicted_target = 0);
+         
         const std::string& Dump() const { return disasm; }
 
         RegNum get_src1_num() const { return src1; }
