@@ -13,8 +13,6 @@
 #include <infra/types.h>
 #include <infra/log.h>
 
-
-#include <func_sim/instr_cache.h>
 #include <mips/mips_instr.h>
 
 
@@ -27,8 +25,6 @@ class MIPS : public Log
         std::unique_ptr<RF> rf;
         Addr PC = NO_VAL32;
         MIPSMemory* mem = nullptr;
-
-        InstrCache<uint32, FuncInstr> instr_cache{};
     
     public:
         explicit MIPS( bool log = false);

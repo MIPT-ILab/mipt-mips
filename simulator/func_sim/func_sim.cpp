@@ -18,22 +18,8 @@ MIPS::~MIPS()
 
 std::string MIPS::step()
 {
-    // fetch
-    uint32 instr_bytes = mem->fetch( PC);
-
-
-    // check whether an instruction has been already decoded
-    // and decode it if it is not in the cache
-    auto it = instr_cache.find( instr_bytes);
-    FuncInstr instr = ( it != instr_cache.end())
-                      ? FuncInstr( it -> second, PC)
-                      : FuncInstr( instr_bytes, PC);
-    
-    // update cache              
-    if ( it == instr_cache.end())
-        instr_cache.update( instr_bytes, instr);                              
-
-
+    // fetch instruction
+    FuncInstr instr = mem -> fetch_instr( PC);
         
     // read sources
     rf->read_sources( &instr);
