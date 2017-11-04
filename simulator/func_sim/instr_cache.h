@@ -23,13 +23,29 @@ class InstrCache
         iterator end() { return cache.end(); }
 
         iterator find( const K& key) { return cache.find( key); }
-        iterator update( const K& key, V&& value) 
-        { 
-            return cache.insert_or_assign(key, value).first;
+        void update( const K& key, const V& value) 
+        {
+            // it is possible to change values or add new ones
+            // only if number of elements is not greater than capacity
+            if (number_of_elements < CAPACITY)
+            {
+                auto result{ cache.insert_or_assign( key, value)};
+
+                if ( result.second)
+                    number_of_elements++;
+            }
         } 
 
+        std::size_t size() const { return number_of_elements; }
+        bool empty() const { return !number_of_elements; }
+        
+        static const std::size_t CAPACITY = 8192;
+
+        
     private:
         std::map<K, V> cache{};
+        std::size_t number_of_elements = 0;
+
 };
 
 
