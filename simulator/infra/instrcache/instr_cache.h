@@ -11,41 +11,50 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
-#include <map>
+#include <infra/types.h>
 
-template <typename K, typename V>
+#include <unordered_map>
+#include <utility>
+
+template <typename V>
 class InstrCache
 {
     public:
-        using iterator = typename std::map<K, V>::iterator;
+        using value_type = typename std::pair<bool, V>;
+        using iterator = typename std::unordered_map<Addr, value_type>::iterator;
+        
+        auto begin() const { return cache.cbegin(); }
+        auto end() const { return cache.cend(); }
 
-        iterator begin() { return cache.begin(); }
-        iterator end() { return cache.end(); }
-
-        iterator find( const K& key) { return cache.find( key); }
-        void update( const K& key, const V& value) 
+        iterator find( Addr key) { return cache.find( key); }
+        void update( Addr key, const V& value) 
         {
             // it is possible to change values or add new ones
             // only if number of elements is not greater than capacity
             if (number_of_elements < CAPACITY)
             {
-                auto result{ cache.insert_or_assign( key, value)};
+                auto result{ cache.insert_or_assign( key, std::make_pair( true, value))};
 
                 if ( result.second)
                     number_of_elements++;
             }
         } 
+        void mark_invalid( Addr key)
+        {
+            iterator it = cache.find( key);
+            if ( it != cache.end())
+                it -> second.first = false;
+        }
 
         std::size_t size() const { return number_of_elements; }
-        bool empty() const { return !number_of_elements; }
+        bool empty() const { return number_of_elements == 0u; }
         
         static const std::size_t CAPACITY = 8192;
 
         
     private:
-        std::map<K, V> cache{};
+        std::unordered_map<Addr, value_type> cache{};
         std::size_t number_of_elements = 0;
-
 };
 
 
