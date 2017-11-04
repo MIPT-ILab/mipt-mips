@@ -18,6 +18,7 @@ cl /I. /EHsc /c /nologo /MD ^
    infra/ports/ports.cpp ^
    infra/cache/cache_tag_array.cpp ^
    mips/mips_instr.cpp ^
+   mips/mips_memory.cpp ^
    func_sim/func_sim.cpp ^
    core/perf_sim.cpp || exit /b
 
