@@ -32,7 +32,7 @@ script:
 # Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Run PVS
-  - if [ $CXX == g++-7 ]; then ./pvs.sh; fi
+  - if [ $CXX == g++-7 ]; then bash ./pvs.sh; fi
 
 addons:
   apt:
