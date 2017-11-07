@@ -4,7 +4,6 @@
 */
 #include <iostream>
 
-#include <boost/chrono.hpp>
 #include <boost/timer/timer.hpp>
 
 #include <infra/config/config.h>
