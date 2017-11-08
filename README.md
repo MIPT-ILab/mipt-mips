@@ -2,9 +2,9 @@
 
 # MIPT-MIPS
 
-MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It tells the _performance_ of program running on CPU, taking best features of RTL and traditional functional simulation:
-* **Precision**. We provide precise models of branch prediction unit and pipeline behavior.
-* **Customization**. Cache size, branch prediction algorithm etc. are easily parametrizable.
+MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
+* **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
+* **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
 * **Speed**. Simulation frequency gets up to 0.4 MHz.
 
@@ -48,7 +48,7 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 
 This project is a part of [ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 
-The main aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
+The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
 ### May I contribute?
 
