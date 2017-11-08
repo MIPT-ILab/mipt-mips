@@ -2,14 +2,18 @@
 
 # MIPT-MIPS
 
-This project is a part of [ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
+MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It tells the _performance_ of program running on CPU, taking best features of RTL and traditional functional simulation:
+* **Precision**. We provide precise models of branch prediction unit and pipeline behavior.
+* **Customization**. Cache size, branch prediction algorithm etc. are easily parametrizable.
+* **Simplicity**. Our source files are much more readable than RTL.
+* **Speed**. Simulation frequency gets up to 0.4 MHz.
 
-The aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
+MIPT-MIPS can be used for different purposes:
+* Performance control of **software optimizations**: you may check IPC boosts of your programs
+* Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
+* **Education**: simulator is a nice experimental frog to study CPU internals
 
-This repository contains source files of cycle-accurate simulator (aka performance or pre-silicon simulator) of MIPS CPU.
-
-More details about the project are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
-
+----
 ## Getting started
 
 1. [Install MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
@@ -18,28 +22,34 @@ More details about the project are available on [Wiki](https://github.com/MIPT-I
 1. To get traces and GoogleTest environment, you have to fetch our submodules by typing `git submodule update --init` command.
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
 
-### C++ requirements
-
-MIPT-MIPS uses C++17. Thus, you have to use compilers of these versions or newer:
-* GCC 7
-* MS Visual Studio 2017
-* Clang 5.0
-* Apple LLVM 7.3.0 (uses -std=c++1z flag)
-
-Required versions of Boost:
-* 1.55 for GCC and Clang
-* 1.64 for MS Visual Studio
-
-## Basic command line options
+### Basic command line options
 
 * `-b <filename>` — provide path to ELF binary file to execute
 * `-n <number>` — number of instructions to run
 * `-f` — enables functional simulation only
 * `-d` — enables detailed output of each cycle
 
-## Known issues
-* Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
+### C++ requirements
 
-## May I contribute?
+MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these versions or newer:
+* GCC 7
+* Clang 5.0
+* Apple LLVM 7.3.0 (uses -std=c++1z flag)
+* MS Visual Studio 2017 (Boost 1.65.1 is required)
+
+### Known issues
+* Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
+* Self-modifying code is not supported at the moment in performance mode.
+
+More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
+
+----
+## About MIPT-MIPS
+
+This project is a part of [ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
+
+The main aim of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
+
+### May I contribute?
 
 Yes, if you attend MIPT-MIPS lectures. See our [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
