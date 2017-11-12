@@ -326,14 +326,12 @@ class FuncInstr
         uint32 lo = NO_VAL32;
 
         FuncInstr() = delete; // constructor w/o arguments for ports
- 
-        FuncInstr( const FuncInstr& instr) = default;
 
         explicit   
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
-                   
+
         const std::string& Dump() const { return disasm; }
 
         RegNum get_src1_num() const { return src1; }

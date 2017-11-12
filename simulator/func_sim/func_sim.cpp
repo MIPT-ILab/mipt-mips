@@ -19,7 +19,7 @@ MIPS::~MIPS()
 std::string MIPS::step()
 {
     // fetch instruction
-    FuncInstr instr = mem -> fetch_instr( PC);
+    FuncInstr instr = mem->fetch_instr( PC);
         
     // read sources
     rf->read_sources( &instr);

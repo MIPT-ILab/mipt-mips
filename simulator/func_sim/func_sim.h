@@ -13,8 +13,6 @@
 #include <infra/types.h>
 #include <infra/log.h>
 
-#include <mips/mips_instr.h>
-
 
 class MIPSMemory;
 class RF;
