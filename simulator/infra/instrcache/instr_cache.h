@@ -8,9 +8,6 @@
 #define INSTR_CACHE_H
 
 #include <infra/types.h>
-
-#include <unordered_map>
-
 #include <infra/instrcache/LRUCache.h>
 
 #ifndef INSTR_CACHE_CAPACITY
