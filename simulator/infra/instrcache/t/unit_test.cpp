@@ -11,13 +11,13 @@
 #include <gtest/gtest.h>
 
 
-// Module
+// Modules
 #include "../instr_cache.h"
+#include "../LRUCache.h"
 
 
 #include <infra/types.h>
 #include <mips/mips_instr.h>
-
 
 
 
@@ -34,7 +34,7 @@ TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
 
     ASSERT_TRUE( it != cache.end());
     ASSERT_EQ( it -> first, PC);
-    ASSERT_EQ( it -> second, test_number);
+    ASSERT_EQ( (*it -> second).second, test_number);
 }
 
 
@@ -100,6 +100,23 @@ TEST( check_method_size, Check_Method_Size)
 }
 
 
+TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
+{
+    const std::size_t CAPACITY = InstrCache<std::size_t>::CAPACITY;
+
+    LRUCache<std::size_t, std::size_t> cache(CAPACITY);
+
+    for ( std::size_t i = 1; i <= CAPACITY; i++)
+        cache.update( i, i); 
+    cache.update( 1, 27);
+    cache.update( CAPACITY / 2, CAPACITY / 4);
+
+    cache.update( CAPACITY + 1, CAPACITY + 1);
+
+    ASSERT_EQ( cache.size(), CAPACITY);
+    ASSERT_FALSE( cache.empty());
+    ASSERT_TRUE( cache.find( 2) == cache.end());
+} 
 
 
 
