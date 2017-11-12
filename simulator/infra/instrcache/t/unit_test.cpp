@@ -89,9 +89,9 @@ TEST( check_method_size, Check_Method_Size)
 
     uint32 instr_bytes = 0x2484ae10;
     Addr PC = 0x30ae17;
-    const std::size_t SIZE = InstrCache<FuncInstr> :: CAPACITY / 12;
+    const std::size_t SIZE = InstrCache<FuncInstr>::get_capacity() / 12;
 
-    for ( std::size_t i = 0; i < SIZE; i++)
+    for ( std::size_t i = 0; i < SIZE; ++i)
     {
         FuncInstr instr( instr_bytes++, PC);
         instr_cache.update( PC++, instr);
@@ -104,11 +104,11 @@ TEST( check_method_size, Check_Method_Size)
 
 TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
 {
-    const std::size_t CAPACITY = InstrCache<std::size_t>::CAPACITY;
+    constexpr const auto CAPACITY = 8192;
 
-    LRUCache<std::size_t, Dummy> cache(CAPACITY);
+    LRUCache<std::size_t, Dummy, CAPACITY> cache;
 
-    for ( std::size_t i = 1; i <= CAPACITY; i++)
+    for ( std::size_t i = 1; i <= CAPACITY; ++i) // note the <=
         cache.update( i, Dummy( i));
 
     cache.update( 1, Dummy( 1));

@@ -13,15 +13,12 @@
 
 #include <infra/instrcache/LRUCache.h>
 
+#ifndef INSTR_CACHE_CAPACITY
+#define INSTR_CACHE_CAPACITY 8192
+#endif
+
 template <typename V>
-class InstrCache : public LRUCache<Addr, V>
-{
-    public:
-        InstrCache() : LRUCache<Addr, V>(CAPACITY) {}
-        
-        static const std::size_t CAPACITY = 8192;
-};
-
-
+using InstrCache = LRUCache<Addr, V, INSTR_CACHE_CAPACITY>;
 
 #endif // INSTR_CACHE_H
+

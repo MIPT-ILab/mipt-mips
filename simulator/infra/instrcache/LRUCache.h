@@ -13,15 +13,13 @@
 #include <utility>
 
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache
 {
     public:
-        explicit LRUCache( std::size_t capacity) 
-            : CAPACITY( capacity) 
-        { 
-            mp.reserve( capacity);
-        }
+        LRUCache() { mp.reserve( CAPACITY); }
+
+        static auto get_capacity() { return CAPACITY; }
         
         auto begin() const { return mp.cbegin(); }
         auto end() const { return mp.cend(); }
@@ -71,7 +69,6 @@ class LRUCache
         std::unordered_map<Key, typename std::list<std::pair<Key, Value>>::iterator> mp{};
 
         std::size_t number_of_elements = 0u;
-        const std::size_t CAPACITY;
 };
 
 
