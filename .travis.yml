@@ -29,13 +29,10 @@ script:
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
   - cd $TRAVIS_BUILD_DIR/simulator
   - make test
+# Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Run PVS
-  - make clean
-  - if [ $CXX == g++-7 ]; then pvs-studio-analyzer trace -- make mipt-mips; fi
-  - if [ $CXX == g++-7 ]; then pvs-studio-analyzer analyze -o ./project.log --compiler $CXX; fi
-  - if [ $CXX == g++-7 ]; then plog-converter -a GA:1,2 -t tasklist -o ./project.tasks ./project.log; fi
-  - if [ $CXX == g++-7 ]; then cat ./project.tasks; fi
+  - if [ $CXX == g++-7 ]; then bash ./pvs.sh; fi
 
 addons:
   apt:
