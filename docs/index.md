@@ -40,13 +40,13 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 N | Year | Name | Score | Comments
 :-: |:----: |:----: | ------------------------------ | ------------------------------
 1 | 2016/2017 | Georgiy Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
+2 | 2017/2018 | Denis Los | 4 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99) |
 2 | 2016/2017 | Alexandr Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
+3 | 2017/2018 | Danil Yarovoy | 2 |[T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 3 | 2017/2018 | Kirill Nedostoev | 2 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147) |
-4 | 2017/2018 | Danil Yarovoy | 2 |[T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
-5 | 2017/2018 | Denis Los | 1 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98) |
-6 | 2017/2018 | Aleksandr Misevich | 1 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37) |
-7 | 2017/2018 | Alexey Steksov | 1 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152) |
-8 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+4 | 2017/2018 | Aleksandr Misevich | 1 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37) |
+4 | 2017/2018 | Alexey Steksov | 1 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152) |
+4 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
 
 
