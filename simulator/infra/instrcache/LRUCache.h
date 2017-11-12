@@ -6,6 +6,7 @@
 #ifndef LRUCACHE_H
 #define LRUCACHE_H
 
+#include <cassert>
 
 #include <list>
 #include <unordered_map>
@@ -48,8 +49,8 @@ class LRUCache
             }
             else
             {
-                (*it -> second).second = value;
-                cache.splice( cache.begin(), cache, it -> second);
+                assert( it->second->second.is_same( value));
+                cache.splice( cache.begin(), cache, it->second);
             }
         }
 
@@ -58,7 +59,7 @@ class LRUCache
             auto it = mp.find( key);
             if ( it != mp.end())
             {
-                cache.erase( it -> second);
+                cache.erase( it->second);
                 mp.erase( it);
 
                 number_of_elements--;

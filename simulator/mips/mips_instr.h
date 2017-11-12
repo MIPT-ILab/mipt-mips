@@ -111,9 +111,9 @@ class FuncInstr
             EXPLICIT_TRAP,
         } trap = TrapType::NO_TRAP;
 
-        union _instr
+        const union _instr
         {
-            struct
+            const struct
             {
                 unsigned funct  :6;
                 unsigned shamt  :5;
@@ -122,19 +122,19 @@ class FuncInstr
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asR;
-            struct
+            const struct
             {
                 unsigned imm    :16;
                 unsigned rt     :5;
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asI;
-            struct
+            const struct
             {
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
-            uint32 raw;
+            const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
@@ -182,7 +182,7 @@ class FuncInstr
         Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        Addr PC = NO_VAL32;
+        const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
@@ -327,12 +327,16 @@ class FuncInstr
 
         FuncInstr() = delete; // constructor w/o arguments for ports
 
-        explicit   
+        explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
 
         const std::string& Dump() const { return disasm; }
+        bool is_same( const FuncInstr& rhs) const {
+            return PC == rhs.PC && instr.raw == rhs.instr.raw;
+        }
+
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
@@ -373,6 +377,7 @@ class FuncInstr
 
         void execute();
         void check_trap();
+
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)

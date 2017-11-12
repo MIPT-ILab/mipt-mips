@@ -20,23 +20,28 @@
 #include <mips/mips_instr.h>
 
 
-
+class Dummy {
+    const size_t value;
+public:
+    explicit Dummy( uint32 val) : value( val) {};
+    bool is_same( const Dummy& rhs) const { return value == rhs.value; }
+    bool operator==( const Dummy& rhs) const { return is_same(rhs); }
+};
 
 TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
 {
-    InstrCache<uint32> cache{};
+    InstrCache<Dummy> cache{};
 
     const Addr PC = 0x401c04;
-    const uint32 test_number = 0x103abf9;
+    const Dummy test_number( 0x103abf9);
 
     cache.update( PC, test_number);
     auto it = cache.find( PC);
 
     ASSERT_TRUE( it != cache.end());
-    ASSERT_EQ( it -> first, PC);
-    ASSERT_EQ( (*it -> second).second, test_number);
+    ASSERT_EQ( it->first, PC);
+    ASSERT_EQ( it->second->second, test_number);
 }
-
 
 TEST( update_and_find, Update_Find_And_Check)
 {
@@ -48,8 +53,7 @@ TEST( update_and_find, Update_Find_And_Check)
 
     instr_cache.update( PC, instr);
     ASSERT_TRUE( instr_cache.find( PC) != instr_cache.end());
-} 
-
+}
 
 TEST( check_method_erase, Check_Method_Erase)
 {
@@ -64,7 +68,6 @@ TEST( check_method_erase, Check_Method_Erase)
 
     ASSERT_TRUE( instr_cache.find( PC) == instr_cache.end());
 }
-
 
 TEST( check_method_empty, Check_Method_Empty)
 {
@@ -91,33 +94,32 @@ TEST( check_method_size, Check_Method_Size)
     for ( std::size_t i = 0; i < SIZE; i++)
     {
         FuncInstr instr( instr_bytes++, PC);
-        instr_cache.update( PC++, instr); 
-    } 
+        instr_cache.update( PC++, instr);
+    }
     ASSERT_EQ( SIZE, instr_cache.size());
 
     instr_cache.erase( PC - 1);
     ASSERT_EQ( SIZE - 1, instr_cache.size());
 }
 
-
 TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
 {
     const std::size_t CAPACITY = InstrCache<std::size_t>::CAPACITY;
 
-    LRUCache<std::size_t, std::size_t> cache(CAPACITY);
+    LRUCache<std::size_t, Dummy> cache(CAPACITY);
 
     for ( std::size_t i = 1; i <= CAPACITY; i++)
-        cache.update( i, i); 
-    cache.update( 1, 27);
-    cache.update( CAPACITY / 2, CAPACITY / 4);
+        cache.update( i, Dummy( i));
 
-    cache.update( CAPACITY + 1, CAPACITY + 1);
+    cache.update( 1, Dummy( 1));
+    cache.update( CAPACITY / 2, Dummy( CAPACITY / 2));
+
+    cache.update( CAPACITY + 1, Dummy( CAPACITY + 1));
 
     ASSERT_EQ( cache.size(), CAPACITY);
     ASSERT_FALSE( cache.empty());
     ASSERT_TRUE( cache.find( 2) == cache.end());
-} 
-
+}
 
 
 int main( int argc, char** argv)
@@ -126,3 +128,4 @@ int main( int argc, char** argv)
     ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     return RUN_ALL_TESTS();
 }
+
