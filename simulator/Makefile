@@ -63,6 +63,7 @@ TESTS:= \
     infra/elf_parser \
     infra/memory \
     infra/config \
+    infra/instrcache \
     mips \
     bpu \
     func_sim \
