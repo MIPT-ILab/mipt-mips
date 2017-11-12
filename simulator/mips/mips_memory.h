@@ -32,7 +32,7 @@ class MIPSMemory : private Memory
 
         void store( const FuncInstr& instr)
         {
-            instr_cache.mark_invalid( instr.get_mem_addr()); // Here find() is used
+            instr_cache.erase( instr.get_mem_addr());
             write(instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
         }
 
