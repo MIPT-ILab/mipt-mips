@@ -58,7 +58,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
 # Install PVS
   - cd $TRAVIS_BUILD_DIR
-  - export PVS=pvs-studio-6.18.23098.1541-x86_64
+  - export PVS=pvs-studio-6.19.23789.1731-x86_64
   - wget http://files.viva64.com/$PVS.tgz
   - tar -xvzf $PVS.tgz
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/$PVS/bin
