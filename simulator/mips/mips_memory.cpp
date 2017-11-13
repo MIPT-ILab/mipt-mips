@@ -8,8 +8,6 @@
 
 #include <infra/instrcache/instr_cache.h>
 
-#include <iostream>
-
 FuncInstr MIPSMemory::fetch_instr( Addr PC)
 {
     const auto& [found, value] = instr_cache.find( PC);
