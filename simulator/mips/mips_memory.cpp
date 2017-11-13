@@ -8,7 +8,6 @@
 
 #include <infra/instrcache/instr_cache.h>
 
-#include <iostream>
 FuncInstr MIPSMemory::fetch_instr( Addr PC)
 {
     auto it = instr_cache.find( PC);
@@ -17,8 +16,7 @@ FuncInstr MIPSMemory::fetch_instr( Addr PC)
                       ? FuncInstr( it->second)
                       : FuncInstr( read( PC), PC);
 
-    if ( it != instr_cache.end())
-        instr_cache.update( PC, instr);
-        
+    instr_cache.update( PC, instr);
+
     return instr;    
 }
