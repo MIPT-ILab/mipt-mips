@@ -24,7 +24,7 @@ class LRUCache
         bool empty() const { return size() == 0; }
 
         // First return value is true if and only if the value was found
-        // Second return value is not dereferenceable if first value if 'false'
+        // Second return value is dereferenceable only if first value if 'true'
         auto find( const Key& key) const
         {
             auto result = data.find( key);
