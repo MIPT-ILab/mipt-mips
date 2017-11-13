@@ -23,30 +23,16 @@ class LRUCache
         }
 
         static auto get_capacity() { return CAPACITY; }
-        
-        auto begin() const { return data.cbegin(); }
-        auto end() const { return data.cend(); }
-        auto find( const Key& key) const { return data.find( key); }
-        
-        std::size_t size() const { return number_of_elements; }
-        bool empty() const { return number_of_elements == 0u; }
 
-        void allocate( const Key& key, const Value& value) {
-            if ( number_of_elements == CAPACITY)
-            {
-                // Delete least recently used element
-                const auto& lru_elem = lru_list.back();
-                lru_hash.erase( lru_elem);
-                data.erase( lru_elem);
-                lru_list.pop_back();
-            }
-            else {
-                 number_of_elements++;
-            }
-            // Add a new element
-            data.emplace( key, value);
-            auto ptr = lru_list.insert( lru_list.begin(), key);
-            lru_hash.emplace( key, ptr);
+        auto size() const { return number_of_elements; }
+        bool empty() const { return size() == 0; }
+
+        // First return value is true if and only if the value was found
+        // Second return value is dereferenceable only if first value if 'true'
+        auto find( const Key& key) const
+        {
+            auto result = data.find( key);
+            return std::pair<bool, const Value&>( result != data.end(), result->second);
         }
 
         void update( const Key& key, const Value& value)
@@ -72,7 +58,7 @@ class LRUCache
             assert ( ( data_it == data.end()) == ( lru_it == lru_hash.end()));
             if ( data_it != data.end())
             {
-                assert( number_of_elements > 0);
+                assert( !empty());
                 data.erase( data_it);
                 lru_list.erase( lru_it->second);
                 lru_hash.erase( lru_it);
@@ -82,6 +68,25 @@ class LRUCache
         }
 
     private:
+        void allocate( const Key& key, const Value& value)
+        {
+            if ( number_of_elements == CAPACITY)
+            {
+                // Delete least recently used element
+                const auto& lru_elem = lru_list.back();
+                lru_hash.erase( lru_elem);
+                data.erase( lru_elem);
+                lru_list.pop_back();
+            }
+            else {
+                 number_of_elements++;
+            }
+            // Add a new element
+            data.emplace( key, value);
+            auto ptr = lru_list.insert( lru_list.begin(), key);
+            lru_hash.emplace( key, ptr);
+        }
+
         std::unordered_map<Key, Value> data{};
 
         std::list<Key> lru_list{};
