@@ -16,7 +16,11 @@ template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache
 {
     public:
-        LRUCache() { data.reserve( CAPACITY); }
+        LRUCache()
+        {
+            data.reserve( CAPACITY);
+            lru_hash.reserve( CAPACITY);
+        }
 
         static auto get_capacity() { return CAPACITY; }
         
