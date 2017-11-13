@@ -178,8 +178,8 @@ class FuncInstr
         bool complete = false;
 
         /* info for branch misprediction unit */
-        const bool predicted_taken = false;     // Predicted direction
-        const Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        bool predicted_taken = false;     // Predicted direction
+        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
         const Addr PC = NO_VAL32;
@@ -333,6 +333,10 @@ class FuncInstr
                    Addr predicted_target = 0);
 
         const std::string& Dump() const { return disasm; }
+        bool is_same( const FuncInstr& rhs) const {
+            return PC == rhs.PC && instr.raw == rhs.instr.raw;
+        }
+
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
@@ -373,6 +377,7 @@ class FuncInstr
 
         void execute();
         void check_trap();
+
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)

@@ -285,7 +285,7 @@ void PerfMIPS::clock_memory( int cycle)
             /* sending valid PC to fetch stage */
             wp_memory_2_fetch_target->write( real_target, cycle);
 
-            sout << "misprediction on\n";
+            sout << "misprediction on ";
         }
     }
 

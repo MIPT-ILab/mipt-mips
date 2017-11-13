@@ -25,7 +25,9 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
  Date | Event | Hometask
  :-: |:---- |:----------------
  03<br/>Nov | **L6: Single-Cycle Implementation of MIPS CPU**<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_06__03_Nov__Single-Cycle_Implementation_of_MIPS_CPU__Eng_text__No_audio.pptx?raw=true) | • Take a look at [MIPS ISA](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)<br/>• Check simulator internals: [MIPS disasm](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-disassembler) and [Functional Simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Functional-simulator)<br/>• Assign yourself to [MIPS ISA tasks](https://github.com/MIPT-ILab/mipt-mips/milestone/1) and [MIPS traces tasks](https://github.com/MIPT-ILab/mips-traces/issues)|
- 10<br/>Nov | **L7: Pipeline** | • Check simulator internals: [Ports](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports) and [Performance Simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator)|
+ 10<br/>Nov | **L7: Pipeline**<br/>• [Eng text, no audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/2017/Lecture_07__10_Nov__Pipelining__No_audio.pptx?raw=true) | • Check simulator internals: [Ports](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports) and [Performance Simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator)<br/>• Assign yourself to [PerfSim tasks](https://github.com/MIPT-ILab/mipt-mips/milestone/3)|
+ 17<br/>Nov | **L8: Branch Prediction** | |
+ 24<br/>Nov | **_No lecture_** | |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
@@ -38,12 +40,15 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 N | Year | Name | Score | Comments
 :-: |:----: |:----: | ------------------------------ | ------------------------------
 1 | 2016/2017 | Georgiy Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
+2 | 2017/2018 | Denis Los | 4 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99) |
 2 | 2016/2017 | Alexandr Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
+3 | 2017/2018 | Danil Yarovoy | 2 |[T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 3 | 2017/2018 | Kirill Nedostoev | 2 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147) |
-4 | 2017/2018 | Denis Los | 1 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98) |
-5 | 2017/2018 | Aleksandr Misevich | 1 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37) |
-6 | 2017/2018 | Alexey Steksov | 1 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152) |
-7 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+4 | 2017/2018 | Aleksandr Misevich | 1 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37) |
+4 | 2017/2018 | Alexey Steksov | 1 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152) |
+4 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
+
 
 ## About us
 

@@ -16,10 +16,10 @@ MIPT-MIPS can be used for different purposes:
 ----
 ## Getting started
 
-1. [Install MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. MIPT-MIPS requires LibELF and Boost. We have [an instruction how to get them](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries)
+1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
+1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
+1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
 1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) you can build MIPT-MIPS just by `make mipt-mips` command.
-1. To get traces and GoogleTest environment, you have to fetch our submodules by typing `git submodule update --init` command.
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
 
 ### Basic command line options
