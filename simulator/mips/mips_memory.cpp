@@ -14,7 +14,7 @@ FuncInstr MIPSMemory::fetch_instr( Addr PC)
     auto it = instr_cache.find( PC);
 
     FuncInstr instr = ( it != instr_cache.end())
-                      ? FuncInstr( (*it -> second).second)
+                      ? FuncInstr( it->second)
                       : FuncInstr( read( PC), PC);
 
     if ( it != instr_cache.end())

@@ -40,7 +40,7 @@ TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
 
     ASSERT_TRUE( it != cache.end());
     ASSERT_EQ( it->first, PC);
-    ASSERT_EQ( it->second->second, test_number);
+    ASSERT_EQ( it->second, test_number);
 }
 
 TEST( update_and_find, Update_Find_And_Check)
