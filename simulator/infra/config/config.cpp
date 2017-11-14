@@ -59,7 +59,7 @@ template class Value<uint32>;
 template class Value<int32>;
 
 /* basic method */
-void handleArgs( int argc, char** argv)
+void handleArgs( int argc, const char* argv[])
 {
     po::options_description description( "Allowed options");
 

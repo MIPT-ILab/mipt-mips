@@ -20,6 +20,7 @@ CPPS= \
     infra/ports/ports.cpp \
     infra/cache/cache_tag_array.cpp \
     mips/mips_instr.cpp \
+    mips/mips_memory.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
 
@@ -35,9 +36,11 @@ mipt-mips: $(OBJS) $(OBJ_DIR)/main.o
 	@echo "---------------------------------"
 	@echo "$@ is built SUCCESSFULLY"
 
-tidy: $(CPPS) main.cpp
+tidy-check: $(CPPS) main.cpp
 	@$(TIDY) $^ $(TIDYFLAGS) -- -std=c++17 $(INCL)
 
+tidy: $(CPPS) main.cpp
+	@$(TIDY) $^ $(TIDYFLAGS) -fix -- -std=c++17 $(INCL)
 
 ###### Rules to get GTest #######
 
@@ -59,6 +62,8 @@ $(GTEST_LIB): $(GTEST_OBJ)
 TESTS:= \
     infra/elf_parser \
     infra/memory \
+    infra/config \
+    infra/instrcache \
     mips \
     bpu \
     func_sim \
@@ -71,6 +76,7 @@ test: $(addsuffix /t/test.run, $(TESTS))
 clean-tests: $(addsuffix /t/test.clean, $(TESTS))
 
 -include $(addsuffix /t/test.d, $(TESTS))
+
 %/t/test.o: %/t/unit_test.cpp 
 	@echo "[$(CXX)] $@"
 	@$(CXX) $(CXXFLAGS) -o $@ -c $< $(INCL) -isystem $(GTEST_INCL) -DTEST_PATH=\"$(TEST_PATH)\" -DIMAGE_PATH=\"$(IMAGE_PATH)\"
@@ -99,6 +105,5 @@ $(OBJ_DIR)/%.o: %.cpp
 	@$(CXX) $(CXXFLAGS) -o $(patsubst %.o, %.d, $@) -MM -MT $@ $< $(INCL)
 
 clean: clean-tests
-	rm -rf obj
+	rm -rf $(OBJ_DIR)
 	rm -f mipt-mips disasm $(GTEST_LIB)
-

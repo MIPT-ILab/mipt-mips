@@ -96,6 +96,7 @@ void PerfMIPS::run( const std::string& tr,
     auto simips = 1e6 * executed_instrs / time;
 
     std::cout << std::endl << "****************************"
+              << std::endl << "instrs:   " << executed_instrs
               << std::endl << "cycles:   " << cycle
               << std::endl << "IPC:      " << ipc
               << std::endl << "sim freq: " << frequency << " kHz"
@@ -284,7 +285,7 @@ void PerfMIPS::clock_memory( int cycle)
             /* sending valid PC to fetch stage */
             wp_memory_2_fetch_target->write( real_target, cycle);
 
-            sout << "misprediction on\n";
+            sout << "misprediction on ";
         }
     }
 

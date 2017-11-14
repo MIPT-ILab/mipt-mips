@@ -9,16 +9,21 @@ else
         CXXFLAGS+= -std=c++17
 endif
 
-OBJ_DIR:=obj-$(CXX)-$(UNAME)
+OBJ_DIR:=obj-$(CXX)-$(UNAME)-D$(DEBUG)-P$(GPROF)
 
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
 	CXXFLAGS+= -O0 -g
-	OBJDIR+=-DEBUG
 else
 	CXXFLAGS+= -O3
 	LDFLAGS+= -flto
 endif
+
+ifeq ($(GPROF), 1)
+	CXXFLAGS+= -pg -g
+	LDFLAGS+= -pg
+endif
+	
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)
@@ -41,4 +46,4 @@ INCL+= -I. -isystem $(BOOST_INCL) -isystem $(LIBELF_INCL)
 LPATH:= -L $(BOOST_LPATH) -L $(LIBELF_LPATH)
 
 TIDY?=clang-tidy
-TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-modernize-pass-by-value,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-android-cloexec-fopen
+TIDYFLAGS:=-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-android-cloexec-fopen
