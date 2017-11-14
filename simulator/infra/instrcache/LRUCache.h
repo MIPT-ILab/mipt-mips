@@ -90,7 +90,7 @@ class LRUCache
         std::unordered_map<Key, Value> data{};
 
         std::list<Key> lru_list{};
-        std::unordered_map<Key, typename std::list<Key>::iterator> lru_hash{};
+        std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
 
         std::size_t number_of_elements = 0u;
 };
