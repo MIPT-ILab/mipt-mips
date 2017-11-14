@@ -31,8 +31,10 @@ script:
   - make test
 # Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
+# Check simulation spped
+  - ./tools/simfreq.sh
 # Run PVS
-  - if [ $CXX == g++-7 ]; then bash ./pvs.sh; fi
+  - if [ $CXX == g++-7 ]; then ./tools/pvs.sh; fi
 
 addons:
   apt:
@@ -62,8 +64,9 @@ install:
   - wget http://files.viva64.com/$PVS.tgz
   - tar -xvzf $PVS.tgz
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/$PVS/bin
-# Install GNU Binutils
+# Infreqstall GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
   - make > /dev/null
   - make install > /dev/null
+  - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
