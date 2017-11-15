@@ -3,13 +3,16 @@ CXX ?= g++
 CXXVERSION:= $(shell $(CXX) --version | grep version | sed -e 's/.*version //' -e 's/ .*//')
 CXXFLAGS:= -Wall -Wextra -Werror -Wpedantic -Wold-style-cast -Weffc++
 UNAME:= $(shell uname -o)
+
+RELEASE?=0
+
 ifeq ($(shell uname), Darwin)	#OSX uses older version of clang which does not support std=c++17
         CXXFLAGS+= -std=c++1z
 else
         CXXFLAGS+= -std=c++17
 endif
 
-OBJ_DIR:=obj-$(CXX)-$(UNAME)-D$(DEBUG)-P$(GPROF)
+OBJ_DIR:=obj-$(CXX)-$(UNAME)-D$(DEBUG)-P$(GPROF)-R$(RELEASE)
 
 LDFLAGS= # -static
 ifeq ($(DEBUG), 1)
@@ -19,11 +22,15 @@ else
 	LDFLAGS+= -flto
 endif
 
+ifeq ($(RELEASE), 0)
+	CXXFLAGS+= -march=native
+endif
+
 ifeq ($(GPROF), 1)
 	CXXFLAGS+= -pg -g
 	LDFLAGS+= -pg
 endif
-	
+
 ifeq ($(UNAME), Msys)
     CXXFLAGS+= -D__STDC_LIMIT_MACROS
     ifeq ($(CXX), clang++)
