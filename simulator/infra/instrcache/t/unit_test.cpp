@@ -26,6 +26,10 @@ public:
     explicit Dummy( uint32 val) : value( val) {};
     bool is_same( const Dummy& rhs) const { return value == rhs.value; }
     bool operator==( const Dummy& rhs) const { return is_same(rhs); }
+    friend std::ostream& operator<<( std::ostream& out, const Dummy& val)
+    {
+        return out << val.value;
+    }
 };
 
 TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
@@ -36,11 +40,10 @@ TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
     const Dummy test_number( 0x103abf9);
 
     cache.update( PC, test_number);
-    auto it = cache.find( PC);
+    auto result = cache.find( PC);
 
-    ASSERT_TRUE( it != cache.end());
-    ASSERT_EQ( it->first, PC);
-    ASSERT_EQ( it->second, test_number);
+    ASSERT_TRUE( result.first);
+    ASSERT_EQ( result.second, test_number);
 }
 
 TEST( update_and_find, Update_Find_And_Check)
@@ -52,7 +55,7 @@ TEST( update_and_find, Update_Find_And_Check)
     const FuncInstr instr( instr_bytes, PC);
 
     instr_cache.update( PC, instr);
-    ASSERT_TRUE( instr_cache.find( PC) != instr_cache.end());
+    ASSERT_TRUE( instr_cache.find( PC).first);
 }
 
 TEST( check_method_erase, Check_Method_Erase)
@@ -66,7 +69,7 @@ TEST( check_method_erase, Check_Method_Erase)
     instr_cache.update( PC, instr);
     instr_cache.erase( PC);
 
-    ASSERT_TRUE( instr_cache.find( PC) == instr_cache.end());
+    ASSERT_FALSE( instr_cache.find( PC).first);
 }
 
 TEST( check_method_empty, Check_Method_Empty)
@@ -118,7 +121,7 @@ TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
 
     ASSERT_EQ( cache.size(), CAPACITY);
     ASSERT_FALSE( cache.empty());
-    ASSERT_TRUE( cache.find( 2) == cache.end());
+    ASSERT_FALSE( cache.find( 2).first);
 }
 
 
