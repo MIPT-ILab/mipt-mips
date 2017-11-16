@@ -179,7 +179,7 @@ void PerfMIPS::clock_decode( int cycle)
     {
         /* ignore data from port -- to suppress loss messages */
         rp_fetch_2_decode->ignore( cycle);
-        _data = rp_decode_2_decode->( cycle);
+        _data = rp_decode_2_decode->read( cycle);
     }
 
     FuncInstr instr( _data.raw,
