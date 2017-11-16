@@ -34,6 +34,9 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
     rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
+    wp_decode_2_decode = make_write_port<FuncInstr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_decode = make_read_port<FuncInstr>("DECODE_2_DECODE", PORT_LATENCY);
+
     wp_decode_2_execute = make_write_port<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
     rp_decode_2_execute = make_read_port<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
@@ -145,52 +148,50 @@ void PerfMIPS::clock_decode( int cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
+    IfIdData _data;
 
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        decode_data = rp_fetch_2_decode->read( cycle);
-
-        is_anything_to_decode = false;
+        _data = rp_fetch_2_decode->read( cycle);
+        
         sout << "flush\n";
         return;
     }
 
-    if ( !is_anything_to_decode)
+    if ( !rp_decode_2_decode->is_ready(cycle))
     {
         /* acquiring data from fetch */
-        is_anything_to_decode = rp_fetch_2_decode->is_ready( cycle);
-        if ( is_anything_to_decode)
+        if ( rp_fetch_2_decode->is_ready(cycle))
+            {
+                _data = rp_fetch_2_decode->read( cycle);
+
+            }
+        /* check if there is something to process */
+        else
         {
-            decode_data = rp_fetch_2_decode->read( cycle);
+             sout << "bubble\n";
+             return;
         }
     }
     else
     {
         /* ignore data from port -- to suppress loss messages */
         rp_fetch_2_decode->ignore( cycle);
+        _data = rp_decode_2_decode->( cycle);
     }
 
-    /* check if there is something to process */
-    if ( !is_anything_to_decode)
-    {
-        sout << "bubble\n";
-        return;
-    }
-
-    FuncInstr instr( decode_data.raw,
-                     decode_data.PC,
-                     decode_data.predicted_taken,
-                     decode_data.predicted_target);
+    FuncInstr instr( _data.raw,
+                     _data.PC,
+                     _data.predicted_taken,
+                     _data.predicted_target);
 
     /* TODO: replace all this code by introducing Forwarding unit */
     if ( rf->check_sources( instr))
     {
         rf->read_sources( &instr);
-
-        is_anything_to_decode = false; // successfully decoded
-
+        
         wp_decode_2_execute->write( instr, cycle);
 
         /* log */
@@ -199,6 +200,7 @@ void PerfMIPS::clock_decode( int cycle)
     else // data hazard, stalling pipeline
     {
         wp_decode_2_fetch_stall->write( true, cycle);
+        wp_decode_2_decode->write(_data, cycle);
         sout << instr << " (data hazard)\n";
     }
 }
