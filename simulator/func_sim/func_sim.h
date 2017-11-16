@@ -13,6 +13,7 @@
 #include <infra/types.h>
 #include <infra/log.h>
 
+
 class MIPSMemory;
 class RF;
 
@@ -22,6 +23,7 @@ class MIPS : public Log
         std::unique_ptr<RF> rf;
         Addr PC = NO_VAL32;
         MIPSMemory* mem = nullptr;
+    
     public:
         explicit MIPS( bool log = false);
         ~MIPS() final;

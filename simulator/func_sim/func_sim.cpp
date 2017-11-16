@@ -18,12 +18,9 @@ MIPS::~MIPS()
 
 std::string MIPS::step()
 {
-    // fetch
-    uint32 instr_bytes = mem->fetch( PC);
-
-    // decode
-    FuncInstr instr( instr_bytes, PC);
-
+    // fetch instruction
+    FuncInstr instr = mem->fetch_instr( PC);
+        
     // read sources
     rf->read_sources( &instr);
 
