@@ -33,8 +33,6 @@ private:
         uint32 raw = NO_VAL32;            // fetched instruction code
     };
 
-    /* decode stage variables */
-
     /* simulator units */
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
