@@ -164,10 +164,10 @@ void PerfMIPS::clock_decode( int cycle)
     {
         /* acquiring data from fetch */
         if ( rp_fetch_2_decode->is_ready(cycle))
-            {
-                _data = rp_fetch_2_decode->read( cycle);
+        {
+            _data = rp_fetch_2_decode->read( cycle);
 
-            }
+        }
         /* check if there is something to process */
         else
         {
@@ -179,7 +179,7 @@ void PerfMIPS::clock_decode( int cycle)
     {
         /* ignore data from port -- to suppress loss messages */
         rp_fetch_2_decode->ignore( cycle);
-        _data = rp_decode_2_decode->read( cycle);
+        rp_decode_2_decode->ignore( cycle);
     }
 
     FuncInstr instr( _data.raw,

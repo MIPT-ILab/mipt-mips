@@ -34,8 +34,6 @@ private:
     };
 
     /* decode stage variables */
-    IfIdData decode_data = {};
-    bool is_anything_to_decode = false;
 
     /* simulator units */
     RF* rf = nullptr;
@@ -53,6 +51,9 @@ private:
     std::unique_ptr<ReadPort<IfIdData>> rp_fetch_2_decode = nullptr;
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
+
+    std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_decode = nullptr;
+    std::uniqie_ptr<ReadPort<FuncInstr>> rp_decode_2_decode = nullptr;
 
     std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute = nullptr;
     std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute = nullptr;
