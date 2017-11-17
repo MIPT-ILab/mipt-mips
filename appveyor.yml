@@ -42,11 +42,9 @@ environment:
 #    MINGW_ARCH: x86_64
 #    MSYSTEM: MINGW64
 
-
 before_build:
 # install submodules
-- cmd: git submodule init
-- cmd: git submodule update
+- cmd: git submodule update --init
 # configure variable
 - cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 # install Boost and LibELF for MINGW
