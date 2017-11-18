@@ -136,7 +136,7 @@ template<class T> class WritePort : public Port<T>
         ReadListType _destinations = {};
 
         // Variables for counting token in the last cycle
-        uint32 _lastCycle = 0;
+        uint64 _lastCycle = 0;
         uint32 _writeCounter = 0;
 
         void init( const ReadListType& readers);
