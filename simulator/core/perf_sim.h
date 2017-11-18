@@ -51,7 +51,7 @@ private:
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
 
     std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_decode = nullptr;
-    std::uniqie_ptr<ReadPort<FuncInstr>> rp_decode_2_decode = nullptr;
+    std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_decode = nullptr;
 
     std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute = nullptr;
     std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute = nullptr;

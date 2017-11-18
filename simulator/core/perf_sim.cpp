@@ -68,8 +68,6 @@ void PerfMIPS::run( const std::string& tr,
     assert( instrs_to_run < MAX_VAL32);
     Cycles cycle = 0;
 
-    is_anything_to_decode = false;
-
     memory = new MIPSMemory( tr);
 
     checker.init( tr);
@@ -200,7 +198,7 @@ void PerfMIPS::clock_decode( int cycle)
     else // data hazard, stalling pipeline
     {
         wp_decode_2_fetch_stall->write( true, cycle);
-        wp_decode_2_decode->write(_data, cycle);
+        wp_decode_2_decode->write( instr, cycle);
         sout << instr << " (data hazard)\n";
     }
 }
