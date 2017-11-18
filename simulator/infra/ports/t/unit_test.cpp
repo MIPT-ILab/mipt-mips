@@ -12,6 +12,8 @@
 #include "../ports.h"
 
 
+#include <cassert>
+
 
 namespace ports {
     namespace testing {
@@ -22,7 +24,61 @@ namespace ports {
     
         static const int DATA_LIMIT = 5;
         static const uint64 CLOCK_LIMIT = 10;
+
+        class Logic
+        {
+            public:
+                enum
+                {
+                    DATA_FROM_A,
+                    DATA_FROM_B,
+                    DATA_INIT
+                };
+
+                enum 
+                {
+                    IS_FROM_A_READY,
+                    IS_FROM_B_READY,
+                    IS_INIT_READY,
+                    IS_STOP_READY
+                };
+
+                bool check_readiness( uint64 cycle, int check_code, bool is_ready);
+                bool check_data( uint64 cycle, int check_code, int data);
+
+            private:
+                static const int NONE = -1;
+                static const uint64 EXPECTED_MAX_CYCLE = 8;
+
+                const int data_logic[EXPECTED_MAX_CYCLE + 1][2] = 
+                {
+                    { NONE, NONE}, 
+                    { NONE, NONE}, 
+                    { 1,    NONE}, 
+                    { NONE,    2}, 
+                    { 3,    NONE}, 
+                    { NONE,    4}, 
+                    { 5,    NONE}, 
+                    { NONE,    6},
+                    { NONE, NONE} 
+                };
+
+                bool readiness_logic[EXPECTED_MAX_CYCLE + 1][3] = 
+                { 
+                    { false, false, false},
+                    { false, false, true},
+                    { true, false, false},
+                    { false, true, false},
+                    { true, false, false},
+                    { false, true, false},
+                    { true, false, false},
+                    { false, true, false},
+                    { false, false, false}
+                };   
+        };
         
+
+
         class A
         {
             public:
@@ -39,6 +95,8 @@ namespace ports {
                 void process_data( int data, uint64 cycle);    
         };
 
+
+
         class B
         {
             public:
@@ -52,6 +110,10 @@ namespace ports {
                 void process_data ( int data, uint64 cycle);
         };
 
+
+
+        
+        static Logic logic{};
     } // namespace testing
 } // namespace ports
 
@@ -67,6 +129,9 @@ namespace ports {
     statement
 
 
+
+
+using ports::testing::Logic;
 
 
 
@@ -94,6 +159,9 @@ TEST( test_ports, Test_Ports_A_B)
         //check the stop port from object A
         bool is_ready;
         GTEST_ASSERT_NO_DEATH( is_ready = stop.is_ready( cycle););
+        ASSERT_TRUE( ports::testing::logic.check_readiness( cycle, 
+                                                            Logic::IS_STOP_READY, 
+                                                            is_ready));
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
@@ -132,7 +200,42 @@ int main( int argc, char** argv)
 
 
 namespace ports {
-    namespace testing {
+    namespace testing {  
+
+        bool Logic::check_readiness( uint64 cycle, int check_code, bool is_ready)
+        {
+            assert( check_code >= 0 && check_code <= 3);
+
+            if ( cycle > EXPECTED_MAX_CYCLE)
+                return false;
+
+            if ( check_code == IS_STOP_READY)
+                return (cycle == EXPECTED_MAX_CYCLE) == is_ready;
+            else
+            {
+                bool is_ok = readiness_logic[cycle][check_code] == is_ready;
+                if ( is_ok && is_ready)
+                    readiness_logic[cycle][check_code] = false;
+
+                return is_ok;    
+            }
+        }
+
+        bool Logic::check_data( uint64 cycle, int check_code, int data)
+        {
+            assert( check_code >= 0 && check_code <= 2);
+
+            if ( cycle > EXPECTED_MAX_CYCLE || data < 0)
+                return false;
+
+            if ( check_code == DATA_INIT)
+                return cycle == 1 && data == 0;
+            else 
+                return data_logic[cycle][check_code] == data;
+        }
+
+
+
         A::A()
             : to_B{ make_write_port<int>( "A_to_B", PORT_BANDWIDTH, PORT_FANOUT)}
             , from_B{ make_read_port<int>( "B_to_A", PORT_LATENCY)}
@@ -165,11 +268,29 @@ namespace ports {
             while( true)
             {
                 GTEST_ASSERT_NO_DEATH( is_init_ready = init->is_ready( cycle););
-                GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););   
+                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                    Logic::IS_INIT_READY,
+                                                                    is_init_ready));
+
+                GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););
+                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                    Logic::IS_FROM_B_READY,
+                                                                    is_from_B_ready));
+
                 if( is_init_ready) 
-                    { GTEST_ASSERT_NO_DEATH( data = init->read( cycle););}
+                { 
+                    GTEST_ASSERT_NO_DEATH( data = init->read( cycle););
+                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                                   Logic::DATA_INIT,
+                                                                   data));
+                }
                 else if ( is_from_B_ready)
-                    { GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););}
+                { 
+                    GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););
+                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                                   Logic::DATA_FROM_B,
+                                                                   data));
+                }
                 else
                     break;
 
@@ -195,10 +316,17 @@ namespace ports {
         {
             bool is_from_A_ready;
             GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););
+            ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                Logic::IS_FROM_A_READY,
+                                                                is_from_A_ready));
             if ( is_from_A_ready)
             {
                 int data;
                 GTEST_ASSERT_NO_DEATH( data = from_A->read( cycle););
+                ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                               Logic::DATA_FROM_A,
+                                                               data));
+
                 GTEST_ASSERT_NO_DEATH( process_data( data, cycle););
             }
         }
