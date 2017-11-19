@@ -43,6 +43,7 @@ environment:
 #    MSYSTEM: MINGW64
 
 before_build:
+- cmd: dir C:\Libraries
 # install submodules
 - cmd: git submodule update --init
 # configure variable
