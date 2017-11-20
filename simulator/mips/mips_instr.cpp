@@ -1,4 +1,8 @@
 /*
+* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+*/
+/*
  * func_instr.cpp - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2015 MIPT-MIPS
@@ -171,7 +175,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ =
     // 0x30 - 0x3F atomic load/stores
 };
 
-std::array<std::string, REG_NUM_MAX> FuncInstr::regTable =
+std::array<string_view, REG_NUM_MAX> FuncInstr::regTable =
 {{
     "zero",
     "at",
@@ -247,7 +251,7 @@ void FuncInstr::initFormat()
             format    = entry.format;
             operation = entry.operation;
             mem_size  = entry.mem_size;
-            name      = entry.name.c_str();
+            name      = entry.name;
             function  = entry.function;
             return;
         }

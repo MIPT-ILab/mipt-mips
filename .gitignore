@@ -64,7 +64,3 @@
 ehthumbs.db
 Thumbs.db
 *.swp
-
-# Keep compressed traces #
-##########################
-!*.s.gz

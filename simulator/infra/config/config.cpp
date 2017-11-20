@@ -1,4 +1,8 @@
 /*
+* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+*/
+/*
  * config.cpp - implementation of Config class
  * Copyright 2017 MIPT-MIPS
  */
@@ -55,7 +59,7 @@ template class Value<uint32>;
 template class Value<int32>;
 
 /* basic method */
-void handleArgs( int argc, char** argv)
+void handleArgs( int argc, const char* argv[])
 {
     po::options_description description( "Allowed options");
 
@@ -88,7 +92,7 @@ void handleArgs( int argc, char** argv)
     }
     catch ( const std::exception& e)
     {
-        std::cerr << argv[0] << ": " << e.what()
+        std::cerr << *argv << ": " << e.what()
                   << std::endl << std::endl
                   << description << std::endl;
         std::exit( EXIT_FAILURE);
