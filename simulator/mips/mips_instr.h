@@ -147,8 +147,6 @@ class FuncInstr
         {
             string_view name;
 
-            uint8 opcode;
-
             Format format;
             OperationType operation;
 
