@@ -83,13 +83,13 @@ private:
 public:
     explicit PerfMIPS( bool log);
     ~PerfMIPS() final { destroy_ports(); }
+    void run( const std::string& tr, uint64 instrs_to_run);
 
-    /* forbid copies */
-    PerfMIPS& operator=( const PerfMIPS&) = delete;
+    // Rule of five
     PerfMIPS( const PerfMIPS&) = delete;
-
-    void run( const std::string& tr,
-              uint64 instrs_to_run);
+    PerfMIPS( PerfMIPS&&) = delete;
+    PerfMIPS operator=( const PerfMIPS&) = delete;
+    PerfMIPS operator=( PerfMIPS&&) = delete;
 };
 
 #endif

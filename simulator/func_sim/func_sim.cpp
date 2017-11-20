@@ -1,3 +1,7 @@
+/*
+* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+*/
 #include <iostream>
 
 #include <mips/mips_memory.h>
@@ -14,12 +18,9 @@ MIPS::~MIPS()
 
 std::string MIPS::step()
 {
-    // fetch
-    uint32 instr_bytes = mem->fetch( PC);
-
-    // decode
-    FuncInstr instr( instr_bytes, PC);
-
+    // fetch instruction
+    FuncInstr instr = mem->fetch_instr( PC);
+        
     // read sources
     rf->read_sources( &instr);
 

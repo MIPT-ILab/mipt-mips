@@ -51,7 +51,6 @@ class BasePort : protected Log
                 static std::list<BaseMap*> all_maps;
             protected:
                 BaseMap() : Log(true) { all_maps.push_back( this); }
-                ~BaseMap() override = default;
         };
 
         // Key of port
@@ -61,9 +60,7 @@ class BasePort : protected Log
         bool _init = false;
 
         // Constructor of port
-        explicit BasePort( const std::string& key) : Log( true), _key( key) { }
-
-        ~BasePort() override = default;
+        explicit BasePort( std::string key) : Log( true), _key( std::move( key)) { }
 };
 
 /*
@@ -101,12 +98,7 @@ template<class T> class Port : public BasePort
 
             // Constructors
             Map() noexcept : BaseMap() { }
-            ~Map() final = default;
-
         public:
-            Map( const Map&) = delete;
-            Map& operator=(const Map&) = delete;
-
             decltype(auto) operator[]( const std::string& v) { return _map.operator[]( v); }
 
             // Singletone
@@ -117,7 +109,7 @@ template<class T> class Port : public BasePort
             }
         };
 
-        explicit Port( const std::string& key) : BasePort( key) { }
+        explicit Port( std::string key) : BasePort( std::move( key)) { }
 
         // ports Map to connect ports between for themselves;
         Map& portMap = Map::get_instance();
@@ -144,7 +136,7 @@ template<class T> class WritePort : public Port<T>
         ReadListType _destinations = {};
 
         // Variables for counting token in the last cycle
-        uint32 _lastCycle = 0;
+        uint64 _lastCycle = 0;
         uint32 _writeCounter = 0;
 
         void init( const ReadListType& readers);
@@ -166,14 +158,14 @@ template<class T> class WritePort : public Port<T>
          *
          * Adds port to needed Map.
         */
-        WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout) :
-            Port<T>::Port( key), _bandwidth(bandwidth), _fanout(fanout)
+        WritePort<T>( std::string key, uint32 bandwidth, uint32 fanout) :
+            Port<T>::Port( std::move( key)), _bandwidth(bandwidth), _fanout(fanout)
         {
-            if ( this->portMap[ key].writer != nullptr)
+            if ( this->portMap[ this->_key].writer != nullptr)
                 serr << "Reusing of " << key
                      << " key for WritePort. Last WritePort will be used." << std::endl;
 
-            this->portMap[ key].writer = this;
+            this->portMap[ this->_key].writer = this;
         }
 
         // Write Method
@@ -202,14 +194,14 @@ template<class T> class ReadPort: public Port<T>
             T data = T();
             uint64 cycle = 0;
             Cell() = delete;
-            Cell( const T& v, uint64 c) : data( v), cycle( c) { }
+            Cell( T v, uint64 c) : data( std::move( v)), cycle( c) { }
         };
         std::queue<Cell> _dataQueue;
 
         // Pushes data from WritePort
         void pushData( const T& what, uint64 cycle)
         {
-             _dataQueue.emplace(what, cycle + _latency); // NOTE: we copy data here
+             _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
         }
 
         // Tests if there is any ungot data
@@ -223,14 +215,20 @@ template<class T> class ReadPort: public Port<T>
          *
          * Adds port to needed Map.
         */
-        ReadPort<T>( const std::string& key, uint64 latency) :
-            Port<T>::Port( key), _latency( latency), _dataQueue()
+        ReadPort<T>( std::string key, uint64 latency) :
+            Port<T>::Port( std::move( key)), _latency( latency), _dataQueue()
         {
-            this->portMap[ key].readers.push_front( this);
+            this->portMap[ this->_key].readers.push_front( this);
         }
 
+        // Is ready? method
+        bool is_ready( uint64 cycle) const;
+
         // Read method
-        bool read( T* address, uint64 cycle);
+        T read( uint64 cycle);
+
+        // Read but ignore the data
+        void ignore( uint64 cycle);
 };
 
 /*
@@ -263,9 +261,7 @@ template<class T> void WritePort<T>::write( const T& what, uint64 cycle)
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
         _writeCounter++;
         for ( auto dst : this->_destinations)
-        {
-            dst->pushData(what, cycle);
-        }
+            dst->pushData( what, cycle);
     }
     else
     {
@@ -286,12 +282,9 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
     this->_init = true;
 
     // Initializing ports with setting their init flags.
-    uint32 readersCounter = 0;
+    uint32 readersCounter = _destinations.size();
     for ( const auto reader : _destinations)
-    {
         reader->_init = true;
-        readersCounter++;
-    }
 
     if ( readersCounter == 0)
         serr << "No ReadPorts for " << this->_key << " key" << std::endl << critical;
@@ -325,15 +318,15 @@ template<class T> void WritePort<T>::destroy()
 }
 
 /*
- * Read method
+ * Ready method
  *
- * First arguments is address, second is the number of cycle
+ * Checks if there is something to read in this cycle
  *
  * If there's nothing in port to give, returns false
  * If succesful, returns true
- * If uninitalized, asserts
+ * If uninitalized, generates error
 */
-template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
+template<class T> bool ReadPort<T>::is_ready( uint64 cycle) const
 {
     if ( !this->_init)
     {
@@ -341,17 +334,47 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
         return false;
     }
 
-    if ( _dataQueue.empty())
-        return false; // the port is empty
+    // there are some entries and they are ready to be read
+    return !_dataQueue.empty() && _dataQueue.front().cycle == cycle;
+}
 
-    // there are some entries, but they are not ready to read
-    if ( _dataQueue.front().cycle != cycle)
-        return false;
+/*
+ * Read method
+ *
+ * Returns data which should be read in this cycle
+ *
+ * If there was nothing to read, generates error (use is_ready before reading)
+*/
+template<class T> T ReadPort<T>::read( uint64 cycle)
+{
+    if ( !this->_init)
+        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
+
+    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
+        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
 
     // data is successfully read
-    *address = _dataQueue.front().data; // NOTE: we copy data here
+    auto tmp = _dataQueue.front().data; // NOTE: we copy data here
     _dataQueue.pop();
-    return true;
+    return tmp;
+}
+
+/*
+ * Ignoring read method
+ *
+ * Reads data which should be read in this cycle but does not copy it
+ *
+ * If there was nothing to read, generates error (use is_ready before reading)
+*/
+template<class T> void ReadPort<T>::ignore( uint64 cycle)
+{
+    if ( !this->_init)
+        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
+
+    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
+        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
+
+    _dataQueue.pop();
 }
 
 /*
@@ -360,11 +383,9 @@ template<class T> bool ReadPort<T>::read( T* address, uint64 cycle)
 template<class T> void ReadPort<T>::check(uint64 cycle) const
 {
     if ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle)
-    {
         serr << "In " << this->_key << " port data was added at "
              << (_dataQueue.front().cycle - _latency)
              << " clock and will not be readed" << std::endl << critical;
-    }
 }
 
 /*

@@ -16,10 +16,10 @@
 #include <unordered_map>
 #if __has_include("string_view")
 #include <string_view>
-using std::string_view;
+using std::string_view; // NOLINT
 #else
 #include <experimental/string_view>
-using std::experimental::string_view;
+using std::experimental::string_view; // NOLINT
 #endif
 
 // MIPT-MIPS modules
@@ -112,9 +112,9 @@ class FuncInstr
             EXPLICIT_TRAP,
         } trap = TrapType::NO_TRAP;
 
-        union _instr
+        const union _instr
         {
-            struct
+            const struct
             {
                 unsigned funct  :6;
                 unsigned shamt  :5;
@@ -123,29 +123,29 @@ class FuncInstr
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asR;
-            struct
+            const struct
             {
                 unsigned imm    :16;
                 unsigned rt     :5;
                 unsigned rs     :5;
                 unsigned opcode :6;
             } asI;
-            struct
+            const struct
             {
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
-            uint32 raw;
+            const uint32 raw;
 
-            _instr() : raw( NO_VAL32) { } // constructor w/o arguments for ports
+            _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
-        } instr = {};
+        } instr;
 
         using Execute = void (FuncInstr::*)();
 
         struct ISAEntry // NOLINT
         {
-            std::string name;
+            string_view name;
 
             uint8 opcode;
 
@@ -164,7 +164,7 @@ class FuncInstr
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
                         
         static string_view regTableName(RegNum reg);
-        static std::array<std::string, REG_NUM_MAX> regTable;
+        static std::array<string_view, REG_NUM_MAX> regTable;
         string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
@@ -186,7 +186,7 @@ class FuncInstr
         Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        Addr PC = NO_VAL32; // removing "const" keyword to supporting ports
+        const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
         std::string disasm = "";
@@ -329,7 +329,7 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = default; // constructor w/o arguments for ports
+        FuncInstr() = delete; // constructor w/o arguments for ports
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
@@ -337,18 +337,22 @@ class FuncInstr
                    Addr predicted_target = 0);
 
         const std::string& Dump() const { return disasm; }
+        bool is_same( const FuncInstr& rhs) const {
+            return PC == rhs.PC && instr.raw == rhs.instr.raw;
+        }
+
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
-        bool isJump() const { return operation == OUT_J_JUMP      ||
-                                     operation == OUT_J_JUMP_LINK ||
-                                     operation == OUT_R_JUMP      ||
-                                     operation == OUT_R_JUMP_LINK ||
-                                     operation == OUT_I_BRANCH_0  ||
-                                     operation == OUT_I_BRANCH; }
+        bool is_jump() const { return operation == OUT_J_JUMP      ||
+                                      operation == OUT_J_JUMP_LINK ||
+                                      operation == OUT_R_JUMP      ||
+                                      operation == OUT_R_JUMP_LINK ||
+                                      operation == OUT_I_BRANCH_0  ||
+                                      operation == OUT_I_BRANCH; }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
@@ -377,6 +381,7 @@ class FuncInstr
 
         void execute();
         void check_trap();
+
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
