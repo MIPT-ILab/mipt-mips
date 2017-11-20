@@ -12,7 +12,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "mips_instr.h"
+//#include "mips_instr.h"
 
 //unordered map for R-instructions
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
@@ -240,8 +240,8 @@ void FuncInstr::initFormat()
             mem_size  = entry.mem_size;
             name      = entry.name;
             function  = entry.function;
-        }    
-		return; 
+            return;
+        }     
     }
     
     else if( is_RI)
@@ -257,8 +257,9 @@ void FuncInstr::initFormat()
             mem_size  = entry.mem_size;
             name      = entry.name;
             function  = entry.function;
+            return;
         }    
-		return;
+		
     }
     
     else
@@ -272,8 +273,8 @@ void FuncInstr::initFormat()
             mem_size  = entry.mem_size;
             name      = entry.name;
             function  = entry.function;
+            return;
         }    
-		return;
     }
     
     initUnknown();
