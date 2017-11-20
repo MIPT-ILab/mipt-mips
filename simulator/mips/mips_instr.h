@@ -13,6 +13,8 @@
 #include <cassert>
 #include <string>
 #include <array>
+#include <unordered_map>
+#include <utility>
 #if __has_include("string_view")
 #include <string_view>
 using std::string_view;
@@ -22,8 +24,9 @@ using std::experimental::string_view;
 #endif
 
 // MIPT-MIPS modules
-#include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/types.h>
+
 
 enum RegNum
 {
@@ -157,8 +160,11 @@ class FuncInstr
 
             uint8 mips_version;
         };
-
-        static const ISAEntry isaTable[];
+        
+    	static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
+		static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
+		static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
+       
         static string_view regTableName(RegNum reg);
         static std::array<std::string, REG_NUM_MAX> regTable;
         string_view name = {};
