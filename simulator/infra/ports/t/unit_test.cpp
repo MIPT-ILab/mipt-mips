@@ -158,7 +158,7 @@ TEST( test_ports, Test_Ports_A_B)
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
-            break;
+            break;             
         }
 
         a.clock( cycle);
