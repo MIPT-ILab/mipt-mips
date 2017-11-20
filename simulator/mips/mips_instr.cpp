@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <stdexcept>
+
 #include "mips_instr.h"
 
 //unordered map for R-instructions
