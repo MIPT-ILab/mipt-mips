@@ -231,66 +231,51 @@ void FuncInstr::initFormat()
 
     if ( is_R)
     {    
-        try
-        { 
-            const auto& entry = isaMapR.at( ident);
-        }
+        const auto& entry = isaMapR.find( ident);
         
-        catch ( const std::out_of_range& oor) 
+        if ( entry != isaMapR.end())
         {
-            std::cerr << "Operation is absent" << oor.what() << std::endl;
-            return;
-        }
-        
-        format    = entry.format;
-        operation = entry.operation;
-        mem_size  = entry.mem_size;
-        name      = entry.name;
-        function  = entry.function;
-        return;	 
+            format    = entry.format;
+            operation = entry.operation;
+            mem_size  = entry.mem_size;
+            name      = entry.name;
+            function  = entry.function;
+        }    
+		return; 
     }
     
     else if( is_RI)
     {
-         try
-         {    
-             const auto& entry = isaMapRI.at( ident);
-         }
-         
-         catch ( const std::out_of_range& oor) 
-         {
-             std::cerr << "Operation is absent" << oor.what() << std::endl;
-             return;
-         }
         
-         format    = entry.format;
-         operation = entry.operation;
-         mem_size  = entry.mem_size;
-         name      = entry.name;
-         function  = entry.function;
-         return;
+            
+        const auto& entry = isaMapRI.find( ident);
+        
+        if ( entry != isaMapRI.end())
+        {
+            format    = entry.format;
+            operation = entry.operation;
+            mem_size  = entry.mem_size;
+            name      = entry.name;
+            function  = entry.function;
+        }    
+		return;
     }
     
     else
-    {
-        try
-        {
-            const auto& entry = isaMapIJ.at( ident);
-        }
+    {     
+        const auto& entry = isaMapIJ.find( ident);
         
-        catch ( const std::out_of_range& oor) 
+        if ( entry != isaMapIJ.end())
         {
-            std::cerr << "Operation is absent" << oor.what() << std::endl;
-            return;
-        }
-        
-        format    = entry.format;
-        operation = entry.operation;
-        mem_size  = entry.mem_size;
-        name      = entry.name;
-        function  = entry.function;
+            format    = entry.format;
+            operation = entry.operation;
+            mem_size  = entry.mem_size;
+            name      = entry.name;
+            function  = entry.function;
+        }    
 		return;
     }
+    
     initUnknown();
 }
 
