@@ -97,12 +97,7 @@ TEST( test_ports, Test_Ports_A_B)
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
-            std::cout << "------------\n"
-                      << "A stop signal has been received.\n"
-                      << "Calculation has been completed in cycle "
-                      << cycle << std::endl << std::endl;
-
-            exit( EXIT_SUCCESS);                    
+            break;             
         }
 
         a.clock( cycle);
