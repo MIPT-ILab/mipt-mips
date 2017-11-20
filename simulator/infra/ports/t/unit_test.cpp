@@ -28,52 +28,45 @@ namespace ports {
         class Logic
         {
             public:
-                enum
+                enum class CheckCode
                 {
                     DATA_FROM_A,
                     DATA_FROM_B,
-                    DATA_INIT
-                };
-
-                enum 
-                {
+                    DATA_INIT,
                     IS_FROM_A_READY,
                     IS_FROM_B_READY,
                     IS_INIT_READY,
                     IS_STOP_READY
                 };
 
-                bool check_readiness( uint64 cycle, int check_code, bool is_ready);
-                bool check_data( uint64 cycle, int check_code, int data);
+                bool check_readiness( uint64 cycle, CheckCode code, bool is_ready);
+                bool check_data( uint64 cycle, CheckCode code, int data) const;
 
             private:
                 static const int NONE = -1;
                 static const uint64 EXPECTED_MAX_CYCLE = 8;
 
-                const int data_logic[EXPECTED_MAX_CYCLE + 1][2] = 
+                struct State
                 {
-                    { NONE, NONE}, 
-                    { NONE, NONE}, 
-                    { 1,    NONE}, 
-                    { NONE,    2}, 
-                    { 3,    NONE}, 
-                    { NONE,    4}, 
-                    { 5,    NONE}, 
-                    { NONE,    6},
-                    { NONE, NONE} 
+                    bool is_from_A_ready;
+                    bool is_from_B_ready;
+                    bool is_init_ready;
+                    int data_from_A;
+                    int data_from_B;
                 };
 
-                bool readiness_logic[EXPECTED_MAX_CYCLE + 1][3] = 
-                { 
-                    { false, false, false},
-                    { false, false, true},
-                    { true, false, false},
-                    { false, true, false},
-                    { true, false, false},
-                    { false, true, false},
-                    { true, false, false},
-                    { false, true, false},
-                    { false, false, false}
+                State blogic[EXPECTED_MAX_CYCLE + 1] = 
+                //  |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
+                {
+                   { false,          false,          false,        NONE,       NONE        },
+                   { false,          false,          true,         NONE,       NONE        },       
+                   { true,           false,          false,        1,          NONE        },
+                   { false,          true,           false,        NONE,       2           },
+                   { true,           false,          false,        3,          NONE        },
+                   { false,          true,           false,        NONE,       4           },
+                   { true,           false,          false,        5,          NONE        },
+                   { false,          true,           false,        NONE,       6           },
+                   { false,          false,          false,        NONE,       NONE        }
                 };   
         };
         
@@ -160,17 +153,12 @@ TEST( test_ports, Test_Ports_A_B)
         bool is_ready;
         GTEST_ASSERT_NO_DEATH( is_ready = stop.is_ready( cycle););
         ASSERT_TRUE( ports::testing::logic.check_readiness( cycle, 
-                                                            Logic::IS_STOP_READY, 
+                                                            Logic::CheckCode::IS_STOP_READY, 
                                                             is_ready));
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
-            std::cout << "------------\n"
-                      << "A stop signal has been received.\n"
-                      << "Calculation has been completed in cycle "
-                      << cycle << std::endl << std::endl;
-
-            exit( EXIT_SUCCESS);                    
+            break;
         }
 
         a.clock( cycle);
@@ -179,11 +167,7 @@ TEST( test_ports, Test_Ports_A_B)
         GTEST_ASSERT_NO_DEATH( check_ports( cycle););
     }
 
-    GTEST_ASSERT_NO_DEATH( destroy_ports(););
-
-    std::cout << "------------\n"
-              << "CLOCK_LIMIT (" << ports::testing::CLOCK_LIMIT 
-              << ")  has been reached\n\n";           
+    GTEST_ASSERT_NO_DEATH( destroy_ports(););           
 }
 
 
@@ -202,36 +186,77 @@ int main( int argc, char** argv)
 namespace ports {
     namespace testing {  
 
-        bool Logic::check_readiness( uint64 cycle, int check_code, bool is_ready)
+        bool Logic::check_readiness( uint64 cycle, CheckCode code, bool is_ready)
         {
-            assert( check_code >= 0 && check_code <= 3);
-
             if ( cycle > EXPECTED_MAX_CYCLE)
                 return false;
-
-            if ( check_code == IS_STOP_READY)
-                return (cycle == EXPECTED_MAX_CYCLE) == is_ready;
-            else
+            
+            bool is_ok = false;
+            switch ( code)
             {
-                bool is_ok = readiness_logic[cycle][check_code] == is_ready;
-                if ( is_ok && is_ready)
-                    readiness_logic[cycle][check_code] = false;
+                case CheckCode::IS_STOP_READY:
+                    // STOP port should be ready only in the expected max cycle
+                    return (cycle == EXPECTED_MAX_CYCLE) == is_ready;
 
-                return is_ok;    
+                case CheckCode::IS_INIT_READY:
+                    is_ok = blogic[cycle].is_init_ready == is_ready;
+                    
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready) 
+                        blogic[cycle].is_init_ready = false;
+                    
+                    break;
+
+                case CheckCode::IS_FROM_A_READY:
+                    is_ok = blogic[cycle].is_from_A_ready == is_ready;
+
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready)
+                        blogic[cycle].is_from_A_ready = false;
+
+                    break;
+                
+                case CheckCode::IS_FROM_B_READY:
+                    is_ok = blogic[cycle].is_from_B_ready == is_ready;
+
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready)
+                        blogic[cycle].is_from_B_ready = false;
+
+                    break;
+
+                default:
+                    return false;    
             }
         }
 
-        bool Logic::check_data( uint64 cycle, int check_code, int data)
+        bool Logic::check_data( uint64 cycle, CheckCode code, int data) const
         {
-            assert( check_code >= 0 && check_code <= 2);
-
             if ( cycle > EXPECTED_MAX_CYCLE || data < 0)
                 return false;
 
-            if ( check_code == DATA_INIT)
-                return cycle == 1 && data == 0;
-            else 
-                return data_logic[cycle][check_code] == data;
+            switch ( code)
+            {
+                case CheckCode::DATA_INIT:
+                    // data from init port should be equal to 0
+                    // merely in cycle 1
+                    return cycle == 1 && data == 0;
+
+                case CheckCode::DATA_FROM_A:
+                    return blogic[cycle].data_from_A == data;
+
+                case CheckCode::DATA_FROM_B:
+                    return blogic[cycle].data_from_B == data;
+
+                default:
+                    return false;
+            };
         }
 
 
@@ -249,7 +274,7 @@ namespace ports {
             ++data;
 
             // If data limit is exceeded
-            // then send a stop signal
+            // stop signal will be sent
             if ( data > DATA_LIMIT)
             {
                 GTEST_ASSERT_NO_DEATH( stop->write( true, cycle););
@@ -269,26 +294,26 @@ namespace ports {
             {
                 GTEST_ASSERT_NO_DEATH( is_init_ready = init->is_ready( cycle););
                 ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
-                                                                    Logic::IS_INIT_READY,
+                                                                    Logic::CheckCode::IS_INIT_READY,
                                                                     is_init_ready));
 
                 GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););
                 ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
-                                                                    Logic::IS_FROM_B_READY,
+                                                                    Logic::CheckCode::IS_FROM_B_READY,
                                                                     is_from_B_ready));
 
                 if( is_init_ready) 
                 { 
                     GTEST_ASSERT_NO_DEATH( data = init->read( cycle););
                     ASSERT_TRUE( ports::testing::logic.check_data( cycle,
-                                                                   Logic::DATA_INIT,
+                                                                   Logic::CheckCode::DATA_INIT,
                                                                    data));
                 }
                 else if ( is_from_B_ready)
                 { 
                     GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););
                     ASSERT_TRUE( ports::testing::logic.check_data( cycle,
-                                                                   Logic::DATA_FROM_B,
+                                                                   Logic::CheckCode::DATA_FROM_B,
                                                                    data));
                 }
                 else
@@ -317,14 +342,14 @@ namespace ports {
             bool is_from_A_ready;
             GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););
             ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
-                                                                Logic::IS_FROM_A_READY,
+                                                                Logic::CheckCode::IS_FROM_A_READY,
                                                                 is_from_A_ready));
             if ( is_from_A_ready)
             {
                 int data;
                 GTEST_ASSERT_NO_DEATH( data = from_A->read( cycle););
                 ASSERT_TRUE( ports::testing::logic.check_data( cycle,
-                                                               Logic::DATA_FROM_A,
+                                                               Logic::CheckCode::DATA_FROM_A,
                                                                data));
 
                 GTEST_ASSERT_NO_DEATH( process_data( data, cycle););
