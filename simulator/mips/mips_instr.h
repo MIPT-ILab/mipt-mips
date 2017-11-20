@@ -160,8 +160,8 @@ class FuncInstr
         };
         
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
-	    static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
-	    static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
                         
         static string_view regTableName(RegNum reg);
         static std::array<std::string, REG_NUM_MAX> regTable;
