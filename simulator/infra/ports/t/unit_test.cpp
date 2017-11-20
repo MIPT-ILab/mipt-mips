@@ -232,8 +232,10 @@ namespace ports {
                     break;
 
                 default:
-                    return false;    
+                    break;    
             }
+
+            return is_ok;
         }
 
         bool Logic::check_data( uint64 cycle, CheckCode code, int data) const
