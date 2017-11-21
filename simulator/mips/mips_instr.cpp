@@ -222,63 +222,47 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     }
     new_PC = PC + 4;
 }
+   
 
 void FuncInstr::initFormat()
 {
-    bool is_R = ( instr.asR.opcode == 0x0);
-    bool is_RI = ( instr.asR.opcode == 0x1);
-    uint8 ident = is_R ? instr.asR.funct : instr.asR.opcode;
-
-    if ( is_R)
-    {    
-        const auto& entry = isaMapR.find( ident);
-        
-        if ( entry != isaMapR.end())
-        {
-            format    = entry->second.format;
-            operation = entry->second.operation;
-            mem_size  = entry->second.mem_size;
-            name      = entry->second.name;
-            function  = entry->second.function;
-            return;
-        }     
-    }
+    bool valid = false;
+    auto it = isaMapRI.cbegin();
     
-    else if( is_RI)
+    switch ( instr.asR.opcode) 
     {
-        
+        case 0x0: // R instruction
+            it = isaMapR.find( instr.asR.funct);
+            valid = ( it != isaMapR.end());
+            break;
             
-        const auto& entry = isaMapRI.find( ident);
-        
-        if ( entry != isaMapRI.end())
-        {
-            format    = entry->second.format;
-            operation = entry->second.operation;
-            mem_size  = entry->second.mem_size;
-            name      = entry->second.name;
-            function  = entry->second.function;
-            return;
-        }    
-		
+        case 0x1: // RegIMM instruction
+            it = isaMapR.find( instr.asR.opcode);
+            valid = ( it != isaMapRI.end());
+            break;
+            
+        default: // I and J instructions
+            it = isaMapR.find( instr.asR.opcode);
+            valid = ( it != isaMapIJ.end());
+            break;
     }
     
-    else
-    {     
-        const auto& entry = isaMapIJ.find( ident);
+    if ( valid) 
+    {
+        const auto& entry = it->second; 
         
-        if ( entry != isaMapIJ.end())
-        {
-            format    = entry->second.format;
-            operation = entry->second.operation;
-            mem_size  = entry->second.mem_size;
-            name      = entry->second.name;
-            function  = entry->second.function;
-            return;
-        }    
+        format    = entry.format;
+        operation = entry.operation;
+        mem_size  = entry.mem_size;
+        name      = entry.name;
+        function  = entry.function;       
     }
-    
-    initUnknown();
-}
+     
+    else 
+    {
+        initUnknown();
+    }
+} 
 
 void FuncInstr::initR()
 {
