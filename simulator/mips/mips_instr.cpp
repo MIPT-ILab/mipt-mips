@@ -231,7 +231,7 @@ void FuncInstr::initFormat()
 
     if ( is_R)
     {    
-        auto entry = isaMapR.find( ident);
+        const auto& entry = isaMapR.find( ident);
         
         if ( entry != isaMapR.end())
         {
@@ -248,7 +248,7 @@ void FuncInstr::initFormat()
     {
         
             
-        auto entry = isaMapRI.find( ident);
+        const auto& entry = isaMapRI.find( ident);
         
         if ( entry != isaMapRI.end())
         {
@@ -264,7 +264,7 @@ void FuncInstr::initFormat()
     
     else
     {     
-        auto entry = isaMapIJ.find( ident);
+        const auto& entry = isaMapIJ.find( ident);
         
         if ( entry != isaMapIJ.end())
         {
