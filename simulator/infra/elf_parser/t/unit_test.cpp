@@ -27,8 +27,7 @@ TEST( Elf_parser_init, Process_Args_Of_Constr)
 TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
 {
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")),
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+    ASSERT_TRUE( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")).empty());
 }
 
 int main( int argc, char* argv[])
