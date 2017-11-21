@@ -12,7 +12,7 @@
 #include <sstream>
 #include <iomanip>
 
-//#include "mips_instr.h"
+#include "mips_instr.h"
 
 //unordered map for R-instructions
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
@@ -231,15 +231,15 @@ void FuncInstr::initFormat()
 
     if ( is_R)
     {    
-        const auto& entry = isaMapR.find( ident);
+        auto entry = isaMapR.find( ident);
         
         if ( entry != isaMapR.end())
         {
-            format    = entry.format;
-            operation = entry.operation;
-            mem_size  = entry.mem_size;
-            name      = entry.name;
-            function  = entry.function;
+            format    = entry->second.format;
+            operation = entry->second.operation;
+            mem_size  = entry->second.mem_size;
+            name      = entry->second.name;
+            function  = entry->second.function;
             return;
         }     
     }
@@ -248,15 +248,15 @@ void FuncInstr::initFormat()
     {
         
             
-        const auto& entry = isaMapRI.find( ident);
+        auto entry = isaMapRI.find( ident);
         
         if ( entry != isaMapRI.end())
         {
-            format    = entry.format;
-            operation = entry.operation;
-            mem_size  = entry.mem_size;
-            name      = entry.name;
-            function  = entry.function;
+            format    = entry->second.format;
+            operation = entry->second.operation;
+            mem_size  = entry->second.mem_size;
+            name      = entry->second.name;
+            function  = entry->second.function;
             return;
         }    
 		
@@ -264,15 +264,15 @@ void FuncInstr::initFormat()
     
     else
     {     
-        const auto& entry = isaMapIJ.find( ident);
+        auto entry = isaMapIJ.find( ident);
         
         if ( entry != isaMapIJ.end())
         {
-            format    = entry.format;
-            operation = entry.operation;
-            mem_size  = entry.mem_size;
-            name      = entry.name;
-            function  = entry.function;
+            format    = entry->second.format;
+            operation = entry->second.operation;
+            mem_size  = entry->second.mem_size;
+            name      = entry->second.name;
+            function  = entry->second.function;
             return;
         }    
     }
