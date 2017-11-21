@@ -13,6 +13,7 @@
 #include <cassert>
 #include <string>
 #include <array>
+#include <unordered_map>
 #if __has_include("string_view")
 #include <string_view>
 using std::string_view; // NOLINT
@@ -146,8 +147,6 @@ class FuncInstr
         {
             string_view name;
 
-            uint8 opcode;
-
             Format format;
             OperationType operation;
 
@@ -157,8 +156,11 @@ class FuncInstr
 
             uint8 mips_version;
         };
-
-        static const ISAEntry isaTable[];
+        
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
+                        
         static string_view regTableName(RegNum reg);
         static std::array<string_view, REG_NUM_MAX> regTable;
         string_view name = {};
