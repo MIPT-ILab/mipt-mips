@@ -37,12 +37,12 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    FILE* file_descr = fopen( elf_file_name.c_str(), "rb");
-    if ( file_descr == nullptr)
+    std::unique_ptr<FILE, decltype(&fclose)> file( fopen( elf_file_name.c_str(), "rb"), fclose);
+    if ( file == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
                   << std::strerror( errno) << std::endl;
-        std::exit( EXIT_FAILURE);
+        return {};
     }
 
     // set ELF library operating version
@@ -50,19 +50,17 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
     {
         std::cerr << "ERROR: Could not set ELF library operating version:"
                   <<  elf_errmsg( elf_errno()) << std::endl;
-        std::fclose( file_descr);
-        std::exit( EXIT_FAILURE);
+        return {};
     }
 
     // open the file in ELF format
-    Elf* elf = elf_begin( fileno( file_descr), ELF_C_READ, nullptr);
+    Elf* elf = elf_begin( fileno( file.get()), ELF_C_READ, nullptr);
     if ( elf == nullptr)
     {
         std::cerr << "ERROR: Could not open file " << elf_file_name
                   << " as ELF file: "
                   <<  elf_errmsg( elf_errno()) << std::endl;
-        std::fclose( file_descr);
-        std::exit( EXIT_FAILURE);
+        return {};
     }
 
     size_t shstrndx;
@@ -85,16 +83,15 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
         auto offset = shdr.sh_offset;
         auto content = std::make_unique<uint8[]>( size);
 
-        fseek( file_descr, offset, SEEK_SET);
+        fseek( file.get(), offset, SEEK_SET);
 
         // fill the content by the section data
-        ignored( std::fread( content.get(), sizeof( uint8), size, file_descr));
+        ignored( std::fread( content.get(), sizeof( uint8), size, file.get()));
         sections.emplace( sections.end(), name, start_addr, size, std::move(content));
     }
 
     // close all used files
     elf_end( elf);
-    fclose( file_descr);
 
     return sections;
 }
