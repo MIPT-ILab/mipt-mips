@@ -237,12 +237,12 @@ void FuncInstr::initFormat()
             break;
             
         case 0x1: // RegIMM instruction
-            it = isaMapR.find( instr.asR.opcode);
+            it = isaMapRI.find( instr.asR.opcode);
             valid = ( it != isaMapRI.end());
             break;
             
         default: // I and J instructions
-            it = isaMapR.find( instr.asR.opcode);
+            it = isaMapIJ.find( instr.asR.opcode);
             valid = ( it != isaMapIJ.end());
             break;
     }
