@@ -49,7 +49,6 @@ addons:
     - llvm-5.0-dev
     - libelf-dev
     - libboost1.55-all-dev
-    - texinfo
     - zlib1g-dev
 
 install:
@@ -66,7 +65,7 @@ install:
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/$PVS/bin
 # Infreqstall GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
-  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --disable-texinfo --with-system-zlib > /dev/null
   - make > /dev/null
   - make install > /dev/null
   - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
