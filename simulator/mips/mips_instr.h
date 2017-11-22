@@ -26,7 +26,7 @@ using std::experimental::string_view; // NOLINT
 #include <infra/types.h>
 #include <infra/macro.h>
 
-enum RegNum
+enum RegNum : uint8
 {
     REG_NUM_ZERO = 0,
     REG_NUM_AT,
@@ -72,7 +72,7 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 class FuncInstr
 {
     private:
-        enum Format
+        enum Format : uint8
         {
             FORMAT_R,
             FORMAT_I,
@@ -80,7 +80,7 @@ class FuncInstr
             FORMAT_UNKNOWN
         };
 
-        enum OperationType
+        enum OperationType : uint8
         {
             OUT_R_ARITHM,
             OUT_R_SHIFT,
@@ -106,7 +106,7 @@ class FuncInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
-        enum class TrapType
+        enum class TrapType : uint8
         {
             NO_TRAP,
             EXPLICIT_TRAP,
