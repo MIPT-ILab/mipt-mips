@@ -49,7 +49,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     {0xC, { "syscall", FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1} },
     {0xD, { "break",   FORMAT_R, OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1} },
     //          0xE reserved
-    //          0xF SYNC    
+    //          0xF SYNC
 
     // HI/LO manipulations
     //key      name     format operation  memsize           pointer
@@ -88,7 +88,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     {0x2B, { "sltu", FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1} },
 
     // 0x2C - 0x2F double width addition/substraction
-    
+
     // Conditional traps (MIPS II)
     //key      name     format operation  memsize           pointer
     {0x30, { "tge",  FORMAT_R, OUT_R_TRAP, 0, &FuncInstr::execute_tge,  2} },
@@ -115,10 +115,10 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     // ********************* I and J INSTRUCTIONS *************************
     {0xFF, {"###", FORMAT_UNKNOWN, OUT_UNKNOWN, 0, &FuncInstr::execute_unknown, 1} } ,
     // Branches
-    //key     name   format    operation  memsize       pointer     
+    //key     name   format    operation  memsize       pointer
     {0x2, { "j",   FORMAT_J, OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
     {0x3, { "jal", FORMAT_J, OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1 } },
-       
+
     {0x4, { "beq",  FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1} },
     {0x5, { "bne",  FORMAT_I, OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1} },
     {0x6, { "blez", FORMAT_I, OUT_I_BRANCH_0,  0, &FuncInstr::execute_blez, 1} },
@@ -138,7 +138,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     {0xE, { "xori",  FORMAT_I, OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1} },
     {0xF, { "lui",   FORMAT_I, OUT_I_CONST,  0, &FuncInstr::execute_lui,   1} },
 
-    // 0x10 - 0x13 coprocessor operations 
+    // 0x10 - 0x13 coprocessor operations
 
     // Likely branches (MIPS II)
     //key     name   format    operation  memsize       pointer
@@ -171,7 +171,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     //       0x2D   store double word right
     {0x2E, { "swr", FORMAT_I, OUT_I_STORER, 4, &FuncInstr::calculate_store_addr, 1 } }
     //       0x2F   coprocessor
-    
+
     // 0x30 - 0x3F atomic load/stores
 };
 
@@ -204,7 +204,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     predicted_target( predicted_target),
     PC( PC)
 {
-    initFormat();
+    auto format = initFormat();
     switch ( format)
     {
         case FORMAT_R:
@@ -222,47 +222,44 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     }
     new_PC = PC + 4;
 }
-   
 
-void FuncInstr::initFormat()
+
+FuncInstr::Format FuncInstr::initFormat()
 {
     bool valid = false;
     auto it = isaMapRI.cbegin();
-    
-    switch ( instr.asR.opcode) 
+
+    switch ( instr.asR.opcode)
     {
         case 0x0: // R instruction
             it = isaMapR.find( instr.asR.funct);
             valid = ( it != isaMapR.end());
             break;
-            
+
         case 0x1: // RegIMM instruction
             it = isaMapRI.find( instr.asR.opcode);
             valid = ( it != isaMapRI.end());
             break;
-            
+
         default: // I and J instructions
             it = isaMapIJ.find( instr.asR.opcode);
             valid = ( it != isaMapIJ.end());
             break;
     }
-    
-    if ( valid) 
+
+    if ( valid)
     {
-        const auto& entry = it->second; 
-        
-        format    = entry.format;
+        const auto& entry = it->second;
+
         operation = entry.operation;
         mem_size  = entry.mem_size;
         name      = entry.name;
-        function  = entry.function;       
+        function  = entry.function;
+        return entry.format;
     }
-     
-    else 
-    {
-        initUnknown();
-    }
-} 
+
+    return FORMAT_UNKNOWN;
+}
 
 void FuncInstr::initR()
 {
