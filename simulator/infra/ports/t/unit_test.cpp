@@ -12,6 +12,8 @@
 #include "../ports.h"
 
 
+#include <cassert>
+
 
 namespace ports {
     namespace testing {
@@ -22,7 +24,54 @@ namespace ports {
     
         static const int DATA_LIMIT = 5;
         static const uint64 CLOCK_LIMIT = 10;
+
+        class Logic
+        {
+            public:
+                enum class CheckCode
+                {
+                    DATA_FROM_A,
+                    DATA_FROM_B,
+                    DATA_INIT,
+                    IS_FROM_A_READY,
+                    IS_FROM_B_READY,
+                    IS_INIT_READY,
+                    IS_STOP_READY
+                };
+
+                bool check_readiness( uint64 cycle, CheckCode code, bool is_ready);
+                bool check_data( uint64 cycle, CheckCode code, int data) const;
+
+            private:
+                static const int NONE = -1;
+                static const uint64 EXPECTED_MAX_CYCLE = 8;
+
+                struct State
+                {
+                    bool is_from_A_ready;
+                    bool is_from_B_ready;
+                    bool is_init_ready;
+                    int data_from_A;
+                    int data_from_B;
+                };
+
+                State blogic[EXPECTED_MAX_CYCLE + 1] = 
+                //  |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
+                {
+                   { false,          false,          false,        NONE,       NONE        },
+                   { false,          false,          true,         NONE,       NONE        },       
+                   { true,           false,          false,        1,          NONE        },
+                   { false,          true,           false,        NONE,       2           },
+                   { true,           false,          false,        3,          NONE        },
+                   { false,          true,           false,        NONE,       4           },
+                   { true,           false,          false,        5,          NONE        },
+                   { false,          true,           false,        NONE,       6           },
+                   { false,          false,          false,        NONE,       NONE        }
+                };   
+        };
         
+
+
         class A
         {
             public:
@@ -39,6 +88,8 @@ namespace ports {
                 void process_data( int data, uint64 cycle);    
         };
 
+
+
         class B
         {
             public:
@@ -52,6 +103,10 @@ namespace ports {
                 void process_data ( int data, uint64 cycle);
         };
 
+
+
+        
+        static Logic logic{};
     } // namespace testing
 } // namespace ports
 
@@ -67,6 +122,9 @@ namespace ports {
     statement
 
 
+
+
+using ports::testing::Logic;
 
 
 
@@ -94,15 +152,13 @@ TEST( test_ports, Test_Ports_A_B)
         //check the stop port from object A
         bool is_ready;
         GTEST_ASSERT_NO_DEATH( is_ready = stop.is_ready( cycle););
+        ASSERT_TRUE( ports::testing::logic.check_readiness( cycle, 
+                                                            Logic::CheckCode::IS_STOP_READY, 
+                                                            is_ready));
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
-            std::cout << "------------\n"
-                      << "A stop signal has been received.\n"
-                      << "Calculation has been completed in cycle "
-                      << cycle << std::endl << std::endl;
-
-            exit( EXIT_SUCCESS);                    
+            break;             
         }
 
         a.clock( cycle);
@@ -111,11 +167,7 @@ TEST( test_ports, Test_Ports_A_B)
         GTEST_ASSERT_NO_DEATH( check_ports( cycle););
     }
 
-    GTEST_ASSERT_NO_DEATH( destroy_ports(););
-
-    std::cout << "------------\n"
-              << "CLOCK_LIMIT (" << ports::testing::CLOCK_LIMIT 
-              << ")  has been reached\n\n";           
+    GTEST_ASSERT_NO_DEATH( destroy_ports(););           
 }
 
 
@@ -132,7 +184,85 @@ int main( int argc, char** argv)
 
 
 namespace ports {
-    namespace testing {
+    namespace testing {  
+
+        bool Logic::check_readiness( uint64 cycle, CheckCode code, bool is_ready)
+        {
+            if ( cycle > EXPECTED_MAX_CYCLE)
+                return false;
+            
+            bool is_ok = false;
+            switch ( code)
+            {
+                case CheckCode::IS_STOP_READY:
+                    // STOP port should be ready only in the expected max cycle
+                    return (cycle == EXPECTED_MAX_CYCLE) == is_ready;
+
+                case CheckCode::IS_INIT_READY:
+                    is_ok = blogic[cycle].is_init_ready == is_ready;
+                    
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready) 
+                        blogic[cycle].is_init_ready = false;
+                    
+                    break;
+
+                case CheckCode::IS_FROM_A_READY:
+                    is_ok = blogic[cycle].is_from_A_ready == is_ready;
+
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready)
+                        blogic[cycle].is_from_A_ready = false;
+
+                    break;
+                
+                case CheckCode::IS_FROM_B_READY:
+                    is_ok = blogic[cycle].is_from_B_ready == is_ready;
+
+                    // If it is ready it will be read in the current cycle
+                    // so blogic should be updated to not interfere with
+                    // subsequent checks in the same cycle
+                    if ( is_ok && is_ready)
+                        blogic[cycle].is_from_B_ready = false;
+
+                    break;
+
+                default:
+                    break;    
+            }
+
+            return is_ok;
+        }
+
+        bool Logic::check_data( uint64 cycle, CheckCode code, int data) const
+        {
+            if ( cycle > EXPECTED_MAX_CYCLE || data < 0)
+                return false;
+
+            switch ( code)
+            {
+                case CheckCode::DATA_INIT:
+                    // data from init port should be equal to 0
+                    // merely in cycle 1
+                    return cycle == 1 && data == 0;
+
+                case CheckCode::DATA_FROM_A:
+                    return blogic[cycle].data_from_A == data;
+
+                case CheckCode::DATA_FROM_B:
+                    return blogic[cycle].data_from_B == data;
+
+                default:
+                    return false;
+            };
+        }
+
+
+
         A::A()
             : to_B{ make_write_port<int>( "A_to_B", PORT_BANDWIDTH, PORT_FANOUT)}
             , from_B{ make_read_port<int>( "B_to_A", PORT_LATENCY)}
@@ -146,7 +276,7 @@ namespace ports {
             ++data;
 
             // If data limit is exceeded
-            // then send a stop signal
+            // stop signal will be sent
             if ( data > DATA_LIMIT)
             {
                 GTEST_ASSERT_NO_DEATH( stop->write( true, cycle););
@@ -165,11 +295,29 @@ namespace ports {
             while( true)
             {
                 GTEST_ASSERT_NO_DEATH( is_init_ready = init->is_ready( cycle););
-                GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););   
+                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                    Logic::CheckCode::IS_INIT_READY,
+                                                                    is_init_ready));
+
+                GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););
+                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                    Logic::CheckCode::IS_FROM_B_READY,
+                                                                    is_from_B_ready));
+
                 if( is_init_ready) 
-                    { GTEST_ASSERT_NO_DEATH( data = init->read( cycle););}
+                { 
+                    GTEST_ASSERT_NO_DEATH( data = init->read( cycle););
+                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                                   Logic::CheckCode::DATA_INIT,
+                                                                   data));
+                }
                 else if ( is_from_B_ready)
-                    { GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););}
+                { 
+                    GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););
+                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                                   Logic::CheckCode::DATA_FROM_B,
+                                                                   data));
+                }
                 else
                     break;
 
@@ -195,10 +343,17 @@ namespace ports {
         {
             bool is_from_A_ready;
             GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););
+            ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                                Logic::CheckCode::IS_FROM_A_READY,
+                                                                is_from_A_ready));
             if ( is_from_A_ready)
             {
                 int data;
                 GTEST_ASSERT_NO_DEATH( data = from_A->read( cycle););
+                ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                                                               Logic::CheckCode::DATA_FROM_A,
+                                                               data));
+
                 GTEST_ASSERT_NO_DEATH( process_data( data, cycle););
             }
         }

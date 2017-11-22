@@ -37,7 +37,13 @@ MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these ve
 * Apple LLVM 7.3.0 (uses -std=c++1z flag)
 * MS Visual Studio 2017 (Boost 1.65.1 is required)
 
-### Known issues
+### Testing
+
+1. Get sure GoogleTest is fetched with other submodules.
+1. To run all unit tests in POSIX environment, use `make test` command.
+1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
+
+## Known issues
 * Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
 * Self-modifying code is not supported at the moment in performance mode.
 
