@@ -78,7 +78,7 @@ class FuncInstr
             FORMAT_I,
             FORMAT_J,
             FORMAT_UNKNOWN
-        } format = FORMAT_UNKNOWN;
+        };
 
         enum OperationType
         {
@@ -143,7 +143,7 @@ class FuncInstr
 
         using Execute = void (FuncInstr::*)();
 
-        struct ISAEntry // NOLINT
+        struct ISAEntry
         {
             string_view name;
 
@@ -189,7 +189,7 @@ class FuncInstr
 
         std::string disasm = "";
 
-        void initFormat();
+        Format initFormat();
         void initR();
         void initI();
         void initJ();
