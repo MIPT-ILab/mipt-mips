@@ -227,8 +227,8 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
 void FuncInstr::initFormat()
 {
     bool valid = false;
-    auto it = isaMapRI.cbegin();
-    
+    const auto& map = isaMapIJ;
+
     switch ( instr.asR.opcode) 
     {
         case 0x0: // R instruction
