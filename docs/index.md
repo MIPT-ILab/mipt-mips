@@ -31,8 +31,9 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
  01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_ | |
  
  ### MSU Seminars
-  Date | Event |
- :-: |:---- |
+ 
+ Date | Event 
+ :-: |:---- 
   24<br/>Nov | **Caches and Memory Hierarchy**<br/>• [Rus text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_01__24_Nov__Caches__No_audio.pptx?raw=true) |
   15<br/>Dec | **Out-of-Order Execution** |
 
