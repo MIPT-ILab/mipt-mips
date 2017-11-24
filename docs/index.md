@@ -30,12 +30,12 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
  24<br/>Nov | **_No lecture_** | • Use the time slot to progress with your tasks |
  01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_ | |
  
- ### MSU Seminars
- 
+### MSU Seminars
+
  Date | Event 
  :-: |:---- 
-  24<br/>Nov | **Caches and Memory Hierarchy**<br/>• [Rus text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_01__24_Nov__Caches__No_audio.pptx?raw=true) |
-  15<br/>Dec | **Out-of-Order Execution** |
+ 24<br/>Nov | **Caches and Memory Hierarchy**<br/>• [Rus text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_01__24_Nov__Caches__No_audio.pptx?raw=true) |
+ 15<br/>Dec | **Out-of-Order Execution** |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
