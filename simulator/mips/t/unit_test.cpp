@@ -78,7 +78,6 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x0229001b).Dump(), "divu $zero, $s1, $t1");
     ASSERT_EQ(FuncInstr(0x0139880a).Dump(), "movz $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x0139880b).Dump(), "movn $s1, $t1, $t9");
-
     ASSERT_EQ(FuncInstr(0x02290018).Dump(), "mult $zero, $s1, $t1");
     ASSERT_EQ(FuncInstr(0x02290019).Dump(), "multu $zero, $s1, $t1");
 //  ASSERT_EQ(FuncInstr(0x71398802).Dump(), "mul $s1, $t1, $t9");
