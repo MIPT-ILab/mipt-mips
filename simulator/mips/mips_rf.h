@@ -83,9 +83,9 @@ class RF
         inline void write_dst( const FuncInstr& instr)
         {
             RegNum reg_num  = instr.get_dst_num();
-            uint32 v_dst    = instr.get_v_dst();
-            if ( REG_NUM_ZERO != reg_num && v_dst != NO_VAL32)
-                write( reg_num, v_dst);
+            bool writes_dst = instr.get_writes_dst();
+            if ( REG_NUM_ZERO != reg_num && writes_dst == true)
+                write( reg_num, instr.get_v_dst());
             else
                 write( reg_num, read(reg_num));
         }
