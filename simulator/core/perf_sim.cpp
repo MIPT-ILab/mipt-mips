@@ -151,9 +151,9 @@ void PerfMIPS::clock_decode( int cycle)
     {
         /* ignoring the upcoming instruction as it is invalid */
         _data = rp_fetch_2_decode->read( cycle);
-	    if(rp_decode_2_decode->is_ready(cycle))
+        if( rp_decode_2_decode->is_ready( cycle))
         {
-            rp_decode_2_decode->read(cycle);
+            rp_decode_2_decode->ignore( cycle);
         }
 
         sout << "flush\n";
@@ -165,76 +165,57 @@ void PerfMIPS::clock_decode( int cycle)
         sout << "bubble\n";
         return;
     }
-    if(rp_decode_2_decode->is_ready( cycle))
+    if( rp_decode_2_decode->is_ready( cycle))
     {
-    	auto instr = rp_decode_2_decode->read( cycle);
-	    
+        auto instr = rp_decode_2_decode->read( cycle);
+        
         rp_fetch_2_decode->ignore( cycle);
-	    
+        
         if ( rf->check_sources( instr))
         {
             rf->read_sources( &instr);
 
             wp_decode_2_execute->write( instr, cycle);
 
-        /* log */
-        sout << instr << std::endl;
+            /* log */
+            sout << instr << std::endl;
         }
-   	    else // data hazard, stalling pipeline
-   	    {
-        wp_decode_2_fetch_stall->write( true, cycle);
-	    wp_decode_2_decode->write( instr, cycle);
-        sout << instr << " (data hazard)\n";
-   	    }
+        else // data hazard, stalling pipeline
+        {
+            wp_decode_2_fetch_stall->write( true, cycle);
+            wp_decode_2_decode->write( instr, cycle);
+            sout << instr << " (data hazard)\n";
+        }
 
     }
     else
     {
-    if(rp_fetch_2_decode->is_ready( cycle)) {
-        _data = rp_fetch_2_decode->read( cycle);
-        FuncInstr instr( _data.raw, 
+        if( rp_fetch_2_decode->is_ready( cycle)) 
+        {
+            _data = rp_fetch_2_decode->read( cycle);
+            FuncInstr instr( _data.raw, 
                 _data.PC, 
                 _data.predicted_taken, 
                 _data.predicted_target);
-         if ( rf->check_sources( instr))
-         {
-            rf->read_sources( &instr);
+            if( rf->check_sources( instr))
+            {
+                rf->read_sources( &instr);
         
-            wp_decode_2_execute->write( instr, cycle);
+                wp_decode_2_execute->write( instr, cycle);
 
-            /* log */
-            sout << instr << std::endl;
-         }
-         else // data hazard, stalling pipeline
-         {
-            wp_decode_2_fetch_stall->write( true, cycle);
-            wp_decode_2_decode->write(instr, cycle);
-            sout << instr << " (data hazard)\n";
-         }
+                /* log */
+                sout << instr << std::endl;
+            }
+            else // data hazard, stalling pipeline
+            {
+                wp_decode_2_fetch_stall->write( true, cycle);
+                wp_decode_2_decode->write( instr, cycle);
+                sout << instr << " (data hazard)\n";
+            }
     
-
-    }
+        }
     }
 }
-
-
-    /* TODO: replace all this code by introducing Forwarding unit */
-    /*if ( rf->check_sources( instr))
-    {
-        rf->read_sources( &instr);
-        
-        wp_decode_2_execute->write( instr, cycle);
-
-      */  /* log */
-        /*sout << instr << std::endl;
-    }
-    else // data hazard, stalling pipeline
-    {
-        wp_decode_2_fetch_stall->write( true, cycle);
-        wp_decode_2_decode->write( instr, cycle);
-        sout << instr << " (data hazard)\n";
-    }
-}*/
 
 void PerfMIPS::clock_execute( int cycle)
 {
