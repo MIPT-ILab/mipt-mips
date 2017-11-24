@@ -268,8 +268,8 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
     
-        void execute_movn()  { if(v_src1 != 0) v_dst = v_src2; else writes_dst = false;}
-        void execute_movz()  { if(v_src1 == 0) v_dst = v_src2; else writes_dst = false;}
+        void execute_movn()  { if(v_src2 != 0) v_dst = v_src1; else writes_dst = false;}
+        void execute_movz()  { if(v_src2 == 0) v_dst = v_src1; else writes_dst = false;}
     
         void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
         void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
