@@ -84,7 +84,7 @@ class RF
         {
             RegNum reg_num  = instr.get_dst_num();
             bool writes_dst = instr.get_writes_dst();
-            if ( REG_NUM_ZERO != reg_num && writes_dst == true)
+            if ( REG_NUM_ZERO != reg_num && writes_dst)
                 write( reg_num, instr.get_v_dst());
             else
                 write( reg_num, read(reg_num));
