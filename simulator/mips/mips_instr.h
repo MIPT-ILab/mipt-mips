@@ -13,6 +13,7 @@
 #include <cassert>
 #include <string>
 #include <array>
+#include <unordered_map>
 #if __has_include("string_view")
 #include <string_view>
 using std::string_view; // NOLINT
@@ -25,7 +26,7 @@ using std::experimental::string_view; // NOLINT
 #include <infra/types.h>
 #include <infra/macro.h>
 
-enum RegNum
+enum RegNum : uint8
 {
     REG_NUM_ZERO = 0,
     REG_NUM_AT,
@@ -71,15 +72,15 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 class FuncInstr
 {
     private:
-        enum Format
+        enum Format : uint8
         {
             FORMAT_R,
             FORMAT_I,
             FORMAT_J,
             FORMAT_UNKNOWN
-        } format = FORMAT_UNKNOWN;
+        };
 
-        enum OperationType
+        enum OperationType : uint8
         {
             OUT_R_ARITHM,
             OUT_R_SHIFT,
@@ -105,7 +106,7 @@ class FuncInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
-        enum class TrapType
+        enum class TrapType : uint8
         {
             NO_TRAP,
             EXPLICIT_TRAP,
@@ -142,11 +143,9 @@ class FuncInstr
 
         using Execute = void (FuncInstr::*)();
 
-        struct ISAEntry // NOLINT
+        struct ISAEntry
         {
             string_view name;
-
-            uint8 opcode;
 
             Format format;
             OperationType operation;
@@ -157,8 +156,11 @@ class FuncInstr
 
             uint8 mips_version;
         };
-
-        static const ISAEntry isaTable[];
+        
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
+                        
         static string_view regTableName(RegNum reg);
         static std::array<string_view, REG_NUM_MAX> regTable;
         string_view name = {};
@@ -175,7 +177,8 @@ class FuncInstr
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
-        bool complete = false;
+        bool complete   = false;
+        bool writes_dst = true;
 
         /* info for branch misprediction unit */
         bool predicted_taken = false;     // Predicted direction
@@ -187,7 +190,7 @@ class FuncInstr
 
         std::string disasm = "";
 
-        void initFormat();
+        Format initFormat();
         void initR();
         void initI();
         void initJ();
@@ -268,8 +271,8 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
     
-        void execute_movn()  { execute_unknown(); }
-        void execute_movz()  { execute_unknown(); }
+        void execute_movn()  { if(v_src1 != 0) v_dst = v_src2; else writes_dst = false;}
+        void execute_movz()  { if(v_src1 == 0) v_dst = v_src2; else writes_dst = false;}
     
         void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
         void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
@@ -361,6 +364,8 @@ class FuncInstr
         bool is_nop() const { return instr.raw == 0x0u; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
+
+        bool get_writes_dst() const { return writes_dst; }
 
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }

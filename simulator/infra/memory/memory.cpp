@@ -59,6 +59,11 @@ Memory::Memory( const std::string& executable_file_name,
 
     const auto& sections_array = ElfSection::getAllElfSections( executable_file_name);
 
+    if ( sections_array.empty()) {
+        std::cerr << "ERROR. No ELF sections read from " << executable_file_name << "\n";
+        std::exit( EXIT_FAILURE);
+    }
+
     for ( const auto& section : sections_array)
     {
         if ( section.get_name() == ".text")
