@@ -362,19 +362,12 @@ template<class T> T ReadPort<T>::read( uint64 cycle)
 /*
  * Ignoring read method
  *
- * Reads data which should be read in this cycle but does not copy it
- *
- * If there was nothing to read, generates error (use is_ready before reading)
-*/
+ * Reads all data which should be read in this cycle but does not copy it
+ */
 template<class T> void ReadPort<T>::ignore( uint64 cycle)
 {
-    if ( !this->_init)
-        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
-
-    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
-        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
-
-    _dataQueue.pop();
+    while ( this->is_ready( cycle))
+         _dataQueue.pop();
 }
 
 /*
