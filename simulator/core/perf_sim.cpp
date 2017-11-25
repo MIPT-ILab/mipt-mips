@@ -170,6 +170,7 @@ void PerfMIPS::clock_decode( int cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
+    IfIdData _data;
     /* branch misprediction */
     if ( is_flush)
     {

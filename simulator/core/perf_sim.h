@@ -78,6 +78,7 @@ private:
     void clock_execute( int cycle);
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
+    FuncInstr read_instr(uint64 cycle);
 
 public:
     explicit PerfMIPS( bool log);
