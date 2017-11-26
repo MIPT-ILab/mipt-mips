@@ -57,19 +57,18 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-    
+
     init_ports();
 }
 
 FuncInstr PerfMIPS::read_instr(uint64 cycle)
 {
-    IfIdData _data;
-    if(rp_decode_2_decode->is_ready( cycle))
+    if (rp_decode_2_decode->is_ready( cycle))
     {
         rp_fetch_2_decode->ignore( cycle);
         return rp_decode_2_decode->read( cycle);
     }
-    _data = rp_fetch_2_decode->read( cycle);
+    const auto& _data = rp_fetch_2_decode->read( cycle);
     FuncInstr instr( _data.raw,
         _data.PC,
         _data.predicted_taken,
@@ -78,7 +77,7 @@ FuncInstr PerfMIPS::read_instr(uint64 cycle)
 
 }
 
-        
+
 
 void PerfMIPS::run( const std::string& tr,
                     uint64 instrs_to_run)
@@ -164,31 +163,31 @@ void PerfMIPS::clock_decode( int cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
-    IfIdData _data;
+
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        _data = rp_fetch_2_decode->read( cycle);
+        rp_fetch_2_decode->ignore( cycle);
         rp_decode_2_decode->ignore( cycle);
 
         sout << "flush\n";
         return;
     }
     /* check if there is something to process */
-    if( !rp_fetch_2_decode->is_ready( cycle) && !rp_decode_2_decode->is_ready( cycle))
+    if ( !rp_fetch_2_decode->is_ready( cycle) && !rp_decode_2_decode->is_ready( cycle))
     {
         sout << "bubble\n";
         return;
     }
-    
-    FuncInstr instr = read_instr( cycle);
-    
+
+    auto instr = read_instr( cycle);
+
     /* TODO: replace all this code by introducing Forwarding unit */
     if( rf->check_sources( instr))
     {
         rf->read_sources( &instr);
-                                                  
+
         wp_decode_2_execute->write( instr, cycle);
 
         /* log */
@@ -200,7 +199,6 @@ void PerfMIPS::clock_decode( int cycle)
         wp_decode_2_decode->write( instr, cycle);
         sout << instr << " (data hazard)\n";
     }
-
 }
 
 void PerfMIPS::clock_execute( int cycle)
