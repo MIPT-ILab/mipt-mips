@@ -66,21 +66,15 @@ FuncInstr PerfMIPS::read_instr(uint64 cycle)
     IfIdData _data;
     if(rp_decode_2_decode->is_ready( cycle))
     {
-        if(rp_fetch_2_decode->is_ready( cycle))
-        {
-            rp_fetch_2_decode->ignore( cycle);
-        }
+        rp_fetch_2_decode->ignore( cycle);
         return rp_decode_2_decode->read( cycle);
     }
-    else 
-    {
-        _data = rp_fetch_2_decode->read( cycle);
-        FuncInstr instr( _data.raw,
-                _data.PC,
-                _data.predicted_taken,
-                _data.predicted_target);
-        return instr;
-    }
+    _data = rp_fetch_2_decode->read( cycle);
+    FuncInstr instr( _data.raw,
+        _data.PC,
+        _data.predicted_taken,
+        _data.predicted_target);
+    return instr;
 
 }
 
@@ -176,10 +170,7 @@ void PerfMIPS::clock_decode( int cycle)
     {
         /* ignoring the upcoming instruction as it is invalid */
         _data = rp_fetch_2_decode->read( cycle);
-        if( rp_decode_2_decode->is_ready( cycle))
-        {
-            rp_decode_2_decode->ignore( cycle);
-        }
+        rp_decode_2_decode->ignore( cycle);
 
         sout << "flush\n";
         return;
@@ -193,6 +184,7 @@ void PerfMIPS::clock_decode( int cycle)
     
     FuncInstr instr = read_instr( cycle);
     
+    /* TODO: replace all this code by introducing Forwarding unit */
     if( rf->check_sources( instr))
     {
         rf->read_sources( &instr);
@@ -201,13 +193,13 @@ void PerfMIPS::clock_decode( int cycle)
 
         /* log */
         sout << instr << std::endl;
-     }
-     else // data hazard, stalling pipeline
-     {
-     wp_decode_2_fetch_stall->write( true, cycle);
-     wp_decode_2_decode->write( instr, cycle);
-     sout << instr << " (data hazard)\n";
-     }
+    }
+    else // data hazard, stalling pipeline
+    {
+        wp_decode_2_fetch_stall->write( true, cycle);
+        wp_decode_2_decode->write( instr, cycle);
+        sout << instr << " (data hazard)\n";
+    }
 
 }
 
