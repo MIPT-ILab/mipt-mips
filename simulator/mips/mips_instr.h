@@ -1,7 +1,7 @@
 /*
  * func_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014 MIPT-MIPS
+ * Copyright 2014-2017 MIPT-MIPS
  */
 
 /** Edited by Ladin Oleg. */
@@ -14,17 +14,11 @@
 #include <string>
 #include <array>
 #include <unordered_map>
-#if __has_include("string_view")
-#include <string_view>
-using std::string_view; // NOLINT
-#else
-#include <experimental/string_view>
-using std::experimental::string_view; // NOLINT
-#endif
 
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/string/string_view.h>
 
 enum RegNum : uint8
 {
@@ -145,7 +139,7 @@ class FuncInstr
 
         struct ISAEntry
         {
-            string_view name;
+            std::string_view name;
 
             Format format;
             OperationType operation;
@@ -161,9 +155,9 @@ class FuncInstr
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
                         
-        static string_view regTableName(RegNum reg);
-        static std::array<string_view, REG_NUM_MAX> regTable;
-        string_view name = {};
+        static std::string_view regTableName(RegNum reg);
+        static std::array<std::string_view, REG_NUM_MAX> regTable;
+        std::string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -328,7 +322,7 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = delete; // constructor w/o arguments for ports
+        FuncInstr() = delete;
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
@@ -339,7 +333,6 @@ class FuncInstr
         bool is_same( const FuncInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
-
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
@@ -382,7 +375,6 @@ class FuncInstr
 
         void execute();
         void check_trap();
-
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
