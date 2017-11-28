@@ -11,14 +11,13 @@
 
 // Generic C++
 #include <cassert>
-#include <string>
 #include <array>
 #include <unordered_map>
 
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
-#include <infra/string/string_view.h>
+#include <infra/string/cow_string.h>
 
 enum RegNum : uint8
 {
@@ -182,7 +181,11 @@ class FuncInstr
         const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
-        std::string disasm = "";
+#if 0
+        std::string disasm = {};
+#else
+        CowString disasm = {};
+#endif
 
         Format initFormat();
         void initR();
