@@ -329,7 +329,7 @@ class FuncInstr
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
 
-        const std::string& Dump() const { return disasm; }
+        const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const FuncInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
