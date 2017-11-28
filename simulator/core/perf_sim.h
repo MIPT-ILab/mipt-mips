@@ -33,10 +33,6 @@ private:
         uint32 raw = NO_VAL32;            // fetched instruction code
     };
 
-    /* decode stage variables */
-    IfIdData decode_data = {};
-    bool is_anything_to_decode = false;
-
     /* simulator units */
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
@@ -53,6 +49,9 @@ private:
     std::unique_ptr<ReadPort<IfIdData>> rp_fetch_2_decode = nullptr;
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
+
+    std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_decode = nullptr;
+    std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_decode = nullptr;
 
     std::unique_ptr<WritePort<FuncInstr>> wp_decode_2_execute = nullptr;
     std::unique_ptr<ReadPort<FuncInstr>> rp_decode_2_execute = nullptr;
@@ -79,6 +78,7 @@ private:
     void clock_execute( int cycle);
     void clock_memory( int cycle);
     void clock_writeback( int cycle);
+    FuncInstr read_instr(uint64 cycle);
 
 public:
     explicit PerfMIPS( bool log);

@@ -1,6 +1,5 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
+ * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 */
 #include <iostream>
 
@@ -34,6 +33,9 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
     rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
+    wp_decode_2_decode = make_write_port<FuncInstr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_decode = make_read_port<FuncInstr>("DECODE_2_DECODE", PORT_LATENCY);
+
     wp_decode_2_execute = make_write_port<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
     rp_decode_2_execute = make_read_port<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
@@ -55,17 +57,33 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-    
+
     init_ports();
 }
+
+FuncInstr PerfMIPS::read_instr(uint64 cycle)
+{
+    if (rp_decode_2_decode->is_ready( cycle))
+    {
+        rp_fetch_2_decode->ignore( cycle);
+        return rp_decode_2_decode->read( cycle);
+    }
+    const auto& _data = rp_fetch_2_decode->read( cycle);
+    FuncInstr instr( _data.raw,
+        _data.PC,
+        _data.predicted_taken,
+        _data.predicted_target);
+    return instr;
+
+}
+
+
 
 void PerfMIPS::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
     Cycles cycle = 0;
-
-    is_anything_to_decode = false;
 
     memory = new MIPSMemory( tr);
 
@@ -150,46 +168,25 @@ void PerfMIPS::clock_decode( int cycle)
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        decode_data = rp_fetch_2_decode->read( cycle);
+        rp_fetch_2_decode->ignore( cycle);
+        rp_decode_2_decode->ignore( cycle);
 
-        is_anything_to_decode = false;
         sout << "flush\n";
         return;
     }
-
-    if ( !is_anything_to_decode)
-    {
-        /* acquiring data from fetch */
-        is_anything_to_decode = rp_fetch_2_decode->is_ready( cycle);
-        if ( is_anything_to_decode)
-        {
-            decode_data = rp_fetch_2_decode->read( cycle);
-        }
-    }
-    else
-    {
-        /* ignore data from port -- to suppress loss messages */
-        rp_fetch_2_decode->ignore( cycle);
-    }
-
     /* check if there is something to process */
-    if ( !is_anything_to_decode)
+    if ( !rp_fetch_2_decode->is_ready( cycle) && !rp_decode_2_decode->is_ready( cycle))
     {
         sout << "bubble\n";
         return;
     }
 
-    FuncInstr instr( decode_data.raw,
-                     decode_data.PC,
-                     decode_data.predicted_taken,
-                     decode_data.predicted_target);
+    auto instr = read_instr( cycle);
 
     /* TODO: replace all this code by introducing Forwarding unit */
-    if ( rf->check_sources( instr))
+    if( rf->check_sources( instr))
     {
         rf->read_sources( &instr);
-
-        is_anything_to_decode = false; // successfully decoded
 
         wp_decode_2_execute->write( instr, cycle);
 
@@ -199,6 +196,7 @@ void PerfMIPS::clock_decode( int cycle)
     else // data hazard, stalling pipeline
     {
         wp_decode_2_fetch_stall->write( true, cycle);
+        wp_decode_2_decode->write( instr, cycle);
         sout << instr << " (data hazard)\n";
     }
 }

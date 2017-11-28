@@ -51,10 +51,10 @@ N | Year | Name | Score | Comments
 2 | 2017/2018 | Denis Los | 5 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [½#77](https://github.com/MIPT-ILab/mipt-mips/issues/77) |
 3 | 2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 4 | 2017/2018 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
+4 | 2017/2018 | Alexander Misevich | 3 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216) |
 5 | 2017/2018 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 5 | 2017/2018 | Kirill Nedostoev | 2 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147) |
 6 | 2017/2018 | Alexander Timofeev | 1 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69) |
-6 | 2017/2018 | Alexander Misevich | 1 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37) |
 6 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
 ## About us
