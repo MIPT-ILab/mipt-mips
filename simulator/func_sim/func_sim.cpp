@@ -16,7 +16,7 @@ MIPS::~MIPS()
     delete mem;
 }
 
-std::string MIPS::step()
+FuncInstr MIPS::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
@@ -40,7 +40,7 @@ std::string MIPS::step()
     PC = instr.get_new_PC();
 
     // dump
-    return instr.Dump();
+    return instr;
 }
 
 void MIPS::init( const std::string& tr)

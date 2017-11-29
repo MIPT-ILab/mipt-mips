@@ -175,7 +175,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     // 0x30 - 0x3F atomic load/stores
 };
 
-std::array<string_view, REG_NUM_MAX> FuncInstr::regTable =
+std::array<std::string_view, REG_NUM_MAX> FuncInstr::regTable =
 {{
     "zero",
     "at",
@@ -191,8 +191,7 @@ std::array<string_view, REG_NUM_MAX> FuncInstr::regTable =
     "ra"
 }};
 
-string_view FuncInstr::regTableName(RegNum reg) {
-
+std::string_view FuncInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 

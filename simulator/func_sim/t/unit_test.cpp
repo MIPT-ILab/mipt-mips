@@ -35,7 +35,7 @@ TEST( Func_Sim, Make_A_Step)
 {
     MIPS mips;
     mips.init( valid_elf_file);
-    ASSERT_EQ( mips.step(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
+    ASSERT_EQ( mips.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
 }
 
 TEST( Func_Sim, Run_Full_Trace)

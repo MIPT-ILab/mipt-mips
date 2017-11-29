@@ -333,9 +333,9 @@ void PerfMIPS::clock_writeback( int cycle)
 
 void PerfMIPS::check( const FuncInstr& instr)
 {
-    const std::string func_dump = checker.step();
+    const auto func_dump = checker.step();
 
-    if ( func_dump != instr.Dump())
+    if ( func_dump.Dump() != instr.Dump())
         serr << "****************************" << std::endl
              << "Mismatch: " << std::endl
              << "Checker output: " << func_dump    << std::endl
