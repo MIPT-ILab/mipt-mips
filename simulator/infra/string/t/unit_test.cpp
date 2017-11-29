@@ -53,9 +53,11 @@ TEST( Cow_String, Empty_String)
     ASSERT_NE( a, b);
 
     CowString c;
+    CowString d = c;
     ASSERT_EQ( c, "");
     c += "World!";
     ASSERT_EQ( c, "World!");
+    ASSERT_EQ( d, "");
 }
 
 int main( int argc, char* argv[])
