@@ -36,6 +36,28 @@ TEST( Cow_String, Assignment_Check)
     ASSERT_NE( static_cast<std::string_view>(a).data(), static_cast<std::string_view>(b).data());
 }
 
+TEST( Cow_String, Empty_String)
+{
+    CowString a;
+    ASSERT_EQ( a, "");
+    CowString b = a;
+    ASSERT_EQ( b, "");
+
+    a = "Hello!";
+    ASSERT_EQ( a, "Hello!");
+    ASSERT_EQ( b, "");
+    ASSERT_NE( a, b);
+    
+    b = "Goodbye!";
+    ASSERT_EQ( b, "Goodbye!");
+    ASSERT_NE( a, b);
+
+    CowString c;
+    ASSERT_EQ( c, "");
+    c += "World!";
+    ASSERT_EQ( c, "World!");
+}
+
 int main( int argc, char* argv[])
 {
     ::testing::InitGoogleTest( &argc, argv);

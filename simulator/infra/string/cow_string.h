@@ -87,6 +87,9 @@ class CowString { // KryuCowString, ha-ha, what a pun
     // easily converted to std::string or const char*
     // and has a lot of useful operators already (==, != etc.)
     const std::string_view get_string_view() const {
+        if (data.use_count() == 0)
+            return std::string_view(nullptr, 0);
+
         return data->get_string_view();
     }
 
