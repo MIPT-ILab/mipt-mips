@@ -65,6 +65,7 @@ TESTS:= \
     infra/config \
     infra/instrcache \
     infra/ports \
+    infra/string \
     mips \
     bpu \
     func_sim \
