@@ -7,3 +7,6 @@
 [submodule "traces"]
 	path = traces
 	url = https://github.com/MIPT-ILab/mips-traces.git
+[submodule "mips-traces"]
+	path = mips-traces
+	url = https://github.com/YanLo/mips-traces

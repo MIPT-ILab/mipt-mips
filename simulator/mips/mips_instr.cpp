@@ -437,7 +437,7 @@ void FuncInstr::execute()
     (this->*function)();
     complete = true;
 
-    if ( dst != REG_NUM_ZERO && !is_load())
+    if ( dst != REG_NUM_ZERO && !is_load() && get_writes_dst())
     {
         std::ostringstream oss;
         oss << "\t [ $" << regTableName(dst)
