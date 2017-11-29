@@ -17,6 +17,7 @@ TEST( Cow_String, Copy_Check)
 
     b += " World!";
     ASSERT_EQ( a, "Hello");
+    ASSERT_NE( b, "Hello");
     ASSERT_EQ( b, "Hello World!");
     ASSERT_NE( a, b);
     ASSERT_NE( static_cast<std::string_view>(a).data(), static_cast<std::string_view>(b).data());
@@ -47,7 +48,7 @@ TEST( Cow_String, Empty_String)
     ASSERT_EQ( a, "Hello!");
     ASSERT_EQ( b, "");
     ASSERT_NE( a, b);
-    
+
     b = "Goodbye!";
     ASSERT_EQ( b, "Goodbye!");
     ASSERT_NE( a, b);
@@ -58,6 +59,25 @@ TEST( Cow_String, Empty_String)
     c += "World!";
     ASSERT_EQ( c, "World!");
     ASSERT_EQ( d, "");
+}
+
+TEST( Wide_Cow_String, Initializing_Checks)
+{
+    WCowString a;
+    WCowString b = a;
+    ASSERT_EQ( a, b);
+
+    WCowString c( L"Hello!");
+    ASSERT_EQ( c, L"Hello!");
+
+    a += c;
+    ASSERT_EQ( a, c);
+    ASSERT_NE( a, b);
+    ASSERT_EQ( a, L"Hello!");
+
+    c += a;
+    ASSERT_EQ( c, L"Hello!Hello!");
+    ASSERT_EQ( a, L"Hello!");
 }
 
 int main( int argc, char* argv[])
