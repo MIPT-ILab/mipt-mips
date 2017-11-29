@@ -108,7 +108,7 @@ public:
     // assignment: clear existing string and
     // append the value to the empty string
     template<typename T>
-    auto& operator=( const T& value) {
+    BasicCowString& operator=( const T& value) {
         clear();
         append( value);
         return *this;
@@ -133,7 +133,7 @@ public:
     }
 
     // convert to std::string_view like std::string does
-    explicit operator auto() const noexcept {
+    explicit operator View_t() const noexcept {
         return get_string_view();
     }
 
