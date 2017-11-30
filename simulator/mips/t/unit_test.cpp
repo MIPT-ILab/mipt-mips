@@ -102,7 +102,7 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x02290036).Dump(), "tne $s1, $t1");
     ASSERT_EQ(FuncInstr(0x01208809).Dump(), "jalr $s1, $t1");
     ASSERT_EQ(FuncInstr(0x00000000).Dump(), "nop ");
-    
+
     ASSERT_EQ(FuncInstr(0x213104d2).Dump(), "addi $s1, $t1, 0x4d2");
     ASSERT_EQ(FuncInstr(0x2131fb2e).Dump(), "addi $s1, $t1, 0xfb2e");
     ASSERT_EQ(FuncInstr(0x253104d2).Dump(), "addiu $s1, $t1, 0x4d2");
@@ -171,7 +171,7 @@ TEST( Func_instr_disasm, Process_Disasm)
 //  ASSERT_EQ(FuncInstr(0x06200002).Dump(), "bltz $s1, 2");
     ASSERT_EQ(FuncInstr(0x1629fff1).Dump(), "bne $s1, $t1, -15");
     ASSERT_EQ(FuncInstr(0x16290000).Dump(), "bne $s1, $t1, 0");
-    
+
     ASSERT_EQ(FuncInstr(0x0bfffb2e).Dump(), "j 0xfb2e");
     ASSERT_EQ(FuncInstr(0x080004d2).Dump(), "j 0x4d2");
     ASSERT_EQ(FuncInstr(0x0ffffb2e).Dump(), "jal 0xfb2e");

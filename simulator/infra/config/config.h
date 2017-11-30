@@ -16,7 +16,7 @@
 // small hack to include boost only in config.cpp
 namespace boost { namespace program_options {
     class options_description;
-} // namespace program_options 
+} // namespace program_options
 } // namespace boost
 
 namespace config {
@@ -59,14 +59,14 @@ template<typename T>
 class RequiredValue : public BaseValue {
 protected:
     T value;
-    
+
     void reg( bod* d) override;
 public:
     RequiredValue<T>( const char* name, const char* desc) noexcept
         : BaseValue( name, desc)
         , value( )
     { }
-    
+
     RequiredValue<T>() = delete;
 
     operator const T&() const { return value; } // NOLINT

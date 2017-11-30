@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 
-// Testing module 
+// Testing module
 #include "../config.h"
 
 
@@ -39,7 +39,7 @@ TEST( config_parse, Pass_Valid_Args_1)
     const uint64 mandatory_int_value = 145;
     const std::string mandatory_string_value{ "file.elf"};
 
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "file.elf",
@@ -51,7 +51,7 @@ TEST( config_parse, Pass_Valid_Args_1)
 
     };
     const int argc = countof(argv);
-    
+
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
@@ -64,8 +64,8 @@ TEST( config_parse, Pass_Valid_Args_1)
 
 
 
-// 
-// To check whether returned values 
+//
+// To check whether returned values
 // are equal to passed arguments
 //
 TEST( config_parse,  Pass_Valid_Args_2)
@@ -73,7 +73,7 @@ TEST( config_parse,  Pass_Valid_Args_2)
     const uint64 mandatory_int_value = 356;
     const std::string mandatory_string_value{ "run_test.elf"};
 
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test.elf",
@@ -81,7 +81,7 @@ TEST( config_parse,  Pass_Valid_Args_2)
         "-d"
     };
     const int argc = countof(argv);
-    
+
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
@@ -94,68 +94,68 @@ TEST( config_parse,  Pass_Valid_Args_2)
 
 
 
-// 
+//
 // Pass no arguments
 //
 TEST( config_parse,  Pass_No_Args)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips"
     };
     const int argc = countof(argv);
 
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass arguments without a binary option
 //
 TEST( config_parse,  Pass_Args_Without_Binary_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "--numsteps", "356",
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass arguments without a numsteps option
 //
 TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
-        "--binary", "test.elf", 
+        "--binary", "test.elf",
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass arguments with unrecognised option
 //
 TEST( config_parse,  Pass_Args_With_Unrecognised_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "--binary", "test.elf",
@@ -163,20 +163,20 @@ TEST( config_parse,  Pass_Args_With_Unrecognised_Option)
         "-koption"
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass a binary option multiple times
 //
 TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test_1.elf",
@@ -184,40 +184,40 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
         "-n", "412",
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass a binary option without an argument
 //
 TEST( config_parse,  Pass_Binary_Option_Without_Arg)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b",
         "-n", "412",
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 
 
-// 
+//
 // Pass a numsteps option without an argument
 //
 TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test.elf",
@@ -226,9 +226,9 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
         "-d"
     };
     const int argc = countof(argv);
-    
+
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
+    ASSERT_EXIT( config::handleArgs( argc, argv),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
@@ -252,14 +252,14 @@ TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
 
-    auto test_function = []() 
-    { 
-        config::RequiredValue<std::string> second_binary_file_option = 
+    auto test_function = []()
+    {
+        config::RequiredValue<std::string> second_binary_file_option =
             {
-                "binary,b", 
+                "binary,b",
                 "input binary file"
-            }; 
-    }; 
+            };
+    };
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( test_function(), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
