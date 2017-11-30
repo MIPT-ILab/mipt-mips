@@ -15,44 +15,42 @@
 /* Simulator modules. */
 #include "../cache_tag_array.h"
 
-using namespace std;
-
 int main( int argc, char* argv[])
 {
     /* Check arguments. */
     if ( argc != 3)
     {
-        cerr << "ERROR: Wrong number of arguments! Required 2: name of file "
-             << "with memory access addresses; name of output file with miss "
-             << "rates." << endl;
+        std::cerr << "ERROR: Wrong number of arguments! Required 2: name of file "
+                  << "with memory access addresses; name of output file with miss "
+                  << "rates." << std::endl;
         exit( EXIT_FAILURE);
     }
     if ( argv[ 1] == nullptr)
     {
-        cerr << "ERROR: Wrong first argument! Required name of file with "
-             << "memory access addresses." << endl;
+        std::cerr << "ERROR: Wrong first argument! Required name of file with "
+                  << "memory access addresses." << std::endl;
         exit( EXIT_FAILURE);
     }
     if ( argv[ 2] == nullptr)
     {
-        cerr << "ERROR: Wrong second argument! Required name of output file "
-             << "with miss rates." << endl;
+        srd::cerr << "ERROR: Wrong second argument! Required name of output file "
+                  << "with miss rates." << std::endl;
         exit( EXIT_FAILURE);
     }
 
     /* Open and check input and output files. */
-    ifstream file_in;
-    file_in.open( argv[ 1], ifstream::in);
+    std::ifstream file_in;
+    file_in.open( argv[ 1], std::ifstream::in);
     if ( !file_in.is_open())
     {
-        cerr << "ERROR: Can't open the input file!" << endl;
+        std::cerr << "ERROR: Can't open the input file!" << std::endl;
         exit( EXIT_FAILURE);
     }
-    ofstream file_out;
-    file_out.open( argv[ 2], ofstream::out);
+    std::ofstream file_out;
+    file_out.open( argv[ 2], std::ofstream::out);
     if ( !file_out.is_open())
     {
-        cerr << "ERROR: Can't open the output file!" << endl;
+        std::cerr << "ERROR: Can't open the output file!" << std::endl;
         exit( EXIT_FAILURE);
     }
 
@@ -84,7 +82,7 @@ int main( int argc, char* argv[])
             file_out << rate << ", ";
             file_out.flush(); // immidiate print to the file (to avoid delays)
         }
-        file_out << endl;
+        file_out << std::endl;
     }
     /* Same as previous for full-associative cache. */
     for ( auto cache_size : cache_sizes)
@@ -108,7 +106,7 @@ int main( int argc, char* argv[])
         file_out << rate << ", ";
         file_out.flush();
     }
-    file_out << endl;
+    file_out << std::endl;
 
     /* Close files. */
     file_in.close();
