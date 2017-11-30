@@ -64,35 +64,21 @@ void handleArgs( int argc, const char* argv[])
 
     po::variables_map vm;
 
-    try
+    po::store(po::command_line_parser(argc, argv).options(description).run(), vm);
+
+    /* parsing help */
+    if ( vm.count( "help") != 0u)
     {
-        po::store(po::command_line_parser(argc, argv).
-                                    options(description).
-                                    run(),
-                                    vm);
-
-
-        /* parsing help */
-        if ( vm.count( "help") != 0u)
-        {
-            std::cout << "Functional and performance simulators for MIPS-based CPU."
-                      << std::endl << std::endl
-                      << description << std::endl;
-            std::exit( EXIT_SUCCESS);
-        }
-
-        /* calling notify AFTER parsing help, as otherwise
-         * absent required args will cause errors
-         */
-        po::notify(vm);
-    }
-    catch ( const std::exception& e)
-    {
-        std::cerr << *argv << ": " << e.what()
+        std::cout << "Functional and performance simulators for MIPS-based CPU."
                   << std::endl << std::endl
                   << description << std::endl;
-        std::exit( EXIT_FAILURE);
+        std::exit( EXIT_SUCCESS);
     }
+
+    /* calling notify AFTER parsing help, as otherwise
+     * absent required args will cause errors
+     */
+    po::notify(vm);
 }
 
 } // namespace config

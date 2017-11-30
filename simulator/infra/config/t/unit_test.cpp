@@ -3,32 +3,22 @@
  * @author Denis Los
  */
 
-
-
 // Google test library
 #include <gtest/gtest.h>
-
 
 // Testing module 
 #include "../config.h"
 
-
 // Utils
 #include "infra/macro.h"
 
-
-
 namespace config {
-RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
-RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
+    RequiredValue<std::string> string_config = { "string_config_name,b", "string config description"};
+    RequiredValue<uint64> uint64_config = { "uint64_config_name,n", "uint64 config description"};
 
-Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
-Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
+    Value<bool> bool_config_1 = { "bool_config_1,d", false, "first bool config description"};
+    Value<bool> bool_config_2 = { "bool_config_2,f", false, "second bool config description"};
 } // namespace config
-
-
-
-
 
 //
 // To check whether the returned values
@@ -55,14 +45,11 @@ TEST( config_parse, Pass_Valid_Args_1)
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
-
-    ASSERT_EQ( config::num_steps, mandatory_int_value);
-    ASSERT_FALSE( mandatory_string_value.compare( config::binary_filename));
-    ASSERT_EQ( config::disassembly_on, false);
-    ASSERT_EQ( config::functional_only, true);
+    ASSERT_EQ( config::uint64_config, mandatory_int_value);
+    ASSERT_FALSE( mandatory_string_value.compare( config::string_config));
+    ASSERT_EQ( config::bool_config_1, false);
+    ASSERT_EQ( config::bool_config_2, true);
 }
-
-
 
 // 
 // To check whether returned values 
@@ -85,19 +72,16 @@ TEST( config_parse,  Pass_Valid_Args_2)
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
-
-    ASSERT_EQ( config::num_steps, mandatory_int_value);
-    ASSERT_FALSE( mandatory_string_value.compare( config::binary_filename));
-    ASSERT_EQ( config::disassembly_on, true);
-    ASSERT_EQ( config::functional_only, false);
+    ASSERT_EQ( config::uint64_config, mandatory_int_value);
+    ASSERT_FALSE( mandatory_string_value.compare( config::string_config));
+    ASSERT_EQ( config::bool_config_1, true);
+    ASSERT_EQ( config::bool_config_2, false);
 }
-
-
 
 // 
 // Pass no arguments
 //
-TEST( config_parse,  Pass_No_Args)
+TEST( config_parse, Pass_No_Args)
 {
     const char* argv[] = 
     {
@@ -105,47 +89,40 @@ TEST( config_parse,  Pass_No_Args)
     };
     const int argc = countof(argv);
 
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
 // 
-// Pass arguments without a binary option
+// Pass arguments without a string_config_name option
 //
-TEST( config_parse,  Pass_Args_Without_Binary_Option)
+TEST( config_parse, Pass_Args_Without_Binary_Option)
 {
     const char* argv[] = 
     {
         "mipt-mips",
-        "--numsteps", "356",
+        "--uint64_config_name", "356",
     };
     const int argc = countof(argv);
     
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
 // 
-// Pass arguments without a numsteps option
+// Pass arguments without a uint64_config_name option
 //
 TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
 {
     const char* argv[] = 
     {
         "mipt-mips",
-        "--binary", "test.elf", 
+        "--string_config_name", "test.elf", 
     };
     const int argc = countof(argv);
     
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
 
@@ -153,26 +130,23 @@ TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
 // 
 // Pass arguments with unrecognised option
 //
-TEST( config_parse,  Pass_Args_With_Unrecognised_Option)
+TEST( config_parse, Pass_Args_With_Unrecognised_Option)
 {
     const char* argv[] = 
     {
         "mipt-mips",
-        "--binary", "test.elf",
+        "--string_config_name", "test.elf",
         "-n", "356",
         "-koption"
     };
     const int argc = countof(argv);
     
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
 // 
-// Pass a binary option multiple times
+// Pass a string_config_name option multiple times
 //
 TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
 {
@@ -180,20 +154,17 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
     {
         "mipt-mips",
         "-b", "run_test_1.elf",
-        "--binary", "run_test_2.elf",
+        "--string_config_name", "run_test_2.elf",
         "-n", "412",
     };
     const int argc = countof(argv);
     
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
 // 
-// Pass a binary option without an argument
+// Pass a string_config_name option without an argument
 //
 TEST( config_parse,  Pass_Binary_Option_Without_Arg)
 {
@@ -205,15 +176,12 @@ TEST( config_parse,  Pass_Binary_Option_Without_Arg)
     };
     const int argc = countof(argv);
     
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
 // 
-// Pass a numsteps option without an argument
+// Pass a uint64_config_name option without an argument
 //
 TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
 {
@@ -226,13 +194,10 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
         "-d"
     };
     const int argc = countof(argv);
-    
-    // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv), 
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+
+    // should throw
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
-
-
 
 //
 // To check whether providing configuration parser
@@ -256,15 +221,13 @@ TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
     { 
         config::RequiredValue<std::string> second_binary_file_option = 
             {
-                "binary,b", 
-                "input binary file"
+                "string_config_name,b", 
+                "input string_config_name file"
             }; 
     }; 
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( test_function(), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
-
-
 
 int main( int argc, char** argv)
 {
