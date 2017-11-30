@@ -1,8 +1,4 @@
 /*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
-/*
  * cache_tag_array.cpp
  * Implementation of the cache tag array model.
  * MIPT-MIPS Assignment 5.

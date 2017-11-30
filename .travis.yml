@@ -33,8 +33,6 @@ script:
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Check simulation spped
   - ./tools/simfreq.sh
-# Run PVS
-  - if [ $CXX == g++-7 ]; then ./tools/pvs.sh; fi
 
 addons:
   apt:
@@ -58,12 +56,6 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
-# Install PVS
-  - cd $TRAVIS_BUILD_DIR
-  - export PVS=pvs-studio-6.20.24121.1823-x86_64
-  - wget http://files.viva64.com/$PVS.tgz
-  - tar -xvzf $PVS.tgz
-  - export PATH=$PATH:$TRAVIS_BUILD_DIR/$PVS/bin
 # Infreqstall GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
