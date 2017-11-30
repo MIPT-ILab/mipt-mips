@@ -77,7 +77,7 @@ public:
             /* if the address has somehow changed, we should update it appropriately */
             reset();
             update_target(target);
-        } else 
+        } else
         {
             state = static_cast<State>( is_taken);
         }

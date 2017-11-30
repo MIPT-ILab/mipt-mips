@@ -309,7 +309,7 @@ template<class T> void WritePort<T>::destroy()
 
     for ( const auto reader : _destinations)
     {
-        if ( !reader->_init) 
+        if ( !reader->_init)
             serr << "Destroying uninitialized ReadPort " << this->_key << std::endl << critical;
 
         reader->_init = false;
