@@ -7,28 +7,19 @@
 #ifndef COW_STRING_H
 #define COW_STRING_H
 
-#include <cassert>
 #include <memory>
 #include <string>
 #include <exception>
 
+#include <boost/integer.hpp>
+
 #include <infra/string/string_view.h>
 
-// This class implements COW string with fixed maximum size
+// This class implements COW string with fixed maximum size.
 // It is very useful if you have to do A LOT of string copying
 // but modify them rarely.
 // List of non-implemented features:
-//   * make resizeable?
-//   * add std::string compatibility by demand
-
-class BasicCowStringOverflowException : public std::exception {
-public:
-    const char * what() const noexcept final
-    {
-        return "Limit of CowString size is reached\n";
-    }
-};
-
+//   * add more std::string compatibility by demand
 template<typename CharT, typename Traits = std::char_traits<CharT>>
 class BasicCowString { // KryuCowString, ha-ha, what a pun
 private:
@@ -36,65 +27,80 @@ private:
     using String_t = std::basic_string<CharT, Traits>;
 
     struct InternalString { // NOLINT Clang-Tidy doesn't like uninitalized array here
+        using SizeType = typename boost::uint_t<sizeof(CharT) * 8>::exact;
+        static_assert(sizeof(SizeType) == sizeof(CharT));
         static constexpr const size_t SIZE = 63;
-        CharT size = 0;
+        static_assert((1ull << (sizeof(SizeType) * 8)) > SIZE);
+
+        SizeType size = 0;
         CharT arena[SIZE];
+
         auto get_string_view() const { return View_t( arena, size); }
     };
 
     // I would like to have a static string of cache line granularity (64B typically)
     static_assert(sizeof(InternalString) % 64 == 0);
 
-    std::shared_ptr<InternalString> data = nullptr;
+    std::shared_ptr<InternalString> pointer = nullptr;
 
     // Allocate new memory
-    void init() { data = std::make_shared<InternalString>(); }
+    void init() { pointer = std::make_shared<InternalString>(); }
 
-    // Makes a string empty
-    void clear() {
-        if (data.use_count() > 1) {
-            // Someone else uses the data, so we
-            // must allocate a new data block
-            // Let's do it on demand and keep
-            // nullptr
-            data = nullptr;
-        }
-        else if (data.use_count() == 1) {
-            // We own the data, so we may clear it
-            // and do not allocate new data block
-            data->size = 0;
-        }
-    }
-
-    // Appends new data to any string
+    // Appends new pointer to any string
     void append( const CharT* ptr, size_t app_size)
     {
         // The string is empty. Need to allocate memory first.
-        if (data.use_count() == 0)
+        if (pointer.use_count() == 0)
             init();
 
-        const auto my_size = data->size; // May be zero as well
+        const auto my_size = pointer->size; // May be zero as well
         if ( my_size + app_size > InternalString::SIZE)
-            throw BasicCowStringOverflowException();
+            throw std::length_error("CowSting exceeded length\n");
 
         // The string has a full copy. That's the place 'copy-on-write' occurs
-        if (data.use_count() > 1) {
-            const auto old_data = data; // Keep a pointer to old data for a moment
+        if (pointer.use_count() > 1) {
+            const auto old_pointer = pointer; // Keep a pointer to old pointer for a moment
             init(); // Allocate new memory
-            std::copy( old_data->arena, old_data->arena + my_size, data->arena); // NOLINT deep copy
+            std::copy( old_pointer->arena, old_pointer->arena + my_size, pointer->arena); // NOLINT deep copy
         }
 
-        std::copy( ptr, ptr + app_size, data->arena + my_size); // NOLINT copy new data
-        data->size = my_size + app_size; // update size
+        std::copy( ptr, ptr + app_size, pointer->arena + my_size); // NOLINT copy new pointer
+        pointer->size = my_size + app_size; // update size
     }
 
     // Append wrappers
-    void append( const CharT* ptr)        { append( ptr, Traits::length( ptr)); }
-    void append( const View_t& v)         { append( v.data(), v.length());   }
-    void append( const String_t& v)       { append( static_cast<View_t>(v)); }
-    void append( const BasicCowString& v) { append( static_cast<View_t>(v)); }
+    void append( const CharT* ptr) { append( ptr, Traits::length( ptr)); }
+
+    template<typename T>
+    void append( const T& v) { append( v.data(), v.length());   }
+
+    // Get string view object
+    // const std::string_view is fancy here as it may be
+    // easily converted to std::string or const char*
+    // and has a lot of useful operators already (==, != etc.)
+    auto get_string_view() const noexcept {
+        if (pointer.use_count() != 0)
+            return pointer->get_string_view();
+
+        return View_t(nullptr, 0);
+    }
 
 public:
+    // std::basic_string typedefs
+    using traits_type = Traits;
+    using value_type  = CharT;
+    // using allocator_type = Allocator;
+    using size_type       = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference       = value_type&;
+    using const_reference = const value_type&;
+    // using pointer;
+    // using const_pointer;
+    // using iterator;
+    // using const_iterator;
+    // using reverse_iterator;
+    // using const_reverse_iterator
+
     // ctor
     BasicCowString() = default;
 
@@ -121,20 +127,57 @@ public:
         return *this;
     }
 
-    // Get string view object
-    // const std::string_view is fancy here as it may be
-    // easily converted to std::string or const char*
-    // and has a lot of useful operators already (==, != etc.)
-    auto get_string_view() const noexcept {
-        if (data.use_count() != 0)
-            return data->get_string_view();
-
-        return View_t(nullptr, 0);
-    }
-
     // convert to std::string_view like std::string does
     explicit operator View_t() const noexcept {
         return get_string_view();
+    }
+
+    // capacity
+    bool empty() const {
+        return pointer.use_count() == 0 || pointer->size == 0;
+    }
+
+    size_t size() const noexcept {
+        return pointer.use_count() == 0 ? 0 : pointer->size;
+    }
+
+    size_t length() const noexcept {
+        return size();
+    }
+
+    constexpr size_type max_size() const noexcept {
+        return InternalString::SIZE;
+    }
+
+    constexpr size_type capacity() const noexcept {
+        return InternalString::SIZE;
+    }
+
+    // only CONSTANT get operators
+    const CharT& operator[]( size_t value) const noexcept {
+        return pointer->arena[value];
+    }
+
+    const CharT& at( size_t value) const {
+        if ( empty() || value > pointer->size)
+            throw std::out_of_range("CowString index is out of range\n");
+        return operator[](value);
+    }
+
+    const CharT& front() const noexcept {
+        return operator[](0);
+    }
+
+    const CharT& back() const noexcept {
+        return operator[](size() - 1);
+    }
+
+    const CharT* data() const noexcept {
+        return pointer.use_count() == 0 ? nullptr : pointer->arena;
+    }
+
+    const CharT* c_str() const noexcept {
+        return data();
     }
 
     // Equality comparators for obvious types
@@ -142,18 +185,34 @@ public:
     // of RHS types to std::string_view
     bool operator==( const BasicCowString& rhs) const noexcept { return get_string_view() == rhs.get_string_view(); }
     bool operator==( const String_t& rhs) const noexcept { return get_string_view() == static_cast<decltype(get_string_view())>(rhs); }
+    bool operator==( const View_t& rhs) const noexcept { return get_string_view() == rhs; }
     bool operator==( const CharT* rhs) const { return get_string_view() == View_t( rhs, Traits::length(rhs)); }
 
     // Generate inequality comparator
     template<typename T>
     bool operator!=( const T& rhs) const { return !(*this == rhs); }
-};
 
-// Dump operator. Very nice that we may reuse std::string_view here.
-template<typename CharT, typename Traits = std::char_traits<CharT>>
-static inline auto operator<<( std::basic_ostream<CharT, Traits>& out, const BasicCowString<CharT, Traits>& value) -> decltype(out) {
-    return out << static_cast<decltype(value.get_string_view())>(value);
-}
+    // Makes a string empty
+    void clear() {
+        if (pointer.use_count() > 1) {
+            // Someone else uses the pointer, so we
+            // must allocate a new pointer block
+            // Let's do it on demand and keep
+            // nullptr
+            pointer = nullptr;
+        }
+        else if (pointer.use_count() == 1) {
+            // We own the pointer, so we may clear it
+            // and do not allocate new pointer block
+            pointer->size = 0;
+        }
+    }
+
+    // Dump operator. Very nice that we may reuse std::string_view here.
+    friend auto operator<<( std::basic_ostream<CharT, Traits>& out, const BasicCowString& value) -> decltype(out) {
+        return out << value.get_string_view();
+    }
+};
 
 // LHS comparators.
 // Some SFINAE here as we don't want to generate
