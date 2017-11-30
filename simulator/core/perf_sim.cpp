@@ -1,7 +1,5 @@
 #include <iostream>
-
-#include <boost/chrono.hpp>
-#include <boost/timer/timer.hpp>
+#include <chrono>
 
 #include <infra/config/config.h>
 
@@ -74,8 +72,6 @@ FuncInstr PerfMIPS::read_instr(uint64 cycle)
 
 }
 
-
-
 void PerfMIPS::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
@@ -88,7 +84,7 @@ void PerfMIPS::run( const std::string& tr,
 
     new_PC = memory->startPC();
 
-    boost::timer::cpu_timer timer;
+    auto t_start = std::chrono::high_resolution_clock::now();
 
     while (executed_instrs < instrs_to_run)
     {
@@ -105,10 +101,12 @@ void PerfMIPS::run( const std::string& tr,
         check_ports( cycle);
     }
 
-    auto time = timer.elapsed().wall;
-    auto frequency = 1e6 * cycle / time;
+    auto t_end = std::chrono::high_resolution_clock::now();
+
+    auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
+    auto frequency = cycle / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / cycle;
-    auto simips = 1e6 * executed_instrs / time;
+    auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:   " << executed_instrs
