@@ -6,7 +6,7 @@
 // Google test library
 #include <gtest/gtest.h>
 
-// Testing module 
+// Testing module
 #include "../config.h"
 
 // Utils
@@ -29,7 +29,7 @@ TEST( config_parse, Pass_Valid_Args_1)
     const uint64 mandatory_int_value = 145;
     const std::string mandatory_string_value{ "file.elf"};
 
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "file.elf",
@@ -41,7 +41,7 @@ TEST( config_parse, Pass_Valid_Args_1)
 
     };
     const int argc = countof(argv);
-    
+
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
@@ -51,8 +51,8 @@ TEST( config_parse, Pass_Valid_Args_1)
     ASSERT_EQ( config::bool_config_2, true);
 }
 
-// 
-// To check whether returned values 
+//
+// To check whether returned values
 // are equal to passed arguments
 //
 TEST( config_parse,  Pass_Valid_Args_2)
@@ -60,7 +60,7 @@ TEST( config_parse,  Pass_Valid_Args_2)
     const uint64 mandatory_int_value = 356;
     const std::string mandatory_string_value{ "run_test.elf"};
 
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test.elf",
@@ -68,7 +68,7 @@ TEST( config_parse,  Pass_Valid_Args_2)
         "-d"
     };
     const int argc = countof(argv);
-    
+
     // should not throw any exceptions
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
@@ -78,12 +78,12 @@ TEST( config_parse,  Pass_Valid_Args_2)
     ASSERT_EQ( config::bool_config_2, false);
 }
 
-// 
+//
 // Pass no arguments
 //
 TEST( config_parse, Pass_No_Args)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips"
     };
@@ -93,12 +93,12 @@ TEST( config_parse, Pass_No_Args)
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-// 
+//
 // Pass arguments without a string_config_name option
 //
 TEST( config_parse, Pass_Args_Without_Binary_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "--uint64_config_name", "356",
@@ -109,30 +109,28 @@ TEST( config_parse, Pass_Args_Without_Binary_Option)
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-// 
-// Pass arguments without a uint64_config_name option
+//
+// Pass arguments without a numsteps option
 //
 TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "--string_config_name", "test.elf", 
     };
     const int argc = countof(argv);
-    
+
     // should throw
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-
-
-// 
+//
 // Pass arguments with unrecognised option
 //
 TEST( config_parse, Pass_Args_With_Unrecognised_Option)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "--string_config_name", "test.elf",
@@ -140,17 +138,17 @@ TEST( config_parse, Pass_Args_With_Unrecognised_Option)
         "-koption"
     };
     const int argc = countof(argv);
-    
+
     // should throw
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-// 
-// Pass a string_config_name option multiple times
+//
+// Pass a binary option multiple times
 //
 TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test_1.elf",
@@ -163,29 +161,29 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-// 
-// Pass a string_config_name option without an argument
+//
+// Pass a binary option without an argument
 //
 TEST( config_parse,  Pass_Binary_Option_Without_Arg)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b",
         "-n", "412",
     };
     const int argc = countof(argv);
-    
+
     // should throw
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
-// 
-// Pass a uint64_config_name option without an argument
+//
+// Pass a numsteps option without an argument
 //
 TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
 {
-    const char* argv[] = 
+    const char* argv[] =
     {
         "mipt-mips",
         "-b", "run_test.elf",
@@ -195,8 +193,9 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
     };
     const int argc = countof(argv);
 
-    // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    // should exit with EXIT_FAILURE
+    ASSERT_EXIT( config::handleArgs( argc, argv),
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
 }
 
 //
@@ -217,14 +216,15 @@ TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
     ASSERT_NO_THROW( config::handleArgs( argc, argv));
 
 
-    auto test_function = []() 
-    { 
-        config::RequiredValue<std::string> second_binary_file_option = 
+    auto test_function = []()
+    {
+        config::RequiredValue<std::string> second_binary_file_option =
             {
-                "string_config_name,b", 
+                "string_config_name,b",
                 "input string_config_name file"
-            }; 
-    }; 
+            };
+    };
+
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( test_function(), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }

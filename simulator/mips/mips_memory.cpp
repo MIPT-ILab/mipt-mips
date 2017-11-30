@@ -12,5 +12,5 @@ FuncInstr MIPSMemory::fetch_instr( Addr PC)
 
     instr_cache.update( PC, instr);
 
-    return instr;    
+    return instr;
 }

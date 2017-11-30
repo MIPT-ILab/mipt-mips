@@ -21,7 +21,7 @@ TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
 
     // Call constructor and init
     ASSERT_NO_THROW( MIPS().init( valid_elf_file) );
-   
+
     // Do bad init
     ASSERT_EXIT( MIPS().init( "./1234567890/qwertyuop"),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");

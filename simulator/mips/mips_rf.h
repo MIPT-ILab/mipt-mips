@@ -25,7 +25,7 @@ class RF
              * instruction with WAW or RAW dependency from register $t0 can be
              * executed. The WAW dependency is just a workaround for #45 issue.
              */
-            bool is_valid = true; 
+            bool is_valid = true;
         };
         std::array<Reg, REG_NUM_MAX> array = {};
 
