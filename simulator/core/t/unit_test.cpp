@@ -26,7 +26,7 @@ TEST( Perf_Sim_init, Make_A_Step)
     GTEST_ASSERT_NO_DEATH( PerfMIPS( false).run( valid_elf_file, 1); );
 }
 
-TEST( Perf_Sim_init, Process_Wrong_Args) 
+TEST( Perf_Sim_init, Process_Wrong_Args)
 {
     // Do bad init
     ASSERT_EXIT( PerfMIPS( false).run( "./1234567890/qwertyuop", 1),
