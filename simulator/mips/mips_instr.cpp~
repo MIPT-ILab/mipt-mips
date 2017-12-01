@@ -424,11 +424,9 @@ void FuncInstr::initJ()
 
 void FuncInstr::init32()
 {
-    std::ostringstream oss;
-    if ( PC != 0)
-        oss << std::hex << "0x" << PC << ": ";
-    oss << name;
+    
        
+    
     switch ( operation)
     {
         case OUT_32_COUNT: 

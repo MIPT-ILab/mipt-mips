@@ -6,37 +6,36 @@
 #include <gtest/gtest.h>
 
 // Module
-#include "../func_sim.h"
+#include "../perf_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH;
-static const int64 num_steps = 2041;
+static const int64 num_steps = 2039;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
 
-TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
+TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
     // Just call a constructor
-    ASSERT_NO_THROW( MIPS mips );
+    GTEST_ASSERT_NO_DEATH( PerfMIPS mips( false); );
+}
 
-    // Call constructor and init
-    ASSERT_NO_THROW( MIPS().init( valid_elf_file) );
+TEST( Perf_Sim_init, Make_A_Step)
+{
+    // Call constructor and run one instr
+    GTEST_ASSERT_NO_DEATH( PerfMIPS( false).run( valid_elf_file, 1); );
+}
 
+TEST( Perf_Sim_init, Process_Wrong_Args)
+{
     // Do bad init
-    ASSERT_EXIT( MIPS().init( "./1234567890/qwertyuop"),
+    ASSERT_EXIT( PerfMIPS( false).run( "./1234567890/qwertyuop", 1),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
-TEST( Func_Sim, Make_A_Step)
+TEST( Perf_Sim, Run_Full_Trace)
 {
-    MIPS mips;
-    mips.init( valid_elf_file);
-    ASSERT_EQ( mips.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
-}
-
-TEST( Func_Sim, Run_Full_Trace)
-{
-    MIPS mips;
+    PerfMIPS mips( false);
     GTEST_ASSERT_NO_DEATH( mips.run( valid_elf_file, num_steps); );
 }
 
