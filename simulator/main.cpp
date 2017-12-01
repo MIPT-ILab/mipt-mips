@@ -27,21 +27,33 @@ namespace config {
 
 int main( int argc, const char* argv[])
 {
-    /* Analysing and handling of inserted arguments */
-    config::handleArgs( argc, argv);
+    try {
+        /* Analysing and handling of inserted arguments */
+        config::handleArgs( argc, argv);
 
-    /* running simulation */
-    if ( !config::functional_only)
-    {
-        PerfMIPS p_mips( config::disassembly_on);
-        p_mips.run( config::binary_filename,
-                    config::num_steps);
+        /* running simulation */
+        if ( !config::functional_only)
+        {
+            PerfMIPS p_mips( config::disassembly_on);
+            p_mips.run( config::binary_filename,
+                        config::num_steps);
+        }
+        else
+        {
+            MIPS mips( config::disassembly_on);
+            mips.run( config::binary_filename, config::num_steps);
+        }
     }
-    else
-    {
-        MIPS mips( config::disassembly_on);
-        mips.run( config::binary_filename, config::num_steps);
+    catch (const std::exception& e) {
+        std::cerr << *argv << ": " << e.what()
+                  << std::endl << std::endl;
+        return 2;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception\n";
+        return 3;
     }
 
     return 0;
 }
+
