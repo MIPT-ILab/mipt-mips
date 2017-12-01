@@ -194,8 +194,7 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
     const int argc = countof(argv);
 
     // should exit with EXIT_FAILURE
-    ASSERT_EXIT( config::handleArgs( argc, argv),
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "");
+    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
 //
