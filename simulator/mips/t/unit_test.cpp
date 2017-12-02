@@ -32,8 +32,6 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
 
 TEST( Func_instr_disasm, Process_Unknown_Instruction)
 {
-    TEST_BAD_OPCODE(0x71208821)
-    TEST_BAD_OPCODE(0x71208820)
     TEST_BAD_OPCODE(0x71398802)
     TEST_BAD_OPCODE(0x72290000)
     TEST_BAD_OPCODE(0x72290001)

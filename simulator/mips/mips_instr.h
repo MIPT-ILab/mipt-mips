@@ -1,5 +1,4 @@
-/*
- * func_instr.h - instruction parser for mips
+ /* func_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2014-2017 MIPT-MIPS
  */
@@ -97,7 +96,7 @@ class FuncInstr
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_J_SPECIAL,
-            OUT_32_COUNT,
+            OUT_SP2_COUNT,
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
@@ -130,6 +129,7 @@ class FuncInstr
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
+          
             const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
@@ -155,7 +155,7 @@ class FuncInstr
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMap32;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapMIPS32;
 
         static std::string_view regTableName(RegNum reg);
         static std::array<std::string_view, REG_NUM_MAX> regTable;
@@ -194,7 +194,7 @@ class FuncInstr
         void initR();
         void initI();
         void initJ();
-        void init32();
+        void initMIPS32();
         void initUnknown();
 
         // Predicate helpers - unary
@@ -312,7 +312,7 @@ class FuncInstr
         
         void execute_clz()   
         {
-            unsigned int v_dst = 0;
+            v_dst = 0;
             for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
             {
 		        if ( v_src1 & i)
@@ -323,7 +323,7 @@ class FuncInstr
         
         void execute_clo()   
         {
-            unsigned int v_dst = 0;
+            v_dst = 0;
             for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
             {
 		        if ( !(v_src1 & i))
