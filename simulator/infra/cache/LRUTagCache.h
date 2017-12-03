@@ -1,5 +1,5 @@
 /**
- * LRU cache module for BPU cache
+ * LRU cache module for CacheTagArray
  * @author Denis Los
 */
 
@@ -13,11 +13,11 @@
 #include <utility>
 
 // size_type should be a type of unsigned integer
-template <typename Key, typename size_type>
+template <typename Key>
 class LRUTagCache
 {
     public:
-        explicit LRUTagCache( size_type capacity)
+        explicit LRUTagCache( std::size_t capacity)
             : CAPACITY( capacity)
         {
             assert( capacity != 0u);
@@ -34,8 +34,8 @@ class LRUTagCache
         {   
             auto result = data.find( key);
             return ( result != data.end()) 
-                     ? std::pair<bool, size_type>( true, result -> second)
-                     : std::pair<bool, size_type>( false, 0u);
+                     ? std::pair<bool, std::size_t>( true, result -> second)
+                     : std::pair<bool, std::size_t>( false, 0u);
         }
 
         void update( const Key& key)
@@ -54,7 +54,7 @@ class LRUTagCache
     private:
         void allocate( const Key& key)
         {
-            size_type value = 0;
+            std::size_t value = 0;
 
             if ( number_of_elements == CAPACITY)
             {
@@ -78,13 +78,13 @@ class LRUTagCache
         }
 
     private:
-        std::unordered_map<Key, size_type> data{};
+        std::unordered_map<Key, std::size_t> data{};
 
         std::list<Key> lru_list{};
         std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
 
-        size_type number_of_elements = 0u;
-        size_type CAPACITY;
+        std::size_t number_of_elements = 0u;
+        std::size_t CAPACITY;
 };
 
 

@@ -10,10 +10,13 @@
 #include <infra/macro.h>
 
 
-
-uint32 CacheTagArray::check_arguments( uint32 size, uint32 ways)
+#include <iostream>
+uint32 CacheTagArray::check_arguments( uint32 size_in_bytes, 
+                                       uint32 ways,
+                                       uint32 line_size,
+                                       uint32 addr_size_in_bits)
 {
-    if ( size == 0)
+    if ( size_in_bytes == 0)
         serr << "ERROR: Wrong arguments! Cache size should be greater than zero"
              << std::endl << critical;
     
@@ -21,42 +24,59 @@ uint32 CacheTagArray::check_arguments( uint32 size, uint32 ways)
         serr << "ERROR: Wrong arguments! Num of ways should be greater than zero"
              << std::endl << critical;
     
-    if ( size < ways)
-        serr << "ERROR: Wrong arguments! Cache size should be greater"
-             << "than the number of ways" 
+    if ( line_size == 0)
+        serr << "ERROR: Wrong argument! Size of the line should be greater than zero"
              << std::endl << critical;
-
-    if ( !is_power_of_two( size))
-        serr << "ERROR: Wrong argumets! Cache size should be a power of 2"
-             << std::endl << critical;         
     
-    if ( size % ways != 0)
-        serr << "ERROR: Wrong arguments! Cache size should be multiple of"
-             << "the number of ways"
+    if ( addr_size_in_bits == 0)
+        serr << "ERROR: Wrong argument! Address size should be greater than zero"
              << std::endl << critical;
 
-    return size / ways;
+                 
+    if ( size_in_bytes < ways * line_size)
+        serr << "ERROR: Wrong arguments! Cache size should be greater"
+             << "than the number of ways multiplied by line size" 
+             << std::endl << critical;
+
+    if ( !is_power_of_two( size_in_bytes))
+        serr << "ERROR: Wrong argumets! Cache size should be a power of 2"
+             << std::endl << critical;
+    
+    if ( !is_power_of_two( line_size))
+        serr << "ERROR: Wrong arguments! Block size should be a power of 2"
+             << std::endl << critical;
+    
+    if ( size_in_bytes % ( line_size * ways) != 0)
+        serr << "ERROR: Wrong arguments! Cache size should be multiple of"
+             << "the number of ways and line size"
+             << std::endl << critical;
+
+
+    return size_in_bytes / ( line_size * ways);
 }
 
 
 
-std::pair<Addr, uint32> CacheTagArray::read( Addr addr)
+std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
     uint32 num_set = set( addr);
+    uint32 num_tag = tag( addr);
 
-    auto result = cache[ num_set].find( addr);
+    auto result = cache[ num_set].find( num_tag);
     if ( result.first)
-        cache[ num_set].update( addr); // update LRU if it's a hit
+        cache[ num_set].update( num_tag); // update LRU if it's a hit
 
     return result;    
 }
 
 
 
-std::pair<Addr, uint32> CacheTagArray::read_no_touch( Addr addr) const
+std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 {
     uint32 num_set = set( addr);
-    return cache[ num_set].find( addr);
+    uint32 num_tag = tag( addr);
+
+    return cache[ num_set].find( num_tag);
 }
 
 
@@ -64,9 +84,10 @@ std::pair<Addr, uint32> CacheTagArray::read_no_touch( Addr addr) const
 uint32 CacheTagArray::write( Addr addr)
 {
     uint32 num_set = set( addr);
+    uint32 num_tag = tag( addr);
 
-    cache[ num_set].update( addr);
-    const auto&[ is_hit, value] = cache[ num_set].find( addr);
+    cache[ num_set].update( num_tag);
+    const auto&[ is_hit, value] = cache[ num_set].find( num_tag);
     assert( is_hit);
 
     return value;
