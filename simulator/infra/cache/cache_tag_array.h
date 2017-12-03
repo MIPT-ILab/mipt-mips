@@ -21,15 +21,15 @@ class CacheTagArray : private Log
     public:
         CacheTagArray( uint32 size_in_bytes, 
                        uint32 ways,
-                       uint32 line_size = 4,
+                       uint32 size_of_line = 4,
                        uint32 addr_size_in_bits = 32)
             : Log( false)
             , number_of_sets( check_arguments( size_in_bytes, 
                                                ways,
-                                               line_size,
+                                               size_of_line,
                                                addr_size_in_bits))
             , number_of_ways( ways)
-            , line_size( line_size)
+            , line_size( size_of_line)
             , cache( number_of_sets, LRUTagCache<Addr>( number_of_ways))  
         { }
 
@@ -44,7 +44,7 @@ class CacheTagArray : private Log
         // If arguments are correct, it returns the number of sets
         uint32 check_arguments( uint32 size_in_bytes, 
                                 uint32 ways,
-                                uint32 line_size,
+                                uint32 size_of_line,
                                 uint32 addr_size_in_bits); 
 
     private:

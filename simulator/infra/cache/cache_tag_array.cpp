@@ -10,10 +10,10 @@
 #include <infra/macro.h>
 
 
-#include <iostream>
+
 uint32 CacheTagArray::check_arguments( uint32 size_in_bytes, 
                                        uint32 ways,
-                                       uint32 line_size,
+                                       uint32 size_of_line,
                                        uint32 addr_size_in_bits)
 {
     if ( size_in_bytes == 0)
@@ -24,7 +24,7 @@ uint32 CacheTagArray::check_arguments( uint32 size_in_bytes,
         serr << "ERROR: Wrong arguments! Num of ways should be greater than zero"
              << std::endl << critical;
     
-    if ( line_size == 0)
+    if ( size_of_line == 0)
         serr << "ERROR: Wrong argument! Size of the line should be greater than zero"
              << std::endl << critical;
     
@@ -33,7 +33,7 @@ uint32 CacheTagArray::check_arguments( uint32 size_in_bytes,
              << std::endl << critical;
 
                  
-    if ( size_in_bytes < ways * line_size)
+    if ( size_in_bytes < ways * size_of_line)
         serr << "ERROR: Wrong arguments! Cache size should be greater"
              << "than the number of ways multiplied by line size" 
              << std::endl << critical;
@@ -42,17 +42,17 @@ uint32 CacheTagArray::check_arguments( uint32 size_in_bytes,
         serr << "ERROR: Wrong argumets! Cache size should be a power of 2"
              << std::endl << critical;
     
-    if ( !is_power_of_two( line_size))
+    if ( !is_power_of_two( size_of_line))
         serr << "ERROR: Wrong arguments! Block size should be a power of 2"
              << std::endl << critical;
     
-    if ( size_in_bytes % ( line_size * ways) != 0)
+    if ( size_in_bytes % ( size_of_line * ways) != 0)
         serr << "ERROR: Wrong arguments! Cache size should be multiple of"
              << "the number of ways and line size"
              << std::endl << critical;
 
 
-    return size_in_bytes / ( line_size * ways);
+    return size_in_bytes / ( size_of_line * ways);
 }
 
 
