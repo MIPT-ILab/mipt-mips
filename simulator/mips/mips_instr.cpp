@@ -64,7 +64,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     {0x1B, { "divu",  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1} },
 
     // 0x1C - 0x1F double width multiplication/division
-    
+
     // Addition/Subtraction
     //key      name     format operation  memsize           pointer
     {0x20, { "add",  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1} },
@@ -171,7 +171,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapMIPS32 =
 {
-    // ********************* MIPS32 INSTRUCTIONS ************************* 
+    // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name   format         operation  memsize      pointer       mips version
     {0x20, { "clz", FORMAT_MIPS32, OUT_SP2_COUNT, 0, &FuncInstr::execute_clz, 32} },
@@ -220,7 +220,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
             break;
         case FORMAT_MIPS32:
             initMIPS32();
-            break;    
+            break;
         case FORMAT_UNKNOWN:
             initUnknown();
             break;
@@ -245,11 +245,11 @@ FuncInstr::Format FuncInstr::initFormat()
             it = isaMapRI.find( instr.asR.opcode);
             valid = ( it != isaMapRI.end());
             break;
-            
+
         case 0x1C: // MIPS32 instruction
             it = isaMapMIPS32.find( instr.asR.funct);
             valid = ( it != isaMapMIPS32.end());
-            break;    
+            break;
 
         default: // I and J instructions
             it = isaMapIJ.find( instr.asR.opcode);
@@ -324,9 +324,9 @@ void FuncInstr::initR()
 
             oss <<  " $" << regTableName(src1)
                 << ", $" << regTableName(src2);
-            break;    
+            break;
         case OUT_R_SPECIAL:
-            break;    
+            break;
         default:
             assert( false);
     }
@@ -432,20 +432,20 @@ void FuncInstr::initMIPS32()
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
     oss << name;
-       
+
     switch ( operation)
     {
-        case OUT_SP2_COUNT: 
+        case OUT_SP2_COUNT:
             src1 = static_cast<RegNum>(instr.asR.rs);
-            dst  = static_cast<RegNum>(instr.asR.rd);       
-           
+            dst  = static_cast<RegNum>(instr.asR.rd);
+
             oss <<  " $" << regTableName(dst )
-                << ", $" << regTableName(src1);           
+                << ", $" << regTableName(src1);
             break;
         default:
             assert( false);
-    } 
-    disasm = oss.str();     
+    }
+    disasm = oss.str();
 }
 
 void FuncInstr::initUnknown()
