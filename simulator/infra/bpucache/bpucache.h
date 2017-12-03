@@ -23,7 +23,6 @@ class BPUCache : private Log
             : Log( false)
             , number_of_sets( check_arguments( size, ways))
             , number_of_ways( ways)
-            , size_in_entries( size)
             , cache( number_of_sets, LRUTagCache<Addr, uint32>( number_of_ways))  
         { }
 
@@ -40,7 +39,6 @@ class BPUCache : private Log
     private:
         const uint32 number_of_sets;
         const uint32 number_of_ways;
-        const uint32 size_in_entries;
 
         std::vector<LRUTagCache<Addr, uint32>> cache;
 };

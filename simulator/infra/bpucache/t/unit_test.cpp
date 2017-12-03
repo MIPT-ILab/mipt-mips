@@ -26,31 +26,31 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_BPUCache)
 {
     // size_in_entries = 128
     // ways = 0
-    ASSERT_EXIT( BPUCache cache = BPUCache( 128, 0),
+    ASSERT_EXIT( BPUCache cache( 128, 0),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // size_in_entries = 0
     // ways = 16             
-    ASSERT_EXIT( BPUCache cache = BPUCache( 0, 16),
+    ASSERT_EXIT( BPUCache cache( 0, 16),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // size_in_entries = 0
     // ways = 0
-    ASSERT_EXIT( BPUCache cache = BPUCache( 0, 0),
+    ASSERT_EXIT( BPUCache cache( 0, 0),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // size_in_entries is power of 2, 
     // but the number of ways is not
-    ASSERT_EXIT( BPUCache cache = BPUCache( 32, 9),
+    ASSERT_EXIT( BPUCache cache( 32, 9),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // the number of ways is power of 2,
     // but size_in_entries is not
-    ASSERT_EXIT( BPUCache cache = BPUCache( 5, 16),
+    ASSERT_EXIT( BPUCache cache( 5, 16),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");          
 }
