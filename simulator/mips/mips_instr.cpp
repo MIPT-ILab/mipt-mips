@@ -64,7 +64,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     {0x1B, { "divu",  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1} },
 
     // 0x1C - 0x1F double width multiplication/division
-   
+    
     // Addition/Subtraction
     //key      name     format operation  memsize           pointer
     {0x20, { "add",  FORMAT_R, OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1} },
@@ -297,7 +297,6 @@ void FuncInstr::initR()
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
-
         case OUT_R_SHAMT:
             src1  = static_cast<RegNum>(instr.asR.rt);
             dst   = static_cast<RegNum>(instr.asR.rd);
@@ -336,7 +335,6 @@ void FuncInstr::initR()
     else
         disasm = oss.str();
 }
-
 
 void FuncInstr::initI()
 {
@@ -422,8 +420,10 @@ void FuncInstr::initJ()
         dst = REG_NUM_RA;
     else
         dst = REG_NUM_ZERO;
-
-    disasm = oss.str();
+    if ( instr.raw == 0x0ul)
+        disasm = "nop ";
+    else
+        disasm = oss.str();
 }
 
 void FuncInstr::initMIPS32()
@@ -444,11 +444,8 @@ void FuncInstr::initMIPS32()
             break;
         default:
             assert( false);
-    }  
-    if ( instr.raw == 0x0ul)
-        disasm = "nop ";
-    else
-        disasm = oss.str();     
+    } 
+    disasm = oss.str();     
 }
 
 void FuncInstr::initUnknown()
