@@ -13,9 +13,7 @@
 //unordered map for R-instructions
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
 {
-    {0xFF, {"###", OUT_UNKNOWN, 0, &FuncInstr::execute_unknown, 1} } ,
-
-     // **************** R INSTRUCTIONS ****************
+    // **************** R INSTRUCTIONS ****************
     // Constant shifts
     //key      name  operation  memsize           pointer
     {0x0, { "sll" , OUT_R_SHAMT, 0, &FuncInstr::execute_sll, 1} },
@@ -43,7 +41,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     // System calls
     //key      name     operation  memsize           pointer
     {0xC, { "syscall", OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1} },
-    {0xD, { "break", OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1} },
+    {0xD, { "break",   OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1} },
     //          0xE reserved
     //          0xF SYNC
 
@@ -58,40 +56,40 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
 
     // Multiplication/Division
     //key      name    operation  memsize           pointer
-    {0x18, { "mult", OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1} },
+    {0x18, { "mult",  OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1} },
     {0x19, { "multu", OUT_R_ARITHM, 0, &FuncInstr::execute_multu, 1} },
-    {0x1A, { "div", OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1} },
-    {0x1B, { "divu", OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1} },
+    {0x1A, { "div",   OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1} },
+    {0x1B, { "divu",  OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1} },
 
     // 0x1C - 0x1F double width multiplication/division
 
     // Addition/Subtraction
     //key      name   operation  memsize           pointer
-    {0x20, { "add", OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1} },
+    {0x20, { "add",  OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1} },
     {0x21, { "addu", OUT_R_ARITHM, 0, &FuncInstr::execute_addu, 1} },
-    {0x22, { "sub", OUT_R_ARITHM, 0, &FuncInstr::execute_sub,  1} },
+    {0x22, { "sub",  OUT_R_ARITHM, 0, &FuncInstr::execute_sub,  1} },
     {0x23, { "subu", OUT_R_ARITHM, 0, &FuncInstr::execute_subu, 1} },
 
     // Logical operations
     //key      name   operation  memsize           pointer
     {0x24, { "and", OUT_R_ARITHM, 0, &FuncInstr::execute_and,  1} },
-    {0x25, { "or", OUT_R_ARITHM, 0, &FuncInstr::execute_or,   1} },
+    {0x25, { "or",  OUT_R_ARITHM, 0, &FuncInstr::execute_or,   1} },
     {0x26, { "xor", OUT_R_ARITHM, 0, &FuncInstr::execute_xor,  1} },
     {0x27, { "nor", OUT_R_ARITHM, 0, &FuncInstr::execute_nor,  1} },
     //        0x28 reserved
     //        0x29 reserved
-    {0x2A, { "slt", OUT_R_ARITHM, 0, &FuncInstr::execute_slt,  1} },
+    {0x2A, { "slt",  OUT_R_ARITHM, 0, &FuncInstr::execute_slt,  1} },
     {0x2B, { "sltu", OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1} },
 
     // 0x2C - 0x2F double width addition/substraction
 
     // Conditional traps (MIPS II)
     //key      name operation  memsize           pointer
-    {0x30, { "tge", OUT_R_TRAP, 0, &FuncInstr::execute_tge,  2} },
+    {0x30, { "tge",  OUT_R_TRAP, 0, &FuncInstr::execute_tge,  2} },
     {0x31, { "tgeu", OUT_R_TRAP, 0, &FuncInstr::execute_tgeu, 2} },
-    {0x32, { "tlt", OUT_R_TRAP, 0, &FuncInstr::execute_tlt,  2} },
+    {0x32, { "tlt",  OUT_R_TRAP, 0, &FuncInstr::execute_tlt,  2} },
     {0x33, { "tltu", OUT_R_TRAP, 0, &FuncInstr::execute_tltu, 2} },
-    {0x34, { "teq", OUT_R_TRAP, 0, &FuncInstr::execute_teq,  2} },
+    {0x34, { "teq",  OUT_R_TRAP, 0, &FuncInstr::execute_teq,  2} },
     //        0x35 reserved
     {0x36, { "tne", OUT_R_TRAP, 0, &FuncInstr::execute_tne,  2} }
     //        0x37 reserved
@@ -107,37 +105,36 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 {
     // ********************* I and J INSTRUCTIONS *************************
-    {0xFF, {"###", OUT_UNKNOWN, 0, &FuncInstr::execute_unknown, 1} } ,
     // Branches
     //key     name operation  memsize       pointer
     {0x2, { "j", OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
     {0x3, { "jal", OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1 } },
 
-    {0x4, { "beq", OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1} },
-    {0x5, { "bne", OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1} },
+    {0x4, { "beq",  OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1} },
+    {0x5, { "bne",  OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1} },
     {0x6, { "blez", OUT_I_BRANCH_0,  0, &FuncInstr::execute_blez, 1} },
     {0x7, { "bgtz", OUT_I_BRANCH_0,  0, &FuncInstr::execute_bgtz, 1} },
 
     // Addition/Subtraction
     //key     name  operation  memsize       pointer
-    {0x8, { "addi", OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1} },
+    {0x8, { "addi",  OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1} },
     {0x9, { "addiu", OUT_I_ARITHM, 0, &FuncInstr::execute_addiu, 1} },
 
     // Logical operations
     //key     name   operation  memsize       pointer
-    {0xA, { "slti", OUT_I_ARITHM, 0, &FuncInstr::execute_slti,  1} },
+    {0xA, { "slti",  OUT_I_ARITHM, 0, &FuncInstr::execute_slti,  1} },
     {0xB, { "sltiu", OUT_I_ARITHM, 0, &FuncInstr::execute_sltiu, 1} },
-    {0xC, { "andi", OUT_I_ARITHM, 0, &FuncInstr::execute_andi,  1} },
-    {0xD, { "ori", OUT_I_ARITHM, 0, &FuncInstr::execute_ori,   1} },
+    {0xC, { "andi",  OUT_I_ARITHM, 0, &FuncInstr::execute_andi,  1} },
+    {0xD, { "ori",  OUT_I_ARITHM, 0, &FuncInstr::execute_ori,   1} },
     {0xE, { "xori", OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1} },
-    {0xF, { "lui", OUT_I_CONST,  0, &FuncInstr::execute_lui,   1} },
+    {0xF, { "lui",  OUT_I_CONST,  0, &FuncInstr::execute_lui,   1} },
 
     // 0x10 - 0x13 coprocessor operations
 
     // Likely branches (MIPS II)
     //key     name   operation  memsize       pointer
-    {0x14, { "beql", OUT_I_BRANCH,   0, &FuncInstr::execute_beq,  2} },
-    {0x15, { "bnel", OUT_I_BRANCH,   0, &FuncInstr::execute_bne,  2} },
+    {0x14, { "beql",  OUT_I_BRANCH,   0, &FuncInstr::execute_beq,  2} },
+    {0x15, { "bnel",  OUT_I_BRANCH,   0, &FuncInstr::execute_bne,  2} },
     {0x16, { "blezl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_blez, 2} },
     {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_bgtz, 2} },
 
@@ -145,11 +142,11 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     // 0x1A - 0x1B load double word left/right
 
     // Loads
-    //key     name   peration  memsize       pointer
-    {0x20, { "lb", OUT_I_LOAD,  1, &FuncInstr::calculate_load_addr, 1} },
-    {0x21, { "lh", OUT_I_LOAD,  2, &FuncInstr::calculate_load_addr, 1} },
+    //key     name  operation  memsize       pointer
+    {0x20, { "lb",  OUT_I_LOAD,  1, &FuncInstr::calculate_load_addr, 1} },
+    {0x21, { "lh",  OUT_I_LOAD,  2, &FuncInstr::calculate_load_addr, 1} },
     {0x22, { "lwl", OUT_I_LOADL, 4, &FuncInstr::calculate_load_addr, 1} },
-    {0x23, { "lw", OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1} },
+    {0x23, { "lw",  OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1} },
     {0x24, { "lbu", OUT_I_LOADU, 1, &FuncInstr::calculate_load_addr, 1} },
     {0x25, { "lhu", OUT_I_LOADU, 2, &FuncInstr::calculate_load_addr, 1} },
     {0x26, { "lwr", OUT_I_LOADR, 4, &FuncInstr::calculate_load_addr, 1} },
@@ -157,10 +154,10 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 
     // Store
     //key     name   operation  memsize       pointer
-    {0x28, { "sb", OUT_I_STORE,  1, &FuncInstr::calculate_store_addr, 1} },
-    {0x29, { "sh", OUT_I_STORE,  2, &FuncInstr::calculate_store_addr, 1} },
+    {0x28, { "sb",  OUT_I_STORE,  1, &FuncInstr::calculate_store_addr, 1} },
+    {0x29, { "sh",  OUT_I_STORE,  2, &FuncInstr::calculate_store_addr, 1} },
     {0x2A, { "swl", OUT_I_STOREL, 4, &FuncInstr::calculate_store_addr, 1} },
-    {0x2B, { "sw", OUT_I_STORE,  4, &FuncInstr::calculate_store_addr, 1} },
+    {0x2B, { "sw",  OUT_I_STORE,  4, &FuncInstr::calculate_store_addr, 1} },
     //       0x2C   store double word left
     //       0x2D   store double word right
     {0x2E, { "swr", OUT_I_STORER, 4, &FuncInstr::calculate_store_addr, 1 } }
