@@ -58,6 +58,18 @@ enum RegNum : uint8
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
 
+inline uint32 count_zeros(uint32 value)
+{
+    uint32_t count = 0;
+    for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
+    {
+        if ( ( value & i) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
@@ -220,18 +232,6 @@ class FuncInstr
         // Predicate helpers - immediate unsigned
         bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
         bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
-        
-        uint32 count_zeros(uint32 value) 
-        {
-            uint32_t count = 0;
-            for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
-            {
-                if ( value & i)
-                   break; 
-                count++;  
-            }  
-            return count;
-        }
         
         void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
         void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
