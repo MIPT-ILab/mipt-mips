@@ -16,7 +16,7 @@ cl /I. /EHsc /c /nologo /MD ^
    infra/memory/memory.cpp ^
    infra/config/config.cpp ^
    infra/ports/ports.cpp ^
-   infra/cache/cache_tag_array.cpp ^
+   infra/bpucache/bpucache.cpp ^
    mips/mips_instr.cpp ^
    mips/mips_memory.cpp ^
    func_sim/func_sim.cpp ^
@@ -31,7 +31,7 @@ set TRUNK=%cd%
 set TRUNKX=%TRUNK:\=\\%
 
 rem Build and run all the tests
-for %%G in (infra\elf_parser infra\config infra\memory infra\ports infra\string mips infra\instrcache func_sim bpu core) do (
+for %%G in (infra\bpucache infra\elf_parser infra\config infra\memory infra\ports infra\string mips infra\instrcache func_sim bpu core) do (
     echo Testing %%G
     cd %%G\t
     cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib ^

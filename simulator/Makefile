@@ -18,7 +18,7 @@ CPPS= \
     infra/memory/memory.cpp \
     infra/config/config.cpp \
     infra/ports/ports.cpp \
-    infra/cache/cache_tag_array.cpp \
+    infra/bpucache/bpucache.cpp \
     mips/mips_instr.cpp \
     mips/mips_memory.cpp \
     func_sim/func_sim.cpp \
@@ -60,6 +60,7 @@ $(GTEST_LIB): $(GTEST_OBJ)
 ####### TESTS #######
 
 TESTS:= \
+    infra/bpucache \
     infra/elf_parser \
     infra/memory \
     infra/config \
