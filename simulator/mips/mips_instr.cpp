@@ -106,8 +106,6 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
 //unordered map for I-instructions and J-instructions
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 {
-    // ********************** REGIMM INSTRUCTIONS *************************
-
     // ********************* I and J INSTRUCTIONS *************************
     {0xFF, {"###", FORMAT_UNKNOWN, OUT_UNKNOWN, 0, &FuncInstr::execute_unknown, 1} } ,
     // Branches
@@ -171,6 +169,15 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     // 0x30 - 0x3F atomic load/stores
 };
 
+const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapMIPS32 =
+{
+    // ********************* MIPS32 INSTRUCTIONS *************************
+    //SPECIAL 2
+    //key     name   format         operation  memsize      pointer       mips version
+    {0x20, { "clz", FORMAT_MIPS32, OUT_SP2_COUNT, 0, &FuncInstr::execute_clz, 32} },
+    {0x21, { "clo", FORMAT_MIPS32, OUT_SP2_COUNT, 0, &FuncInstr::execute_clo, 32} }
+};
+
 std::array<std::string_view, REG_NUM_MAX> FuncInstr::regTable =
 {{
     "zero",
@@ -211,6 +218,9 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
         case FORMAT_J:
             initJ();
             break;
+        case FORMAT_MIPS32:
+            initMIPS32();
+            break;
         case FORMAT_UNKNOWN:
             initUnknown();
             break;
@@ -234,6 +244,11 @@ FuncInstr::Format FuncInstr::initFormat()
         case 0x1: // RegIMM instruction
             it = isaMapRI.find( instr.asR.opcode);
             valid = ( it != isaMapRI.end());
+            break;
+
+        case 0x1C: // MIPS32 instruction
+            it = isaMapMIPS32.find( instr.asR.funct);
+            valid = ( it != isaMapMIPS32.end());
             break;
 
         default: // I and J instructions
@@ -282,7 +297,6 @@ void FuncInstr::initR()
                 << ", $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
-
         case OUT_R_SHAMT:
             src1  = static_cast<RegNum>(instr.asR.rt);
             dst   = static_cast<RegNum>(instr.asR.rd);
@@ -321,7 +335,6 @@ void FuncInstr::initR()
     else
         disasm = oss.str();
 }
-
 
 void FuncInstr::initI()
 {
@@ -407,7 +420,31 @@ void FuncInstr::initJ()
         dst = REG_NUM_RA;
     else
         dst = REG_NUM_ZERO;
+    if ( instr.raw == 0x0ul)
+        disasm = "nop ";
+    else
+        disasm = oss.str();
+}
 
+void FuncInstr::initMIPS32()
+{
+    std::ostringstream oss;
+    if ( PC != 0)
+        oss << std::hex << "0x" << PC << ": ";
+    oss << name;
+
+    switch ( operation)
+    {
+        case OUT_SP2_COUNT:
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            dst  = static_cast<RegNum>(instr.asR.rd);
+
+            oss <<  " $" << regTableName(dst )
+                << ", $" << regTableName(src1);
+            break;
+        default:
+            assert( false);
+    }
     disasm = oss.str();
 }
 

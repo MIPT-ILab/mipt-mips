@@ -32,8 +32,6 @@ TEST( Func_instr_init, Process_Wrong_Args_Of_Constr)
 
 TEST( Func_instr_disasm, Process_Unknown_Instruction)
 {
-    TEST_BAD_OPCODE(0x71208821)
-    TEST_BAD_OPCODE(0x71208820)
     TEST_BAD_OPCODE(0x71398802)
     TEST_BAD_OPCODE(0x72290000)
     TEST_BAD_OPCODE(0x72290001)
@@ -68,8 +66,8 @@ TEST( Func_instr_disasm, Process_Disasm)
     ASSERT_EQ(FuncInstr(0x01398820).Dump(), "add $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x01398821).Dump(), "addu $s1, $t1, $t9");
     ASSERT_EQ(FuncInstr(0x01398824).Dump(), "and $s1, $t1, $t9");
-//  ASSERT_EQ(FuncInstr(0x71208821).Dump(), "clo $s1, $t1");
-//  ASSERT_EQ(FuncInstr(0x71208820).Dump(), "clz $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x71208821).Dump(), "clo $s1, $t1");
+    ASSERT_EQ(FuncInstr(0x71208820).Dump(), "clz $s1, $t1");
     ASSERT_EQ(FuncInstr(0x0229001a).Dump(), "div $zero, $s1, $t1");
     ASSERT_EQ(FuncInstr(0x0229001b).Dump(), "divu $zero, $s1, $t1");
     ASSERT_EQ(FuncInstr(0x0139880a).Dump(), "movz $s1, $t1, $t9");

@@ -1,5 +1,4 @@
-/*
- * func_instr.h - instruction parser for mips
+ /* func_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2014-2017 MIPT-MIPS
  */
@@ -70,6 +69,7 @@ class FuncInstr
             FORMAT_R,
             FORMAT_I,
             FORMAT_J,
+            FORMAT_MIPS32,
             FORMAT_UNKNOWN
         };
 
@@ -96,6 +96,7 @@ class FuncInstr
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_J_SPECIAL,
+            OUT_SP2_COUNT,
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
@@ -128,6 +129,7 @@ class FuncInstr
                 unsigned imm    :26;
                 unsigned opcode :6;
             } asJ;
+          
             const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
@@ -153,6 +155,7 @@ class FuncInstr
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapMIPS32;
 
         static std::string_view regTableName(RegNum reg);
         static std::array<std::string_view, REG_NUM_MAX> regTable;
@@ -191,6 +194,7 @@ class FuncInstr
         void initR();
         void initI();
         void initJ();
+        void initMIPS32();
         void initUnknown();
 
         // Predicate helpers - unary
@@ -216,7 +220,19 @@ class FuncInstr
         // Predicate helpers - immediate unsigned
         bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
         bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
-
+        
+        uint32 count_zeros(uint32 value) 
+        {
+            uint32_t count = 0;
+            for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
+            {
+                if ( value & i)
+                   break; 
+                count++;  
+            }  
+            return count;
+        }
+        
         void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
         void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
         void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
@@ -305,7 +321,10 @@ class FuncInstr
             if ( _is_jump_taken)
                 new_PC += sign_extend( v_imm) << 2;
         }
-
+        
+        void execute_clo() { v_dst = count_zeros( ~v_src1); }
+        void execute_clz() { v_dst = count_zeros(  v_src1); }
+        
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
 
