@@ -12,7 +12,7 @@
 #include <memory>
 
 // MIPT_MIPS modules
-#include <infra/bpucache/bpucache.h>
+#include <infra/cache/cache_tag_array.h>
 #include <infra/log.h>
 #include <infra/types.h>
 
@@ -43,7 +43,7 @@ template<typename T>
 class BP final: public BaseBP
 {
     std::vector<std::vector<T>> data;
-    BPUCache cache;
+    CacheTagArray cache;
 
 public:
     BP( uint32 size_in_entries, uint32 ways)
