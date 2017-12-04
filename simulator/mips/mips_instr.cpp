@@ -238,6 +238,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
         mem_size  = entry.mem_size;
         name      = entry.name;
         function  = entry.function;
+        init();
     }
     else {
         std::ostringstream oss;
@@ -246,9 +247,11 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
         oss << std::hex << std::setfill( '0')
             << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown";
         disasm = oss.str();
-        return;
     }
+}
 
+void FuncInstr::init() 
+{
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
