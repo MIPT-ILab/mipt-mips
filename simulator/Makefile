@@ -61,6 +61,7 @@ $(GTEST_LIB): $(GTEST_OBJ)
 ####### TESTS #######
 
 TESTS:= \
+    infra/cache \
     infra/elf_parser \
     infra/memory \
     infra/config \

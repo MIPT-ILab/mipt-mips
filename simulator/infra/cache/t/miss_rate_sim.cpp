@@ -13,7 +13,7 @@
 #include <fstream>
 
 /* Simulator modules. */
-#include "../cache_tag_array.h"
+#include "cache_tag_array.h"
 
 int main( int argc, char* argv[])
 {
@@ -33,7 +33,7 @@ int main( int argc, char* argv[])
     }
     if ( argv[ 2] == nullptr)
     {
-        srd::cerr << "ERROR: Wrong second argument! Required name of output file "
+        std::cerr << "ERROR: Wrong second argument! Required name of output file "
                   << "with miss rates." << std::endl;
         exit( EXIT_FAILURE);
     }
@@ -65,7 +65,7 @@ int main( int argc, char* argv[])
         {
             CacheTagArray cta( 1024 * cache_size, associativity);
             uint64 hit = 0, miss = 0;
-            while ( file_in >> hex >> addr) // while file contains addresses
+            while ( file_in >> std::hex >> addr) // while file contains addresses
             {
                 if ( cta.read( addr).first) // hit
                 {
@@ -77,9 +77,8 @@ int main( int argc, char* argv[])
                 }
             }
             file_in.clear(); // reset "EOF" flag on file stream
-            file_in.seekg( ifstream::beg); // set file pointer to the beginning
-            double rate = 1.0 * miss / ( hit + miss);
-            file_out << rate << ", ";
+            file_in.seekg( std::ifstream::beg); // set file pointer to the beginning
+            file_out << miss << " " << hit << " ";
             file_out.flush(); // immidiate print to the file (to avoid delays)
         }
         file_out << std::endl;
@@ -89,7 +88,7 @@ int main( int argc, char* argv[])
     {
         CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4);
         uint64 hit = 0, miss = 0;
-        while ( file_in >> hex >> addr)
+        while ( file_in >> std::hex >> addr)
         {
             if ( cta.read( addr).first)
             {
@@ -101,9 +100,8 @@ int main( int argc, char* argv[])
             }
         }
         file_in.clear();
-        file_in.seekg( ifstream::beg);
-        double rate = 1.0 * miss / ( hit + miss);
-        file_out << rate << ", ";
+        file_in.seekg( std::ifstream::beg);
+        file_out << miss << " " << hit << " ";
         file_out.flush();
     }
     file_out << std::endl;
