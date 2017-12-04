@@ -252,7 +252,7 @@ class FuncInstr
         void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
         void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
 
-        // Function-templated methods is a little-known feature of C++, but useful here
+        // Function-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
         void execute_set() { v_dst = static_cast<uint32>((this->*p)()); }
 

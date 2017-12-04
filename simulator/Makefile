@@ -51,7 +51,7 @@ GTEST_OBJ:=$(OBJ_DIR)/gtest-all.o
 
 $(GTEST_OBJ): $(GTEST_DIR)/src/gtest-all.cc
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
 
 $(GTEST_LIB): $(GTEST_OBJ)
 	@echo "[ar] $@"
