@@ -58,7 +58,6 @@ CacheTagArrayCheck::CacheTagArrayCheck(
 		      ways( ways),
 		      line_size( line_size),
 		      addr_size_in_bits( addr_size_in_bits)
-
 {
     /* All args are not less than zero because of "unsigned" keyword. */
     if ( size_in_bytes == 0)
@@ -77,6 +76,9 @@ CacheTagArrayCheck::CacheTagArrayCheck(
         serr << "ERROR: Wrong arguments! Address size should be greater than zero"
              << std::endl << critical;
 
+    if ( addr_size_in_bits > 32)
+        serr << "ERROR: Wrong arguments! Address size should be less or equal than 32"
+             << std::endl << critical;
     /*
      * It also checks "size_in_bytes < line_size" and "size_in_bytes
      * < ways".
@@ -113,6 +115,7 @@ CacheTagArray::CacheTagArray( uint32 size_in_bytes,
                               CacheTagArrayCheck( size_in_bytes, ways,
                                                   line_size, addr_size_in_bits),
                               num_sets( size_in_bytes / ( line_size * ways)),
+                              addr_mask( bitmask<Addr>( addr_size_in_bits)),
                               array( num_sets, std::vector<CacheTag>( ways)),
                               lru( ways, num_sets)
 {
@@ -163,12 +166,12 @@ uint32 CacheTagArray::write( Addr addr)
 uint32 CacheTagArray::set( Addr addr) const
 {
     /* Cut "logbin(line_size)" bits from the end. */
-    return (addr / line_size) & (num_sets - 1);
+    return ((addr & addr_mask) / line_size) & (num_sets - 1);
 }
 
 Addr CacheTagArray::tag( Addr addr) const
 {
     /* Cut "logbin(line_size)" bits from the end. */
-    return addr / line_size;
+    return (addr & addr_mask) / line_size;
 }
 
