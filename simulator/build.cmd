@@ -12,6 +12,7 @@ cl /I. /EHsc /c /nologo /MD ^
    /D_HAS_AUTO_PTR_ETC=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
    /std:c++17 ^
+   infra/macro_test.cpp ^
    infra/elf_parser/elf_parser.cpp ^
    infra/memory/memory.cpp ^
    infra/config/config.cpp ^
