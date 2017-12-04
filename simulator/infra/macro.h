@@ -14,6 +14,8 @@
 #include <type_traits>
 #include <algorithm>
 
+#include <infra/types.h>
+
 /* Returns size of a static array */
 template<typename T, size_t N>
 constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
@@ -42,7 +44,7 @@ constexpr auto bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T
 template<typename T,
          typename = std::enable_if_t<std::is_integral<T>::value>,         // only integral
          typename = std::enable_if_t<std::numeric_limits<T>::radix == 2>, // only binary
-         typename = std::enable_if_t<bitwidth<T> <= bitwidth<unsigned long long>> // only narrow
+         typename = std::enable_if_t<bitwidth<T> <= bitwidth<uint64>> // only narrow
        >
 constexpr auto popcount( T x) noexcept
 {

@@ -5,7 +5,6 @@
  * Copyright 2017 MIPT-MIPS
  */
 
-#include <infra/types.h>
 #include <infra/macro.h>
  
 static char array[] = "Hello World!";
@@ -16,8 +15,8 @@ static_assert(is_power_of_two(2));
 static_assert(is_power_of_two(4));
 static_assert(!is_power_of_two(5));
 
-static_assert(min_sizeof<char, int, long long>() == sizeof(char));
-static_assert(max_sizeof<char, int, long long>() == sizeof(long long));
+static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
+static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));
 
 static_assert(bitwidth<int8> == 8);
 static_assert(bitwidth<int16> == 16);
