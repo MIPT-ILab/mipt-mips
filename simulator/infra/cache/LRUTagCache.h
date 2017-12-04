@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <utility>
 
-// size_type should be a type of unsigned integer
+
 template <typename Key>
 class LRUTagCache
 {
