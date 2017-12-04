@@ -14,6 +14,7 @@ include ./options.mk
 #
 # Enter for build "perf_sim" program
 CPPS= \
+    infra/macro_test.cpp \
     infra/elf_parser/elf_parser.cpp \
     infra/memory/memory.cpp \
     infra/config/config.cpp \

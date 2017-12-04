@@ -28,11 +28,11 @@ void ignored( const T& /* unused */) noexcept { }
 
 /* Find minimal sizeof */
 template<typename ... Args>
-constexpr size_t min_sizeof() noexcept { return std::min(sizeof(Args)...); }
+constexpr size_t min_sizeof() noexcept { return std::min({sizeof(Args)...}); }
 
 /* Find maximal sizeof */
 template<typename ... Args>
-constexpr size_t max_sizeof() noexcept { return std::max(sizeof(Args)...); }
+constexpr size_t max_sizeof() noexcept { return std::max({sizeof(Args)...}); }
 
 // sizeof(x)*CHAR_BIT
 template<typename T>
@@ -44,7 +44,7 @@ template<typename T,
          typename = std::enable_if_t<std::numeric_limits<T>::radix == 2>, // only binary
          typename = std::enable_if_t<bitwidth<T> <= bitwidth<unsigned long long>> // only narrow
        >
-auto popcount( T x) noexcept
+constexpr auto popcount( T x) noexcept
 {
     return std::bitset<bitwidth<T>>( static_cast<typename std::make_unsigned<T>::type>( x)).count();
 }
