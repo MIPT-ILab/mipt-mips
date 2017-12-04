@@ -49,5 +49,10 @@ auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( static_cast<typename std::make_unsigned<T>::type>( x)).count();
 }
 
+template <typename T>
+static constexpr T bitmask(unsigned int const onecount)
+{
+    return static_cast<T>(-(onecount != 0)) & (static_cast<T>(-1) >> (bitwidth<T> - onecount));
+}
 
 #endif

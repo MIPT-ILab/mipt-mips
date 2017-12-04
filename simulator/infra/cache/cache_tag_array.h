@@ -44,7 +44,6 @@ public:
         const uint32 ways;
         const uint32 line_size;
         const uint32 addr_size_in_bits;
-
 };
 
 class CacheTagArray : public CacheTagArrayCheck
@@ -58,6 +57,7 @@ class CacheTagArray : public CacheTagArrayCheck
         };
 
         const uint32 num_sets;
+        const Addr   addr_mask;
 
         std::vector<std::vector<CacheTag>> array; // array of tags
         LRUInfo lru; // LRU algorithm module
