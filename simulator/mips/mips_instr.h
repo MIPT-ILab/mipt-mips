@@ -140,6 +140,7 @@ class FuncInstr
         } instr;
 
         using Execute = void (FuncInstr::*)();
+        using Predicate = bool (FuncInstr::*)() const;
 
         struct ISAEntry
         {
@@ -251,11 +252,6 @@ class FuncInstr
         void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
         void execute_lui()   { v_dst = sign_extend( v_imm) << 0x10; }
 
-        void execute_slt()   { v_dst = static_cast<uint32>( lt()); }
-        void execute_sltu()  { v_dst = static_cast<uint32>( ltu()); }
-        void execute_slti()  { v_dst = static_cast<uint32>( lti()); }
-        void execute_sltiu() { v_dst = static_cast<uint32>( ltiu()); }
-
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -265,15 +261,15 @@ class FuncInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
 
-        void execute_movn()  { if(v_src2 != 0) v_dst = v_src1; else writes_dst = false;}
-        void execute_movz()  { if(v_src2 == 0) v_dst = v_src1; else writes_dst = false;}
+        void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
+        void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
 
-        void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tlt()  { if ( lt() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tltu() { if ( ltu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_teq()  { if ( eq() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tne()  { if ( ne() ) trap = TrapType::EXPLICIT_TRAP; }
+        // Function-templated method is a little-known feature of C++, but useful here
+        template<Predicate p>
+        void execute_set() { v_dst = static_cast<uint32>((this->*p)()); }
+
+        template<Predicate p>
+        void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
 
         void execute_beq()
         {

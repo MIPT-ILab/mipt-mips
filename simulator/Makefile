@@ -14,6 +14,7 @@ include ./options.mk
 #
 # Enter for build "perf_sim" program
 CPPS= \
+    infra/macro_test.cpp \
     infra/elf_parser/elf_parser.cpp \
     infra/memory/memory.cpp \
     infra/config/config.cpp \
@@ -51,7 +52,7 @@ GTEST_OBJ:=$(OBJ_DIR)/gtest-all.o
 
 $(GTEST_OBJ): $(GTEST_DIR)/src/gtest-all.cc
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
 
 $(GTEST_LIB): $(GTEST_OBJ)
 	@echo "[ar] $@"

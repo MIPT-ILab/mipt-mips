@@ -1,6 +1,6 @@
 /**
- * Unit tests for CacheTagArray
- * @author Denis Los 
+ * Tests for CacheTagArray
+ * @author Oleg Ladin, Denis Los 
  */
 
 // Google Test Library
@@ -14,11 +14,8 @@
 #include <infra/types.h>
 
 
-#define GTEST_ASSERT_NO_DEATH( statement)                        \
-    ASSERT_EXIT( { statement}::exit( EXIT_SUCCESS),              \
-                 ::testing::ExitedWithCode( EXIT_SUCCESS), "");  \
-    statement
-
+#include <fstream>
+#include <vector>
 
 
 
@@ -84,76 +81,111 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
 
 
 
-TEST( check_lru_update_and_find, Check_LRU_Full_Update_And_Find)
+TEST( miss_rate_sim, Miss_Rate_Sim_Test)
 {
-    const uint32 CAPACITY = 128;
-    LRUTagCache<Addr> cache( CAPACITY);
+    const std::string MEM_TRACE_FILENAME = "mem_trace.txt";
+    const std::string MISS_RATE_FILENAME = "miss_rate.txt";
 
-    std::pair<bool, uint32> result;
+    // open and check mem_trace file
+    std::ifstream mem_trace_file;
+    mem_trace_file.open( MEM_TRACE_FILENAME, std::ifstream::in);
+    ASSERT_TRUE( mem_trace_file.is_open());
 
-    // try to find an element in the empty cache
-    GTEST_ASSERT_NO_DEATH( result = cache.find( 10););
-    ASSERT_FALSE( result.first);
+    // open and check miss_rate file
+    std::ifstream miss_rate_file;
+    miss_rate_file.open( MISS_RATE_FILENAME, std::ifstream::in);
+    ASSERT_TRUE( miss_rate_file.is_open());
 
+    // Cache parameters
+    std::vector<uint32> associativities = { 1, 2, 4, 8, 16 };
+    std::vector<uint32> cache_sizes = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+    Addr addr;
+
+
+
+    // test CacheTagArray on different parameters
+    for ( auto associativity : associativities)
+        for ( auto cache_size : cache_sizes)
+        {
+            CacheTagArray cta( 1024 * cache_size, associativity);
+            
+            std::size_t hit = 0;
+            std::size_t miss = 0;
+
+            while ( mem_trace_file >> std::hex >> addr)
+                if ( cta.read( addr).first) // hit
+                    hit++;
+                else                        // miss
+                {
+                    miss++;
+                    cta.write( addr); // load to the cache
+                }
+
+            // hit and miss numbers are both needed 
+            // because mem_trace file can be changed
+            std::size_t sample_hit;
+            std::size_t sample_miss;
+
+            // read sample miss rates from miss_rate file
+            // and check whether a file with sample miss rates has been corrupted
+            ASSERT_TRUE( miss_rate_file >> sample_miss);
+            ASSERT_TRUE( miss_rate_file >> sample_hit);
+
+            // check whether sample hit and miss numbers
+            // are equal to the evaluated ones 
+            ASSERT_EQ( hit, sample_hit);
+            ASSERT_EQ( miss, sample_miss);
+
+            mem_trace_file.clear(); // reset "EOF" flag on file stream
+            mem_trace_file.seekg( std::ifstream::beg); // set file pointer to the beginning
+        }
     
-    Addr addr = 0;
-    for ( uint32 i = 0; i < CAPACITY; i++)
+
+
+
+    // test full-assotiative cache
+    for ( auto cache_size : cache_sizes)
     {
-        GTEST_ASSERT_NO_DEATH( cache.update( addr););
-        GTEST_ASSERT_NO_DEATH( result = cache.find( addr););
-        ASSERT_TRUE( result.first);
-        ASSERT_EQ( result.second, i);
-        addr++;
+        CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4);
+        
+        std::size_t hit = 0;
+        std::size_t miss = 0;
+
+        while ( mem_trace_file >> std::hex >> addr)
+            if ( cta.read( addr).first)  // hit
+                hit++;
+            else                         // miss
+            {
+                miss++;
+                cta.write( addr);
+            }
+
+        // hit and miss numbers are both needed 
+        // because mem_trace file can be changed
+        std::size_t sample_hit;
+        std::size_t sample_miss;
+            
+        // read sample miss rates from miss_rate file
+        // and check whether a file with sample miss rates has been corrupted
+        ASSERT_TRUE( miss_rate_file >> sample_miss);
+        ASSERT_TRUE( miss_rate_file >> sample_hit);
+
+        // check whether sample hit and miss numbers
+        // are equal to the evaluated ones 
+        ASSERT_EQ( hit, sample_hit);
+        ASSERT_EQ( miss, sample_miss);
+
+        mem_trace_file.clear(); // reset "EOF" flag on file stream
+        mem_trace_file.seekg( std::ifstream::beg); // set file pointer to the beginning   
     }
 
-    // make (Addr = 1; way = 1) the least recently used element  
-    GTEST_ASSERT_NO_DEATH( cache.update( 0););
-    
-    // add new element with Addr = CAPACITY and check lru
-    GTEST_ASSERT_NO_DEATH( cache.update( addr););
-    GTEST_ASSERT_NO_DEATH( result = cache.find( addr););
-    ASSERT_TRUE( result.first);
-    ASSERT_EQ( result.second, 1);
+
+    mem_trace_file.close();
+    miss_rate_file.close();
 }
 
 
 
-TEST( check_method_get_capacity, Check_Method_Get_Capacity)
-{
-    const uint32 CAPACITY = 512;
-    LRUTagCache<Addr> cache( CAPACITY);
-
-    ASSERT_EQ( cache.get_capacity(), CAPACITY);
-
-    const Addr TEST_ADDR = 12;
-    GTEST_ASSERT_NO_DEATH( cache.update( TEST_ADDR););
-    ASSERT_EQ( cache.get_capacity(), CAPACITY);
-}
-
-
-
-TEST( check_size_and_empty, Check_Methods_Size_And_Empty)
-{
-    const uint32 CAPACITY = 213;
-    LRUTagCache<Addr> cache( CAPACITY);
-
-    ASSERT_EQ( cache.size(), 0);
-    ASSERT_TRUE( cache.empty());
-
-    Addr addr = 0;
-    for ( uint32 i = 0; i < CAPACITY; i++)
-    {
-        GTEST_ASSERT_NO_DEATH( cache.update( addr););
-        ASSERT_EQ( cache.size(), i + 1);
-        ASSERT_FALSE( cache.empty());
-        addr++;
-    }
-
-    // Put element with Addr = CAPACITY in the cache
-    GTEST_ASSERT_NO_DEATH( cache.update( addr););
-    ASSERT_EQ( cache.size(), CAPACITY);
-    ASSERT_FALSE( cache.empty());
-}
 
 
 

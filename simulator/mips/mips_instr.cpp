@@ -78,20 +78,20 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     {0x27, { "nor", OUT_R_ARITHM, 0, &FuncInstr::execute_nor,  1} },
     //        0x28 reserved
     //        0x29 reserved
-    {0x2A, { "slt",  OUT_R_ARITHM, 0, &FuncInstr::execute_slt,  1} },
-    {0x2B, { "sltu", OUT_R_ARITHM, 0, &FuncInstr::execute_sltu, 1} },
+    {0x2A, { "slt",  OUT_R_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::lt>,  1} },
+    {0x2B, { "sltu", OUT_R_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::ltu>, 1} },
 
     // 0x2C - 0x2F double width addition/substraction
 
     // Conditional traps (MIPS II)
     //key      name operation  memsize           pointer
-    {0x30, { "tge",  OUT_R_TRAP, 0, &FuncInstr::execute_tge,  2} },
-    {0x31, { "tgeu", OUT_R_TRAP, 0, &FuncInstr::execute_tgeu, 2} },
-    {0x32, { "tlt",  OUT_R_TRAP, 0, &FuncInstr::execute_tlt,  2} },
-    {0x33, { "tltu", OUT_R_TRAP, 0, &FuncInstr::execute_tltu, 2} },
-    {0x34, { "teq",  OUT_R_TRAP, 0, &FuncInstr::execute_teq,  2} },
+    {0x30, { "tge",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ge>,  2} },
+    {0x31, { "tgeu", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::geu>, 2} },
+    {0x32, { "tlt",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::lt>,  2} },
+    {0x33, { "tltu", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ltu>, 2} },
+    {0x34, { "teq",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::eq>,  2} },
     //        0x35 reserved
-    {0x36, { "tne", OUT_R_TRAP, 0, &FuncInstr::execute_tne,  2} }
+    {0x36, { "tne", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ne>,  2} }
     //        0x37 reserved
     // 0x38 - 0x3F double width shifts
 };
@@ -122,8 +122,8 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 
     // Logical operations
     //key     name   operation  memsize       pointer
-    {0xA, { "slti",  OUT_I_ARITHM, 0, &FuncInstr::execute_slti,  1} },
-    {0xB, { "sltiu", OUT_I_ARITHM, 0, &FuncInstr::execute_sltiu, 1} },
+    {0xA, { "slti",  OUT_I_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::lti>,  1} },
+    {0xB, { "sltiu", OUT_I_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::ltiu>, 1} },
     {0xC, { "andi",  OUT_I_ARITHM, 0, &FuncInstr::execute_andi,  1} },
     {0xD, { "ori",  OUT_I_ARITHM, 0, &FuncInstr::execute_ori,   1} },
     {0xE, { "xori", OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1} },
@@ -238,6 +238,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
         mem_size  = entry.mem_size;
         name      = entry.name;
         function  = entry.function;
+        init();
     }
     else {
         std::ostringstream oss;
@@ -246,9 +247,11 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
         oss << std::hex << std::setfill( '0')
             << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown";
         disasm = oss.str();
-        return;
     }
+}
 
+void FuncInstr::init() 
+{
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
