@@ -65,12 +65,12 @@ CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
     uint32 num_set = set( addr);
-    uint32 num_tag = tag( addr);
+    Addr   num_tag = tag( addr);
 
     auto result = read_no_touch( addr);
 
     if ( result.first)
-        lru_module.update( num_set, num_tag); // update LRU if it's a hit
+        lru_module.touch( num_set, num_tag); // update LRU if it's a hit
 
     return result;    
 }
@@ -80,7 +80,7 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 {
     uint32 num_set = set( addr);
-    uint32 num_tag = tag( addr);
+    Addr   num_tag = tag( addr);
 
     auto result = data[ num_set].find( num_tag);
     return ( result != data[ num_set].end())
@@ -93,7 +93,7 @@ std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 uint32 CacheTagArray::write( Addr addr)
 {
     uint32 num_set = set( addr);
-    uint32 num_tag = tag( addr);
+    Addr   num_tag = tag( addr);
 
     const auto&[ lru_num_tag, num_way]  = lru_module.update( num_set, num_tag);
     if ( num_tag != lru_num_tag)

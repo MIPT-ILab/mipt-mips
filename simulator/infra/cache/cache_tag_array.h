@@ -10,6 +10,7 @@
 
 #include <infra/types.h>
 #include <infra/log.h>
+#include <infra/macro.h>
 
 #include <vector>
 #include <unordered_map>
@@ -36,6 +37,13 @@ class  LRUCacheInfo
         auto size() const { return number_of_elements; }
         bool empty() const { return size() == 0u; }
 
+        void touch( const Key& key)
+        {
+            auto lru_it = lru_hash.find( key);
+
+            if ( lru_it != lru_hash.end())
+                lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
+        }
 
         // if an element with a given key is present in the lru module
         // or the number of elements is less than CAPACITY,
@@ -121,6 +129,11 @@ class LRUModule
             : lru_info( number_of_sets, LRUCacheInfo<Addr>( number_of_ways))
         { }
 
+        void touch( uint32 num_set, Addr addr)
+        {
+            lru_info[ num_set].touch( addr);
+        }
+
         std::pair<Addr, uint32> update( uint32 num_set, Addr addr) 
         { 
             return lru_info[ num_set].update( addr);
@@ -162,6 +175,7 @@ class CacheTagArray : public CacheTagArrayCheck
             , number_of_sets( size_in_bytes / ( ways * size_of_line))
             , number_of_ways( ways)
             , line_size( size_of_line)
+            , addr_mask( bitmask<Addr>( addr_size_in_bits))
             , data( number_of_sets, std::unordered_map<Addr, uint32>{})
             , lru_module( number_of_sets, number_of_ways) 
         { 
@@ -176,13 +190,17 @@ class CacheTagArray : public CacheTagArrayCheck
         // create new entry in cache
         uint32 write( Addr addr);
 
-        uint32 set( Addr addr) const { return (addr / line_size) & (number_of_sets - 1); }
-        uint32 tag( Addr addr) const { return (addr / line_size); }
+        uint32 set( Addr addr) const 
+        { 
+            return ( ( addr & addr_mask) / line_size) & (number_of_sets - 1); 
+        }
+        Addr tag( Addr addr) const { return ( addr & addr_mask) / line_size; }
 
     private:
         const uint32 number_of_sets;
         const uint32 number_of_ways;
         const uint32 line_size;
+        const Addr   addr_mask;
 
         std::vector<std::unordered_map<Addr, uint32>> data; // tags
         LRUModule lru_module; // LRU algorithm module
