@@ -12,6 +12,43 @@
 
 
 
+void LRUCacheInfo::touch( std::size_t key)
+{
+    auto lru_it = lru_hash.find( key);
+
+    if ( lru_it != lru_hash.end())
+        lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
+}
+
+
+
+std::size_t LRUCacheInfo::update()
+{
+    std::size_t return_value = number_of_elements;
+
+    if ( number_of_elements == CAPACITY)
+    {
+        // Delete least recently used element and save its key
+        const auto& lru_elem = lru_list.back();
+                
+        return_value = lru_elem;
+        
+        lru_hash.erase( lru_elem);
+        lru_list.pop_back();
+    }
+    else
+        number_of_elements++;
+
+    auto ptr = lru_list.insert( lru_list.begin(), return_value);
+    lru_hash.emplace( return_value, ptr);
+
+    return return_value;    
+}
+
+
+
+
+
 
 CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes, 
                                         uint32 ways,
@@ -64,13 +101,14 @@ CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
-    uint32 num_set = set( addr);
-    Addr   num_tag = tag( addr);
-
     auto result = read_no_touch( addr);
 
     if ( result.first)
-        lru_module.touch( num_set, num_tag); // update LRU if it's a hit
+    {
+        uint32 num_set = set( addr);
+        // update LRU passing num_way as the second argument if it's a hit
+        lru_module.touch( num_set, result.second);
+    }
 
     return result;    
 }
@@ -95,11 +133,15 @@ uint32 CacheTagArray::write( Addr addr)
     uint32 num_set = set( addr);
     Addr   num_tag = tag( addr);
 
-    const auto&[ lru_num_tag, num_way]  = lru_module.update( num_set, num_tag);
-    if ( num_tag != lru_num_tag)
-        data[ num_set].erase( lru_num_tag);
+    uint32 num_way = lru_module.update( num_set);
+
+    // convert a num_way to a tag
+    auto result = ways_to_tags[ num_set].find( num_way);
+    if ( result != ways_to_tags[ num_set].end())
+        data[ num_set].erase( result->second);  // remove the least recently used element
 
     data[ num_set].emplace( num_tag, num_way);
+    ways_to_tags[ num_set].insert_or_assign( num_way, num_tag);
 
     return num_way;
 }
