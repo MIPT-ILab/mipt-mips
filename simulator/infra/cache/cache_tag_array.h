@@ -23,13 +23,7 @@
 class  LRUCacheInfo
 {
     public:
-        explicit LRUCacheInfo( std::size_t capacity)
-            : CAPACITY( capacity)
-        {
-            assert( capacity != 0u);
-
-            lru_hash.reserve( CAPACITY);
-        }
+        explicit LRUCacheInfo( std::size_t capacity);
 
         auto get_capacity() const { return CAPACITY; }
         auto size() const { return number_of_elements; }
@@ -75,7 +69,7 @@ class CacheTagArrayCheck : private Log
     protected:
         CacheTagArrayCheck( uint32 size_in_bytes,
                             uint32 ways,
-                            uint32 size_of_line,
+                            uint32 line_size,
                             uint32 addr_size_in_bits);
 };
 
@@ -86,26 +80,25 @@ class CacheTagArray : public CacheTagArrayCheck
     public:
         CacheTagArray( uint32 size_in_bytes, 
                        uint32 ways,
-                       uint32 size_of_line = 4,
+                       uint32 line_size = 4,
                        uint32 addr_size_in_bits = 32)
 
             : CacheTagArrayCheck( size_in_bytes, 
                                   ways,
-                                  size_of_line,
+                                  line_size,
                                   addr_size_in_bits)
-            , number_of_sets( size_in_bytes / ( ways * size_of_line))
+            , number_of_sets( size_in_bytes / ( ways * line_size))
             , number_of_ways( ways)
-            , line_size( size_of_line)
+            , line_size( line_size)
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
-            , ways_to_tags( number_of_sets, std::unordered_map<uint32, Addr>{})
+            , ways_to_tags( number_of_sets, 
+                            std::vector<std::pair<bool, Addr>>( number_of_ways,
+                                                                std::pair<bool, Addr>( false, 0)))
             , data( number_of_sets, std::unordered_map<Addr, uint32>{})
             , lru_module( number_of_sets, number_of_ways) 
         { 
-            for ( std::size_t i = 0; i < number_of_sets; i++)
-            {
-                data[i].reserve( number_of_ways);
-                ways_to_tags[i].reserve( number_of_ways);
-            }    
+            for ( auto& map_of_ways : data)
+                map_of_ways.reserve( number_of_ways);  
         }
 
         // lookup the cache and update LRU info
@@ -127,8 +120,8 @@ class CacheTagArray : public CacheTagArrayCheck
         const uint32 line_size;
         const Addr   addr_mask;
 
-        // maps to convert num_ways to tags
-        std::vector<std::unordered_map<uint32, Addr>> ways_to_tags;
+        // to convert num_ways to tags
+        std::vector<std::vector<std::pair<bool, Addr>>> ways_to_tags;
 
         std::vector<std::unordered_map<Addr, uint32>> data; // tags
         LRUModule lru_module; // LRU algorithm module
