@@ -101,16 +101,16 @@ CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
-    auto result = read_no_touch( addr);
+    const auto lookup_result = read_no_touch( addr);
+    const auto&[ is_hit, num_way] = lookup_result;
 
-    if ( result.first)
+    if ( is_hit)
     {
         uint32 num_set = set( addr);
-        // update LRU passing num_way as the second argument if it's a hit
-        lru_module.touch( num_set, result.second);
+        lru_module.touch( num_set, num_way);
     }
 
-    return result;    
+    return lookup_result;    
 }
 
 
