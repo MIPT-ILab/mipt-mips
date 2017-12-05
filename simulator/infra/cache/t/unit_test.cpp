@@ -6,8 +6,7 @@
 // Google Test Library
 #include <gtest/gtest.h> 
 
-// Modules
-#include "../LRUTagCache.h"
+// Module
 #include "../cache_tag_array.h"
 
 

@@ -8,13 +8,13 @@
 #define CACHE_TAG_ARRAY_H
 
 
-#include <infra/cache/LRUTagCache.h>
 #include <infra/types.h>
 #include <infra/log.h>
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <utility>
+#include <list>
 
 
 
