@@ -57,6 +57,10 @@ CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
                                         uint32 line_size,
                                         uint32 addr_size_in_bits)
     : Log( false)
+    , size_in_bytes( size_in_bytes)
+    , number_of_ways( ways)
+    , line_size( line_size)
+    , addr_size_in_bits( addr_size_in_bits)
 {
     if ( size_in_bytes == 0)
         serr << "ERROR: Wrong arguments! Cache size should be greater than zero"

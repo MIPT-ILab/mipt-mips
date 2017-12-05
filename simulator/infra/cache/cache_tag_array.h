@@ -66,6 +66,12 @@ class CacheTagArrayCheck : private Log
                             uint32 ways,
                             uint32 line_size,
                             uint32 addr_size_in_bits);
+
+    public:
+        const uint32 size_in_bytes;
+        const uint32 number_of_ways;
+        const uint32 line_size;
+        const uint32 addr_size_in_bits;
 };
 
 
@@ -83,8 +89,6 @@ class CacheTagArray : public CacheTagArrayCheck
                                   line_size,
                                   addr_size_in_bits)
             , number_of_sets( size_in_bytes / ( ways * line_size))
-            , number_of_ways( ways)
-            , line_size( line_size)
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
             , ways_to_tags( number_of_sets, 
                             std::vector<std::pair<bool, Addr>>( number_of_ways,
@@ -111,8 +115,6 @@ class CacheTagArray : public CacheTagArrayCheck
 
     private:
         const uint32 number_of_sets;
-        const uint32 number_of_ways;
-        const uint32 line_size;
         const Addr   addr_mask;
 
         // to convert num_ways to tags
