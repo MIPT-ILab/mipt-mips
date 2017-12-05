@@ -25,10 +25,6 @@ class  LRUCacheInfo
     public:
         explicit LRUCacheInfo( std::size_t capacity);
 
-        auto get_capacity() const { return CAPACITY; }
-        auto size() const { return number_of_elements; }
-        bool empty() const { return size() == 0u; }
-
         void touch( std::size_t key);
         std::size_t update();
 
@@ -37,7 +33,6 @@ class  LRUCacheInfo
         std::list<std::size_t> lru_list{};
         std::unordered_map<std::size_t, typename std::list<std::size_t>::const_iterator> lru_hash{};
 
-        std::size_t number_of_elements = 0u;
         std::size_t CAPACITY;
 };
 
