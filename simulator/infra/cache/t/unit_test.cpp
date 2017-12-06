@@ -9,9 +9,7 @@
 // Module
 #include "../cache_tag_array.h"
 
-
 #include <infra/types.h>
-
 
 #include <fstream>
 #include <vector>
@@ -76,7 +74,42 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArraySizeCheck)
                  "ERROR.*");         
 }
 
+static const uint32 LINE_SIZE = 4; // why not 32?
 
+static void test( std::ifstream& miss_rate_file, const std::vector<Addr>& values,
+                  uint32 associativity, uint32 cache_size)
+{
+    CacheTagArray cta( cache_size, associativity, LINE_SIZE);
+
+    std::size_t hit = 0;
+    std::size_t miss = 0;
+
+    for ( const auto& addr : values)
+        if ( cta.read( addr).first)
+        {
+            hit++;
+        }
+        else
+        {
+            miss++;
+            cta.write( addr); // load to the cache
+        }
+
+    // hit and miss numbers are both needed 
+    // because mem_trace file can be changed
+    std::size_t sample_hit;
+    std::size_t sample_miss;
+
+    // read sample miss rates from miss_rate file
+    // and check whether a file with sample miss rates has been corrupted
+    ASSERT_TRUE( miss_rate_file >> sample_miss);
+    ASSERT_TRUE( miss_rate_file >> sample_hit);
+
+    // check whether sample hit and miss numbers
+    // are equal to the evaluated ones 
+    ASSERT_EQ( hit, sample_hit);
+    ASSERT_EQ( miss, sample_miss);
+}
 
 TEST( miss_rate_sim, Miss_Rate_Sim_Test)
 {
@@ -96,83 +129,21 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
     // Cache parameters
     std::vector<uint32> associativities = { 1, 2, 4, 8, 16 };
     std::vector<uint32> cache_sizes = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+   
     Addr addr;
-
-
+    std::vector<uint32> values;
+    values.reserve(100000);
+    while ( mem_trace_file >> std::hex >> addr)
+        values.push_back(addr);
 
     // test CacheTagArray on different parameters
     for ( auto associativity : associativities)
         for ( auto cache_size : cache_sizes)
-        {
-            CacheTagArray cta( 1024 * cache_size, associativity, 4);
-            
-            std::size_t hit = 0;
-            std::size_t miss = 0;
-
-            while ( mem_trace_file >> std::hex >> addr)
-                if ( cta.read( addr).first) // hit
-                    hit++;
-                else                        // miss
-                {
-                    miss++;
-                    cta.write( addr); // load to the cache
-                }
-
-            // hit and miss numbers are both needed 
-            // because mem_trace file can be changed
-            std::size_t sample_hit;
-            std::size_t sample_miss;
-
-            // read sample miss rates from miss_rate file
-            // and check whether a file with sample miss rates has been corrupted
-            ASSERT_TRUE( miss_rate_file >> sample_miss);
-            ASSERT_TRUE( miss_rate_file >> sample_hit);
-
-            // check whether sample hit and miss numbers
-            // are equal to the evaluated ones 
-            ASSERT_EQ( hit, sample_hit);
-            ASSERT_EQ( miss, sample_miss);
-
-            mem_trace_file.clear(); // reset "EOF" flag on file stream
-            mem_trace_file.seekg( std::ifstream::beg); // set file pointer to the beginning
-        }
+            test( miss_rate_file, values, associativity, 1024 * cache_size);
     
     // test full-assotiative cache
     for ( auto cache_size : cache_sizes)
-    {
-        CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4, 4);
-        
-        std::size_t hit = 0;
-        std::size_t miss = 0;
-
-        while ( mem_trace_file >> std::hex >> addr)
-            if ( cta.read( addr).first)  // hit
-                hit++;
-            else                         // miss
-            {
-                miss++;
-                cta.write( addr);
-            }
-
-        // hit and miss numbers are both needed 
-        // because mem_trace file can be changed
-        std::size_t sample_hit;
-        std::size_t sample_miss;
-            
-        // read sample miss rates from miss_rate file
-        // and check whether a file with sample miss rates has been corrupted
-        ASSERT_TRUE( miss_rate_file >> sample_miss);
-        ASSERT_TRUE( miss_rate_file >> sample_hit);
-
-        // check whether sample hit and miss numbers
-        // are equal to the evaluated ones 
-        ASSERT_EQ( hit, sample_hit);
-        ASSERT_EQ( miss, sample_miss);
-
-        mem_trace_file.clear(); // reset "EOF" flag on file stream
-        mem_trace_file.seekg( std::ifstream::beg); // set file pointer to the beginning   
-    }
-
+        test( miss_rate_file, values, 1024 * cache_size / LINE_SIZE, 1024 * cache_size);
 
     mem_trace_file.close();
     miss_rate_file.close();
