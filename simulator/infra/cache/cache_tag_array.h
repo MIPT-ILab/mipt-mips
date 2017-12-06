@@ -48,30 +48,53 @@ class LRUModule
 };
 
 // Cache tag array module implementation
-class CacheTagArrayCheck : private Log
+class CacheTagArraySizeCheck : private Log
 {
-    protected:
-        CacheTagArrayCheck( uint32 size_in_bytes,
-                            uint32 ways,
-                            uint32 line_size,
-                            uint32 addr_size_in_bits);
-
     public:
+        CacheTagArraySizeCheck(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        );
+
         const uint32 size_in_bytes;
-        const uint32 number_of_ways;
+        const uint32 ways;
         const uint32 line_size;
         const uint32 addr_size_in_bits;
 };
 
-class CacheTagArray : public CacheTagArrayCheck
+class CacheTagArraySize : public CacheTagArraySizeCheck
+{
+    protected:
+        CacheTagArraySize(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        );
+
+    public:
+        const uint32 sets;
+        const Addr   addr_mask;
+
+        // extract set from address
+        uint32 set( Addr addr) const;
+        // extract tag from address
+        Addr tag( Addr addr) const;
+};
+
+class CacheTagArray : public CacheTagArraySize
 {
     public:
         using Way = uint32;
 
-        CacheTagArray( uint32 size_in_bytes,
-                       uint32 ways,
-                       uint32 line_size = 4,
-                       uint32 addr_size_in_bits = 32);
+        CacheTagArray(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits = 32
+        );
 
         // lookup the cache and update LRU info
         std::pair<bool, Way> read( Addr addr);
@@ -79,15 +102,7 @@ class CacheTagArray : public CacheTagArrayCheck
         std::pair<bool, Way> read_no_touch( Addr addr) const;
         // create new entry in cache
         Way write( Addr addr);
-
-        // extract set from address
-        uint32 set( Addr addr) const;
-        // extract tag from address
-        Addr tag( Addr addr) const;
     private:
-        const uint32 number_of_sets;
-        const Addr   addr_mask;
-
         struct Tag
         {
             bool is_valid = false;

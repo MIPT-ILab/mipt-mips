@@ -16,15 +16,13 @@
 #include <fstream>
 #include <vector>
 
-
-
-TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
+TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArraySizeCheck)
 {
     // size_in_bytes = 128
     // ways = 0
     // line_size = 4
     // addr_size_in_bits = 32
-    ASSERT_EXIT( CacheTagArray cache( 128, 0, 4, 32),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 128, 0, 4, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
@@ -32,7 +30,7 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
     // ways = 16
     // line_size = 4
     // addr_size_in_bits = 32
-    ASSERT_EXIT( CacheTagArray cache( 0, 16, 4, 32),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 0, 16, 4, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
@@ -40,7 +38,7 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
     // ways = 16
     // line_size = 0
     // addr_size_in_bits = 32
-    ASSERT_EXIT( CacheTagArray cache( 128, 16, 0, 32),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 128, 16, 0, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
@@ -48,7 +46,7 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
     // ways = 16
     // line_size = 4
     // addr_size_in_bits = 0
-    ASSERT_EXIT( CacheTagArray cache( 128, 16, 4, 0),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 128, 16, 4, 0),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
@@ -56,24 +54,24 @@ TEST( pass_wrong_arguments, Pass_Wrong_Arguments_To_CacheTagArray)
     // ways = 0
     // line_size = 0
     // addr_size_in_bits = 0
-    ASSERT_EXIT( CacheTagArray cache( 0, 0, 0, 0),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 0, 0, 0, 0),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // size_in_bytes is power of 2, 
     // but the number of ways is not
-    ASSERT_EXIT( CacheTagArray cache( 64, 9),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 64, 9, 4, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // the number of ways is power of 2,
     // but size_in_bytes is not
-    ASSERT_EXIT( CacheTagArray cache( 500, 16),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 500, 16, 4, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");
 
     // line_size is not power of 2
-    ASSERT_EXIT( CacheTagArray cache( 512, 16, 12),
+    ASSERT_EXIT( CacheTagArraySizeCheck cache( 512, 16, 12, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE),
                  "ERROR.*");         
 }
@@ -106,7 +104,7 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
     for ( auto associativity : associativities)
         for ( auto cache_size : cache_sizes)
         {
-            CacheTagArray cta( 1024 * cache_size, associativity);
+            CacheTagArray cta( 1024 * cache_size, associativity, 4);
             
             std::size_t hit = 0;
             std::size_t miss = 0;
@@ -139,13 +137,10 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
             mem_trace_file.seekg( std::ifstream::beg); // set file pointer to the beginning
         }
     
-
-
-
     // test full-assotiative cache
     for ( auto cache_size : cache_sizes)
     {
-        CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4);
+        CacheTagArray cta( 1024 * cache_size, 1024 * cache_size / 4, 4);
         
         std::size_t hit = 0;
         std::size_t miss = 0;
@@ -182,12 +177,6 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
     mem_trace_file.close();
     miss_rate_file.close();
 }
-
-
-
-
-
-
 
 int main( int argc, char** argv)
 {

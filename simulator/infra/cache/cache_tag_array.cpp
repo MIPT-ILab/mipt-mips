@@ -19,8 +19,8 @@ LRUCacheInfo::LRUCacheInfo( std::size_t ways)
 
     for ( std::size_t i = 0; i < ways; i++)
     {
-        auto ptr = lru_list.insert( lru_list.begin(), i);
-        lru_hash.emplace( i, ptr);
+        lru_list.push_front( i);
+        lru_hash.emplace( i, lru_list.begin());
     }
 }
 
@@ -46,13 +46,14 @@ std::size_t LRUCacheInfo::update()
     return lru_elem;
 }
 
-CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
-                                        uint32 ways,
-                                        uint32 line_size,
-                                        uint32 addr_size_in_bits)
+CacheTagArraySizeCheck::CacheTagArraySizeCheck(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits)
     : Log( false)
     , size_in_bytes( size_in_bytes)
-    , number_of_ways( ways)
+    , ways( ways)
     , line_size( line_size)
     , addr_size_in_bits( addr_size_in_bits)
 {
@@ -95,31 +96,46 @@ CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes,
              << std::endl << critical;
 }
 
+CacheTagArraySize::CacheTagArraySize(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits)
+    : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
+    , sets( size_in_bytes / ( ways * line_size))
+    , addr_mask( bitmask<Addr>( addr_size_in_bits))
+{ }
+
+uint32 CacheTagArraySize::set( Addr addr) const
+{
+    return ( ( addr & addr_mask) / line_size) & (sets - 1);
+}
+
+Addr CacheTagArraySize::tag( Addr addr) const
+{
+    return ( addr & addr_mask) / line_size;
+}
+
 CacheTagArray::CacheTagArray(
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
-    : CacheTagArrayCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-    , number_of_sets( size_in_bytes / ( ways * line_size))
-    , addr_mask( bitmask<Addr>( addr_size_in_bits))
-    , tags( number_of_sets, std::vector<Tag>( number_of_ways))
-    , lookup_helper( number_of_sets, std::unordered_map<Addr, uint32>{})
-    , lru_module( number_of_sets, number_of_ways)
-{
-    for ( auto& map_of_ways : lookup_helper)
-        map_of_ways.reserve( number_of_ways);
-}
+    : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
+    , tags( sets, std::vector<Tag>( ways))
+    , lookup_helper( sets, std::unordered_map<Addr, uint32>( ways))
+    , lru_module( sets, ways)
+{ }
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
     const auto lookup_result = read_no_touch( addr);
-    const auto&[ is_hit, num_way] = lookup_result;
+    const auto&[ is_hit, way] = lookup_result;
 
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        lru_module.touch( num_set, num_way);
+        lru_module.touch( num_set, way);
     }
 
     return lookup_result;
@@ -142,29 +158,20 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const uint32 num_way = lru_module.update( num_set);
+    const uint32 way = lru_module.update( num_set);
 
     // get an old tag
-    const auto& old_tag = tags[ num_set][ num_way];
+    auto& entry = tags[ num_set][ way];
+    const Addr old_tag = entry.tag;
 
     // Remove old tag from lookup helper and add a new tag
-    if ( old_tag.is_valid)
-        lookup_helper[ num_set].erase( old_tag.tag);
-    lookup_helper[ num_set].emplace( new_tag, num_way);
+    if ( entry.is_valid)
+        lookup_helper[ num_set].erase( old_tag);
+    lookup_helper[ num_set].emplace( new_tag, way);
 
     // Update tag array
-    tags[ num_set][ num_way].tag = new_tag;
-    tags[ num_set][ num_way].is_valid = true;
+    entry.tag = new_tag;
+    entry.is_valid = true;
 
-    return num_way;
-}
-
-uint32 CacheTagArray::set( Addr addr) const
-{
-    return ( ( addr & addr_mask) / line_size) & (number_of_sets - 1);
-}
-
-Addr CacheTagArray::tag( Addr addr) const
-{
-    return ( addr & addr_mask) / line_size;
+    return way;
 }
