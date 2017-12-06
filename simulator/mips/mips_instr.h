@@ -158,7 +158,6 @@ class FuncInstr
 
         static std::string_view regTableName(RegNum reg);
         static std::array<std::string_view, REG_NUM_MAX> regTable;
-        std::string_view name = {};
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -189,7 +188,7 @@ class FuncInstr
         CowString disasm = {};
 #endif
 
-        void init();
+        void init( const ISAEntry& entry);
 
         // Predicate helpers - unary
         bool lez() const { return static_cast<int32>( v_src1) <= 0; }
