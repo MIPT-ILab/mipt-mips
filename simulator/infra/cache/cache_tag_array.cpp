@@ -1,177 +1,155 @@
-/*
+/**
  * cache_tag_array.cpp
  * Implementation of the cache tag array model.
- * MIPT-MIPS Assignment 5.
- * Ladin Oleg.
+ * @author Oleg Ladin, Denis Los
  */
 
-/* C generic modules */
-#include <cstdlib>
+#include <cassert>
 
-/* C++ generic modules */
-#include <iostream>
 
-/* MIPT-MIPS infra */
+#include <infra/cache/cache_tag_array.h>
 #include <infra/macro.h>
 
-/* MIPT-MIPS modules */
-#include "cache_tag_array.h"
 
-LRUInfo::LRUInfo( uint32 ways, uint32 sets) : lru( sets)
+LRUCacheInfo::LRUCacheInfo( std::size_t capacity)
+    : CAPACITY( capacity)
 {
-    std::list< uint32> l;
-    for ( uint32 i = 0; i < ways; ++i)
-    {
-        l.push_front( i);
-    }
-    std::fill_n( lru.begin(), sets, l);
-}
+    assert( CAPACITY != 0u);
 
-/* On hit - mark (push front) way that contains the set */
-void LRUInfo::touch( uint32 set, uint32 way)
-{
-    auto& list = lru[ set];
-    for ( auto it = list.begin(); it != list.end(); ++it)
+    lru_hash.reserve( CAPACITY);
+
+    for ( std::size_t i = 0; i < CAPACITY; i++)
     {
-        if ( *it == way)
-        {
-            list.splice( list.begin(), list, it);
-            return;
-        }
+        auto ptr = lru_list.insert( lru_list.begin(), i);
+        lru_hash.emplace( i, ptr);
     }
 }
 
-/* Get number of the Least Resently Used way and push front it */
-uint32 LRUInfo::update( uint32 set)
+
+void LRUCacheInfo::touch( std::size_t key)
 {
-    auto& list = lru[ set];
-    list.splice( list.begin(), list, std::prev( list.end()));
-    return list.front();
+    auto lru_it = lru_hash.find( key);
+    assert( lru_it != lru_hash.end());
+
+    lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
 }
 
-CacheTagArrayCheck::CacheTagArrayCheck(
-    uint32 size_in_bytes,
-    uint32 ways,
-    uint32 line_size,
-    uint32 addr_size_in_bits) : Log( false),
-		      size_in_bytes( size_in_bytes),
-		      ways( ways),
-		      line_size( line_size),
-		      addr_size_in_bits( addr_size_in_bits)
+
+
+std::size_t LRUCacheInfo::update()
 {
-    /* All args are not less than zero because of "unsigned" keyword. */
+    std::size_t lru_elem = lru_list.back();
+    lru_list.pop_back(); // remove the least recently used element
+
+    auto ptr = lru_list.insert( lru_list.begin(), lru_elem);
+    lru_hash.insert_or_assign( lru_elem, ptr);
+
+    return lru_elem;
+}
+
+
+
+
+
+
+CacheTagArrayCheck::CacheTagArrayCheck( uint32 size_in_bytes, 
+                                        uint32 ways,
+                                        uint32 line_size,
+                                        uint32 addr_size_in_bits)
+    : Log( false)
+    , size_in_bytes( size_in_bytes)
+    , number_of_ways( ways)
+    , line_size( line_size)
+    , addr_size_in_bits( addr_size_in_bits)
+{
     if ( size_in_bytes == 0)
         serr << "ERROR: Wrong arguments! Cache size should be greater than zero"
              << std::endl << critical;
-
+    
     if ( ways == 0)
         serr << "ERROR: Wrong arguments! Num of ways should be greater than zero"
              << std::endl << critical;
-
+    
     if ( line_size == 0)
-        serr << "ERROR: Wrong arguments! Line size should be greater than zero"
+        serr << "ERROR: Wrong argument! Size of the line should be greater than zero"
              << std::endl << critical;
-
+    
     if ( addr_size_in_bits == 0)
-        serr << "ERROR: Wrong arguments! Address size should be greater than zero"
+        serr << "ERROR: Wrong argument! Address size should be greater than zero"
              << std::endl << critical;
-
+    
     if ( addr_size_in_bits > 32)
         serr << "ERROR: Wrong arguments! Address size should be less or equal than 32"
              << std::endl << critical;
-    /*
-     * It also checks "size_in_bytes < line_size" and "size_in_bytes
-     * < ways".
-     */
-    if ( size_in_bytes / ways < line_size)
-        serr << "ERROR: Wrong arguments! Size of each way should be not "
-                  << "less than size of block (size in bytes of cache should "
-                  << "be not less than number of ways and size of block in "
-                  << "bytes)." << critical;
 
-    /*
-     * It also checks "size_in_bytes % line_size != 0" and
-     * "size_in_bytes % ways != 0".
-     */
-    if ( ( size_in_bytes % ( line_size * ways)) != 0)
-        serr << "ERROR: Wrong arguments! Size of cache should be a "
-                  << "multiple of block size in bytes and number of ways."
-                  << critical;
+                 
 
-    /* The next two use: "2^a=b"<=>"b=100...000[2]"<=>"(b&(b-1))=0". */
-    if ( !is_power_of_two( size_in_bytes / ( line_size * ways)))
-        serr << "ERROR: Wrong arguments! Number of sets should be a power"
-                  << " of 2." << critical;
+    if ( size_in_bytes < ways * line_size)
+        serr << "ERROR: Wrong arguments! Cache size should be greater"
+             << "than the number of ways multiplied by line size" 
+             << std::endl << critical;
 
+    if ( !is_power_of_two( size_in_bytes))
+        serr << "ERROR: Wrong argumets! Cache size should be a power of 2"
+             << std::endl << critical;
+    
     if ( !is_power_of_two( line_size))
-        serr << "ERROR: Wrong arguments! Block size should be a power of "
-                  << "2." << critical;
+        serr << "ERROR: Wrong arguments! Block size should be a power of 2"
+             << std::endl << critical;
+    
+    if ( size_in_bytes % ( line_size * ways) != 0)
+        serr << "ERROR: Wrong arguments! Cache size should be multiple of"
+             << "the number of ways and line size"
+             << std::endl << critical;
 }
 
-CacheTagArray::CacheTagArray( uint32 size_in_bytes,
-                              uint32 ways,
-                              uint32 line_size,
-                              uint32 addr_size_in_bits) :
-                              CacheTagArrayCheck( size_in_bytes, ways,
-                                                  line_size, addr_size_in_bits),
-                              num_sets( size_in_bytes / ( line_size * ways)),
-                              addr_mask( bitmask<Addr>( addr_size_in_bits)),
-                              array( num_sets, std::vector<CacheTag>( ways)),
-                              lru( ways, num_sets)
-{
 
-}
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
     const auto lookup_result = read_no_touch( addr);
-    const auto&[ is_hit, way_num] = lookup_result;
+    const auto&[ is_hit, num_way] = lookup_result;
 
     if ( is_hit)
     {
-        const auto set_num = set( addr);
-        lru.touch( set_num, way_num); // update LRU info
+        uint32 num_set = set( addr);
+        lru_module.touch( num_set, num_way);
     }
 
-    return lookup_result;
+    return lookup_result;    
 }
+
+
 
 std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
 {
-    const auto set_num = set( addr);
-    const auto tag_num = tag( addr);
+    uint32 num_set = set( addr);
+    Addr   num_tag = tag( addr);
 
-    /* search into each way */
-    for ( uint32 i = 0; i < ways; ++i)
-    {
-        const auto& entry = array[ set_num][ i];
-
-        if ( entry.is_valid && entry.line == tag_num) // hit
-            return std::make_pair(true, i);
-    }
-    return std::make_pair(false, NO_VAL32); // miss (no data)
+    auto result = data[ num_set].find( num_tag);
+    return ( result != data[ num_set].end())
+           ? std::pair<bool, uint32>( true, result -> second)
+           : std::pair<bool, uint32>( false, NO_VAL32);
 }
+
+
 
 uint32 CacheTagArray::write( Addr addr)
 {
-    uint32 set_num = set( addr);
-    uint32 way_num = lru.update( set_num); // get l.r.u. way
+    uint32 num_set = set( addr);
+    Addr   num_tag = tag( addr);
+ 
+    uint32 num_way = lru_module.update( num_set);
 
-    array[ set_num][ way_num].line = tag( addr); // write it
-    array[ set_num][ way_num].is_valid = true; // this set is valid now
+    // convert a num_way to a tag
+    const auto&[ is_valid, lru_num_tag] = ways_to_tags[ num_set][ num_way];
+    if ( is_valid)
+        data[ num_set].erase( lru_num_tag);  // remove the least recently used element
+    else 
+        ways_to_tags[ num_set][ num_way].is_valid = true;
 
-    return way_num;
+    data[ num_set].emplace( num_tag, num_way);
+    ways_to_tags[ num_set][ num_way].tag = num_tag;
+
+    return num_way;
 }
-
-uint32 CacheTagArray::set( Addr addr) const
-{
-    /* Cut "logbin(line_size)" bits from the end. */
-    return ((addr & addr_mask) / line_size) & (num_sets - 1);
-}
-
-Addr CacheTagArray::tag( Addr addr) const
-{
-    /* Cut "logbin(line_size)" bits from the end. */
-    return (addr & addr_mask) / line_size;
-}
-
