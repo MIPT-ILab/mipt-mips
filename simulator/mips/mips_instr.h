@@ -113,24 +113,24 @@ class FuncInstr
         {
             const struct
             {
-                unsigned funct  :6;
-                unsigned shamt  :5;
-                unsigned rd     :5;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 funct  :6;
+                uint32 shamt  :5;
+                uint32 rd     :5;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asR;
             const struct
             {
-                unsigned imm    :16;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 imm    :16;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asI;
             const struct
             {
-                unsigned imm    :26;
-                unsigned opcode :6;
+                uint32 imm    :26;
+                uint32 opcode :6;
             } asJ;
           
             const uint32 raw;
