@@ -50,7 +50,7 @@ class LRUModule
 // Cache tag array module implementation
 class CacheTagArraySizeCheck : private Log
 {
-    protected:
+    public:
         CacheTagArraySizeCheck(
             uint32 size_in_bytes,
             uint32 ways,
@@ -58,7 +58,6 @@ class CacheTagArraySizeCheck : private Log
             uint32 addr_size_in_bits
         );
 
-    public:
         const uint32 size_in_bytes;
         const uint32 ways;
         const uint32 line_size;
