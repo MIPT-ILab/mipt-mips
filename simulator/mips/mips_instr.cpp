@@ -232,13 +232,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
 
     if ( valid)
     {
-        const auto& entry = it->second;
-
-        operation = entry.operation;
-        mem_size  = entry.mem_size;
-        name      = entry.name;
-        function  = entry.function;
-        init();
+        init( it->second);
     }
     else {
         std::ostringstream oss;
@@ -250,12 +244,16 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     }
 }
 
-void FuncInstr::init() 
+void FuncInstr::init( const FuncInstr::ISAEntry& entry) 
 {
+    operation = entry.operation;
+    mem_size  = entry.mem_size;
+    function  = entry.function;
+
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
-    oss << name;
+    oss << entry.name;
 
     switch ( operation)
     {
