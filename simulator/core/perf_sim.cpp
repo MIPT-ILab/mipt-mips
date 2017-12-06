@@ -109,11 +109,12 @@ void PerfMIPS::run( const std::string& tr,
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
-              << std::endl << "instrs:   " << executed_instrs
-              << std::endl << "cycles:   " << cycle
-              << std::endl << "IPC:      " << ipc
-              << std::endl << "sim freq: " << frequency << " kHz"
-              << std::endl << "sim IPS:  " << simips    << " kips"
+              << std::endl << "instrs:     " << executed_instrs
+              << std::endl << "cycles:     " << cycle
+              << std::endl << "IPC:        " << ipc
+              << std::endl << "sim freq:   " << frequency << " kHz"
+              << std::endl << "sim IPS:    " << simips    << " kips"
+              << std::endl << "instr size: " << sizeof(FuncInstr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
 }
