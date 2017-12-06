@@ -271,30 +271,10 @@ class FuncInstr
         template<Predicate p>
         void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
 
-        void execute_beq()
+        template<Predicate p>
+        void execute_branch()
         {
-            _is_jump_taken = eq();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
-
-        void execute_bne()
-        {
-            _is_jump_taken = ne();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
-
-        void execute_blez()
-        {
-            _is_jump_taken = lez();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
-
-        void execute_bgtz()
-        {
-            _is_jump_taken = gtz();
+            _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
                 new_PC += sign_extend( v_imm) << 2;
         }

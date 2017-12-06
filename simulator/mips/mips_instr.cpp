@@ -110,10 +110,10 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     {0x2, { "j", OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
     {0x3, { "jal", OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1 } },
 
-    {0x4, { "beq",  OUT_I_BRANCH,    0, &FuncInstr::execute_beq,  1} },
-    {0x5, { "bne",  OUT_I_BRANCH,    0, &FuncInstr::execute_bne,  1} },
-    {0x6, { "blez", OUT_I_BRANCH_0,  0, &FuncInstr::execute_blez, 1} },
-    {0x7, { "bgtz", OUT_I_BRANCH_0,  0, &FuncInstr::execute_bgtz, 1} },
+    {0x4, { "beq",  OUT_I_BRANCH,    0, &FuncInstr::execute_branch<&FuncInstr::eq>,  1} },
+    {0x5, { "bne",  OUT_I_BRANCH,    0, &FuncInstr::execute_branch<&FuncInstr::ne>,  1} },
+    {0x6, { "blez", OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::lez>, 1} },
+    {0x7, { "bgtz", OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gtz>, 1} },
 
     // Addition/Subtraction
     //key     name  operation  memsize       pointer
@@ -133,10 +133,10 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
 
     // Likely branches (MIPS II)
     //key     name   operation  memsize       pointer
-    {0x14, { "beql",  OUT_I_BRANCH,   0, &FuncInstr::execute_beq,  2} },
-    {0x15, { "bnel",  OUT_I_BRANCH,   0, &FuncInstr::execute_bne,  2} },
-    {0x16, { "blezl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_blez, 2} },
-    {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_bgtz, 2} },
+    {0x14, { "beql",  OUT_I_BRANCH,   0, &FuncInstr::execute_branch<&FuncInstr::eq>,  2} },
+    {0x15, { "bnel",  OUT_I_BRANCH,   0, &FuncInstr::execute_branch<&FuncInstr::ne>,  2} },
+    {0x16, { "blezl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::lez>, 2} },
+    {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::gtz>, 2} },
 
     // 0x18 - 0x19 double width addition
     // 0x1A - 0x1B load double word left/right
