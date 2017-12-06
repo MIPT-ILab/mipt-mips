@@ -146,10 +146,10 @@ uint32 CacheTagArray::write( Addr addr)
     if ( is_valid)
         data[ num_set].erase( lru_num_tag);  // remove the least recently used element
     else 
-        ways_to_tags[ num_set][ num_way].first = true; // mark it valid
+        ways_to_tags[ num_set][ num_way].is_valid = true;
 
     data[ num_set].emplace( num_tag, num_way);
-    ways_to_tags[ num_set][ num_way].second = num_tag;
+    ways_to_tags[ num_set][ num_way].tag = num_tag;
 
     return num_way;
 }

@@ -90,9 +90,7 @@ class CacheTagArray : public CacheTagArrayCheck
                                   addr_size_in_bits)
             , number_of_sets( size_in_bytes / ( ways * line_size))
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
-            , ways_to_tags( number_of_sets, 
-                            std::vector<std::pair<bool, Addr>>( number_of_ways,
-                                                                std::pair<bool, Addr>( false, 0)))
+            , ways_to_tags( number_of_sets, std::vector<way_to_tag_t>( number_of_ways))
             , data( number_of_sets, std::unordered_map<Addr, uint32>{})
             , lru_module( number_of_sets, number_of_ways) 
         { 
@@ -117,8 +115,14 @@ class CacheTagArray : public CacheTagArrayCheck
         const uint32 number_of_sets;
         const Addr   addr_mask;
 
+        struct way_to_tag_t
+        {
+            bool is_valid = false;
+            Addr tag = 0u;
+        };
+
         // to convert num_ways to tags
-        std::vector<std::vector<std::pair<bool, Addr>>> ways_to_tags;
+        std::vector<std::vector<way_to_tag_t>> ways_to_tags;
 
         std::vector<std::unordered_map<Addr, uint32>> data; // tags
         LRUModule lru_module; // LRU algorithm module
