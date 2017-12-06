@@ -7,7 +7,6 @@
 #ifndef CACHE_TAG_ARRAY_H
 #define CACHE_TAG_ARRAY_H
 
-
 #include <infra/types.h>
 #include <infra/log.h>
 #include <infra/macro.h>
@@ -17,26 +16,21 @@
 #include <utility>
 #include <list>
 
-
-
 // Replacement algorithm modules (LRU)
-class  LRUCacheInfo
+class LRUCacheInfo
 {
     public:
-        explicit LRUCacheInfo( std::size_t capacity);
+        explicit LRUCacheInfo( std::size_t ways);
 
-        void touch( std::size_t key);
+        void touch( std::size_t way);
         std::size_t update();
-
 
     private:
         std::list<std::size_t> lru_list{};
-        std::unordered_map<std::size_t, typename std::list<std::size_t>::const_iterator> lru_hash{};
+        std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
 
-        std::size_t CAPACITY;
+        const std::size_t ways;
 };
-
-
 
 class LRUModule
 {
@@ -46,17 +40,12 @@ class LRUModule
         { }
 
         void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
-        
+
         uint32 update( uint32 num_set) { return lru_info[ num_set].update(); }
 
     private:
         std::vector<LRUCacheInfo> lru_info;
 };
-
-
-
-
-
 
 // Cache tag array module implementation
 class CacheTagArrayCheck : private Log
@@ -74,57 +63,42 @@ class CacheTagArrayCheck : private Log
         const uint32 addr_size_in_bits;
 };
 
-
-
 class CacheTagArray : public CacheTagArrayCheck
 {
     public:
-        CacheTagArray( uint32 size_in_bytes, 
+        using Way = uint32;
+
+        CacheTagArray( uint32 size_in_bytes,
                        uint32 ways,
                        uint32 line_size = 4,
-                       uint32 addr_size_in_bits = 32)
-
-            : CacheTagArrayCheck( size_in_bytes, 
-                                  ways,
-                                  line_size,
-                                  addr_size_in_bits)
-            , number_of_sets( size_in_bytes / ( ways * line_size))
-            , addr_mask( bitmask<Addr>( addr_size_in_bits))
-            , ways_to_tags( number_of_sets, std::vector<way_to_tag_t>( number_of_ways))
-            , data( number_of_sets, std::unordered_map<Addr, uint32>{})
-            , lru_module( number_of_sets, number_of_ways) 
-        { 
-            for ( auto& map_of_ways : data)
-                map_of_ways.reserve( number_of_ways);  
-        }
+                       uint32 addr_size_in_bits = 32);
 
         // lookup the cache and update LRU info
-        std::pair<bool, uint32> read( Addr addr);
+        std::pair<bool, Way> read( Addr addr);
         // find in the cache but do not update LRU info
-        std::pair<bool, uint32> read_no_touch( Addr addr) const;
+        std::pair<bool, Way> read_no_touch( Addr addr) const;
         // create new entry in cache
-        uint32 write( Addr addr);
+        Way write( Addr addr);
 
-        uint32 set( Addr addr) const 
-        { 
-            return ( ( addr & addr_mask) / line_size) & (number_of_sets - 1); 
-        }
-        Addr tag( Addr addr) const { return ( addr & addr_mask) / line_size; }
-
+        // extract set from address
+        uint32 set( Addr addr) const;
+        // extract tag from address
+        Addr tag( Addr addr) const;
     private:
         const uint32 number_of_sets;
         const Addr   addr_mask;
 
-        struct way_to_tag_t
+        struct Tag
         {
             bool is_valid = false;
             Addr tag = 0u;
         };
 
-        // to convert num_ways to tags
-        std::vector<std::vector<way_to_tag_t>> ways_to_tags;
+        // tags storage
+        std::vector<std::vector<Tag>> tags;
 
-        std::vector<std::unordered_map<Addr, uint32>> data; // tags
+        // hash tabe to lookup tags in O(1)
+        std::vector<std::unordered_map<Addr, Way>> lookup_helper;
         LRUModule lru_module; // LRU algorithm module
 };
 
