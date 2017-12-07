@@ -28,7 +28,13 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
  10<br/>Nov | **L7: Pipeline**<br/>• [Eng text, no audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_07__10_Nov__Pipelining__No_audio.pptx?raw=true) | • Check simulator internals: [Ports](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports) and [Performance Simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator)<br/>• Assign yourself to [PerfSim tasks](https://github.com/MIPT-ILab/mipt-mips/milestone/3)|
  17<br/>Nov | **L8: Branch Prediction**<br/>• [Eng text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_08__17_Nov__Branch_Prediction__No_audio.pptx?raw=true) | • Check [branch prediction model manual](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model)  |
  24<br/>Nov | **_No lecture_** | • Use the time slot to progress with your tasks |
- 01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_ | |
+ 01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_09__01_Dec__Advanced_Pipelining__No_audio.pptx?raw=true) | |
+ 08<br/>Dec | **L10: Performance and Power**<br/>• [Eng text, no audio, 1.1 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_10__08_Dec__Performance_and_Power__Eng_text__No_audio.pptx?raw=true) | • Get ready for the upcoming test! |
+ 15<br/>Dec | **Test 2**<br/> • Review **L6−L9** material<br/> • Review chapters **3-6** of Schildt C++ manual<br/> | |
+ 
+### Term 3: Breaking the Memory Wall
+ 
+ _Starts in 2018_
  
 ### MSU Seminars
 
