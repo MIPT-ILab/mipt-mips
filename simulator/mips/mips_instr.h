@@ -132,11 +132,16 @@ class FuncInstr
                 uint32 imm    :26;
                 uint32 opcode :6;
             } asJ;
-          
+
             const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
+
+            static_assert( sizeof( asR) == sizeof( raw));
+            static_assert( sizeof( asI) == sizeof( raw));
+            static_assert( sizeof( asJ) == sizeof( raw));
+            static_assert( sizeof( raw) == 4);
         } instr;
 
         using Execute = void (FuncInstr::*)();
