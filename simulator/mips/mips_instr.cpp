@@ -96,9 +96,28 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
     // 0x38 - 0x3F double width shifts
 };
 
+//unordered map for RI-instructions
 const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
 {
-//for RI-instructions
+// ********************** REGIMM INSTRUCTIONS *************************
+    // Branches
+    //key     name    operation     memsize       pointer
+    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 1} },
+    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 1} },
+    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 2} },
+    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 2} },
+
+    {0x8,  { "tgei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::gei>,  2} },
+    {0x9,  { "tgeiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::geiu>, 2} },
+    {0xA,  { "tlti",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::lti>,  2} },
+    {0xB,  { "tltiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::ltiu>, 2} },
+    {0xC,  { "teqi",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::eqi>,  2} },
+    {0xE,  { "tnei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::nei>,  2} },
+
+    {0x10, { "bltzal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 1} },
+    {0x11, { "bgezal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 1} },
+    {0x12, { "bltzall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 2} },
+    {0x13, { "bgezall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 2} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -107,7 +126,7 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
     // ********************* I and J INSTRUCTIONS *************************
     // Branches
     //key     name operation  memsize       pointer
-    {0x2, { "j", OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
+    {0x2, { "j",   OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
     {0x3, { "jal", OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1 } },
 
     {0x4, { "beq",  OUT_I_BRANCH,    0, &FuncInstr::execute_branch<&FuncInstr::eq>,  1} },
@@ -215,7 +234,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
             break;
 
         case 0x1: // RegIMM instruction
-            it = isaMapRI.find( instr.asR.opcode);
+            it = isaMapRI.find( instr.asI.rt);
             valid = ( it != isaMapRI.end());
             break;
 
@@ -244,7 +263,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     }
 }
 
-void FuncInstr::init( const FuncInstr::ISAEntry& entry) 
+void FuncInstr::init( const FuncInstr::ISAEntry& entry)
 {
     operation = entry.operation;
     mem_size  = entry.mem_size;
@@ -303,6 +322,14 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
             oss <<  " $" << regTableName(src1)
                 << ", $" << regTableName(src2);
             break;
+        case OUT_RI_TRAP:
+            v_imm = instr.asI.imm;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+
+            oss << " $" << regTable[src1] << ", "
+                << std::hex << "0x"
+                << static_cast<int16>(v_imm) << std::dec;
+            break;
         case OUT_R_SPECIAL:
             break;
         case OUT_I_ARITHM:
@@ -313,7 +340,6 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
             oss << " $" << regTable[dst] << ", $"
                 << regTable[src1] << ", "
                 << std::hex << "0x" << v_imm << std::dec;
-
             break;
         case OUT_I_BRANCH:
             v_imm = instr.asI.imm;
@@ -324,6 +350,12 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
                 << regTable[src2] << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
+        case OUT_RI_BRANCH_0:
+            v_imm = instr.asI.imm;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+            oss << " $" << regTable[src1] << ", "
+                << std::dec << static_cast<int16>(v_imm);
+            break;
         case OUT_I_BRANCH_0:
             v_imm = instr.asI.imm;
             src1 = static_cast<RegNum>(instr.asI.rs);
@@ -331,7 +363,6 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
             oss << " $" << regTable[src1] << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
-
         case OUT_I_CONST:
             v_imm = instr.asI.imm;
             dst  = static_cast<RegNum>(instr.asI.rt);
@@ -364,6 +395,13 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
             oss << " $" << regTable[src2] << ", 0x"
                 << std::hex << v_imm
                 << "($" << regTable[src1] << ")" << std::dec;
+            break;
+        case OUT_RI_BRANCH_LINK:
+            v_imm = instr.asI.imm;
+            src1 = static_cast<RegNum>(instr.asI.rs);
+            dst = REG_NUM_RA;
+            oss << " $" << regTable[src1] << ", "
+                << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_J_JUMP_LINK:
             v_imm = instr.asJ.imm;
