@@ -100,7 +100,7 @@ class FuncInstr
             OUT_I_STORER,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
-            OUT_RI_JUMP_LINK,
+            OUT_RI_BRANCH_LINK,
             OUT_J_SPECIAL,
             OUT_SP2_COUNT,
             OUT_UNKNOWN
@@ -144,9 +144,10 @@ class FuncInstr
             static_assert( sizeof( AsR) == sizeof( uint32));
             static_assert( sizeof( AsI) == sizeof( uint32));
             static_assert( sizeof( AsJ) == sizeof( uint32));
-            static_assert( sizeof( uint32) == 4);using Execute = void (FuncInstr::*)();
+            static_assert( sizeof( uint32) == 4);
         } instr;
 
+        using Execute = void (FuncInstr::*)(); 
         using Predicate = bool (FuncInstr::*)() const;
 
         struct ISAEntry
@@ -295,7 +296,7 @@ class FuncInstr
         void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
 
         template<Predicate p>
-        void execute_jlr()
+        void execute_branch_and_link()
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
@@ -335,13 +336,13 @@ class FuncInstr
         RegNum get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
-        bool is_jump() const { return operation == OUT_J_JUMP       ||
-                                      operation == OUT_J_JUMP_LINK  ||
-                                      operation == OUT_RI_JUMP_LINK ||
-                                      operation == OUT_R_JUMP       ||
-                                      operation == OUT_R_JUMP_LINK  ||
-                                      operation == OUT_I_BRANCH_0   ||
-                                      operation == OUT_RI_BRANCH_0  ||
+        bool is_jump() const { return operation == OUT_J_JUMP         ||
+                                      operation == OUT_J_JUMP_LINK    ||
+                                      operation == OUT_RI_BRANCH_LINK ||
+                                      operation == OUT_R_JUMP         ||
+                                      operation == OUT_R_JUMP_LINK    ||
+                                      operation == OUT_I_BRANCH_0     ||
+                                      operation == OUT_RI_BRANCH_0    ||
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }

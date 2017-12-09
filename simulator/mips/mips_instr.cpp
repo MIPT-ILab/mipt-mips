@@ -111,11 +111,13 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
     {0x9,  { "tgeiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::geiu>, 2} },
     {0xA,  { "tlti",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::lti>,  2} },
     {0xB,  { "tltiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::ltiu>, 2} },
+    {0xC,  { "teqi",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::eqi>,  2} },
+    {0xE,  { "tnei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::nei>,  2} },
 
-    {0x10, { "bltzal",  OUT_RI_JUMP_LINK, 0, &FuncInstr::execute_jlr<&FuncInstr::ltz>, 1} },
-    {0x11, { "bgezal",  OUT_RI_JUMP_LINK, 0, &FuncInstr::execute_jlr<&FuncInstr::gez>, 1} },
-    {0x12, { "bltzall", OUT_RI_JUMP_LINK, 0, &FuncInstr::execute_jlr<&FuncInstr::ltz>, 2} },
-    {0x13, { "bgezall", OUT_RI_JUMP_LINK, 0, &FuncInstr::execute_jlr<&FuncInstr::gez>, 2} }
+    {0x10, { "bltzal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 1} },
+    {0x11, { "bgezal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 1} },
+    {0x12, { "bltzall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 2} },
+    {0x13, { "bgezall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 2} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -395,12 +397,12 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
                 << std::hex << v_imm
                 << "($" << regTable[src1] << ")" << std::dec;
             break;
-        case OUT_RI_JUMP_LINK:
+        case OUT_RI_BRANCH_LINK:
             v_imm = instr.asI.imm;
             src1 = static_cast<RegNum>(instr.asI.rs);
             dst = REG_NUM_RA;
-            oss << " $" << regTable[src1] << ", 0x"
-                << std::hex << static_cast<uint16>(v_imm) << std::dec;
+            oss << " $" << regTable[src1] << ", "
+                << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_J_JUMP_LINK:
             v_imm = instr.asJ.imm;
