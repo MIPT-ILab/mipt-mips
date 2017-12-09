@@ -114,7 +114,7 @@ class FuncInstr
 
         const union _instr
         {
-            const struct
+            const struct AsR
             {
                 uint32 funct  :6;
                 uint32 shamt  :5;
@@ -123,14 +123,14 @@ class FuncInstr
                 uint32 rs     :5;
                 uint32 opcode :6;
             } asR;
-            const struct
+            const struct AsI
             {
                 uint32 imm    :16;
                 uint32 rt     :5;
                 uint32 rs     :5;
                 uint32 opcode :6;
             } asI;
-            const struct
+            const struct AsJ
             {
                 uint32 imm    :26;
                 uint32 opcode :6;
@@ -140,9 +140,13 @@ class FuncInstr
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
+
+            static_assert( sizeof( AsR) == sizeof( uint32));
+            static_assert( sizeof( AsI) == sizeof( uint32));
+            static_assert( sizeof( AsJ) == sizeof( uint32));
+            static_assert( sizeof( uint32) == 4);using Execute = void (FuncInstr::*)();
         } instr;
 
-        using Execute = void (FuncInstr::*)();
         using Predicate = bool (FuncInstr::*)() const;
 
         struct ISAEntry
