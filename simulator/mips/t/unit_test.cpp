@@ -135,8 +135,8 @@ TEST( Func_instr_disasm, Process_Disasm)
 //  ASSERT_EQ(FuncInstr(0xe131fb2e).Dump(), "sc $s1, 0xfb2e($t1)");
     ASSERT_EQ(FuncInstr(0x1229ffff).Dump(), "beq $s1, $t1, -1");
     ASSERT_EQ(FuncInstr(0x1229000e).Dump(), "beq $s1, $t1, 14");
-    ASSERT_EQ(FuncInstr(0x0621fffc).Dump(), "bgez $s1, 0xfffc");
-    ASSERT_EQ(FuncInstr(0x0621000c).Dump(), "bgez $s1, 0xc");
+    ASSERT_EQ(FuncInstr(0x0621fffc).Dump(), "bgez $s1, -4");
+    ASSERT_EQ(FuncInstr(0x0621000c).Dump(), "bgez $s1, 12");
     ASSERT_EQ(FuncInstr(0x0631fffa).Dump(), "bgezal $s1, -6");
     ASSERT_EQ(FuncInstr(0x0631000a).Dump(), "bgezal $s1, 10");
     ASSERT_EQ(FuncInstr(0x1e20fff9).Dump(), "bgtz $s1, -7");
@@ -152,8 +152,8 @@ TEST( Func_instr_disasm, Process_Disasm)
 
     ASSERT_EQ(FuncInstr(0x0622fff3).Dump(), "bltzl $s1, -13");
     ASSERT_EQ(FuncInstr(0x06220003).Dump(), "bltzl $s1, 3");
-    ASSERT_EQ(FuncInstr(0x0623fffd).Dump(), "bgezl $s1, 0xfffd");
-    ASSERT_EQ(FuncInstr(0x0623000d).Dump(), "bgezl $s1, 0xd");
+    ASSERT_EQ(FuncInstr(0x0623fffd).Dump(), "bgezl $s1, -3");
+    ASSERT_EQ(FuncInstr(0x0623000d).Dump(), "bgezl $s1, 13");
     ASSERT_EQ(FuncInstr(0x0632fff6).Dump(), "bltzall $s1, -10");
     ASSERT_EQ(FuncInstr(0x06320003).Dump(), "bltzall $s1, 3");
     ASSERT_EQ(FuncInstr(0x0633fffb).Dump(), "bgezall $s1, -5");

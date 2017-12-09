@@ -102,10 +102,10 @@ const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
 // ********************** REGIMM INSTRUCTIONS *************************
     // Branches
     //key     name    operation     memsize       pointer
-    {0x0,  { "bltz",  OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 1} },
-    {0x1,  { "bgez",  OUT_RI_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::gez>, 1} },
-    {0x2,  { "bltzl", OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 2} },
-    {0x3,  { "bgezl", OUT_RI_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::gez>, 2} },
+    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 1} },
+    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 1} },
+    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 2} },
+    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 2} },
 
     {0x8,  { "tgei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::gei>,  2} },
     {0x9,  { "tgeiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::geiu>, 2} },
@@ -354,8 +354,7 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
             v_imm = instr.asI.imm;
             src1 = static_cast<RegNum>(instr.asI.rs);
             oss << " $" << regTable[src1] << ", "
-                << std::hex << "0x"
-                << static_cast<int16>(v_imm) << std::dec;
+                << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_I_BRANCH_0:
             v_imm = instr.asI.imm;
