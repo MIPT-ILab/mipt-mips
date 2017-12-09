@@ -147,7 +147,7 @@ class FuncInstr
             static_assert( sizeof( uint32) == 4);
         } instr;
 
-        using Execute = void (FuncInstr::*)(); 
+        using Execute = void (FuncInstr::*)();
         using Predicate = bool (FuncInstr::*)() const;
 
         struct ISAEntry
