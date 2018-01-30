@@ -6,7 +6,7 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 
 MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture.
 
-Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
+Lectures are delivered every Saturday at 18:30 in **304 RT building** of MIPT.
 
 ### Term 1: CS Basics and Components
 
@@ -36,7 +36,7 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
 
  Date | Event | Hometask
  :-: |:---- |:----------------
- _February 2018_  | **L11: Caches and Memory Hierarchy, Part I** | |
+ 10<br/>Feb | **L11: Caches and Memory Hierarchy, Part I** | |
  
 ### MSU Seminars
 
