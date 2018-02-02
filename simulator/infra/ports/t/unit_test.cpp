@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 
 
 // Google Test Library
@@ -17,11 +13,11 @@
 
 namespace ports {
     namespace testing {
-        
+
         static const uint64 PORT_LATENCY = 1;
         static const uint32 PORT_FANOUT = 1;
         static const uint32 PORT_BANDWIDTH = 1;
-    
+
         static const int DATA_LIMIT = 5;
         static const uint64 CLOCK_LIMIT = 10;
 
@@ -55,11 +51,11 @@ namespace ports {
                     int data_from_B;
                 };
 
-                State blogic[EXPECTED_MAX_CYCLE + 1] = 
+                State blogic[EXPECTED_MAX_CYCLE + 1] =
                 //  |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
                 {
                    { false,          false,          false,        NONE,       NONE        },
-                   { false,          false,          true,         NONE,       NONE        },       
+                   { false,          false,          true,         NONE,       NONE        },
                    { true,           false,          false,        1,          NONE        },
                    { false,          true,           false,        NONE,       2           },
                    { true,           false,          false,        3,          NONE        },
@@ -67,9 +63,9 @@ namespace ports {
                    { true,           false,          false,        5,          NONE        },
                    { false,          true,           false,        NONE,       6           },
                    { false,          false,          false,        NONE,       NONE        }
-                };   
+                };
         };
-        
+
 
 
         class A
@@ -85,7 +81,7 @@ namespace ports {
                 std::unique_ptr<ReadPort<int>> init;
                 std::unique_ptr<WritePort<bool>> stop;
 
-                void process_data( int data, uint64 cycle);    
+                void process_data( int data, uint64 cycle);
         };
 
 
@@ -95,7 +91,7 @@ namespace ports {
             public:
                 B();
                 void clock( uint64 cycle);
-            
+
             private:
                 std::unique_ptr<WritePort<int>> to_A;
                 std::unique_ptr<ReadPort<int>> from_A;
@@ -105,7 +101,7 @@ namespace ports {
 
 
 
-        
+
         static Logic logic{};
     } // namespace testing
 } // namespace ports
@@ -135,30 +131,30 @@ TEST( test_ports, Test_Ports_A_B)
     GTEST_ASSERT_NO_DEATH( ports::testing::B b;);
 
 
-    GTEST_ASSERT_NO_DEATH( WritePort<int> init( "init_A", ports::testing::PORT_BANDWIDTH, 
+    GTEST_ASSERT_NO_DEATH( WritePort<int> init( "init_A", ports::testing::PORT_BANDWIDTH,
                                                 ports::testing::PORT_FANOUT););
     GTEST_ASSERT_NO_DEATH( ReadPort<bool> stop( "stop", ports::testing::PORT_LATENCY););
 
 
     // connect all the ports
     GTEST_ASSERT_NO_DEATH( init_ports(););
-    
+
     // init object A by value 0
     GTEST_ASSERT_NO_DEATH( init.write( 0, 0););
-    
+
 
     for ( uint64 cycle = 0; cycle < ports::testing::CLOCK_LIMIT; cycle++)
     {
         //check the stop port from object A
         bool is_ready;
         GTEST_ASSERT_NO_DEATH( is_ready = stop.is_ready( cycle););
-        ASSERT_TRUE( ports::testing::logic.check_readiness( cycle, 
-                                                            Logic::CheckCode::IS_STOP_READY, 
+        ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                                                            Logic::CheckCode::IS_STOP_READY,
                                                             is_ready));
         if ( is_ready)
         {
             GTEST_ASSERT_NO_DEATH( stop.read( cycle););
-            break;             
+            break;
         }
 
         a.clock( cycle);
@@ -167,7 +163,7 @@ TEST( test_ports, Test_Ports_A_B)
         GTEST_ASSERT_NO_DEATH( check_ports( cycle););
     }
 
-    GTEST_ASSERT_NO_DEATH( destroy_ports(););           
+    GTEST_ASSERT_NO_DEATH( destroy_ports(););
 }
 
 
@@ -184,13 +180,13 @@ int main( int argc, char** argv)
 
 
 namespace ports {
-    namespace testing {  
+    namespace testing {
 
         bool Logic::check_readiness( uint64 cycle, CheckCode code, bool is_ready)
         {
             if ( cycle > EXPECTED_MAX_CYCLE)
                 return false;
-            
+
             bool is_ok = false;
             switch ( code)
             {
@@ -200,13 +196,13 @@ namespace ports {
 
                 case CheckCode::IS_INIT_READY:
                     is_ok = blogic[cycle].is_init_ready == is_ready;
-                    
+
                     // If it is ready it will be read in the current cycle
                     // so blogic should be updated to not interfere with
                     // subsequent checks in the same cycle
-                    if ( is_ok && is_ready) 
+                    if ( is_ok && is_ready)
                         blogic[cycle].is_init_ready = false;
-                    
+
                     break;
 
                 case CheckCode::IS_FROM_A_READY:
@@ -219,7 +215,7 @@ namespace ports {
                         blogic[cycle].is_from_A_ready = false;
 
                     break;
-                
+
                 case CheckCode::IS_FROM_B_READY:
                     is_ok = blogic[cycle].is_from_B_ready == is_ready;
 
@@ -232,7 +228,7 @@ namespace ports {
                     break;
 
                 default:
-                    break;    
+                    break;
             }
 
             return is_ok;
@@ -271,7 +267,7 @@ namespace ports {
             , stop{ make_write_port<bool> ( "stop", PORT_BANDWIDTH, PORT_FANOUT)}
         { }
 
-        void A::process_data( int data, uint64 cycle) 
+        void A::process_data( int data, uint64 cycle)
         {
             ++data;
 
@@ -304,15 +300,15 @@ namespace ports {
                                                                     Logic::CheckCode::IS_FROM_B_READY,
                                                                     is_from_B_ready));
 
-                if( is_init_ready) 
-                { 
+                if( is_init_ready)
+                {
                     GTEST_ASSERT_NO_DEATH( data = init->read( cycle););
                     ASSERT_TRUE( ports::testing::logic.check_data( cycle,
                                                                    Logic::CheckCode::DATA_INIT,
                                                                    data));
                 }
                 else if ( is_from_B_ready)
-                { 
+                {
                     GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););
                     ASSERT_TRUE( ports::testing::logic.check_data( cycle,
                                                                    Logic::CheckCode::DATA_FROM_B,
@@ -332,14 +328,14 @@ namespace ports {
             , from_A{ make_read_port<int>( "A_to_B", PORT_LATENCY)}
         { }
 
-        void B::process_data( int data, uint64 cycle) 
+        void B::process_data( int data, uint64 cycle)
         {
             ++data;
 
             GTEST_ASSERT_NO_DEATH( to_A->write( data, cycle););
         }
 
-        void B::clock( uint64 cycle) 
+        void B::clock( uint64 cycle)
         {
             bool is_from_A_ready;
             GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););

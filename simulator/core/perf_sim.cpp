@@ -1,10 +1,5 @@
-/* This is an open source non-commercial project. Dear PVS-Studio, please check it.
- * PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 #include <iostream>
-
-#include <boost/chrono.hpp>
-#include <boost/timer/timer.hpp>
+#include <chrono>
 
 #include <infra/config/config.h>
 
@@ -57,19 +52,18 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-    
+
     init_ports();
 }
 
 FuncInstr PerfMIPS::read_instr(uint64 cycle)
 {
-    IfIdData _data;
-    if(rp_decode_2_decode->is_ready( cycle))
+    if (rp_decode_2_decode->is_ready( cycle))
     {
         rp_fetch_2_decode->ignore( cycle);
         return rp_decode_2_decode->read( cycle);
     }
-    _data = rp_fetch_2_decode->read( cycle);
+    const auto& _data = rp_fetch_2_decode->read( cycle);
     FuncInstr instr( _data.raw,
         _data.PC,
         _data.predicted_taken,
@@ -77,8 +71,6 @@ FuncInstr PerfMIPS::read_instr(uint64 cycle)
     return instr;
 
 }
-
-        
 
 void PerfMIPS::run( const std::string& tr,
                     uint64 instrs_to_run)
@@ -92,7 +84,7 @@ void PerfMIPS::run( const std::string& tr,
 
     new_PC = memory->startPC();
 
-    boost::timer::cpu_timer timer;
+    auto t_start = std::chrono::high_resolution_clock::now();
 
     while (executed_instrs < instrs_to_run)
     {
@@ -109,17 +101,20 @@ void PerfMIPS::run( const std::string& tr,
         check_ports( cycle);
     }
 
-    auto time = timer.elapsed().wall;
-    auto frequency = 1e6 * cycle / time;
+    auto t_end = std::chrono::high_resolution_clock::now();
+
+    auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
+    auto frequency = cycle / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / cycle;
-    auto simips = 1e6 * executed_instrs / time;
+    auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
-              << std::endl << "instrs:   " << executed_instrs
-              << std::endl << "cycles:   " << cycle
-              << std::endl << "IPC:      " << ipc
-              << std::endl << "sim freq: " << frequency << " kHz"
-              << std::endl << "sim IPS:  " << simips    << " kips"
+              << std::endl << "instrs:     " << executed_instrs
+              << std::endl << "cycles:     " << cycle
+              << std::endl << "IPC:        " << ipc
+              << std::endl << "sim freq:   " << frequency << " kHz"
+              << std::endl << "sim IPS:    " << simips    << " kips"
+              << std::endl << "instr size: " << sizeof(FuncInstr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
 }
@@ -164,31 +159,31 @@ void PerfMIPS::clock_decode( int cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
-    IfIdData _data;
+
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        _data = rp_fetch_2_decode->read( cycle);
+        rp_fetch_2_decode->ignore( cycle);
         rp_decode_2_decode->ignore( cycle);
 
         sout << "flush\n";
         return;
     }
     /* check if there is something to process */
-    if( !rp_fetch_2_decode->is_ready( cycle) && !rp_decode_2_decode->is_ready( cycle))
+    if ( !rp_fetch_2_decode->is_ready( cycle) && !rp_decode_2_decode->is_ready( cycle))
     {
         sout << "bubble\n";
         return;
     }
-    
-    FuncInstr instr = read_instr( cycle);
-    
+
+    auto instr = read_instr( cycle);
+
     /* TODO: replace all this code by introducing Forwarding unit */
     if( rf->check_sources( instr))
     {
         rf->read_sources( &instr);
-                                                  
+
         wp_decode_2_execute->write( instr, cycle);
 
         /* log */
@@ -200,7 +195,6 @@ void PerfMIPS::clock_decode( int cycle)
         wp_decode_2_decode->write( instr, cycle);
         sout << instr << " (data hazard)\n";
     }
-
 }
 
 void PerfMIPS::clock_execute( int cycle)
@@ -335,9 +329,9 @@ void PerfMIPS::clock_writeback( int cycle)
 
 void PerfMIPS::check( const FuncInstr& instr)
 {
-    const std::string func_dump = checker.step();
+    const auto func_dump = checker.step();
 
-    if ( func_dump != instr.Dump())
+    if ( func_dump.Dump() != instr.Dump())
         serr << "****************************" << std::endl
              << "Mismatch: " << std::endl
              << "Checker output: " << func_dump    << std::endl

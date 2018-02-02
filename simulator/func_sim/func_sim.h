@@ -13,6 +13,7 @@
 #include <infra/types.h>
 #include <infra/log.h>
 
+#include <mips/mips_instr.h>
 
 class MIPSMemory;
 class RF;
@@ -23,7 +24,7 @@ class MIPS : public Log
         std::unique_ptr<RF> rf;
         Addr PC = NO_VAL32;
         MIPSMemory* mem = nullptr;
-    
+
     public:
         explicit MIPS( bool log = false);
         ~MIPS() final;
@@ -35,7 +36,7 @@ class MIPS : public Log
         MIPS& operator=( MIPS&&) = delete;
 
         void init( const std::string& tr);
-        std::string step();
+        FuncInstr step();
         void run(const std::string& tr, uint32 instrs_to_run);
 };
 

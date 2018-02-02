@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 #include <iostream>
 
 #include <mips/mips_memory.h>
@@ -16,11 +12,11 @@ MIPS::~MIPS()
     delete mem;
 }
 
-std::string MIPS::step()
+FuncInstr MIPS::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
-        
+
     // read sources
     rf->read_sources( &instr);
 
@@ -40,7 +36,7 @@ std::string MIPS::step()
     PC = instr.get_new_PC();
 
     // dump
-    return instr.Dump();
+    return instr;
 }
 
 void MIPS::init( const std::string& tr)

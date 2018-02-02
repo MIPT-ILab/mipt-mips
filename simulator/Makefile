@@ -14,6 +14,7 @@ include ./options.mk
 #
 # Enter for build "perf_sim" program
 CPPS= \
+    infra/macro_test.cpp \
     infra/elf_parser/elf_parser.cpp \
     infra/memory/memory.cpp \
     infra/config/config.cpp \
@@ -27,7 +28,7 @@ CPPS= \
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))
 DEPS= $(OBJS:.o=.d)
-LIBS= elf boost_program_options$(BOOST_POSTFIX) boost_timer$(BOOST_POSTFIX) boost_chrono$(BOOST_POSTFIX) boost_system$(BOOST_POSTFIX)
+LIBS= elf boost_program_options$(BOOST_POSTFIX)
 
 vpath %.cpp $(dir $(CPPS))
 
@@ -51,7 +52,7 @@ GTEST_OBJ:=$(OBJ_DIR)/gtest-all.o
 
 $(GTEST_OBJ): $(GTEST_DIR)/src/gtest-all.cc
 	@echo "[$(CXX)] $@"
-	@$(CXX) $(CXXFLAGS) -Wno-effc++ -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -I $(GTEST_INCL) -I $(GTEST_INCL)/.. -c $< -o $@
 
 $(GTEST_LIB): $(GTEST_OBJ)
 	@echo "[ar] $@"
@@ -60,11 +61,13 @@ $(GTEST_LIB): $(GTEST_OBJ)
 ####### TESTS #######
 
 TESTS:= \
+    infra/cache \
     infra/elf_parser \
     infra/memory \
     infra/config \
     infra/instrcache \
     infra/ports \
+    infra/string \
     mips \
     bpu \
     func_sim \

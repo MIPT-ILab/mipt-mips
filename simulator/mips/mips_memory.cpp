@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 
 #include "mips_memory.h"
 #include "mips_instr.h"
@@ -16,5 +12,5 @@ FuncInstr MIPSMemory::fetch_instr( Addr PC)
 
     instr_cache.update( PC, instr);
 
-    return instr;    
+    return instr;
 }

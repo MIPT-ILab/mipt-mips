@@ -12,6 +12,7 @@ cl /I. /EHsc /c /nologo /MD ^
    /D_HAS_AUTO_PTR_ETC=1 ^
    /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 ^
    /std:c++17 ^
+   infra/macro_test.cpp ^
    infra/elf_parser/elf_parser.cpp ^
    infra/memory/memory.cpp ^
    infra/config/config.cpp ^
@@ -31,7 +32,7 @@ set TRUNK=%cd%
 set TRUNKX=%TRUNK:\=\\%
 
 rem Build and run all the tests
-for %%G in (infra\elf_parser infra\config infra\memory infra\ports mips infra/instrcache func_sim bpu core) do (
+for %%G in (infra\cache infra\elf_parser infra\config infra\memory infra\ports infra\string mips infra\instrcache func_sim bpu core) do (
     echo Testing %%G
     cd %%G\t
     cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib ^

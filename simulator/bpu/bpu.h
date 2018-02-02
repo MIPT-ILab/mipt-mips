@@ -56,7 +56,7 @@ public:
               // we're reusing existing CacheTagArray functionality,
               // but here we don't split memory in blocks, storing
               // IP's only, so hardcoding here the granularity of 4 bytes:
-              4, 
+              4,
               branch_ip_size_in_bits)
         { }
 
@@ -170,7 +170,7 @@ public:
         for ( auto& elem : map)
             delete elem.second;
     }
-    
+
     BPFactory( const BPFactory&) = delete;
     BPFactory( BPFactory&&) = delete;
     BPFactory& operator=( const BPFactory&) = delete;

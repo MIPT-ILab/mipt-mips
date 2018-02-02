@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 // generic C
 #include <cassert>
 #include <cstdlib>
@@ -13,7 +9,7 @@
 #include "../perf_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH;
-static const int64 num_steps = 2013;
+static const int64 num_steps = 2250;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -30,7 +26,7 @@ TEST( Perf_Sim_init, Make_A_Step)
     GTEST_ASSERT_NO_DEATH( PerfMIPS( false).run( valid_elf_file, 1); );
 }
 
-TEST( Perf_Sim_init, Process_Wrong_Args) 
+TEST( Perf_Sim_init, Process_Wrong_Args)
 {
     // Do bad init
     ASSERT_EXIT( PerfMIPS( false).run( "./1234567890/qwertyuop", 1),

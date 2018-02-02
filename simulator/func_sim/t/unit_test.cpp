@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 // generic C
 #include <cassert>
 #include <cstdlib>
@@ -13,7 +9,7 @@
 #include "../func_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH;
-static const int64 num_steps = 2013;
+static const int64 num_steps = 2250;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -25,7 +21,7 @@ TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
 
     // Call constructor and init
     ASSERT_NO_THROW( MIPS().init( valid_elf_file) );
-   
+
     // Do bad init
     ASSERT_EXIT( MIPS().init( "./1234567890/qwertyuop"),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
@@ -35,7 +31,7 @@ TEST( Func_Sim, Make_A_Step)
 {
     MIPS mips;
     mips.init( valid_elf_file);
-    ASSERT_EQ( mips.step(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
+    ASSERT_EQ( mips.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
 }
 
 TEST( Func_Sim, Run_Full_Trace)

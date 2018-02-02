@@ -1,7 +1,6 @@
-/*
- * func_instr.h - instruction parser for mips
+ /* func_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014 MIPT-MIPS
+ * Copyright 2014-2017 MIPT-MIPS
  */
 
 /** Edited by Ladin Oleg. */
@@ -11,20 +10,13 @@
 
 // Generic C++
 #include <cassert>
-#include <string>
 #include <array>
 #include <unordered_map>
-#if __has_include("string_view")
-#include <string_view>
-using std::string_view; // NOLINT
-#else
-#include <experimental/string_view>
-using std::experimental::string_view; // NOLINT
-#endif
 
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/string/cow_string.h>
 
 enum RegNum : uint8
 {
@@ -66,20 +58,24 @@ enum RegNum : uint8
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
 
+inline uint32 count_zeros(uint32 value)
+{
+    uint32_t count = 0;
+    for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
+    {
+        if ( ( value & i) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 class FuncInstr
 {
     private:
-        enum Format : uint8
-        {
-            FORMAT_R,
-            FORMAT_I,
-            FORMAT_J,
-            FORMAT_UNKNOWN
-        };
-
         enum OperationType : uint8
         {
             OUT_R_ARITHM,
@@ -92,6 +88,8 @@ class FuncInstr
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_I_BRANCH_0,
+            OUT_RI_BRANCH_0,
+            OUT_RI_TRAP,
             OUT_I_LOAD,
             OUT_I_LOADU,
             OUT_I_LOADR,
@@ -102,7 +100,9 @@ class FuncInstr
             OUT_I_STORER,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
+            OUT_RI_BRANCH_LINK,
             OUT_J_SPECIAL,
+            OUT_SP2_COUNT,
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
@@ -114,56 +114,58 @@ class FuncInstr
 
         const union _instr
         {
-            const struct
+            const struct AsR
             {
-                unsigned funct  :6;
-                unsigned shamt  :5;
-                unsigned rd     :5;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 funct  :6;
+                uint32 shamt  :5;
+                uint32 rd     :5;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asR;
-            const struct
+            const struct AsI
             {
-                unsigned imm    :16;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 imm    :16;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asI;
-            const struct
+            const struct AsJ
             {
-                unsigned imm    :26;
-                unsigned opcode :6;
+                uint32 imm    :26;
+                uint32 opcode :6;
             } asJ;
+
             const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
+
+            static_assert( sizeof( AsR) == sizeof( uint32));
+            static_assert( sizeof( AsI) == sizeof( uint32));
+            static_assert( sizeof( AsJ) == sizeof( uint32));
+            static_assert( sizeof( uint32) == 4);
         } instr;
 
         using Execute = void (FuncInstr::*)();
+        using Predicate = bool (FuncInstr::*)() const;
 
         struct ISAEntry
         {
-            string_view name;
-
-            Format format;
+            std::string_view name;
             OperationType operation;
-
             uint8 mem_size;
-
             FuncInstr::Execute function;
-
             uint8 mips_version;
         };
-        
+
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
         static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
-                        
-        static string_view regTableName(RegNum reg);
-        static std::array<string_view, REG_NUM_MAX> regTable;
-        string_view name = {};
+        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapMIPS32;
+
+        static std::string_view regTableName(RegNum reg);
+        static std::array<std::string_view, REG_NUM_MAX> regTable;
 
         RegNum src1 = REG_NUM_ZERO;
         RegNum src2 = REG_NUM_ZERO;
@@ -188,13 +190,13 @@ class FuncInstr
         const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
-        std::string disasm = "";
+#if 0
+        std::string disasm = {};
+#else
+        CowString disasm = {};
+#endif
 
-        Format initFormat();
-        void initR();
-        void initI();
-        void initJ();
-        void initUnknown();
+        void init( const ISAEntry& entry);
 
         // Predicate helpers - unary
         bool lez() const { return static_cast<int32>( v_src1) <= 0; }
@@ -257,11 +259,6 @@ class FuncInstr
         void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
         void execute_lui()   { v_dst = sign_extend( v_imm) << 0x10; }
 
-        void execute_slt()   { v_dst = static_cast<uint32>( lt()); }
-        void execute_sltu()  { v_dst = static_cast<uint32>( ltu()); }
-        void execute_slti()  { v_dst = static_cast<uint32>( lti()); }
-        void execute_sltiu() { v_dst = static_cast<uint32>( ltiu()); }
-
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -270,50 +267,44 @@ class FuncInstr
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
-    
-        void execute_movn()  { if(v_src1 != 0) v_dst = v_src2; else writes_dst = false;}
-        void execute_movz()  { if(v_src1 == 0) v_dst = v_src2; else writes_dst = false;}
-    
-        void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tlt()  { if ( lt() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tltu() { if ( ltu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_teq()  { if ( eq() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tne()  { if ( ne() ) trap = TrapType::EXPLICIT_TRAP; }
-    
-        void execute_beq()
+
+        void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
+        void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
+
+        // Function-templated method is a little-known feature of C++, but useful here
+        template<Predicate p>
+        void execute_set() { v_dst = static_cast<uint32>((this->*p)()); }
+
+        template<Predicate p>
+        void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
+
+        template<Predicate p>
+        void execute_branch()
         {
-            _is_jump_taken = eq();
+            _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
                 new_PC += sign_extend( v_imm) << 2;
         }
 
-        void execute_bne()
-        {
-            _is_jump_taken = ne();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
-
-        void execute_blez()
-        {
-            _is_jump_taken = lez();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
-
-        void execute_bgtz()
-        {
-            _is_jump_taken = gtz();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
-        }
+        void execute_clo() { v_dst = count_zeros( ~v_src1); }
+        void execute_clz() { v_dst = count_zeros(  v_src1); }
 
         void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
         void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
 
         void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
         void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
+
+        template<Predicate p>
+        void execute_branch_and_link()
+        {
+            _is_jump_taken = (this->*p)();
+            if ( _is_jump_taken)
+            {
+                v_dst = new_PC;
+                new_PC += sign_extend( v_imm) << 2;
+            }
+        }
 
         void execute_syscall(){ };
         void execute_break()  { };
@@ -328,30 +319,31 @@ class FuncInstr
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = delete; // constructor w/o arguments for ports
+        FuncInstr() = delete;
 
         explicit
         FuncInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
 
-        const std::string& Dump() const { return disasm; }
+        const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const FuncInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
-
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
-        bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_J_JUMP_LINK ||
-                                      operation == OUT_R_JUMP      ||
-                                      operation == OUT_R_JUMP_LINK ||
-                                      operation == OUT_I_BRANCH_0  ||
-                                      operation == OUT_I_BRANCH; }
+        bool is_jump() const { return operation == OUT_J_JUMP         ||
+                                      operation == OUT_J_JUMP_LINK    ||
+                                      operation == OUT_RI_BRANCH_LINK ||
+                                      operation == OUT_R_JUMP         ||
+                                      operation == OUT_R_JUMP_LINK    ||
+                                      operation == OUT_I_BRANCH_0     ||
+                                      operation == OUT_RI_BRANCH_0    ||
+                                      operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
@@ -382,7 +374,6 @@ class FuncInstr
 
         void execute();
         void check_trap();
-
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)

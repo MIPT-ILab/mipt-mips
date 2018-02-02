@@ -1,82 +1,120 @@
 /**
  * cache_tag_array.h
  * Header for the cache tag array model.
- * MIPT-MIPS Assignment 5.
- * Ladin Oleg.
+ * @author Oleg Ladin, Denis Los
  */
 
-/* Protection from multi-including. */
 #ifndef CACHE_TAG_ARRAY_H
 #define CACHE_TAG_ARRAY_H
 
-/* C++ libraries. */
-#include <list>
-#include <vector>
-
-/* Simulator modules. */
 #include <infra/types.h>
 #include <infra/log.h>
+#include <infra/macro.h>
 
-/* Replacement algorithm modules (LRU). */
-class LRUInfo
+#include <vector>
+#include <unordered_map>
+#include <utility>
+#include <list>
+
+// Replacement algorithm modules (LRU)
+class LRUCacheInfo
 {
-    /*
-     * "lru" contains sequences of using for each set. First number in set list
-     * is the least used.
-     */
-    std::vector< std::list< uint32>> lru = {};
+    public:
+        explicit LRUCacheInfo( std::size_t ways);
 
-public:
-    LRUInfo( uint32 ways, uint32 sets);
-    void touch( uint32 set, uint32 way);
-    uint32 update( uint32 set);
+        void touch( std::size_t way);
+        std::size_t update();
+
+    private:
+        std::list<std::size_t> lru_list{};
+        std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
+
+        const std::size_t ways;
 };
 
-class CacheTagArrayCheck : private Log
+class LRUModule
 {
-protected:
-    CacheTagArrayCheck( uint32 size_in_bytes,
-                        uint32 ways,
-                        uint32 line_size,
-                        uint32 addr_size_in_bits);
-public:
+    public:
+        LRUModule( std::size_t number_of_sets, std::size_t number_of_ways)
+            : lru_info( number_of_sets, LRUCacheInfo( number_of_ways))
+        { }
+
+        void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
+
+        uint32 update( uint32 num_set) { return lru_info[ num_set].update(); }
+
+    private:
+        std::vector<LRUCacheInfo> lru_info;
+};
+
+// Cache tag array module implementation
+class CacheTagArraySizeCheck : private Log
+{
+    public:
+        CacheTagArraySizeCheck(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        );
+
         const uint32 size_in_bytes;
         const uint32 ways;
         const uint32 line_size;
         const uint32 addr_size_in_bits;
-
 };
 
-class CacheTagArray : public CacheTagArrayCheck
+class CacheTagArraySize : public CacheTagArraySizeCheck
 {
-    private:
-        /* The set (line) of the cache. */
-        struct CacheTag
-        {
-            Addr line = 0; // data
-            bool is_valid = false; // validity
-        };
-
-        const uint32 num_sets;
-
-        std::vector<std::vector<CacheTag>> array; // array of tags
-        LRUInfo lru; // LRU algorithm module
+    protected:
+        CacheTagArraySize(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        );
 
     public:
-        CacheTagArray( uint32 size_in_bytes,
-                       uint32 ways,
-                       uint32 line_size = 4,
-                       uint32 addr_size_in_bits = 32);
+        const uint32 sets;
+        const Addr   addr_mask;
 
-        /* lookup the cache and update LRU info */
-        std::pair<bool, uint32> read( Addr addr);
-        /* find in the cache but do not update LRU info */
-        std::pair<bool, uint32> read_no_touch( Addr addr) const;
-        /* create new entry in cache */
-        uint32 write( Addr addr);
-
+        // extract set from address
         uint32 set( Addr addr) const;
+        // extract tag from address
         Addr tag( Addr addr) const;
 };
 
-#endif // #ifndef CACHE_TAG_ARRAY_H
+class CacheTagArray : public CacheTagArraySize
+{
+    public:
+        using Way = uint32;
+
+        CacheTagArray(
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits = 32
+        );
+
+        // lookup the cache and update LRU info
+        std::pair<bool, Way> read( Addr addr);
+        // find in the cache but do not update LRU info
+        std::pair<bool, Way> read_no_touch( Addr addr) const;
+        // create new entry in cache
+        Way write( Addr addr);
+    private:
+        struct Tag
+        {
+            bool is_valid = false;
+            Addr tag = 0u;
+        };
+
+        // tags storage
+        std::vector<std::vector<Tag>> tags;
+
+        // hash tabe to lookup tags in O(1)
+        std::vector<std::unordered_map<Addr, Way>> lookup_helper;
+        LRUModule lru_module; // LRU algorithm module
+};
+
+#endif // CACHE_TAG_ARRAY_H
