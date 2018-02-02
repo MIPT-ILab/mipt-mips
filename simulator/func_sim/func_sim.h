@@ -1,5 +1,5 @@
 /*
- * func_sim.cpp - extremely simple MIPS simulator
+ * func_sim.cpp - extremely simple FuncSim simulator
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2015 MIPT-MIPS
  */
@@ -18,7 +18,7 @@
 class MIPSMemory;
 class RF;
 
-class MIPS : public Log
+class FuncSim : public Log
 {
     private:
         std::unique_ptr<RF> rf;
@@ -26,14 +26,14 @@ class MIPS : public Log
         MIPSMemory* mem = nullptr;
 
     public:
-        explicit MIPS( bool log = false);
-        ~MIPS() final;
+        explicit FuncSim( bool log = false);
+        ~FuncSim() final;
 
         // Rule of five
-        MIPS( const MIPS&) = delete;
-        MIPS( MIPS&&) = delete;
-        MIPS& operator=( const MIPS&) = delete;
-        MIPS& operator=( MIPS&&) = delete;
+        FuncSim( const FuncSim&) = delete;
+        FuncSim( FuncSim&&) = delete;
+        FuncSim operator=( const FuncSim&) = delete;
+        FuncSim operator=( FuncSim&&) = delete;
 
         void init( const std::string& tr);
         FuncInstr step();

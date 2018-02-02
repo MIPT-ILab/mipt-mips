@@ -5,14 +5,14 @@
 
 #include "func_sim.h"
 
-MIPS::MIPS( bool log) : Log( log), rf( new RF) { }
+FuncSim::FuncSim( bool log) : Log( log), rf( new RF) { }
 
-MIPS::~MIPS()
+FuncSim::~FuncSim()
 {
     delete mem;
 }
 
-FuncInstr MIPS::step()
+FuncInstr FuncSim::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
@@ -39,14 +39,14 @@ FuncInstr MIPS::step()
     return instr;
 }
 
-void MIPS::init( const std::string& tr)
+void FuncSim::init( const std::string& tr)
 {
     assert( mem == nullptr);
     mem = new MIPSMemory( tr);
     PC = mem->startPC();
 }
 
-void MIPS::run( const std::string& tr, uint32 instrs_to_run)
+void FuncSim::run( const std::string& tr, uint32 instrs_to_run)
 {
     init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i)

@@ -41,7 +41,7 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
-    MIPS checker;
+    FuncSim checker;
     void check( const FuncInstr& instr);
 
     /* all ports */
