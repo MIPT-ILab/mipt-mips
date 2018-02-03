@@ -74,7 +74,7 @@ class Cycle
         auto operator!=( const Cycle& cycle) const { return value != cycle.value; }
 
         void inc() { ++value; }
-        operator double() const { return static_cast<double>( value); }
+        explicit operator double() const { return static_cast<double>( value); }
 
         uint64 operator%( uint64 number) const { return value % number; }
 
@@ -145,7 +145,5 @@ Cycle   Cycle::operator+( const Latency& latency) const { return Cycle( value + 
 Cycle   Cycle::operator-( const Latency& latency) const { return Cycle( value - latency.value); }
 Latency Cycle::operator-( const Cycle& cycle) const { return Latency( value - cycle.value); }
 
-
-using Cycles = uint64;
 
 #endif // #ifndef COMMON__TYPES_H

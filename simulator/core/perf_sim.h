@@ -22,7 +22,7 @@
 class PerfMIPS : protected Log
 {
 private:
-    Cycles executed_instrs = 0;
+    uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
     /* the struture of data sent from fetch to decode stage */

@@ -104,8 +104,8 @@ void PerfMIPS::run( const std::string& tr,
     auto t_end = std::chrono::high_resolution_clock::now();
 
     auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-    auto frequency = cycle / time; // cycles per millisecond = kHz
-    auto ipc = 1.0 * executed_instrs / cycle;
+    auto frequency = static_cast<double>( cycle) / time; // cycles per millisecond = kHz
+    auto ipc = 1.0 * executed_instrs / static_cast<double>( cycle);
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
@@ -300,7 +300,7 @@ void PerfMIPS::clock_writeback( Cycle cycle)
     if ( !rp_memory_2_writeback->is_ready( cycle))
     {
         sout << "bubble\n";
-        if ( 0_Cl + (cycle - last_writeback_cycle) >= 10_Cl)
+        if ( cycle >= last_writeback_cycle + 10_Lt)
         {
             serr << "Deadlock was detected. The process will be aborted."
                  << std::endl << std::endl << critical;
