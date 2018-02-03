@@ -131,7 +131,7 @@ class Latency
         uint64 value;
 };
 
-inline auto operator""_Lt( unsigned long long int number)
+inline auto operator""_Lt( uint64 number)
 {
     assert( number <= MAX_VAL64);
     return Latency( number);
