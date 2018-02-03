@@ -23,7 +23,7 @@ class PerfMIPS : protected Log
 {
 private:
     Cycles executed_instrs = 0;
-    Cycles last_writeback_cycle = 0; // to handle possible deadlocks
+    Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
@@ -73,12 +73,12 @@ private:
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
 
     /* main stages functions */
-    void clock_fetch( int cycle);
-    void clock_decode( int cycle);
-    void clock_execute( int cycle);
-    void clock_memory( int cycle);
-    void clock_writeback( int cycle);
-    FuncInstr read_instr(uint64 cycle);
+    void clock_fetch( Cycle cycle);
+    void clock_decode( Cycle cycle);
+    void clock_execute( Cycle cycle);
+    void clock_memory( Cycle cycle);
+    void clock_writeback( Cycle cycle);
+    FuncInstr read_instr( Cycle cycle);
 
 public:
     explicit PerfMIPS( bool log);
