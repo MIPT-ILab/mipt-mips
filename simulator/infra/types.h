@@ -74,7 +74,7 @@ class Cycle
         auto operator!=( const Cycle& cycle) const { return value != cycle.value; }
 
         void inc() { ++value; }
-        void dec() { --value; }
+        operator double() const { return static_cast<double>( value); }
 
         uint64 operator%( uint64 number) const { return value % number; }
 
@@ -97,7 +97,7 @@ class Cycle
 
 inline auto operator""_Cl( unsigned long long int number)
 {
-    assert( number > MAX_VAL64);
+    assert( number <= MAX_VAL64);
     return Cycle( number);
 }
 
@@ -133,7 +133,7 @@ class Latency
 
 inline auto operator""_Lt( unsigned long long int number)
 {
-    assert( number > MAX_VAL64);
+    assert( number <= MAX_VAL64);
     return Latency( number);
 }
 
@@ -144,18 +144,6 @@ inline auto operator*( uint64 number, const Latency& latency) { return latency *
 Cycle   Cycle::operator+( const Latency& latency) const { return Cycle( value + latency.value); }
 Cycle   Cycle::operator-( const Latency& latency) const { return Cycle( value - latency.value); }
 Latency Cycle::operator-( const Cycle& cycle) const { return Latency( value - cycle.value); }
-
-
-
-static const Cycle MAX_CYCLE_8  = Cycle( MAX_VAL8);
-static const Cycle MAX_CYCLE_16 = Cycle( MAX_VAL16);
-static const Cycle MAX_CYCLE_32 = Cycle( MAX_VAL32);
-static const Cycle MAX_CYCLE_64 = Cycle( MAX_VAL64);
-
-static const Latency MAX_LATENCY_8  = Latency( MAX_VAL8); 
-static const Latency MAX_LATENCY_16 = Latency( MAX_VAL16);
-static const Latency MAX_LATENCY_32 = Latency( MAX_VAL32);
-static const Latency MAX_LATENCY_64 = Latency( MAX_VAL64);
 
 
 using Cycles = uint64;
