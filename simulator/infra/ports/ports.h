@@ -192,7 +192,7 @@ template<class T> class ReadPort: public Port<T>
         struct Cell
         {
             T data = T();
-            Cycle cycle = 0;
+            Cycle cycle = 0_Cl;
             Cell() = delete;
             Cell( T v, Cycle c) : data( std::move( v)), cycle( c) { }
         };
