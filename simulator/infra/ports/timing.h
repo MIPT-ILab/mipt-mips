@@ -1,6 +1,5 @@
 /**
- * types.h - Implementation of types that are independent of host system
- * The types are used in algorithms affected by size of a variable
+ * timing.h - Implementation of safe timing primitive types
  *
  * @author Denis Los
  * Copyright 2018 MIPT-MIPS project
