@@ -114,8 +114,8 @@ class Latency
             return is >> latency.value;
         }
 
-        friend inline Cycle Cycle::operator+( const Latency& latency) const;
-        friend inline Cycle Cycle::operator-( const Latency& latency) const;
+        friend constexpr inline Cycle Cycle::operator+( const Latency& latency) const;
+        friend constexpr inline Cycle Cycle::operator-( const Latency& latency) const;
         
     private:
         uint64 value;
@@ -133,3 +133,4 @@ constexpr Cycle   Cycle::operator-( const Latency& latency) const { return Cycle
 constexpr Latency Cycle::operator-( const Cycle& cycle) const { return Latency( value - cycle.value); }
 
 #endif // #ifndef COMMON__TYPES_H
+
