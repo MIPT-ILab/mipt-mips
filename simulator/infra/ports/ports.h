@@ -17,6 +17,7 @@
 
 #include "../types.h"
 #include "../log.h"
+#include "timing.h"
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name
