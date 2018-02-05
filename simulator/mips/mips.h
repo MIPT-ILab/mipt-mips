@@ -1,3 +1,16 @@
+/*
+ *mips.h - all the aliases to MIPS ISA
+ * @author Pavel Kryukov pavel.kryukov@phystech.edu
+ * Copyright 2014-2017 MIPT-MIPS
+ */ 
+
+#ifndef MIPS_H_
+#define MIPS_H_
+
+#include "mips_instr.h"
+#include "mips_memory.h"
+#include "mips_rf.h"
+
 struct MIPS
 {
     using FuncInstr = MIPSInstr;
@@ -6,3 +19,5 @@ struct MIPS
     using Syscalls = MIPSSyscalls;
     using Traps = MIPSTraps;
 };
+
+#endif
