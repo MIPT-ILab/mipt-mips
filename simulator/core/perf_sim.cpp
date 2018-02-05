@@ -8,7 +8,7 @@
 
 #include "perf_sim.h"
 
-static const uint32 PORT_LATENCY = 1;
+static const Latency PORT_LATENCY = 1_Lt;
 static const uint32 PORT_FANOUT = 1;
 static const uint32 PORT_BW = 1;
 static const uint32 FLUSHED_STAGES_NUM = 4;
@@ -56,7 +56,7 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
     init_ports();
 }
 
-FuncInstr PerfMIPS::read_instr(uint64 cycle)
+FuncInstr PerfMIPS::read_instr( Cycle cycle)
 {
     if (rp_decode_2_decode->is_ready( cycle))
     {
@@ -76,7 +76,7 @@ void PerfMIPS::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
-    Cycles cycle = 0;
+    Cycle cycle = 0_Cl;
 
     memory = new MIPSMemory( tr);
 
@@ -93,7 +93,7 @@ void PerfMIPS::run( const std::string& tr,
         clock_decode( cycle);
         clock_execute( cycle);
         clock_memory( cycle);
-        ++cycle;
+        cycle.inc();
 
         sout << "Executed instructions: " << executed_instrs
              << std::endl << std::endl;
@@ -104,8 +104,8 @@ void PerfMIPS::run( const std::string& tr,
     auto t_end = std::chrono::high_resolution_clock::now();
 
     auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-    auto frequency = cycle / time; // cycles per millisecond = kHz
-    auto ipc = 1.0 * executed_instrs / cycle;
+    auto frequency = static_cast<double>( cycle) / time; // cycles per millisecond = kHz
+    auto ipc = 1.0 * executed_instrs / static_cast<double>( cycle);
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
@@ -119,7 +119,7 @@ void PerfMIPS::run( const std::string& tr,
               << std::endl;
 }
 
-void PerfMIPS::clock_fetch( int cycle)
+void PerfMIPS::clock_fetch( Cycle cycle)
 {
     /* receive flush and stall signals */
     const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
@@ -153,7 +153,7 @@ void PerfMIPS::clock_fetch( int cycle)
          << std::hex << PC << ": 0x" << data.raw << std::endl;
 }
 
-void PerfMIPS::clock_decode( int cycle)
+void PerfMIPS::clock_decode( Cycle cycle)
 {
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
@@ -197,7 +197,7 @@ void PerfMIPS::clock_decode( int cycle)
     }
 }
 
-void PerfMIPS::clock_execute( int cycle)
+void PerfMIPS::clock_execute( Cycle cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
@@ -235,7 +235,7 @@ void PerfMIPS::clock_execute( int cycle)
     sout << instr << std::endl;
 }
 
-void PerfMIPS::clock_memory( int cycle)
+void PerfMIPS::clock_memory( Cycle cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
@@ -292,7 +292,7 @@ void PerfMIPS::clock_memory( int cycle)
     sout << instr << std::endl;
 }
 
-void PerfMIPS::clock_writeback( int cycle)
+void PerfMIPS::clock_writeback( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
@@ -300,7 +300,7 @@ void PerfMIPS::clock_writeback( int cycle)
     if ( !rp_memory_2_writeback->is_ready( cycle))
     {
         sout << "bubble\n";
-        if ( cycle - last_writeback_cycle >= 10)
+        if ( cycle >= last_writeback_cycle + 10_Lt)
         {
             serr << "Deadlock was detected. The process will be aborted."
                  << std::endl << std::endl << critical;

@@ -3,7 +3,7 @@
  * The types are used in algorithms affected by size of a variable
  *
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012 uArchSim iLab project
+ * Copyright 2012-2018 MIPT-MIPS project
  */
 
 // protection from multi-include
@@ -51,7 +51,5 @@ static const uint16 MAX_VAL16 = UINT16_MAX;
 static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
-// semantics
-using Cycles = uint64;
-
 #endif // #ifndef COMMON__TYPES_H
+

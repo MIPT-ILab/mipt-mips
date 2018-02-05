@@ -9,17 +9,18 @@
 
 
 #include <cassert>
+#include <map>
 
 
 namespace ports {
     namespace testing {
 
-        static const uint64 PORT_LATENCY = 1;
+        static const Latency PORT_LATENCY = 1_Lt;
         static const uint32 PORT_FANOUT = 1;
         static const uint32 PORT_BANDWIDTH = 1;
 
         static const int DATA_LIMIT = 5;
-        static const uint64 CLOCK_LIMIT = 10;
+        static const Cycle CLOCK_LIMIT = 10_Cl;
 
         class Logic
         {
@@ -35,12 +36,12 @@ namespace ports {
                     IS_STOP_READY
                 };
 
-                bool check_readiness( uint64 cycle, CheckCode code, bool is_ready);
-                bool check_data( uint64 cycle, CheckCode code, int data) const;
+                bool check_readiness( Cycle cycle, CheckCode code, bool is_ready);
+                bool check_data( Cycle cycle, CheckCode code, int data);
 
             private:
                 static const int NONE = -1;
-                static const uint64 EXPECTED_MAX_CYCLE = 8;
+                static const Cycle EXPECTED_MAX_CYCLE;
 
                 struct State
                 {
@@ -51,28 +52,29 @@ namespace ports {
                     int data_from_B;
                 };
 
-                State blogic[EXPECTED_MAX_CYCLE + 1] =
-                //  |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
+                std::map<Cycle, State> blogic=
+                //  | CYCLE |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
                 {
-                   { false,          false,          false,        NONE,       NONE        },
-                   { false,          false,          true,         NONE,       NONE        },
-                   { true,           false,          false,        1,          NONE        },
-                   { false,          true,           false,        NONE,       2           },
-                   { true,           false,          false,        3,          NONE        },
-                   { false,          true,           false,        NONE,       4           },
-                   { true,           false,          false,        5,          NONE        },
-                   { false,          true,           false,        NONE,       6           },
-                   { false,          false,          false,        NONE,       NONE        }
+                   { 0_Cl, { false,          false,          false,        NONE,       NONE        }},
+                   { 1_Cl, { false,          false,          true,         NONE,       NONE        }},
+                   { 2_Cl, { true,           false,          false,        1,          NONE        }},
+                   { 3_Cl, { false,          true,           false,        NONE,       2           }},
+                   { 4_Cl, { true,           false,          false,        3,          NONE        }},
+                   { 5_Cl, { false,          true,           false,        NONE,       4           }},
+                   { 6_Cl, { true,           false,          false,        5,          NONE        }},
+                   { 7_Cl, { false,          true,           false,        NONE,       6           }},
+                   { 8_Cl, { false,          false,          false,        NONE,       NONE        }}
                 };
         };
 
+        const Cycle Logic::EXPECTED_MAX_CYCLE = 8_Cl;
 
 
         class A
         {
             public:
                 A();
-                void clock( uint64 cycle);
+                void clock( Cycle cycle);
 
             private:
                 std::unique_ptr<WritePort<int>> to_B;
@@ -81,7 +83,7 @@ namespace ports {
                 std::unique_ptr<ReadPort<int>> init;
                 std::unique_ptr<WritePort<bool>> stop;
 
-                void process_data( int data, uint64 cycle);
+                void process_data( int data, Cycle cycle);
         };
 
 
@@ -90,13 +92,13 @@ namespace ports {
         {
             public:
                 B();
-                void clock( uint64 cycle);
+                void clock( Cycle cycle);
 
             private:
                 std::unique_ptr<WritePort<int>> to_A;
                 std::unique_ptr<ReadPort<int>> from_A;
 
-                void process_data ( int data, uint64 cycle);
+                void process_data ( int data, Cycle cycle);
         };
 
 
@@ -140,10 +142,10 @@ TEST( test_ports, Test_Ports_A_B)
     GTEST_ASSERT_NO_DEATH( init_ports(););
 
     // init object A by value 0
-    GTEST_ASSERT_NO_DEATH( init.write( 0, 0););
+    GTEST_ASSERT_NO_DEATH( init.write( 0, 0_Cl););
 
 
-    for ( uint64 cycle = 0; cycle < ports::testing::CLOCK_LIMIT; cycle++)
+    for ( auto cycle = 0_Cl; cycle < ports::testing::CLOCK_LIMIT; cycle.inc())
     {
         //check the stop port from object A
         bool is_ready;
@@ -182,7 +184,7 @@ int main( int argc, char** argv)
 namespace ports {
     namespace testing {
 
-        bool Logic::check_readiness( uint64 cycle, CheckCode code, bool is_ready)
+        bool Logic::check_readiness( Cycle cycle, CheckCode code, bool is_ready)
         {
             if ( cycle > EXPECTED_MAX_CYCLE)
                 return false;
@@ -234,7 +236,7 @@ namespace ports {
             return is_ok;
         }
 
-        bool Logic::check_data( uint64 cycle, CheckCode code, int data) const
+        bool Logic::check_data( Cycle cycle, CheckCode code, int data)
         {
             if ( cycle > EXPECTED_MAX_CYCLE || data < 0)
                 return false;
@@ -244,7 +246,7 @@ namespace ports {
                 case CheckCode::DATA_INIT:
                     // data from init port should be equal to 0
                     // merely in cycle 1
-                    return cycle == 1 && data == 0;
+                    return cycle == 1_Cl && data == 0;
 
                 case CheckCode::DATA_FROM_A:
                     return blogic[cycle].data_from_A == data;
@@ -267,7 +269,7 @@ namespace ports {
             , stop{ make_write_port<bool> ( "stop", PORT_BANDWIDTH, PORT_FANOUT)}
         { }
 
-        void A::process_data( int data, uint64 cycle)
+        void A::process_data( int data, Cycle cycle)
         {
             ++data;
 
@@ -282,7 +284,7 @@ namespace ports {
             GTEST_ASSERT_NO_DEATH( to_B->write( data, cycle););
         }
 
-        void A::clock( uint64 cycle)
+        void A::clock( Cycle cycle)
         {
             int data;
 
@@ -328,14 +330,14 @@ namespace ports {
             , from_A{ make_read_port<int>( "A_to_B", PORT_LATENCY)}
         { }
 
-        void B::process_data( int data, uint64 cycle)
+        void B::process_data( int data, Cycle cycle)
         {
             ++data;
 
             GTEST_ASSERT_NO_DEATH( to_A->write( data, cycle););
         }
 
-        void B::clock( uint64 cycle)
+        void B::clock( Cycle cycle)
         {
             bool is_from_A_ready;
             GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););
