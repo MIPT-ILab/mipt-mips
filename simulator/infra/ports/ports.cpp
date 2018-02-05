@@ -14,7 +14,7 @@ void init_ports()
         map->init();
 }
 
-void check_ports( uint64 cycle)
+void check_ports( Cycle cycle)
 {
     for ( auto map : BasePort::BaseMap::all_maps)
         map->check( cycle);

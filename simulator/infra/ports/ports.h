@@ -17,6 +17,7 @@
 
 #include "../types.h"
 #include "../log.h"
+#include "timing.h"
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name
@@ -28,24 +29,24 @@ template<class T> class WritePort;
 
 // Global port handlers
 extern void init_ports();
-extern void check_ports( uint64 cycle);
+extern void check_ports( Cycle cycle);
 extern void destroy_ports();
 
 class BasePort : protected Log
 {
         friend void init_ports();
-        friend void check_ports( uint64 cycle);
+        friend void check_ports( Cycle cycle);
         friend void destroy_ports();
 
     protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
-                friend void check_ports( uint64 cycle);
+                friend void check_ports( Cycle cycle);
                 friend void destroy_ports();
 
                 virtual void init() const = 0;
-                virtual void check( uint64 cycle) const = 0;
+                virtual void check( Cycle cycle) const = 0;
                 virtual void destroy() = 0;
 
                 static std::list<BaseMap*> all_maps;
@@ -91,7 +92,7 @@ template<class T> class Port : public BasePort
             void init() const final;
 
             // Finding lost elements
-            void check( uint64 cycle) const final;
+            void check( Cycle cycle) const final;
 
             // Destroy connections
             void destroy() final;
@@ -136,12 +137,12 @@ template<class T> class WritePort : public Port<T>
         ReadListType _destinations = {};
 
         // Variables for counting token in the last cycle
-        uint64 _lastCycle = 0;
+        Cycle _lastCycle = 0_Cl;
         uint32 _writeCounter = 0;
 
         void init( const ReadListType& readers);
 
-        void check( uint64 cycle) const {
+        void check( Cycle cycle) const {
             for ( const auto& reader : _destinations)
                 reader->check( cycle);
         }
@@ -169,7 +170,7 @@ template<class T> class WritePort : public Port<T>
         }
 
         // Write Method
-        void write( const T& what, uint64 cycle);
+        void write( const T& what, Cycle cycle);
 
         // Returns fanout for test of connection
         uint32 getFanout() const { return _fanout; }
@@ -186,26 +187,26 @@ template<class T> class ReadPort: public Port<T>
         using Log::critical;
 
         // Latency is the number of cycles after which we may take data from port.
-        const uint64 _latency;
+        const Latency _latency;
 
         // Queue of data that should be released
         struct Cell
         {
             T data = T();
-            uint64 cycle = 0;
+            Cycle cycle = 0_Cl;
             Cell() = delete;
-            Cell( T v, uint64 c) : data( std::move( v)), cycle( c) { }
+            Cell( T v, Cycle c) : data( std::move( v)), cycle( c) { }
         };
         std::queue<Cell> _dataQueue;
 
         // Pushes data from WritePort
-        void pushData( const T& what, uint64 cycle)
+        void pushData( const T& what, Cycle cycle)
         {
              _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
         }
 
         // Tests if there is any ungot data
-        void check( uint64 cycle) const;
+        void check( Cycle cycle) const;
     public:
         /*
          * Constructor
@@ -215,20 +216,20 @@ template<class T> class ReadPort: public Port<T>
          *
          * Adds port to needed Map.
         */
-        ReadPort<T>( std::string key, uint64 latency) :
+        ReadPort<T>( std::string key, Latency latency) :
             Port<T>::Port( std::move( key)), _latency( latency), _dataQueue()
         {
             this->portMap[ this->_key].readers.push_front( this);
         }
 
         // Is ready? method
-        bool is_ready( uint64 cycle) const;
+        bool is_ready( Cycle cycle) const;
 
         // Read method
-        T read( uint64 cycle);
+        T read( Cycle cycle);
 
         // Read but ignore the data
-        void ignore( uint64 cycle);
+        void ignore( Cycle cycle);
 };
 
 /*
@@ -242,7 +243,7 @@ template<class T> class ReadPort: public Port<T>
  * If port wasn't initialized, asserts.
  * If port is overloaded by bandwidth (more than _bandwidth token during one cycle, asserts).
 */
-template<class T> void WritePort<T>::write( const T& what, uint64 cycle)
+template<class T> void WritePort<T>::write( const T& what, Cycle cycle)
 {
     if ( !this->_init)
     {
@@ -326,7 +327,7 @@ template<class T> void WritePort<T>::destroy()
  * If succesful, returns true
  * If uninitalized, generates error
 */
-template<class T> bool ReadPort<T>::is_ready( uint64 cycle) const
+template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
 {
     if ( !this->_init)
     {
@@ -345,7 +346,7 @@ template<class T> bool ReadPort<T>::is_ready( uint64 cycle) const
  *
  * If there was nothing to read, generates error (use is_ready before reading)
 */
-template<class T> T ReadPort<T>::read( uint64 cycle)
+template<class T> T ReadPort<T>::read( Cycle cycle)
 {
     if ( !this->_init)
         serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
@@ -364,7 +365,7 @@ template<class T> T ReadPort<T>::read( uint64 cycle)
  *
  * Reads all data which should be read in this cycle but does not copy it
  */
-template<class T> void ReadPort<T>::ignore( uint64 cycle)
+template<class T> void ReadPort<T>::ignore( Cycle cycle)
 {
     while ( this->is_ready( cycle))
          _dataQueue.pop();
@@ -373,7 +374,7 @@ template<class T> void ReadPort<T>::ignore( uint64 cycle)
 /*
  * Tests if there is any data that can not be used ever.
 */
-template<class T> void ReadPort<T>::check(uint64 cycle) const
+template<class T> void ReadPort<T>::check( Cycle cycle) const
 {
     if ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle)
         serr << "In " << this->_key << " port data was added at "
@@ -418,10 +419,10 @@ template<class T> void Port<T>::Map::destroy()
  * Argument is the number of current cycle.
  * If some token couldn't be get in future, warnings
 */
-template<class T> void Port<T>::Map::check( uint64 cycle) const
+template<class T> void Port<T>::Map::check( Cycle cycle) const
 {
     for ( const auto& cluster : _map)
-        cluster.second.writer->check(cycle);
+        cluster.second.writer->check( cycle);
 }
 
 // External methods
