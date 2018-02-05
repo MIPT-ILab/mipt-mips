@@ -1,7 +1,7 @@
-/*
- *mips.h - all the aliases to MIPS ISA
- * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014-2017 MIPT-MIPS
+/**
+ * mips.h - all the aliases to MIPS ISA
+ * @author Aleksandr Misevich
+ * Copyright 2018 MIPT-MIPS
  */ 
 
 #ifndef MIPS_H_
@@ -20,4 +20,4 @@ struct MIPS
     using Traps = MIPSTraps;
 };
 
-#endif
+#endif // MIPS_H_
