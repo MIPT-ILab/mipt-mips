@@ -40,7 +40,7 @@ int main( int argc, const char* argv[])
         }
         else
         {
-            MIPS mips( config::disassembly_on);
+            FuncSim mips( config::disassembly_on);
             mips.run( config::binary_filename, config::num_steps);
         }
     }
