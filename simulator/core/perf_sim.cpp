@@ -9,10 +9,10 @@
 
 #include "perf_sim.h"
 
-static const Latency PORT_LATENCY = 1_Lt;
-static const uint32 PORT_FANOUT = 1;
-static const uint32 PORT_BW = 1;
-static const uint32 FLUSHED_STAGES_NUM = 4;
+static constexpr const Latency PORT_LATENCY = 1_Lt;
+static constexpr const uint32 PORT_FANOUT = 1;
+static constexpr const uint32 PORT_BW = 1;
+static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
