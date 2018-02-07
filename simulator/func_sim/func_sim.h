@@ -16,9 +16,6 @@
 #include <mips/mips_instr.h>
 #include <mips/mips.h>
 
-//class MIPSMemory;
-//class MIPSRF;
-
 template <typename ISA>
 class FuncSim : public Log
 {
