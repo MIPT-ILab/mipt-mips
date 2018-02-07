@@ -23,7 +23,7 @@ union uint64_8
     explicit uint64_8( uint64 value) : val( value) { }
 };
 
-Memory::Memory( const std::string& executable_file_name,
+FuncMemory::FuncMemory( const std::string& executable_file_name,
                         uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
@@ -70,7 +70,7 @@ Memory::Memory( const std::string& executable_file_name,
     }
 }
 
-uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
+uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
 {
     if ( num_of_bytes == 0 || num_of_bytes > 8) {
         std::cerr << "ERROR. Reading " << num_of_bytes << " bytes)\n";
@@ -88,7 +88,7 @@ uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
     return value.val;
 }
 
-void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
+void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
@@ -107,7 +107,7 @@ void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
         write_byte( addr + i, value_.bytes[i]);
 }
 
-void Memory::alloc( Addr addr)
+void FuncMemory::alloc( Addr addr)
 {
     auto& set = memory[get_set(addr)];
     if ( set.empty())
@@ -118,13 +118,13 @@ void Memory::alloc( Addr addr)
         page.resize(page_size, 0);
 }
 
-bool Memory::check( Addr addr) const
+bool FuncMemory::check( Addr addr) const
 {
     const auto& set = memory[get_set(addr)];
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-std::string Memory::dump() const
+std::string FuncMemory::dump() const
 {
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;
