@@ -1,6 +1,6 @@
-/*
+/**
  * mips.h - all the aliases to MIPS ISA
- * @author Alexandr Misevich
+ * @author Aleksandr Misevich
  * Copyright 2018 MIPT-MIPS
  */ 
 
@@ -20,4 +20,4 @@ struct MIPS
     //using Traps = MIPSTraps;
 };
 
-#endif
+#endif // MIPS_H_
