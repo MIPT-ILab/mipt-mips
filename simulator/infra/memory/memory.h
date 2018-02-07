@@ -17,7 +17,7 @@
 #include <infra/types.h>
 #include <infra/elf_parser/elf_parser.h>
 
-class Memory
+class FuncMemory
 {
     private:
         const uint32 page_bits;
@@ -72,7 +72,7 @@ class Memory
         void alloc( Addr addr);
         bool check( Addr addr) const;
     public:
-        explicit Memory ( const std::string& executable_file_name,
+        explicit FuncMemory ( const std::string& executable_file_name,
                      uint32 addr_bits = 32,
                      uint32 page_bits = 10,
                      uint32 offset_bits = 12);

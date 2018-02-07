@@ -5,6 +5,7 @@
 
 #include <mips/mips_memory.h>
 #include <mips/mips_rf.h>
+#include <mips/mips.h>
 
 #include "perf_sim.h"
 

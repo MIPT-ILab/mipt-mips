@@ -14,12 +14,18 @@
 #include <infra/log.h>
 
 #include <mips/mips_instr.h>
+#include <mips/mips.h>
 
-class MIPSMemory;
-class MIPSRF;
+//class MIPSMemory;
+//class MIPSRF;
 
+template <typename ISA>
 class FuncSim : public Log
 {
+    using FuncInstr = typename ISA::FuncInstr;
+    using RF = typename ISA::RF;
+    using Memory = typename ISA::Memory;
+    
     private:
         std::unique_ptr<MIPSRF> rf;
         Addr PC = NO_VAL32;
@@ -36,9 +42,9 @@ class FuncSim : public Log
         FuncSim operator=( FuncSim&&) = delete;
 
         void init( const std::string& tr);
-        MIPSInstr step();
+        FuncInstr step();
         void run(const std::string& tr, uint32 instrs_to_run);
 };
+using FuncMIPS = FuncSim<MIPS>;
 
 #endif
-

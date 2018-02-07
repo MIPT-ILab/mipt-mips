@@ -18,9 +18,7 @@
 #include "mips/mips_rf.h"
 #include "mips/mips.h"
 
-
 #include "bpu/bpu.h"
-
 
 template <typename ISA>
 class PerfSim : protected Log
@@ -48,7 +46,7 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
-    FuncSim checker;
+    FuncSim<ISA> checker;
     void check( const FuncInstr& instr);
 
     /* all ports */

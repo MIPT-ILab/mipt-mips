@@ -35,13 +35,13 @@ int main( int argc, const char* argv[])
         /* running simulation */
         if ( !config::functional_only)
         {
-            PerfSim<MIPS> p_mips(bool(config::disassembly_on));
+            PerfSim<MIPS> p_mips(config::disassembly_on);
             p_mips.run( config::binary_filename,
                         config::num_steps);
         }
         else
         {
-            FuncSim mips( config::disassembly_on);
+            FuncSim<MIPS> mips( config::disassembly_on);
             mips.run( config::binary_filename, config::num_steps);
         }
     }

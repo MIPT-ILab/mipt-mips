@@ -11,15 +11,15 @@
 #include <infra/memory/memory.h>
 #include "mips_instr.h"
 
-class MIPSMemory : private Memory
+class MIPSMemory : private FuncMemory
 {
     private:
         InstrCache<MIPSInstr> instr_cache{};
 
     public:
-        explicit MIPSMemory( const std::string& tr) : Memory( tr) { }
+        explicit MIPSMemory( const std::string& tr) : FuncMemory( tr) { }
 
-        using Memory::startPC;
+        using FuncMemory::startPC;
 
         uint32 fetch( Addr pc) const { return read( pc); }
 
