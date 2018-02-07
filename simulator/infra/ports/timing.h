@@ -9,21 +9,18 @@
 #define INFRA_TIMING_H
 
 #include <iostream>
+#include <boost/operators.hpp>
 
 class Cycle;
 class Latency;
 
-class Cycle
+class Cycle : public boost::totally_ordered<Cycle>
 {
     public:
         constexpr explicit Cycle( uint64 value = NO_VAL64) : value( value) { }
 
-        constexpr auto operator< ( const Cycle& cycle) const { return value < cycle.value; }
-        constexpr auto operator> ( const Cycle& cycle) const { return value > cycle.value; }
-        constexpr auto operator<=( const Cycle& cycle) const { return value <= cycle.value; }
-        constexpr auto operator>=( const Cycle& cycle) const { return value >= cycle.value; }
-        constexpr auto operator==( const Cycle& cycle) const { return value == cycle.value; }
-        constexpr auto operator!=( const Cycle& cycle) const { return value != cycle.value; }
+        constexpr auto operator==( const Cycle& rhs) const { return value == rhs.value; }
+        constexpr auto operator<( const Cycle& rhs) const { return value < rhs.value; }
 
         constexpr void inc() { ++value; }
         constexpr explicit operator double() const { return static_cast<double>( value); }
@@ -52,11 +49,13 @@ constexpr inline auto operator""_Cl( unsigned long long int number)
     return Cycle( static_cast<uint64>( number));
 }
 
-class Latency
+class Latency : public boost::totally_ordered<Latency>
 {
     public:
         constexpr explicit Latency( uint64 value = NO_VAL64) : value( value) { }
 
+        constexpr auto operator==( const Latency& rhs) const { return value == rhs.value; }
+        constexpr auto operator<( const Latency& rhs) const { return value < rhs.value; }
         constexpr auto operator+( const Latency& latency) const { return Latency( value + latency.value); }
         constexpr auto operator-( const Latency& latency) const { return Latency( value - latency.value); }
         constexpr auto operator/( uint64 number) const { return Latency( value / number); }
