@@ -11,7 +11,7 @@
 
 #include "mips_instr.h"
 
-class RF
+class MIPSRF
 {
         struct Reg {
             uint32 value = 0;
@@ -64,23 +64,23 @@ class RF
             entry.value = val;
         }
     public:
-        RF() = default;
+        MIPSRF() = default;
 
-        inline void read_sources( FuncInstr* instr)
+        inline void read_sources( MIPSInstr* instr)
         {
             instr->set_v_src1( read(instr->get_src1_num()));
             instr->set_v_src2( read(instr->get_src2_num()));
             invalidate( instr->get_dst_num());
         }
 
-        inline bool check_sources( const FuncInstr& instr) const
+        inline bool check_sources( const MIPSInstr& instr) const
         {
             return check( instr.get_src1_num())
                 && check( instr.get_src2_num())
                 && check( instr.get_dst_num());
         }
 
-        inline void write_dst( const FuncInstr& instr)
+        inline void write_dst( const MIPSInstr& instr)
         {
             RegNum reg_num  = instr.get_dst_num();
             bool writes_dst = instr.get_writes_dst();
@@ -90,7 +90,7 @@ class RF
                 write( reg_num, read(reg_num));
         }
 
-        inline void cancel( const FuncInstr& instr)
+        inline void cancel( const MIPSInstr& instr)
         {
             validate( instr.get_dst_num());
         }

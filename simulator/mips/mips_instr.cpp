@@ -1,5 +1,5 @@
 /*
- * func_instr.cpp - instruction parser for mips
+ * mips_instr.cpp - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2015 MIPT-MIPS
  */
@@ -11,190 +11,190 @@
 #include "mips_instr.h"
 
 //unordered map for R-instructions
-const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapR =
+const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
 {
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
     //key      name  operation  memsize           pointer
-    {0x0, { "sll" , OUT_R_SHAMT, 0, &FuncInstr::execute_sll, 1} },
+    {0x0, { "sll" , OUT_R_SHAMT, 0, &MIPSInstr::execute_sll, 1} },
     //       0x1 movci
-    {0x2, { "srl", OUT_R_SHAMT, 0, &FuncInstr::execute_srl, 1} },
-    {0x3, { "sra", OUT_R_SHAMT, 0, &FuncInstr::execute_sra, 1} },
+    {0x2, { "srl", OUT_R_SHAMT, 0, &MIPSInstr::execute_srl, 1} },
+    {0x3, { "sra", OUT_R_SHAMT, 0, &MIPSInstr::execute_sra, 1} },
 
     // Variable shifts
     //key      name  operation  memsize           pointer
-    {0x4, { "sllv", OUT_R_SHIFT, 0, &FuncInstr::execute_sllv, 1} },
+    {0x4, { "sllv", OUT_R_SHIFT, 0, &MIPSInstr::execute_sllv, 1} },
     //        0x5 reserved
-    {0x6, { "srlv", OUT_R_SHIFT, 0, &FuncInstr::execute_srlv, 1} },
-    {0x7, { "srav", OUT_R_SHIFT, 0, &FuncInstr::execute_srav, 1} },
+    {0x6, { "srlv", OUT_R_SHIFT, 0, &MIPSInstr::execute_srlv, 1} },
+    {0x7, { "srav", OUT_R_SHIFT, 0, &MIPSInstr::execute_srav, 1} },
 
     // Indirect branches
     //key      name   operation  memsize           pointer
-    {0x8, { "jr"  , OUT_R_JUMP,      0, &FuncInstr::execute_jr,   1} },
-    {0x9, { "jalr", OUT_R_JUMP_LINK, 0, &FuncInstr::execute_jalr, 1} },
+    {0x8, { "jr"  , OUT_R_JUMP,      0, &MIPSInstr::execute_jr,   1} },
+    {0x9, { "jalr", OUT_R_JUMP_LINK, 0, &MIPSInstr::execute_jalr, 1} },
 
     // Conditional moves (MIPS IV)
     //key      name    operation  memsize           pointer
-    {0xA,  { "movz", OUT_R_ARITHM, 0, &FuncInstr::execute_movz, 4} },
-    {0xB,  { "movn", OUT_R_ARITHM, 0, &FuncInstr::execute_movn, 4} },
+    {0xA,  { "movz", OUT_R_ARITHM, 0, &MIPSInstr::execute_movz, 4} },
+    {0xB,  { "movn", OUT_R_ARITHM, 0, &MIPSInstr::execute_movn, 4} },
 
     // System calls
     //key      name     operation  memsize           pointer
-    {0xC, { "syscall", OUT_R_SPECIAL, 0, &FuncInstr::execute_syscall, 1} },
-    {0xD, { "break",   OUT_R_SPECIAL, 0, &FuncInstr::execute_break,   1} },
+    {0xC, { "syscall", OUT_R_SPECIAL, 0, &MIPSInstr::execute_syscall, 1} },
+    {0xD, { "break",   OUT_R_SPECIAL, 0, &MIPSInstr::execute_break,   1} },
     //          0xE reserved
     //          0xF SYNC
 
     // HI/LO manipulations
     //key      name   operation  memsize           pointer
-    {0x10, { "mfhi", OUT_R_ARITHM, 0, &FuncInstr::execute_mfhi, 1} },
-    {0x11, { "mthi", OUT_R_ARITHM, 0, &FuncInstr::execute_mthi, 1} },
-    {0x12, { "mflo", OUT_R_ARITHM, 0, &FuncInstr::execute_mflo, 1} },
-    {0x13, { "mtlo", OUT_R_ARITHM, 0, &FuncInstr::execute_mtlo, 1} },
+    {0x10, { "mfhi", OUT_R_ARITHM, 0, &MIPSInstr::execute_mfhi, 1} },
+    {0x11, { "mthi", OUT_R_ARITHM, 0, &MIPSInstr::execute_mthi, 1} },
+    {0x12, { "mflo", OUT_R_ARITHM, 0, &MIPSInstr::execute_mflo, 1} },
+    {0x13, { "mtlo", OUT_R_ARITHM, 0, &MIPSInstr::execute_mtlo, 1} },
 
     // 0x14 - 0x17 double width shifts
 
     // Multiplication/Division
     //key      name    operation  memsize           pointer
-    {0x18, { "mult",  OUT_R_ARITHM, 0, &FuncInstr::execute_mult,  1} },
-    {0x19, { "multu", OUT_R_ARITHM, 0, &FuncInstr::execute_multu, 1} },
-    {0x1A, { "div",   OUT_R_ARITHM, 0, &FuncInstr::execute_div,   1} },
-    {0x1B, { "divu",  OUT_R_ARITHM, 0, &FuncInstr::execute_divu,  1} },
+    {0x18, { "mult",  OUT_R_ARITHM, 0, &MIPSInstr::execute_mult,  1} },
+    {0x19, { "multu", OUT_R_ARITHM, 0, &MIPSInstr::execute_multu, 1} },
+    {0x1A, { "div",   OUT_R_ARITHM, 0, &MIPSInstr::execute_div,   1} },
+    {0x1B, { "divu",  OUT_R_ARITHM, 0, &MIPSInstr::execute_divu,  1} },
 
     // 0x1C - 0x1F double width multiplication/division
 
     // Addition/Subtraction
     //key      name   operation  memsize           pointer
-    {0x20, { "add",  OUT_R_ARITHM, 0, &FuncInstr::execute_add,  1} },
-    {0x21, { "addu", OUT_R_ARITHM, 0, &FuncInstr::execute_addu, 1} },
-    {0x22, { "sub",  OUT_R_ARITHM, 0, &FuncInstr::execute_sub,  1} },
-    {0x23, { "subu", OUT_R_ARITHM, 0, &FuncInstr::execute_subu, 1} },
+    {0x20, { "add",  OUT_R_ARITHM, 0, &MIPSInstr::execute_add,  1} },
+    {0x21, { "addu", OUT_R_ARITHM, 0, &MIPSInstr::execute_addu, 1} },
+    {0x22, { "sub",  OUT_R_ARITHM, 0, &MIPSInstr::execute_sub,  1} },
+    {0x23, { "subu", OUT_R_ARITHM, 0, &MIPSInstr::execute_subu, 1} },
 
     // Logical operations
     //key      name   operation  memsize           pointer
-    {0x24, { "and", OUT_R_ARITHM, 0, &FuncInstr::execute_and,  1} },
-    {0x25, { "or",  OUT_R_ARITHM, 0, &FuncInstr::execute_or,   1} },
-    {0x26, { "xor", OUT_R_ARITHM, 0, &FuncInstr::execute_xor,  1} },
-    {0x27, { "nor", OUT_R_ARITHM, 0, &FuncInstr::execute_nor,  1} },
+    {0x24, { "and", OUT_R_ARITHM, 0, &MIPSInstr::execute_and,  1} },
+    {0x25, { "or",  OUT_R_ARITHM, 0, &MIPSInstr::execute_or,   1} },
+    {0x26, { "xor", OUT_R_ARITHM, 0, &MIPSInstr::execute_xor,  1} },
+    {0x27, { "nor", OUT_R_ARITHM, 0, &MIPSInstr::execute_nor,  1} },
     //        0x28 reserved
     //        0x29 reserved
-    {0x2A, { "slt",  OUT_R_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::lt>,  1} },
-    {0x2B, { "sltu", OUT_R_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::ltu>, 1} },
+    {0x2A, { "slt",  OUT_R_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::lt>,  1} },
+    {0x2B, { "sltu", OUT_R_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::ltu>, 1} },
 
     // 0x2C - 0x2F double width addition/substraction
 
     // Conditional traps (MIPS II)
     //key      name operation  memsize           pointer
-    {0x30, { "tge",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ge>,  2} },
-    {0x31, { "tgeu", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::geu>, 2} },
-    {0x32, { "tlt",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::lt>,  2} },
-    {0x33, { "tltu", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ltu>, 2} },
-    {0x34, { "teq",  OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::eq>,  2} },
+    {0x30, { "tge",  OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ge>,  2} },
+    {0x31, { "tgeu", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::geu>, 2} },
+    {0x32, { "tlt",  OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::lt>,  2} },
+    {0x33, { "tltu", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ltu>, 2} },
+    {0x34, { "teq",  OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::eq>,  2} },
     //        0x35 reserved
-    {0x36, { "tne", OUT_R_TRAP, 0, &FuncInstr::execute_trap<&FuncInstr::ne>,  2} }
+    {0x36, { "tne", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ne>,  2} }
     //        0x37 reserved
     // 0x38 - 0x3F double width shifts
 };
 
 //unordered map for RI-instructions
-const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapRI =
+const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapRI =
 {
 // ********************** REGIMM INSTRUCTIONS *************************
     // Branches
     //key     name    operation     memsize       pointer
-    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 1} },
-    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 1} },
-    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::ltz>, 2} },
-    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gez>, 2} },
+    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::ltz>, 1} },
+    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::gez>, 1} },
+    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::ltz>, 2} },
+    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::gez>, 2} },
 
-    {0x8,  { "tgei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::gei>,  2} },
-    {0x9,  { "tgeiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::geiu>, 2} },
-    {0xA,  { "tlti",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::lti>,  2} },
-    {0xB,  { "tltiu", OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::ltiu>, 2} },
-    {0xC,  { "teqi",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::eqi>,  2} },
-    {0xE,  { "tnei",  OUT_RI_TRAP,      0, &FuncInstr::execute_trap<&FuncInstr::nei>,  2} },
+    {0x8,  { "tgei",  OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::gei>,  2} },
+    {0x9,  { "tgeiu", OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::geiu>, 2} },
+    {0xA,  { "tlti",  OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::lti>,  2} },
+    {0xB,  { "tltiu", OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::ltiu>, 2} },
+    {0xC,  { "teqi",  OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::eqi>,  2} },
+    {0xE,  { "tnei",  OUT_RI_TRAP,      0, &MIPSInstr::execute_trap<&MIPSInstr::nei>,  2} },
 
-    {0x10, { "bltzal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 1} },
-    {0x11, { "bgezal",  OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 1} },
-    {0x12, { "bltzall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::ltz>, 2} },
-    {0x13, { "bgezall", OUT_RI_BRANCH_LINK, 0, &FuncInstr::execute_branch_and_link<&FuncInstr::gez>, 2} }
+    {0x10, { "bltzal",  OUT_RI_BRANCH_LINK, 0, &MIPSInstr::execute_branch_and_link<&MIPSInstr::ltz>, 1} },
+    {0x11, { "bgezal",  OUT_RI_BRANCH_LINK, 0, &MIPSInstr::execute_branch_and_link<&MIPSInstr::gez>, 1} },
+    {0x12, { "bltzall", OUT_RI_BRANCH_LINK, 0, &MIPSInstr::execute_branch_and_link<&MIPSInstr::ltz>, 2} },
+    {0x13, { "bgezall", OUT_RI_BRANCH_LINK, 0, &MIPSInstr::execute_branch_and_link<&MIPSInstr::gez>, 2} }
 };
 
 //unordered map for I-instructions and J-instructions
-const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapIJ =
+const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 {
     // ********************* I and J INSTRUCTIONS *************************
     // Branches
     //key     name operation  memsize       pointer
-    {0x2, { "j",   OUT_J_JUMP,      0, &FuncInstr::execute_j,    1 } },
-    {0x3, { "jal", OUT_J_JUMP_LINK, 0, &FuncInstr::execute_jal,  1 } },
+    {0x2, { "j",   OUT_J_JUMP,      0, &MIPSInstr::execute_j,    1 } },
+    {0x3, { "jal", OUT_J_JUMP_LINK, 0, &MIPSInstr::execute_jal,  1 } },
 
-    {0x4, { "beq",  OUT_I_BRANCH,    0, &FuncInstr::execute_branch<&FuncInstr::eq>,  1} },
-    {0x5, { "bne",  OUT_I_BRANCH,    0, &FuncInstr::execute_branch<&FuncInstr::ne>,  1} },
-    {0x6, { "blez", OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::lez>, 1} },
-    {0x7, { "bgtz", OUT_I_BRANCH_0,  0, &FuncInstr::execute_branch<&FuncInstr::gtz>, 1} },
+    {0x4, { "beq",  OUT_I_BRANCH,    0, &MIPSInstr::execute_branch<&MIPSInstr::eq>,  1} },
+    {0x5, { "bne",  OUT_I_BRANCH,    0, &MIPSInstr::execute_branch<&MIPSInstr::ne>,  1} },
+    {0x6, { "blez", OUT_I_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::lez>, 1} },
+    {0x7, { "bgtz", OUT_I_BRANCH_0,  0, &MIPSInstr::execute_branch<&MIPSInstr::gtz>, 1} },
 
     // Addition/Subtraction
     //key     name  operation  memsize       pointer
-    {0x8, { "addi",  OUT_I_ARITHM, 0, &FuncInstr::execute_addi,  1} },
-    {0x9, { "addiu", OUT_I_ARITHM, 0, &FuncInstr::execute_addiu, 1} },
+    {0x8, { "addi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_addi,  1} },
+    {0x9, { "addiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_addiu, 1} },
 
     // Logical operations
     //key     name   operation  memsize       pointer
-    {0xA, { "slti",  OUT_I_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::lti>,  1} },
-    {0xB, { "sltiu", OUT_I_ARITHM, 0, &FuncInstr::execute_set<&FuncInstr::ltiu>, 1} },
-    {0xC, { "andi",  OUT_I_ARITHM, 0, &FuncInstr::execute_andi,  1} },
-    {0xD, { "ori",  OUT_I_ARITHM, 0, &FuncInstr::execute_ori,   1} },
-    {0xE, { "xori", OUT_I_ARITHM, 0, &FuncInstr::execute_xori,  1} },
-    {0xF, { "lui",  OUT_I_CONST,  0, &FuncInstr::execute_lui,   1} },
+    {0xA, { "slti",  OUT_I_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::lti>,  1} },
+    {0xB, { "sltiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::ltiu>, 1} },
+    {0xC, { "andi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_andi,  1} },
+    {0xD, { "ori",  OUT_I_ARITHM, 0, &MIPSInstr::execute_ori,   1} },
+    {0xE, { "xori", OUT_I_ARITHM, 0, &MIPSInstr::execute_xori,  1} },
+    {0xF, { "lui",  OUT_I_CONST,  0, &MIPSInstr::execute_lui,   1} },
 
     // 0x10 - 0x13 coprocessor operations
 
     // Likely branches (MIPS II)
     //key     name   operation  memsize       pointer
-    {0x14, { "beql",  OUT_I_BRANCH,   0, &FuncInstr::execute_branch<&FuncInstr::eq>,  2} },
-    {0x15, { "bnel",  OUT_I_BRANCH,   0, &FuncInstr::execute_branch<&FuncInstr::ne>,  2} },
-    {0x16, { "blezl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::lez>, 2} },
-    {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &FuncInstr::execute_branch<&FuncInstr::gtz>, 2} },
+    {0x14, { "beql",  OUT_I_BRANCH,   0, &MIPSInstr::execute_branch<&MIPSInstr::eq>,  2} },
+    {0x15, { "bnel",  OUT_I_BRANCH,   0, &MIPSInstr::execute_branch<&MIPSInstr::ne>,  2} },
+    {0x16, { "blezl", OUT_I_BRANCH_0, 0, &MIPSInstr::execute_branch<&MIPSInstr::lez>, 2} },
+    {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &MIPSInstr::execute_branch<&MIPSInstr::gtz>, 2} },
 
     // 0x18 - 0x19 double width addition
     // 0x1A - 0x1B load double word left/right
 
     // Loads
     //key     name  operation  memsize       pointer
-    {0x20, { "lb",  OUT_I_LOAD,  1, &FuncInstr::calculate_load_addr, 1} },
-    {0x21, { "lh",  OUT_I_LOAD,  2, &FuncInstr::calculate_load_addr, 1} },
-    {0x22, { "lwl", OUT_I_LOADL, 4, &FuncInstr::calculate_load_addr, 1} },
-    {0x23, { "lw",  OUT_I_LOAD,  4, &FuncInstr::calculate_load_addr, 1} },
-    {0x24, { "lbu", OUT_I_LOADU, 1, &FuncInstr::calculate_load_addr, 1} },
-    {0x25, { "lhu", OUT_I_LOADU, 2, &FuncInstr::calculate_load_addr, 1} },
-    {0x26, { "lwr", OUT_I_LOADR, 4, &FuncInstr::calculate_load_addr, 1} },
-    {0x27, { "lwu", OUT_I_LOADU, 4, &FuncInstr::calculate_load_addr, 1} },
+    {0x20, { "lb",  OUT_I_LOAD,  1, &MIPSInstr::calculate_load_addr, 1} },
+    {0x21, { "lh",  OUT_I_LOAD,  2, &MIPSInstr::calculate_load_addr, 1} },
+    {0x22, { "lwl", OUT_I_LOADL, 4, &MIPSInstr::calculate_load_addr, 1} },
+    {0x23, { "lw",  OUT_I_LOAD,  4, &MIPSInstr::calculate_load_addr, 1} },
+    {0x24, { "lbu", OUT_I_LOADU, 1, &MIPSInstr::calculate_load_addr, 1} },
+    {0x25, { "lhu", OUT_I_LOADU, 2, &MIPSInstr::calculate_load_addr, 1} },
+    {0x26, { "lwr", OUT_I_LOADR, 4, &MIPSInstr::calculate_load_addr, 1} },
+    {0x27, { "lwu", OUT_I_LOADU, 4, &MIPSInstr::calculate_load_addr, 1} },
 
     // Store
     //key     name   operation  memsize       pointer
-    {0x28, { "sb",  OUT_I_STORE,  1, &FuncInstr::calculate_store_addr, 1} },
-    {0x29, { "sh",  OUT_I_STORE,  2, &FuncInstr::calculate_store_addr, 1} },
-    {0x2A, { "swl", OUT_I_STOREL, 4, &FuncInstr::calculate_store_addr, 1} },
-    {0x2B, { "sw",  OUT_I_STORE,  4, &FuncInstr::calculate_store_addr, 1} },
+    {0x28, { "sb",  OUT_I_STORE,  1, &MIPSInstr::calculate_store_addr, 1} },
+    {0x29, { "sh",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
+    {0x2A, { "swl", OUT_I_STOREL, 4, &MIPSInstr::calculate_store_addr, 1} },
+    {0x2B, { "sw",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 1} },
     //       0x2C   store double word left
     //       0x2D   store double word right
-    {0x2E, { "swr", OUT_I_STORER, 4, &FuncInstr::calculate_store_addr, 1 } }
+    {0x2E, { "swr", OUT_I_STORER, 4, &MIPSInstr::calculate_store_addr, 1 } }
     //       0x2F   coprocessor
 
     // 0x30 - 0x3F atomic load/stores
 };
 
-const std::unordered_map <uint8, FuncInstr::ISAEntry> FuncInstr::isaMapMIPS32 =
+const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
 {
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
-    {0x20, { "clz", OUT_SP2_COUNT, 0, &FuncInstr::execute_clz, 32} },
-    {0x21, { "clo", OUT_SP2_COUNT, 0, &FuncInstr::execute_clo, 32} }
+    {0x20, { "clz", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz, 32} },
+    {0x21, { "clo", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo, 32} }
 };
 
-std::array<std::string_view, REG_NUM_MAX> FuncInstr::regTable =
+std::array<std::string_view, REG_NUM_MAX> MIPSInstr::regTable =
 {{
     "zero",
     "at",
@@ -210,11 +210,11 @@ std::array<std::string_view, REG_NUM_MAX> FuncInstr::regTable =
     "ra"
 }};
 
-std::string_view FuncInstr::regTableName(RegNum reg) {
+std::string_view MIPSInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 
-FuncInstr::FuncInstr( uint32 bytes, Addr PC,
+MIPSInstr::MIPSInstr( uint32 bytes, Addr PC,
                       bool predicted_taken,
                       Addr predicted_target) :
     instr( bytes),
@@ -263,7 +263,7 @@ FuncInstr::FuncInstr( uint32 bytes, Addr PC,
     }
 }
 
-void FuncInstr::init( const FuncInstr::ISAEntry& entry)
+void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
 {
     operation = entry.operation;
     mem_size  = entry.mem_size;
@@ -431,13 +431,13 @@ void FuncInstr::init( const FuncInstr::ISAEntry& entry)
         disasm = oss.str();
 }
 
-void FuncInstr::execute_unknown()
+void MIPSInstr::execute_unknown()
 {
     std::cerr << "ERROR.Incorrect instruction: " << disasm << std::endl;
     exit(EXIT_FAILURE);
 }
 
-void FuncInstr::execute()
+void MIPSInstr::execute()
 {
     (this->*function)();
     complete = true;
@@ -451,7 +451,7 @@ void FuncInstr::execute()
     }
 }
 
-void FuncInstr::set_v_dst( uint32 value)
+void MIPSInstr::set_v_dst( uint32 value)
 {
     if ( operation == OUT_I_LOAD)
     {
@@ -481,7 +481,7 @@ void FuncInstr::set_v_dst( uint32 value)
     }
 }
 
-void FuncInstr::check_trap()
+void MIPSInstr::check_trap()
 {
     if ( trap != TrapType::NO_TRAP)
     {

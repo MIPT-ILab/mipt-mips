@@ -5,17 +5,17 @@
 
 #include "func_sim.h"
 
-FuncSim::FuncSim( bool log) : Log( log), rf( new RF) { }
+FuncSim::FuncSim( bool log) : Log( log), rf( new MIPSRF) { }
 
 FuncSim::~FuncSim()
 {
     delete mem;
 }
 
-FuncInstr FuncSim::step()
+MIPSInstr FuncSim::step()
 {
     // fetch instruction
-    FuncInstr instr = mem->fetch_instr( PC);
+    MIPSInstr instr = mem->fetch_instr( PC);
 
     // read sources
     rf->read_sources( &instr);

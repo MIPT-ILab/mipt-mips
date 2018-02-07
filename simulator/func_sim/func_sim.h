@@ -16,12 +16,12 @@
 #include <mips/mips_instr.h>
 
 class MIPSMemory;
-class RF;
+class MIPSRF;
 
 class FuncSim : public Log
 {
     private:
-        std::unique_ptr<RF> rf;
+        std::unique_ptr<MIPSRF> rf;
         Addr PC = NO_VAL32;
         MIPSMemory* mem = nullptr;
 
@@ -36,7 +36,7 @@ class FuncSim : public Log
         FuncSim operator=( FuncSim&&) = delete;
 
         void init( const std::string& tr);
-        FuncInstr step();
+        MIPSInstr step();
         void run(const std::string& tr, uint32 instrs_to_run);
 };
 

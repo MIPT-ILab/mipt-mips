@@ -19,7 +19,10 @@ namespace config {
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
 
-PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
+template class PerfSim<MIPS>;
+
+template <typename ISA>
+PerfSim<ISA>::PerfSim(bool log) : Log( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 
@@ -56,7 +59,8 @@ PerfMIPS::PerfMIPS(bool log) : Log( log), rf( new RF), checker( false)
     init_ports();
 }
 
-FuncInstr PerfMIPS::read_instr( Cycle cycle)
+template <typename ISA>
+typename PerfSim<ISA>::FuncInstr PerfSim<ISA>::read_instr(Cycle cycle)
 {
     if (rp_decode_2_decode->is_ready( cycle))
     {
@@ -72,13 +76,14 @@ FuncInstr PerfMIPS::read_instr( Cycle cycle)
 
 }
 
-void PerfMIPS::run( const std::string& tr,
+template<typename ISA>
+void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
     Cycle cycle = 0_Cl;
 
-    memory = new MIPSMemory( tr);
+    memory = new Memory( tr);
 
     checker.init( tr);
 
@@ -119,7 +124,8 @@ void PerfMIPS::run( const std::string& tr,
               << std::endl;
 }
 
-void PerfMIPS::clock_fetch( Cycle cycle)
+template <typename ISA>
+void PerfSim<ISA>::clock_fetch( Cycle cycle)
 {
     /* receive flush and stall signals */
     const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
@@ -153,7 +159,8 @@ void PerfMIPS::clock_fetch( Cycle cycle)
          << std::hex << PC << ": 0x" << data.raw << std::endl;
 }
 
-void PerfMIPS::clock_decode( Cycle cycle)
+template <typename ISA> 
+void PerfSim<ISA>::clock_decode( Cycle cycle)
 {
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
@@ -197,7 +204,8 @@ void PerfMIPS::clock_decode( Cycle cycle)
     }
 }
 
-void PerfMIPS::clock_execute( Cycle cycle)
+template <typename ISA>
+void PerfSim<ISA>::clock_execute( Cycle cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
@@ -235,7 +243,8 @@ void PerfMIPS::clock_execute( Cycle cycle)
     sout << instr << std::endl;
 }
 
-void PerfMIPS::clock_memory( Cycle cycle)
+template <typename ISA>
+void PerfSim<ISA>::clock_memory( Cycle cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
@@ -292,7 +301,8 @@ void PerfMIPS::clock_memory( Cycle cycle)
     sout << instr << std::endl;
 }
 
-void PerfMIPS::clock_writeback( Cycle cycle)
+template <typename ISA>
+void PerfSim<ISA>::clock_writeback( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
@@ -327,7 +337,8 @@ void PerfMIPS::clock_writeback( Cycle cycle)
     last_writeback_cycle = cycle;
 }
 
-void PerfMIPS::check( const FuncInstr& instr)
+template <typename ISA>
+void PerfSim<ISA>::check( const FuncInstr& instr)
 {
     const auto func_dump = checker.step();
 

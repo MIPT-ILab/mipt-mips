@@ -17,6 +17,7 @@
 #include <func_sim/func_sim.h>
 #include <core/perf_sim.h>
 
+
 namespace config {
     static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
     static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
@@ -34,7 +35,7 @@ int main( int argc, const char* argv[])
         /* running simulation */
         if ( !config::functional_only)
         {
-            PerfMIPS p_mips( config::disassembly_on);
+            PerfSim<MIPS> p_mips(bool(config::disassembly_on));
             p_mips.run( config::binary_filename,
                         config::num_steps);
         }

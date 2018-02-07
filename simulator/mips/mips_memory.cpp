@@ -4,11 +4,11 @@
 
 #include <infra/instrcache/instr_cache.h>
 
-FuncInstr MIPSMemory::fetch_instr( Addr PC)
+MIPSInstr MIPSMemory::fetch_instr( Addr PC)
 {
     const auto [found, value] = instr_cache.find( PC);
 
-    FuncInstr instr = found ? value : FuncInstr( fetch( PC), PC);
+    MIPSInstr instr = found ? value : MIPSInstr( fetch( PC), PC);
 
     instr_cache.update( PC, instr);
 

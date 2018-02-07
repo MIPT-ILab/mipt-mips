@@ -14,7 +14,7 @@
 class MIPSMemory : private Memory
 {
     private:
-        InstrCache<FuncInstr> instr_cache{};
+        InstrCache<MIPSInstr> instr_cache{};
 
     public:
         explicit MIPSMemory( const std::string& tr) : Memory( tr) { }
@@ -23,20 +23,20 @@ class MIPSMemory : private Memory
 
         uint32 fetch( Addr pc) const { return read( pc); }
 
-        FuncInstr fetch_instr( Addr PC);
+        MIPSInstr fetch_instr( Addr PC);
 
-        void load( FuncInstr* instr) const
+        void load( MIPSInstr* instr) const
         {
             instr->set_v_dst(read(instr->get_mem_addr(), instr->get_mem_size()));
         }
 
-        void store( const FuncInstr& instr)
+        void store( const MIPSInstr& instr)
         {
             instr_cache.erase( instr.get_mem_addr());
             write(instr.get_v_src2(), instr.get_mem_addr(), instr.get_mem_size());
         }
 
-        void load_store(FuncInstr* instr)
+        void load_store(MIPSInstr* instr)
         {
             if (instr->is_load())
                 load(instr);
