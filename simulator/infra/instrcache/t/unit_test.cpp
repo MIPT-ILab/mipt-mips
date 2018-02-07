@@ -56,7 +56,7 @@ TEST( update_and_find, Update_Find_And_Check)
 
 TEST( check_method_erase, Check_Method_Erase)
 {
-    InstrCache<FuncInstr> instr_cache{};
+    InstrCache<MIPSInstr> instr_cache{};
 
     const uint32 instr_bytes = 0x3c010400;
     const Addr PC = 0x401c04;
@@ -70,11 +70,11 @@ TEST( check_method_erase, Check_Method_Erase)
 
 TEST( check_method_empty, Check_Method_Empty)
 {
-    InstrCache<FuncInstr> instr_cache{};
+    InstrCache<MIPSInstr> instr_cache{};
 
     const uint32 instr_bytes = 0x2484ae10;
     const Addr PC = 0x400d05;
-    const FuncInstr instr( instr_bytes, PC);
+    const MIPSInstr instr( instr_bytes, PC);
 
     ASSERT_TRUE( instr_cache.empty());
     instr_cache.update( PC, instr);
@@ -84,7 +84,7 @@ TEST( check_method_empty, Check_Method_Empty)
 
 TEST( check_method_size, Check_Method_Size)
 {
-    InstrCache<FuncInstr> instr_cache{};
+    InstrCache<MIPSInstr> instr_cache{};
 
     uint32 instr_bytes = 0x2484ae10;
     Addr PC = 0x30ae17;
@@ -92,7 +92,7 @@ TEST( check_method_size, Check_Method_Size)
 
     for ( std::size_t i = 0; i < SIZE; ++i)
     {
-        FuncInstr instr( instr_bytes++, PC);
+        MIPSInstr instr( instr_bytes++, PC);
         instr_cache.update( PC++, instr);
     }
     ASSERT_EQ( SIZE, instr_cache.size());
