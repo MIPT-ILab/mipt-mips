@@ -17,30 +17,30 @@ static const std::string valid_elf_file = "./mips_bin_exmpl.out";
 TEST( Func_memory_init, Process_Wrong_Args_Of_Constr)
 {
     // check memory initialization with default parameters
-    ASSERT_NO_THROW( Memory func_mem( valid_elf_file));
+    ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file));
     // check memory initialization with custom parameters
-    ASSERT_NO_THROW( Memory func_mem( valid_elf_file, 48, 15, 10));
+    ASSERT_NO_THROW( FuncMemory func_mem( valid_elf_file, 48, 15, 10));
     // check memory initialization with 4GB page
-    ASSERT_EXIT( Memory func_mem( valid_elf_file, 64, 15, 32),
+    ASSERT_EXIT( FuncMemory func_mem( valid_elf_file, 64, 15, 32),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 
     // test behavior when the file name does not exist
     const char * wrong_file_name = "./1234567890/qwertyuiop";
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( Memory func_mem( wrong_file_name),
+    ASSERT_EXIT( FuncMemory func_mem( wrong_file_name),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
 TEST( Func_memory, StartPC_Method_Test)
 {
-    Memory func_mem( valid_elf_file);
+    FuncMemory func_mem( valid_elf_file);
 
     ASSERT_EQ( func_mem.startPC(), 0x4000b0u /*address of the ".text" section*/);
 }
 
 TEST( Func_memory, Read_Method_Test)
 {
-    Memory func_mem( valid_elf_file);
+    FuncMemory func_mem( valid_elf_file);
 
     // the address of the ".data" section
     uint64 dataSectAddr = 0x4100c0;
@@ -72,7 +72,7 @@ TEST( Func_memory, Read_Method_Test)
 
 TEST( Func_memory, Write_Read_Initialized_Mem_Test)
 {
-    Memory func_mem( valid_elf_file);
+    FuncMemory func_mem( valid_elf_file);
 
     // the address of the ".data" func_memion
     uint64 data_sect_addr = 0x4100c0;
@@ -99,7 +99,7 @@ TEST( Func_memory, Write_Read_Initialized_Mem_Test)
 
 TEST( Func_memory, Write_Read_Not_Initialized_Mem_Test)
 {
-    Memory func_mem( valid_elf_file);
+    FuncMemory func_mem( valid_elf_file);
 
     uint64 write_addr = 0x3FFFFE;
 
