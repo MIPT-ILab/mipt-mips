@@ -1,10 +1,12 @@
 /*
  * config.cpp - implementation of Config class
- * Copyright 2017 MIPT-MIPS
+ * Copyright 2017-2018 MIPT-MIPS
  */
 
 /* Boost */
 #include <boost/program_options.hpp>
+
+#include <infra/ports/timing.h>
 
 /* Simulator modules */
 #include "config.h"
@@ -49,10 +51,14 @@ template class RequiredValue<std::string>;
 template class RequiredValue<uint64>;
 template class RequiredValue<uint32>;
 template class RequiredValue<int32>;
+template class RequiredValue<Latency>;
+template class RequiredValue<Cycle>;
 template class Value<std::string>;
 template class Value<uint64>;
 template class Value<uint32>;
 template class Value<int32>;
+template class Value<Latency>;
+template class Value<Cycle>;
 
 /* basic method */
 void handleArgs( int argc, const char* argv[])

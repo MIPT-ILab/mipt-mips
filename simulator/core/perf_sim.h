@@ -46,6 +46,7 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
+    
     FuncSim<ISA> checker;
     void check( const FuncInstr& instr);
 
