@@ -16,11 +16,16 @@
 #include "func_sim/func_sim.h"
 #include "mips/mips_instr.h"
 #include "mips/mips_rf.h"
+#include "mips/mips.h"
 
 #include "bpu/bpu.h"
 
-class PerfMIPS : protected Log
+template <typename ISA>
+class PerfSim : protected Log
 {
+    using FuncInstr = typename ISA::FuncInstr;
+    using RF = typename ISA::RF;
+    using Memory = typename ISA::Memory;
 private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
@@ -41,7 +46,8 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
-    FuncSim checker;
+    
+    FuncSim<ISA> checker;
     void check( const FuncInstr& instr);
 
     /* all ports */
@@ -81,15 +87,16 @@ private:
     FuncInstr read_instr( Cycle cycle);
 
 public:
-    explicit PerfMIPS( bool log);
-    ~PerfMIPS() final { destroy_ports(); }
+    explicit PerfSim( bool log);
+    ~PerfSim() final { destroy_ports(); }
     void run( const std::string& tr, uint64 instrs_to_run);
 
     // Rule of five
-    PerfMIPS( const PerfMIPS&) = delete;
-    PerfMIPS( PerfMIPS&&) = delete;
-    PerfMIPS operator=( const PerfMIPS&) = delete;
-    PerfMIPS operator=( PerfMIPS&&) = delete;
+    PerfSim( const PerfSim&) = delete;
+    PerfSim( PerfSim&&) = delete;
+    PerfSim operator=( const PerfSim&) = delete;
+    PerfSim operator=( PerfSim&&) = delete;
 };
+using PerfMIPS = PerfSim<MIPS>;
 
 #endif

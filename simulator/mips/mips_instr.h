@@ -1,12 +1,12 @@
- /* func_instr.h - instruction parser for mips
+ /* mips_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2014-2017 MIPT-MIPS
  */
 
 /** Edited by Ladin Oleg. */
 
-#ifndef FUNC_INSTR_H
-#define FUNC_INSTR_H
+#ifndef MIPS_INSTR_H
+#define MIPS_INSTR_H
 
 // Generic C++
 #include <cassert>
@@ -73,7 +73,7 @@ inline uint32 count_zeros(uint32 value)
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
-class FuncInstr
+class MIPSInstr
 {
     private:
         enum OperationType : uint8
@@ -147,22 +147,22 @@ class FuncInstr
             static_assert( sizeof( uint32) == 4);
         } instr;
 
-        using Execute = void (FuncInstr::*)();
-        using Predicate = bool (FuncInstr::*)() const;
+        using Execute = void (MIPSInstr::*)();
+        using Predicate = bool (MIPSInstr::*)() const;
 
         struct ISAEntry
         {
             std::string_view name;
             OperationType operation;
             uint8 mem_size;
-            FuncInstr::Execute function;
+            MIPSInstr::Execute function;
             uint8 mips_version;
         };
 
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapMIPS32;
+        static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapR;
+        static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapRI;
+        static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapIJ;
+        static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapMIPS32;
 
         static std::string_view regTableName(RegNum reg);
         static std::array<std::string_view, REG_NUM_MAX> regTable;
@@ -271,7 +271,7 @@ class FuncInstr
         void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
         void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
 
-        // Function-templated method is a little-known feature of C++, but useful here
+        // MIPStion-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
         void execute_set() { v_dst = static_cast<uint32>((this->*p)()); }
 
@@ -314,20 +314,20 @@ class FuncInstr
         void calculate_load_addr()  { mem_addr = v_src1 + sign_extend(v_imm); }
         void calculate_store_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
 
-        Execute function = &FuncInstr::execute_unknown;
+        Execute function = &MIPSInstr::execute_unknown;
     public:
         uint32 hi = NO_VAL32;
         uint32 lo = NO_VAL32;
 
-        FuncInstr() = delete;
+        MIPSInstr() = delete;
 
         explicit
-        FuncInstr( uint32 bytes, Addr PC = 0,
+        MIPSInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
 
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
-        bool is_same( const FuncInstr& rhs) const {
+        bool is_same( const MIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
@@ -376,9 +376,9 @@ class FuncInstr
         void check_trap();
 };
 
-static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
+static inline std::ostream& operator<<( std::ostream& out, const MIPSInstr& instr)
 {
     return out << instr.Dump();
 }
 
-#endif //FUNC_INSTR_H
+#endif //MIPS_INSTR_H
