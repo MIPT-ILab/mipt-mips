@@ -6,8 +6,6 @@
 
 #include "func_sim.h"
 
-template class FuncSim<MIPS>;
-
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Log( log), rf( new RF) { }
 
@@ -60,3 +58,5 @@ void FuncSim<ISA>::run( const std::string& tr, uint32 instrs_to_run)
     for ( uint32 i = 0; i < instrs_to_run; ++i)
         sout << step() << std::endl;
 }
+
+template class FuncSim<MIPS>;
