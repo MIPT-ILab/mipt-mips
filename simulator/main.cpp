@@ -16,7 +16,7 @@
 
 #include <func_sim/func_sim.h>
 #include <core/perf_sim.h>
-
+#include <mips/mips.h>
 
 namespace config {
     static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};

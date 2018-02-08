@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 // Module
+#include <mips/mips.h>
 #include "../func_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH;

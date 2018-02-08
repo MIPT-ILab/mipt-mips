@@ -1,8 +1,9 @@
+/*
+ * func_sim.cpp - extremely simple simulator
+ * Copyright 2018 MIPT-MIPS
+ */
+#include <cassert>
 #include <iostream>
-
-#include <mips/mips_memory.h>
-#include <mips/mips_rf.h>
-#include <mips/mips.h>
 
 #include "func_sim.h"
 
@@ -58,5 +59,7 @@ void FuncSim<ISA>::run( const std::string& tr, uint32 instrs_to_run)
     for ( uint32 i = 0; i < instrs_to_run; ++i)
         sout << step() << std::endl;
 }
+
+#include <mips/mips.h>
 
 template class FuncSim<MIPS>;

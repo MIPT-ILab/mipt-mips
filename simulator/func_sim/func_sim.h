@@ -1,5 +1,5 @@
 /*
- * func_sim.cpp - extremely simple FuncSim simulator
+ * func_sim.cpp - extremely simple simulator
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2015 MIPT-MIPS
  */
@@ -12,9 +12,6 @@
 
 #include <infra/types.h>
 #include <infra/log.h>
-
-#include <mips/mips_instr.h>
-#include <mips/mips.h>
 
 template <typename ISA>
 class FuncSim : public Log
@@ -42,6 +39,5 @@ class FuncSim : public Log
         FuncInstr step();
         void run(const std::string& tr, uint32 instrs_to_run);
 };
-using FuncMIPS = FuncSim<MIPS>;
 
 #endif

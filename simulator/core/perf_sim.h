@@ -12,13 +12,8 @@
 
 #include <infra/log.h>
 #include <infra/ports/ports.h>
-
-#include "func_sim/func_sim.h"
-#include "mips/mips_instr.h"
-#include "mips/mips_rf.h"
-#include "mips/mips.h"
-
-#include "bpu/bpu.h"
+#include <bpu/bpu.h>
+#include <func_sim/func_sim.h>
 
 template <typename ISA>
 class PerfSim : protected Log
@@ -42,7 +37,7 @@ private:
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
-    MIPSMemory* memory = nullptr;
+    Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* MIPS functional simulator for internal checks */
@@ -97,6 +92,5 @@ public:
     PerfSim operator=( const PerfSim&) = delete;
     PerfSim operator=( PerfSim&&) = delete;
 };
-using PerfMIPS = PerfSim<MIPS>;
 
 #endif

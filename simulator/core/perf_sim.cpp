@@ -1,9 +1,9 @@
+#include <cassert>
+
 #include <iostream>
 #include <chrono>
 
 #include <infra/config/config.h>
-
-#include <mips/mips.h>
 
 #include "perf_sim.h"
 
@@ -346,5 +346,7 @@ void PerfSim<ISA>::check( const FuncInstr& instr)
              << "PerfSim output: " << instr.Dump() << std::endl
              << critical;
 }
+
+#include <mips/mips.h>
 
 template class PerfSim<MIPS>;
