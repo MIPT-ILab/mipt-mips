@@ -13,7 +13,7 @@
  
 class Simulator : public Log {
 public:
-    Simulator( bool log = false) : Log( log) {}
+    explicit Simulator( bool log = false) : Log( log) {}
 
     virtual void run(const std::string& tr, uint64 instrs_to_run) = 0;
 
