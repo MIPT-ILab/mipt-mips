@@ -17,19 +17,19 @@ static const int64 num_steps = 2250;
 TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
     // Just call a constructor
-    GTEST_ASSERT_NO_DEATH( PerfMIPS mips( false); );
+    GTEST_ASSERT_NO_DEATH( PerfSim<ISA> mips( false); );
 }
 
 TEST( Perf_Sim_init, Make_A_Step)
 {
     // Call constructor and run one instr
-    GTEST_ASSERT_NO_DEATH( PerfSim<ISA>( false).run( valid_elf_file, 1); );
+    GTEST_ASSERT_NO_DEATH( PerfSim( false).run( valid_elf_file, 1); );
 }
 
 TEST( Perf_Sim_init, Process_Wrong_Args)
 {
     // Do bad init
-    ASSERT_EXIT( PerfSim<ISA>( false).run( "./1234567890/qwertyuop", 1),
+    ASSERT_EXIT( PerfSim( false).run( "./1234567890/qwertyuop", 1),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
