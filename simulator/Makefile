@@ -24,6 +24,7 @@ CPPS= \
     mips/mips_memory.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
+    simulator.cpp
 
 
 OBJS= $(addprefix $(OBJ_DIR)/, $(notdir $(CPPS:%.cpp=%.o)))

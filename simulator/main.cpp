@@ -13,15 +13,13 @@
 
 /* Simulator modules. */
 #include <infra/config/config.h>
-
-#include <func_sim/func_sim.h>
-#include <core/perf_sim.h>
-#include <mips/mips.h>
+#include <simulator.h>
 
 namespace config {
     static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
     static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
 
+    static Value<std::string> isa = { "isa,I", "mips", "modeled ISA"};
     static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
 } // namespace config
@@ -31,19 +29,8 @@ int main( int argc, const char* argv[])
     try {
         /* Analysing and handling of inserted arguments */
         config::handleArgs( argc, argv);
-
-        /* running simulation */
-        if ( !config::functional_only)
-        {
-            PerfSim<MIPS> p_mips(config::disassembly_on);
-            p_mips.run( config::binary_filename,
-                        config::num_steps);
-        }
-        else
-        {
-            FuncSim<MIPS> mips( config::disassembly_on);
-            mips.run( config::binary_filename, config::num_steps);
-        }
+        auto simulator = Simulator::create_simulator( config::isa, config::functional_only, config::disassembly_on);
+        simulator->run(config::binary_filename, config::num_steps);
     }
     catch (const std::exception& e) {
         std::cerr << *argv << ": " << e.what()

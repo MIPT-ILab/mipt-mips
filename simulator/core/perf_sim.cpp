@@ -19,7 +19,7 @@ namespace config {
 } // namespace config
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : Log( log), rf( new RF), checker( false)
+PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 
