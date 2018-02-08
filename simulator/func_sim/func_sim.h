@@ -24,9 +24,9 @@ class FuncSim : public Log
     using Memory = typename ISA::Memory;
     
     private:
-        std::unique_ptr<MIPSRF> rf;
+        std::unique_ptr<RF> rf;
         Addr PC = NO_VAL32;
-        MIPSMemory* mem = nullptr;
+        Memory* mem = nullptr;
 
     public:
         explicit FuncSim( bool log = false);
