@@ -3,8 +3,6 @@
 
 #include <infra/config/config.h>
 
-#include <mips/mips_memory.h>
-#include <mips/mips_rf.h>
 #include <mips/mips.h>
 
 #include "perf_sim.h"
@@ -19,8 +17,6 @@ namespace config {
     static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
-
-template class PerfSim<MIPS>;
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : Log( log), rf( new RF), checker( false)
@@ -351,3 +347,4 @@ void PerfSim<ISA>::check( const FuncInstr& instr)
              << critical;
 }
 
+template class PerfSim<MIPS>;
