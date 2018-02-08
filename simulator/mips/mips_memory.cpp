@@ -6,7 +6,7 @@
 
 FuncInstr MIPSMemory::fetch_instr( Addr PC)
 {
-    const auto [found, value] = instr_cache.find( PC);
+    const auto [found, value] = instr_cache.find( PC); // NOLINT https://bugs.llvm.org/show_bug.cgi?id=36283
 
     FuncInstr instr = found ? value : FuncInstr( fetch( PC), PC);
 
