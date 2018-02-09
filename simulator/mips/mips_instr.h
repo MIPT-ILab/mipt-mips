@@ -73,6 +73,11 @@ inline uint32 count_zeros(uint32 value)
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
+template<typename T32, typename T64>
+T64 mips_division(T32 x, T32 y) {
+    return static_cast<T64>(x / y) | (static_cast<T64>(x % y) << 32);
+}
+
 class MIPSInstr
 {
     private:
@@ -230,26 +235,14 @@ class MIPSInstr
         void execute_subu()  { v_dst = v_src1 - v_src2; }
         void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
-        void execute_multu()
-        {
-             uint64 mult_res = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_mult()
-        {
-             uint64 mult_res = static_cast<int64>(v_src1) * static_cast<int64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_mfhi()  { v_dst = hi; };
-        void execute_mthi()  { hi = v_src2; };
-        void execute_mflo()  { v_dst = lo; };
-        void execute_mtlo()  { lo = v_src2;};
+        void execute_multu() { v_dst = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2); }
+        void execute_mult()  { v_dst = static_cast<int64>(v_src1) * static_cast<int64>(v_src2); }
+        void execute_div()   { v_dst = mips_division<int32, int64>(v_src2, v_src1); }
+        void execute_divu()  { v_dst = mips_division<uint32, uint64>(v_src2, v_src1); }
+        void execute_mfhi()  { v_dst = v_src2; }
+        void execute_mthi()  { v_dst = static_cast<uint64>(v_src2) << 32; }
+        void execute_mflo()  { v_dst = v_src2; }
+        void execute_mtlo()  { v_dst = v_src2 & 0xFFFFFFFF; }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
@@ -316,9 +309,6 @@ class MIPSInstr
 
         Execute function = &MIPSInstr::execute_unknown;
     public:
-        uint32 hi = NO_VAL32;
-        uint32 lo = NO_VAL32;
-
         MIPSInstr() = delete;
 
         explicit
