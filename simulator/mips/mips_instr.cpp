@@ -190,6 +190,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
+    {0x02, { "mul", OUT_R_ARITHM, 0, &MIPSInstr::execute_mult, 32} },
     {0x20, { "clz", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz, 32} },
     {0x21, { "clo", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo, 32} }
 };
