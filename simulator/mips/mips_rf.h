@@ -32,25 +32,14 @@ class MIPSRF
         Reg& get_entry( RegNum num) { return array.at( static_cast<size_t>( num)); }
         const Reg& get_entry( RegNum num) const { return array.at( static_cast<size_t>( num)); }
 
-        void invalidate( RegNum num)
+        void set_valid( RegNum num, bool value)
         {
             if ( num == REG_NUM_HI_LO) {
-                invalidate( REG_NUM_HI);
-                invalidate( REG_NUM_LO);
+                set_valid( REG_NUM_HI, value);
+                set_valid( REG_NUM_LO, value);
             }
             else if ( num != REG_NUM_ZERO) {
-                get_entry( num).is_valid = false;
-            }
-        }
-
-        void validate( RegNum num)
-        {
-            if ( num == REG_NUM_HI_LO) {
-                validate( REG_NUM_HI);
-                validate( REG_NUM_LO);
-            }
-            else if ( num != REG_NUM_ZERO) {
-                get_entry( num).is_valid = false;
+                get_entry( num).is_valid = value;
             }
         }
 
@@ -90,7 +79,7 @@ class MIPSRF
         {
             instr->set_v_src1( read(instr->get_src1_num()));
             instr->set_v_src2( read(instr->get_src2_num()));
-            invalidate( instr->get_dst_num());
+            set_valid( instr->get_dst_num(), false);
         }
 
         inline bool check_sources( const MIPSInstr& instr) const
@@ -112,7 +101,7 @@ class MIPSRF
 
         inline void cancel( const MIPSInstr& instr)
         {
-            validate( instr.get_dst_num());
+            set_valid( instr.get_dst_num(), true);
         }
 };
 
