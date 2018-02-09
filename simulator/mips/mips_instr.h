@@ -269,7 +269,7 @@ class MIPSInstr
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-        void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
+        void execute_nor()   { v_dst = static_cast<uint64>( ~( v_src1 | v_src2)); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }

@@ -474,8 +474,13 @@ void MIPSInstr::execute()
     if ( dst != REG_NUM_ZERO && !is_load() && get_writes_dst())
     {
         std::ostringstream oss;
-        oss << "\t [ $" << regTableName(dst)
-            << " = 0x" << std::hex << v_dst << "]";
+        oss << "\t [ $" << std::hex;
+        if ( dst == REG_NUM_HI_LO)
+            oss << "hi = 0x" << static_cast<uint32>(v_dst >> 32) << ", $lo";
+        else
+            oss << regTableName(dst);
+
+        oss << " = 0x" << static_cast<uint32>(v_dst) << " ]";
         disasm += oss.str();
     }
 }
