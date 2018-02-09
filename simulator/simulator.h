@@ -6,7 +6,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
  
-#include <memory.h>
+#include <memory>
  
 #include <infra/types.h>
 #include <infra/log.h>
