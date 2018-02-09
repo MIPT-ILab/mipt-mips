@@ -71,9 +71,9 @@ public:
 
     operator const T&() const { return value; } // NOLINT
     
-    friend std::ostream& operator<<( std::ostream& out, const RequiredValue& value)
+    friend std::ostream& operator<<( std::ostream& out, const RequiredValue& rhs)
     {
-        return out << value;
+        return out << rhs.value;
     }
 };
 
