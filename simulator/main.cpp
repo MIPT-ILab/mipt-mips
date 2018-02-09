@@ -24,13 +24,22 @@ namespace config {
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
 } // namespace config
 
+auto create_simulator()
+{
+    auto simulator = Simulator::create_simulator( config::isa, config::functional_only, config::disassembly_on);
+    if ( simulator == nullptr) {
+       std::cerr << "ERROR. Invalid simulation mode " << config::isa << ( config::functional_only ? "-functional" : "-performance") << std::endl;
+       std::exit( EXIT_FAILURE);
+    }
+    return simulator;
+}
+
 int main( int argc, const char* argv[])
 {
     try {
         /* Analysing and handling of inserted arguments */
         config::handleArgs( argc, argv);
-        auto simulator = Simulator::create_simulator( config::isa, config::functional_only, config::disassembly_on);
-        simulator->run(config::binary_filename, config::num_steps);
+        create_simulator()->run( config::binary_filename, config::num_steps);
     }
     catch (const std::exception& e) {
         std::cerr << *argv << ": " << e.what()
