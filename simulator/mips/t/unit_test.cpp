@@ -48,8 +48,8 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0x01398824).Dump(), "and $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x71208821).Dump(), "clo $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x71208820).Dump(), "clz $s1, $t1");
-    ASSERT_EQ(MIPSInstr(0x0229001a).Dump(), "div $zero, $s1, $t1");
-    ASSERT_EQ(MIPSInstr(0x0229001b).Dump(), "divu $zero, $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x0229001a).Dump(), "div $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x0229001b).Dump(), "divu $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x0139880a).Dump(), "movz $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x0139880b).Dump(), "movn $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x02290018).Dump(), "mult $s1, $t1");

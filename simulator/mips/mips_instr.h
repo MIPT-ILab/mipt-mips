@@ -247,10 +247,7 @@ class MIPSInstr
         void execute_mult()  { v_dst = static_cast<int64>(v_src1) * static_cast<int64>(v_src2); }
         void execute_div()   { v_dst = mips_division<int32, int64>(v_src2, v_src1); }
         void execute_divu()  { v_dst = mips_division<uint32, uint64>(v_src2, v_src1); }
-        void execute_mfhi()  { v_dst = v_src1; }
-        void execute_mthi()  { v_dst = static_cast<uint64>(v_src1) << 32; }
-        void execute_mflo()  { v_dst = v_src1; }
-        void execute_mtlo()  { v_dst = v_src1 & 0xFFFFFFFF; }
+        void execute_move()  { v_dst = v_src1; }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
@@ -269,8 +266,8 @@ class MIPSInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
 
-        void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
-        void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
+        void execute_movn()  { execute_move(); writes_dst = (v_src2 != 0);}
+        void execute_movz()  { execute_move(); writes_dst = (v_src2 == 0);}
 
         // MIPStion-templated method is a little-known feature of C++, but useful here
         template<Predicate p>

@@ -47,10 +47,10 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
 
     // HI/LO manipulations
     //key      name   operation  memsize           pointer
-    {0x10, { "mfhi", OUT_R_MFHI, 0, &MIPSInstr::execute_mfhi, 1} },
-    {0x11, { "mthi", OUT_R_MTHI, 0, &MIPSInstr::execute_mthi, 1} },
-    {0x12, { "mflo", OUT_R_MFLO, 0, &MIPSInstr::execute_mflo, 1} },
-    {0x13, { "mtlo", OUT_R_MTLO, 0, &MIPSInstr::execute_mtlo, 1} },
+    {0x10, { "mfhi", OUT_R_MFHI, 0, &MIPSInstr::execute_move, 1} },
+    {0x11, { "mthi", OUT_R_MTHI, 0, &MIPSInstr::execute_move, 1} },
+    {0x12, { "mflo", OUT_R_MFLO, 0, &MIPSInstr::execute_move, 1} },
+    {0x13, { "mtlo", OUT_R_MTLO, 0, &MIPSInstr::execute_move, 1} },
 
     // 0x14 - 0x17 double width shifts
 
