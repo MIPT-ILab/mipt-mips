@@ -75,6 +75,7 @@ class MIPSRF
             if ( num == REG_NUM_HI_LO) {
                 write( REG_NUM_HI, val >> 32);
                 write( REG_NUM_LO, val);
+                return;
             }            
 
             auto& entry = get_entry(num);
