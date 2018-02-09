@@ -174,7 +174,7 @@ class MIPSInstr
         uint32 v_imm = NO_VAL32;
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
-        uint32 v_dst = NO_VAL32;
+        uint64 v_dst = NO_VAL64;
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -362,7 +362,7 @@ class MIPSInstr
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 
-        uint32 get_v_dst() const { return v_dst; }
+        uint64 get_v_dst() const { return v_dst; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
