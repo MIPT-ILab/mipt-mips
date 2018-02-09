@@ -52,6 +52,9 @@ enum RegNum : uint8
     REG_NUM_SP,
     REG_NUM_FP,
     REG_NUM_RA,
+    REG_NUM_HI,
+    REG_NUM_LO,
+    REG_NUM_HI_LO,
     REG_NUM_MAX
 };
 
@@ -73,18 +76,28 @@ inline uint32 count_zeros(uint32 value)
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
+template<typename T32, typename T64>
+T64 mips_division(T32 x, T32 y) {
+    return static_cast<T64>(x / y) | (static_cast<T64>(x % y) << 32);
+}
+
 class MIPSInstr
 {
     private:
         enum OperationType : uint8
         {
             OUT_R_ARITHM,
+            OUT_R_DIVMULT,
             OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_R_TRAP,
+            OUT_R_MFLO,
+            OUT_R_MTLO,
+            OUT_R_MFHI,
+            OUT_R_MTHI,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_I_BRANCH_0,
@@ -174,7 +187,7 @@ class MIPSInstr
         uint32 v_imm = NO_VAL32;
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
-        uint32 v_dst = NO_VAL32;
+        uint64 v_dst = NO_VAL64;
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -230,26 +243,11 @@ class MIPSInstr
         void execute_subu()  { v_dst = v_src1 - v_src2; }
         void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
-        void execute_multu()
-        {
-             uint64 mult_res = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_mult()
-        {
-             uint64 mult_res = static_cast<int64>(v_src1) * static_cast<int64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_mfhi()  { v_dst = hi; };
-        void execute_mthi()  { hi = v_src2; };
-        void execute_mflo()  { v_dst = lo; };
-        void execute_mtlo()  { lo = v_src2;};
+        void execute_multu() { v_dst = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2); }
+        void execute_mult()  { v_dst = static_cast<int64>(v_src1) * static_cast<int64>(v_src2); }
+        void execute_div()   { v_dst = mips_division<int32, int64>(v_src2, v_src1); }
+        void execute_divu()  { v_dst = mips_division<uint32, uint64>(v_src2, v_src1); }
+        void execute_move()  { v_dst = v_src1; }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
@@ -268,8 +266,8 @@ class MIPSInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
 
-        void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
-        void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
+        void execute_movn()  { execute_move(); writes_dst = (v_src2 != 0);}
+        void execute_movz()  { execute_move(); writes_dst = (v_src2 == 0);}
 
         // MIPStion-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
@@ -316,9 +314,6 @@ class MIPSInstr
 
         Execute function = &MIPSInstr::execute_unknown;
     public:
-        uint32 hi = NO_VAL32;
-        uint32 lo = NO_VAL32;
-
         MIPSInstr() = delete;
 
         explicit
@@ -362,7 +357,7 @@ class MIPSInstr
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 
-        uint32 get_v_dst() const { return v_dst; }
+        uint64 get_v_dst() const { return v_dst; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }

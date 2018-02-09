@@ -32,32 +32,41 @@ class MIPSRF
         Reg& get_entry( RegNum num) { return array.at( static_cast<size_t>( num)); }
         const Reg& get_entry( RegNum num) const { return array.at( static_cast<size_t>( num)); }
 
-        void invalidate( RegNum num)
+        void set_valid( RegNum num, bool value)
         {
-            if ( num != REG_NUM_ZERO)
-                get_entry( num).is_valid = false;
-        }
-
-        void validate( RegNum num)
-        {
-            if ( num != REG_NUM_ZERO)
-                get_entry( num).is_valid = true;
+            if ( num == REG_NUM_HI_LO) {
+                set_valid( REG_NUM_HI, value);
+                set_valid( REG_NUM_LO, value);
+            }
+            else if ( num != REG_NUM_ZERO) {
+                get_entry( num).is_valid = value;
+            }
         }
 
         bool check( RegNum num) const
         {
+            if ( num == REG_NUM_HI_LO) {
+                return check( REG_NUM_HI) && check( REG_NUM_LO);
+            }
             return get_entry( num).is_valid;
         }
 
         uint32 read( RegNum num) const
         {
+            assert( num != REG_NUM_HI_LO);
             return get_entry( num).value;
         }
 
-        void write( RegNum num, uint32 val)
+        void write( RegNum num, uint64 val)
         {
             if ( num == REG_NUM_ZERO)
                 return;
+            if ( num == REG_NUM_HI_LO) {
+                write( REG_NUM_HI, val >> 32);
+                write( REG_NUM_LO, val);
+                return;
+            }            
+
             auto& entry = get_entry(num);
             assert( !entry.is_valid);
             entry.is_valid = true;
@@ -70,7 +79,7 @@ class MIPSRF
         {
             instr->set_v_src1( read(instr->get_src1_num()));
             instr->set_v_src2( read(instr->get_src2_num()));
-            invalidate( instr->get_dst_num());
+            set_valid( instr->get_dst_num(), false);
         }
 
         inline bool check_sources( const MIPSInstr& instr) const
@@ -92,7 +101,7 @@ class MIPSRF
 
         inline void cancel( const MIPSInstr& instr)
         {
-            validate( instr.get_dst_num());
+            set_valid( instr.get_dst_num(), true);
         }
 };
 
