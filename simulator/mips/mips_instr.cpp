@@ -190,6 +190,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
+    {0x02, { "mul", OUT_R_ARITHM, 0, &MIPSInstr::execute_mult, 32} },
     {0x20, { "clz", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz, 32} },
     {0x21, { "clo", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo, 32} }
 };
@@ -473,8 +474,13 @@ void MIPSInstr::execute()
     if ( dst != REG_NUM_ZERO && !is_load() && get_writes_dst())
     {
         std::ostringstream oss;
-        oss << "\t [ $" << regTableName(dst)
-            << " = 0x" << std::hex << v_dst << "]";
+        oss << "\t [ $" << std::hex;
+        if ( dst == REG_NUM_HI_LO)
+            oss << "hi = 0x" << static_cast<uint32>(v_dst >> 32) << ", $lo";
+        else
+            oss << regTableName(dst);
+
+        oss << " = 0x" << static_cast<uint32>(v_dst) << " ]";
         disasm += oss.str();
     }
 }

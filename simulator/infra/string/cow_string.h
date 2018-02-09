@@ -29,7 +29,7 @@ private:
     struct InternalString { // NOLINT Clang-Tidy doesn't like uninitalized array here
         using SizeType = typename boost::uint_t<sizeof(CharT) * 8>::exact;
         static_assert(sizeof(SizeType) == sizeof(CharT));
-        static constexpr const size_t SIZE = 63;
+        static constexpr const size_t SIZE = 127;
         static_assert((1ull << (sizeof(SizeType) * 8)) > SIZE);
 
         SizeType size = 0;
