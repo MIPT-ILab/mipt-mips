@@ -87,12 +87,17 @@ class MIPSInstr
         enum OperationType : uint8
         {
             OUT_R_ARITHM,
+            OUT_R_DIVMULT,
             OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_R_TRAP,
+            OUT_R_MFLO,
+            OUT_R_MTLO,
+            OUT_R_MFHI,
+            OUT_R_MTHI,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_I_BRANCH_0,
@@ -242,10 +247,10 @@ class MIPSInstr
         void execute_mult()  { v_dst = static_cast<int64>(v_src1) * static_cast<int64>(v_src2); }
         void execute_div()   { v_dst = mips_division<int32, int64>(v_src2, v_src1); }
         void execute_divu()  { v_dst = mips_division<uint32, uint64>(v_src2, v_src1); }
-        void execute_mfhi()  { v_dst = v_src2; }
-        void execute_mthi()  { v_dst = static_cast<uint64>(v_src2) << 32; }
-        void execute_mflo()  { v_dst = v_src2; }
-        void execute_mtlo()  { v_dst = v_src2 & 0xFFFFFFFF; }
+        void execute_mfhi()  { v_dst = v_src1; }
+        void execute_mthi()  { v_dst = static_cast<uint64>(v_src1) << 32; }
+        void execute_mflo()  { v_dst = v_src1; }
+        void execute_mtlo()  { v_dst = v_src1 & 0xFFFFFFFF; }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
