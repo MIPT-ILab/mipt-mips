@@ -207,7 +207,8 @@ std::array<std::string_view, REG_NUM_MAX> MIPSInstr::regTable =
     "gp",
     "sp",
     "fp",
-    "ra"
+    "ra",
+    "hi",  "lo", "hi~lo"
 }};
 
 std::string_view MIPSInstr::regTableName(RegNum reg) {

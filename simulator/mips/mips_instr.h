@@ -52,6 +52,9 @@ enum RegNum : uint8
     REG_NUM_SP,
     REG_NUM_FP,
     REG_NUM_RA,
+    REG_NUM_HI,
+    REG_NUM_LO,
+    REG_NUM_HI_LO,
     REG_NUM_MAX
 };
 

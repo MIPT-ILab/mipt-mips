@@ -34,30 +34,49 @@ class MIPSRF
 
         void invalidate( RegNum num)
         {
-            if ( num != REG_NUM_ZERO)
+            if ( num == REG_NUM_HI_LO) {
+                invalidate( REG_NUM_HI);
+                invalidate( REG_NUM_LO);
+            }
+            else if ( num != REG_NUM_ZERO) {
                 get_entry( num).is_valid = false;
+            }
         }
 
         void validate( RegNum num)
         {
-            if ( num != REG_NUM_ZERO)
-                get_entry( num).is_valid = true;
+            if ( num == REG_NUM_HI_LO) {
+                validate( REG_NUM_HI);
+                validate( REG_NUM_LO);
+            }
+            else if ( num != REG_NUM_ZERO) {
+                get_entry( num).is_valid = false;
+            }
         }
 
         bool check( RegNum num) const
         {
+            if ( num == REG_NUM_HI_LO) {
+                return check( REG_NUM_HI) && check( REG_NUM_LO);
+            }
             return get_entry( num).is_valid;
         }
 
         uint32 read( RegNum num) const
         {
+            assert( num != REG_NUM_HI_LO);
             return get_entry( num).value;
         }
 
-        void write( RegNum num, uint32 val)
+        void write( RegNum num, uint64 val)
         {
             if ( num == REG_NUM_ZERO)
                 return;
+            if ( num == REG_NUM_HI_LO) {
+                write( REG_NUM_HI, val >> 32);
+                write( REG_NUM_LO, val);
+            }            
+
             auto& entry = get_entry(num);
             assert( !entry.is_valid);
             entry.is_valid = true;
