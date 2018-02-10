@@ -1,7 +1,7 @@
 /*
  * mips_instr.cpp - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS
+ * Copyright 2015-2018 MIPT-MIPS
  */
 
 #include <iostream>
@@ -476,11 +476,12 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst == REG_NUM_HI_LO)
-            oss << "hi = 0x" << static_cast<uint32>(v_dst >> 32) << ", $lo";
+            oss << regTableName( REG_NUM_HI) << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+                << regTableName( REG_NUM_LO);
         else
-            oss << regTableName(dst);
+            oss << regTableName( dst);
 
-        oss << " = 0x" << static_cast<uint32>(v_dst) << " ]";
+        oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
         disasm += oss.str();
     }
 }
