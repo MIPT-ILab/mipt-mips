@@ -33,6 +33,14 @@ private:
         uint32 raw = NO_VAL32;            // fetched instruction code
     };
 
+    /*the structure of data sent from memory to fetch stage */
+    struct BPInterface {
+        bool is_taken = false;
+        Addr branch_ip = NO_VAL32;
+        Addr target = NO_VAL32;
+    };
+
+
     /* simulator units */
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
@@ -72,6 +80,9 @@ private:
 
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
+
+    std::unique_ptr<WritePort<BPInterface>> wp_memory_2_fetch = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_fetch = nullptr;
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);
