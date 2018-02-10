@@ -38,6 +38,5 @@ class FuncSim : public Simulator
         FuncInstr step();
         void run(const std::string& tr, uint64 instrs_to_run) final;
 };
-using FuncMIPS = FuncSim<MIPS>;
 
 #endif

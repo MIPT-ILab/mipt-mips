@@ -5,11 +5,6 @@
 
 #include <infra/config/config.h>
 
-<<<<<<< HEAD
-#include <mips/mips.h>
-
-=======
->>>>>>> upstream/master
 #include "perf_sim.h"
 
 static constexpr const Latency PORT_LATENCY = 1_Lt;

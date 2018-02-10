@@ -40,7 +40,6 @@ private:
         Addr target = NO_VAL32;
     };
 
-
     /* simulator units */
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
@@ -103,6 +102,5 @@ public:
     PerfSim operator=( const PerfSim&) = delete;
     PerfSim operator=( PerfSim&&) = delete;
 };
-using PerfMIPS = PerfSim<MIPS>;
 
 #endif
