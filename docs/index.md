@@ -36,7 +36,9 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
 
  Date | Event | Hometask
  :-: |:---- |:----------------
- 10<br/>Feb | **L11: Caches and Memory Hierarchy, Part I** | |
+ 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) | |
+ 17<br/>Feb | **L12: Caches, pt. II** | |
+ 22<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
  
 ### MSU Seminars
 
