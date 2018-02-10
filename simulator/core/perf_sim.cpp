@@ -50,6 +50,9 @@ PerfSim<ISA>::PerfSim(bool log) : Log( log), rf( new RF), checker( false)
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
+    wp_memory_2_fetch = make_write_port<BPUpdate>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
+    rp_memory_2_fetch = make_read_port<BPUpdate>("MEMORY_2_FETCH", PORT_LATENCY);
+
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 
@@ -137,6 +140,9 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     /* creating structure to be sent to decode stage */
     IfIdData data;
 
+    /* creating structure to update BP unit */
+    BPUpdate _data;
+
     /* fetching instruction */
     data.raw = memory->fetch( PC);
 
@@ -144,6 +150,13 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     data.PC = PC;
     data.predicted_taken = bp->is_taken( PC);
     data.predicted_target = bp->get_target( PC);
+
+    if( rp_memory_2_fetch->is_ready( cycle)) 
+    {
+        _data = rp_memory_2_fetch->read( cycle);
+        bp->update( _data.is_taken, _data.branch_ip, _data.target);
+    }    
+
 
     /* updating PC according to prediction */
     new_PC = data.predicted_target;
@@ -245,6 +258,8 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
+    BPUpdate _data;
+
     /* receieve flush signal */
     const bool is_flush = rp_memory_flush->is_ready( cycle) && rp_memory_flush->read( cycle);
 
@@ -272,10 +287,11 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
     if (instr.is_jump()) {
         /* acquiring real information for BPU */
-        bool actually_taken = instr.is_jump_taken();
-        Addr real_target = instr.get_new_PC();
-        bp->update( actually_taken, instr.get_PC(), real_target);
-
+        _data.is_taken = instr.is_jump_taken();
+        _data.branch_ip = instr.get_PC();
+        _data.target = instr.get_new_PC();
+        wp_memory_2_fetch->write( _data, cycle);
+        
         /* handle misprediction */
         if ( instr.is_misprediction())
         {
@@ -283,7 +299,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
             wp_memory_2_all_flush->write( true, cycle);
 
             /* sending valid PC to fetch stage */
-            wp_memory_2_fetch_target->write( real_target, cycle);
+            wp_memory_2_fetch_target->write( _data.target, cycle);
 
             sout << "misprediction on ";
         }
