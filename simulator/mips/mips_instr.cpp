@@ -1,7 +1,7 @@
 /*
  * mips_instr.cpp - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2015 MIPT-MIPS
+ * Copyright 2015-2018 MIPT-MIPS
  */
 
 #include <iostream>
@@ -47,19 +47,19 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
 
     // HI/LO manipulations
     //key      name   operation  memsize           pointer
-    {0x10, { "mfhi", OUT_R_ARITHM, 0, &MIPSInstr::execute_mfhi, 1} },
-    {0x11, { "mthi", OUT_R_ARITHM, 0, &MIPSInstr::execute_mthi, 1} },
-    {0x12, { "mflo", OUT_R_ARITHM, 0, &MIPSInstr::execute_mflo, 1} },
-    {0x13, { "mtlo", OUT_R_ARITHM, 0, &MIPSInstr::execute_mtlo, 1} },
+    {0x10, { "mfhi", OUT_R_MFHI, 0, &MIPSInstr::execute_move, 1} },
+    {0x11, { "mthi", OUT_R_MTHI, 0, &MIPSInstr::execute_move, 1} },
+    {0x12, { "mflo", OUT_R_MFLO, 0, &MIPSInstr::execute_move, 1} },
+    {0x13, { "mtlo", OUT_R_MTLO, 0, &MIPSInstr::execute_move, 1} },
 
     // 0x14 - 0x17 double width shifts
 
     // Multiplication/Division
     //key      name    operation  memsize           pointer
-    {0x18, { "mult",  OUT_R_ARITHM, 0, &MIPSInstr::execute_mult,  1} },
-    {0x19, { "multu", OUT_R_ARITHM, 0, &MIPSInstr::execute_multu, 1} },
-    {0x1A, { "div",   OUT_R_ARITHM, 0, &MIPSInstr::execute_div,   1} },
-    {0x1B, { "divu",  OUT_R_ARITHM, 0, &MIPSInstr::execute_divu,  1} },
+    {0x18, { "mult",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_mult,  1} },
+    {0x19, { "multu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_multu, 1} },
+    {0x1A, { "div",   OUT_R_DIVMULT, 0, &MIPSInstr::execute_div,   1} },
+    {0x1B, { "divu",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_divu,  1} },
 
     // 0x1C - 0x1F double width multiplication/division
 
@@ -190,6 +190,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
+    {0x02, { "mul", OUT_R_ARITHM, 0, &MIPSInstr::execute_mult, 32} },
     {0x20, { "clz", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz, 32} },
     {0x21, { "clo", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo, 32} }
 };
@@ -207,7 +208,8 @@ std::array<std::string_view, REG_NUM_MAX> MIPSInstr::regTable =
     "gp",
     "sp",
     "fp",
-    "ra"
+    "ra",
+    "hi",  "lo", "hi~lo"
 }};
 
 std::string_view MIPSInstr::regTableName(RegNum reg) {
@@ -276,6 +278,33 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
 
     switch ( operation)
     {
+        case OUT_R_MFHI:
+            src1 = REG_NUM_HI;
+            dst  = static_cast<RegNum>(instr.asR.rd);
+            oss <<  " $" << regTableName(dst);
+            break;
+        case OUT_R_MFLO:
+            src1 = REG_NUM_LO;
+            dst  = static_cast<RegNum>(instr.asR.rd);
+            oss <<  " $" << regTableName(dst);
+            break;
+        case OUT_R_MTHI:
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            dst  = REG_NUM_HI;
+            oss <<  " $" << regTableName(src1);
+            break;
+        case OUT_R_MTLO:
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            dst  = REG_NUM_LO;
+            oss <<  " $" << regTableName(src1);
+            break;
+        case OUT_R_DIVMULT:
+            src2 = static_cast<RegNum>(instr.asR.rt);
+            src1 = static_cast<RegNum>(instr.asR.rs);
+            dst  = REG_NUM_HI_LO;
+            oss <<  " $" << regTableName(src1)
+                << ", $" << regTableName(src2);
+            break;
         case OUT_R_ARITHM:
             src2 = static_cast<RegNum>(instr.asR.rt);
             src1 = static_cast<RegNum>(instr.asR.rs);
@@ -445,8 +474,14 @@ void MIPSInstr::execute()
     if ( dst != REG_NUM_ZERO && !is_load() && get_writes_dst())
     {
         std::ostringstream oss;
-        oss << "\t [ $" << regTableName(dst)
-            << " = 0x" << std::hex << v_dst << "]";
+        oss << "\t [ $" << std::hex;
+        if ( dst == REG_NUM_HI_LO)
+            oss << regTableName( REG_NUM_HI) << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+                << regTableName( REG_NUM_LO);
+        else
+            oss << regTableName( dst);
+
+        oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
         disasm += oss.str();
     }
 }

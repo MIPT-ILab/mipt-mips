@@ -21,7 +21,8 @@ cl /I. /EHsc /c /nologo /MD ^
    mips/mips_instr.cpp ^
    mips/mips_memory.cpp ^
    func_sim/func_sim.cpp ^
-   core/perf_sim.cpp || exit /b
+   core/perf_sim.cpp ^
+   simulator.cpp || exit /b
 
 rem Build GoogleTest
 cl /EHsc /c /nologo /MD ^

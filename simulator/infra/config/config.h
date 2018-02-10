@@ -70,6 +70,11 @@ public:
     RequiredValue<T>() = delete;
 
     operator const T&() const { return value; } // NOLINT
+    
+    friend std::ostream& operator<<( std::ostream& out, const RequiredValue& rhs)
+    {
+        return out << rhs.value;
+    }
 };
 
 template<typename T>

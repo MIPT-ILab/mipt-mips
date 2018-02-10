@@ -6,10 +6,11 @@
 #include <gtest/gtest.h>
 
 // Module
+#include <mips/mips.h>
 #include "../perf_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH;
-static const int64 num_steps = 2250;
+static const int64 num_steps = 2503;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -17,7 +18,7 @@ static const int64 num_steps = 2250;
 TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
     // Just call a constructor
-    GTEST_ASSERT_NO_DEATH( PerfMIPS mips( false); );
+    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS> mips( false); );
 }
 
 TEST( Perf_Sim_init, Make_A_Step)

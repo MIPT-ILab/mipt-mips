@@ -1,10 +1,15 @@
+#include <cassert>
+
 #include <iostream>
 #include <chrono>
 
 #include <infra/config/config.h>
 
+<<<<<<< HEAD
 #include <mips/mips.h>
 
+=======
+>>>>>>> upstream/master
 #include "perf_sim.h"
 
 static constexpr const Latency PORT_LATENCY = 1_Lt;
@@ -19,7 +24,7 @@ namespace config {
 } // namespace config
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : Log( log), rf( new RF), checker( false)
+PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 
@@ -362,5 +367,7 @@ void PerfSim<ISA>::check( const FuncInstr& instr)
              << "PerfSim output: " << instr.Dump() << std::endl
              << critical;
 }
+
+#include <mips/mips.h>
 
 template class PerfSim<MIPS>;

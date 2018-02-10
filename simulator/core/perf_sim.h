@@ -10,18 +10,13 @@
 #include <sstream>
 #include <iomanip>
 
-#include <infra/log.h>
+#include <simulator.h>
 #include <infra/ports/ports.h>
-
-#include "func_sim/func_sim.h"
-#include "mips/mips_instr.h"
-#include "mips/mips_rf.h"
-#include "mips/mips.h"
-
-#include "bpu/bpu.h"
+#include <bpu/bpu.h>
+#include <func_sim/func_sim.h>
 
 template <typename ISA>
-class PerfSim : protected Log
+class PerfSim : public Simulator
 {
     using FuncInstr = typename ISA::FuncInstr;
     using RF = typename ISA::RF;
@@ -100,7 +95,7 @@ private:
 public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
-    void run( const std::string& tr, uint64 instrs_to_run);
+    void run( const std::string& tr, uint64 instrs_to_run) final;
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;

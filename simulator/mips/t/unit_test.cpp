@@ -32,7 +32,6 @@ TEST( MIPS_instr_init, Process_Wrong_Args_Of_Constr)
 
 TEST( MIPS_instr_disasm, Process_Unknown_Instruction)
 {
-    TEST_BAD_OPCODE(0x71398802)
     TEST_BAD_OPCODE(0x72290000)
     TEST_BAD_OPCODE(0x72290001)
     TEST_BAD_OPCODE(0x72290004)
@@ -54,7 +53,7 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0x0139880b).Dump(), "movn $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x02290018).Dump(), "mult $zero, $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x02290019).Dump(), "multu $zero, $s1, $t1");
-//  ASSERT_EQ(MIPSInstr(0x71398802).Dump(), "mul $s1, $t1, $t9");
+    ASSERT_EQ(MIPSInstr(0x71398802).Dump(), "mul $s1, $t1, $t9");
 //  ASSERT_EQ(MIPSInstr(0x72290000).Dump(), "madd $s1, $t1");
 //  ASSERT_EQ(MIPSInstr(0x72290001).Dump(), "maddu $s1, $t1");
 //  ASSERT_EQ(MIPSInstr(0x72290004).Dump(), "msub $s1, $t1");
