@@ -12,6 +12,7 @@
 
 #include <simulator.h>
 #include <infra/ports/ports.h>
+#include <bpu/bp_interface.h>
 #include <bpu/bpu.h>
 #include <func_sim/func_sim.h>
 
@@ -32,14 +33,6 @@ private:
         Addr PC = NO_VAL32;               // current PC
         uint32 raw = NO_VAL32;            // fetched instruction code
     };
-
-    /*the structure of data sent from memory to fetch stage */
-    struct BPInterface {
-        bool is_taken = false;
-        Addr branch_ip = NO_VAL32;
-        Addr target = NO_VAL32;
-    };
-
 
     /* simulator units */
     RF* rf = nullptr;
