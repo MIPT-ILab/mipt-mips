@@ -17,6 +17,7 @@
 #include <infra/types.h>
 
 #include "bpentry.h"
+#include "bp_interface.h"
 
 /*
  *******************************************************************************
@@ -28,7 +29,8 @@ class BaseBP
 public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
-    virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
+    virtual void update( BPUpdateInfo bp_update) = 0;
+    virtual BPUpdateInfo get_bp_info (Addr PC) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -84,23 +86,32 @@ public:
     }
 
     /* update */
-    void update( bool is_taken,
-                 Addr branch_ip,
-                 Addr target) final
+    void update( BPUpdateInfo bp_update) final
     {
-        const auto set = tags.set( branch_ip);
-        auto[ is_hit, way] = tags.read( branch_ip);
+        const auto set = tags.set( bp_update.branch_ip);
+        auto[ is_hit, way] = tags.read( bp_update.branch_ip);
 
         if ( !is_hit) { // miss
-            way = tags.write( branch_ip); // add new entry to cache
+            way = tags.write( bp_update.branch_ip); // add new entry to cache
             auto& entry = data[ way][ set];
             entry.reset();
-            entry.update_target( target);
+            entry.update_target( bp_update.target);
         }
 
-        data[ way][ set].update( is_taken, target);
+        data[ way][ set].update( bp_update.is_taken, bp_update.target);
+    }
+
+    /* get BP update information */
+    BPUpdateInfo get_bp_info( Addr PC) final 
+    {
+        BPUpdateInfo bp_update;
+        bp_update.is_taken = is_taken( PC);
+        bp_update.target = get_target( PC);
+        bp_update.branch_ip = PC;
+        return bp_update;
     }
 };
+
 
 
 /*

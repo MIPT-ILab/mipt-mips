@@ -221,10 +221,10 @@ MIPSInstr::MIPSInstr( uint32 bytes, Addr PC,
                       Addr predicted_target) :
     instr( bytes),
     predicted_taken( predicted_taken),
-    predicted_target( predicted_target),
-    PC( PC),
-    new_PC( PC + 4)
+    predicted_target( predicted_target)
 {
+    bp_update.branch_ip = PC;
+    bp_update.target = PC + 4;
     bool valid = false;
     auto it = isaMapRI.cbegin();
 
@@ -257,8 +257,8 @@ MIPSInstr::MIPSInstr( uint32 bytes, Addr PC,
     }
     else {
         std::ostringstream oss;
-        if ( PC != 0)
-            oss << std::hex << "0x" << PC << ": ";
+        if ( bp_update.branch_ip != 0)
+            oss << std::hex << "0x" << bp_update.branch_ip << ": ";
         oss << std::hex << std::setfill( '0')
             << "0x" << std::setw( 8) << instr.raw << '\t' << "Unknown";
         disasm = oss.str();
@@ -272,8 +272,8 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
     function  = entry.function;
 
     std::ostringstream oss;
-    if ( PC != 0)
-        oss << std::hex << "0x" << PC << ": ";
+    if ( bp_update.branch_ip != 0)
+        oss << std::hex << "0x" << bp_update.branch_ip << ": ";
     oss << entry.name;
 
     switch ( operation)
