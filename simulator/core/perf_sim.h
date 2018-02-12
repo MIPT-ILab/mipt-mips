@@ -12,6 +12,7 @@
 
 #include <simulator.h>
 #include <infra/ports/ports.h>
+#include <bpu/bp_interface.h>
 #include <bpu/bpu.h>
 #include <func_sim/func_sim.h>
 
@@ -28,7 +29,7 @@ private:
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
         uint32 raw = NO_VAL32;            // fetched instruction code
-        BPInterface bp_info;
+        BPInterface bp_info = {};
     };
 
     /* simulator units */
@@ -37,7 +38,6 @@ private:
     Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
-    BPInterface bp_update;
 
     /* MIPS functional simulator for internal checks */
     
@@ -74,7 +74,6 @@ private:
 
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_fetch = nullptr;
     std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_fetch = nullptr;
-
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);

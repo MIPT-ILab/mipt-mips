@@ -16,8 +16,8 @@
 #include <infra/log.h>
 #include <infra/types.h>
 
-#include "bpentry.h"
 #include "bp_interface.h"
+#include "bpentry.h"
 
 /*
  *******************************************************************************
@@ -27,11 +27,10 @@
 class BaseBP
 {
 public:
-    virtual bool is_taken( Addr PC) = 0;
-    virtual Addr get_target( Addr PC) = 0;
-    virtual void update( BPInterface& bp_update) = 0;
-    virtual BPInterface get_bp_info( Addr PC) = 0;
-    virtual void bp_update_init( BPInterface& bp_update, bool is_taken, Addr branch_ip, Addr target) = 0;
+    virtual bool is_taken( Addr PC) const = 0;
+    virtual Addr get_target( Addr PC) const = 0;
+    virtual BPInterface get_bp_info( Addr PC) const = 0;
+    virtual void update( const BPInterface& bp_upd) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -64,7 +63,7 @@ public:
         { }
 
     /* prediction */
-    bool is_taken( Addr PC) final
+    bool is_taken( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -73,7 +72,7 @@ public:
         return is_hit && data[ way][ tags.set(PC)].is_taken( PC);
     }
 
-    Addr get_target( Addr PC) final
+    Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -87,42 +86,25 @@ public:
     }
 
     /* update */
-    void update( BPInterface& bp_update) final
+    void update( const BPInterface& bp_upd) final
     {
-        const auto set = tags.set( bp_update.branch_ip);
-        auto[ is_hit, way] = tags.read( bp_update.branch_ip);
+        const auto set = tags.set( bp_upd.pc);
+        auto[ is_hit, way] = tags.read( bp_upd.pc);
 
         if ( !is_hit) { // miss
-            way = tags.write( bp_update.branch_ip); // add new entry to cache
+            way = tags.write( bp_upd.pc); // add new entry to cache
             auto& entry = data[ way][ set];
             entry.reset();
-            entry.update_target( bp_update.target);
+            entry.update_target( bp_upd.target);
         }
 
-        data[ way][ set].update( bp_update.is_taken, bp_update.target);
+        data[ way][ set].update( bp_upd.is_taken, bp_upd.target);
     }
 
-    /* getting BP unit information */
-    BPInterface get_bp_info( Addr PC) final 
+    BPInterface get_bp_info( Addr PC) const final
     {
-        BPInterface bp_info;
-        bp_info.is_taken = is_taken( PC);
-        bp_info.target = get_target( PC);
-        bp_info.branch_ip = PC;
-        return bp_info;
+        return BPInterface( PC, is_taken( PC), get_target( PC)); 
     }
-
-    /* BP update initialization */
-    void bp_update_init( BPInterface& bp_update, 
-                        bool is_taken,
-                        Addr branch_ip, 
-                        Addr target) final 
-    {
-        bp_update.is_taken = is_taken;
-        bp_update.branch_ip = branch_ip;
-        bp_update.target = target;
-    }
-
 };
 
 

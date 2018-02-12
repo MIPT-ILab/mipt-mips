@@ -10,12 +10,18 @@
 #include <infra/types.h>
 
 /*the structure of data sent from memory to fetch stage */
-struct BPInterface{
+struct BPInterface {
+    Addr pc = NO_VAL32;
     bool is_taken = false;
-    Addr branch_ip = NO_VAL32;
     Addr target = NO_VAL32;
-    bool predicted_taken = false;
-    Addr predicted_target = NO_VAL32;
+
+    BPInterface() = default;
+
+    BPInterface( Addr pc, bool is_taken, Addr target)
+        : pc( pc)
+	    , is_taken( is_taken)
+        , target( target)
+    { }
 };
 
 #endif // BP_INTERFACE_H_

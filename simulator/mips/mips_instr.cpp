@@ -216,14 +216,11 @@ std::string_view MIPSInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 
-MIPSInstr::MIPSInstr( uint32 bytes, Addr PC,
-                      bool predicted_taken,
-                      Addr predicted_target) :
+MIPSInstr::MIPSInstr( uint32 bytes, Addr PC, const BPInterface& bp_info) :
     instr( bytes),
-    predicted_taken( predicted_taken),
-    predicted_target( predicted_target),
-    PC( PC),
-    new_PC( PC + 4)
+    bp_data( bp_info),
+    new_PC( PC + 4),
+    PC( PC)
 {
     bool valid = false;
     auto it = isaMapRI.cbegin();
@@ -460,9 +457,6 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
         disasm = oss.str();
 }
 
-MIPSInstr::MIPSInstr( uint32 bytes, const BPInterface& bp_info) :
-          MIPSInstr( bytes, bp_info.branch_ip, bp_info.is_taken, bp_info.target) { }
-
 void MIPSInstr::execute_unknown()
 {
     std::cerr << "ERROR.Incorrect instruction: " << disasm << std::endl;
@@ -528,4 +522,3 @@ void MIPSInstr::check_trap()
         disasm += oss.str();
     }
 }
-
