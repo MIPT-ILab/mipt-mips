@@ -25,10 +25,10 @@ private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
-    // the struture of data sent from fetch to decode stage 
+    /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
-        BPUpdateInfo bp_update;           // the structure of data to update BP unit
         uint32 raw = NO_VAL32;            // fetched instruction code
+        BPInterface bp_info;
     };
 
     /* simulator units */
@@ -37,7 +37,7 @@ private:
     Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
-    BPUpdateInfo bp_update;
+    BPInterface bp_update;
 
     /* MIPS functional simulator for internal checks */
     
@@ -72,8 +72,9 @@ private:
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
 
-    std::unique_ptr<WritePort<BPUpdateInfo>> wp_memory_2_fetch = nullptr;
-    std::unique_ptr<ReadPort<BPUpdateInfo>> rp_memory_2_fetch = nullptr;
+    std::unique_ptr<WritePort<BPInterface>> wp_memory_2_fetch = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_fetch = nullptr;
+
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);

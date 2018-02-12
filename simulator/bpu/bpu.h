@@ -29,8 +29,9 @@ class BaseBP
 public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
-    virtual void update( BPUpdateInfo bp_update) = 0;
-    virtual BPUpdateInfo get_bp_info (Addr PC) = 0;
+    virtual void update( BPInterface& bp_update) = 0;
+    virtual BPInterface get_bp_info( Addr PC) = 0;
+    virtual void bp_update_init( BPInterface& bp_update, bool is_taken, Addr branch_ip, Addr target) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -86,7 +87,7 @@ public:
     }
 
     /* update */
-    void update( BPUpdateInfo bp_update) final
+    void update( BPInterface& bp_update) final
     {
         const auto set = tags.set( bp_update.branch_ip);
         auto[ is_hit, way] = tags.read( bp_update.branch_ip);
@@ -101,17 +102,28 @@ public:
         data[ way][ set].update( bp_update.is_taken, bp_update.target);
     }
 
-    /* get BP update information */
-    BPUpdateInfo get_bp_info( Addr PC) final 
+    /* getting BP unit information */
+    BPInterface get_bp_info( Addr PC) final 
     {
-        BPUpdateInfo bp_update;
-        bp_update.is_taken = is_taken( PC);
-        bp_update.target = get_target( PC);
-        bp_update.branch_ip = PC;
-        return bp_update;
+        BPInterface bp_info;
+        bp_info.is_taken = is_taken( PC);
+        bp_info.target = get_target( PC);
+        bp_info.branch_ip = PC;
+        return bp_info;
     }
-};
 
+    /* BP update initialization */
+    void bp_update_init( BPInterface& bp_update, 
+                        bool is_taken,
+                        Addr branch_ip, 
+                        Addr target) final 
+    {
+        bp_update.is_taken = is_taken;
+        bp_update.branch_ip = branch_ip;
+        bp_update.target = target;
+    }
+
+};
 
 
 /*

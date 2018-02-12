@@ -207,9 +207,13 @@ class MIPSInstr
 
         /* info for branch misprediction unit */
         bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // bp_update.branch_ip, predicted by BPU
+        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+        bool _is_jump_taken = false;      // actual result
+
+        const Addr PC = NO_VAL32;
+        Addr new_PC = NO_VAL32;
         
-        BPUpdateInfo bp_update;
+        BPInterface bp_info;
 
 #if 0
         std::string disasm = {};
@@ -287,28 +291,28 @@ class MIPSInstr
         template<Predicate p>
         void execute_branch()
         {
-            bp_update.is_taken = (this->*p)();
-            if ( bp_update.is_taken)
-                bp_update.target += sign_extend( v_imm) << 2;
+            _is_jump_taken = (this->*p)();
+            if ( _is_jump_taken)
+                new_PC += sign_extend( v_imm) << 2;
         }
 
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_j()      { bp_update.is_taken = true; bp_update.target = (bp_update.branch_ip & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { bp_update.is_taken = true; bp_update.target = align_up<2>(v_src1); }
+        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
+        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
 
-        void execute_jal()    { bp_update.is_taken = true; v_dst = bp_update.target; bp_update.target = (bp_update.branch_ip & 0xF0000000) | (v_imm << 2); };
-        void execute_jalr()   { bp_update.is_taken = true; v_dst = bp_update.target; bp_update.target = align_up<2>(v_src1); };
+        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
+        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
 
         template<Predicate p>
         void execute_branch_and_link()
         {
-            bp_update.is_taken = (this->*p)();
-            if ( bp_update.is_taken)
+            _is_jump_taken = (this->*p)();
+            if ( _is_jump_taken)
             {
-                v_dst = bp_update.target;
-                bp_update.target += sign_extend( v_imm) << 2;
+                v_dst = new_PC;
+                new_PC += sign_extend( v_imm) << 2;
             }
         }
 
@@ -329,16 +333,18 @@ class MIPSInstr
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
 
+        MIPSInstr( uint32 bytes, const BPInterface& bp_info);
+
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const MIPSInstr& rhs) const {
-            return bp_update.branch_ip == rhs.bp_update.branch_ip && instr.raw == rhs.instr.raw;
+            return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
         RegNum get_src1_num() const { return src1; }
         RegNum get_src2_num() const { return src2; }
         RegNum get_dst_num()  const { return dst;  }
 
-        /* Checks if instruction can change bp_update.branch_ip in unusual way. */
+        /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP         ||
                                       operation == OUT_J_JUMP_LINK    ||
                                       operation == OUT_RI_BRANCH_LINK ||
@@ -347,8 +353,8 @@ class MIPSInstr
                                       operation == OUT_I_BRANCH_0     ||
                                       operation == OUT_RI_BRANCH_0    ||
                                       operation == OUT_I_BRANCH;     }
-        bool is_jump_taken() const { return  bp_update.is_taken; }
-        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != bp_update.target; }
+        bool is_jump_taken() const { return  _is_jump_taken; }
+        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
@@ -369,8 +375,8 @@ class MIPSInstr
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
-        Addr get_new_PC() const { return bp_update.target; }
-        Addr get_PC() const { return bp_update.branch_ip; }
+        Addr get_new_PC() const { return new_PC; }
+        Addr get_PC() const { return PC; }
 
         void set_v_dst(uint32 value); // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores

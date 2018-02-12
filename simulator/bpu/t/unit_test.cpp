@@ -42,52 +42,64 @@ TEST( Main, PredictingBits)
     BPFactory bp_factory;
     auto bp = bp_factory.create( "dynamic_two_bit", 128, 16);
 
+    BPInterface bp_update;
     Addr PC = 12;
     Addr target = 28;
 
     // Learn
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // "Over" - learning
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // Moderate "Un" - learning
-    bp->update( false, PC, NO_VAL32);
+    bp->bp_update_init( bp_update, false, PC, NO_VAL32);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // Strong "un" - learning
-    bp->update( false, PC, NO_VAL32);
-    bp->update( false, PC, NO_VAL32);
-    bp->update( false, PC, NO_VAL32);
+    bp->bp_update_init( bp_update, false, PC, NO_VAL32);
+    bp->update( bp_update);
+    bp->update( bp_update);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->bp_update_init( bp_update, false, PC, NO_VAL32);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->bp_update_init( bp_update, false, PC, NO_VAL32);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->bp_update_init( bp_update, false, PC, NO_VAL32);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), false);
 
     // Learn again
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( true, PC, target);
+    bp->bp_update_init( bp_update, true, PC, target);
+    bp->update( bp_update);
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 }
@@ -97,6 +109,7 @@ TEST( Overload, LRU)
 {
     BPFactory bp_factory;
     auto bp = bp_factory.create( "dynamic_two_bit", 128, 16);
+    BPInterface bp_update;
 
     const Addr PCconst = 16;
     Addr target = 48;
@@ -104,9 +117,13 @@ TEST( Overload, LRU)
     // Trying to make it forget the PCconst
     for ( int i = 0; i < 1000; i++)
     {
-        bp->update( false, i, NO_VAL32);
-        if ( i % 50 == 0)
-            bp->update( true, PCconst, target);
+        bp->bp_update_init( bp_update, false, i, NO_VAL32);
+        bp->update( bp_update);
+        if ( i % 50 == 0) 
+        {
+            bp->bp_update_init( bp_update, true, PCconst, target);
+            bp->update( bp_update);
+        }
     }
 
     // Checking some random PC and PCConst

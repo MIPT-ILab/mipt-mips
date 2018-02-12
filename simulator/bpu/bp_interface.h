@@ -10,10 +10,12 @@
 #include <infra/types.h>
 
 /*the structure of data sent from memory to fetch stage */
-struct BPUpdateInfo{
+struct BPInterface{
     bool is_taken = false;
     Addr branch_ip = NO_VAL32;
     Addr target = NO_VAL32;
+    bool predicted_taken = false;
+    Addr predicted_target = NO_VAL32;
 };
 
 #endif // BP_INTERFACE_H_
