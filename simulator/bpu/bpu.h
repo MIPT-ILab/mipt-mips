@@ -27,9 +27,9 @@
 class BaseBP
 {
 public:
-    virtual bool is_taken( Addr PC) = 0;
-    virtual Addr get_target( Addr PC) = 0;
-    virtual BPInterface get_bp_info( Addr PC) = 0;
+    virtual bool is_taken( Addr PC) const = 0;
+    virtual Addr get_target( Addr PC) const = 0;
+    virtual BPInterface get_bp_info( Addr PC) const = 0;
     virtual void update( const BPInterface& bp_upd) = 0;
 
     BaseBP() = default;
@@ -63,7 +63,7 @@ public:
         { }
 
     /* prediction */
-    bool is_taken( Addr PC) final
+    bool is_taken( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -72,7 +72,7 @@ public:
         return is_hit && data[ way][ tags.set(PC)].is_taken( PC);
     }
 
-    Addr get_target( Addr PC) final
+    Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -101,7 +101,7 @@ public:
         data[ way][ set].update( bp_upd.is_taken, bp_upd.target);
     }
 
-    BPInterface get_bp_info( Addr PC) final
+    BPInterface get_bp_info( Addr PC) const final
     {
         return BPInterface( PC, is_taken( PC), get_target( PC)); 
     }
