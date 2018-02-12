@@ -50,6 +50,10 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
+    wp_memory_2_fetch = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
+    rp_memory_2_fetch = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
+
+
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 
@@ -65,10 +69,7 @@ typename PerfSim<ISA>::FuncInstr PerfSim<ISA>::read_instr(Cycle cycle)
         return rp_decode_2_decode->read( cycle);
     }
     const auto& _data = rp_fetch_2_decode->read( cycle);
-    FuncInstr instr( _data.raw,
-        _data.PC,
-        _data.predicted_taken,
-        _data.predicted_target);
+    FuncInstr instr( _data.raw, _data.bp_info);
     return instr;
 
 }
@@ -141,12 +142,16 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     data.raw = memory->fetch( PC);
 
     /* saving predictions and updating PC according to them */
-    data.PC = PC;
-    data.predicted_taken = bp->is_taken( PC);
-    data.predicted_target = bp->get_target( PC);
+    data.bp_info = bp->get_bp_info( PC);
+
+    if( rp_memory_2_fetch->is_ready( cycle)) 
+    {
+        bp_update = rp_memory_2_fetch->read( cycle);
+        bp->update( bp_update);
+    }    
 
     /* updating PC according to prediction */
-    new_PC = data.predicted_target;
+    new_PC = data.bp_info.target;
 
     /* sending to decode */
     wp_fetch_2_decode->write( data, cycle);
@@ -272,9 +277,14 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
     if (instr.is_jump()) {
         /* acquiring real information for BPU */
-        bool actually_taken = instr.is_jump_taken();
-        Addr real_target = instr.get_new_PC();
-        bp->update( actually_taken, instr.get_PC(), real_target);
+        //bool actually_taken = instr.is_jump_taken();
+        //Addr real_target = instr.get_new_PC();
+        //bp->update( actually_taken, instr.get_PC(), real_target);
+        bp_update.is_taken = instr.is_jump_taken();
+        bp_update.branch_ip = instr.get_PC();
+        bp_update.target = instr.get_new_PC();
+        wp_memory_2_fetch->write( bp_update, cycle);
+
 
         /* handle misprediction */
         if ( instr.is_misprediction())
@@ -283,7 +293,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
             wp_memory_2_all_flush->write( true, cycle);
 
             /* sending valid PC to fetch stage */
-            wp_memory_2_fetch_target->write( real_target, cycle);
+            wp_memory_2_fetch_target->write( bp_update.target, cycle);
 
             sout << "misprediction on ";
         }

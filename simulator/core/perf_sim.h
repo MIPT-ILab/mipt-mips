@@ -27,10 +27,8 @@ private:
 
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
-        Addr PC = NO_VAL32;               // current PC
         uint32 raw = NO_VAL32;            // fetched instruction code
+        BPInterface bp_info;
     };
 
     /* simulator units */
@@ -39,6 +37,7 @@ private:
     Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
+    BPInterface bp_update;
 
     /* MIPS functional simulator for internal checks */
     
@@ -72,6 +71,10 @@ private:
 
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
+
+    std::unique_ptr<WritePort<BPInterface>> wp_memory_2_fetch = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_fetch = nullptr;
+
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);

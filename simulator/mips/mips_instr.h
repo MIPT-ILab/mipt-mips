@@ -17,6 +17,7 @@
 #include <infra/types.h>
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
+#include <bpu/bp_interface.h>
 
 enum RegNum : uint8
 {
@@ -211,6 +212,8 @@ class MIPSInstr
 
         const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
+        
+        BPInterface bp_info;
 
 #if 0
         std::string disasm = {};
@@ -329,6 +332,8 @@ class MIPSInstr
         MIPSInstr( uint32 bytes, Addr PC = 0,
                    bool predicted_taken = false,
                    Addr predicted_target = 0);
+
+        MIPSInstr( uint32 bytes, const BPInterface& bp_info);
 
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const MIPSInstr& rhs) const {

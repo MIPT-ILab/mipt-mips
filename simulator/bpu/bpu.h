@@ -17,6 +17,7 @@
 #include <infra/types.h>
 
 #include "bpentry.h"
+#include "bp_interface.h"
 
 /*
  *******************************************************************************
@@ -28,7 +29,9 @@ class BaseBP
 public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
-    virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
+    virtual void update( BPInterface& bp_update) = 0;
+    virtual BPInterface get_bp_info( Addr PC) = 0;
+    virtual void bp_update_init( BPInterface& bp_update, bool is_taken, Addr branch_ip, Addr target) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -84,22 +87,42 @@ public:
     }
 
     /* update */
-    void update( bool is_taken,
-                 Addr branch_ip,
-                 Addr target) final
+    void update( BPInterface& bp_update) final
     {
-        const auto set = tags.set( branch_ip);
-        auto[ is_hit, way] = tags.read( branch_ip);
+        const auto set = tags.set( bp_update.branch_ip);
+        auto[ is_hit, way] = tags.read( bp_update.branch_ip);
 
         if ( !is_hit) { // miss
-            way = tags.write( branch_ip); // add new entry to cache
+            way = tags.write( bp_update.branch_ip); // add new entry to cache
             auto& entry = data[ way][ set];
             entry.reset();
-            entry.update_target( target);
+            entry.update_target( bp_update.target);
         }
 
-        data[ way][ set].update( is_taken, target);
+        data[ way][ set].update( bp_update.is_taken, bp_update.target);
     }
+
+    /* getting BP unit information */
+    BPInterface get_bp_info( Addr PC) final 
+    {
+        BPInterface bp_info;
+        bp_info.is_taken = is_taken( PC);
+        bp_info.target = get_target( PC);
+        bp_info.branch_ip = PC;
+        return bp_info;
+    }
+
+    /* BP update initialization */
+    void bp_update_init( BPInterface& bp_update, 
+                        bool is_taken,
+                        Addr branch_ip, 
+                        Addr target) final 
+    {
+        bp_update.is_taken = is_taken;
+        bp_update.branch_ip = branch_ip;
+        bp_update.target = target;
+    }
+
 };
 
 

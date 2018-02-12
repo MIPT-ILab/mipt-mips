@@ -460,6 +460,9 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
         disasm = oss.str();
 }
 
+MIPSInstr::MIPSInstr( uint32 bytes, const BPInterface& bp_info) :
+          MIPSInstr( bytes, bp_info.branch_ip, bp_info.is_taken, bp_info.target) { }
+
 void MIPSInstr::execute_unknown()
 {
     std::cerr << "ERROR.Incorrect instruction: " << disasm << std::endl;
