@@ -67,13 +67,8 @@ typename PerfSim<ISA>::FuncInstr PerfSim<ISA>::read_instr(Cycle cycle)
         rp_fetch_2_decode->ignore( cycle);
         return rp_decode_2_decode->read( cycle);
     }
-    const auto& bp_info = rp_fetch_2_decode->read( cycle);
-    FuncInstr instr( bp_info.raw,
-        bp_info.PC,
-        bp_info.predicted_taken,
-        bp_info.predicted_target);
-    return instr;
-
+    const auto& fe_info = rp_fetch_2_decode->read( cycle);
+    return FuncInstr( fe_info.raw, fe_info.bp_info);
 }
 
 template<typename ISA>
@@ -145,20 +140,18 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     data.raw = memory->fetch( PC);
 
     /* saving predictions and updating PC according to them */
-    data.PC = PC;
-    data.predicted_taken = bp->is_taken( PC);
-    data.predicted_target = bp->get_target( PC);
+    data.bp_info = bp->get_bp_info( PC);
 
-    if( rp_memory_2_fetch->is_ready( cycle)) 
+    if ( rp_memory_2_fetch->is_ready( cycle)) 
     {
         /* creating structure to update BP unit */
-        BPInterface bp_info = rp_memory_2_fetch->read( cycle);
-        bp->update( bp_info.is_taken, bp_info.branch_ip, bp_info.target);
+        BPInterface bp_upd = rp_memory_2_fetch->read( cycle);
+        bp->update( bp_upd.is_taken, bp_upd.pc, bp_upd.target);
     }    
 
 
     /* updating PC according to prediction */
-    new_PC = data.predicted_target;
+    new_PC = data.bp_info.target;
 
     /* sending to decode */
     wp_fetch_2_decode->write( data, cycle);
@@ -287,7 +280,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
         /* acquiring real information for BPU */
         bp_info.is_taken = instr.is_jump_taken();
-        bp_info.branch_ip = instr.get_PC();
+        bp_info.pc = instr.get_PC();
         bp_info.target = instr.get_new_PC();
         wp_memory_2_fetch->write( bp_info, cycle);
         

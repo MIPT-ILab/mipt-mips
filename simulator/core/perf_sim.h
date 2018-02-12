@@ -28,10 +28,8 @@ private:
 
     /* the struture of data sent from fetch to decode stage */
     struct IfIdData {
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
-        Addr PC = NO_VAL32;               // current PC
         uint32 raw = NO_VAL32;            // fetched instruction code
+        BPInterface bp_info = {};
     };
 
     /* simulator units */

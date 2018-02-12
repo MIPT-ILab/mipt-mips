@@ -17,6 +17,7 @@
 #include <infra/types.h>
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
+#include <bpu/bp_interface.h>
 
 enum RegNum : uint8
 {
@@ -205,12 +206,11 @@ class MIPSInstr
         bool writes_dst = true;
 
         /* info for branch misprediction unit */
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
+	const BPInterface bp_data = {};
         bool _is_jump_taken = false;      // actual result
+        Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
-        Addr new_PC = NO_VAL32;
 
 #if 0
         std::string disasm = {};
@@ -326,9 +326,10 @@ class MIPSInstr
         MIPSInstr() = delete;
 
         explicit
-        MIPSInstr( uint32 bytes, Addr PC = 0,
-                   bool predicted_taken = false,
-                   Addr predicted_target = 0);
+        MIPSInstr( uint32 bytes, Addr PC = 0, const BPInterface& bp_info = BPInterface());
+
+        MIPSInstr( uint32 bytes, const BPInterface& bp_info)
+            : MIPSInstr( bytes, bp_info.pc, bp_info) { };
 
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const MIPSInstr& rhs) const {
@@ -349,7 +350,7 @@ class MIPSInstr
                                       operation == OUT_RI_BRANCH_0    ||
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
-        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
+        bool is_misprediction() const { return bp_data.is_taken != is_jump_taken() || bp_data.target != new_PC; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||

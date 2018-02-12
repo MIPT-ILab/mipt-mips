@@ -16,6 +16,7 @@
 #include <infra/log.h>
 #include <infra/types.h>
 
+#include "bp_interface.h"
 #include "bpentry.h"
 
 /*
@@ -28,6 +29,7 @@ class BaseBP
 public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
+    virtual BPInterface get_bp_info( Addr PC) = 0;
     virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
 
     BaseBP() = default;
@@ -99,6 +101,11 @@ public:
         }
 
         data[ way][ set].update( is_taken, target);
+    }
+
+    BPInterface get_bp_info( Addr PC) final
+    {
+        return BPInterface( PC, is_taken( PC), get_target( PC)); 
     }
 };
 
