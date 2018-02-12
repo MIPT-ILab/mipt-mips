@@ -145,8 +145,7 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     if ( rp_memory_2_fetch->is_ready( cycle)) 
     {
         /* creating structure to update BP unit */
-        BPInterface bp_upd = rp_memory_2_fetch->read( cycle);
-        bp->update( bp_upd.is_taken, bp_upd.pc, bp_upd.target);
+        bp->update( rp_memory_2_fetch->read( cycle));
     }    
 
 

@@ -30,7 +30,7 @@ public:
     virtual bool is_taken( Addr PC) = 0;
     virtual Addr get_target( Addr PC) = 0;
     virtual BPInterface get_bp_info( Addr PC) = 0;
-    virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
+    virtual void update( const BPInterface& bp_upd) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -86,21 +86,19 @@ public:
     }
 
     /* update */
-    void update( bool is_taken,
-                 Addr branch_ip,
-                 Addr target) final
+    void update( const BPInterface& bp_upd) final
     {
-        const auto set = tags.set( branch_ip);
-        auto[ is_hit, way] = tags.read( branch_ip);
+        const auto set = tags.set( bp_upd.pc);
+        auto[ is_hit, way] = tags.read( bp_upd.pc);
 
         if ( !is_hit) { // miss
-            way = tags.write( branch_ip); // add new entry to cache
+            way = tags.write( bp_upd.pc); // add new entry to cache
             auto& entry = data[ way][ set];
             entry.reset();
-            entry.update_target( target);
+            entry.update_target( bp_upd.target);
         }
 
-        data[ way][ set].update( is_taken, target);
+        data[ way][ set].update( bp_upd.is_taken, bp_upd.target);
     }
 
     BPInterface get_bp_info( Addr PC) final
