@@ -13,7 +13,7 @@ template <typename FuncInstr>
 class PerfInstr : public FuncInstr
 {
     /* info for branch misprediction unit */
-	const BPInterface bp_data = {};
+    const BPInterface bp_data = {};
 public:
     PerfInstr( const FuncInstr& instr, const BPInterface& bp_info) : FuncInstr( instr), bp_data( bp_info) { }
 
