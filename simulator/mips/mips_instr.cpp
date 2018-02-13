@@ -521,3 +521,4 @@ void MIPSInstr::check_trap()
         disasm += oss.str();
     }
 }
+
