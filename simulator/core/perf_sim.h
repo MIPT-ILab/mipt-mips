@@ -44,6 +44,7 @@ private:
     /* all ports */
     std::unique_ptr<WritePort<Instr>> wp_fetch_2_decode = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_fetch_2_decode = nullptr;
+
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
 

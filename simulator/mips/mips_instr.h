@@ -373,6 +373,9 @@ class MIPSInstr
 
         void execute();
         void check_trap();
+
+        void set_bp_info( const BPInterface& v) { bp_data = v; }
+        BPInterface get_bp_upd() const { return BPInterface( get_PC(), is_jump_taken(), get_new_PC()); }
 };
 
 static inline std::ostream& operator<<( std::ostream& out, const MIPSInstr& instr)
