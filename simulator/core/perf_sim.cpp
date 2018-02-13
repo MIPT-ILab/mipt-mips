@@ -23,22 +23,22 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = make_write_port<FuncInstr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_fetch_2_decode = make_read_port<FuncInstr>("FETCH_2_DECODE", PORT_LATENCY);
+    wp_fetch_2_decode = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
     rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
-    wp_decode_2_decode = make_write_port<FuncInstr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_decode_2_decode = make_read_port<FuncInstr>("DECODE_2_DECODE", PORT_LATENCY);
+    wp_decode_2_decode = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_decode = make_read_port<Instr>("DECODE_2_DECODE", PORT_LATENCY);
 
-    wp_decode_2_execute = make_write_port<FuncInstr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
-    rp_decode_2_execute = make_read_port<FuncInstr>("DECODE_2_EXECUTE", PORT_LATENCY);
+    wp_decode_2_execute = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
-    wp_execute_2_memory = make_write_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
-    rp_execute_2_memory = make_read_port<FuncInstr>("EXECUTE_2_MEMORY", PORT_LATENCY);
+    wp_execute_2_memory = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    rp_execute_2_memory = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
 
-    wp_memory_2_writeback = make_write_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_memory_2_writeback = make_read_port<FuncInstr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
+    wp_memory_2_writeback = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    rp_memory_2_writeback = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
 
     /* branch misprediction unit ports */
     wp_memory_2_all_flush = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
@@ -60,7 +60,7 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 }
 
 template <typename ISA>
-typename PerfSim<ISA>::FuncInstr PerfSim<ISA>::read_instr(Cycle cycle)
+typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
 {
     if (rp_decode_2_decode->is_ready( cycle))
     {
@@ -113,7 +113,7 @@ void PerfSim<ISA>::run( const std::string& tr,
               << std::endl << "IPC:        " << ipc
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
-              << std::endl << "instr size: " << sizeof(FuncInstr) << " bytes"
+              << std::endl << "instr size: " << sizeof(Instr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
 }
@@ -132,8 +132,7 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
         PC = new_PC;
 
     /* fetching instruction */
-    auto instr = memory->fetch_instr( PC);
-    instr.set_bp_info( bp->get_bp_info( PC));
+    PerfInstr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 
     if ( rp_memory_2_bp->is_ready( cycle)) 
     {
@@ -310,7 +309,7 @@ void PerfSim<ISA>::clock_writeback( Cycle cycle)
         return;
     }
 
-    FuncInstr instr = rp_memory_2_writeback->read( cycle);
+    auto instr = rp_memory_2_writeback->read( cycle);
 
     /* perform writeback */
     rf->write_dst( instr);

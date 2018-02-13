@@ -216,9 +216,8 @@ std::string_view MIPSInstr::regTableName(RegNum reg) {
     return regTable.at(static_cast<size_t>( reg));
 }
 
-MIPSInstr::MIPSInstr( uint32 bytes, Addr PC, const BPInterface& bp_info) :
+MIPSInstr::MIPSInstr( uint32 bytes, Addr PC) :
     instr( bytes),
-    bp_data( bp_info),
     new_PC( PC + 4),
     PC( PC)
 {
