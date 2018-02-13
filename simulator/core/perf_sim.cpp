@@ -133,7 +133,7 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
         PC = new_PC;
 
     /* fetching instruction */
-    PerfInstr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
+    Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 
     if ( rp_memory_2_bp->is_ready( cycle)) 
     {
