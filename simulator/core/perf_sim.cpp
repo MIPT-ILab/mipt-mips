@@ -23,8 +23,8 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = make_write_port<IfIdData>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_fetch_2_decode = make_read_port<IfIdData>("FETCH_2_DECODE", PORT_LATENCY);
+    wp_fetch_2_decode = make_write_port<FuncInstr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    rp_fetch_2_decode = make_read_port<FuncInstr>("FETCH_2_DECODE", PORT_LATENCY);
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
     rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
@@ -67,8 +67,7 @@ typename PerfSim<ISA>::FuncInstr PerfSim<ISA>::read_instr(Cycle cycle)
         rp_fetch_2_decode->ignore( cycle);
         return rp_decode_2_decode->read( cycle);
     }
-    const auto& fe_info = rp_fetch_2_decode->read( cycle);
-    return FuncInstr( fe_info.raw, fe_info.bp_info);
+    return rp_fetch_2_decode->read( cycle);
 }
 
 template<typename ISA>
@@ -132,15 +131,9 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     else if ( !is_stall)
         PC = new_PC;
 
-    /* creating structure to be sent to decode stage */
-    IfIdData data;
-
-
     /* fetching instruction */
-    data.raw = memory->fetch( PC);
-
-    /* saving predictions and updating PC according to them */
-    data.bp_info = bp->get_bp_info( PC);
+    auto instr = memory->fetch_instr( PC);
+    instr.set_bp_info( bp->get_bp_info( PC));
 
     if ( rp_memory_2_bp->is_ready( cycle)) 
     {
@@ -150,14 +143,14 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
 
 
     /* updating PC according to prediction */
-    new_PC = data.bp_info.target;
+    new_PC = instr.get_predicted_target();
 
     /* sending to decode */
-    wp_fetch_2_decode->write( data, cycle);
+    wp_fetch_2_decode->write( instr, cycle);
 
     /* log */
     sout << "fetch   cycle " << std::dec << cycle << ": 0x"
-         << std::hex << PC << ": 0x" << data.raw << std::endl;
+         << std::hex << PC << ": 0x" << instr << std::endl;
 }
 
 template <typename ISA> 

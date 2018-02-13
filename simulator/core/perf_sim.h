@@ -26,12 +26,6 @@ private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
-    /* the struture of data sent from fetch to decode stage */
-    struct IfIdData {
-        uint32 raw = NO_VAL32;            // fetched instruction code
-        BPInterface bp_info = {};
-    };
-
     /* simulator units */
     RF* rf = nullptr;
     Addr PC = NO_VAL32;
@@ -45,8 +39,8 @@ private:
     void check( const FuncInstr& instr);
 
     /* all ports */
-    std::unique_ptr<WritePort<IfIdData>> wp_fetch_2_decode = nullptr;
-    std::unique_ptr<ReadPort<IfIdData>> rp_fetch_2_decode = nullptr;
+    std::unique_ptr<WritePort<FuncInstr>> wp_fetch_2_decode = nullptr;
+    std::unique_ptr<ReadPort<FuncInstr>> rp_fetch_2_decode = nullptr;
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
 

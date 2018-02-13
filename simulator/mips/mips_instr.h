@@ -206,7 +206,7 @@ class MIPSInstr
         bool writes_dst = true;
 
         /* info for branch misprediction unit */
-	const BPInterface bp_data = {};
+	BPInterface bp_data = {};
         bool _is_jump_taken = false;      // actual result
         Addr new_PC = NO_VAL32;
 
@@ -351,6 +351,7 @@ class MIPSInstr
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
         bool is_misprediction() const { return bp_data.is_taken != is_jump_taken() || bp_data.target != new_PC; }
+        auto get_predicted_target() const { return bp_data.target; }
         bool is_load()  const { return operation == OUT_I_LOAD  ||
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
@@ -380,6 +381,7 @@ class MIPSInstr
         void execute();
         void check_trap();
 
+        void set_bp_info( const BPInterface& v) { bp_data = v; }
         BPInterface get_bp_upd() const { return BPInterface( get_PC(), is_jump_taken(), get_new_PC()); }
 };
 
