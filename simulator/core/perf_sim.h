@@ -72,8 +72,8 @@ private:
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
 
-    std::unique_ptr<WritePort<BPInterface>> wp_memory_2_fetch = nullptr;
-    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_fetch = nullptr;
+    std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);

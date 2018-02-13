@@ -50,8 +50,8 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
-    wp_memory_2_fetch = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
-    rp_memory_2_fetch = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
+    wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
+    rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
@@ -142,10 +142,10 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
     /* saving predictions and updating PC according to them */
     data.bp_info = bp->get_bp_info( PC);
 
-    if ( rp_memory_2_fetch->is_ready( cycle)) 
+    if ( rp_memory_2_bp->is_ready( cycle)) 
     {
         /* creating structure to update BP unit */
-        bp->update( rp_memory_2_fetch->read( cycle));
+        bp->update( rp_memory_2_bp->read( cycle));
     }    
 
 
@@ -276,7 +276,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
     if ( instr.is_jump()) {
         /* acquiring real information for BPU */
-        wp_memory_2_fetch->write( instr.get_bp_upd(), cycle);
+        wp_memory_2_bp->write( instr.get_bp_upd(), cycle);
         
         /* handle misprediction */
         if ( instr.is_misprediction())
