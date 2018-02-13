@@ -274,14 +274,9 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
     auto instr = rp_execute_2_memory->read( cycle);
 
-    if (instr.is_jump()) {
-        BPInterface bp_info;
-
+    if ( instr.is_jump()) {
         /* acquiring real information for BPU */
-        bp_info.is_taken = instr.is_jump_taken();
-        bp_info.pc = instr.get_PC();
-        bp_info.target = instr.get_new_PC();
-        wp_memory_2_fetch->write( bp_info, cycle);
+        wp_memory_2_fetch->write( instr.get_bp_upd(), cycle);
         
         /* handle misprediction */
         if ( instr.is_misprediction())
@@ -290,7 +285,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
             wp_memory_2_all_flush->write( true, cycle);
 
             /* sending valid PC to fetch stage */
-            wp_memory_2_fetch_target->write( bp_info.target, cycle);
+            wp_memory_2_fetch_target->write( instr.get_new_PC(), cycle);
 
             sout << "misprediction on ";
         }
