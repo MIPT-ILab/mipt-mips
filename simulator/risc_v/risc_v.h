@@ -9,11 +9,11 @@
 
 #include <infra/instrcache/instr_cache_memory.h>
 
-struct RISC_V
+struct RISCV
 {
-    // using FuncInstr = RISC_VInstr;
-    // using RF = RISC_VRF;
-    // using Memory = InstrMemory<RISC_VInstr>;
+    // using FuncInstr = RISCVInstr;
+    // using RF = RISCVRF;
+    // using Memory = InstrMemory<RISCVInstr>;
 };
 
 #endif // RISC_V_H_
