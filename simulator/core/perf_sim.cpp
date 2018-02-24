@@ -11,6 +11,7 @@ static constexpr const Latency PORT_LATENCY = 1_Lt;
 static constexpr const uint32 PORT_FANOUT = 1;
 static constexpr const uint32 PORT_BW = 1;
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
+static constexpr const uint32 SRC_REGISTERS_NUM = 2;
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
@@ -54,6 +55,24 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
     rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
+    wp_execute_2_execute_forward = make_write_port<uint64>("EXECUTE_2_EXECUTE_FORWARD", PORT_BW, SRC_REGISTERS_NUM);
+    rp_execute_2_execute_src1_forward = make_read_port<uint64>("EXECUTE_2_EXECUTE_FORWARD", PORT_LATENCY);
+    rp_execute_2_execute_src2_forward = make_read_port<uint64>("EXECUTE_2_EXECUTE_FORWARD", PORT_LATENCY);
+
+    wp_memory_2_execute_forward = make_write_port<uint64>("MEMORY_2_EXECUTE_FORWARD", PORT_BW, SRC_REGISTERS_NUM);
+    rp_memory_2_execute_src1_forward = make_read_port<uint64>("MEMORY_2_EXECUTE_FORWARD", PORT_LATENCY);
+    rp_memory_2_execute_src2_forward = make_read_port<uint64>("MEMORY_2_EXECUTE_FORWARD", PORT_LATENCY);
+
+    wp_decode_2_execute_src1_command = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND", 
+                                                                                  PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute_src1_command = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+                                                                                  PORT_LATENCY);
+
+    wp_decode_2_execute_src2_command = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND", 
+                                                                                  PORT_BW, PORT_FANOUT);
+    rp_decode_2_execute_src2_command = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+                                                                                  PORT_LATENCY);
+
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 
@@ -83,6 +102,8 @@ void PerfSim<ISA>::run( const std::string& tr,
     checker.init( tr);
 
     new_PC = memory->startPC();
+
+    data_bypass = new DataBypass();
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -180,22 +201,43 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
 
     auto instr = read_instr( cycle);
 
-    /* TODO: replace all this code by introducing Forwarding unit */
-    if( rf->check_sources( instr))
-    {
-        rf->read_sources( &instr);
 
-        wp_decode_2_execute->write( instr, cycle);
-
-        /* log */
-        sout << instr << std::endl;
-    }
-    else // data hazard, stalling pipeline
-    {
+    const auto src1_reg_num = instr.get_src1_num();
+    const auto src2_reg_num = instr.get_src2_num(); 
+    
+    if ( (!data_bypass->is_in_RF( src1_reg_num) && !data_bypass->is_bypassible( src1_reg_num)) ||
+         (!data_bypass->is_in_RF( src2_reg_num) && !data_bypass->is_bypassible( src2_reg_num)))
+    {   
+        // data hazard, stalling pipeline
         wp_decode_2_fetch_stall->write( true, cycle);
         wp_decode_2_decode->write( instr, cycle);
         sout << instr << " (data hazard)\n";
+        return;   
     }
+
+    if ( data_bypass->is_in_RF( src1_reg_num))
+        rf->read_source_1( &instr);
+    else if ( data_bypass->is_bypassible( src1_reg_num))
+    {
+        const auto bypass_command = data_bypass->get_bypass_command( src1_reg_num);
+        wp_decode_2_execute_src1_command->write( bypass_command, cycle);
+    }
+
+    if ( data_bypass->is_in_RF( src2_reg_num))
+        rf->read_source_2( &instr);
+    else if ( data_bypass->is_bypassible( src2_reg_num))
+    {
+        const auto bypass_command = data_bypass->get_bypass_command( src2_reg_num);
+        wp_decode_2_execute_src2_command->write( bypass_command, cycle);
+    }
+
+
+    data_bypass->update( instr, cycle, DataBypass::RegisterStage::EXECUTE);
+    
+    wp_decode_2_execute->write( instr, cycle);
+
+    /* log */
+    sout << instr << std::endl;
 }
 
 template <typename ISA>
@@ -213,8 +255,17 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
         if ( rp_decode_2_execute->is_ready( cycle))
         {
             const auto& instr = rp_decode_2_execute->read( cycle);
-            rf->cancel( instr);
+            data_bypass->cancel( instr);
         }
+
+        rp_decode_2_execute_src1_command->ignore( cycle);
+        rp_decode_2_execute_src2_command->ignore( cycle);
+        
+        rp_execute_2_execute_src1_forward->ignore( cycle);
+        rp_memory_2_execute_src1_forward->ignore( cycle);
+        rp_execute_2_execute_src2_forward->ignore( cycle);
+        rp_memory_2_execute_src2_forward->ignore( cycle);
+        
         sout << "flush\n";
         return;
     }
@@ -222,14 +273,86 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     /* check if there is something to process */
     if ( !rp_decode_2_execute->is_ready( cycle))
     {
+        rp_execute_2_execute_src1_forward->ignore( cycle);
+        rp_memory_2_execute_src1_forward->ignore( cycle);
+        rp_execute_2_execute_src2_forward->ignore( cycle);
+        rp_memory_2_execute_src2_forward->ignore( cycle);
+        
         sout << "bubble\n";
         return;
     }
 
     auto instr = rp_decode_2_execute->read( cycle);
 
+
+    if ( rp_decode_2_execute_src1_command->is_ready( cycle))
+    {
+        const auto bypass_command = rp_decode_2_execute_src1_command->read( cycle);
+        uint64 value = 0;
+
+        if ( bypass_command.direction == DataBypass::BypassCommand::Direction::GET_FROM_EXECUTE)
+        {
+            value = rp_execute_2_execute_src1_forward->read( cycle);
+            rp_memory_2_execute_src1_forward->ignore( cycle);
+        }
+        if ( bypass_command.direction == DataBypass::BypassCommand::Direction::GET_FROM_MEMORY)
+        {
+            value = rp_memory_2_execute_src1_forward->read( cycle);
+            rp_execute_2_execute_src1_forward->ignore( cycle);
+        }
+
+        switch( bypass_command.specifier)
+        {
+            case DataBypass::BypassCommand::Specifier::GET_REGULAR:
+            case DataBypass::BypassCommand::Specifier::GET_LO:
+                instr.set_v_src1( value);
+                break;
+
+            case DataBypass::BypassCommand::Specifier::GET_HI:
+                instr.set_v_src1( value >> 32);
+                break;
+        }
+    }
+    else
+    {
+        rp_execute_2_execute_src1_forward->ignore( cycle);
+        rp_memory_2_execute_src1_forward->ignore( cycle);
+    }
+
+
+    if ( rp_decode_2_execute_src2_command->is_ready( cycle))
+    {
+        const auto bypass_command = rp_decode_2_execute_src2_command->read( cycle);
+        uint64 value = 0;
+
+        if ( bypass_command.direction == DataBypass::BypassCommand::Direction::GET_FROM_EXECUTE)
+        {
+            value = rp_execute_2_execute_src2_forward->read( cycle);
+            rp_memory_2_execute_src2_forward->ignore( cycle);
+        }
+        if ( bypass_command.direction == DataBypass::BypassCommand::Direction::GET_FROM_MEMORY)
+        {
+            value = rp_memory_2_execute_src2_forward->read( cycle);
+            rp_execute_2_execute_src2_forward->ignore( cycle);
+        }
+
+        assert( bypass_command.specifier == DataBypass::BypassCommand::Specifier::GET_REGULAR);
+
+        instr.set_v_src2( value);
+    }
+    else
+    {
+        rp_execute_2_execute_src2_forward->ignore( cycle);
+        rp_memory_2_execute_src2_forward->ignore( cycle);
+    }
+    
+
     /* preform execution */
     instr.execute();
+
+    wp_execute_2_execute_forward->write( instr.get_v_dst(), cycle);
+    
+    data_bypass->update( instr, cycle, DataBypass::RegisterStage::MEMORY);
 
     wp_execute_2_memory->write( instr, cycle);
 
@@ -252,7 +375,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
         if ( rp_execute_2_memory->is_ready( cycle))
         {
             const auto& instr = rp_execute_2_memory->read( cycle);
-            rf->cancel( instr);
+            data_bypass->cancel( instr);
         }
         sout << "flush\n";
         return;
@@ -279,13 +402,16 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
             /* sending valid PC to fetch stage */
             wp_memory_2_fetch_target->write( instr.get_new_PC(), cycle);
-
             sout << "misprediction on ";
         }
     }
 
     /* perform required loads and stores */
     memory->load_store( &instr);
+    
+    wp_memory_2_execute_forward->write( instr.get_v_dst(), cycle);
+
+    data_bypass->update( instr, cycle, DataBypass::RegisterStage::WRITEBACK);
 
     wp_memory_2_writeback->write( instr, cycle);
 
@@ -317,6 +443,8 @@ void PerfSim<ISA>::clock_writeback( Cycle cycle)
 
     /* check for traps */
     instr.check_trap();
+
+    data_bypass->update( instr, cycle, DataBypass::RegisterStage::IN_RF);
 
     /* log */
     sout << instr << std::endl;

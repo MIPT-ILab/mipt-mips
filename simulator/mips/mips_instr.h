@@ -354,6 +354,12 @@ class MIPSInstr
                                        operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
 
+        bool is_conditional_move() const { return  instr.asR.opcode == 0x0 && 
+                                                  (instr.asR.funct == 0xA || 
+                                                   instr.asR.funct == 0xB); }
+        
+        bool is_div_mult() const { return operation == OUT_R_DIVMULT; } 
+
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
         bool get_writes_dst() const { return writes_dst; }

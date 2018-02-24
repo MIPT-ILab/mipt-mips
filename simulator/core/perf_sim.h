@@ -12,6 +12,7 @@
 
 #include <simulator.h>
 #include <infra/ports/ports.h>
+#include <infra/bypass/data_bypass.h>
 #include <bpu/bp_interface.h>
 #include <bpu/bpu.h>
 #include <func_sim/func_sim.h>
@@ -35,6 +36,7 @@ private:
     Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
+    DataBypass* data_bypass = nullptr;
 
     /* MIPS functional simulator for internal checks */
 
@@ -71,6 +73,20 @@ private:
 
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
     std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
+
+    std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_forward = nullptr;
+    std::unique_ptr<ReadPort<uint64>> rp_execute_2_execute_src1_forward = nullptr;
+    std::unique_ptr<ReadPort<uint64>> rp_execute_2_execute_src2_forward = nullptr;
+
+    std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_forward = nullptr;
+    std::unique_ptr<ReadPort<uint64>> rp_memory_2_execute_src1_forward = nullptr;
+    std::unique_ptr<ReadPort<uint64>> rp_memory_2_execute_src2_forward = nullptr;
+
+    std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src1_command = nullptr;
+    std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src1_command = nullptr;
+
+    std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src2_command = nullptr;
+    std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src2_command = nullptr;
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);
