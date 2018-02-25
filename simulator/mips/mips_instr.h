@@ -358,6 +358,8 @@ class MIPSInstr
 
         bool get_writes_dst() const { return writes_dst; }
 
+        bool is_bubble() const { return is_nop() && PC == 0; }
+
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 

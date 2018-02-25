@@ -51,6 +51,12 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
+    wp_target = make_write_port<Addr>("TARGET", PORT_BW, PORT_FANOUT);
+    rp_target = make_read_port<Addr>("TARGET", PORT_LATENCY);
+
+    wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    rp_core_2_fetch_target = make_read_port<Addr>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
     rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
@@ -59,6 +65,35 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 
     init_ports();
 }
+
+template <typename ISA>
+Addr PerfSim<ISA>::get_PC( Cycle cycle) 
+{
+    /* receive flush and stall signals */
+
+    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
+    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
+    
+    if(rp_core_2_fetch_target->is_ready( cycle)) 
+        return rp_core_2_fetch_target->read(cycle);
+    
+    if ( is_flush)
+        return rp_memory_2_fetch_target->read( cycle);
+    else if ( !is_stall)
+        if(rp_target->is_ready( cycle))
+            return rp_target->read( cycle);
+    
+    return 0;
+}
+
+template <typename ISA>
+typename PerfSim<ISA>::Instr PerfSim<ISA>::get_instr( Addr PC)
+{
+    if(PC != 0) 
+        return Instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
+    return  Instr( FuncInstr(0x0u),  bp->get_bp_info( PC));
+}
+
 
 template <typename ISA>
 typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
@@ -82,7 +117,7 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     checker.init( tr);
 
-    new_PC = memory->startPC();
+    wp_core_2_fetch_target->write( memory->startPC(), cycle);
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -122,19 +157,8 @@ void PerfSim<ISA>::run( const std::string& tr,
 template <typename ISA>
 void PerfSim<ISA>::clock_fetch( Cycle cycle)
 {
-    /* receive flush and stall signals */
-    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
-    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
-
-    /* updating PC */
-    if ( is_flush)
-        PC = rp_memory_2_fetch_target->read( cycle); // fixing PC
-    else if ( !is_stall)
-        PC = new_PC;
 
     /* fetching instruction */
-    Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
-
     if ( rp_memory_2_bp->is_ready( cycle)) 
     {
         /* creating structure to update BP unit */
@@ -143,9 +167,10 @@ void PerfSim<ISA>::clock_fetch( Cycle cycle)
 
 
     /* updating PC according to prediction */
-    new_PC = instr.get_predicted_target();
+    auto PC = get_PC( cycle);
 
     /* sending to decode */
+    auto instr = get_instr( PC);
     wp_fetch_2_decode->write( instr, cycle);
 
     /* log */
@@ -314,6 +339,13 @@ void PerfSim<ISA>::clock_writeback( Cycle cycle)
 
     /* perform writeback */
     rf->write_dst( instr);
+
+    /* check for bubble */
+    if(instr.is_bubble())
+    {
+        ++executed_instrs;
+        return;
+    }
 
     /* check for traps */
     instr.check_trap();
