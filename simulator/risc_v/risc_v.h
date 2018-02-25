@@ -7,9 +7,13 @@
 #ifndef RISC_V_H_
 #define RISC_V_H_
 
-struct RISC_V
-{
+#include <infra/instrcache/instr_cache_memory.h>
 
+struct RISCV
+{
+    // using FuncInstr = RISCVInstr;
+    // using RF = RISCVRF;
+    // using Memory = InstrMemory<RISCVInstr>;
 };
 
 #endif // RISC_V_H_
