@@ -6,13 +6,14 @@
 #ifndef PERF_SIM_H
 #define PERF_SIM_H
 
+#include <array>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
 #include <simulator.h>
 #include <infra/ports/ports.h>
-#include <infra/bypass/data_bypass.h>
+#include <bypass/data_bypass.h>
 #include <bpu/bp_interface.h>
 #include <bpu/bpu.h>
 #include <func_sim/func_sim.h>
@@ -36,7 +37,7 @@ private:
     Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
-    DataBypass* data_bypass = nullptr;
+    std::unique_ptr<DataBypass> bypassing_unit = nullptr;
 
     /* MIPS functional simulator for internal checks */
 
@@ -74,13 +75,20 @@ private:
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
     std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
 
-    std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_forward = nullptr;
-    std::unique_ptr<ReadPort<uint64>> rp_execute_2_execute_src1_forward = nullptr;
-    std::unique_ptr<ReadPort<uint64>> rp_execute_2_execute_src2_forward = nullptr;
+    std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_bypass = nullptr;
+    std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_bypass = nullptr;
+    std::unique_ptr<WritePort<uint64>> wp_writeback_2_execute_bypass = nullptr;
 
-    std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_forward = nullptr;
-    std::unique_ptr<ReadPort<uint64>> rp_memory_2_execute_src1_forward = nullptr;
-    std::unique_ptr<ReadPort<uint64>> rp_memory_2_execute_src2_forward = nullptr;
+    static constexpr const std::size_t BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
+    std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src1_bypass;
+    std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src2_bypass;
+
+    static constexpr const uint32 BU_NOTIFYING_STAGES_NUM = 4;
+    std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;
+    std::unique_ptr<WritePort<Instr>> wp_execute_2_bypassing_unit = nullptr;
+    std::unique_ptr<WritePort<Instr>> wp_memory_2_bypassing_unit = nullptr;
+    std::unique_ptr<WritePort<Instr>> wp_writeback_2_bypassing_unit = nullptr;
+    std::array<std::unique_ptr<ReadPort<Instr>>, BU_NOTIFYING_STAGES_NUM> rps_stages_2_bypassing_unit;
 
     std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src1_command = nullptr;
     std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src1_command = nullptr;

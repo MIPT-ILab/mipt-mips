@@ -1,5 +1,5 @@
 /**
- * data_bypass.cpp - Implementation of DataBypass class
+ * data_bypass.cpp - Implementation of forwarding unit
  * 
  * @author Denis Los
  * Copyright 2018 MIPT-MIPS Project
@@ -12,47 +12,46 @@
 #include <mips/mips_instr.h>
 #include <infra/ports/timing.h>
 
-#include <iostream>
+
 void DataBypass::update_register_info( const MIPSInstr& instr, RegNum num,
                                        const Cycle& cycle,
-                                       DataBypass::RegisterStage next_dst_stage)
+                                       DataBypass::RegisterStage new_dst_stage)
 {
     auto& entry = scoreboard.get_entry( num);
 
-    if ( next_dst_stage == DataBypass::RegisterStage::EXECUTE)
+    if ( new_dst_stage == 0_RSG)
     {
-        entry.master_instr_hash_cycle = cycle;
+        entry.first_execute_stage_cycle = cycle;
         entry.is_bypassible = false;
         
-        if ( instr.is_div_mult())
+        if ( instr.get_dst_num() == REG_NUM_HI_LO)
         {
             is_HI_master_DIVMULT = true;
-            is_LO_master_DIVMULT = true;
         }
         else if ( num == REG_NUM_HI)
+        {
             is_HI_master_DIVMULT = false;
-        else if ( num == REG_NUM_LO)
-            is_LO_master_DIVMULT = false;
+        }
 
         if ( instr.is_conditional_move())
-            entry.ready_stage = DataBypass::RegisterStage::IN_RF;
+            entry.ready_stage = DataBypass::RegisterStage::in_RF();
         else
-            entry.ready_stage = instr.is_load() ? DataBypass::RegisterStage::MEMORY
-                                                : DataBypass::RegisterStage::EXECUTE;
+            entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
+                                                : 0_RSG; // EXECUTE
     }
-    else if ( entry.master_instr_hash_cycle != eval_instr_hash_cycle( cycle, next_dst_stage))
+    else if ( entry.first_execute_stage_cycle + new_dst_stage.get_latency_from_first_execute_stage() != cycle)
         return;
 
-    entry.current_stage = next_dst_stage;
+    entry.current_stage = new_dst_stage;
 
     if ( entry.current_stage == entry.ready_stage)
-        entry.is_bypassible = true;    
+        entry.is_bypassible = true;
 }
 
 
 
 void DataBypass::update( const MIPSInstr& instr, const Cycle& cycle, 
-                         DataBypass::RegisterStage next_dst_stage)
+                         DataBypass::RegisterStage new_dst_stage)
 {
     auto dst_reg_num = instr.get_dst_num();
 
@@ -61,12 +60,12 @@ void DataBypass::update( const MIPSInstr& instr, const Cycle& cycle,
 
     if ( dst_reg_num == REG_NUM_HI_LO)
     {
-        update_register_info( instr, REG_NUM_LO, cycle, next_dst_stage);
-        update_register_info( instr, REG_NUM_HI, cycle, next_dst_stage);
+        update_register_info( instr, REG_NUM_LO, cycle, new_dst_stage);
+        update_register_info( instr, REG_NUM_HI, cycle, new_dst_stage);
         return;
     }    
     
-    update_register_info( instr, dst_reg_num, cycle, next_dst_stage);
+    update_register_info( instr, dst_reg_num, cycle, new_dst_stage);
 }
 
 
