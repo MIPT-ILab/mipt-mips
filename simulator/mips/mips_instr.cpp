@@ -35,8 +35,8 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
 
     // Conditional moves (MIPS IV)
     //key      name    operation  memsize           pointer
-    {0xA,  { "movz", OUT_R_ARITHM, 0, &MIPSInstr::execute_movz, 4} },
-    {0xB,  { "movn", OUT_R_ARITHM, 0, &MIPSInstr::execute_movn, 4} },
+    {0xA,  { "movz", OUT_R_CONDM, 0, &MIPSInstr::execute_movz, 4} },
+    {0xB,  { "movn", OUT_R_CONDM, 0, &MIPSInstr::execute_movn, 4} },
 
     // System calls
     //key      name     operation  memsize           pointer
@@ -302,6 +302,7 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
                 << ", $" << regTableName(src2);
             break;
         case OUT_R_ARITHM:
+        case OUT_R_CONDM:
             src2 = static_cast<RegNum>(instr.asR.rt);
             src1 = static_cast<RegNum>(instr.asR.rs);
             dst  = static_cast<RegNum>(instr.asR.rd);
