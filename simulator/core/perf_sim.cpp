@@ -549,8 +549,7 @@ void PerfSim<ISA>::check( const FuncInstr& instr)
     const auto func_dump = checker.step();
 
     if ( func_dump.Dump() != instr.Dump())
-        serr << "****************************" << std::endl
-             << "Mismatch: " << std::endl
+        serr << "Mismatch: " << std::endl
              << "Checker output: " << func_dump    << std::endl
              << "PerfSim output: " << instr.Dump() << std::endl
              << critical;

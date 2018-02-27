@@ -40,7 +40,7 @@ for %%G in (infra\cache infra\elf_parser infra\config infra\memory infra\ports i
        /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest ^
        /D_HAS_AUTO_PTR_ETC=1 ^
        /std:c++17 ^
-       /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" /MD || exit /b
+       /DTEST_PATH=\"%TRUNKX%\\..\\traces\" /MD || exit /b
     .\test.exe || exit /b
     cd %TRUNK%
 )
