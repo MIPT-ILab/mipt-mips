@@ -16,6 +16,7 @@ public:
     explicit Simulator( bool log = false) : Log( log) {}
 
     virtual void run(const std::string& tr, uint64 instrs_to_run) = 0;
+    virtual void set_PC(Addr value) = 0;
 
     static std::unique_ptr<Simulator> create_simulator(const std::string& isa, bool functional_only, bool log);
 };

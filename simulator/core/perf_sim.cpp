@@ -52,6 +52,15 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
+    wp_target = make_write_port<Addr>("TARGET", PORT_BW, PORT_FANOUT);
+    rp_target = make_read_port<Addr>("TARGET", PORT_LATENCY);
+
+    wp_hold_pc = make_write_port<Addr>("HOLD_PC", PORT_BW, PORT_FANOUT);
+    rp_hold_pc = make_read_port<Addr>("HOLD_PC", PORT_LATENCY);
+
+    wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    rp_core_2_fetch_target = make_read_port<Addr>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
     rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
@@ -87,7 +96,36 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 }
 
 template <typename ISA>
-typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
+Addr PerfSim<ISA>::get_PC( Cycle cycle) 
+{
+    /* receive flush and stall signals */
+    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
+    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
+
+    /* Receive all possible PC */
+    const Addr external_PC = rp_core_2_fetch_target->is_ready( cycle) ? rp_core_2_fetch_target->read( cycle) : 0;
+    const Addr hold_PC     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : 0;
+    const Addr flushed_PC  = rp_memory_2_fetch_target->is_ready( cycle) ? rp_memory_2_fetch_target->read( cycle) : 0;
+    const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
+
+    /* Multiplexing */
+    if ( external_PC)
+        return external_PC;
+
+    if ( is_flush)
+        return flushed_PC;
+
+    if ( !is_stall)
+        return target_PC;
+
+    if ( hold_PC)
+        return hold_PC;
+
+    return 0;
+}
+
+template <typename ISA>
+typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr( Cycle cycle)
 {
     if (rp_decode_2_decode->is_ready( cycle))
     {
@@ -97,18 +135,24 @@ typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
     return rp_fetch_2_decode->read( cycle);
 }
 
+template <typename ISA>
+void PerfSim<ISA>::set_PC( Addr value)
+{
+    wp_core_2_fetch_target->write( value, curr_cycle);
+    checker.set_PC( value);
+}
+
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
-    Cycle cycle = 0_Cl;
 
     memory = new Memory( tr);
 
     checker.init( tr);
-
-    new_PC = memory->startPC();
+    
+    set_PC( memory->startPC());
 
     bypassing_unit = std::make_unique<DataBypass>();
 
@@ -116,29 +160,29 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     while (executed_instrs < instrs_to_run)
     {
-        clock_writeback( cycle);
-        clock_fetch( cycle);
-        clock_decode( cycle);
-        clock_execute( cycle);
-        clock_memory( cycle);
-        cycle.inc();
+        clock_writeback( curr_cycle);
+        clock_fetch( curr_cycle);
+        clock_decode( curr_cycle);
+        clock_execute( curr_cycle);
+        clock_memory( curr_cycle);
+        curr_cycle.inc();
 
         sout << "Executed instructions: " << executed_instrs
              << std::endl << std::endl;
 
-        check_ports( cycle);
+        check_ports( curr_cycle);
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
 
     auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-    auto frequency = static_cast<double>( cycle) / time; // cycles per millisecond = kHz
-    auto ipc = 1.0 * executed_instrs / static_cast<double>( cycle);
+    auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
+    auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
-              << std::endl << "cycles:     " << cycle
+              << std::endl << "cycles:     " << curr_cycle
               << std::endl << "IPC:        " << ipc
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
@@ -150,28 +194,24 @@ void PerfSim<ISA>::run( const std::string& tr,
 template <typename ISA>
 void PerfSim<ISA>::clock_fetch( Cycle cycle)
 {
-    /* receive flush and stall signals */
-    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
-    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
+    /* Process BP updates */
+    if ( rp_memory_2_bp->is_ready( cycle))
+        bp->update( rp_memory_2_bp->read( cycle));
 
-    /* updating PC */
-    if ( is_flush)
-        PC = rp_memory_2_fetch_target->read( cycle); // fixing PC
-    else if ( !is_stall)
-        PC = new_PC;
+    /* getting PC */
+    auto PC = get_PC( cycle);
 
-    /* fetching instruction */
+    /* hold PC for the stall case */
+    wp_hold_pc->write( PC, cycle);
+
+    /* ignore bubbles */
+    if( PC == 0)
+        return;
+
     Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 
-    if ( rp_memory_2_bp->is_ready( cycle)) 
-    {
-        /* creating structure to update BP unit */
-        bp->update( rp_memory_2_bp->read( cycle));
-    }    
-
-
     /* updating PC according to prediction */
-    new_PC = instr.get_predicted_target();
+    wp_target->write( instr.get_predicted_target(), cycle);
 
     /* sending to decode */
     wp_fetch_2_decode->write( instr, cycle);
@@ -457,6 +497,10 @@ void PerfSim<ISA>::clock_writeback( Cycle cycle)
 
     /* perform writeback */
     rf->write_dst( instr);
+
+    /* check for bubble */
+    if(instr.is_bubble())
+        return;
 
     /* check for traps */
     instr.check_trap();
