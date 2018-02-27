@@ -33,8 +33,6 @@ private:
 
     /* simulator units */
     RF* rf = nullptr;
-    Addr PC = NO_VAL32;
-    Addr new_PC = NO_VAL32;
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<DataBypass> bypassing_unit = nullptr;
@@ -72,6 +70,15 @@ private:
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
 
+    std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_target = nullptr;
+
+    std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_core_2_fetch_target = nullptr;
+
+    std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_hold_pc = nullptr;
+
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
     std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
 
@@ -103,6 +110,7 @@ private:
     void clock_memory( Cycle cycle);
     void clock_writeback( Cycle cycle);
     Instr read_instr( Cycle cycle);
+    Addr get_PC( Cycle cycle);
 
 public:
     explicit PerfSim( bool log);
