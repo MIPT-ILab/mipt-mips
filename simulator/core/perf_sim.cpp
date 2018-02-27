@@ -108,7 +108,7 @@ Addr PerfSim<ISA>::get_PC( Cycle cycle)
     const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
 
     /* Multiplexing */
-    if ( external_PC)
+    if ( external_PC != 0)
         return external_PC;
 
     if ( is_flush)
@@ -117,7 +117,7 @@ Addr PerfSim<ISA>::get_PC( Cycle cycle)
     if ( !is_stall)
         return target_PC;
 
-    if ( hold_PC)
+    if ( hold_PC != 0)
         return hold_PC;
 
     return 0;
