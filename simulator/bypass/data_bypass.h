@@ -10,13 +10,13 @@
 #define DATA_BYPASS_H
 
 
+#include <set>
 #include <array>
 
 #include <mips/mips_instr.h>
-#include <infra/ports/timing.h>
 
 
-
+#include <iostream>
 class DataBypass
 {
     public:
@@ -30,21 +30,20 @@ class DataBypass
 
                 void inc() { ++value; }
 
-                constexpr auto get_latency_from_first_execute_stage() const { return Latency( value); }
-
-                static constexpr auto get_bypassing_stages_number() { return BYPASSING_STAGES_NUM; }
+                static constexpr std::size_t get_bypassing_stages_number() { return LAST_BYPASSING_STAGE + 1; }
+                static RegisterStage get_last_bypassing_stage() { return RegisterStage( LAST_BYPASSING_STAGE); }
                 static RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
 
             private:
-                uint8 value = 0;  // distance from first execute stage
-
+                uint8 value = 0;  // distance from execute stage
+                
                 // EXECUTE   - 0  | Bypassing stage
                 // MEMORY    - 1  | Bypassing stage
                 // WRITEBACK - 2  | Bypassing stage
-                // IN_RF     - 3
+                // IN_RF     - MAX_VAL8
 
-                static constexpr const uint8 IN_RF_STAGE_VALUE = 3;
-                static constexpr const std::size_t BYPASSING_STAGES_NUM = 3;
+                static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
+                static constexpr const uint8 LAST_BYPASSING_STAGE = 2;
         };
 
         class BypassCommand
@@ -69,7 +68,6 @@ class DataBypass
             RegisterStage current_stage = RegisterStage::in_RF();
             RegisterStage ready_stage = RegisterStage::in_RF();
             bool is_bypassible = false;
-            Cycle first_execute_stage_cycle = 0_Cl;
         };
 
 
@@ -95,22 +93,23 @@ class DataBypass
             return scoreboard.get_entry( num).current_stage;
         }
 
-        void update_register_info( const MIPSInstr& instr, RegNum num,
-                                   const Cycle& cycle,
-                                   RegisterStage new_dst_stage);
+        void trace_new_register( const MIPSInstr& instr, RegNum num);
 
-        void set_initial_state_to_reg_info( RegNum num)
+        void untrace_register( RegNum num)
         {
             auto& entry = scoreboard.get_entry( num);
+
             entry.current_stage = RegisterStage::in_RF();
-            entry.is_bypassible = false; 
+            entry.is_bypassible = false;
+            
+            traceable_registers.erase( num); 
         }
 
         Scoreboard scoreboard = {};
+        std::set<RegNum> traceable_registers = {};
 
-        /* gives the information whether bypassed data should be transformed
-           when bypassing is needed for HI register
-        */ 
+        // gives the information whether bypassed data should be transformed
+        // when bypassing is needed for HI register 
         bool is_HI_master_DIVMULT = false;
 
     public:
@@ -156,14 +155,15 @@ class DataBypass
             return adapted_data;
         }
 
-        void update( const MIPSInstr& instr, const Cycle& cycle, 
-                     RegisterStage new_dst_stage);
+        void trace_new_instr( const MIPSInstr& instr);
+
+        void update();
 
         void cancel( const MIPSInstr& instr);
 };
 
 
-inline auto operator""_RSG( unsigned long long int number)
+inline auto operator""_RSG( unsigned long long int number) // NOLINT https://bugs.llvm.org/show_bug.cgi?id=24840
 {
     return DataBypass::RegisterStage( static_cast<uint8>( number));
 }

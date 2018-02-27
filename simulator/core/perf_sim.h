@@ -83,18 +83,14 @@ private:
     std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src1_bypass;
     std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src2_bypass;
 
-    static constexpr const uint32 BU_NOTIFYING_STAGES_NUM = 4;
-    std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;
-    std::unique_ptr<WritePort<Instr>> wp_execute_2_bypassing_unit = nullptr;
-    std::unique_ptr<WritePort<Instr>> wp_memory_2_bypassing_unit = nullptr;
-    std::unique_ptr<WritePort<Instr>> wp_writeback_2_bypassing_unit = nullptr;
-    std::array<std::unique_ptr<ReadPort<Instr>>, BU_NOTIFYING_STAGES_NUM> rps_stages_2_bypassing_unit;
-
     std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src1_command = nullptr;
     std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src1_command = nullptr;
 
     std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src2_command = nullptr;
     std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src2_command = nullptr;
+
+    std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_decode_2_bypassing_unit = nullptr;
 
     /* main stages functions */
     void clock_fetch( Cycle cycle);

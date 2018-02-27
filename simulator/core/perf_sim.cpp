@@ -78,17 +78,8 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
                                                                                   PORT_LATENCY);
 
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
-    rps_stages_2_bypassing_unit[0] = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
+    rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
 
-    wp_execute_2_bypassing_unit = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
-    rps_stages_2_bypassing_unit[1] = make_read_port<Instr>("EXECUTE_2_BYPASSING_UNIT", PORT_LATENCY);
-    
-    wp_memory_2_bypassing_unit = make_write_port<Instr>("MEMORY_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
-    rps_stages_2_bypassing_unit[2] = make_read_port<Instr>("MEMORY_2_BYPASSING_UNIT", PORT_LATENCY);
-
-    wp_writeback_2_bypassing_unit = make_write_port<Instr>("WRITEBACK_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT); 
-    rps_stages_2_bypassing_unit[3] = make_read_port<Instr>("WRITEBACK_2_BYPASSING_UNIT", PORT_LATENCY);
-    
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 
@@ -198,18 +189,13 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
 
-    /* collect information and update bypassing unit */
-    DataBypass::RegisterStage current_stage_of_communication = 0_RSG;
+    /* update bypassing unit */
+    bypassing_unit->update();
 
-    for ( auto& port:rps_stages_2_bypassing_unit)
+    if ( rp_decode_2_bypassing_unit->is_ready( cycle))
     {
-        if ( port->is_ready( cycle))
-        {
-            const auto instr = port->read( cycle);
-            bypassing_unit->update( instr, cycle, current_stage_of_communication); 
-        }
-
-        current_stage_of_communication.inc();
+        auto instr = rp_decode_2_bypassing_unit->read( cycle);
+        bypassing_unit->trace_new_instr( instr);
     }
 
     /* branch misprediction */
@@ -263,9 +249,8 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
         wp_decode_2_execute_src2_command->write( bypass_command, cycle);
     }
 
-    /* notify bypassing unit */
     wp_decode_2_bypassing_unit->write( instr, cycle);
-    
+
     wp_decode_2_execute->write( instr, cycle);
 
     /* log */
@@ -341,7 +326,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
         
         /* transform received data in accordance with bypass command */
         const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
-        
+
         instr.set_v_src1( adapted_data);
     }
     else
@@ -384,9 +369,6 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     /* perform execution */
     instr.execute();
     
-    /* notify bypassing unit */
-    wp_execute_2_bypassing_unit->write( instr, cycle);
-
     /* bypass data */
     wp_execute_2_execute_bypass->write( instr.get_v_dst(), cycle);
 
@@ -445,9 +427,6 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
     /* perform required loads and stores */
     memory->load_store( &instr);
     
-    /* notify bypassing unit */
-    wp_memory_2_bypassing_unit->write( instr, cycle);
-
     /* bypass data */
     wp_memory_2_execute_bypass->write( instr.get_v_dst(), cycle);
 
@@ -481,9 +460,6 @@ void PerfSim<ISA>::clock_writeback( Cycle cycle)
 
     /* check for traps */
     instr.check_trap();
-    
-    /* notify bypassing unit */
-    wp_writeback_2_bypassing_unit->write( instr, cycle);
 
     /* bypass data */
     wp_writeback_2_execute_bypass->write( instr.get_v_dst(), cycle);
