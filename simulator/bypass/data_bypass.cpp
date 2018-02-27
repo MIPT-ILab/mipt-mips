@@ -35,11 +35,9 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
         is_HI_master_DIVMULT = false;
     }
 
-    entry.is_bypassible = ( entry.current_stage == entry.ready_stage) ? true : false;
-
+    entry.is_bypassible = ( entry.current_stage == entry.ready_stage);
     traced_registers.emplace( num);
 }
-
 
 void DataBypass::trace_new_instr( const MIPSInstr& instr)
 {    
