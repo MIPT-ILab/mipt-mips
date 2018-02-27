@@ -13,59 +13,74 @@
 #include <infra/ports/timing.h>
 
 
-void DataBypass::update_register_info( const MIPSInstr& instr, RegNum num,
-                                       const Cycle& cycle,
-                                       DataBypass::RegisterStage new_dst_stage)
+
+void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
 {
     auto& entry = scoreboard.get_entry( num);
 
-    if ( new_dst_stage == 0_RSG)
+    entry.current_stage = 0_RSG; // first execute stage
+
+    if ( instr.is_conditional_move())
+        entry.ready_stage = RegisterStage::in_RF();
+    else
+        entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY 
+                                            : 0_RSG; // EXECUTE
+
+    if ( instr.get_dst_num() == REG_NUM_HI_LO)
     {
-        entry.first_execute_stage_cycle = cycle;
-        entry.is_bypassible = false;
-        
-        if ( instr.get_dst_num() == REG_NUM_HI_LO)
-        {
-            is_HI_master_DIVMULT = true;
-        }
-        else if ( num == REG_NUM_HI)
-        {
-            is_HI_master_DIVMULT = false;
-        }
-
-        if ( instr.is_conditional_move())
-            entry.ready_stage = DataBypass::RegisterStage::in_RF();
-        else
-            entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
-                                                : 0_RSG; // EXECUTE
+        is_HI_master_DIVMULT = true;
     }
-    else if ( entry.first_execute_stage_cycle + new_dst_stage.get_latency_from_first_execute_stage() != cycle)
-        return;
+    else if ( num == REG_NUM_HI)
+    {
+        is_HI_master_DIVMULT = false;
+    }
 
-    entry.current_stage = new_dst_stage;
+    entry.is_bypassible = ( entry.current_stage == entry.ready_stage) ? true : false;
 
-    if ( entry.current_stage == entry.ready_stage)
-        entry.is_bypassible = true;
+    traced_registers.emplace( num);
 }
 
 
-
-void DataBypass::update( const MIPSInstr& instr, const Cycle& cycle, 
-                         DataBypass::RegisterStage new_dst_stage)
-{
-    auto dst_reg_num = instr.get_dst_num();
+void DataBypass::trace_new_instr( const MIPSInstr& instr)
+{    
+    const auto dst_reg_num = instr.get_dst_num();
 
     if ( dst_reg_num == REG_NUM_ZERO)
         return;
 
     if ( dst_reg_num == REG_NUM_HI_LO)
     {
-        update_register_info( instr, REG_NUM_LO, cycle, new_dst_stage);
-        update_register_info( instr, REG_NUM_HI, cycle, new_dst_stage);
+        trace_new_register( instr, REG_NUM_LO);
+        trace_new_register( instr, REG_NUM_HI);
         return;
-    }    
-    
-    update_register_info( instr, dst_reg_num, cycle, new_dst_stage);
+    }
+
+    trace_new_register( instr, dst_reg_num);
+}
+
+
+void DataBypass::update()
+{
+    for ( auto it = traced_registers.begin(); it != traced_registers.end();)
+    {
+        auto& entry = scoreboard.get_entry( *it);
+
+        if ( entry.current_stage == RegisterStage::get_last_bypassing_stage())
+        {
+            entry.current_stage = RegisterStage::in_RF();
+            entry.is_bypassible = false;
+            it = traced_registers.erase( it);
+        }
+        else
+        {
+            entry.current_stage.inc();
+
+            if ( entry.current_stage == entry.ready_stage)
+                entry.is_bypassible = true;
+
+            ++it;
+        }
+    }
 }
 
 
@@ -78,10 +93,10 @@ void DataBypass::cancel( const MIPSInstr& instr)
 
     if ( dst_reg_num == REG_NUM_HI_LO)
     {
-        set_initial_state_to_reg_info( REG_NUM_HI);
-        set_initial_state_to_reg_info( REG_NUM_LO);
+        untrace_register( REG_NUM_HI);
+        untrace_register( REG_NUM_LO);
         return;
     }
 
-    set_initial_state_to_reg_info( dst_reg_num);
+    untrace_register( dst_reg_num);
 }
