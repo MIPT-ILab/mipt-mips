@@ -18,6 +18,7 @@ cl /I. /EHsc /c /nologo /MD ^
    infra/config/config.cpp ^
    infra/ports/ports.cpp ^
    infra/cache/cache_tag_array.cpp ^
+   bypass/data_bypass.cpp ^
    mips/mips_instr.cpp ^
    func_sim/func_sim.cpp ^
    core/perf_sim.cpp ^

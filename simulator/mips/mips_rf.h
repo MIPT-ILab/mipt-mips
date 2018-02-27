@@ -15,41 +15,11 @@ class MIPSRF
 {
         struct Reg {
             uint32 value = 0;
-
-            /* The register is called "valid" when it's value is updated with
-             * result of calculation of the latest fetched writing instruction.
-             * For instance, when there is
-             *    add $t0, $s1, $s2
-             * instruction decoded, the register $t0 is marked "not valid".
-             * After writeback it becomes valid again, and till that moment no
-             * instruction with WAW or RAW dependency from register $t0 can be
-             * executed. The WAW dependency is just a workaround for #45 issue.
-             */
-            bool is_valid = true;
         };
         std::array<Reg, REG_NUM_MAX> array = {};
 
         Reg& get_entry( RegNum num) { return array.at( static_cast<size_t>( num)); }
         const Reg& get_entry( RegNum num) const { return array.at( static_cast<size_t>( num)); }
-
-        void set_valid( RegNum num, bool value)
-        {
-            if ( num == REG_NUM_HI_LO) {
-                set_valid( REG_NUM_HI, value);
-                set_valid( REG_NUM_LO, value);
-            }
-            else if ( num != REG_NUM_ZERO) {
-                get_entry( num).is_valid = value;
-            }
-        }
-
-        bool check( RegNum num) const
-        {
-            if ( num == REG_NUM_HI_LO) {
-                return check( REG_NUM_HI) && check( REG_NUM_LO);
-            }
-            return get_entry( num).is_valid;
-        }
 
         uint32 read( RegNum num) const
         {
@@ -68,25 +38,26 @@ class MIPSRF
             }            
 
             auto& entry = get_entry(num);
-            assert( !entry.is_valid);
-            entry.is_valid = true;
             entry.value = val;
         }
+
     public:
         MIPSRF() = default;
 
-        inline void read_sources( MIPSInstr* instr)
+        inline void read_source_1( MIPSInstr* instr) const
         {
             instr->set_v_src1( read(instr->get_src1_num()));
-            instr->set_v_src2( read(instr->get_src2_num()));
-            set_valid( instr->get_dst_num(), false);
         }
 
-        inline bool check_sources( const MIPSInstr& instr) const
+        inline void read_source_2( MIPSInstr* instr) const
         {
-            return check( instr.get_src1_num())
-                && check( instr.get_src2_num())
-                && check( instr.get_dst_num());
+            instr->set_v_src2( read(instr->get_src2_num()));
+        }
+
+        inline void read_sources( MIPSInstr* instr) const
+        {
+            read_source_1( instr);
+            read_source_2( instr);
         }
 
         inline void write_dst( const MIPSInstr& instr)
@@ -97,11 +68,6 @@ class MIPSRF
                 write( reg_num, instr.get_v_dst());
             else
                 write( reg_num, read(reg_num));
-        }
-
-        inline void cancel( const MIPSInstr& instr)
-        {
-            set_valid( instr.get_dst_num(), true);
         }
 };
 

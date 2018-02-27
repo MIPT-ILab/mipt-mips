@@ -97,6 +97,7 @@ class MIPSInstr
         {
             OUT_R_ARITHM,
             OUT_R_DIVMULT,
+            OUT_R_CONDM,
             OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
@@ -353,6 +354,8 @@ class MIPSInstr
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
+
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
