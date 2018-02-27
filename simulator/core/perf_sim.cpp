@@ -108,33 +108,29 @@ template <typename ISA>
 Addr PerfSim<ISA>::get_PC( Cycle cycle) 
 {
     /* receive flush and stall signals */
-
     const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
     const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
-                
-    Addr PC = 0;
 
-    if( rp_core_2_fetch_target->is_ready( cycle)) 
-        PC = rp_core_2_fetch_target->read( cycle);
-                        
+    /* Receive all possible PC */
+    const Addr external_PC = rp_core_2_fetch_target->is_ready( cycle) ? rp_core_2_fetch_target->read( cycle) : 0;
+    const Addr hold_PC     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : 0;
+    const Addr flushed_PC  = rp_memory_2_fetch_target->is_ready( cycle) ? rp_memory_2_fetch_target->read( cycle) : 0;
+    const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
+
+    /* Multiplexing */
+    if ( external_PC)
+        return external_PC;
+
     if ( is_flush)
-    {
-        rp_hold_pc->ignore( cycle);
-        rp_target->ignore( cycle);
-        PC = rp_memory_2_fetch_target->read( cycle);
-    }
-    else if ( !is_stall) 
-    {
-        rp_hold_pc->ignore( cycle);
-        if(rp_target->is_ready( cycle))
-            PC = rp_target->read( cycle);
-    } 
-    else if ( rp_hold_pc->is_ready( cycle))
-    {
-        rp_target->ignore( cycle);
-        PC = rp_hold_pc->read( cycle);
-    }
-    return PC;
+        return flushed_PC;
+
+    if ( !is_stall)
+        return target_PC;
+
+    if ( hold_PC)
+        return hold_PC;
+
+    return 0;
 }
 
 template <typename ISA>
