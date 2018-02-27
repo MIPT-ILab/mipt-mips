@@ -163,7 +163,7 @@ class DataBypass
 };
 
 
-inline auto operator""_RSG( unsigned long long int number)
+inline auto operator""_RSG( unsigned long long int number) // NOLINT https://bugs.llvm.org/show_bug.cgi?id=24840
 {
     return DataBypass::RegisterStage( static_cast<uint8>( number));
 }
