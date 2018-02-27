@@ -18,7 +18,7 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
 {
     auto& entry = scoreboard.get_entry( num);
 
-    entry.current_stage = 0_RSG;
+    entry.current_stage = 0_RSG; // first execute stage
 
     if ( instr.is_conditional_move())
         entry.ready_stage = RegisterStage::in_RF();
@@ -37,7 +37,7 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
 
     entry.is_bypassible = ( entry.current_stage == entry.ready_stage) ? true : false;
 
-    traceable_registers.emplace( num);
+    traced_registers.emplace( num);
 }
 
 
@@ -61,7 +61,7 @@ void DataBypass::trace_new_instr( const MIPSInstr& instr)
 
 void DataBypass::update()
 {
-    for ( auto it = traceable_registers.begin(); it != traceable_registers.end();)
+    for ( auto it = traced_registers.begin(); it != traced_registers.end();)
     {
         auto& entry = scoreboard.get_entry( *it);
 
@@ -69,7 +69,7 @@ void DataBypass::update()
         {
             entry.current_stage = RegisterStage::in_RF();
             entry.is_bypassible = false;
-            it = traceable_registers.erase( it);
+            it = traced_registers.erase( it);
         }
         else
         {

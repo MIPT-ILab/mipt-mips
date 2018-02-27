@@ -11,7 +11,6 @@ static constexpr const Latency PORT_LATENCY = 1_Lt;
 static constexpr const uint32 PORT_FANOUT = 1;
 static constexpr const uint32 PORT_BW = 1;
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
-static constexpr const uint32 SRC_REGISTERS_NUM = 2;
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
@@ -65,26 +64,26 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
     wp_execute_2_execute_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    rps_stages_2_execute_src1_bypass[0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_src2_bypass[0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[0][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
     wp_memory_2_execute_bypass = make_write_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    rps_stages_2_execute_src1_bypass[1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_src2_bypass[1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[0][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
     
     wp_writeback_2_execute_bypass = make_write_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    rps_stages_2_execute_src1_bypass[2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_src2_bypass[2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    wp_decode_2_execute_src1_command = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND", 
-                                                                                  PORT_BW, PORT_FANOUT);
-    rp_decode_2_execute_src1_command = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                                  PORT_LATENCY);
-
-    wp_decode_2_execute_src2_command = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND", 
-                                                                                  PORT_BW, PORT_FANOUT);
-    rp_decode_2_execute_src2_command = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                                  PORT_LATENCY);
+    wps_decode_2_execute_command[0] = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+                                                                                 PORT_BW, PORT_FANOUT);
+    rps_decode_2_execute_command[0] = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+                                                                                PORT_LATENCY);
+    
+    wps_decode_2_execute_command[1] = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+                                                                                 PORT_BW, PORT_FANOUT);
+    rps_decode_2_execute_command[1] = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+                                                                                PORT_LATENCY);
 
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
@@ -232,6 +231,7 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
     /* update bypassing unit */
     bypassing_unit->update();
 
+    /* trace new instruction if needed */
     if ( rp_decode_2_bypassing_unit->is_ready( cycle))
     {
         auto instr = rp_decode_2_bypassing_unit->read( cycle);
@@ -266,29 +266,20 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
         return;   
     }
 
-    const auto src1_reg_num = instr.get_src1_num();
-    const auto src2_reg_num = instr.get_src2_num();
-
-    if ( bypassing_unit->is_in_RF( src1_reg_num))
+    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {
-        rf->read_source_1( &instr);
-    }
-    else if ( bypassing_unit->is_bypassible( src1_reg_num))
-    {
-        const auto bypass_command = bypassing_unit->get_bypass_command( src1_reg_num);
-        wp_decode_2_execute_src1_command->write( bypass_command, cycle);
-    }
-
-    if ( bypassing_unit->is_in_RF( src2_reg_num))
-    {
-        rf->read_source_2( &instr);
-    }
-    else if ( bypassing_unit->is_bypassible( src2_reg_num))
-    {
-        const auto bypass_command = bypassing_unit->get_bypass_command( src2_reg_num);
-        wp_decode_2_execute_src2_command->write( bypass_command, cycle);
+        if ( bypassing_unit->is_in_RF( instr, src_index))
+        {
+            rf->read_source( &instr, src_index);
+        }
+        else if ( bypassing_unit->is_bypassible( instr, src_index))
+        {
+            const auto bypass_command = bypassing_unit->get_bypass_command( instr, src_index);
+            wps_decode_2_execute_command[ src_index]->write( bypass_command, cycle);
+        }
     }
 
+    /* notify bypassing unit about new instruction */
     wp_decode_2_bypassing_unit->write( instr, cycle);
 
     wp_decode_2_execute->write( instr, cycle);
@@ -316,16 +307,15 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
         }
 
         /* ignoring information from command ports */
-        rp_decode_2_execute_src1_command->ignore( cycle);
-        rp_decode_2_execute_src2_command->ignore( cycle);
-        
-        /* ignoring all bypassed data for the first source register */
-        for ( auto& port:rps_stages_2_execute_src1_bypass)
+        for ( auto& port:rps_decode_2_execute_command)
             port->ignore( cycle);
         
-        /* ignoring all bypassed data for the second source register */
-        for ( auto& port:rps_stages_2_execute_src2_bypass)
-            port->ignore( cycle);
+        /* ignoring all bypassed data for source registers */
+        for ( auto& rps_src_bypass_ports:rps_stages_2_execute_sources_bypass)
+        {
+            for ( auto& port:rps_src_bypass_ports)
+                port->ignore( cycle);
+        }
         
         sout << "flush\n";
         return;
@@ -334,75 +324,55 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     /* check if there is something to process */
     if ( !rp_decode_2_execute->is_ready( cycle))
     {
-        /* ignoring all bypassed data for the first source register */
-        for ( auto& port:rps_stages_2_execute_src1_bypass)
-            port->ignore( cycle);
-        
-        /* ignoring all bypassed data for the second source register */
-        for ( auto& port:rps_stages_2_execute_src2_bypass)
-            port->ignore( cycle);
-        
+        /* ignoring all bypassed data for source registers */
+        for ( auto& rps_src_bypass_ports:rps_stages_2_execute_sources_bypass)
+        {
+            for ( auto& port:rps_src_bypass_ports)
+                port->ignore( cycle);
+        }
+
         sout << "bubble\n";
         return;
     }
 
     auto instr = rp_decode_2_execute->read( cycle);
 
-    /* check whether bypassing is needed for the first source register */
-    if ( rp_decode_2_execute_src1_command->is_ready( cycle))
+
+    void (MIPSInstr::*setters_v_sources[SRC_REGISTERS_NUM])( uint32) = 
     {
-        const auto bypass_command = rp_decode_2_execute_src1_command->read( cycle);
+        &MIPSInstr::set_v_src1,
+        &MIPSInstr::set_v_src2
+    };
 
-        /* get a port which should be used for bypassing and receive data */
-        const auto bypass_direction = bypassing_unit->get_bypass_direction( bypass_command);
-        const auto data = rps_stages_2_execute_src1_bypass[ bypass_direction]->read( cycle);
-
-        /* ignoring all other ports for the first source register */
-        for ( std::size_t i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
-        {    
-            if ( i != bypass_direction)
-                rps_stages_2_execute_src1_bypass[i]->ignore( cycle);
-        }
-        
-        /* transform received data in accordance with bypass command */
-        const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
-
-        instr.set_v_src1( adapted_data);
-    }
-    else
-    {
-        /* ignoring all bypassed data for the first source register */
-        for ( auto& port:rps_stages_2_execute_src1_bypass)
-            port->ignore( cycle);
-    }
-
-
-    /* check whether bypassing is needed for the second source register */
-    if ( rp_decode_2_execute_src2_command->is_ready( cycle))
-    {
-        const auto bypass_command = rp_decode_2_execute_src2_command->read( cycle);
-
-        /* get a port which should be used for bypassing and receive data */
-        const auto bypass_direction = bypassing_unit->get_bypass_direction( bypass_command);
-        const auto data = rps_stages_2_execute_src2_bypass[ bypass_direction]->read( cycle);
-
-        /* ignoring all other ports for the second source register */
-        for ( std::size_t i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
+    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    {   
+        /* check whether bypassing is needed for a source register */ 
+        if ( rps_decode_2_execute_command[src_index]->is_ready( cycle))
         {
-            if ( i != bypass_direction)
-                rps_stages_2_execute_src2_bypass[i]->ignore( cycle);
-        }
+            const auto bypass_command = rps_decode_2_execute_command[src_index]->read( cycle);
 
-        /* transform received data in accordance with bypass command */
-        const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
-        
-        instr.set_v_src2( adapted_data);
-    }
-    else
-    {
-        /* ignoring all bypassed data for the second source register */
-        for ( auto& port:rps_stages_2_execute_src2_bypass)
-            port->ignore( cycle);
+            /* get a port which should be used for bypassing and receive data */
+            const auto bypass_direction = bypassing_unit->get_bypass_direction( bypass_command);
+            const auto data = rps_stages_2_execute_sources_bypass[src_index][bypass_direction]->read( cycle);
+
+            /* ignoring all other ports for a source register */
+            for ( std::size_t i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
+            {    
+                if ( i != bypass_direction)
+                    rps_stages_2_execute_sources_bypass[src_index][i]->ignore( cycle);
+            }
+
+            /* transform received data in accordance with bypass command */
+            const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
+
+            (instr.*setters_v_sources[src_index])( adapted_data);
+        }
+        else
+        {
+            /* ignoring all bypassed data for a source register */
+            for ( auto& port:rps_stages_2_execute_sources_bypass[src_index])
+                port->ignore( cycle);    
+        }
     }
     
 

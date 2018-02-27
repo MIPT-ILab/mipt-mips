@@ -44,20 +44,18 @@ class MIPSRF
     public:
         MIPSRF() = default;
 
-        inline void read_source_1( MIPSInstr* instr) const
+        inline void read_source( MIPSInstr* instr, std::size_t src_index) const
         {
-            instr->set_v_src1( read(instr->get_src1_num()));
-        }
-
-        inline void read_source_2( MIPSInstr* instr) const
-        {
-            instr->set_v_src2( read(instr->get_src2_num()));
+            if ( src_index == 0)
+                instr->set_v_src1( read( instr->get_src1_num()));
+            else
+                instr->set_v_src2( read( instr->get_src2_num()));
         }
 
         inline void read_sources( MIPSInstr* instr) const
         {
-            read_source_1( instr);
-            read_source_2( instr);
+            read_source( instr, 0);
+            read_source( instr, 1);
         }
 
         inline void write_dst( const MIPSInstr& instr)

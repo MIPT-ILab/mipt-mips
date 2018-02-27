@@ -87,15 +87,14 @@ private:
     std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_bypass = nullptr;
     std::unique_ptr<WritePort<uint64>> wp_writeback_2_execute_bypass = nullptr;
 
+    static constexpr const std::size_t SRC_REGISTERS_NUM = 2;
     static constexpr const std::size_t BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
-    std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src1_bypass;
-    std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM> rps_stages_2_execute_src2_bypass;
+    
+    std::array<std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM>, SRC_REGISTERS_NUM> 
+        rps_stages_2_execute_sources_bypass;
 
-    std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src1_command = nullptr;
-    std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src1_command = nullptr;
-
-    std::unique_ptr<WritePort<DataBypass::BypassCommand>> wp_decode_2_execute_src2_command = nullptr;
-    std::unique_ptr<ReadPort<DataBypass::BypassCommand>> rp_decode_2_execute_src2_command = nullptr;
+    std::array<std::unique_ptr<WritePort<DataBypass::BypassCommand>>, SRC_REGISTERS_NUM> wps_decode_2_execute_command;
+    std::array<std::unique_ptr<ReadPort<DataBypass::BypassCommand>>, SRC_REGISTERS_NUM> rps_decode_2_execute_command;
 
     std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_decode_2_bypassing_unit = nullptr;
