@@ -37,6 +37,7 @@ class FuncSim : public Simulator
         void init( const std::string& tr);
         FuncInstr step();
         void run(const std::string& tr, uint64 instrs_to_run) final;
+        void set_PC(Addr value) final { PC = value; }
 };
 
 #endif

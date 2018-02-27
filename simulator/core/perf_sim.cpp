@@ -123,25 +123,22 @@ Addr PerfSim<ISA>::get_PC( Cycle cycle)
         rp_target->ignore( cycle);
         PC = rp_memory_2_fetch_target->read( cycle);
     }
-    else
+    else if ( !is_stall) 
     {
-        if ( !is_stall) 
-        {
-            rp_hold_pc->ignore( cycle);
-            if(rp_target->is_ready( cycle))
-                PC = rp_target->read( cycle);
-        } 
-        else if(rp_hold_pc->is_ready( cycle))
-        {
-            rp_target->ignore( cycle);
-            PC = rp_hold_pc->read( cycle);
-        }
+        rp_hold_pc->ignore( cycle);
+        if(rp_target->is_ready( cycle))
+            PC = rp_target->read( cycle);
+    } 
+    else if ( rp_hold_pc->is_ready( cycle))
+    {
+        rp_target->ignore( cycle);
+        PC = rp_hold_pc->read( cycle);
     }
     return PC;
 }
 
 template <typename ISA>
-typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
+typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr( Cycle cycle)
 {
     if (rp_decode_2_decode->is_ready( cycle))
     {
@@ -151,18 +148,24 @@ typename PerfSim<ISA>::Instr PerfSim<ISA>::read_instr(Cycle cycle)
     return rp_fetch_2_decode->read( cycle);
 }
 
+template <typename ISA>
+void PerfSim<ISA>::set_PC( Addr value)
+{
+    wp_core_2_fetch_target->write( value, curr_cycle);
+    checker.set_PC( value);
+}
+
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     assert( instrs_to_run < MAX_VAL32);
-    Cycle cycle = 0_Cl;
 
     memory = new Memory( tr);
 
     checker.init( tr);
-
-    wp_core_2_fetch_target->write( memory->startPC(), cycle);
+    
+    set_PC( memory->startPC());
 
     bypassing_unit = std::make_unique<DataBypass>();
 
@@ -170,29 +173,29 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     while (executed_instrs < instrs_to_run)
     {
-        clock_writeback( cycle);
-        clock_fetch( cycle);
-        clock_decode( cycle);
-        clock_execute( cycle);
-        clock_memory( cycle);
-        cycle.inc();
+        clock_writeback( curr_cycle);
+        clock_fetch( curr_cycle);
+        clock_decode( curr_cycle);
+        clock_execute( curr_cycle);
+        clock_memory( curr_cycle);
+        curr_cycle.inc();
 
         sout << "Executed instructions: " << executed_instrs
              << std::endl << std::endl;
 
-        check_ports( cycle);
+        check_ports( curr_cycle);
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
 
     auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-    auto frequency = static_cast<double>( cycle) / time; // cycles per millisecond = kHz
-    auto ipc = 1.0 * executed_instrs / static_cast<double>( cycle);
+    auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
+    auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
-              << std::endl << "cycles:     " << cycle
+              << std::endl << "cycles:     " << curr_cycle
               << std::endl << "IPC:        " << ipc
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
@@ -204,34 +207,31 @@ void PerfSim<ISA>::run( const std::string& tr,
 template <typename ISA>
 void PerfSim<ISA>::clock_fetch( Cycle cycle)
 {
-
-    if ( rp_memory_2_bp->is_ready( cycle)) 
-    {
-        /* creating structure to update BP unit */
+    /* Process BP updates */
+    if ( rp_memory_2_bp->is_ready( cycle))
         bp->update( rp_memory_2_bp->read( cycle));
-    }
 
     /* getting PC */
     auto PC = get_PC( cycle);
-    
+
     /* hold PC for the stall case */
     wp_hold_pc->write( PC, cycle);
 
-    /* fetching instruction */
-    if( PC != 0) 
-    {
-        Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
+    /* ignore bubbles */
+    if( PC == 0)
+        return;
 
-        /* updating PC according to prediction */
-        wp_target->write( instr.get_predicted_target(), cycle);
-                                            
-        /* sending to decode */
-        wp_fetch_2_decode->write( instr, cycle);
+    Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 
-        /* log */
-        sout << "fetch   cycle " << std::dec << cycle << ": 0x"
-             << std::hex << PC << ": 0x" << instr << std::endl;
-    }
+    /* updating PC according to prediction */
+    wp_target->write( instr.get_predicted_target(), cycle);
+
+    /* sending to decode */
+    wp_fetch_2_decode->write( instr, cycle);
+
+    /* log */
+    sout << "fetch   cycle " << std::dec << cycle << ": 0x"
+         << std::hex << PC << ": 0x" << instr << std::endl;
 }
 
 template <typename ISA> 

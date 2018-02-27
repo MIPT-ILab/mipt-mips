@@ -28,6 +28,7 @@ class PerfSim : public Simulator
     using RF = typename ISA::RF;
     using Memory = typename ISA::Memory;
 private:
+    Cycle curr_cycle = 0_Cl;
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
@@ -116,6 +117,7 @@ public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
     void run( const std::string& tr, uint64 instrs_to_run) final;
+    void set_PC( Addr value) final;
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
