@@ -8,10 +8,8 @@
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), checker( false)
+PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), writeback( log)
 {
-    executed_instrs = 0;
-
     rp_fetch_2_decode = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
 
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
@@ -24,9 +22,6 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), che
 
     wp_execute_2_memory = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     rp_execute_2_memory = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
-
-    wp_memory_2_writeback = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_memory_2_writeback = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
 
     /* branch misprediction unit ports */
     wp_memory_2_all_flush = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
@@ -47,8 +42,7 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), che
     wp_memory_2_execute_bypass = make_write_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     rps_stages_2_execute_sources_bypass[0][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_stages_2_execute_sources_bypass[1][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    
-    wp_writeback_2_execute_bypass = make_write_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+
     rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
@@ -64,6 +58,9 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), che
 
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
+
+    rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
+    wp_memory_2_writeback = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
 
     init_ports();
 }
@@ -83,7 +80,7 @@ template <typename ISA>
 void PerfSim<ISA>::set_PC( Addr value)
 {
     wp_core_2_fetch_target->write( value, curr_cycle);
-    checker.set_PC( value);
+    writeback.set_PC( value);
 }
 
 template<typename ISA>
@@ -94,32 +91,34 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     memory = new Memory( tr);
     fetch.set_memory( memory);
+    writeback.set_instrs_to_run( instrs_to_run);
+    writeback.set_RF( rf);
+    writeback.init_checker( tr);
 
-    checker.init( tr);
-    
     set_PC( memory->startPC());
 
     bypassing_unit = std::make_unique<DataBypass>();
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    while (executed_instrs < instrs_to_run)
+    while (true)
     {
-        clock_writeback( curr_cycle);
+        if (rp_halt->is_ready( curr_cycle) && rp_halt->read( curr_cycle))
+            break;
+
+        writeback.clock( curr_cycle);
         fetch.clock( curr_cycle);
         clock_decode( curr_cycle);
         clock_execute( curr_cycle);
         clock_memory( curr_cycle);
         curr_cycle.inc();
 
-        sout << "Executed instructions: " << executed_instrs
-             << std::endl << std::endl;
-
         check_ports( curr_cycle);
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
 
+    auto executed_instrs = writeback.get_executed_instrs();
     auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
     auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
@@ -360,61 +359,6 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
 
     /* log */
     sout << instr << std::endl;
-}
-
-template <typename ISA>
-void PerfSim<ISA>::clock_writeback( Cycle cycle)
-{
-    sout << "wb      cycle " << std::dec << cycle << ": ";
-
-    /* check if there is something to process */
-    if ( !rp_memory_2_writeback->is_ready( cycle))
-    {
-        sout << "bubble\n";
-        if ( cycle >= last_writeback_cycle + 10_Lt)
-        {
-            serr << "Deadlock was detected. The process will be aborted."
-                 << std::endl << std::endl << critical;
-        }
-        return;
-    }
-
-    auto instr = rp_memory_2_writeback->read( cycle);
-
-    /* perform writeback */
-    rf->write_dst( instr);
-
-    /* check for bubble */
-    if(instr.is_bubble())
-        return;
-
-    /* check for traps */
-    instr.check_trap();
-
-    /* bypass data */
-    wp_writeback_2_execute_bypass->write( instr.get_v_dst(), cycle);
-
-    /* log */
-    sout << instr << std::endl;
-
-    /* perform checks */
-    check( instr);
-
-    /* update simulator cycles info */
-    ++executed_instrs;
-    last_writeback_cycle = cycle;
-}
-
-template <typename ISA>
-void PerfSim<ISA>::check( const FuncInstr& instr)
-{
-    const auto func_dump = checker.step();
-
-    if ( func_dump.Dump() != instr.Dump())
-        serr << "Mismatch: " << std::endl
-             << "Checker output: " << func_dump    << std::endl
-             << "PerfSim output: " << instr.Dump() << std::endl
-             << critical;
 }
 
 #include <mips/mips.h>
