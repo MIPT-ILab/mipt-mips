@@ -5,7 +5,7 @@
 
 #include "perf_sim.h"
 
-static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
+static constexpr const uint32 FLUSHED_STAGES_NUM = 3;
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), writeback( log)
