@@ -17,6 +17,19 @@ FuncSim<ISA>::~FuncSim()
 }
 
 template <typename ISA>
+void FuncSim<ISA>::update_nop_counter( const FuncSim<ISA>::FuncInstr& instr)
+{
+    if ( instr.is_nop())
+        ++nops_in_a_row;
+    else
+        nops_in_a_row = 0;
+
+    if (nops_in_a_row > 10)
+        serr << "Bearings lost: ten nops in a row. Simulation will be aborted."
+             << std::endl << std::endl << critical;
+}
+
+template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
@@ -40,6 +53,9 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     // PC update
     PC = instr.get_new_PC();
 
+    // Check whether we execute nops
+    update_nop_counter( instr);
+
     // dump
     return instr;
 }
@@ -50,14 +66,17 @@ void FuncSim<ISA>::init( const std::string& tr)
     assert( mem == nullptr);
     mem = new Memory( tr);
     PC = mem->startPC();
+    nops_in_a_row = 0;
 }
 
 template <typename ISA>
 void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     init( tr);
-    for ( uint32 i = 0; i < instrs_to_run; ++i)
-        sout << step() << std::endl;
+    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+        const auto& instr = step();
+        sout << instr << std::endl;
+    }
 }
 
 #include <mips/mips.h>

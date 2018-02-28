@@ -24,6 +24,9 @@ class FuncSim : public Simulator
         Addr PC = NO_VAL32;
         Memory* mem = nullptr;
 
+        uint64 nops_in_a_row = 0;
+        void update_nop_counter( const FuncInstr& instr);
+
     public:
         explicit FuncSim( bool log = false);
         ~FuncSim() final;
