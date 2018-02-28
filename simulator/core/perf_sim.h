@@ -15,8 +15,8 @@
 #include <infra/ports/ports.h>
 #include <bypass/data_bypass.h>
 #include <bpu/bp_interface.h>
-#include <func_sim/func_sim.h>
 #include <fetch/fetch.h>
+#include <writeback/writeback.h>
 
 #include "perf_instr.h"
 
@@ -29,19 +29,13 @@ class PerfSim : public Simulator
     using Memory = typename ISA::Memory;
 private:
     Cycle curr_cycle = 0_Cl;
-    uint64 executed_instrs = 0;
-    Cycle last_writeback_cycle = 0_Cl; // to handle possible deadlocks
 
     /* simulator units */
     RF* rf = nullptr;
     Memory* memory = nullptr;
     std::unique_ptr<DataBypass> bypassing_unit = nullptr;
     Fetch<ISA> fetch;
-
-    /* MIPS functional simulator for internal checks */
-
-    FuncSim<ISA> checker;
-    void check( const FuncInstr& instr);
+    Writeback<ISA> writeback;
 
     /* all ports */
     std::unique_ptr<ReadPort<Instr>> rp_fetch_2_decode = nullptr;
@@ -58,7 +52,6 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_execute_2_memory = nullptr;
 
     std::unique_ptr<WritePort<Instr>> wp_memory_2_writeback = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_memory_2_writeback = nullptr;
 
     std::unique_ptr<WritePort<bool>> wp_memory_2_all_flush = nullptr;
 
@@ -70,11 +63,12 @@ private:
 
     std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
 
+    std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
+
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
 
     std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_bypass = nullptr;
     std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_bypass = nullptr;
-    std::unique_ptr<WritePort<uint64>> wp_writeback_2_execute_bypass = nullptr;
 
     static constexpr const std::size_t SRC_REGISTERS_NUM = 2;
     static constexpr const std::size_t BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
@@ -92,7 +86,6 @@ private:
     void clock_decode( Cycle cycle);
     void clock_execute( Cycle cycle);
     void clock_memory( Cycle cycle);
-    void clock_writeback( Cycle cycle);
     Instr read_instr( Cycle cycle);
 
 public:

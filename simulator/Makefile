@@ -25,6 +25,7 @@ CPPS= \
     mips/mips_instr.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
+    writeback/writeback.cpp \
     simulator.cpp
 
 
