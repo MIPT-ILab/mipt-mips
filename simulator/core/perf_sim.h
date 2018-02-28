@@ -94,7 +94,6 @@ private:
     void clock_memory( Cycle cycle);
     void clock_writeback( Cycle cycle);
     Instr read_instr( Cycle cycle);
-    Addr get_PC( Cycle cycle);
 
 public:
     explicit PerfSim( bool log);
