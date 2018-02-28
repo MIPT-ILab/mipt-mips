@@ -21,25 +21,24 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
 
     /* Input signals */
-    std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_fetch_flush = nullptr;
-    
+    std::unique_ptr<ReadPort<bool>> rp_stall = nullptr;
+
     /* Input signals - BP */
-    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_bp_update = nullptr;
     
     /* Input signals - PC values */
-    std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_core_2_fetch_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_flush_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_external_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_hold_pc = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_target = nullptr;
 
     /* Outputs */
-    std::unique_ptr<WritePort<Instr>> wp_fetch_2_decode = nullptr;
+    std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
     std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
     std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
 
     Addr get_PC( Cycle cycle);
-    
+    void clock_bp( Cycle cycle);
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
