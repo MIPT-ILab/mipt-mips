@@ -3,31 +3,18 @@
 #include <iostream>
 #include <chrono>
 
-#include <infra/config/config.h>
-
 #include "perf_sim.h"
 
-static constexpr const Latency PORT_LATENCY = 1_Lt;
-static constexpr const uint32 PORT_FANOUT = 1;
-static constexpr const uint32 PORT_BW = 1;
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
-namespace config {
-    static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
-    static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
-    static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
-} // namespace config
-
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
+PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), checker( false)
 {
     executed_instrs = 0;
 
-    wp_fetch_2_decode = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
     rp_fetch_2_decode = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
 
     wp_decode_2_fetch_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
-    rp_decode_2_fetch_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
     wp_decode_2_decode = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
     rp_decode_2_decode = make_read_port<Instr>("DECODE_2_DECODE", PORT_LATENCY);
@@ -43,25 +30,15 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
 
     /* branch misprediction unit ports */
     wp_memory_2_all_flush = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
-    rp_fetch_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
     rp_decode_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
     rp_execute_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
     rp_memory_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
     wp_memory_2_fetch_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    rp_memory_2_fetch_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
-
-    wp_target = make_write_port<Addr>("TARGET", PORT_BW, PORT_FANOUT);
-    rp_target = make_read_port<Addr>("TARGET", PORT_LATENCY);
-
-    wp_hold_pc = make_write_port<Addr>("HOLD_PC", PORT_BW, PORT_FANOUT);
-    rp_hold_pc = make_read_port<Addr>("HOLD_PC", PORT_LATENCY);
 
     wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    rp_core_2_fetch_target = make_read_port<Addr>("CORE_2_FETCH_TARGET", PORT_LATENCY);
 
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
-    rp_memory_2_bp = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
     wp_execute_2_execute_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     rps_stages_2_execute_sources_bypass[0][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
@@ -88,39 +65,7 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), checker( false)
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
 
-    BPFactory bp_factory;
-    bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-
     init_ports();
-}
-
-template <typename ISA>
-Addr PerfSim<ISA>::get_PC( Cycle cycle) 
-{
-    /* receive flush and stall signals */
-    const bool is_flush = rp_fetch_flush->is_ready( cycle) && rp_fetch_flush->read( cycle);
-    const bool is_stall = rp_decode_2_fetch_stall->is_ready( cycle) && rp_decode_2_fetch_stall->read( cycle);
-
-    /* Receive all possible PC */
-    const Addr external_PC = rp_core_2_fetch_target->is_ready( cycle) ? rp_core_2_fetch_target->read( cycle) : 0;
-    const Addr hold_PC     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : 0;
-    const Addr flushed_PC  = rp_memory_2_fetch_target->is_ready( cycle) ? rp_memory_2_fetch_target->read( cycle) : 0;
-    const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
-
-    /* Multiplexing */
-    if ( external_PC != 0)
-        return external_PC;
-
-    if ( is_flush)
-        return flushed_PC;
-
-    if ( !is_stall)
-        return target_PC;
-
-    if ( hold_PC != 0)
-        return hold_PC;
-
-    return 0;
 }
 
 template <typename ISA>
@@ -148,6 +93,7 @@ void PerfSim<ISA>::run( const std::string& tr,
     assert( instrs_to_run < MAX_VAL32);
 
     memory = new Memory( tr);
+    fetch.set_memory( memory);
 
     checker.init( tr);
     
@@ -160,7 +106,7 @@ void PerfSim<ISA>::run( const std::string& tr,
     while (executed_instrs < instrs_to_run)
     {
         clock_writeback( curr_cycle);
-        clock_fetch( curr_cycle);
+        fetch.clock( curr_cycle);
         clock_decode( curr_cycle);
         clock_execute( curr_cycle);
         clock_memory( curr_cycle);
@@ -188,36 +134,6 @@ void PerfSim<ISA>::run( const std::string& tr,
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
-}
-
-template <typename ISA>
-void PerfSim<ISA>::clock_fetch( Cycle cycle)
-{
-    /* Process BP updates */
-    if ( rp_memory_2_bp->is_ready( cycle))
-        bp->update( rp_memory_2_bp->read( cycle));
-
-    /* getting PC */
-    auto PC = get_PC( cycle);
-
-    /* hold PC for the stall case */
-    wp_hold_pc->write( PC, cycle);
-
-    /* ignore bubbles */
-    if( PC == 0)
-        return;
-
-    Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
-
-    /* updating PC according to prediction */
-    wp_target->write( instr.get_predicted_target(), cycle);
-
-    /* sending to decode */
-    wp_fetch_2_decode->write( instr, cycle);
-
-    /* log */
-    sout << "fetch   cycle " << std::dec << cycle << ": 0x"
-         << std::hex << PC << ": 0x" << instr << std::endl;
 }
 
 template <typename ISA> 

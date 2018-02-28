@@ -1,5 +1,5 @@
 /*
- * perf_sim.cpp - mips performance simulator
+ * perf_sim.h - mips performance simulator
  * Copyright 2015-2018 MIPT-MIPS
  */
 
@@ -15,8 +15,8 @@
 #include <infra/ports/ports.h>
 #include <bypass/data_bypass.h>
 #include <bpu/bp_interface.h>
-#include <bpu/bpu.h>
 #include <func_sim/func_sim.h>
+#include <fetch/fetch.h>
 
 #include "perf_instr.h"
 
@@ -35,8 +35,8 @@ private:
     /* simulator units */
     RF* rf = nullptr;
     Memory* memory = nullptr;
-    std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<DataBypass> bypassing_unit = nullptr;
+    Fetch<ISA> fetch;
 
     /* MIPS functional simulator for internal checks */
 
@@ -44,12 +44,10 @@ private:
     void check( const FuncInstr& instr);
 
     /* all ports */
-    std::unique_ptr<WritePort<Instr>> wp_fetch_2_decode = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_fetch_2_decode = nullptr;
 
     std::unique_ptr<WritePort<bool>> wp_decode_2_fetch_stall = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_decode_2_fetch_stall = nullptr;
-
+ 
     std::unique_ptr<WritePort<Instr>> wp_decode_2_decode = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_decode_2_decode = nullptr;
 
@@ -63,25 +61,16 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_memory_2_writeback = nullptr;
 
     std::unique_ptr<WritePort<bool>> wp_memory_2_all_flush = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_fetch_flush = nullptr;
+
     std::unique_ptr<ReadPort<bool>> rp_decode_flush = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_execute_flush = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_memory_flush = nullptr;
 
     std::unique_ptr<WritePort<Addr>> wp_memory_2_fetch_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_memory_2_fetch_target = nullptr;
-
-    std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_target = nullptr;
 
     std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_core_2_fetch_target = nullptr;
-
-    std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_hold_pc = nullptr;
 
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
-    std::unique_ptr<ReadPort<BPInterface>> rp_memory_2_bp = nullptr;
 
     std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_bypass = nullptr;
     std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_bypass = nullptr;
@@ -100,7 +89,6 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_decode_2_bypassing_unit = nullptr;
 
     /* main stages functions */
-    void clock_fetch( Cycle cycle);
     void clock_decode( Cycle cycle);
     void clock_execute( Cycle cycle);
     void clock_memory( Cycle cycle);
