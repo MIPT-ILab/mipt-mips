@@ -30,16 +30,6 @@ TEST( MIPS_instr_init, Process_Wrong_Args_Of_Constr)
 #define TEST_BAD_OPCODE( opcode) \
     ASSERT_EQ(MIPSInstr( opcode).Dump(), std::string(#opcode) + "\tUnknown");
 
-TEST( MIPS_instr_disasm, Process_Unknown_Instruction)
-{
-    TEST_BAD_OPCODE(0x72290000)
-    TEST_BAD_OPCODE(0x72290001)
-    TEST_BAD_OPCODE(0x72290004)
-    TEST_BAD_OPCODE(0x72290005)
-    TEST_BAD_OPCODE(0xc13104d2)
-    TEST_BAD_OPCODE(0xc131fb2e)
-}
-
 TEST( MIPS_instr_disasm, Process_Disasm)
 {
     ASSERT_EQ(MIPSInstr(0x01398820).Dump(), "add $s1, $t1, $t9");
@@ -54,10 +44,10 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0x02290018).Dump(), "mult $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x02290019).Dump(), "multu $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x71398802).Dump(), "mul $s1, $t1, $t9");
-//  ASSERT_EQ(MIPSInstr(0x72290000).Dump(), "madd $s1, $t1");
-//  ASSERT_EQ(MIPSInstr(0x72290001).Dump(), "maddu $s1, $t1");
-//  ASSERT_EQ(MIPSInstr(0x72290004).Dump(), "msub $s1, $t1");
-//  ASSERT_EQ(MIPSInstr(0x72290005).Dump(), "msubu $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x72290000).Dump(), "madd $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x72290001).Dump(), "maddu $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x72290004).Dump(), "msub $s1, $t1");
+    ASSERT_EQ(MIPSInstr(0x72290005).Dump(), "msubu $s1, $t1");
     ASSERT_EQ(MIPSInstr(0x01398827).Dump(), "nor $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x01398825).Dump(), "or $s1, $t1, $t9");
     ASSERT_EQ(MIPSInstr(0x00098cc0).Dump(), "sll $s1, $t1, 19");
@@ -118,8 +108,8 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0x8931fb2e).Dump(), "lwl $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0x993104d2).Dump(), "lwr $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0x9931fb2e).Dump(), "lwr $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(MIPSInstr(0xc13104d2).Dump(), "ll $s1, 0x4d2($t1)");
-//  ASSERT_EQ(MIPSInstr(0xc131fb2e).Dump(), "ll $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xc13104d2).Dump(), "ll $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xc131fb2e).Dump(), "ll $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xa13104d2).Dump(), "sb $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0xa131fb2e).Dump(), "sb $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xa53104d2).Dump(), "sh $s1, 0x4d2($t1)");
@@ -130,8 +120,8 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0xa931fb2e).Dump(), "swl $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xb93104d2).Dump(), "swr $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0xb931fb2e).Dump(), "swr $s1, 0xfb2e($t1)");
-//  ASSERT_EQ(MIPSInstr(0xe13104d2).Dump(), "sc $s1, 0x4d2($t1)");
-//  ASSERT_EQ(MIPSInstr(0xe131fb2e).Dump(), "sc $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xe13104d2).Dump(), "sc $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xe131fb2e).Dump(), "sc $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0x1229ffff).Dump(), "beq $s1, $t1, -1");
     ASSERT_EQ(MIPSInstr(0x1229000e).Dump(), "beq $s1, $t1, 14");
     ASSERT_EQ(MIPSInstr(0x0621fffc).Dump(), "bgez $s1, -4");

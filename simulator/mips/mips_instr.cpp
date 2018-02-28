@@ -179,10 +179,12 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     {0x2B, { "sw",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 1} },
     //       0x2C   store double word left
     //       0x2D   store double word right
-    {0x2E, { "swr", OUT_I_STORER, 4, &MIPSInstr::calculate_store_addr, 1 } }
-    //       0x2F   coprocessor
+    {0x2E, { "swr", OUT_I_STORER, 4, &MIPSInstr::calculate_store_addr, 1 } },
+    //       0x2F   cache
 
-    // 0x30 - 0x3F atomic load/stores
+    // Advanced loads and stores
+    {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr, 1} },
+    {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
 };
 
 const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
@@ -190,9 +192,13 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
-    {0x02, { "mul", OUT_R_ARITHM, 0, &MIPSInstr::execute_mult, 32} },
-    {0x20, { "clz", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz, 32} },
-    {0x21, { "clo", OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo, 32} }
+    {0x00, { "madd",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
+    {0x01, { "maddu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
+    {0x02, { "mul",   OUT_R_ARITHM,  0, &MIPSInstr::execute_mult,    32} },
+    {0x04, { "msub",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
+    {0x05, { "msubu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
+    {0x20, { "clz",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz,     32} },
+    {0x21, { "clo",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo,     32} },
 };
 
 std::array<std::string_view, REG_NUM_MAX> MIPSInstr::regTable =
