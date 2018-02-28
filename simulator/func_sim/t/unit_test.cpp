@@ -52,7 +52,7 @@ TEST( Func_Sim, Run_SMC_Trace)
 TEST( Func_Sim, Run_nop_trace)
 {
     FuncSim<MIPS> mips;
-    GTEST_ASSERT_NO_DEATH( mips.run( smc_code, smc_code_num_steps + 100)
+    ASSERT_EXIT( mips.run( smc_code, smc_code_num_steps + 100)
                  ::testing::ExitedWithCode( EXIT_FAILURE), "Bearings lost:.*");
 }
 
