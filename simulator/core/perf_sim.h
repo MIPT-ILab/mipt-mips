@@ -87,7 +87,6 @@ private:
     void clock_execute( Cycle cycle);
     void clock_memory( Cycle cycle);
     Instr read_instr( Cycle cycle);
-    Addr get_PC( Cycle cycle);
 
 public:
     explicit PerfSim( bool log);
