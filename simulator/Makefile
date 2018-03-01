@@ -23,6 +23,7 @@ CPPS= \
     bypass/data_bypass.cpp \
     fetch/fetch.cpp \
     mips/mips_instr.cpp \
+    mips/mips_register.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
     writeback/writeback.cpp \

@@ -8,13 +8,10 @@
 
 #include "data_bypass.h"
 
-
 #include <mips/mips_instr.h>
 #include <infra/ports/timing.h>
 
-
-
-void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegNum num)
+void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegister num)
 {
     auto& entry = scoreboard.get_entry( num);
 
@@ -26,11 +23,11 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegNum num)
         entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY 
                                             : 0_RSG; // EXECUTE
 
-    if ( instr.get_dst_num() == MIPS_REG_HI_LO)
+    if ( instr.get_dst_num().is_mips_hi_lo())
     {
         is_HI_master_DIVMULT = true;
     }
-    else if ( num == MIPS_REG_HI)
+    else if ( num.is_mips_lo())
     {
         is_HI_master_DIVMULT = false;
     }
@@ -43,13 +40,13 @@ void DataBypass::trace_new_instr( const MIPSInstr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
 
-    if ( dst_reg_num == MIPS_REG_ZERO)
+    if ( dst_reg_num.is_zero())
         return;
 
-    if ( dst_reg_num == MIPS_REG_HI_LO)
+    if ( dst_reg_num.is_mips_hi_lo())
     {
-        trace_new_register( instr, MIPS_REG_LO);
-        trace_new_register( instr, MIPS_REG_HI);
+        trace_new_register( instr, MIPSRegister::mips_lo );
+        trace_new_register( instr, MIPSRegister::mips_hi );
         return;
     }
 
@@ -86,13 +83,13 @@ void DataBypass::cancel( const MIPSInstr& instr)
 {
     auto dst_reg_num = instr.get_dst_num();
 
-    if ( dst_reg_num == MIPS_REG_ZERO)
+    if ( dst_reg_num.is_zero())
         return;
 
-    if ( dst_reg_num == MIPS_REG_HI_LO)
+    if ( dst_reg_num.is_mips_hi_lo())
     {
-        untrace_register( MIPS_REG_HI);
-        untrace_register( MIPS_REG_LO);
+        untrace_register( MIPSRegister::mips_hi );
+        untrace_register( MIPSRegister::mips_lo );
         return;
     }
 

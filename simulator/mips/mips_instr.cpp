@@ -201,27 +201,6 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     {0x21, { "clo",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo,     32} },
 };
 
-std::array<std::string_view, MIPS_REG_MAX> MIPSInstr::regTable =
-{{
-    "zero",
-    "at",
-    "v0", "v1",
-    "a0", "a1", "a2", "a3",
-    "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
-    "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
-    "t8", "t9",
-    "k0", "k1",
-    "gp",
-    "sp",
-    "fp",
-    "ra",
-    "hi",  "lo", "hi~lo"
-}};
-
-std::string_view MIPSInstr::regTableName(MIPSRegNum reg) {
-    return regTable.at(static_cast<size_t>( reg));
-}
-
 MIPSInstr::MIPSInstr( uint32 bytes, Addr PC) :
     instr( bytes),
     new_PC( PC + 4),
@@ -281,84 +260,84 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
     switch ( operation)
     {
         case OUT_R_MFHI:
-            src1 = MIPS_REG_HI;
-            dst  = static_cast<MIPSRegNum>(instr.asR.rd);
-            oss <<  " $" << regTableName(dst);
+            src1 = MIPSRegister::mips_hi;
+            dst  = MIPSRegister(instr.asR.rd);
+            oss <<  " $" << dst;
             break;
         case OUT_R_MFLO:
-            src1 = MIPS_REG_LO;
-            dst  = static_cast<MIPSRegNum>(instr.asR.rd);
-            oss <<  " $" << regTableName(dst);
+            src1 = MIPSRegister::mips_lo;
+            dst  = MIPSRegister(instr.asR.rd);
+            oss <<  " $" << dst;
             break;
         case OUT_R_MTHI:
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst  = MIPS_REG_HI;
-            oss <<  " $" << regTableName(src1);
+            src1 = MIPSRegister(instr.asR.rs);
+            dst  = MIPSRegister::mips_hi;
+            oss <<  " $" << src1;
             break;
         case OUT_R_MTLO:
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst  = MIPS_REG_LO;
-            oss <<  " $" << regTableName(src1);
+            src1 = MIPSRegister(instr.asR.rs);
+            dst  = MIPSRegister::mips_lo;
+            oss <<  " $" << src1;
             break;
         case OUT_R_DIVMULT:
-            src2 = static_cast<MIPSRegNum>(instr.asR.rt);
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst  = MIPS_REG_HI_LO;
-            oss <<  " $" << regTableName(src1)
-                << ", $" << regTableName(src2);
+            src2 = MIPSRegister(instr.asR.rt);
+            src1 = MIPSRegister(instr.asR.rs);
+            dst  = MIPSRegister::mips_hi_lo;
+            oss <<  " $" << src1
+                << ", $" << src2;
             break;
         case OUT_R_ARITHM:
         case OUT_R_CONDM:
-            src2 = static_cast<MIPSRegNum>(instr.asR.rt);
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst  = static_cast<MIPSRegNum>(instr.asR.rd);
+            src2 = MIPSRegister(instr.asR.rt);
+            src1 = MIPSRegister(instr.asR.rs);
+            dst  = MIPSRegister(instr.asR.rd);
 
-            oss <<  " $" << regTableName(dst)
-                << ", $" << regTableName(src1)
-                << ", $" << regTableName(src2);
+            oss <<  " $" << dst
+                << ", $" << src1
+                << ", $" << src2;
             break;
         case OUT_R_SHIFT:
-            src2 = static_cast<MIPSRegNum>(instr.asR.rs);
-            src1 = static_cast<MIPSRegNum>(instr.asR.rt);
-            dst  = static_cast<MIPSRegNum>(instr.asR.rd);
+            src2 = MIPSRegister(instr.asR.rs);
+            src1 = MIPSRegister(instr.asR.rt);
+            dst  = MIPSRegister(instr.asR.rd);
 
-            oss <<  " $" << regTableName(dst)
-                << ", $" << regTableName(src1)
-                << ", $" << regTableName(src2);
+            oss <<  " $" << dst
+                << ", $" << src1
+                << ", $" << src2;
             break;
         case OUT_R_SHAMT:
-            src1  = static_cast<MIPSRegNum>(instr.asR.rt);
-            dst   = static_cast<MIPSRegNum>(instr.asR.rd);
+            src1  = MIPSRegister(instr.asR.rt);
+            dst   = MIPSRegister(instr.asR.rd);
             shamt = instr.asR.shamt;
 
-            oss <<  " $" << regTableName(dst)
-                << ", $" << regTableName(src1)
+            oss <<  " $" << dst
+                << ", $" << src1
                 <<  ", " << std::dec << shamt;
             break;
         case OUT_R_JUMP_LINK:
-            src1  = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst   = static_cast<MIPSRegNum>(instr.asR.rd);
-            oss <<  " $" << regTableName(dst)
-                << ", $" << regTableName(src1);
+            src1  = MIPSRegister(instr.asR.rs);
+            dst   = MIPSRegister(instr.asR.rd);
+            oss <<  " $" << dst
+                << ", $" << src1;
             break;
         case OUT_R_JUMP:
-            dst = MIPS_REG_ZERO;
-            src1  = static_cast<MIPSRegNum>(instr.asR.rs);
-            oss << " $" << regTableName(src1);
+            dst = MIPSRegister::zero;
+            src1  = MIPSRegister(instr.asR.rs);
+            oss << " $" << src1;
             break;
         case OUT_R_TRAP:
-            dst = MIPS_REG_ZERO;
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            src2 = static_cast<MIPSRegNum>(instr.asR.rt);
+            dst = MIPSRegister::zero;
+            src1 = MIPSRegister(instr.asR.rs);
+            src2 = MIPSRegister(instr.asR.rt);
 
-            oss <<  " $" << regTableName(src1)
-                << ", $" << regTableName(src2);
+            oss <<  " $" << src1
+                << ", $" << src2;
             break;
         case OUT_RI_TRAP:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
+            src1 = MIPSRegister(instr.asI.rs);
 
-            oss << " $" << regTable[src1] << ", "
+            oss << " $" << src1 << ", "
                 << std::hex << "0x"
                 << static_cast<int16>(v_imm) << std::dec;
             break;
@@ -366,40 +345,40 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
             break;
         case OUT_I_ARITHM:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            dst  = static_cast<MIPSRegNum>(instr.asI.rt);
+            src1 = MIPSRegister(instr.asI.rs);
+            dst  = MIPSRegister(instr.asI.rt);
 
-            oss << " $" << regTable[dst] << ", $"
-                << regTable[src1] << ", "
+            oss << " $" << dst << ", $"
+                << src1 << ", "
                 << std::hex << "0x" << v_imm << std::dec;
             break;
         case OUT_I_BRANCH:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            src2 = static_cast<MIPSRegNum>(instr.asI.rt);
+            src1 = MIPSRegister(instr.asI.rs);
+            src2 = MIPSRegister(instr.asI.rt);
 
-            oss << " $" << regTable[src1] << ", $"
-                << regTable[src2] << ", "
+            oss << " $" << src1 << ", $"
+                << src2 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_RI_BRANCH_0:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            oss << " $" << regTable[src1] << ", "
+            src1 = MIPSRegister(instr.asI.rs);
+            oss << " $" << src1 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_I_BRANCH_0:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
+            src1 = MIPSRegister(instr.asI.rs);
 
-            oss << " $" << regTable[src1] << ", "
+            oss << " $" << src1 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_I_CONST:
             v_imm = instr.asI.imm;
-            dst  = static_cast<MIPSRegNum>(instr.asI.rt);
+            dst  = MIPSRegister(instr.asI.rt);
 
-            oss << " $" << regTable[dst] << std::hex
+            oss << " $" << dst << std::hex
                 << ", 0x" << v_imm << std::dec;
             break;
 
@@ -408,51 +387,51 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
         case OUT_I_LOADL:
         case OUT_I_LOADR:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            dst  = static_cast<MIPSRegNum>(instr.asI.rt);
+            src1 = MIPSRegister(instr.asI.rs);
+            dst  = MIPSRegister(instr.asI.rt);
 
-            oss << " $" << regTable[dst] << ", 0x"
+            oss << " $" << dst << ", 0x"
                 << std::hex << v_imm
-                << "($" << regTable[src1] << ")" << std::dec;
+                << "($" << src1 << ")" << std::dec;
             break;
 
         case OUT_I_STORE:
         case OUT_I_STOREL:
         case OUT_I_STORER:
             v_imm = instr.asI.imm;
-            src2 = static_cast<MIPSRegNum>(instr.asI.rt);
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            dst  = MIPS_REG_ZERO;
+            src2 = MIPSRegister(instr.asI.rt);
+            src1 = MIPSRegister(instr.asI.rs);
+            dst  = MIPSRegister::zero;
 
-            oss << " $" << regTable[src2] << ", 0x"
+            oss << " $" << src2 << ", 0x"
                 << std::hex << v_imm
-                << "($" << regTable[src1] << ")" << std::dec;
+                << "($" << src1 << ")" << std::dec;
             break;
         case OUT_RI_BRANCH_LINK:
             v_imm = instr.asI.imm;
-            src1 = static_cast<MIPSRegNum>(instr.asI.rs);
-            dst = MIPS_REG_RA;
-            oss << " $" << regTable[src1] << ", "
+            src1 = MIPSRegister(instr.asI.rs);
+            dst = MIPSRegister::return_address;
+            oss << " $" << src1 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_J_JUMP_LINK:
             v_imm = instr.asJ.imm;
-            dst = MIPS_REG_RA;
+            dst = MIPSRegister::return_address;
             oss << " 0x"
                 << std::hex << static_cast<uint16>(v_imm) << std::dec;
             break;
         case OUT_J_JUMP:
             v_imm = instr.asJ.imm;
-            dst = MIPS_REG_ZERO;
+            dst = MIPSRegister::zero;
             oss << " 0x"
                 << std::hex << static_cast<uint16>(v_imm) << std::dec;
             break;
         case OUT_SP2_COUNT:
-            src1 = static_cast<MIPSRegNum>(instr.asR.rs);
-            dst  = static_cast<MIPSRegNum>(instr.asR.rd);
+            src1 = MIPSRegister(instr.asR.rs);
+            dst  = MIPSRegister(instr.asR.rd);
 
-            oss <<  " $" << regTableName(dst )
-                << ", $" << regTableName(src1);
+            oss <<  " $" << dst 
+                << ", $" << src1;
             break;
         default:
             assert( false);
@@ -474,15 +453,15 @@ void MIPSInstr::execute()
     (this->*function)();
     complete = true;
 
-    if ( dst != MIPS_REG_ZERO && !is_load() && get_writes_dst())
+    if ( !dst.is_zero() && !is_load() && get_writes_dst())
     {
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
-        if ( dst == MIPS_REG_HI_LO)
-            oss << regTableName( MIPS_REG_HI) << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
-                << regTableName( MIPS_REG_LO);
+        if ( dst.is_mips_hi_lo())
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+                <<  MIPSRegister::mips_lo;
         else
-            oss << regTableName( dst);
+            oss <<  dst;
 
         oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
         disasm += oss.str();
@@ -510,10 +489,10 @@ void MIPSInstr::set_v_dst( uint32 value)
         assert( false);
     }
 
-    if ( dst != MIPS_REG_ZERO)
+    if ( !dst.is_zero())
     {
         std::ostringstream oss;
-        oss << "\t [ $" << regTableName(dst)
+        oss << "\t [ $" << dst
             << " = 0x" << std::hex << v_dst << "]";
         disasm += oss.str();
     }
