@@ -20,10 +20,13 @@ CPPS= \
     infra/config/config.cpp \
     infra/ports/ports.cpp \
     infra/cache/cache_tag_array.cpp \
+    bypass/data_bypass.cpp \
+    fetch/fetch.cpp \
     mips/mips_instr.cpp \
-    mips/mips_memory.cpp \
+    mips/mips_register.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
+    writeback/writeback.cpp \
     simulator.cpp
 
 
@@ -74,7 +77,7 @@ TESTS:= \
     func_sim \
     core \
 
-TEST_PATH:=$(shell pwd)/../traces/tt.core.out
+TEST_PATH:=$(shell pwd)/../traces
 
 test: $(addsuffix /t/test.run, $(TESTS))
 

@@ -18,42 +18,7 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
-enum RegNum : uint8
-{
-    REG_NUM_ZERO = 0,
-    REG_NUM_AT,
-    REG_NUM_V0,
-    REG_NUM_V1,
-    REG_NUM_A0,
-    REG_NUM_A1,
-    REG_NUM_A2,
-    REG_NUM_A3,
-    REG_NUM_T0,
-    REG_NUM_T1,
-    REG_NUM_T2,
-    REG_NUM_T3,
-    REG_NUM_T4,
-    REG_NUM_T5,
-    REG_NUM_T6,
-    REG_NUM_T7,
-    REG_NUM_S0,
-    REG_NUM_S1,
-    REG_NUM_S2,
-    REG_NUM_S3,
-    REG_NUM_S4,
-    REG_NUM_S5,
-    REG_NUM_S6,
-    REG_NUM_S7,
-    REG_NUM_T8,
-    REG_NUM_T9,
-    REG_NUM_K0,
-    REG_NUM_K1,
-    REG_NUM_GP,
-    REG_NUM_SP,
-    REG_NUM_FP,
-    REG_NUM_RA,
-    REG_NUM_MAX
-};
+#include "mips_register.h"
 
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
@@ -73,18 +38,38 @@ inline uint32 count_zeros(uint32 value)
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
+template<typename T>
+uint64 mips_multiplication(T x, T y) {
+    return static_cast<uint64>(x) * static_cast<uint64>(y);
+}
+
+template<typename T, typename T64>
+uint64 mips_division(T x, T y) {
+    if (y == 0)
+        return 0;
+    auto x1 = static_cast<T64>(x);
+    auto y1 = static_cast<T64>(y);
+    return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32);
+}
+
 class MIPSInstr
 {
     private:
         enum OperationType : uint8
         {
             OUT_R_ARITHM,
+            OUT_R_DIVMULT,
+            OUT_R_CONDM,
             OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_R_TRAP,
+            OUT_R_MFLO,
+            OUT_R_MTLO,
+            OUT_R_MFHI,
+            OUT_R_MTHI,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_I_BRANCH_0,
@@ -164,31 +149,26 @@ class MIPSInstr
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapIJ;
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapMIPS32;
 
-        static std::string_view regTableName(RegNum reg);
-        static std::array<std::string_view, REG_NUM_MAX> regTable;
-
-        RegNum src1 = REG_NUM_ZERO;
-        RegNum src2 = REG_NUM_ZERO;
-        RegNum dst = REG_NUM_ZERO;
+        MIPSRegister src1 = MIPSRegister::zero;
+        MIPSRegister src2 = MIPSRegister::zero;
+        MIPSRegister dst = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
-        uint32 v_dst = NO_VAL32;
+        uint64 v_dst = NO_VAL64;
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
+        // convert this to bitset
         bool complete   = false;
         bool writes_dst = true;
-
-        /* info for branch misprediction unit */
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
         bool _is_jump_taken = false;      // actual result
 
-        const Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
+
+        const Addr PC = NO_VAL32;
 
 #if 0
         std::string disasm = {};
@@ -230,26 +210,11 @@ class MIPSInstr
         void execute_subu()  { v_dst = v_src1 - v_src2; }
         void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
 
-        void execute_multu()
-        {
-             uint64 mult_res = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_mult()
-        {
-             uint64 mult_res = static_cast<int64>(v_src1) * static_cast<int64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
-
-        void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_mfhi()  { v_dst = hi; };
-        void execute_mthi()  { hi = v_src2; };
-        void execute_mflo()  { v_dst = lo; };
-        void execute_mtlo()  { lo = v_src2;};
+        void execute_mult()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_multu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_div()   { v_dst = mips_division<int32, int64>(v_src1, v_src2); }
+        void execute_divu()  { v_dst = mips_division<uint32, uint64>(v_src1, v_src2); }
+        void execute_move()  { v_dst = v_src1; }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
@@ -262,14 +227,14 @@ class MIPSInstr
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-        void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
+        void execute_nor()   { v_dst = ~static_cast<uint64>(v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
 
-        void execute_movn()  { v_dst = v_src1; writes_dst = (v_src2 != 0);}
-        void execute_movz()  { v_dst = v_src1; writes_dst = (v_src2 == 0);}
+        void execute_movn()  { execute_move(); writes_dst = (v_src2 != 0);}
+        void execute_movz()  { execute_move(); writes_dst = (v_src2 == 0);}
 
         // MIPStion-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
@@ -289,11 +254,16 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
+        void execute_jump( Addr target)
+        {
+            _is_jump_taken = true;
+            new_PC = target;
+        }
 
-        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
+        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jr() { execute_jump(align_up<2>(v_src1)); }
+        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jalr() { v_dst = new_PC; execute_jump(align_up<2>(v_src1)); }
 
         template<Predicate p>
         void execute_branch_and_link()
@@ -316,24 +286,19 @@ class MIPSInstr
 
         Execute function = &MIPSInstr::execute_unknown;
     public:
-        uint32 hi = NO_VAL32;
-        uint32 lo = NO_VAL32;
-
         MIPSInstr() = delete;
 
         explicit
-        MIPSInstr( uint32 bytes, Addr PC = 0,
-                   bool predicted_taken = false,
-                   Addr predicted_target = 0);
+        MIPSInstr( uint32 bytes, Addr PC = 0);
 
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const MIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
-        RegNum get_src1_num() const { return src1; }
-        RegNum get_src2_num() const { return src2; }
-        RegNum get_dst_num()  const { return dst;  }
+        MIPSRegister get_src1_num() const { return src1; }
+        MIPSRegister get_src2_num() const { return src2; }
+        MIPSRegister get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP         ||
@@ -345,7 +310,7 @@ class MIPSInstr
                                       operation == OUT_RI_BRANCH_0    ||
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
-        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
+
         bool is_load()  const { return operation == OUT_I_LOAD  ||
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
@@ -354,15 +319,20 @@ class MIPSInstr
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
+        bool is_halt() const { return is_jump() && new_PC == 0; }
+
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
         bool get_writes_dst() const { return writes_dst; }
 
+        bool is_bubble() const { return is_nop() && PC == 0; }
+
         void set_v_src1(uint32 value) { v_src1 = value; }
         void set_v_src2(uint32 value) { v_src2 = value; }
 
-        uint32 get_v_dst() const { return v_dst; }
+        uint64 get_v_dst() const { return v_dst; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }

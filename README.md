@@ -6,7 +6,7 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of p
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Simulation frequency gets up to 0.4 MHz.
+* **Speed**. Simulation frequency gets up to 0.9 MHz on i5-7300U.
 
 MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs

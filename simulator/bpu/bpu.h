@@ -16,6 +16,7 @@
 #include <infra/log.h>
 #include <infra/types.h>
 
+#include "bp_interface.h"
 #include "bpentry.h"
 
 /*
@@ -26,9 +27,10 @@
 class BaseBP
 {
 public:
-    virtual bool is_taken( Addr PC) = 0;
-    virtual Addr get_target( Addr PC) = 0;
-    virtual void update( bool is_taken, Addr branch_ip, Addr target) = 0;
+    virtual bool is_taken( Addr PC) const = 0;
+    virtual Addr get_target( Addr PC) const = 0;
+    virtual BPInterface get_bp_info( Addr PC) const = 0;
+    virtual void update( const BPInterface& bp_upd) = 0;
 
     BaseBP() = default;
     virtual ~BaseBP() = default;
@@ -61,7 +63,7 @@ public:
         { }
 
     /* prediction */
-    bool is_taken( Addr PC) final
+    bool is_taken( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -70,7 +72,7 @@ public:
         return is_hit && data[ way][ tags.set(PC)].is_taken( PC);
     }
 
-    Addr get_target( Addr PC) final
+    Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
@@ -84,21 +86,24 @@ public:
     }
 
     /* update */
-    void update( bool is_taken,
-                 Addr branch_ip,
-                 Addr target) final
+    void update( const BPInterface& bp_upd) final
     {
-        const auto set = tags.set( branch_ip);
-        auto[ is_hit, way] = tags.read( branch_ip);
+        const auto set = tags.set( bp_upd.pc);
+        auto[ is_hit, way] = tags.read( bp_upd.pc);
 
         if ( !is_hit) { // miss
-            way = tags.write( branch_ip); // add new entry to cache
+            way = tags.write( bp_upd.pc); // add new entry to cache
             auto& entry = data[ way][ set];
             entry.reset();
-            entry.update_target( target);
+            entry.update_target( bp_upd.target);
         }
 
-        data[ way][ set].update( is_taken, target);
+        data[ way][ set].update( bp_upd.is_taken, bp_upd.target);
+    }
+
+    BPInterface get_bp_info( Addr PC) const final
+    {
+        return BPInterface( PC, is_taken( PC), get_target( PC)); 
     }
 };
 

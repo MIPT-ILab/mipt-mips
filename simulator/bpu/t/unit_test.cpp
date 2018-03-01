@@ -46,48 +46,48 @@ TEST( Main, PredictingBits)
     Addr target = 28;
 
     // Learn
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // "Over" - learning
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // Moderate "Un" - learning
-    bp->update( false, PC, NO_VAL32);
+    bp->update( BPInterface( PC, false, NO_VAL32));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 
     // Strong "un" - learning
-    bp->update( false, PC, NO_VAL32);
-    bp->update( false, PC, NO_VAL32);
-    bp->update( false, PC, NO_VAL32);
+    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32));
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->update( BPInterface( PC, false, NO_VAL32));
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->update( BPInterface( PC, false, NO_VAL32));
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( false, PC, NO_VAL32);
+    bp->update( BPInterface( PC, false, NO_VAL32));
     ASSERT_EQ( bp->is_taken(PC), false);
 
     // Learn again
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), false);
 
-    bp->update( true, PC, target);
+    bp->update( BPInterface( PC, true, target));
     ASSERT_EQ( bp->is_taken(PC), true);
     ASSERT_EQ( bp->get_target(PC), target);
 }
@@ -104,9 +104,9 @@ TEST( Overload, LRU)
     // Trying to make it forget the PCconst
     for ( int i = 0; i < 1000; i++)
     {
-        bp->update( false, i, NO_VAL32);
+        bp->update( BPInterface( i, false, NO_VAL32));
         if ( i % 50 == 0)
-            bp->update( true, PCconst, target);
+            bp->update( BPInterface( PCconst, true, target));
     }
 
     // Checking some random PC and PCConst

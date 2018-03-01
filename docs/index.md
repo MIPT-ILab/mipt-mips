@@ -6,7 +6,7 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 
 MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture.
 
-Lectures are delivered every Saturday at 18:30 in **304 RT building** of MIPT.
+Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
 
 ### Term 1: CS Basics and Components
 
@@ -36,7 +36,11 @@ Lectures are delivered every Saturday at 18:30 in **304 RT building** of MIPT.
 
  Date | Event | Hometask
  :-: |:---- |:----------------
- 10<br/>Feb | **L11: Caches and Memory Hierarchy, Part I** | |
+ 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) | |
+ 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) | |
+ 22<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
+ 01<br/>Mar | **L13: Out-of-Order execution, pt. I** | |
+
  
 ### MSU Seminars
 
@@ -55,10 +59,10 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 
 Year | Name | Score | Comments
 :----: |:----: | ------------------------------ | ------------------------------
-**2017/2018** | Denis Los | 12 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70) |
+**2017/2018** | Denis Los | 15 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31) |
 2016/2017 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
 **2017/2018** | Kirill Nedostoev | 7 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93) |
-**2017/2018** | Alexander Misevich | 4 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201) |
+**2017/2018** | Alexander Misevich | 6 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124) |
 2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 **2017/2018** | Alexander Timofeev | 3 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 **2017/2018** | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
