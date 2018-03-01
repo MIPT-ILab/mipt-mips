@@ -17,8 +17,8 @@
 
 namespace config {
     static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
-    static RequiredValue<uint64> num_steps = { "numsteps,n", "number of instructions to run"};
 
+    static Value<uint64> num_steps = { "numsteps,n", MAX_VAL64, "number of instructions to run"};
     static Value<std::string> isa = { "isa,I", "mips", "modeled ISA"};
     static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
     static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};

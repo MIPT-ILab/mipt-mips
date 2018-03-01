@@ -11,8 +11,6 @@
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
-static const int64 valid_elf_file_num_steps = 2503;
-static const int64 smc_code_num_steps = 234;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -40,19 +38,13 @@ TEST( Func_Sim, Make_A_Step)
 TEST( Func_Sim, Run_Full_Trace)
 {
     FuncSim<MIPS> mips;
-    GTEST_ASSERT_NO_DEATH( mips.run( valid_elf_file, valid_elf_file_num_steps); );
+    GTEST_ASSERT_NO_DEATH( mips.run_no_limit( valid_elf_file); );
 }
 
-TEST( Func_Sim, Run_SMC_Trace)
+TEST( Func_Sim, Run_SMC_trace)
 {
     FuncSim<MIPS> mips;
-    GTEST_ASSERT_NO_DEATH( mips.run( smc_code, smc_code_num_steps); );
-}
-
-TEST( Func_Sim, Run_nop_trace)
-{
-    FuncSim<MIPS> mips;
-    ASSERT_EXIT( mips.run( smc_code, smc_code_num_steps + 100);,
+    ASSERT_EXIT( mips.run_no_limit( smc_code);,
                  ::testing::ExitedWithCode( EXIT_FAILURE), "Bearings lost:.*");
 }
 

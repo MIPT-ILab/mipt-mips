@@ -11,8 +11,6 @@
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
-static const int64 valid_elf_file_num_steps = 2503;
-static const int64 smc_code_num_steps = 234;
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -39,13 +37,13 @@ TEST( Perf_Sim_init, Process_Wrong_Args)
 TEST( Perf_Sim, Run_Full_Trace)
 {
     PerfSim<MIPS> mips( false);
-    GTEST_ASSERT_NO_DEATH( mips.run( valid_elf_file, valid_elf_file_num_steps); );
+    GTEST_ASSERT_NO_DEATH( mips.run_no_limit( valid_elf_file); );
 }
 
 TEST( Perf_Sim, Run_SMC_Trace)
 {
     PerfSim<MIPS> mips( false);
-    ASSERT_EXIT( mips.run( smc_code, smc_code_num_steps);,
+    ASSERT_EXIT( mips.run_no_limit( smc_code);,
                  ::testing::ExitedWithCode( EXIT_FAILURE), "Mismatch:.*");
 }
 

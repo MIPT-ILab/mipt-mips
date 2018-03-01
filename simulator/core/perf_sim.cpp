@@ -87,8 +87,6 @@ template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
-    assert( instrs_to_run < MAX_VAL32);
-
     memory = new Memory( tr);
     fetch.set_memory( memory);
     writeback.set_instrs_to_run( instrs_to_run);

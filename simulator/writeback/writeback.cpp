@@ -54,7 +54,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     /* update simulator cycles info */
     ++executed_instrs;
     last_writeback_cycle = cycle;
-    if ( executed_instrs >= instrs_to_run)
+    if ( executed_instrs >= instrs_to_run || instr.is_halt())
         wp_halt->write( true, cycle);
     
     sout << "Executed instructions: " << executed_instrs
