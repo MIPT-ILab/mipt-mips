@@ -76,6 +76,8 @@ void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
+        if ( instr.is_halt())
+            break;
     }
 }
 

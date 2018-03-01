@@ -202,10 +202,11 @@ class MIPSInstr
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
+        // convert this to bitset
         bool complete   = false;
         bool writes_dst = true;
-
         bool _is_jump_taken = false;      // actual result
+
         Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
@@ -294,11 +295,16 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
+        void execute_jump( Addr target)
+        {
+            _is_jump_taken = true;
+            new_PC = target;
+        }
 
-        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
+        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jr() { execute_jump(align_up<2>(v_src1)); }
+        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jalr() { v_dst = new_PC; execute_jump(align_up<2>(v_src1)); }
 
         template<Predicate p>
         void execute_branch_and_link()
@@ -354,6 +360,7 @@ class MIPSInstr
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
+        bool is_halt() const { return is_jump() && new_PC == 0; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
 
