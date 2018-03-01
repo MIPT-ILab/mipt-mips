@@ -1,4 +1,4 @@
- /* mips_instr.h - instruction parser for mips
+ /* mips_register.h - MIPS register info class
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2014-2018 MIPT-MIPS
  */
@@ -7,6 +7,8 @@
 #define MIPS_REG_H
 
 #include <array>
+#include <iostream>
+#include <utility>
 
 // MIPT-MIPS modules
 #include <infra/types.h>

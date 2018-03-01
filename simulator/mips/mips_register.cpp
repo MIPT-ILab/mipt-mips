@@ -1,3 +1,8 @@
+ /* mips_register.cpp - MIPS register info class
+ * @author Pavel Kryukov pavel.kryukov@phystech.edu
+ * Copyright 2014-2018 MIPT-MIPS
+ */
+
 #include "mips_register.h"
 
 const MIPSRegister MIPSRegister::mips_hi = MIPSRegister( MIPS_REG_HI);
