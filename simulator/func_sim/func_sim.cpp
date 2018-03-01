@@ -17,7 +17,7 @@ FuncSim<ISA>::~FuncSim()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::update_nop_counter( typename const FuncSim<ISA>::FuncInstr& instr)
+void FuncSim<ISA>::update_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
 {
     if ( instr.is_nop())
         ++nops_in_a_row;
