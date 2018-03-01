@@ -24,11 +24,14 @@ matrix:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator
-  - make mipt-mips
+#  - make mipt-mips
+  - mkdir build && cd $TRAVIS_BUILD_DIR/build
+  - cmake ./..
+  - make
   - cd $TRAVIS_BUILD_DIR/traces
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - make test
+  - cd $TRAVIS_BUILD_DIR/simulator/build
+  - ctest
 # Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Check simulation spped
@@ -61,4 +64,5 @@ install:
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
   - make > /dev/null
   - make install > /dev/null
+  - cmake > /dev/null
   - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh

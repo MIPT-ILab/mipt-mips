@@ -2,7 +2,7 @@ project(Test-mips)
 
 set(SRCCPPS unit_test.cpp 
 ../mips_instr.cpp 
-../mips_memory.cpp 
+../mips_register.cpp 
 ../../infra/memory/memory.cpp 
 ../../infra/elf_parser/elf_parser.cpp)
  

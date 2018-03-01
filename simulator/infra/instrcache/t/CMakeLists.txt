@@ -1,6 +1,6 @@
 project(Test-infra-instrcache)
 
-set(SRCCPPS unit_test.cpp ../../../mips/mips_instr.cpp)
+set(SRCCPPS unit_test.cpp ../../../mips/mips_instr.cpp ../../../mips/mips_register.cpp)
 
 
 include_directories(../../.. ./.)

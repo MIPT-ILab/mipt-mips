@@ -9,9 +9,12 @@ set(SRCCPPS unit_test.cpp
                 ../../infra/ports/ports.cpp 
                 ../../infra/cache/cache_tag_array.cpp 
                 ../../mips/mips_instr.cpp 
-                ../../mips/mips_memory.cpp 
+                ../../mips/mips_register.cpp 
                 ../perf_sim.cpp 
-		../../func_sim/func_sim.cpp)
+		../../func_sim/func_sim.cpp
+		../../bypass/data_bypass.cpp
+		../../fetch/fetch.cpp
+		../../writeback/writeback.cpp)
 
 
 include_directories(../.. ./.)
