@@ -17,46 +17,14 @@
 class MIPSRegister {
     enum RegNum : uint8
     {
-        MIPS_REG_ZERO = 0,
-        MIPS_REG_AT,
-        MIPS_REG_V0,
-        MIPS_REG_V1,
-        MIPS_REG_A0,
-        MIPS_REG_A1,
-        MIPS_REG_A2,
-        MIPS_REG_A3,
-        MIPS_REG_T0,
-        MIPS_REG_T1,
-        MIPS_REG_T2,
-        MIPS_REG_T3,
-        MIPS_REG_T4,
-        MIPS_REG_T5,
-        MIPS_REG_T6,
-        MIPS_REG_T7,
-        MIPS_REG_S0,
-        MIPS_REG_S1,
-        MIPS_REG_S2,
-        MIPS_REG_S3,
-        MIPS_REG_S4,
-        MIPS_REG_S5,
-        MIPS_REG_S6,
-        MIPS_REG_S7,
-        MIPS_REG_T8,
-        MIPS_REG_T9,
-        MIPS_REG_K0,
-        MIPS_REG_K1,
-        MIPS_REG_GP,
-        MIPS_REG_SP,
-        MIPS_REG_FP,
-        MIPS_REG_RA,
-        MIPS_REG_HI,
-        MIPS_REG_LO,
-        MIPS_REG_HI_LO,
-        MIPS_REG_MAX
+#define REGISTER(X) MIPS_REG_ ## X
+#include "mips_register.def"
+#undef REGISTER
+        , MAX_VAL_RegNum
     };
-    
+
 public:
-    static constexpr size_t MAX_REG = static_cast<size_t>( MIPS_REG_MAX);
+    static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
     explicit MIPSRegister( uint32 id) : value( static_cast<RegNum>( id)) { }
     
@@ -65,10 +33,10 @@ public:
         return out << regTable[ rhs.value];
     }
 
-    bool is_zero()       const { return value == MIPS_REG_ZERO; }
-    bool is_mips_hi()    const { return value == MIPS_REG_HI; }
-    bool is_mips_lo()    const { return value == MIPS_REG_LO; }
-    bool is_mips_hi_lo() const { return value == MIPS_REG_HI_LO; }
+    bool is_zero()       const { return value == MIPS_REG_zero; }
+    bool is_mips_hi()    const { return value == MIPS_REG_hi; }
+    bool is_mips_lo()    const { return value == MIPS_REG_lo; }
+    bool is_mips_hi_lo() const { return value == MIPS_REG_hi_lo; }
     size_t to_size_t()   const { return value; }
     
     static const MIPSRegister mips_hi;
@@ -79,7 +47,7 @@ public:
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
 private:
-    RegNum value = MIPS_REG_ZERO;
+    RegNum value = MIPS_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
 };
 
