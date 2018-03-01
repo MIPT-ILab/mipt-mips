@@ -9,12 +9,10 @@
 #ifndef DATA_BYPASS_H
 #define DATA_BYPASS_H
 
-
-#include <set>
+#include <unordered_set>
 #include <array>
 
 #include <mips/mips_instr.h>
-
 
 class DataBypass
 {
@@ -109,7 +107,7 @@ class DataBypass
         }
 
         Scoreboard scoreboard = {};
-        std::set<MIPSRegNum> traced_registers = {};
+        std::unordered_set<MIPSRegNum> traced_registers = {};
 
         // gives an idea whether bypassed data should be transformed
         // when bypassing is needed for HI register 
