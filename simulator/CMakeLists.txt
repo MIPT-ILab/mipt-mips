@@ -86,14 +86,15 @@ else()
     set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "${TIDYFLAGS} -fix -- -std=c++17 -I. -isystem ${LIBELF_INCLUDE_DIRS} -isystem ${Boost_INCLUDE_DIRS}")
 endif()
 
-set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-    COMPILE_FLAGS "${WARNING_FLAGS}")
+#set_target_properties(
+#    ${PROJECT_NAME} PROPERTIES
+#    CXX_STANDARD 17
+#    CXX_STANDARD_REQUIRED ON
+#    COMPILE_FLAGS "${WARNING_FLAGS}")
 
 if(CLANG_TIDY_EXE)
-    set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+    #set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+    add_custom_target(tidy-check COMMAND "${CPPS} main.cpp ${DO_CLANG_TIDY}")
 endif()
 
 #googletest

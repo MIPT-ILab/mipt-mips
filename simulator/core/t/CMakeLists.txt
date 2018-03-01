@@ -1,6 +1,6 @@
 project(Test-core)
 
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/../../../../traces/tt.core.out\")
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/../../../../traces\")
 
 set(SRCCPPS unit_test.cpp 
 		../../infra/elf_parser/elf_parser.cpp 
