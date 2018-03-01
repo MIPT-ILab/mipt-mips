@@ -13,6 +13,7 @@
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/string/string_view.h>
 
 class MIPSRegister {
     enum RegNum : uint8
