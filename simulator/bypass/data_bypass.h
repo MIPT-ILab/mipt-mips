@@ -48,7 +48,7 @@ class DataBypass
         class BypassCommand
         {
             public:
-                BypassCommand( RegisterStage bypassing_stage, RegNum register_num)
+                BypassCommand( RegisterStage bypassing_stage, MIPSRegNum register_num)
                     : bypassing_stage( bypassing_stage)
                     , register_num( register_num)
                 { }
@@ -58,7 +58,7 @@ class DataBypass
 
             private:
                 const RegisterStage bypassing_stage;
-                const RegNum register_num;
+                const MIPSRegNum register_num;
         };
 
     private:
@@ -73,32 +73,32 @@ class DataBypass
         class Scoreboard
         {
             public:
-                RegisterInfo& get_entry( RegNum num)
+                RegisterInfo& get_entry( MIPSRegNum num)
                 {
                     return array.at( static_cast<std::size_t>( num));
                 }
 
-                const RegisterInfo& get_entry( RegNum num) const
+                const RegisterInfo& get_entry( MIPSRegNum num) const
                 {
                     return array.at( static_cast<std::size_t>( num));
                 }
 
             private:
-                std::array<RegisterInfo, REG_NUM_MAX> array = {};
+                std::array<RegisterInfo, MIPS_REG_MAX> array = {};
         };
 
         // returns current stage of passed register
         // in accordance with the current state of the scoreboard
-        auto get_current_stage( RegNum num) const
+        auto get_current_stage( MIPSRegNum num) const
         {
             return scoreboard.get_entry( num).current_stage;
         }
 
         // introduces a source register of a passed instruction to scoreboard 
-        void trace_new_register( const MIPSInstr& instr, RegNum num);
+        void trace_new_register( const MIPSInstr& instr, MIPSRegNum num);
 
         // discards the information about passed register
-        void untrace_register( RegNum num)
+        void untrace_register( MIPSRegNum num)
         {
             auto& entry = scoreboard.get_entry( num);
 
@@ -109,7 +109,7 @@ class DataBypass
         }
 
         Scoreboard scoreboard = {};
-        std::set<RegNum> traced_registers = {};
+        std::set<MIPSRegNum> traced_registers = {};
 
         // gives an idea whether bypassed data should be transformed
         // when bypassing is needed for HI register 
@@ -161,7 +161,7 @@ class DataBypass
 
             auto adapted_data = bypassed_data;
 
-            if ( register_num == REG_NUM_HI && is_HI_master_DIVMULT)
+            if ( register_num == MIPS_REG_HI && is_HI_master_DIVMULT)
                 adapted_data >>= 32;
             
             return adapted_data;

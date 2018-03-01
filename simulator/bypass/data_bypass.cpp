@@ -14,7 +14,7 @@
 
 
 
-void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
+void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegNum num)
 {
     auto& entry = scoreboard.get_entry( num);
 
@@ -26,11 +26,11 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, RegNum num)
         entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY 
                                             : 0_RSG; // EXECUTE
 
-    if ( instr.get_dst_num() == REG_NUM_HI_LO)
+    if ( instr.get_dst_num() == MIPS_REG_HI_LO)
     {
         is_HI_master_DIVMULT = true;
     }
-    else if ( num == REG_NUM_HI)
+    else if ( num == MIPS_REG_HI)
     {
         is_HI_master_DIVMULT = false;
     }
@@ -43,13 +43,13 @@ void DataBypass::trace_new_instr( const MIPSInstr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
 
-    if ( dst_reg_num == REG_NUM_ZERO)
+    if ( dst_reg_num == MIPS_REG_ZERO)
         return;
 
-    if ( dst_reg_num == REG_NUM_HI_LO)
+    if ( dst_reg_num == MIPS_REG_HI_LO)
     {
-        trace_new_register( instr, REG_NUM_LO);
-        trace_new_register( instr, REG_NUM_HI);
+        trace_new_register( instr, MIPS_REG_LO);
+        trace_new_register( instr, MIPS_REG_HI);
         return;
     }
 
@@ -86,13 +86,13 @@ void DataBypass::cancel( const MIPSInstr& instr)
 {
     auto dst_reg_num = instr.get_dst_num();
 
-    if ( dst_reg_num == REG_NUM_ZERO)
+    if ( dst_reg_num == MIPS_REG_ZERO)
         return;
 
-    if ( dst_reg_num == REG_NUM_HI_LO)
+    if ( dst_reg_num == MIPS_REG_HI_LO)
     {
-        untrace_register( REG_NUM_HI);
-        untrace_register( REG_NUM_LO);
+        untrace_register( MIPS_REG_HI);
+        untrace_register( MIPS_REG_LO);
         return;
     }
 

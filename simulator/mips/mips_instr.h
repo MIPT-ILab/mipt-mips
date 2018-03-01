@@ -18,44 +18,44 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
-enum RegNum : uint8
+enum MIPSRegNum : uint8
 {
-    REG_NUM_ZERO = 0,
-    REG_NUM_AT,
-    REG_NUM_V0,
-    REG_NUM_V1,
-    REG_NUM_A0,
-    REG_NUM_A1,
-    REG_NUM_A2,
-    REG_NUM_A3,
-    REG_NUM_T0,
-    REG_NUM_T1,
-    REG_NUM_T2,
-    REG_NUM_T3,
-    REG_NUM_T4,
-    REG_NUM_T5,
-    REG_NUM_T6,
-    REG_NUM_T7,
-    REG_NUM_S0,
-    REG_NUM_S1,
-    REG_NUM_S2,
-    REG_NUM_S3,
-    REG_NUM_S4,
-    REG_NUM_S5,
-    REG_NUM_S6,
-    REG_NUM_S7,
-    REG_NUM_T8,
-    REG_NUM_T9,
-    REG_NUM_K0,
-    REG_NUM_K1,
-    REG_NUM_GP,
-    REG_NUM_SP,
-    REG_NUM_FP,
-    REG_NUM_RA,
-    REG_NUM_HI,
-    REG_NUM_LO,
-    REG_NUM_HI_LO,
-    REG_NUM_MAX
+    MIPS_REG_ZERO = 0,
+    MIPS_REG_AT,
+    MIPS_REG_V0,
+    MIPS_REG_V1,
+    MIPS_REG_A0,
+    MIPS_REG_A1,
+    MIPS_REG_A2,
+    MIPS_REG_A3,
+    MIPS_REG_T0,
+    MIPS_REG_T1,
+    MIPS_REG_T2,
+    MIPS_REG_T3,
+    MIPS_REG_T4,
+    MIPS_REG_T5,
+    MIPS_REG_T6,
+    MIPS_REG_T7,
+    MIPS_REG_S0,
+    MIPS_REG_S1,
+    MIPS_REG_S2,
+    MIPS_REG_S3,
+    MIPS_REG_S4,
+    MIPS_REG_S5,
+    MIPS_REG_S6,
+    MIPS_REG_S7,
+    MIPS_REG_T8,
+    MIPS_REG_T9,
+    MIPS_REG_K0,
+    MIPS_REG_K1,
+    MIPS_REG_GP,
+    MIPS_REG_SP,
+    MIPS_REG_FP,
+    MIPS_REG_RA,
+    MIPS_REG_HI,
+    MIPS_REG_LO,
+    MIPS_REG_HI_LO,
+    MIPS_REG_MAX
 };
 
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
@@ -187,12 +187,12 @@ class MIPSInstr
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapIJ;
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapMIPS32;
 
-        static std::string_view regTableName(RegNum reg);
-        static std::array<std::string_view, REG_NUM_MAX> regTable;
+        static std::string_view regTableName(MIPSRegNum reg);
+        static std::array<std::string_view, MIPS_REG_MAX> regTable;
 
-        RegNum src1 = REG_NUM_ZERO;
-        RegNum src2 = REG_NUM_ZERO;
-        RegNum dst = REG_NUM_ZERO;
+        MIPSRegNum src1 = MIPS_REG_ZERO;
+        MIPSRegNum src2 = MIPS_REG_ZERO;
+        MIPSRegNum dst = MIPS_REG_ZERO;
 
         uint32 v_imm = NO_VAL32;
         uint32 v_src1 = NO_VAL32;
@@ -337,9 +337,9 @@ class MIPSInstr
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
-        RegNum get_src1_num() const { return src1; }
-        RegNum get_src2_num() const { return src2; }
-        RegNum get_dst_num()  const { return dst;  }
+        MIPSRegNum get_src1_num() const { return src1; }
+        MIPSRegNum get_src2_num() const { return src2; }
+        MIPSRegNum get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP         ||

@@ -16,24 +16,24 @@ class MIPSRF
         struct Reg {
             uint32 value = 0;
         };
-        std::array<Reg, REG_NUM_MAX> array = {};
+        std::array<Reg, MIPS_REG_MAX> array = {};
 
-        Reg& get_entry( RegNum num) { return array.at( static_cast<size_t>( num)); }
-        const Reg& get_entry( RegNum num) const { return array.at( static_cast<size_t>( num)); }
+        Reg& get_entry( MIPSRegNum num) { return array.at( static_cast<size_t>( num)); }
+        const Reg& get_entry( MIPSRegNum num) const { return array.at( static_cast<size_t>( num)); }
 
-        uint32 read( RegNum num) const
+        uint32 read( MIPSRegNum num) const
         {
-            assert( num != REG_NUM_HI_LO);
+            assert( num != MIPS_REG_HI_LO);
             return get_entry( num).value;
         }
 
-        void write( RegNum num, uint64 val)
+        void write( MIPSRegNum num, uint64 val)
         {
-            if ( num == REG_NUM_ZERO)
+            if ( num == MIPS_REG_ZERO)
                 return;
-            if ( num == REG_NUM_HI_LO) {
-                write( REG_NUM_HI, val >> 32);
-                write( REG_NUM_LO, val);
+            if ( num == MIPS_REG_HI_LO) {
+                write( MIPS_REG_HI, val >> 32);
+                write( MIPS_REG_LO, val);
                 return;
             }            
 
@@ -60,9 +60,9 @@ class MIPSRF
 
         inline void write_dst( const MIPSInstr& instr)
         {
-            RegNum reg_num  = instr.get_dst_num();
+            MIPSRegNum reg_num  = instr.get_dst_num();
             bool writes_dst = instr.get_writes_dst();
-            if ( REG_NUM_ZERO != reg_num && writes_dst)
+            if ( MIPS_REG_ZERO != reg_num && writes_dst)
                 write( reg_num, instr.get_v_dst());
             else
                 write( reg_num, read(reg_num));
