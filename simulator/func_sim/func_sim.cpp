@@ -8,7 +8,7 @@
 #include "func_sim.h"
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF<ISA>) { }
 
 template <typename ISA>
 FuncSim<ISA>::~FuncSim()

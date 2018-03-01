@@ -12,15 +12,16 @@
 
 #include <simulator.h>
 
+#include "rf.h"
+
 template <typename ISA>
 class FuncSim : public Simulator
 {
     using FuncInstr = typename ISA::FuncInstr;
-    using RF = typename ISA::RF;
     using Memory = typename ISA::Memory;
     
     private:
-        std::unique_ptr<RF> rf;
+        std::unique_ptr<RF<ISA>> rf;
         Addr PC = NO_VAL32;
         Memory* mem = nullptr;
 

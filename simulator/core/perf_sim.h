@@ -25,13 +25,12 @@ class PerfSim : public Simulator
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RF = typename ISA::RF;
     using Memory = typename ISA::Memory;
 private:
     Cycle curr_cycle = 0_Cl;
 
     /* simulator units */
-    RF* rf = nullptr;
+    std::unique_ptr<RF<ISA>> rf = nullptr;
     Memory* memory = nullptr;
     std::unique_ptr<DataBypass> bypassing_unit = nullptr;
     Fetch<ISA> fetch;

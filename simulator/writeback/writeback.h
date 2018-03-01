@@ -15,7 +15,6 @@ class Writeback : public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RF = typename ISA::RF;
 private:
     /* Instrumentation */
     uint64 instrs_to_run = 0;
@@ -25,7 +24,7 @@ private:
     void check( const FuncInstr& instr);
 
     /* Simulator internals */
-    RF* rf = nullptr;
+    RF<ISA>* rf = nullptr;
 
     static constexpr const std::size_t SRC_REGISTERS_NUM = 2;
 
@@ -39,7 +38,7 @@ private:
 public:
     explicit Writeback( bool log);
     void clock( Cycle cycle);
-    void set_RF( RF* value) { rf = value; }
+    void set_RF( RF<ISA>* value) { rf = value; }
     void set_PC( Addr value) { checker.set_PC( value); }
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     void init_checker( const std::string& tr) { checker.init( tr); }

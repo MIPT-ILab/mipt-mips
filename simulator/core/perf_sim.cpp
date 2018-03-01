@@ -8,7 +8,7 @@
 static constexpr const uint32 FLUSHED_STAGES_NUM = 3;
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF), fetch( log), writeback( log)
+PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log), writeback( log)
 {
     rp_fetch_2_decode = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
 
@@ -90,7 +90,7 @@ void PerfSim<ISA>::run( const std::string& tr,
     memory = new Memory( tr);
     fetch.set_memory( memory);
     writeback.set_instrs_to_run( instrs_to_run);
-    writeback.set_RF( rf);
+    writeback.set_RF( rf.get());
     writeback.init_checker( tr);
 
     set_PC( memory->startPC());
