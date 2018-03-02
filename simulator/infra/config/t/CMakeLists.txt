@@ -3,7 +3,6 @@ project(Test-infra-config)
 
 
 set(SRCCPPS unit_test.cpp ../config.cpp
-    ../../../main.cpp
     ../../../simulator.cpp
     ../../../infra/elf_parser/elf_parser.cpp 
     ../../../infra/memory/memory.cpp 
