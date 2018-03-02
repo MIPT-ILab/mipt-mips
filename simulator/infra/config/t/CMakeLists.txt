@@ -2,7 +2,7 @@ project(Test-infra-config)
 
 
 
-set(SRCCPPS unit_test.cpp ../config.cpp)
+set(SRCCPPS unit_test.cpp ../config.cpp ../../main.cpp)
 
 
 include_directories(../../.. ./.)
