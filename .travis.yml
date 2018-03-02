@@ -25,7 +25,7 @@ matrix:
 script:
   - cd $TRAVIS_BUILD_DIR/simulator
 #  - make mipt-mips
-  - mkdir build && cd $TRAVIS_BUILD_DIR/build
+  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ./..
   - make
   - cd $TRAVIS_BUILD_DIR/traces
@@ -35,7 +35,7 @@ script:
 # Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Check simulation spped
-  - ./simulator/tools
+  - $TRAVIS_BUILD_DIR/simulator/tools
 
 addons:
   apt:
