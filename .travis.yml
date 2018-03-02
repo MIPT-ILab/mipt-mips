@@ -35,7 +35,7 @@ script:
 # Run Clang-Tidy
   - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
 # Check simulation spped
-  - ./tools/simfreq.sh
+  - ./simulator/tools/simfreq.sh
 
 addons:
   apt:
