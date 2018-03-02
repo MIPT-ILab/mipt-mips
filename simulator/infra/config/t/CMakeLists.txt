@@ -2,8 +2,19 @@ project(Test-infra-config)
 
 
 
-set(SRCCPPS unit_test.cpp ../config.cpp ../../../main.cpp ../../../fetch/fetch.cpp)
-
+set(SRCCPPS unit_test.cpp ../config.cpp
+    ../../../main.cpp
+		../../../infra/elf_parser/elf_parser.cpp 
+    ../../../infra/memory/memory.cpp 
+    ../../../infra/ports/ports.cpp 
+    ../../../infra/cache/cache_tag_array.cpp 
+    ../../../mips/mips_instr.cpp 
+    ../../../mips/mips_register.cpp 
+    ../../../core/perf_sim.cpp 
+		../../../func_sim/func_sim.cpp
+		../../../bypass/data_bypass.cpp
+		../../../fetch/fetch.cpp
+		../../../writeback/writeback.cpp)
 
 include_directories(../../.. ./.)
 
