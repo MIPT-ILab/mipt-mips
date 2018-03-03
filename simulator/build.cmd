@@ -19,9 +19,12 @@ cl /I. /EHsc /c /nologo /MD ^
    infra/ports/ports.cpp ^
    infra/cache/cache_tag_array.cpp ^
    bypass/data_bypass.cpp ^
+   fetch/fetch.cpp ^
    mips/mips_instr.cpp ^
+   mips/mips_register.cpp ^
    func_sim/func_sim.cpp ^
    core/perf_sim.cpp ^
+   writeback/writeback.cpp ^
    simulator.cpp || exit /b
 
 rem Build GoogleTest
@@ -40,7 +43,7 @@ for %%G in (infra\cache infra\elf_parser infra\config infra\memory infra\ports i
        /EHsc /I %TRUNK%\..\googletest\googletest\include\ /I %TRUNK% /Fetest ^
        /D_HAS_AUTO_PTR_ETC=1 ^
        /std:c++17 ^
-       /DTEST_PATH=\"%TRUNKX%\\..\\traces\\tt.core.out\" /MD || exit /b
+       /DTEST_PATH=\"%TRUNKX%\\..\\traces\" /MD || exit /b
     .\test.exe || exit /b
     cd %TRUNK%
 )

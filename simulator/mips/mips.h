@@ -9,12 +9,11 @@
 
 #include <infra/instrcache/instr_cache_memory.h>
 #include "mips_instr.h"
-#include "mips_rf.h"
 
 struct MIPS
 {
     using FuncInstr = MIPSInstr;
-    using RF = MIPSRF;
+    using Register = MIPSRegister;
     using Memory = InstrMemory<MIPSInstr>;
 };
 

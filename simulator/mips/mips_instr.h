@@ -18,45 +18,7 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
-enum RegNum : uint8
-{
-    REG_NUM_ZERO = 0,
-    REG_NUM_AT,
-    REG_NUM_V0,
-    REG_NUM_V1,
-    REG_NUM_A0,
-    REG_NUM_A1,
-    REG_NUM_A2,
-    REG_NUM_A3,
-    REG_NUM_T0,
-    REG_NUM_T1,
-    REG_NUM_T2,
-    REG_NUM_T3,
-    REG_NUM_T4,
-    REG_NUM_T5,
-    REG_NUM_T6,
-    REG_NUM_T7,
-    REG_NUM_S0,
-    REG_NUM_S1,
-    REG_NUM_S2,
-    REG_NUM_S3,
-    REG_NUM_S4,
-    REG_NUM_S5,
-    REG_NUM_S6,
-    REG_NUM_S7,
-    REG_NUM_T8,
-    REG_NUM_T9,
-    REG_NUM_K0,
-    REG_NUM_K1,
-    REG_NUM_GP,
-    REG_NUM_SP,
-    REG_NUM_FP,
-    REG_NUM_RA,
-    REG_NUM_HI,
-    REG_NUM_LO,
-    REG_NUM_HI_LO,
-    REG_NUM_MAX
-};
+#include "mips_register.h"
 
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
@@ -187,12 +149,9 @@ class MIPSInstr
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapIJ;
         static const std::unordered_map <uint8, MIPSInstr::ISAEntry> isaMapMIPS32;
 
-        static std::string_view regTableName(RegNum reg);
-        static std::array<std::string_view, REG_NUM_MAX> regTable;
-
-        RegNum src1 = REG_NUM_ZERO;
-        RegNum src2 = REG_NUM_ZERO;
-        RegNum dst = REG_NUM_ZERO;
+        MIPSRegister src1 = MIPSRegister::zero;
+        MIPSRegister src2 = MIPSRegister::zero;
+        MIPSRegister dst = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
         uint32 v_src1 = NO_VAL32;
@@ -202,10 +161,11 @@ class MIPSInstr
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
+        // convert this to bitset
         bool complete   = false;
         bool writes_dst = true;
-
         bool _is_jump_taken = false;      // actual result
+
         Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
@@ -294,11 +254,16 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
+        void execute_jump( Addr target)
+        {
+            _is_jump_taken = true;
+            new_PC = target;
+        }
 
-        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
+        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jr() { execute_jump(align_up<2>(v_src1)); }
+        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jalr() { v_dst = new_PC; execute_jump(align_up<2>(v_src1)); }
 
         template<Predicate p>
         void execute_branch_and_link()
@@ -331,9 +296,9 @@ class MIPSInstr
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
-        RegNum get_src1_num() const { return src1; }
-        RegNum get_src2_num() const { return src2; }
-        RegNum get_dst_num()  const { return dst;  }
+        MIPSRegister get_src1_num() const { return src1; }
+        MIPSRegister get_src2_num() const { return src2; }
+        MIPSRegister get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP         ||
@@ -354,6 +319,7 @@ class MIPSInstr
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }
         bool is_nop() const { return instr.raw == 0x0u; }
+        bool is_halt() const { return is_jump() && new_PC == 0; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
 

@@ -438,5 +438,9 @@ decltype(auto) make_read_port(Args... args)
     return std::make_unique<ReadPort<T>>(args...);
 }
 
+static constexpr const Latency PORT_LATENCY = 1_Lt;
+static constexpr const uint32 PORT_FANOUT = 1;
+static constexpr const uint32 PORT_BW = 1;
+
 #endif // PORTS_H
 
