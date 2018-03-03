@@ -69,8 +69,8 @@ private:
     std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_bypass = nullptr;
     std::unique_ptr<WritePort<uint64>> wp_memory_2_execute_bypass = nullptr;
 
-    static constexpr const std::size_t SRC_REGISTERS_NUM = 2;
-    static constexpr const std::size_t BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
+    static constexpr const uint8 SRC_REGISTERS_NUM = 2;
+    static constexpr const uint8 BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
     
     std::array<std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM>, SRC_REGISTERS_NUM> 
         rps_stages_2_execute_sources_bypass;

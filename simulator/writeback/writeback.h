@@ -26,7 +26,7 @@ private:
     /* Simulator internals */
     RF<ISA>* rf = nullptr;
 
-    static constexpr const std::size_t SRC_REGISTERS_NUM = 2;
+    static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
     /* Input */
     std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;

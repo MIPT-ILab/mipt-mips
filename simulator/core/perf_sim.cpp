@@ -179,7 +179,7 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
         return;   
     }
 
-    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {
         if ( bypassing_unit->is_in_RF( instr, src_index))
         {
@@ -251,13 +251,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     auto instr = rp_decode_2_execute->read( cycle);
 
 
-    void (MIPSInstr::*setters_v_sources[SRC_REGISTERS_NUM])( uint32) = 
-    {
-        &MIPSInstr::set_v_src1,
-        &MIPSInstr::set_v_src2
-    };
-
-    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {   
         /* check whether bypassing is needed for a source register */ 
         if ( rps_decode_2_execute_command[src_index]->is_ready( cycle))
@@ -269,7 +263,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             const auto data = rps_stages_2_execute_sources_bypass[src_index][bypass_direction]->read( cycle);
 
             /* ignoring all other ports for a source register */
-            for ( std::size_t i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
+            for ( uint8 i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
             {    
                 if ( i != bypass_direction)
                     rps_stages_2_execute_sources_bypass[src_index][i]->ignore( cycle);
@@ -278,13 +272,13 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             /* transform received data in accordance with bypass command */
             const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
 
-            (instr.*setters_v_sources[src_index])( adapted_data);
+            instr.set_v_src( adapted_data, src_index);
         }
         else
         {
             /* ignoring all bypassed data for a source register */
             for ( auto& port:rps_stages_2_execute_sources_bypass[src_index])
-                port->ignore( cycle);    
+                port->ignore( cycle);
         }
     }
     
