@@ -2,7 +2,13 @@
 cmake_minimum_required(VERSION 2.6)
 project(mipt-mips)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
+
+if(APPLE) 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z") 
+else() 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
 
 set(CPPS infra/macro_test.cpp
     infra/elf_parser/elf_parser.cpp 
@@ -75,27 +81,7 @@ include_directories(${LIBELF_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${LIBELF_LIBRARIES})
 
 #clang-tidy
-
-set(TIDYFLAGS "-header-filter=.* -checks=*,-google-readability-braces-around-statements,-readability-braces-around-statements,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-header-guard,-llvm-include-order,-readability-redundant-declaration,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-android-cloexec-fopen")
-
-find_program(CLANG_TIDY_EXE NAMES "clang-tidy" DOC "Path to clang-tidy executable")
-if(NOT CLANG_TIDY_EXE)
-    message(STATUS "clang-tidy not found")
-else()
-    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-    set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "${TIDYFLAGS} -fix -- -std=c++17 -I. -isystem ${LIBELF_INCLUDE_DIRS} -isystem ${Boost_INCLUDE_DIRS}")
-endif()
-
-#set_target_properties(
-#    ${PROJECT_NAME} PROPERTIES
-#    CXX_STANDARD 17
-#    CXX_STANDARD_REQUIRED ON
-#    COMPILE_FLAGS "${WARNING_FLAGS}")
-
-if(CLANG_TIDY_EXE)
-    #set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
-    add_custom_target(tidy-check COMMAND "${CPPS} main.cpp ${DO_CLANG_TIDY}")
-endif()
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #googletest
 set(DEST ${CMAKE_CURRENT_BINARY_DIR})
