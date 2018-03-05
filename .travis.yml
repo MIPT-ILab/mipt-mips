@@ -31,7 +31,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/build
   - ctest
 # Run Clang-Tidy
-  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh
+  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
 # Check simulation spped
   - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
 
