@@ -101,7 +101,7 @@ TEST( check_method_size, Check_Method_Size)
 
 TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
 {
-    constexpr const auto CAPACITY = 8192;
+    constexpr const auto CAPACITY = 8192u;
 
     LRUCache<std::size_t, Dummy, CAPACITY> cache;
 
