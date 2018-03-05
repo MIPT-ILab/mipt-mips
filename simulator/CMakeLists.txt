@@ -1,4 +1,8 @@
 #cmake
+#Building the scalar MIPS CPU simulator
+#Soshin Konstantin
+#soshinkonstantinv@gmail.com
+
 cmake_minimum_required(VERSION 2.6)
 project(mipt-mips)
 
