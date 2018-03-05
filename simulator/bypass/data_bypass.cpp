@@ -20,7 +20,7 @@ void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegister num)
     if ( instr.is_conditional_move())
         entry.ready_stage = RegisterStage::in_RF();
     else
-        entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY 
+        entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
                                             : 0_RSG; // EXECUTE
 
     entry.is_bypassible = ( entry.current_stage == entry.ready_stage);
