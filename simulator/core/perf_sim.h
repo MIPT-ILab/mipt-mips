@@ -71,7 +71,8 @@ private:
 
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
     static constexpr const uint8 BYPASSING_STAGES_NUM = DataBypass::RegisterStage::get_bypassing_stages_number();
-    
+    static constexpr const uint8 BYPASSING_UNIT_FLUSH_NOTIFIERS_NUM = 2;
+
     std::array<std::array<std::unique_ptr<ReadPort<uint64>>, BYPASSING_STAGES_NUM>, SRC_REGISTERS_NUM> 
         rps_stages_2_execute_sources_bypass;
 
@@ -80,6 +81,12 @@ private:
 
     std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_decode_2_bypassing_unit = nullptr;
+
+    std::unique_ptr<WritePort<Instr>> wp_execute_2_bypassing_unit_flush = nullptr;
+    std::unique_ptr<WritePort<Instr>> wp_memory_2_bypassing_unit_flush = nullptr;
+    
+    std::array<std::unique_ptr<ReadPort<Instr>>, BYPASSING_UNIT_FLUSH_NOTIFIERS_NUM> 
+        rps_stages_2_bypassing_unit_flush;
 
     /* main stages functions */
     void clock_decode( Cycle cycle);

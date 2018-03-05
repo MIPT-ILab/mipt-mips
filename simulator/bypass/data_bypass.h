@@ -179,8 +179,8 @@ class DataBypass
         // updates the scoreboard
         void update();
 
-        // discards the information about passed instruction
-        void cancel( const MIPSInstr& instr);
+        // removes the information about passed instruction from scoreboard
+        void untrace_instr( const MIPSInstr& instr);
 };
 
 

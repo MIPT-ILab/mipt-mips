@@ -59,6 +59,12 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
 
+    wp_execute_2_bypassing_unit_flush = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH", PORT_BW, PORT_FANOUT);
+    rps_stages_2_bypassing_unit_flush[0] = make_read_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH", PORT_LATENCY);
+
+    wp_memory_2_bypassing_unit_flush = make_write_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH", PORT_BW, PORT_FANOUT);
+    rps_stages_2_bypassing_unit_flush[1] = make_read_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH", PORT_LATENCY);
+
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
     wp_memory_2_writeback = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
 
@@ -141,6 +147,16 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
 
+    // untrace instructions from flushed stages
+    for ( auto& port:rps_stages_2_bypassing_unit_flush)
+    {
+        if ( port->is_ready( cycle))
+        {
+            const auto& instr = port->read( cycle);
+            bypassing_unit->untrace_instr( instr);
+        }
+    }
+
     /* update bypassing unit */
     bypassing_unit->update();
 
@@ -216,7 +232,9 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
         if ( rp_decode_2_execute->is_ready( cycle))
         {
             const auto& instr = rp_decode_2_execute->read( cycle);
-            bypassing_unit->cancel( instr);
+            
+            /* notifying bypassing unit about invalid instruction */
+            wp_execute_2_bypassing_unit_flush->write( instr, cycle);
         }
 
         /* ignoring information from command ports */
@@ -310,8 +328,11 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
         if ( rp_execute_2_memory->is_ready( cycle))
         {
             const auto& instr = rp_execute_2_memory->read( cycle);
-            bypassing_unit->cancel( instr);
+            
+            /* notifying bypassing unit about invalid instruction */
+            wp_memory_2_bypassing_unit_flush->write( instr, cycle);
         }
+
         sout << "flush\n";
         return;
     }
