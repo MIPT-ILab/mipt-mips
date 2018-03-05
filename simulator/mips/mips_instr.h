@@ -346,6 +346,11 @@ class MIPSInstr
         void set_v_dst(uint32 value); // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
 
+        uint64 get_bypassing_data() const
+        {
+            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+        }
+
         void execute();
         void check_trap();
 };

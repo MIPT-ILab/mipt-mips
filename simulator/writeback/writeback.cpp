@@ -1,6 +1,3 @@
-
-#include <bypass/data_bypass.h>
-
 #include <cassert>
 
 #include <iostream>
@@ -46,7 +43,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     instr.check_trap();
 
     /* bypass data */
-    wp_bypass->write( DataBypass::get_bypassing_data( instr), cycle);
+    wp_bypass->write( instr.get_bypassing_data(), cycle);
 
     /* log */
     sout << instr << std::endl;

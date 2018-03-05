@@ -305,7 +305,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     instr.execute();
     
     /* bypass data */
-    wp_execute_2_execute_bypass->write( DataBypass::get_bypassing_data( instr), cycle);
+    wp_execute_2_execute_bypass->write( instr.get_bypassing_data(), cycle);
 
     wp_execute_2_memory->write( instr, cycle);
 
@@ -366,7 +366,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
     memory->load_store( &instr);
     
     /* bypass data */
-    wp_memory_2_execute_bypass->write( DataBypass::get_bypassing_data( instr), cycle);
+    wp_memory_2_execute_bypass->write( instr.get_bypassing_data(), cycle);
 
     wp_memory_2_writeback->write( instr, cycle);
 

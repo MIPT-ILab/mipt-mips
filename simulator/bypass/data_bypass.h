@@ -147,19 +147,6 @@ class DataBypass
             return static_cast<uint8>( bypassing_stage);
         }
 
-        // transforms bypassing data if needed in accordance with destination register
-        static auto get_bypassing_data( const MIPSInstr& instr)
-        {
-            const auto register_num = instr.get_dst_num();
-            
-            auto bypassing_data = instr.get_v_dst();
-
-            if ( register_num.is_mips_hi())
-                bypassing_data <<= 32;
-            
-            return bypassing_data;
-        }
-
         // transforms bypassed data if needed in accordance with passed bypass command
         static auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
         {
