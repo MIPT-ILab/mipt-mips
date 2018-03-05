@@ -270,7 +270,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = DataBypass::adapt_bypassed_data( bypass_command, data);
 
             instr.set_v_src( adapted_data, src_index);
         }
@@ -287,7 +287,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     instr.execute();
     
     /* bypass data */
-    wp_execute_2_execute_bypass->write( instr.get_v_dst(), cycle);
+    wp_execute_2_execute_bypass->write( DataBypass::get_bypassing_data( instr), cycle);
 
     wp_execute_2_memory->write( instr, cycle);
 
@@ -345,7 +345,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
     memory->load_store( &instr);
     
     /* bypass data */
-    wp_memory_2_execute_bypass->write( instr.get_v_dst(), cycle);
+    wp_memory_2_execute_bypass->write( DataBypass::get_bypassing_data( instr), cycle);
 
     wp_memory_2_writeback->write( instr, cycle);
 

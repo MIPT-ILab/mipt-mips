@@ -109,10 +109,6 @@ class DataBypass
         Scoreboard scoreboard = {};
         std::unordered_set<MIPSRegister> traced_registers = {};
 
-        // gives an idea whether bypassed data should be transformed
-        // when bypassing is needed for HI register 
-        bool is_HI_master_DIVMULT = false;
-
     public:
         // checks whether the source register of passed instruction is in RF  
         auto is_in_RF( const MIPSInstr& instr, uint8 src_index) const
@@ -151,15 +147,27 @@ class DataBypass
             return static_cast<uint8>( bypassing_stage);
         }
 
-        // transforms bypassed data if needed in accordance with passed bypass command and
-        // the information about current possessors of HI register as the destination register
-        auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data) const
+        // transforms bypassing data if needed in accordance with destination register
+        static auto get_bypassing_data( const MIPSInstr& instr)
+        {
+            const auto register_num = instr.get_dst_num();
+            
+            auto bypassing_data = instr.get_v_dst();
+
+            if ( register_num.is_mips_hi())
+                bypassing_data <<= 32;
+            
+            return bypassing_data;
+        }
+
+        // transforms bypassed data if needed in accordance with passed bypass command
+        static auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
         {
             const auto register_num = bypass_command.get_register_num();
 
             auto adapted_data = bypassed_data;
 
-            if ( register_num.is_mips_hi() && is_HI_master_DIVMULT)
+            if ( register_num.is_mips_hi())
                 adapted_data >>= 32;
             
             return adapted_data;
