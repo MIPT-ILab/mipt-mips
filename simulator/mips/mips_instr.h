@@ -18,7 +18,7 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
-#include "mips_register.h"
+#include "mips_register/mips_register.h"
 
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }

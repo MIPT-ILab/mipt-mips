@@ -33,15 +33,6 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
 
     wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
 
-    wp_target = make_write_port<Addr>("TARGET", PORT_BW, PORT_FANOUT);
-    rp_target = make_read_port<Addr>("TARGET", PORT_LATENCY);
-
-    wp_hold_pc = make_write_port<Addr>("HOLD_PC", PORT_BW, PORT_FANOUT);
-    rp_hold_pc = make_read_port<Addr>("HOLD_PC", PORT_LATENCY);
-
-    wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    rp_core_2_fetch_target = make_read_port<Addr>("CORE_2_FETCH_TARGET", PORT_LATENCY);
-
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
 
     wp_execute_2_execute_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);

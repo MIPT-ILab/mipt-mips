@@ -64,15 +64,6 @@ private:
 
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
-    std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_target = nullptr;
-
-    std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_core_2_fetch_target = nullptr;
-
-    std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_hold_pc = nullptr;
-
     std::unique_ptr<WritePort<BPInterface>> wp_memory_2_bp = nullptr;
 
     std::unique_ptr<WritePort<uint64>> wp_execute_2_execute_bypass = nullptr;
@@ -95,7 +86,6 @@ private:
     void clock_execute( Cycle cycle);
     void clock_memory( Cycle cycle);
     Instr read_instr( Cycle cycle);
-    Addr get_PC( Cycle cycle);
 
 public:
     explicit PerfSim( bool log);
