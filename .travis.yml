@@ -62,5 +62,4 @@ install:
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
   - make > /dev/null
   - make install > /dev/null
-  - cmake > /dev/null
   - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
