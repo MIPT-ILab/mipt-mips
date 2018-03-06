@@ -34,11 +34,7 @@ TEST( config_parse, Pass_Valid_Args_1)
         "mipt-mips",
         "-b", "file.elf",
         "-n", "145",
-        "-f",
-        "--bp-mode", "dynamic_two_bit",
-        "--bp-size", "128",
-        "--bp-ways", "16"
-
+        "-f"
     };
     const int argc = countof(argv);
 
