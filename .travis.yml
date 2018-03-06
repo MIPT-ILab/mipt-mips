@@ -39,12 +39,10 @@ addons:
     sources:
     - boost-latest
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-5.0
     packages:
     - g++-7
     - libelf-dev
     - llvm-5.0-dev    # for LLVMgold.so
-    - libboost1.55-all-dev
     - texinfo
     - zlib1g-dev
 
