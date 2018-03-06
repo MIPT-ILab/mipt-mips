@@ -23,16 +23,17 @@ matrix:
       compiler: gcc
 
 script:
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - make mipt-mips
+  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
+  - cmake ./..
+  - make
   - cd $TRAVIS_BUILD_DIR/traces
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - make test
+  - cd $TRAVIS_BUILD_DIR/simulator/build
+  - ctest
 # Run Clang-Tidy
-  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
+  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
 # Check simulation spped
-  - ./tools/simfreq.sh
+  - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
 
 addons:
   apt:
