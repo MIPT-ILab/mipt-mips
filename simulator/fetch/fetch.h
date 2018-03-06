@@ -19,6 +19,7 @@ class Fetch : public Log
 private:
     Memory* memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
+    CacheTagArray* tags = nullptr;
 
     /* Input signals */
     std::unique_ptr<ReadPort<bool>> rp_stall = nullptr;
@@ -43,6 +44,7 @@ public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
     void set_memory( Memory* mem) { memory = mem; }
+    void set_cache( CacheTagArray* t) { tags = t; }
 };
 
 #endif
