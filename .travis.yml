@@ -34,10 +34,6 @@ script:
 # Check simulation spped
   - ./tools/simfreq.sh
 
-          packages:
-            - clang-3.6
-
-
 addons:
   apt:
     sources:
