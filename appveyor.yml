@@ -72,9 +72,10 @@ before_build:
 
 build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/bin/mipsel-unknown-linux-gnu-ld"
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; make BOOST_POSTFIX=-mt mipt-mips test"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/; mkdir build; cd build; cmake ./..; make"
 - cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
 test_script:
 - cmd: cd C:\projects\MIPT-MIPS\simulator
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; ctest"
 - cmd: dir mipt-mips.exe
