@@ -11,6 +11,8 @@
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
 
+
+
 TEST( MIPS_registers, Process_Correct_Args_Of_Constr)
 {
     // Call a constructor
