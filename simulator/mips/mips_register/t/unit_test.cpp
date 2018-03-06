@@ -20,28 +20,27 @@ TEST( MIPS_registers, Process_Correct_Args_Of_Constr)
 // Testing methods of the class
 TEST( MIPS_registers, TEST_methods)
 {
-    ASSERT_TRUE(MIPSRegister(0).is_zero());
-    ASSERT_FALSE(MIPSRegister(0).is_mips_hi());
-    ASSERT_FALSE(MIPSRegister(0).is_mips_lo());
-    ASSERT_FALSE(MIPSRegister(0).is_mips_hi_lo());
-    ASSERT_EQ(MIPSRegister(0).to_size_t(), 0);
-    ASSERT_FALSE(MIPSRegister(32).is_zero());
-    ASSERT_TRUE(MIPSRegister(32).is_mips_hi());
-    ASSERT_FALSE(MIPSRegister(32).is_mips_lo());
-    ASSERT_FALSE(MIPSRegister(32).is_mips_hi_lo());
-    ASSERT_EQ(MIPSRegister(32).to_size_t(), 32);
-    ASSERT_FALSE(MIPSRegister(33).is_zero());
-    ASSERT_FALSE(MIPSRegister(33).is_mips_hi());
-    ASSERT_TRUE(MIPSRegister(33).is_mips_lo());
-    ASSERT_FALSE(MIPSRegister(33).is_mips_hi_lo());
-    ASSERT_EQ(MIPSRegister(33).to_size_t(), 33);
-    ASSERT_FALSE(MIPSRegister(34).is_zero());
-    ASSERT_FALSE(MIPSRegister(34).is_mips_hi());
-    ASSERT_FALSE(MIPSRegister(34).is_mips_lo());
-    ASSERT_TRUE(MIPSRegister(34).is_mips_hi_lo());
-    ASSERT_EQ(MIPSRegister(34).to_size_t(), 34);
+    for (size_t i = 0; i < MIPSRegister::MAX_REG; ++i)
+    {
+        ASSERT_EQ(MIPSRegister(i).to_size_t(), i);
+        if(i != 0)
+            ASSERT_FALSE(MIPSRegister(i).is_zero());
+        else 
+            ASSERT_TRUE(MIPSRegister(i).is_zero());
+	    if(i != 32)
+            ASSERT_FALSE(MIPSRegister(i).is_mips_hi());
+        else 
+            ASSERT_TRUE(MIPSRegister(i).is_mips_hi());
+	    if(i != 33)
+            ASSERT_FALSE(MIPSRegister(i).is_mips_lo());
+        else 
+            ASSERT_TRUE(MIPSRegister(i).is_mips_lo());
+	    if(i != 34)
+            ASSERT_FALSE(MIPSRegister(i).is_mips_hi_lo());
+        else 
+            ASSERT_TRUE(MIPSRegister(i).is_mips_hi_lo());
+    }
 }
-
 
 int main( int argc, char* argv[])
 {
