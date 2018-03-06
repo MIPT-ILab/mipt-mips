@@ -23,7 +23,7 @@ CPPS= \
     bypass/data_bypass.cpp \
     fetch/fetch.cpp \
     mips/mips_instr.cpp \
-    mips/mips_register.cpp \
+    mips/mips_register/mips_register.cpp \
     func_sim/func_sim.cpp \
     core/perf_sim.cpp \
     writeback/writeback.cpp \
@@ -73,6 +73,7 @@ TESTS:= \
     infra/ports \
     infra/string \
     mips \
+    mips/mips_register \
     bpu \
     func_sim \
     core \
