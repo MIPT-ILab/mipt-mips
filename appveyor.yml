@@ -75,7 +75,7 @@ build_script:
 - cmd: cd C:\Projects\mipt-mips\simulator
 - cmd: mkdir build
 - cmd: cd build
-- cmd: cmake .. -G "MinGW Makefiles"
+- cmd: cmake .. -G "MSYS Makefiles"
 - cmd: if not "%build%"=="msvc" bash -lc "make"
 - cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
