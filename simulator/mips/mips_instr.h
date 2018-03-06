@@ -296,8 +296,7 @@ class MIPSInstr
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
-        MIPSRegister get_src1_num() const { return src1; }
-        MIPSRegister get_src2_num() const { return src2; }
+        MIPSRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         MIPSRegister get_dst_num()  const { return dst;  }
 
         /* Checks if instruction can change PC in unusual way. */
@@ -329,8 +328,13 @@ class MIPSInstr
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 
-        void set_v_src1(uint32 value) { v_src1 = value; }
-        void set_v_src2(uint32 value) { v_src2 = value; }
+        void set_v_src( uint32 value, uint8 index)
+        {
+            if ( index == 0)
+                v_src1 = value;
+            else
+                v_src2 = value;
+        }
 
         uint64 get_v_dst() const { return v_dst; }
 
@@ -341,6 +345,11 @@ class MIPSInstr
 
         void set_v_dst(uint32 value); // for loads
         uint32 get_v_src2() const { return v_src2; } // for stores
+
+        uint64 get_bypassing_data() const
+        {
+            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+        }
 
         void execute();
         void check_trap();
