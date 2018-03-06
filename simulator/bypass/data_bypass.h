@@ -23,11 +23,11 @@ class DataBypass
                 explicit RegisterStage( uint8 value) : value( value) { }
 
                 auto operator==( const RegisterStage& rhs) const { return value == rhs.value; }
-                explicit operator std::size_t() const { return static_cast<std::size_t>( value); }
+                explicit operator uint8() const { return value; }
 
                 void inc() { ++value; }
 
-                static constexpr std::size_t get_bypassing_stages_number() { return LAST_BYPASSING_STAGE + 1; }
+                static constexpr uint8 get_bypassing_stages_number() { return LAST_BYPASSING_STAGE + 1; }
                 static RegisterStage get_last_bypassing_stage() { return RegisterStage( LAST_BYPASSING_STAGE); }
                 static RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
 
@@ -109,22 +109,18 @@ class DataBypass
         Scoreboard scoreboard = {};
         std::unordered_set<MIPSRegister> traced_registers = {};
 
-        // gives an idea whether bypassed data should be transformed
-        // when bypassing is needed for HI register 
-        bool is_HI_master_DIVMULT = false;
-
     public:
         // checks whether the source register of passed instruction is in RF  
-        auto is_in_RF( const MIPSInstr& instr, std::size_t src_index) const
+        auto is_in_RF( const MIPSInstr& instr, uint8 src_index) const
         {
-            const auto reg_num = ( src_index == 0) ? instr.get_src1_num() : instr.get_src2_num();
+            const auto reg_num = instr.get_src_num( src_index);
             return scoreboard.get_entry( reg_num).current_stage == RegisterStage::in_RF();
         }
 
         // checks whether the source register of passed instruction is bypassible
-        auto is_bypassible( const MIPSInstr& instr, std::size_t src_index) const
+        auto is_bypassible( const MIPSInstr& instr, uint8 src_index) const
         {
-            const auto reg_num = ( src_index == 0) ? instr.get_src1_num() : instr.get_src2_num();
+            const auto reg_num = instr.get_src_num( src_index);
             return scoreboard.get_entry( reg_num).is_bypassible;
         }
 
@@ -137,9 +133,9 @@ class DataBypass
 
         // returns bypass command for passed instruction and its source register
         // in accordance with current state of the scoreboard
-        auto get_bypass_command( const MIPSInstr& instr, std::size_t src_index) const
+        auto get_bypass_command( const MIPSInstr& instr, uint8 src_index) const
         {
-            const auto reg_num = ( src_index == 0) ? instr.get_src1_num() : instr.get_src2_num();
+            const auto reg_num = instr.get_src_num( src_index);
             return BypassCommand( get_current_stage( reg_num), reg_num);
         }
 
@@ -148,18 +144,17 @@ class DataBypass
         auto get_bypass_direction( const BypassCommand& bypass_command) const
         {
             const auto bypassing_stage = bypass_command.get_bypassing_stage();
-            return static_cast<std::size_t>( bypassing_stage);
+            return static_cast<uint8>( bypassing_stage);
         }
 
-        // transforms bypassed data if needed in accordance with passed bypass command and
-        // the information about current possessors of HI register as the destination register
-        auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data) const
+        // transforms bypassed data if needed in accordance with passed bypass command
+        static auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
         {
             const auto register_num = bypass_command.get_register_num();
 
             auto adapted_data = bypassed_data;
 
-            if ( register_num.is_mips_hi() && is_HI_master_DIVMULT)
+            if ( register_num.is_mips_hi())
                 adapted_data >>= 32;
             
             return adapted_data;
@@ -171,8 +166,8 @@ class DataBypass
         // updates the scoreboard
         void update();
 
-        // discards the information about passed instruction
-        void cancel( const MIPSInstr& instr);
+        // removes the information about passed instruction from the scoreboard
+        void untrace_instr( const MIPSInstr& instr);
 };
 
 

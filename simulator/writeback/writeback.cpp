@@ -43,7 +43,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     instr.check_trap();
 
     /* bypass data */
-    wp_bypass->write( instr.get_v_dst(), cycle);
+    wp_bypass->write( instr.get_bypassing_data(), cycle);
 
     /* log */
     sout << instr << std::endl;

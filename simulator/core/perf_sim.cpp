@@ -59,6 +59,12 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);
 
+    wp_execute_2_bypassing_unit_flush = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH", PORT_BW, PORT_FANOUT);
+    rps_stages_2_bypassing_unit_flush[0] = make_read_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH", PORT_LATENCY);
+
+    wp_memory_2_bypassing_unit_flush = make_write_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH", PORT_BW, PORT_FANOUT);
+    rps_stages_2_bypassing_unit_flush[1] = make_read_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH", PORT_LATENCY);
+
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
     wp_memory_2_writeback = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
 
@@ -141,6 +147,16 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
     /* receive flush signal */
     const bool is_flush = rp_decode_flush->is_ready( cycle) && rp_decode_flush->read( cycle);
 
+    // untrace instructions from flushed stages
+    for ( auto& port:rps_stages_2_bypassing_unit_flush)
+    {
+        if ( port->is_ready( cycle))
+        {
+            const auto& instr = port->read( cycle);
+            bypassing_unit->untrace_instr( instr);
+        }
+    }
+
     /* update bypassing unit */
     bypassing_unit->update();
 
@@ -179,7 +195,7 @@ void PerfSim<ISA>::clock_decode( Cycle cycle)
         return;   
     }
 
-    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {
         if ( bypassing_unit->is_in_RF( instr, src_index))
         {
@@ -216,7 +232,9 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
         if ( rp_decode_2_execute->is_ready( cycle))
         {
             const auto& instr = rp_decode_2_execute->read( cycle);
-            bypassing_unit->cancel( instr);
+            
+            /* notifying bypassing unit about invalid instruction */
+            wp_execute_2_bypassing_unit_flush->write( instr, cycle);
         }
 
         /* ignoring information from command ports */
@@ -251,13 +269,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     auto instr = rp_decode_2_execute->read( cycle);
 
 
-    void (MIPSInstr::*setters_v_sources[SRC_REGISTERS_NUM])( uint32) = 
-    {
-        &MIPSInstr::set_v_src1,
-        &MIPSInstr::set_v_src2
-    };
-
-    for ( std::size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {   
         /* check whether bypassing is needed for a source register */ 
         if ( rps_decode_2_execute_command[src_index]->is_ready( cycle))
@@ -269,22 +281,22 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             const auto data = rps_stages_2_execute_sources_bypass[src_index][bypass_direction]->read( cycle);
 
             /* ignoring all other ports for a source register */
-            for ( std::size_t i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
+            for ( uint8 i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
             {    
                 if ( i != bypass_direction)
                     rps_stages_2_execute_sources_bypass[src_index][i]->ignore( cycle);
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = bypassing_unit->adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = DataBypass::adapt_bypassed_data( bypass_command, data);
 
-            (instr.*setters_v_sources[src_index])( adapted_data);
+            instr.set_v_src( adapted_data, src_index);
         }
         else
         {
             /* ignoring all bypassed data for a source register */
             for ( auto& port:rps_stages_2_execute_sources_bypass[src_index])
-                port->ignore( cycle);    
+                port->ignore( cycle);
         }
     }
     
@@ -293,7 +305,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
     instr.execute();
     
     /* bypass data */
-    wp_execute_2_execute_bypass->write( instr.get_v_dst(), cycle);
+    wp_execute_2_execute_bypass->write( instr.get_bypassing_data(), cycle);
 
     wp_execute_2_memory->write( instr, cycle);
 
@@ -316,8 +328,11 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
         if ( rp_execute_2_memory->is_ready( cycle))
         {
             const auto& instr = rp_execute_2_memory->read( cycle);
-            bypassing_unit->cancel( instr);
+            
+            /* notifying bypassing unit about invalid instruction */
+            wp_memory_2_bypassing_unit_flush->write( instr, cycle);
         }
+
         sout << "flush\n";
         return;
     }
@@ -351,7 +366,7 @@ void PerfSim<ISA>::clock_memory( Cycle cycle)
     memory->load_store( &instr);
     
     /* bypass data */
-    wp_memory_2_execute_bypass->write( instr.get_v_dst(), cycle);
+    wp_memory_2_execute_bypass->write( instr.get_bypassing_data(), cycle);
 
     wp_memory_2_writeback->write( instr, cycle);
 

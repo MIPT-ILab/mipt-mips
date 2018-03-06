@@ -46,12 +46,9 @@ public:
 public:
     RF() = default;
 
-    inline void read_source( FuncInstr* instr, std::size_t src_index) const
+    inline void read_source( FuncInstr* instr, uint8 index) const
     {
-        if ( src_index == 0)
-            instr->set_v_src1( read( instr->get_src1_num()));
-        else
-            instr->set_v_src2( read( instr->get_src2_num()));
+        instr->set_v_src( read( instr->get_src_num( index)), index);
     }
 
     inline void read_sources( FuncInstr* instr) const
