@@ -76,7 +76,7 @@ build_script:
 - cmd: mkdir build
 - cmd: cd build
 - cmd: if not "%build%"=="msvc" cmake .. -G "MSYS Makefiles"
-- cmd: if not "%build%"=="msvc" bash -lc "make"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
 - cmd: if "%build%"=="msvc"  cd C:\Projects\mipt-mips\simulator && call build.cmd
 
 test_script:
