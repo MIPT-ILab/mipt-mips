@@ -21,7 +21,7 @@ cl /I. /EHsc /c /nologo /MD ^
    bypass/data_bypass.cpp ^
    fetch/fetch.cpp ^
    mips/mips_instr.cpp ^
-   mips/mips_register.cpp ^
+   mips/mips_register/mips_register.cpp ^
    func_sim/func_sim.cpp ^
    core/perf_sim.cpp ^
    writeback/writeback.cpp ^
@@ -36,7 +36,7 @@ set TRUNK=%cd%
 set TRUNKX=%TRUNK:\=\\%
 
 rem Build and run all the tests
-for %%G in (infra\cache infra\elf_parser infra\config infra\memory infra\ports infra\string mips infra\instrcache func_sim bpu core) do (
+for %%G in (infra\cache infra\elf_parser infra\config infra\memory infra\ports infra\string mips mips\mips_register infra\instrcache func_sim bpu core) do (
     echo Testing %%G
     cd %%G\t
     cl /nologo unit_test.cpp %TRUNK%\*.obj %TRUNK%\..\libelf\lib\libelf.lib ^
