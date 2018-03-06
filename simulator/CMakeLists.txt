@@ -58,16 +58,6 @@ endif()
 
 add_executable(${PROJECT_NAME} main.cpp)
 
-foreach(ITER IN LISTS CPPS)
-    get_filename_component(CPP_NAME ${ITER} NAME_WE) 
-    list(APPEND SRCNAMES ${CPP_NAME})
-    get_filename_component(CPP_DIR ${ITER} DIRECTORY)
-    list(APPEND SRCDIRS ${CPP_DIR})
-    add_library(${CPP_NAME} OBJECT ${ITER})
-    target_sources(${PROJECT_NAME} PUBLIC $<TARGET_OBJECTS:${CPP_NAME}>)
-endforeach()
-
-
 #include headers
 include_directories(SRCDIRS ./.)
 
@@ -99,9 +89,6 @@ find_library (LIBELF_LIBRARIES
         elf
     PATHS
         /usr/lib
-        #/usr/local/lib
-        #/opt/local/lib
-        #/sw/lib
         ENV LIBRARY_PATH
         ENV LD_LIBRARY_PATH)
 
@@ -111,7 +98,9 @@ endif()
 
 include_directories(${LIBELF_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${LIBELF_LIBRARIES})
+add_library (mipt-mips-src STATIC ${CPPS} ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}  mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
 #clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -134,14 +123,9 @@ foreach(ITER IN LISTS TESTS)
     string(CONCAT EXEC_NAME ${EXEC_NAME_NOTFULL} "_test")
     
     add_executable(${EXEC_NAME} ${SRC_UNIT_TEST})
-    target_link_libraries(${EXEC_NAME} gtest ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
-    foreach(ITER2 IN LISTS SRCNAMES)
-        target_sources(${EXEC_NAME} PUBLIC $<TARGET_OBJECTS:${ITER2}>)
-    endforeach()
-    
+    target_link_libraries(${EXEC_NAME} gtest mipt-mips-src ${Boost_LIBRARIES} ${LIBELF_LIBRARIES})
     add_test(NAME ${EXEC_NAME} COMMAND ${EXEC_NAME})
 
 endforeach()
 #==================
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-
