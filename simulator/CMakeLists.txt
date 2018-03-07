@@ -5,7 +5,7 @@
 #! https://github.com/SoshinK
 
 cmake_minimum_required(VERSION 2.6)
-project(mipt-mips)
+project(mipt-mips CXX)
 
 set(CPPS infra/macro_test.cpp
     infra/elf_parser/elf_parser.cpp 
