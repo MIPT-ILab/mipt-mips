@@ -108,7 +108,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ###### googletest ######
 add_subdirectory(../googletest/googletest ./build)
 enable_testing()
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/../../traces\")
+find_path(TRACESPATH "tt.core.out")
+message("${CMAKE_CURRENT_LIST_DIR}\n")
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
 #==================
 foreach(ITER IN LISTS TESTS)
     #copy all filesfrom */t to build
