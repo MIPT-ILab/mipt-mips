@@ -10,6 +10,15 @@ include(CheckCXXCompilerFlag)
 
 project(mipt-mips CXX)
 
+set(default_build_type "Release")
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
+
 set(CPPS infra/macro_test.cpp
     infra/elf_parser/elf_parser.cpp 
     infra/memory/memory.cpp 
@@ -42,17 +51,6 @@ set(TESTS
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
 
-if(${DEBUG})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-    set(CMAKE_LD_FLAGS "${CMAKE_CXX_FLAGS} -flto")
-endif()
-
-if(NOT ${RELEASE})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-endif()
-
 check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
 if (HAS_STDCXX_17)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
@@ -65,6 +63,10 @@ else()
       exit()
     endif()
 endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
+set(CMAKE_LD_FLAGS_RELEASE " -flto")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
