@@ -29,7 +29,7 @@ class MIPSRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
-    explicit MIPSRegister( uint32 id) : MIPSRegister( static_cast<RegNum>( id))
+    explicit MIPSRegister( uint8 id) : MIPSRegister( static_cast<RegNum>( id))
     {
         if ( id >= 32u) {
             std::cerr << "ERROR: Invalid MIPS register id = " << id;
