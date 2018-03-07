@@ -24,7 +24,7 @@ matrix:
 
 script:
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
-  - cmake ./..
+  - cmake ..
   - make
   - cd $TRAVIS_BUILD_DIR/traces
   - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
@@ -43,7 +43,6 @@ addons:
     - llvm-toolchain-trusty-5.0
     packages:
     - g++-7
-    - llvm-5.0-dev
     - clang-tidy-5.0
     - libelf-dev
     - libboost1.55-all-dev
