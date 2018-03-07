@@ -44,12 +44,10 @@ addons:
     packages:
     - g++-7
     - clang-5.0
-    - clang-tidy-5.0
     - llvm-5.0-dev
     - libelf-dev
     - libboost1.55-all-dev
     - texinfo
-    - zlib1g-dev
 
 install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
