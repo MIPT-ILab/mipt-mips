@@ -22,19 +22,6 @@ matrix:
     - os: osx
       compiler: gcc
 
-script:
-  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
-  - cmake ..
-  - make
-  - cd $TRAVIS_BUILD_DIR/traces
-  - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
-  - cd $TRAVIS_BUILD_DIR/simulator/build
-  - ctest
-# Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
-# Check simulation spped
-  - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
-
 addons:
   apt:
     sources:
@@ -54,6 +41,17 @@ install:
 # Infreqstall GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
   - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-  - make MAKEINFO=true > /dev/null
-  - make install MAKEINFO=true > /dev/null
+  - make all install MAKEINFO=true > /dev/null
   - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
+
+script:
+  - cd $TRAVIS_BUILD_DIR/traces
+  - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
+  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
+  - cmake ..
+  - make
+  - ctest
+# Run Clang-Tidy
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
+# Check simulation spped
+  - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
