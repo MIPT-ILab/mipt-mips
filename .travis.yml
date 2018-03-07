@@ -44,7 +44,7 @@ addons:
     - g++-7
     - clang-tidy-5.0
     - libelf-dev
-    - libboost-all-dev
+    - libboost-program-options1.54-dev
 
 install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
