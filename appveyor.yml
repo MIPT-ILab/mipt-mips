@@ -60,18 +60,18 @@ before_build:
 - cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
 - cmd: set PATH=%LIBELF_INCLUDE%;%PATH%
 # build binutils
-- cmd: set BINUTILS=/c/projects/mipt-mips/binutils/cross/mips
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS% --disable-gdb --disable-gprof > /dev/null"
+- cmd: set BINUTILS=/c/projects/mipt-mips/binutils
+- cmd: bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
 # disable optimizations to speed up build a little
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; sed -i 's/-O2/-O0/g' Makefile"
-- cmd: bash -lc "cd /c/projects/mipt-mips/binutils/; make all install > /dev/null"
+- cmd: bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile"
+- cmd: bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
 
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set CXX=%build%
 
 build_script:
-- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/bin/mipsel-unknown-linux-gnu-ld"
+- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: cd C:\Projects\mipt-mips\simulator
 - cmd: mkdir build
 - cmd: cd build
