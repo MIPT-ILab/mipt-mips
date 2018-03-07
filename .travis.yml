@@ -38,14 +38,13 @@ script:
 addons:
   apt:
     sources:
-    - boost-latest
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-5.0
     packages:
     - g++-7
     - clang-tidy-5.0
     - libelf-dev
-    - libboost1.55-all-dev
+    - libboost-dev
 
 install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
