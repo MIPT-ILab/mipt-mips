@@ -78,6 +78,7 @@ find_path(LIBELF_INCLUDE_DIRS
         /opt/local/include/libelf
         /sw/include
         /sw/include/libelf
+        /usr/local/Cellar/libelf/0.8.13_1/include/libelf
         ENV CPATH)
 
 if(NOT LIBELF_INCLUDE_DIRS)
