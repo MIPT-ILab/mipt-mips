@@ -5,6 +5,9 @@
 #! https://github.com/SoshinK
 
 cmake_minimum_required(VERSION 2.6)
+
+include(CheckCXXCompilerFlag)
+
 project(mipt-mips CXX)
 
 set(CPPS infra/macro_test.cpp
