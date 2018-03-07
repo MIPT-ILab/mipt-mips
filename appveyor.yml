@@ -25,14 +25,12 @@ environment:
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
     BOOST_ROOT: C:\msys64\mingw32\include\boost
-    LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
   - build: g++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     BOOST_ROOT: C:\msys64\mingw64\include\boost
-    LIBELF_INCLUDE: C:\msys64\mingw64\include\libelf
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
 #  - build: clang++
@@ -64,7 +62,6 @@ before_build:
 # disable optimizations to speed up build a little
 - cmd: bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile"
 - cmd: bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
-
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set CXX=%build%
