@@ -38,8 +38,8 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  :-: |:---- |:----------------
  10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) | |
  17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) | |
- 22<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
- 01<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) | |
+ 24<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
+ 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) | |
 
  
 ### MSU Seminars
