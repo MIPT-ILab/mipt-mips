@@ -40,7 +40,6 @@ addons:
     sources:
     - boost-latest
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-5.0
     packages:
     - g++-7
     - clang-tidy-5.0
