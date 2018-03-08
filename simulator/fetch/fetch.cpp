@@ -31,6 +31,12 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     rp_bp_update = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
+    wp_long_latency_pc_holder = make_write_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
+    rp_long_latency_pc_holder = make_read_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_LATENCY);
+
+    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
+    rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
+
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
 }
@@ -72,6 +78,28 @@ void Fetch<ISA>::clock_bp( Cycle cycle)
 }
 
 template <typename ISA>
+Addr Fetch<ISA>::clock_instr_cache( Cycle cycle) 
+{
+    ignore( cycle);
+    if( rp_long_latency_pc_holder->is_ready( cycle))
+    {
+        auto PC = rp_long_latency_pc_holder->read( cycle);
+        tags->write( PC);
+        return PC;
+    }        
+    return 0;
+}
+
+template <typename ISA>
+void Fetch<ISA>::ignore( Cycle cycle)
+{
+    rp_external_target->ignore( cycle);
+    rp_hold_pc->ignore( cycle);
+    rp_flush_target->ignore( cycle);
+    rp_target->ignore( cycle);
+}
+
+template <typename ISA>
 void Fetch<ISA>::clock( Cycle cycle)
 {
     clock_bp( cycle);
@@ -79,12 +107,33 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* getting PC */
     auto PC = get_PC( cycle);
 
+    if( rp_hit_or_miss->is_ready( cycle))
+        if( !rp_hit_or_miss->read( cycle))
+            PC = clock_instr_cache( cycle);
+
+    /* push bubble */
+    if( PC == 0)
+        return;   
+
+    sout << "PC = " << PC << "\n";
+
+    /* hit or miss */
+    auto is_hit = tags->is_hit( PC);
+
+    sout << "hit = " << is_hit;
+
+    /* hold result of previous stage */
+    wp_hit_or_miss->write( is_hit, cycle);
+
+    /* push bubble if miss and update cache */
+    if(!is_hit) 
+    {
+        wp_long_latency_pc_holder->write( PC, cycle);
+        return;
+    }
+
     /* hold PC for the stall case */
     wp_hold_pc->write( PC, cycle);
-
-    /* ignore bubbles */
-    if ( PC == 0)
-        return;
 
     Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 
@@ -97,6 +146,7 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* log */
     sout << "fetch   cycle " << std::dec << cycle << ": 0x"
          << std::hex << PC << ": 0x" << instr << std::endl;
+
 }
 
 #include <mips/mips.h>

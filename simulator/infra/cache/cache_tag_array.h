@@ -96,6 +96,8 @@ class CacheTagArray : public CacheTagArraySize
             uint32 addr_size_in_bits = 32
         );
 
+        // hit or not
+        bool is_hit( Addr addr) { return read( addr).first; }
         // lookup the cache and update LRU info
         std::pair<bool, Way> read( Addr addr);
         // find in the cache but do not update LRU info

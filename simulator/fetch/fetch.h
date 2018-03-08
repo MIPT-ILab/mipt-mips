@@ -38,6 +38,12 @@ private:
     std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
     std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
 
+    std::unique_ptr<WritePort<Addr>> wp_long_latency_pc_holder = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_long_latency_pc_holder = nullptr;
+
+    std::unique_ptr<WritePort<bool>> wp_hit_or_miss = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_hit_or_miss = nullptr;
+
     Addr get_PC( Cycle cycle);
     void clock_bp( Cycle cycle);
 public:
@@ -45,6 +51,8 @@ public:
     void clock( Cycle cycle);
     void set_memory( Memory* mem) { memory = mem; }
     void set_cache( CacheTagArray* t) { tags = t; }
+    Addr clock_instr_cache( Cycle cycle);
+    void ignore( Cycle cycle);
 };
 
 #endif
