@@ -62,7 +62,7 @@ before_build:
 - cmd: bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
 # disable optimizations to speed up build a little
 - cmd: bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile"
-- cmd: bash -lc "cd %BINUTILS%; make all MAKEINFO=true > /dev/null"
+- cmd: bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
 # update environment with Boost and LIBELF
 - cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - cmd: set CXX=%build%
