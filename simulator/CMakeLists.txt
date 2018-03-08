@@ -88,7 +88,9 @@ find_path(LIBELF_INCLUDE_DIRS
         /opt/local/include/libelf
         /sw/include
         /sw/include/libelf
+
         /usr/local/Cellar/libelf/0.8.13_1/include/libelf
+
         ENV CPATH)
 
 if(NOT LIBELF_INCLUDE_DIRS)
@@ -119,7 +121,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ###### googletest ######
 add_subdirectory(../googletest/googletest ./build)
 enable_testing()
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/../../traces\")
+
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
 #==================
 foreach(ITER IN LISTS TESTS)
     #copy all filesfrom */t to build
