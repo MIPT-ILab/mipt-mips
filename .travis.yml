@@ -22,43 +22,38 @@ matrix:
     - os: osx
       compiler: gcc
 
-script:
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - make mipt-mips
-  - cd $TRAVIS_BUILD_DIR/traces
-  - make MIPS_AS=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$TRAVIS_BUILD_DIR/binutils/cross/mips/bin/mipsel-unknown-linux-gnu-ld
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - make test
-# Run Clang-Tidy
-  - if [ $CXX == clang++-5.0 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then make TIDY=clang-tidy-5.0 tidy-check; fi
-# Check simulation spped
-  - ./tools/simfreq.sh
-
 addons:
   apt:
     sources:
-    - boost-latest
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-5.0
     packages:
     - g++-7
-    - clang-5.0
     - clang-tidy-5.0
-    - llvm-5.0-dev
     - libelf-dev
-    - libboost1.55-all-dev
-    - texinfo
-    - zlib1g-dev
+    - libboost-program-options1.54-dev
 
 install:
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=clang++-5.0; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CPATH=$CPATH:/usr/local/Cellar/libelf/0.8.13_1/include/libelf; fi
-# Infreqstall GNU Binutils
-  - cd $TRAVIS_BUILD_DIR/binutils
-  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$TRAVIS_BUILD_DIR/binutils/cross/mips --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-  - make > /dev/null
-  - make install > /dev/null
   - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
+  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
+# Install OS X packages
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
+# Install GNU Binutils
+  - cd $TRAVIS_BUILD_DIR/binutils
+  - BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
+  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+  - make all install MAKEINFO=true > /dev/null
+
+script:
+# Build traces
+  - cd $TRAVIS_BUILD_DIR/traces
+  - make MIPS_AS=$BINUTILS/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
+# Build and test simulator
+  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
+  - cmake ..
+  - make
+  - ctest
+# Run Clang-Tidy
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
+# Check simulation spped
+  - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh

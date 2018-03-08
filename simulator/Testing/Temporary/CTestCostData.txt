@@ -1,0 +1,13 @@
+infra_cache_test 1 9.30282
+infra_elf_parser_test 1 0.00608611
+infra_memory_test 1 0.399706
+infra_config_test 1 0.00699592
+infra_instrcache_test 1 0.00761008
+infra_ports_test 1 0.195164
+infra_string_test 1 0.00316
+bpu_test 1 0.011091
+func_sim_test 1 0.02858
+core_test 0 0
+mips_mips_register_test 1 0.0772958
+---
+core_test

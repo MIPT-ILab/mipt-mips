@@ -1,0 +1,142 @@
+[
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/core_test.dir/core/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/core/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/core/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/func_sim_test.dir/func_sim/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/func_sim/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/func_sim/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/bpu_test.dir/bpu/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/bpu/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/bpu/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_string_test.dir/infra/string/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/string/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/string/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_ports_test.dir/infra/ports/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/ports/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/ports/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_instrcache_test.dir/infra/instrcache/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/instrcache/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/instrcache/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips.dir/main.cpp.o -c /home/alex/mipt-mips/simulator/main.cpp",
+  "file": "/home/alex/mipt-mips/simulator/main.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_config_test.dir/infra/config/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/config/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/config/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mips_mips_register_test.dir/mips/mips_register/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/mips/mips_register/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_elf_parser_test.dir/infra/elf_parser/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/elf_parser/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/elf_parser/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/macro_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/macro_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/macro_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/elf_parser/elf_parser.cpp.o -c /home/alex/mipt-mips/simulator/infra/elf_parser/elf_parser.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/elf_parser/elf_parser.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/memory/memory.cpp.o -c /home/alex/mipt-mips/simulator/infra/memory/memory.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/memory/memory.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/config/config.cpp.o -c /home/alex/mipt-mips/simulator/infra/config/config.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/config/config.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/ports/ports.cpp.o -c /home/alex/mipt-mips/simulator/infra/ports/ports.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/ports/ports.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/infra/cache/cache_tag_array.cpp.o -c /home/alex/mipt-mips/simulator/infra/cache/cache_tag_array.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/cache/cache_tag_array.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/bypass/data_bypass.cpp.o -c /home/alex/mipt-mips/simulator/bypass/data_bypass.cpp",
+  "file": "/home/alex/mipt-mips/simulator/bypass/data_bypass.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o -c /home/alex/mipt-mips/simulator/fetch/fetch.cpp",
+  "file": "/home/alex/mipt-mips/simulator/fetch/fetch.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_instr.cpp",
+  "file": "/home/alex/mipt-mips/simulator/mips/mips_instr.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o -c /home/alex/mipt-mips/simulator/func_sim/func_sim.cpp",
+  "file": "/home/alex/mipt-mips/simulator/func_sim/func_sim.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o -c /home/alex/mipt-mips/simulator/core/perf_sim.cpp",
+  "file": "/home/alex/mipt-mips/simulator/core/perf_sim.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o -c /home/alex/mipt-mips/simulator/writeback/writeback.cpp",
+  "file": "/home/alex/mipt-mips/simulator/writeback/writeback.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/simulator.cpp.o -c /home/alex/mipt-mips/simulator/simulator.cpp",
+  "file": "/home/alex/mipt-mips/simulator/simulator.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp",
+  "file": "/home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_cache_test.dir/infra/cache/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/cache/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/cache/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator",
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/infra_memory_test.dir/infra/memory/t/unit_test.cpp.o -c /home/alex/mipt-mips/simulator/infra/memory/t/unit_test.cpp",
+  "file": "/home/alex/mipt-mips/simulator/infra/memory/t/unit_test.cpp"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator/build",
+  "command": "/usr/bin/c++    -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native    -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17 -Wall -Wshadow -Werror -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/alex/mipt-mips/googletest/googletest/src/gtest-all.cc",
+  "file": "/home/alex/mipt-mips/googletest/googletest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/alex/mipt-mips/simulator/build",
+  "command": "/usr/bin/c++    -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native    -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17 -Wall -Wshadow -Werror -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /home/alex/mipt-mips/googletest/googletest/src/gtest_main.cc",
+  "file": "/home/alex/mipt-mips/googletest/googletest/src/gtest_main.cc"
+}
+]

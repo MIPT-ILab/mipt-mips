@@ -113,7 +113,10 @@ void Fetch<ISA>::clock( Cycle cycle)
 
     /* push bubble */
     if( PC == 0)
-        return;   
+        return;  
+
+    /* hold PC for the stall case */
+    wp_hold_pc->write( PC, cycle);
 
     sout << "PC = " << PC << "\n";
 
@@ -126,14 +129,11 @@ void Fetch<ISA>::clock( Cycle cycle)
     wp_hit_or_miss->write( is_hit, cycle);
 
     /* push bubble if miss and update cache */
-    if(!is_hit) 
+    if( !is_hit) 
     {
         wp_long_latency_pc_holder->write( PC, cycle);
         return;
     }
-
-    /* hold PC for the stall case */
-    wp_hold_pc->write( PC, cycle);
 
     Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
 

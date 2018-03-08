@@ -6,6 +6,8 @@
 #ifndef MIPS_REG_H
 #define MIPS_REG_H
 
+#include <cassert>
+
 #include <array>
 #include <iostream>
 #include <utility>
@@ -27,9 +29,15 @@ class MIPSRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
-    explicit MIPSRegister( uint32 id) : value( static_cast<RegNum>( id)) { }
-    
-    friend inline std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
+    explicit MIPSRegister( uint8 id) : MIPSRegister( static_cast<RegNum>( id))
+    {
+        if ( id >= 32u) {
+            std::cerr << "ERROR: Invalid MIPS register id = " << id;
+            exit( EXIT_FAILURE);
+        }
+    }
+
+    friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
     {
         switch( rhs.value)
         {
@@ -79,7 +87,7 @@ public:
     bool is_mips_hi_lo() const { return value == MIPS_REG_hi_lo; }
     bool is_mips_ra()    const { return value == MIPS_REG_ra; }
     size_t to_size_t()   const { return value; }
-    
+
     static const MIPSRegister mips_hi;
     static const MIPSRegister mips_lo;
     static const MIPSRegister mips_hi_lo;
@@ -87,9 +95,12 @@ public:
     static const MIPSRegister return_address;
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
+    bool operator!=( const MIPSRegister& rhs) const { return !operator==(rhs); }
 private:
     RegNum value = MIPS_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
+
+    explicit MIPSRegister( RegNum id) : value( id) { }
 };
 
 namespace std {

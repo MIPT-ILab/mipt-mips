@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   CMakeFiles/func_sim_test.dir/func_sim/t/unit_test.cpp.o  -o func_sim_test -rdynamic build/libgtest.a libmipt-mips-src.a -lboost_program_options -lelf -pthread 
