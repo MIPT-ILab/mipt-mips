@@ -5,7 +5,10 @@
 #! https://github.com/SoshinK
 
 cmake_minimum_required(VERSION 2.6)
-project(mipt-mips)
+
+include(CheckCXXCompilerFlag)
+
+project(mipt-mips CXX)
 
 set(CPPS infra/macro_test.cpp
     infra/elf_parser/elf_parser.cpp 
@@ -50,10 +53,17 @@ if(NOT ${RELEASE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 endif()
 
-if(APPLE) 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z") 
-else() 
+check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
+if (HAS_STDCXX_17)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+else()
+    check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
+    if (HAS_STDCXX_1z)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+    else()
+      message("The compiler doesn't support the C++17 standard")
+      exit()
+    endif()
 endif()
 
 add_executable(${PROJECT_NAME} main.cpp)
@@ -78,9 +88,7 @@ find_path(LIBELF_INCLUDE_DIRS
         /opt/local/include/libelf
         /sw/include
         /sw/include/libelf
-
         /usr/local/Cellar/libelf/0.8.13_1/include/libelf
-
         ENV CPATH)
 
 if(NOT LIBELF_INCLUDE_DIRS)
