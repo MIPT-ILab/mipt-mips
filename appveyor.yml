@@ -70,8 +70,7 @@ before_build:
 build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: mkdir C:\Projects\mipt-mips\simulator\build
-- cmd: mkdir 
-- cmd: cd build
+- cmd: cd C:\Projects\mipt-mips\simulator\build
 - cmd: if not "%build%"=="msvc" cmake .. -G "MSYS Makefiles"
 - cmd: if "%build%"=="msvc" cmake .. -G "Visual Studio 15 %platform%"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
