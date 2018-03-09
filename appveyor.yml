@@ -75,7 +75,7 @@ build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: mkdir C:\Projects\mipt-mips\simulator\build
 - cmd: cd C:\Projects\mipt-mips\simulator\build
-- cmd: cmake .. -G %CMAKEFILE%
+- cmd: cmake .. -G "%CMAKEFILE%"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
 - cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release
 
