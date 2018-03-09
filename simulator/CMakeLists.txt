@@ -31,6 +31,7 @@ set(CPPS infra/macro_test.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
+    simulator.cpp
     writeback/writeback.cpp
     )
 
