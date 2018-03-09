@@ -130,7 +130,7 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ###### googletest ######
-set(gtest_force_shared_crt ON)
+set(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib even when Google Test is built as static lib.")
 add_subdirectory(../googletest/googletest ./build)
 
 enable_testing()
