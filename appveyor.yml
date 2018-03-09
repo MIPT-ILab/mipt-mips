@@ -14,7 +14,7 @@ environment:
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_65_1\lib32-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
-    CMAKE_ARCH:
+    CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
@@ -22,7 +22,7 @@ environment:
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_65_1\lib64-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
-    CMAKE_ARCH: Win64
+    CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
@@ -30,6 +30,7 @@ environment:
     LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
     MINGW_ARCH: i686
     MSYSTEM: MINGW32
+    CMAKEFILE: "MSYS Makefiles"
   - build: g++
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
@@ -37,6 +38,7 @@ environment:
     LIBELF_INCLUDE: C:\msys64\mingw64\include\libelf
     MINGW_ARCH: x86_64
     MSYSTEM: MINGW64
+    CMAKEFILE: "MSYS Makefiles"
 #  - build: clang++
 #    platform: x64
 #    MINGW_ROOT: C:\msys64\mingw64
@@ -73,8 +75,7 @@ build_script:
 - cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
 - cmd: mkdir C:\Projects\mipt-mips\simulator\build
 - cmd: cd C:\Projects\mipt-mips\simulator\build
-- cmd: if not "%build%"=="msvc" cmake .. -G "MSYS Makefiles"
-- cmd: if "%build%"=="msvc" cmake .. -G "Visual Studio 15 %CMAKE_ARCH%"
+- cmd: cmake .. -G %CMAKEFILE%
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
 - cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release
 
