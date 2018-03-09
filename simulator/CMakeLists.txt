@@ -103,7 +103,7 @@ endif()
 
 find_library (LIBELF_LIBRARIES
     NAMES
-        elf
+        elf libelf
     PATHS
         /usr/lib
         ENV LIBRARY_PATH
