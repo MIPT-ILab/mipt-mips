@@ -1,9 +1,3 @@
-/**
- * Unit tests for MIPS register
- * @author Alexander Misevich
- * Copyright 2018 MIPT-MIPS
- */
-
 // generic C
 #include <cassert>
 #include <cstdlib>
@@ -11,105 +5,46 @@
 // Google Test library
 #include <gtest/gtest.h>
 
-// MIPS-MIPS modules
-#include "../mips_register.h"
+// Module
+#include <mips/mips.h>
+#include "../perf_sim.h"
+
+static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
+static const std::string smc_code = TEST_PATH "/smc.out";
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
 
-static_assert(MIPSRegister::MAX_REG >= 32);
-
-TEST( MIPS_registers, Args_Of_Constr)
+TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
-    // Call a constructor
-    for ( size_t i = 0; i < 32; ++i)
-    {
-        GTEST_ASSERT_NO_DEATH( MIPSRegister reg( i); );
-    }
-
-    // Wrong parameter
-    ASSERT_EXIT( MIPSRegister reg( 32), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR: Invalid MIPS register id*");
+    // Just call a constructor
+    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS> mips( false); );
 }
 
-// Testing methods of the class
-TEST( MIPS_registers, Size_t_converters)
+TEST( Perf_Sim_init, Make_A_Step)
 {
-    for ( size_t i = 0; i < 32; ++i)
-    {
-        ASSERT_EQ(MIPSRegister(i).to_size_t(), i);
-    }
+    // Call constructor and run one instr
+    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS>( false).run( valid_elf_file, 1); );
 }
 
-TEST( MIPS_registers, Equal)
+TEST( Perf_Sim_init, Process_Wrong_Args)
 {
-    for ( size_t i = 0; i < 32; ++i)
-    {
-        ASSERT_EQ(MIPSRegister(i), MIPSRegister(i));
-        if (i > 0) {
-            ASSERT_NE(MIPSRegister(i - 1), MIPSRegister(i));
-        }
-    }
+    // Do bad init
+    ASSERT_EXIT( PerfSim<MIPS>( false).run( "./1234567890/qwertyuop", 1),
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
-TEST( MIPS_registers, Hi_Lo_impossible)
+TEST( Perf_Sim, Run_Full_Trace)
 {
-    for ( size_t i = 0; i < 32; ++i)
-    {
-        MIPSRegister reg(i);
-        ASSERT_FALSE(reg.is_mips_hi());
-        ASSERT_FALSE(reg.is_mips_lo());
-        ASSERT_FALSE(reg.is_mips_hi_lo());
-    }
+    PerfSim<MIPS> mips( false);
+    GTEST_ASSERT_NO_DEATH( mips.run_no_limit( valid_elf_file); );
 }
 
-TEST( MIPS_registers, Zero)
+TEST( Perf_Sim, Run_SMC_Trace)
 {
-    auto reg = MIPSRegister::zero;
-    ASSERT_TRUE(reg.is_zero());
-    ASSERT_FALSE(reg.is_mips_hi());
-    ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
-    ASSERT_TRUE(reg.to_size_t() == 0);
-}
-
-TEST( MIPS_registers, Return_address)
-{
-    auto reg = MIPSRegister::return_address;
-    ASSERT_FALSE(reg.is_zero());
-    ASSERT_FALSE(reg.is_mips_hi());
-    ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
-    ASSERT_TRUE(reg.to_size_t() == 31);
-}
-
-TEST( MIPS_registers, Hi_register)
-{
-    auto reg = MIPSRegister::mips_hi;
-    ASSERT_FALSE(reg.is_zero());
-    ASSERT_TRUE(reg.is_mips_hi());
-    ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
-    ASSERT_FALSE(reg.to_size_t() < 32);
-}
-
-TEST( MIPS_registers, Lo_register)
-{
-    auto reg = MIPSRegister::mips_lo;
-    ASSERT_FALSE(reg.is_zero());
-    ASSERT_FALSE(reg.is_mips_hi());
-    ASSERT_TRUE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
-    ASSERT_FALSE(reg.to_size_t() < 32);
-}
-
-TEST( MIPS_registers, Hi_Lo_register)
-{
-    auto reg = MIPSRegister::mips_hi_lo;
-    ASSERT_FALSE(reg.is_zero());
-    ASSERT_FALSE(reg.is_mips_hi());
-    ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_TRUE(reg.is_mips_hi_lo());
-    ASSERT_FALSE(reg.to_size_t() < 32);
+    PerfSim<MIPS> mips( false);
+    ASSERT_EXIT( mips.run_no_limit( smc_code);,
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "Mismatch:.*");
 }
 
 int main( int argc, char* argv[])

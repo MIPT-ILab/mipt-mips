@@ -249,28 +249,28 @@ CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o.provides: CMakeFiles/mipt-mips-sr
 CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o
 
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o: mips/mips_instr.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_instr.cpp
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o: core/perf_sim.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o -c /home/alex/mipt-mips/simulator/core/perf_sim.cpp
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/mips/mips_instr.cpp > CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/core/perf_sim.cpp > CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/mips/mips_instr.cpp -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/core/perf_sim.cpp -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires:
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires:
 
-.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
+.PHONY : CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
-	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides.build
-.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires
+	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides.build
+.PHONY : CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o
+CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o
 
 
 CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
@@ -297,52 +297,52 @@ CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o.provides: CMakeFiles/mipt-m
 CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o
 
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o: core/perf_sim.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o -c /home/alex/mipt-mips/simulator/core/perf_sim.cpp
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o: mips/mips_instr.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_instr.cpp
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/core/perf_sim.cpp > CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.i
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/mips/mips_instr.cpp > CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.i
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/core/perf_sim.cpp -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.s
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/mips/mips_instr.cpp -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.s
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires:
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires:
 
-.PHONY : CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires
+.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires
-	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides.build
-.PHONY : CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
+	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides.build
+.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides
 
-CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o
+CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o
 
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o: writeback/writeback.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o -c /home/alex/mipt-mips/simulator/writeback/writeback.cpp
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o: mips/mips_register/mips_register.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/writeback/writeback.cpp > CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp > CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/writeback/writeback.cpp -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires:
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires:
 
-.PHONY : CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
+.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
-	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides.build
-.PHONY : CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires
+	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides.build
+.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides
 
-CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o
+CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o
 
 
 CMakeFiles/mipt-mips-src.dir/simulator.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
@@ -369,28 +369,28 @@ CMakeFiles/mipt-mips-src.dir/simulator.cpp.o.provides: CMakeFiles/mipt-mips-src.
 CMakeFiles/mipt-mips-src.dir/simulator.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/simulator.cpp.o
 
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o: mips/mips_register/mips_register.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o: CMakeFiles/mipt-mips-src.dir/flags.make
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o: writeback/writeback.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o -c /home/alex/mipt-mips/simulator/writeback/writeback.cpp
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp > CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.i
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alex/mipt-mips/simulator/writeback/writeback.cpp > CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.i
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.s
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alex/mipt-mips/simulator/writeback/writeback.cpp -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.s
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires:
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires:
 
-.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires
+.PHONY : CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires
-	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides.build
-.PHONY : CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
+	$(MAKE) -f CMakeFiles/mipt-mips-src.dir/build.make CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides.build
+.PHONY : CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides
 
-CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o
+CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.provides.build: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o
 
 
 # Object files for target mipt-mips-src
@@ -403,12 +403,12 @@ mipt__mips__src_OBJECTS = \
 "CMakeFiles/mipt-mips-src.dir/infra/cache/cache_tag_array.cpp.o" \
 "CMakeFiles/mipt-mips-src.dir/bypass/data_bypass.cpp.o" \
 "CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o" \
-"CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o" \
-"CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o" \
 "CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o" \
-"CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o" \
+"CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o" \
+"CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o" \
+"CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o" \
 "CMakeFiles/mipt-mips-src.dir/simulator.cpp.o" \
-"CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o"
+"CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o"
 
 # External object files for target mipt-mips-src
 mipt__mips__src_EXTERNAL_OBJECTS =
@@ -421,12 +421,12 @@ libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/infra/ports/ports.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/infra/cache/cache_tag_array.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/bypass/data_bypass.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o
-libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o
-libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o
-libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o
-libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/simulator.cpp.o
+libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o
+libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o
+libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/simulator.cpp.o
+libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/build.make
 libmipt-mips-src.a: CMakeFiles/mipt-mips-src.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/alex/mipt-mips/simulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX static library libmipt-mips-src.a"
@@ -446,12 +446,12 @@ CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/infra/ports/
 CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/infra/cache/cache_tag_array.cpp.o.requires
 CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/bypass/data_bypass.cpp.o.requires
 CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/fetch/fetch.cpp.o.requires
-CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
-CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o.requires
 CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o.requires
-CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
-CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/simulator.cpp.o.requires
+CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/func_sim/func_sim.cpp.o.requires
+CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o.requires
 CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o.requires
+CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/simulator.cpp.o.requires
+CMakeFiles/mipt-mips-src.dir/requires: CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o.requires
 
 .PHONY : CMakeFiles/mipt-mips-src.dir/requires
 

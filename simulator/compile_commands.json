@@ -91,8 +91,8 @@
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
-  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_instr.cpp",
-  "file": "/home/alex/mipt-mips/simulator/mips/mips_instr.cpp"
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o -c /home/alex/mipt-mips/simulator/core/perf_sim.cpp",
+  "file": "/home/alex/mipt-mips/simulator/core/perf_sim.cpp"
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
@@ -101,13 +101,13 @@
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
-  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/core/perf_sim.cpp.o -c /home/alex/mipt-mips/simulator/core/perf_sim.cpp",
-  "file": "/home/alex/mipt-mips/simulator/core/perf_sim.cpp"
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_instr.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_instr.cpp",
+  "file": "/home/alex/mipt-mips/simulator/mips/mips_instr.cpp"
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
-  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o -c /home/alex/mipt-mips/simulator/writeback/writeback.cpp",
-  "file": "/home/alex/mipt-mips/simulator/writeback/writeback.cpp"
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp",
+  "file": "/home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp"
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
@@ -116,8 +116,8 @@
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
-  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/mips/mips_register/mips_register.cpp.o -c /home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp",
-  "file": "/home/alex/mipt-mips/simulator/mips/mips_register/mips_register.cpp"
+  "command": "/usr/bin/c++   -DTEST_PATH=\\\"/home/alex/mipt-mips/simulator/../traces\\\" -I/home/alex/mipt-mips/simulator/SRCDIRS -I/home/alex/mipt-mips/simulator/./. -I/home/alex/mipt-mips/googletest/googletest/include -I/home/alex/mipt-mips/googletest/googletest   -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   -o CMakeFiles/mipt-mips-src.dir/writeback/writeback.cpp.o -c /home/alex/mipt-mips/simulator/writeback/writeback.cpp",
+  "file": "/home/alex/mipt-mips/simulator/writeback/writeback.cpp"
 },
 {
   "directory": "/home/alex/mipt-mips/simulator",
