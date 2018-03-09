@@ -74,7 +74,7 @@ build_script:
 - cmd: mkdir C:\Projects\mipt-mips\simulator\build
 - cmd: cd C:\Projects\mipt-mips\simulator\build
 - cmd: if not "%build%"=="msvc" cmake .. -G "MSYS Makefiles"
-- cmd: if "%build%"=="msvc" cmake .. -G "Visual Studio 15 2017 %CMAKE_ARCH%"
+- cmd: if "%build%"=="msvc" cmake .. -G "Visual Studio 15 %CMAKE_ARCH%"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
 - cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release
 
