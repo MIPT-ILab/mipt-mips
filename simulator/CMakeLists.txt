@@ -113,8 +113,8 @@ find_library (LIBELF_LIBRARIES
         elf libelf
     PATHS
         /usr/lib
-        LIBRARY_PATH
-        LD_LIBRARY_PATH)
+        ENV LIBRARY_PATH
+        ENV LD_LIBRARY_PATH)
 
 if(NOT LIBELF_LIBRARIES)
     message(SEND_ERROR "Can't find libelf")
