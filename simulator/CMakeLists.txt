@@ -53,24 +53,31 @@ set(TESTS
     core
     )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
+if (MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /std:c++17")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_LD_FLAGS_RELEASE} /MDd")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
+else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
 
-check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
-if (HAS_STDCXX_17)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-else()
-    check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
-    if (HAS_STDCXX_1z)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+    check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
+    if (HAS_STDCXX_17)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
     else()
-      message("The compiler doesn't support the C++17 standard")
-      exit()
+        check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
+        if (HAS_STDCXX_1z)
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+        else()
+          message("The compiler doesn't support the C++17 standard")
+          exit()
+        endif()
     endif()
+    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
+    set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
+    set(CMAKE_LD_FLAGS_RELEASE " -flto")
 endif()
-
-set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
-set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
-set(CMAKE_LD_FLAGS_RELEASE " -flto")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
@@ -106,8 +113,8 @@ find_library (LIBELF_LIBRARIES
         elf libelf
     PATHS
         /usr/lib
-        ENV LIBRARY_PATH
-        ENV LD_LIBRARY_PATH)
+        LIBRARY_PATH
+        LD_LIBRARY_PATH)
 
 if(NOT LIBELF_LIBRARIES)
     message(SEND_ERROR "Can't find libelf")
