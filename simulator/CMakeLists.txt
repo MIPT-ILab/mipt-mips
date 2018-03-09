@@ -130,7 +130,9 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ###### googletest ######
+set(gtest_force_shared_crt ON)
 add_subdirectory(../googletest/googletest ./build)
+
 enable_testing()
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
