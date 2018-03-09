@@ -78,4 +78,4 @@ build_script:
 
 test_script:
 - cmd: cd C:\projects\MIPT-MIPS\simulator
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; ctest"
+- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; ctest --verbose"

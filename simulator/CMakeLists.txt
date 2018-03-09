@@ -20,22 +20,23 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/elf_parser/elf_parser.cpp 
-    infra/memory/memory.cpp 
-    infra/config/config.cpp 
-    infra/ports/ports.cpp 
-    infra/cache/cache_tag_array.cpp 
-    bypass/data_bypass.cpp 
-    fetch/fetch.cpp 
-    mips/mips_instr.cpp  
-    func_sim/func_sim.cpp 
-    core/perf_sim.cpp 
-    writeback/writeback.cpp 
-    simulator.cpp
+    infra/elf_parser/elf_parser.cpp
+    infra/memory/memory.cpp
+    infra/config/config.cpp
+    infra/ports/ports.cpp
+    infra/cache/cache_tag_array.cpp
+    bypass/data_bypass.cpp
+    fetch/fetch.cpp
+    core/perf_sim.cpp
+    func_sim/func_sim.cpp
+    mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
+    simulator.cpp
+    writeback/writeback.cpp
     )
 
-set(TESTS 
+set(TESTS
+# Test infrastructure
     infra/cache
     infra/elf_parser
     infra/memory
@@ -43,10 +44,13 @@ set(TESTS
     infra/instrcache
     infra/ports
     infra/string
+# Test MIPS
+    mips/mips_register
+# Test units
     bpu
+# Overall tests
     func_sim
     core
-    mips/mips_register
     )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
