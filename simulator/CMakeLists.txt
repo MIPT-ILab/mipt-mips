@@ -115,9 +115,9 @@ endif()
 
 include_directories(${LIBELF_INCLUDE_DIRS})
 
-add_library (mipt-mips-src STATIC ${CPPS} ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+add_library(mipt-mips-src STATIC ${CPPS})
 
-target_link_libraries(${PROJECT_NAME}  mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
 #clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
