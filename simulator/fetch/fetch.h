@@ -23,6 +23,7 @@ private:
 
     /* Input signals */
     std::unique_ptr<ReadPort<bool>> rp_stall = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_hit_or_miss = nullptr;
 
     /* Input signals - BP */
     std::unique_ptr<ReadPort<BPInterface>> rp_bp_update = nullptr;
@@ -32,17 +33,14 @@ private:
     std::unique_ptr<ReadPort<Addr>> rp_external_target = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_hold_pc = nullptr;
     std::unique_ptr<ReadPort<Addr>> rp_target = nullptr;
+    std::unique_ptr<ReadPort<Addr>> rp_long_latency_pc_holder = nullptr;
 
     /* Outputs */
     std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
     std::unique_ptr<WritePort<Addr>> wp_hold_pc = nullptr;
     std::unique_ptr<WritePort<Addr>> wp_target = nullptr;
-
     std::unique_ptr<WritePort<Addr>> wp_long_latency_pc_holder = nullptr;
-    std::unique_ptr<ReadPort<Addr>> rp_long_latency_pc_holder = nullptr;
-
     std::unique_ptr<WritePort<bool>> wp_hit_or_miss = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_hit_or_miss = nullptr;
 
     Addr get_PC( Cycle cycle);
     void clock_bp( Cycle cycle);

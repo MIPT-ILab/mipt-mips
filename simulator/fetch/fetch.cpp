@@ -32,7 +32,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
     rp_bp_update = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
     wp_long_latency_pc_holder = make_write_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
-    rp_long_latency_pc_holder = make_read_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_LATENCY);
+    rp_long_latency_pc_holder = make_read_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
 
     wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
     rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
@@ -52,13 +52,17 @@ Addr Fetch<ISA>::get_PC( Cycle cycle)
     const Addr hold_PC     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : 0;
     const Addr flushed_PC  = rp_flush_target->is_ready( cycle) ? rp_flush_target->read( cycle) : 0;
     const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
-
+    const Addr missed_PC   = rp_hit_or_miss->is_ready( cycle) ? clock_instr_cache( cycle) : 0;
+    
     /* Multiplexing */
+    if( flushed_PC != 0)
+        return flushed_PC;
+
+    if( missed_PC != 0) 
+        return missed_PC;
+
     if ( external_PC != 0)
         return external_PC;
-
-    if ( flushed_PC != 0)
-        return flushed_PC;
 
     if ( !is_stall)
         return target_PC;
@@ -80,23 +84,29 @@ void Fetch<ISA>::clock_bp( Cycle cycle)
 template <typename ISA>
 Addr Fetch<ISA>::clock_instr_cache( Cycle cycle) 
 {
+    /* ignore all ports */
     ignore( cycle);
     if( rp_long_latency_pc_holder->is_ready( cycle))
     {
+        /* get PC from long-latency port if it's possible */
         auto PC = rp_long_latency_pc_holder->read( cycle);
+        
+        /* write new PC to tags array */
         tags->write( PC);
         return PC;
-    }        
+    }
+    wp_hit_or_miss->write( false, cycle);
     return 0;
 }
 
 template <typename ISA>
 void Fetch<ISA>::ignore( Cycle cycle)
 {
+    /* ignore PC from other ports in the case of cache miss */ 
     rp_external_target->ignore( cycle);
     rp_hold_pc->ignore( cycle);
-    rp_flush_target->ignore( cycle);
     rp_target->ignore( cycle);
+    rp_hit_or_miss->ignore( cycle);
 }
 
 template <typename ISA>
@@ -107,10 +117,6 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* getting PC */
     auto PC = get_PC( cycle);
 
-    if( rp_hit_or_miss->is_ready( cycle))
-        if( !rp_hit_or_miss->read( cycle))
-            PC = clock_instr_cache( cycle);
-
     /* push bubble */
     if( PC == 0)
         return;  
@@ -118,19 +124,13 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* hold PC for the stall case */
     wp_hold_pc->write( PC, cycle);
 
-    sout << "PC = " << PC << "\n";
-
     /* hit or miss */
     auto is_hit = tags->is_hit( PC);
 
-    sout << "hit = " << is_hit;
-
-    /* hold result of previous stage */
-    wp_hit_or_miss->write( is_hit, cycle);
-
-    /* push bubble if miss and update cache */
+    /* push bubble if miss and send info to the next stage */
     if( !is_hit) 
     {
+        wp_hit_or_miss->write( is_hit, cycle);
         wp_long_latency_pc_holder->write( PC, cycle);
         return;
     }

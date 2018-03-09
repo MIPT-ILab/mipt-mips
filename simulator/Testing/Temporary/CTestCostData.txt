@@ -1,13 +1,12 @@
-infra_cache_test 1 9.30282
-infra_elf_parser_test 1 0.00608611
-infra_memory_test 1 0.399706
-infra_config_test 1 0.00699592
-infra_instrcache_test 1 0.00761008
-infra_ports_test 1 0.195164
-infra_string_test 1 0.00316
-bpu_test 1 0.011091
-func_sim_test 1 0.02858
-core_test 0 0
-mips_mips_register_test 1 0.0772958
+infra_cache_test 8 0.959031
+infra_elf_parser_test 8 0.00046438
+infra_memory_test 8 0.042719
+infra_config_test 8 0.000819981
+infra_instrcache_test 8 0.00131801
+infra_ports_test 8 0.0192621
+infra_string_test 8 0.000260115
+bpu_test 8 0.000923127
+func_sim_test 8 0.00314039
+core_test 3 0.0149017
+mips_mips_register_test 8 0.0121049
 ---
-core_test
