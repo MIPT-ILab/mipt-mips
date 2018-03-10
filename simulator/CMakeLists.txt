@@ -54,7 +54,7 @@ set(TESTS
     )
 
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /DBOOST_ALL_DYN_LINK /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /std:c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /std:c++17")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
     set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
@@ -85,6 +85,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 include_directories(SRCDIRS ./.)
 
 #include Boost libs
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
