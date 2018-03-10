@@ -4,9 +4,7 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 2.6)
-
-include(CheckCXXCompilerFlag)
+cmake_minimum_required(VERSION 3.1)
 
 project(mipt-mips CXX)
 
@@ -61,19 +59,9 @@ if (MSVC)
     set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
-
-    check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
-    if (HAS_STDCXX_17)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-    else()
-        check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
-        if (HAS_STDCXX_1z)
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
-        else()
-          message("The compiler doesn't support the C++17 standard")
-          exit()
-        endif()
-    endif()
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
     set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
     set(CMAKE_LD_FLAGS_RELEASE " -flto")
