@@ -77,8 +77,8 @@ build_script:
 - cmd: cd C:\Projects\mipt-mips\simulator\build
 - cmd: cmake .. -G "%CMAKEFILE%"
 - cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
-- cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release
+- cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:
 - cmd: cd C:\projects\MIPT-MIPS\simulator\build
-- cmd: ctest
+- cmd: ctest -C Release
