@@ -48,37 +48,36 @@ environment:
 
 before_build:
 # install submodules
-- cmd: git submodule update --init
+- git submodule update --init
 # configure variable
-- cmd: set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
-# install Boost and LibELF for MINGW
-- cmd: if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
-- cmd: if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
 # set variables for MSVC
-- cmd: if "%build%"=="msvc"  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
-# build LibELF for MSVC
-- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
-- cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
-- cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
-- cmd: set PATH=%LIBELF_INCLUDE%;%BOOST_LIBRARYDIR%;%PATH%
+- if "%build%"=="msvc"  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
+# install LibELF
+- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
+- if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
+- if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
+- set INCLUDE=%LIBELF_INCLUDE%;%INCLUDE%
+# install Boost
+- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- set PATH=%LIBELF_INCLUDE%;%PATH%
+- set INCLUDE=%BOOST_ROOT%;%INCLUDE%
 # build binutils
-- cmd: set BINUTILS=/c/projects/mipt-mips/binutils
-- cmd: bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
-# disable optimizations to speed up build a little
-- cmd: bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile"
-- cmd: bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
+- set BINUTILS=/c/projects/mipt-mips/binutils
+- bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
+- bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile" # disable optimizations to speed up build a little
+- bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
 # update environment with Boost and LIBELF
-- cmd: set LIB=%BOOST_LIBRARYDIR%;%LIB%
-- cmd: set CXX=%build%
+- set LIB=%BOOST_LIBRARYDIR%;%LIB%
+- set CXX=%build%
 
 build_script:
-- cmd: bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
-- cmd: mkdir C:\Projects\mipt-mips\simulator\build
-- cmd: cd C:\Projects\mipt-mips\simulator\build
-- cmd: cmake .. -G "%CMAKEFILE%"
-- cmd: if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
-- cmd: if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
+- bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
+- mkdir C:\Projects\mipt-mips\simulator\build
+- cd C:\Projects\mipt-mips\simulator\build
+- cmake .. -G "%CMAKEFILE%"
+- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
+- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:
-- cmd: cd C:\projects\MIPT-MIPS\simulator\build
-- cmd: ctest -C Release --verbose
+- ctest -C Release --verbose
