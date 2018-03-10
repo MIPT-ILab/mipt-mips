@@ -53,24 +53,31 @@ set(TESTS
     core
     )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
+if (MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /std:c++17")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
+    set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
+else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
 
-check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
-if (HAS_STDCXX_17)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-else()
-    check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
-    if (HAS_STDCXX_1z)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+    check_cxx_compiler_flag("-std=c++17" HAS_STDCXX_17)
+    if (HAS_STDCXX_17)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
     else()
-      message("The compiler doesn't support the C++17 standard")
-      exit()
+        check_cxx_compiler_flag("-std=c++1z" HAS_STDCXX_1z)
+        if (HAS_STDCXX_1z)
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+        else()
+          message("The compiler doesn't support the C++17 standard")
+          exit()
+        endif()
     endif()
+    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
+    set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
+    set(CMAKE_LD_FLAGS_RELEASE " -flto")
 endif()
-
-set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
-set(CMAKE_CXX_FLAGS_RELEASE " -O3 -g -march=native")
-set(CMAKE_LD_FLAGS_RELEASE " -flto")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
@@ -78,6 +85,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 include_directories(SRCDIRS ./.)
 
 #include Boost libs
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -123,7 +131,9 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ###### googletest ######
+set(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib for GTest" FORCE)
 add_subdirectory(../googletest/googletest ./build)
+
 enable_testing()
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
