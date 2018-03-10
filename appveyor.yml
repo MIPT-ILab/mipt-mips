@@ -11,7 +11,6 @@ environment:
   #  platform: x86
   #  MINGW_ROOT: C:\msys64\mingw32
   #  BOOST_ROOT: C:\Libraries\boost_1_65_1
-  #  BOOST_LIBRARYDIR: C:\Libraries\boost_1_65_1\lib32-msvc-14.1
   #  LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
   #  MINGW_ARCH: i686
   #  CMAKEFILE: "Visual Studio 15"
@@ -19,7 +18,6 @@ environment:
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
     BOOST_ROOT: C:\Libraries\boost_1_65_1
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_65_1\lib64-msvc-14.1
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
     CMAKEFILE: "Visual Studio 15 Win64"
@@ -68,7 +66,6 @@ before_build:
 - bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile" # disable optimizations to speed up build a little
 - bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
 # update environment with Boost and LIBELF
-- set LIB=%BOOST_LIBRARYDIR%;%LIB%
 - set CXX=%build%
 
 build_script:
