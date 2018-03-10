@@ -60,7 +60,7 @@ before_build:
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
 - cmd: if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 - cmd: set INCLUDE=%LIBELF_INCLUDE%;%BOOST_ROOT%;%INCLUDE%
-- cmd: set PATH=%LIBELF_INCLUDE%;%PATH%
+- cmd: set PATH=%LIBELF_INCLUDE%;%BOOST_LIBRARYDIR%;%PATH%
 # build binutils
 - cmd: set BINUTILS=/c/projects/mipt-mips/binutils
 - cmd: bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
