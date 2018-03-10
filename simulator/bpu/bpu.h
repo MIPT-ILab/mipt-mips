@@ -10,6 +10,7 @@
 // C++ generic modules
 #include <vector>
 #include <memory>
+#include <map>
 
 // MIPT_MIPS modules
 #include <infra/cache/cache_tag_array.h>
