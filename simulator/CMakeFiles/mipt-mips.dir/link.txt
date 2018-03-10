@@ -1,1 +1,0 @@
-/usr/bin/c++    -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -std=c++17  -O3 -g -march=native   CMakeFiles/mipt-mips.dir/main.cpp.o  -o mipt-mips -rdynamic libmipt-mips-src.a -lelf -lboost_program_options 
