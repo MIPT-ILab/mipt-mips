@@ -44,6 +44,7 @@ set(TESTS
     infra/string
 # Test MIPS
     mips/mips_register
+    mips
 # Test units
     bpu
 # Overall tests
