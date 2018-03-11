@@ -1,7 +1,7 @@
 /**
  * ports.h - template for simulation of ports.
  * @author Pavel Kryukov
- * Copyright 2017 MIPT-MIPS team
+ * Copyright 2017-2018 MIPT-MIPS team
  */
 
 #ifndef PORTS_H
@@ -9,7 +9,7 @@
 
 #include <cstdlib>
 
-#include <map>
+#include <unordered_map>
 #include <queue>
 #include <list>
 #include <string>
@@ -86,7 +86,7 @@ template<class T> class Port : public BasePort
                 ReadListType readers = {};
             };
 
-            std::map<std::string, Cluster> _map = { };
+            std::unordered_map<std::string, Cluster> _map = { };
 
             // Init method
             void init() const final;
