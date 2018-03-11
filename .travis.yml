@@ -55,6 +55,6 @@ script:
   - make
   - ctest --verbose
 # Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then $TRAVIS_BUILD_DIR/simulator/tools/tidy-check.sh; fi
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-5.0.py '^.*simulator((?!unit_test).)*$'; fi
 # Check simulation spped
   - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
