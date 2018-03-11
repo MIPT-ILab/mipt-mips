@@ -9,6 +9,8 @@
 
 #include <infra/instrcache/instr_cache_memory.h>
 
+using MyType = int; // Dummy type to treat the file as C++
+
 struct RISCV
 {
     // using FuncInstr = RISCVInstr;
