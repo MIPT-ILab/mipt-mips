@@ -14,6 +14,7 @@ environment:
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: i686
     CMAKEFILE: "Visual Studio 15"
+    CMAKEPLATFORM: "Any CPU"
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
@@ -21,6 +22,7 @@ environment:
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
     CMAKEFILE: "Visual Studio 15 Win64"
+    CMAKEPLATFORM: x64
   - build: g++
     platform: x86
     MINGW_ROOT: C:\msys64\mingw32
@@ -74,7 +76,7 @@ build_script:
 - cd C:\Projects\mipt-mips\simulator\build
 - cmake .. -G "%CMAKEFILE%"
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
+- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%CMAKEPLATFORM%
 
 test_script:
 - ctest -C Release --verbose
