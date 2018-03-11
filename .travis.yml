@@ -35,7 +35,6 @@ addons:
 
 install:
   - export GTEST_COLOR=1
-  - chmod +x $TRAVIS_BUILD_DIR/simulator/tools/*.sh
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
 # Install OS X packages
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
@@ -56,5 +55,5 @@ script:
   - ctest --verbose
 # Run Clang-Tidy
   - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-5.0.py '^.*simulator((?!unit_test).)*$'; fi
-# Check simulation spped
-  - $TRAVIS_BUILD_DIR/simulator/tools/simfreq.sh
+# Run a trace to see simulation frequency
+  - ./mipt-mips -b $TRAVIS_BUILD_TID/traces/fib.out -n 1000000
