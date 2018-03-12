@@ -254,6 +254,11 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
+        void execute_madd()  { v_dst += mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_maddu() { v_dst += mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_msub()  { v_dst -= mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_msubu() { v_dst -= mips_multiplication<uint32>(v_src1, v_src2); }
+
         void execute_jump( Addr target)
         {
             _is_jump_taken = true;
@@ -320,7 +325,7 @@ class MIPSInstr
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
-        bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
@@ -348,7 +353,7 @@ class MIPSInstr
 
         uint64 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst;
         }
 
         void execute();
