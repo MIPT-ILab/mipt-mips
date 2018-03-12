@@ -54,6 +54,6 @@ script:
   - make
   - ctest --verbose
 # Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-5.0.py '^.*simulator((?!unit_test).)*$'; fi
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-5.0.py -header-filter '.*' '^.*simulator((?!unit_test).)*$'; fi
 # Run a trace to see simulation frequency
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000

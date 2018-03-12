@@ -69,7 +69,8 @@ public:
 
     RequiredValue<T>() = delete;
 
-    operator const T&() const { return value; } // NOLINT
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    operator const T&() const { return value; }
     
     friend std::ostream& operator<<( std::ostream& out, const RequiredValue& rhs)
     {
