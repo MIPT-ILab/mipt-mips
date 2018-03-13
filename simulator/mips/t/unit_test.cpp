@@ -17,8 +17,9 @@ TEST( MIPS_instr_init, Process_Wrong_Args_Of_Constr)
     ASSERT_NO_THROW( MIPSInstr(0x0).execute());
 
     // must exit and return EXIT_FAILURE
-    ASSERT_EXIT( MIPSInstr(0xFFFFFFFFull).execute(),
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+    //ASSERT_EXIT( MIPSInstr(0xFFFFFFFFull).execute(),
+    //             ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+    // can't use, because add inst "sd"
 }
 
 /*
@@ -110,6 +111,12 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0x9931fb2e).Dump(), "lwr $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xc13104d2).Dump(), "ll $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0xc131fb2e).Dump(), "ll $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xdd3104d2).Dump(), "ld $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xdd31fb2e).Dump(), "ld $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0x693104d2).Dump(), "ldl $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0x6931fb2e).Dump(), "ldl $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0x6d3104d2).Dump(), "ldr $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0x6d31fb2e).Dump(), "ldr $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xa13104d2).Dump(), "sb $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0xa131fb2e).Dump(), "sb $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xa53104d2).Dump(), "sh $s1, 0x4d2($t1)");
@@ -122,6 +129,12 @@ TEST( MIPS_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPSInstr(0xb931fb2e).Dump(), "swr $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0xe13104d2).Dump(), "sc $s1, 0x4d2($t1)");
     ASSERT_EQ(MIPSInstr(0xe131fb2e).Dump(), "sc $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xfd3104d2).Dump(), "sd $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xfd31fb2e).Dump(), "sd $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xb13104d2).Dump(), "sdl $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xb131fb2e).Dump(), "sdl $s1, 0xfb2e($t1)");
+    ASSERT_EQ(MIPSInstr(0xb53104d2).Dump(), "sdr $s1, 0x4d2($t1)");
+    ASSERT_EQ(MIPSInstr(0xb531fb2e).Dump(), "sdr $s1, 0xfb2e($t1)");
     ASSERT_EQ(MIPSInstr(0x1229ffff).Dump(), "beq $s1, $t1, -1");
     ASSERT_EQ(MIPSInstr(0x1229000e).Dump(), "beq $s1, $t1, 14");
     ASSERT_EQ(MIPSInstr(0x0621fffc).Dump(), "bgez $s1, -4");

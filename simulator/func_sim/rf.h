@@ -24,7 +24,7 @@ public:
     Reg& get_entry( Register num) { return array.at( num.to_size_t()); }
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
-    uint32 read( Register num) const
+    uint64 read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_entry( num).value;

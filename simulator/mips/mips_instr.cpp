@@ -158,8 +158,8 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &MIPSInstr::execute_branch<&MIPSInstr::gtz>, 2} },
 
     // 0x18 - 0x19 double width addition
-    // 0x1A - 0x1B load double word left/right
-
+    {0x1A, { "ldl",  OUT_I_LOAD64L, 8, &MIPSInstr::calculate_load_addr, 3} },
+    {0x1B, { "ldr",  OUT_I_LOAD64R, 8, &MIPSInstr::calculate_load_addr, 3} },
     // Loads
     //key     name  operation  memsize       pointer
     {0x20, { "lb",  OUT_I_LOAD,  1, &MIPSInstr::calculate_load_addr, 1} },
@@ -173,18 +173,22 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     // Store
     //key     name   operation  memsize       pointer
-    {0x28, { "sb",  OUT_I_STORE,  1, &MIPSInstr::calculate_store_addr, 1} },
-    {0x29, { "sh",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
-    {0x2A, { "swl", OUT_I_STOREL, 4, &MIPSInstr::calculate_store_addr, 1} },
-    {0x2B, { "sw",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 1} },
-    //       0x2C   store double word left
-    //       0x2D   store double word right
-    {0x2E, { "swr", OUT_I_STORER, 4, &MIPSInstr::calculate_store_addr, 1 } },
+    {0x28, { "sb",  OUT_I_STORE,    1, &MIPSInstr::calculate_store_addr, 1} },
+    {0x29, { "sh",  OUT_I_STORE,    2, &MIPSInstr::calculate_store_addr, 1} },
+    {0x2A, { "swl", OUT_I_STOREL,   4, &MIPSInstr::calculate_store_addr, 1} },
+    {0x2B, { "sw",  OUT_I_STORE,    4, &MIPSInstr::calculate_store_addr, 1} },
+    {0x2C, { "sdl", OUT_I_STORE64L, 8, &MIPSInstr::calculate_store_addr, 3} },
+    {0x2D, { "sdr", OUT_I_STORE64R, 8, &MIPSInstr::calculate_store_addr, 3} },
+    {0x2E, { "swr", OUT_I_STORER,   4, &MIPSInstr::calculate_store_addr, 1} },
     //       0x2F   cache
 
     // Advanced loads and stores
     {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr, 1} },
+
+    {0x37, { "ld",  OUT_I_LOAD64, 8, &MIPSInstr::calculate_load_addr,  3} },
     {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
+
+    {0x3F, { "sd",  OUT_I_STORE64,8, &MIPSInstr::calculate_store_addr, 3} },
 };
 
 const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
@@ -386,6 +390,9 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
         case OUT_I_LOADU:
         case OUT_I_LOADL:
         case OUT_I_LOADR:
+        case OUT_I_LOAD64:
+        case OUT_I_LOAD64R:
+        case OUT_I_LOAD64L:
             v_imm = instr.asI.imm;
             src1 = MIPSRegister(instr.asI.rs);
             dst  = MIPSRegister(instr.asI.rt);
@@ -398,6 +405,9 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
         case OUT_I_STORE:
         case OUT_I_STOREL:
         case OUT_I_STORER:
+        case OUT_I_STORE64:
+        case OUT_I_STORE64L:
+        case OUT_I_STORE64R:
             v_imm = instr.asI.imm;
             src2 = MIPSRegister(instr.asI.rt);
             src1 = MIPSRegister(instr.asI.rs);
@@ -430,7 +440,7 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
             src1 = MIPSRegister(instr.asR.rs);
             dst  = MIPSRegister(instr.asR.rd);
 
-            oss <<  " $" << dst 
+            oss <<  " $" << dst
                 << ", $" << src1;
             break;
         default:
@@ -482,7 +492,19 @@ void MIPSInstr::set_v_dst( uint64 value)
     }
     else if ( operation == OUT_I_LOADU)
     {
-        v_dst = static_cast<uint32>( value);
+        v_dst = static_cast<uint64>( value);
+    }
+    else if ( operation == OUT_I_LOAD64)
+    {
+        v_dst = static_cast<int64>( value);
+    }
+    else if ( operation == OUT_I_LOAD64L)
+    {
+        v_dst = static_cast<int64>( value) & 0xFFFFFFFFFFFF0000;
+    }
+    else if ( operation == OUT_I_LOAD64R)
+    {
+        v_dst = static_cast<int64>( value) & 0xFFFF;
     }
     else
     {

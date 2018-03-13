@@ -80,10 +80,16 @@ class MIPSInstr
             OUT_I_LOADU,
             OUT_I_LOADR,
             OUT_I_LOADL,
+            OUT_I_LOAD64,
+            OUT_I_LOAD64L,
+            OUT_I_LOAD64R,
             OUT_I_CONST,
             OUT_I_STORE,
             OUT_I_STOREL,
             OUT_I_STORER,
+            OUT_I_STORE64,
+            OUT_I_STORE64L,
+            OUT_I_STORE64R,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_RI_BRANCH_LINK,
@@ -224,7 +230,7 @@ class MIPSInstr
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
         void execute_srav()  { v_dst = static_cast<uint32>( static_cast<int32>( v_src1) >> static_cast<uint32>( v_src2)); }
         void execute_lui()   { v_dst = static_cast<uint32>(sign_extend( v_imm) << 0x10); }
-        
+
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -311,17 +317,23 @@ class MIPSInstr
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
 
-        bool is_load()  const { return operation == OUT_I_LOAD  ||
-                                       operation == OUT_I_LOADU ||
-                                       operation == OUT_I_LOADR ||
-                                       operation == OUT_I_LOADL; }
-        bool is_store() const { return operation == OUT_I_STORE  ||
-                                       operation == OUT_I_STORER ||
-                                       operation == OUT_I_STOREL; }
+        bool is_load()  const { return operation == OUT_I_LOAD    ||
+                                       operation == OUT_I_LOADU   ||
+                                       operation == OUT_I_LOADR   ||
+                                       operation == OUT_I_LOADL   ||
+                                       operation == OUT_I_LOAD64  ||
+                                       operation == OUT_I_LOAD64L ||
+                                       operation == OUT_I_LOAD64R;  }
+        bool is_store() const { return operation == OUT_I_STORE    ||
+                                       operation == OUT_I_STORER   ||
+                                       operation == OUT_I_STOREL   ||
+                                       operation == OUT_I_STORE64  ||
+                                       operation == OUT_I_STORE64L ||
+                                       operation == OUT_I_STORE64R;  }
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
-        bool is_conditional_move() const { return operation == OUT_R_CONDM; } 
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
@@ -345,11 +357,22 @@ class MIPSInstr
         Addr get_PC() const { return PC; }
 
         void set_v_dst(uint64 value); // for loads
-        uint64 get_v_src2() const { return v_src2; } // for stores
+        uint64 get_v_src2() const     // for stores
+        {
+            if( operation == OUT_I_STORE64L)
+            {
+                return static_cast<uint64>( v_src2) & 0xFFFFFFFFFFFF0000;
+            }
+            else if ( operation == OUT_I_STORE64R)
+            {
+                return static_cast<uint64>( v_src2) & 0xFFFF;
+            }
+            else return v_src2;
+        }
 
         uint128 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst;
         }
 
         void execute();
