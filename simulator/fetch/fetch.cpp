@@ -13,9 +13,9 @@ namespace config {
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 
     /* Cache parameters */
-    static Value<uint32> size_in_bytes = {"size", 2048, "cache size in bytes"};
-    static Value<uint32> ways = {"ways", 4, "cache associativity"};
-    static Value<uint32> line_size = {"line-size", 64, "size of a line in bytes"};
+    static Value<uint32> size_in_bytes = {"size,S", 2048, "cache size in bytes"};
+    static Value<uint32> ways = {"ways,W", 4, "cache associativity"};
+    static Value<uint32> line_size = {"line-size,L", 64, "size of a line in bytes"};
 } // namespace config
 
 template <typename ISA>
