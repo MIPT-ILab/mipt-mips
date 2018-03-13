@@ -48,18 +48,15 @@ private:
     std::unique_ptr<WritePort<bool>> wp_hit_or_miss = nullptr;
 
     Addr get_PC( Cycle cycle);
+    Addr get_cached_PC( Cycle cycle);
     void clock_bp( Cycle cycle);
+    void clock_instr_cache( Cycle cycle);
+    void save_flush( Cycle cycle);
+    void ignore( Cycle cycle);
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
     void set_memory( Memory* mem) { memory = mem; }
-    void clock_instr_cache( Cycle cycle);
-    Addr get_cached_PC( Cycle cycle);
-    void save_flush( Cycle cycle);
-    void ignore( Cycle cycle);
-    void init() { tags = std::make_unique<CacheTagArray>( size_in_bytes, ways, line_size); }
-        
 };
 
 #endif
-    

@@ -35,7 +35,6 @@ private:
     std::unique_ptr<DataBypass> bypassing_unit = nullptr;
     Fetch<ISA> fetch;
     Writeback<ISA> writeback;
-    CacheTagArray* tags = nullptr;
 
     /* all ports */
     std::unique_ptr<ReadPort<Instr>> rp_fetch_2_decode = nullptr;

@@ -39,6 +39,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
+    tags = std::make_unique<CacheTagArray>( size_in_bytes, ways, line_size);
 
 }
 
