@@ -468,21 +468,21 @@ void MIPSInstr::execute()
     }
 }
 
-void MIPSInstr::set_v_dst( uint32 value)
+void MIPSInstr::set_v_dst( uint64 value)
 {
     if ( operation == OUT_I_LOAD)
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = static_cast<int32>( static_cast<int8>( value)); break;
-            case 2: v_dst = static_cast<int32>( static_cast<int16>( value)); break;
-            case 4: v_dst = value; break;
+            case 1: v_dst = static_cast<uint64>( static_cast<int8>( value)); break;
+            case 2: v_dst = static_cast<uint64>( static_cast<int16>( value)); break;
+            case 4: v_dst = static_cast<uint32>( value); break;
             default: assert( false);
         }
     }
     else if ( operation == OUT_I_LOADU)
     {
-        v_dst = value;
+        v_dst = static_cast<uint32>( value);
     }
     else
     {

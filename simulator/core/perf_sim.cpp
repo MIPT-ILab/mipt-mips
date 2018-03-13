@@ -35,16 +35,16 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
 
     wp_memory_2_bp = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
 
-    wp_execute_2_execute_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    rps_stages_2_execute_sources_bypass[0][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_sources_bypass[1][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    wp_execute_2_execute_bypass = make_write_port<uint128>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    rps_stages_2_execute_sources_bypass[0][0] = make_read_port<uint128>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][0] = make_read_port<uint128>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    wp_memory_2_execute_bypass = make_write_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    rps_stages_2_execute_sources_bypass[0][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_sources_bypass[1][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    wp_memory_2_execute_bypass = make_write_port<uint128>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    rps_stages_2_execute_sources_bypass[0][1] = make_read_port<uint128>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][1] = make_read_port<uint128>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint128>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint128>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
     wps_decode_2_execute_command[0] = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                                  PORT_BW, PORT_FANOUT);
@@ -290,7 +290,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             /* transform received data in accordance with bypass command */
             const auto adapted_data = DataBypass::adapt_bypassed_data( bypass_command, data);
 
-            instr.set_v_src( adapted_data, src_index);
+            instr.set_v_src( static_cast<uint64>( adapted_data), src_index);
         }
         else
         {
