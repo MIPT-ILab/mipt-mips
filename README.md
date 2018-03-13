@@ -31,11 +31,11 @@ _Konstantin, please update this section_
 
 ### C++ requirements
 
-MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these versions or newer:
+MIPT-MIPS uses C++17 features and Boost 1.54. Thus, you have to use compilers of these versions or newer:
 * GCC 7
 * Clang 5.0
-* Apple LLVM 7.3.0 (uses -std=c++1z flag)
-* MS Visual Studio 2017 (Boost 1.65.1 is required)
+* Apple LLVM 7.3.0
+* MS Visual Studio 2017 (Boost 1.66 is required)
 
 Additionally, you have to use CMake 3.8 or higher.
 
