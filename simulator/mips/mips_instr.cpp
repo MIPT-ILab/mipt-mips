@@ -473,12 +473,12 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint64>( v_dst >> 32) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
 
-        oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
+        oss << " = 0x" << static_cast<uint64>( v_dst) << " ]";
         disasm += oss.str();
     }
 }
@@ -491,7 +491,7 @@ void MIPSInstr::set_v_dst( uint64 value)
         {
             case 1: v_dst = static_cast<uint64>( static_cast<int8>( value)); break;
             case 2: v_dst = static_cast<uint64>( static_cast<int16>( value)); break;
-            case 4: v_dst = static_cast<uint32>( value); break;
+            case 4: v_dst = static_cast<uint64>( value); break;
             default: assert( false);
         }
     }
