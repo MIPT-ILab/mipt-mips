@@ -15,7 +15,7 @@ MIPT-MIPS can be used for different purposes:
 
 ----
 ## Getting started
-
+_Konstantin, please update this section_
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
@@ -36,10 +36,12 @@ MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these ve
 * Clang 5.0
 * Apple LLVM 7.3.0 (uses -std=c++1z flag)
 * MS Visual Studio 2017 (Boost 1.65.1 is required)
-* CMake 2.6 
+
+Additionally, you have to use CMake 3.8 or higher.
 
 ### Testing
 
+_Konstantin, please update this section_
 1. Get sure GoogleTest is fetched with other submodules.
 1. To run all unit tests in POSIX environment, use `ctest` command.
 1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
