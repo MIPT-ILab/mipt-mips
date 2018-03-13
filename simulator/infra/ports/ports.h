@@ -439,7 +439,7 @@ decltype(auto) make_read_port(Args... args)
 }
 
 static constexpr const Latency PORT_LATENCY = 1_Lt;
-static constexpr const Latency PORT_LONG_LATENCY = 2_Lt;
+static constexpr const Latency PORT_LONG_LATENCY = 30_Lt;
 static constexpr const uint32 PORT_FANOUT = 1;
 static constexpr const uint32 PORT_BW = 1;
 

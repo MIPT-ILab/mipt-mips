@@ -28,11 +28,6 @@ class PerfSim : public Simulator
     using Memory = typename ISA::Memory;
 private:
     Cycle curr_cycle = 0_Cl;
-    /* Cache parameters */
-    uint32 size_in_bytes = 2048;
-    uint32 ways = 4;
-    uint32 line_size = 64;
-
 
     /* simulator units */
     std::unique_ptr<RF<ISA>> rf = nullptr;

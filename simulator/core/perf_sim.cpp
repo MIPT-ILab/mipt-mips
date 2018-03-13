@@ -94,9 +94,8 @@ void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
     memory = new Memory( tr);
-    tags = new CacheTagArray( size_in_bytes, ways, line_size);
     fetch.set_memory( memory);
-    fetch.set_cache( tags);
+    fetch.init();
     writeback.set_instrs_to_run( instrs_to_run);
     writeback.set_RF( rf.get());
     writeback.init_checker( tr);
