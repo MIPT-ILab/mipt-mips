@@ -21,11 +21,6 @@ private:
     std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<CacheTagArray> tags = nullptr;
     
-    /* Cache parameters */ 
-    const uint32 size_in_bytes = 2048;
-    const uint32 ways = 4; 
-    const uint32 line_size = 64;
-
     /* Input signals */
     std::unique_ptr<ReadPort<bool>> rp_stall = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_hit_or_miss = nullptr;

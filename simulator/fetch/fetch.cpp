@@ -11,6 +11,11 @@ namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
     static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
+
+    /* Cache parameters */
+    static Value<uint32> size_in_bytes = {"size", 2048, "cache size in bytes"};
+    static Value<uint32> ways = {"ways", 4, "cache associativity"};
+    static Value<uint32> line_size = {"line-size", 64, "size of a line in bytes"};
 } // namespace config
 
 template <typename ISA>
@@ -39,7 +44,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-    tags = std::make_unique<CacheTagArray>( size_in_bytes, ways, line_size);
+    tags = std::make_unique<CacheTagArray>( config::size_in_bytes, config::ways, config::line_size);
 
 }
 
