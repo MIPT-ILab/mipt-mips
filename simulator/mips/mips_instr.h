@@ -44,13 +44,13 @@ uint64 mips_multiplication(T x, T y) {
     return static_cast<uint64>(x) * static_cast<uint64>(y);
 }
 
-template<typename T, typename T64>
-    uint64 mips_division(T x, T y) {
+template<typename T, typename T64, typename UT64, typename UT32, size_t offset>
+    UT64 mips_division(T x, T y) {
     if (y == 0)
         return 0;
     auto x1 = static_cast<T64>(x);
     auto y1 = static_cast<T64>(y);
-    return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32);
+    return static_cast<UT64>(static_cast<UT32>(x1 / y1)) | (static_cast<UT64>(static_cast<UT32>(x1 % y1)) << offset);
 }
 
 class MIPSInstr
@@ -208,19 +208,24 @@ class MIPSInstr
         // Predicate helpers - immediate unsigned
         bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
         bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
-
-        void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
+        template <typename T>
+        void execute_add()   { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
+        
         void execute_sub()   { v_dst = static_cast<uint32>( static_cast<int32>( v_src1) - static_cast<int32>( v_src2)); }
-        void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
+        template <typename T>
+        void execute_addi()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( sign_extend( v_imm)); }
 
-        void execute_addu()  { v_dst = static_cast<uint32>( v_src1) + static_cast<uint32>( v_src2); }
+        template <typename T>
+        void execute_addu()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
         void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addiu() { v_dst = static_cast<uint32>(static_cast<int32>(v_src1) + sign_extend(v_imm)); }
+        template <typename UT, typename T>
+        void execute_addiu() { v_dst = static_cast<UT>(static_cast<T>(v_src1) + static_cast<T>( sign_extend(v_imm))); }
 
         void execute_mult()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
         void execute_multu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
-        void execute_div()   { v_dst = mips_division<int32, int64>(v_src1, v_src2); }
-        void execute_divu()  { v_dst = mips_division<uint32, uint64>( v_src1, v_src2); }
+        void execute_div()   { v_dst = mips_division<int32, int64, uint64, uint32, 32>( v_src1, v_src2); }
+        void execute_divu()  { v_dst = mips_division<uint32, uint64, uint64, uint32, 32>( v_src1, v_src2); }
+        void execute_ddiv()  { v_dst = mips_division<int64, int128, uint128, uint64, 64>( v_src1, v_src2); }
         void execute_move()  { v_dst = static_cast<uint32>( v_src1); }
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
