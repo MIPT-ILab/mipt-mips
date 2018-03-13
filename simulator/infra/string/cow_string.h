@@ -26,7 +26,8 @@ private:
     using View_t = std::basic_string_view<CharT, Traits>;
     using String_t = std::basic_string<CharT, Traits>;
 
-    struct InternalString { // NOLINT Clang-Tidy doesn't like uninitalized array here
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init) We don't want to initialize arena
+    struct InternalString {
         using SizeType = typename boost::uint_t<sizeof(CharT) * 8>::exact;
         static_assert(sizeof(SizeType) == sizeof(CharT));
         static constexpr const size_t SIZE = 127;
@@ -61,10 +62,12 @@ private:
         if (pointer.use_count() > 1) {
             const auto old_pointer = pointer; // Keep a pointer to old pointer for a moment
             init(); // Allocate new memory
-            std::copy( old_pointer->arena, old_pointer->arena + my_size, pointer->arena); // NOLINT deep copy
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Use pointer arithmetic
+            std::copy( old_pointer->arena, old_pointer->arena + my_size, pointer->arena);
         }
 
-        std::copy( ptr, ptr + app_size, pointer->arena + my_size); // NOLINT copy new pointer
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Use pointer arithmetic
+        std::copy( ptr, ptr + app_size, pointer->arena + my_size);
         pointer->size = my_size + app_size; // update size
     }
 
