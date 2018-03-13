@@ -22,7 +22,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     if ( !rp_datapath->is_ready( cycle))
     {
         sout << "bubble\n";
-        if ( cycle >= last_writeback_cycle + 10_Lt)
+        if ( cycle >= last_writeback_cycle + 100_Lt)
         {
             serr << "Deadlock was detected. The process will be aborted."
                  << std::endl << std::endl << critical;
