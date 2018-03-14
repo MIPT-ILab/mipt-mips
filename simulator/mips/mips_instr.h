@@ -231,7 +231,8 @@ class MIPSInstr
         void execute_div()   { v_dst = mips_division<int32, int64, uint64, uint32, 32>( v_src1, v_src2); }
         void execute_divu()  { v_dst = mips_division<uint32, uint64, uint64, uint32, 32>( v_src1, v_src2); }
         void execute_ddiv()  { v_dst = mips_division<int64, int128, uint128, uint64, 64>( v_src1, v_src2); }
-        void execute_move()  { v_dst = static_cast<uint32>( v_src1); }
+        void execute_ddivu() { }
+        void execute_move()  { v_dst = static_cast<uint64>( v_src1); }
          
         template <typename T>    
         void execute_sll()    { v_dst = static_cast<T>( v_src1) << shamt; }
@@ -377,18 +378,7 @@ class MIPSInstr
         Addr get_PC() const { return PC; }
 
         void set_v_dst(uint64 value); // for loads
-        uint64 get_v_src2() const     // for stores
-        {
-            if( operation == OUT_I_STORE64L)
-            {
-                return static_cast<uint64>( v_src2) & 0xFFFFFFFFFFFF0000;
-            }
-            else if ( operation == OUT_I_STORE64R)
-            {
-                return static_cast<uint64>( v_src2) & 0xFFFF;
-            }
-            else return v_src2;
-        }
+        uint64 get_v_src2() const;    // for stores
 
         uint128 get_bypassing_data() const
         {

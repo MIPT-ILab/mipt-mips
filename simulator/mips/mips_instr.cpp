@@ -67,7 +67,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x1C, { "dmult", OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmult,  64} },
     {0x1D, { "dmultu",OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmultu, 64} },
     {0x1E, { "ddiv",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddiv,    3} },
-    {0x1F, { "ddivu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddiv,    3} },
+    {0x1F, { "ddivu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddivu,    3} },
     // Addition/Subtraction
     //key      name   operation  memsize           pointer
     {0x20, { "add",  OUT_R_ARITHM, 0, &MIPSInstr::execute_add<int32>,          1} },
@@ -499,43 +499,40 @@ void MIPSInstr::execute()
 
 void MIPSInstr::set_v_dst( uint64 value)
 {
-    if ( operation == OUT_I_LOAD)
+    switch ( operation)
     {
-        switch ( get_mem_size())
-        {
-            case 1: v_dst = static_cast<uint64>( static_cast<int8>( value)); break;
-            case 2: v_dst = static_cast<uint64>( static_cast<int16>( value)); break;
-            case 4: v_dst = static_cast<uint32>( value); break;
-            default: assert( false);
-        }
+        case OUT_I_LOAD:
+            switch ( get_mem_size())
+            {
+                case 1: v_dst = static_cast<uint64>( static_cast<int8>( value)); break;
+                case 2: v_dst = static_cast<uint64>( static_cast<int16>( value)); break;
+                case 4: v_dst = static_cast<uint32>( value); break;
+                default: assert( false);
+            }
+            break;
+        case OUT_I_LOADU: v_dst = static_cast<uint64>( value); break;
+        case OUT_I_LOAD64: v_dst = static_cast<int64>( value); break;
+        case OUT_I_LOAD64L: v_dst = static_cast<int64>( value) & 0xFFFFFFFFFFFF0000; break;
+        case OUT_I_LOAD64R: v_dst = static_cast<int64>( value) & 0xFFFF; break;
+        default: assert( false);
     }
-    else if ( operation == OUT_I_LOADU)
-    {
-        v_dst = static_cast<uint64>( value);
-    }
-    else if ( operation == OUT_I_LOAD64)
-    {
-        v_dst = static_cast<int64>( value);
-    }
-    else if ( operation == OUT_I_LOAD64L)
-    {
-        v_dst = static_cast<int64>( value) & 0xFFFFFFFFFFFF0000;
-    }
-    else if ( operation == OUT_I_LOAD64R)
-    {
-        v_dst = static_cast<int64>( value) & 0xFFFF;
-    }
-    else
-    {
-        assert( false);
-    }
-
+    
     if ( !dst.is_zero())
     {
         std::ostringstream oss;
         oss << "\t [ $" << dst
             << " = 0x" << std::hex << v_dst << "]";
         disasm += oss.str();
+    }
+}
+
+uint64 MIPSInstr::get_v_src2() const
+{
+    switch ( operation)
+    {
+        case OUT_I_STORE64L: return static_cast<uint64>( v_src2) & 0xFFFFFFFFFFFF0000;
+        case OUT_I_STORE64R: return static_cast<uint64>( v_src2) & 0xFFFF;
+        default: return v_src2;
     }
 }
 
