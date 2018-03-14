@@ -6,12 +6,20 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of p
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Simulation frequency gets up to 0.9 MHz on i5-7300U.
+* **Speed**. Simulation frequency gets up to 0.7 MHz on i5-7300U.
 
 MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
 * **Education**: simulator is a nice experimental frog to study CPU internals
+
+Features modeled:
+* Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
+* Configurable instruction cache with true-LRU policy
+* Interstage data bypassing
+
+More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
+
 
 ----
 ## Getting started
@@ -31,7 +39,7 @@ _Konstantin, please update this section_
 
 ### C++ requirements
 
-MIPT-MIPS uses C++17 features and Boost 1.54. Thus, you have to use compilers of these versions or newer:
+MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of these versions or newer:
 * GCC 7
 * Clang 5.0
 * Apple LLVM 7.3.0
@@ -45,12 +53,6 @@ _Konstantin, please update this section_
 1. Get sure GoogleTest is fetched with other submodules.
 1. To run all unit tests in POSIX environment, use `ctest` command.
 1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
-
-## Known issues
-* Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
-* Self-modifying code is not supported at the moment in performance mode.
-
-More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
 ----
 ## About MIPT-MIPS

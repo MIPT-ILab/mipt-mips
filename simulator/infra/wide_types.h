@@ -11,7 +11,12 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <infra/types.h>
+
 using int128 = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
+
+template<> struct sign<uint128>  { using type = int128; };
+template<> struct unsign<int128> { using type = uint128; };
 
 #endif // WIDE_TYPES_H
