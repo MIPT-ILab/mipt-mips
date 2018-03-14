@@ -4,7 +4,7 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 
 project(mipt-mips CXX)
 
