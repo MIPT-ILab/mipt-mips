@@ -15,11 +15,6 @@
 TEST( MIPS_instr_init, Process_Wrong_Args_Of_Constr)
 {
     ASSERT_NO_THROW( MIPSInstr(0x0).execute());
-
-    // must exit and return EXIT_FAILURE
-    //ASSERT_EXIT( MIPSInstr(0xFFFFFFFFull).execute(),
-    //             ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
-    // can't use, because add inst "sd"
 }
 
 /*
