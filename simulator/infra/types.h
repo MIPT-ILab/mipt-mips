@@ -34,6 +34,24 @@ using float32 = float;
 /* Double precision 64-bit float type */
 using float64 = double;
 
+/* Convert signed type to unsigned type */
+template<typename> struct unsign;
+template<> struct unsign<int8>  { using type = uint8; };
+template<> struct unsign<int16> { using type = uint16; };
+template<> struct unsign<int32> { using type = uint32; };
+template<> struct unsign<int64> { using type = uint64; };
+
+template<typename T> using unsign_t = typename unsign<T>::type;
+
+/* Convert unsigned type to signed type */
+template<typename> struct sign;
+template<> struct sign<uint8>  { using type = int8; };
+template<> struct sign<uint16> { using type = int16; };
+template<> struct sign<uint32> { using type = int32; };
+template<> struct sign<uint64> { using type = int64; };
+
+template<typename T> using sign_t = typename sign<T>::type;
+
 using Addr = uint32;
 
 // The following consts are used to initialize some variables
