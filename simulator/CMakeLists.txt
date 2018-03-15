@@ -4,26 +4,37 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 2.6)
-project(mipt-mips)
+cmake_minimum_required(VERSION 3.8)
+
+project(mipt-mips CXX)
+
+set(default_build_type "Release")
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/elf_parser/elf_parser.cpp 
-    infra/memory/memory.cpp 
-    infra/config/config.cpp 
-    infra/ports/ports.cpp 
-    infra/cache/cache_tag_array.cpp 
-    bypass/data_bypass.cpp 
-    fetch/fetch.cpp 
-    mips/mips_instr.cpp  
-    func_sim/func_sim.cpp 
-    core/perf_sim.cpp 
-    writeback/writeback.cpp 
-    simulator.cpp
+    infra/elf_parser/elf_parser.cpp
+    infra/memory/memory.cpp
+    infra/config/config.cpp
+    infra/ports/ports.cpp
+    infra/cache/cache_tag_array.cpp
+    bypass/data_bypass.cpp
+    fetch/fetch.cpp
+    core/perf_sim.cpp
+    func_sim/func_sim.cpp
+    mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
+    simulator.cpp
+    writeback/writeback.cpp
     )
 
-set(TESTS 
+set(TESTS
+# Test infrastructure
     infra/cache
     infra/elf_parser
     infra/memory
@@ -31,29 +42,30 @@ set(TESTS
     infra/instrcache
     infra/ports
     infra/string
+# Test MIPS
+    mips/mips_register
+    mips
+# Test units
     bpu
+# Overall tests
     func_sim
     core
-    mips/mips_register
     )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
-
-if(${DEBUG})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-    set(CMAKE_LD_FLAGS "${CMAKE_CXX_FLAGS} -flto")
-endif()
-
-if(NOT ${RELEASE})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-endif()
-
-if(APPLE) 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z") 
-else() 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+if (MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /std:c++17")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
+    set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
+else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror")
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
+    set(CMAKE_CXX_FLAGS_RELEASE " -O3 -march=native")
+    set(CMAKE_LD_FLAGS_RELEASE " -flto")
 endif()
 
 add_executable(${PROJECT_NAME} main.cpp)
@@ -62,6 +74,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 include_directories(SRCDIRS ./.)
 
 #include Boost libs
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -89,7 +102,7 @@ endif()
 
 find_library (LIBELF_LIBRARIES
     NAMES
-        elf
+        elf libelf
     PATHS
         /usr/lib
         ENV LIBRARY_PATH
@@ -101,15 +114,17 @@ endif()
 
 include_directories(${LIBELF_INCLUDE_DIRS})
 
-add_library (mipt-mips-src STATIC ${CPPS} ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+add_library(mipt-mips-src STATIC ${CPPS})
 
-target_link_libraries(${PROJECT_NAME}  mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
 #clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ###### googletest ######
+set(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib for GTest" FORCE)
 add_subdirectory(../googletest/googletest ./build)
+
 enable_testing()
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
