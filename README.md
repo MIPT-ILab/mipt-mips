@@ -19,7 +19,7 @@ MIPT-MIPS can be used for different purposes:
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) you can build MIPT-MIPS just by `make mipt-mips` command.
+1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) create build directory and build MIPT-MIPS just by `cmake <path_to_mipt_mips_directory>/simulator && make` command ([CMake](http://github.com/MIPT-ILab/mipt-mips/wiki/CMake) is required).
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
 
 ### Basic command line options
@@ -41,7 +41,7 @@ MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these ve
 ### Testing
 
 1. Get sure GoogleTest is fetched with other submodules.
-1. To run all unit tests in POSIX environment, use `ctest` command.
+1. To run all unit tests in POSIX environment, use `ctest` command right in your build directory.
 1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
 
 ## Known issues
