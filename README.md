@@ -21,14 +21,16 @@ Features modeled:
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
 
-----
 ## Getting started
-_Konstantin, please update this section_
+
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) create build directory and build MIPT-MIPS just by `cmake <path_to_mipt_mips_directory>/simulator && make` command ([CMake](http://github.com/MIPT-ILab/mipt-mips/wiki/CMake) is required).
+1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) create build directory anywhere you want.
+Then just type `cmake <path_to_simulator>` from your build directory, where `<path_to_simulator>` is absolute or relative path to mipt-mips/simulator.
+Then just 'make' and all binaries are in your build directory. ([CMake](https://cmake.org/) is required).
 1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
+1. IDE users (Eclipse, CodeBlocks etc.) may use CMake to generate project files as well.
 
 ### Basic command line options
 
@@ -49,12 +51,9 @@ Additionally, you have to use CMake 3.8 or higher.
 
 ### Testing
 
-_Konstantin, please update this section_
 1. Get sure GoogleTest is fetched with other submodules.
-1. To run all unit tests in POSIX environment, use `ctest` command right in your build directory.
-1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
+1. To run all unit tests in POSIX environment or MS Visual Studio command line, use `ctest` command.
 
-----
 ## About MIPT-MIPS
 
 This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
