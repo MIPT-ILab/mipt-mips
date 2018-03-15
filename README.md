@@ -20,24 +20,17 @@ Features modeled:
 
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
-
 ## Getting started
 
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) create build directory anywhere you want.
-Then just type `cmake <path_to_simulator>` from your build directory, where `<path_to_simulator>` is absolute or relative path to mipt-mips/simulator.
-Then just 'make' and all binaries are in your build directory. ([CMake](https://cmake.org/) is required).
-1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
-1. IDE users (Eclipse, CodeBlocks etc.) may use CMake to generate project files as well.
+1. Install CMake 3.8 or higher.
+1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details.
 
-### Basic command line options
+Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
-* `-b <filename>` — provide path to ELF binary file to execute
-* `-n <number>` — number of instructions to run
-* `-f` — enables functional simulation only
-* `-d` — enables detailed output of each cycle
+To run all unit tests, call `ctest --verbose -C Release` from your build directory.
 
 ### C++ requirements
 
@@ -47,12 +40,12 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 * Apple LLVM 7.3.0
 * MS Visual Studio 2017 (Boost 1.66 is required)
 
-Additionally, you have to use CMake 3.8 or higher.
+### Basic command line options
 
-### Testing
-
-1. Get sure GoogleTest is fetched with other submodules.
-1. To run all unit tests in POSIX environment or MS Visual Studio command line, use `ctest` command.
+* `-b <filename>` — provide path to ELF binary file to execute
+* `-n <number>` — number of instructions to run
+* `-f` — enables functional simulation only
+* `-d` — enables detailed output of each cycle
 
 ## About MIPT-MIPS
 
