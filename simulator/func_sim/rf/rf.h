@@ -8,6 +8,7 @@
 #define RF_H
 
 #include <array>
+#include <infra/types.h>
 
 template<typename ISA>
 class RF

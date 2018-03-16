@@ -45,6 +45,7 @@ set(TESTS
 # Test MIPS
     mips/mips_register
     mips
+    func_sim/rf
 # Test units
     bpu
 # Overall tests
