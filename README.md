@@ -6,21 +6,39 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of p
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Simulation frequency gets up to 0.9 MHz on i5-7300U.
+* **Speed**. Simulation frequency gets up to 0.7 MHz on i5-7300U.
 
 MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
 * **Education**: simulator is a nice experimental frog to study CPU internals
 
-----
+Features modeled:
+* Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
+* Configurable instruction cache with true-LRU policy
+* Interstage data bypassing
+
+More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
+
 ## Getting started
-_Konstantin, please update this section_
+
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. In POSIX environment (Linux, OSX, Windows-Ubuntu, and Msys) you can build MIPT-MIPS just by `make mipt-mips` command.
-1. WIP on MS Visual Studio support. Currently you can build MIPT-MIPS in command line using `build.cmd` batch file.
+1. Install CMake 3.8 or higher.
+1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details.
+
+Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
+
+To run all unit tests, call `ctest --verbose -C Release` from your build directory.
+
+### C++ requirements
+
+MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of these versions or newer:
+* GCC 7
+* Clang 5.0
+* Apple LLVM 7.3.0
+* MS Visual Studio 2017 (Boost 1.66 is required)
 
 ### Basic command line options
 
@@ -29,33 +47,9 @@ _Konstantin, please update this section_
 * `-f` — enables functional simulation only
 * `-d` — enables detailed output of each cycle
 
-### C++ requirements
-
-MIPT-MIPS uses C++17 and Boost 1.55. Thus, you have to use compilers of these versions or newer:
-* GCC 7
-* Clang 5.0
-* Apple LLVM 7.3.0 (uses -std=c++1z flag)
-* MS Visual Studio 2017 (Boost 1.65.1 is required)
-
-Additionally, you have to use CMake 3.8 or higher.
-
-### Testing
-
-_Konstantin, please update this section_
-1. Get sure GoogleTest is fetched with other submodules.
-1. To run all unit tests in POSIX environment, use `ctest` command.
-1. To run all unit tests in MS Visual Studio command line, run `build.cmd` batch file.
-
-## Known issues
-* Reduced subset of MIPS instructions is supported at the moment. Check [this page](https://github.com/MIPT-ILab/mipt-mips/wiki/Supported-MIPS-instructions) for the detailed status.
-* Self-modifying code is not supported at the moment in performance mode.
-
-More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
-
-----
 ## About MIPT-MIPS
 
-This project is a part of [ILab](https://mipt.ru/drec/about/ilab/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
+This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 
 The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
