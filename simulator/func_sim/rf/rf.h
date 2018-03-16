@@ -10,7 +10,6 @@
 #include <array>
 #include <infra/types.h>
 
-
 template<typename ISA>
 class RF
 {
@@ -64,12 +63,7 @@ public:
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
         if ( !reg_num.is_zero() && writes_dst)
-        {
-            std::cout << "instr = " << instr;
-            std::cout << "v_dst = " << instr.get_v_dst();
             write( reg_num, instr.get_v_dst());
-            std::cout << "value in array = " << read( reg_num);
-        }
         else
             write( reg_num, read(reg_num));
     }
