@@ -43,9 +43,9 @@ set(TESTS
     infra/ports
     infra/string
 # Test MIPS
-    func_sim/rf
     mips/mips_register
     mips
+    func_sim/rf
 # Test units
     bpu
 # Overall tests
