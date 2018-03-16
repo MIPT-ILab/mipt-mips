@@ -43,6 +43,7 @@ set(TESTS
     infra/ports
     infra/string
 # Test MIPS
+    func_sim/rf
     mips/mips_register
     mips
 # Test units

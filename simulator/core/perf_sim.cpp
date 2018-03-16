@@ -97,8 +97,8 @@ void PerfSim<ISA>::run( const std::string& tr,
     fetch.set_memory( memory);
     writeback.set_instrs_to_run( instrs_to_run);
     writeback.set_RF( rf.get());
-    writeback.init_checker( tr);
-
+    writeback.init_checker( tr); 
+    
     set_PC( memory->startPC());
 
     bypassing_unit = std::make_unique<DataBypass>();
