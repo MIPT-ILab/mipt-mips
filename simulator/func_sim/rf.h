@@ -8,6 +8,7 @@
 #define RF_H
 
 #include <array>
+#include <infra/wide_types.h>
 
 template<typename ISA>
 class RF
@@ -16,20 +17,20 @@ class RF
     using Register = typename ISA::Register;
 public:
     struct Reg {
-        uint32 value = 0;
+        uint64 value = 0;
     };
     std::array<Reg, Register::MAX_REG> array = {};
 
     Reg& get_entry( Register num) { return array.at( num.to_size_t()); }
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
-    uint32 read( Register num) const
+    uint64 read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_entry( num).value;
     }
 
-    void write( Register num, uint64 val)
+    void write( Register num, uint128 val)
     {
         if ( num.is_zero())
             return;
@@ -40,7 +41,7 @@ public:
         }            
 
         auto& entry = get_entry(num);
-        entry.value = val;
+        entry.value = static_cast<uint64>(val);
     }
 
 public:

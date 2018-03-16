@@ -32,7 +32,7 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
 
     /* Output */
-    std::unique_ptr<WritePort<uint64>> wp_bypass = nullptr;
+    std::unique_ptr<WritePort<uint128>> wp_bypass = nullptr;
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
 
 public:

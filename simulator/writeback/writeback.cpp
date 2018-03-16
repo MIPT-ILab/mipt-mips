@@ -9,7 +9,7 @@ template <typename ISA>
 Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
 {
     rp_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
-    wp_bypass = make_write_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<uint128>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW, PORT_FANOUT);
 }
 

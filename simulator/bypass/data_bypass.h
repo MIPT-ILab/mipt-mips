@@ -148,7 +148,7 @@ class DataBypass
         }
 
         // transforms bypassed data if needed in accordance with passed bypass command
-        static auto adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
+        static auto adapt_bypassed_data( const BypassCommand& bypass_command, uint128 bypassed_data)
         {
             const auto register_num = bypass_command.get_register_num();
 
