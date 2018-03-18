@@ -101,7 +101,7 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     set_PC( memory->startPC());
 
-    bypassing_unit = std::make_unique<DataBypass<ISA>>();
+    bypassing_unit = std::make_unique<BypassingUnit>();
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -288,7 +288,7 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = DataBypass<ISA>::adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = BypassingUnit::adapt_bypassed_data( bypass_command, data);
 
             instr.set_v_src( adapted_data, src_index);
         }
