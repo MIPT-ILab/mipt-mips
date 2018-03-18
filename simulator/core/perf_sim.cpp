@@ -46,15 +46,15 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
     rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    wps_decode_2_execute_command[0] = make_write_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                                 PORT_BW, PORT_FANOUT);
-    rps_decode_2_execute_command[0] = make_read_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                                PORT_LATENCY);
+    wps_decode_2_execute_command[0] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+                                                                                             PORT_BW, PORT_FANOUT);
+    rps_decode_2_execute_command[0] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+                                                                                            PORT_LATENCY);
     
-    wps_decode_2_execute_command[1] = make_write_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                                 PORT_BW, PORT_FANOUT);
-    rps_decode_2_execute_command[1] = make_read_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                                PORT_LATENCY);
+    wps_decode_2_execute_command[1] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+                                                                                             PORT_BW, PORT_FANOUT);
+    rps_decode_2_execute_command[1] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+                                                                                            PORT_LATENCY);
 
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
     rp_decode_2_bypassing_unit = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_LATENCY);

@@ -26,13 +26,14 @@ class PerfSim : public Simulator
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
+    using BypassingUnit = DataBypass<ISA>;
 private:
     Cycle curr_cycle = 0_Cl;
 
     /* simulator units */
     std::unique_ptr<RF<ISA>> rf = nullptr;
     Memory* memory = nullptr;
-    std::unique_ptr<DataBypass<ISA>> bypassing_unit = nullptr;
+    std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
     Fetch<ISA> fetch;
     Writeback<ISA> writeback;
 
@@ -75,9 +76,9 @@ private:
     std::array<std::array<std::unique_ptr<ReadPort<uint64>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
         rps_stages_2_execute_sources_bypass;
 
-    std::array<std::unique_ptr<WritePort<typename DataBypass<ISA>::BypassCommand>>, SRC_REGISTERS_NUM> 
+    std::array<std::unique_ptr<WritePort<typename BypassingUnit::BypassCommand>>, SRC_REGISTERS_NUM>
         wps_decode_2_execute_command;
-    std::array<std::unique_ptr<ReadPort<typename DataBypass<ISA>::BypassCommand>>, SRC_REGISTERS_NUM> 
+    std::array<std::unique_ptr<ReadPort<typename BypassingUnit::BypassCommand>>, SRC_REGISTERS_NUM>
         rps_decode_2_execute_command;
 
     std::unique_ptr<WritePort<Instr>> wp_decode_2_bypassing_unit = nullptr;

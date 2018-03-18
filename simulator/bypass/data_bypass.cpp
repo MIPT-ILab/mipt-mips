@@ -11,9 +11,6 @@
 #include <mips/mips.h>
 
 
-const RegisterStage RegisterStage::IN_RF     = RegisterStage( MAX_VAL8);
-const RegisterStage RegisterStage::WRITEBACK = RegisterStage( 2);
-
 
 
 // *****************************************************

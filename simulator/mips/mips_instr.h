@@ -320,7 +320,7 @@ class MIPSInstr
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
-        bool is_bypassible() const { return operation != OUT_R_CONDM; }
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 

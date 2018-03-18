@@ -12,8 +12,7 @@
 
 #include <array>
 
-#include <mips/mips.h>
-
+#include <core/perf_instr.h>
 
 
 class RegisterStage
@@ -26,9 +25,10 @@ class RegisterStage
 
         void inc() { ++value; }
 
-        static constexpr const uint8 BYPASSING_STAGES_NUMBER = 3;
-        static const RegisterStage WRITEBACK;
-        static const RegisterStage IN_RF;
+        static constexpr const uint8 BYPASSING_STAGES_NUMBER = 3;        
+        static RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
+
+        auto is_writeback() const { return value == WRITEBACK_STAGE_VALUE; }
 
     private:
         uint8 value = 0;  // distance from first execute stage
@@ -37,6 +37,9 @@ class RegisterStage
         // MEMORY    - 1  | Bypassing stage
         // WRITEBACK - 2  | Bypassing stage
         // IN_RF     - MAX_VAL8
+
+        static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
+        static constexpr const uint8 WRITEBACK_STAGE_VALUE = 2;
 };
 
 
@@ -53,6 +56,7 @@ class DataBypass
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register  = typename ISA::Register;
+    using Instr     = PerfInstr<FuncInstr>;
 
     public:
         class BypassCommand
@@ -72,21 +76,21 @@ class DataBypass
         };
 
         // checks whether the source register of passed instruction is in RF  
-        auto is_in_RF( const FuncInstr& instr, uint8 src_index) const
+        auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return scoreboard.get_entry( reg_num).current_stage == RegisterStage::IN_RF;
+            return get_entry( reg_num).current_stage == RegisterStage::in_RF();
         }
 
         // checks whether the source register of passed instruction is bypassible
-        auto is_bypassible( const FuncInstr& instr, uint8 src_index) const
+        auto is_bypassible( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return scoreboard.get_entry( reg_num).is_bypassible;
+            return get_entry( reg_num).is_bypassible;
         }
 
         // checks if the stall needed for passed instruction
-        auto is_stall( const FuncInstr& instr) const
+        auto is_stall( const Instr& instr) const
         {
             return ( (!is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                      (!is_in_RF( instr, 1) && !is_bypassible( instr, 1)) );
@@ -94,7 +98,7 @@ class DataBypass
 
         // returns bypass command for passed instruction and its source register
         // in accordance with current state of the scoreboard
-        auto get_bypass_command( const FuncInstr& instr, uint8 src_index) const
+        auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return BypassCommand( get_current_stage( reg_num), reg_num);
@@ -112,78 +116,81 @@ class DataBypass
         static uint64 adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data);
 
         // introduces new instruction to bypassing unit
-        void trace_new_instr( const FuncInstr& instr);
+        void trace_new_instr( const Instr& instr);
 
         // updates the scoreboard
         void update();
 
         // removes the information about passed instruction from the scoreboard
-        void untrace_instr( const FuncInstr& instr);
+        void untrace_instr( const Instr& instr);
     
     private:
         struct RegisterInfo
         {
-            RegisterStage current_stage = RegisterStage::IN_RF;
-            RegisterStage ready_stage = RegisterStage::IN_RF;
+            RegisterStage current_stage = RegisterStage::in_RF();
+            RegisterStage ready_stage = RegisterStage::in_RF();
             bool is_bypassible = false;
             bool is_traced = false;
         };
 
+        std::array<RegisterInfo, Register::MAX_REG> scoreboard = {};
 
-        class Scoreboard
+        RegisterInfo& get_entry( Register num)
         {
-            public:
-                RegisterInfo& get_entry( Register num)
-                {
-                    return array.at( num.to_size_t());
-                }
+            return scoreboard.at( num.to_size_t());
+        }
 
-                const RegisterInfo& get_entry( Register num) const
-                {
-                    return array.at( num.to_size_t());
-                }
-
-                auto begin() { return array.begin(); }
-                auto end() { return array.end(); }
-
-            private:
-                std::array<RegisterInfo, Register::MAX_REG> array = {};
-        };
+        const RegisterInfo& get_entry( Register num) const
+        {
+            return scoreboard.at( num.to_size_t());
+        }
 
         // returns current stage of passed register
         // in accordance with the current state of the scoreboard
         RegisterStage get_current_stage( Register num) const
         {
-            return scoreboard.get_entry( num).current_stage;
+            return get_entry( num).current_stage;
         }
 
         // introduces a source register of a passed instruction to scoreboard 
-        void trace_new_register( const FuncInstr& instr, Register num);
+        void trace_new_register( const Instr& instr, Register num);
 
         // discards the information about passed register
         void untrace_register( Register num)
         {
-            auto& entry = scoreboard.get_entry( num);
+            auto& entry = get_entry( num);
 
-            entry.current_stage = RegisterStage::IN_RF;
+            entry.current_stage = RegisterStage::in_RF();
             entry.is_bypassible = false;
             entry.is_traced = false; 
         }
-
-        Scoreboard scoreboard = {};
 };
 
 
 
 template <typename ISA>
-void DataBypass<ISA>::trace_new_register( const FuncInstr& instr, Register num)
+uint64 DataBypass<ISA>::adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
 {
-    auto& entry = scoreboard.get_entry( num);
+    const auto register_num = bypass_command.get_register_num();
+
+    auto adapted_data = bypassed_data;
+
+    if ( register_num.is_mips_hi())
+        adapted_data >>= 32;
+            
+    return adapted_data;
+}
+
+
+template <typename ISA>
+void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
+{
+    auto& entry = get_entry( num);
 
     entry.current_stage = 0_RSG; // first execute stage
 
     if ( !instr.is_bypassible())
-        entry.ready_stage = RegisterStage::IN_RF;
+        entry.ready_stage = RegisterStage::in_RF();
     else
         entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
                                             : 0_RSG; // EXECUTE
@@ -194,12 +201,19 @@ void DataBypass<ISA>::trace_new_register( const FuncInstr& instr, Register num)
 
 
 template <typename ISA>
-void DataBypass<ISA>::trace_new_instr( const FuncInstr& instr)
+void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
 
     if ( dst_reg_num.is_zero())
         return;
+    
+    if ( dst_reg_num.is_mips_hi_lo())
+    {
+        trace_new_register( instr, Register::mips_lo );
+        trace_new_register( instr, Register::mips_hi );
+        return;
+    }
 
     trace_new_register( instr, dst_reg_num);
 }
@@ -212,9 +226,9 @@ void DataBypass<ISA>::update()
     {
         if ( entry.is_traced)
         {
-            if ( entry.current_stage == RegisterStage::WRITEBACK)
+            if ( entry.current_stage.is_writeback())
             {
-                entry.current_stage = RegisterStage::IN_RF;
+                entry.current_stage = RegisterStage::in_RF();
                 entry.is_bypassible = false;
                 entry.is_traced = false;
             }
@@ -231,29 +245,23 @@ void DataBypass<ISA>::update()
 
 
 template <typename ISA>
-void DataBypass<ISA>::untrace_instr( const FuncInstr& instr)
+void DataBypass<ISA>::untrace_instr( const Instr& instr)
 {
     auto dst_reg_num = instr.get_dst_num();
 
     if ( dst_reg_num.is_zero())
         return;
 
+    if ( dst_reg_num.is_mips_hi_lo())
+    {
+        untrace_register( Register::mips_hi );
+        untrace_register( Register::mips_lo );
+        return;
+    }    
+
     untrace_register( dst_reg_num);
 }
 
-
-
-// *****************************************************
-// ***              MIPS SPECILIZATION               ***
-// *****************************************************
-template <>
-uint64 DataBypass<MIPS>::adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data);
-
-template <>
-void DataBypass<MIPS>::trace_new_instr( const FuncInstr& instr);
-
-template <>
-void DataBypass<MIPS>::untrace_instr( const FuncInstr& instr);
 
 
 #endif // DATA_BYPASS_H
