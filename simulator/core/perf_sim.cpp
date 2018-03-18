@@ -46,14 +46,14 @@ PerfSim<ISA>::PerfSim(bool log) : Simulator( log), rf( new RF<ISA>), fetch( log)
     rps_stages_2_execute_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_stages_2_execute_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    wps_decode_2_execute_command[0] = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    wps_decode_2_execute_command[0] = make_write_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                                  PORT_BW, PORT_FANOUT);
-    rps_decode_2_execute_command[0] = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    rps_decode_2_execute_command[0] = make_read_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                                 PORT_LATENCY);
     
-    wps_decode_2_execute_command[1] = make_write_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    wps_decode_2_execute_command[1] = make_write_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                                  PORT_BW, PORT_FANOUT);
-    rps_decode_2_execute_command[1] = make_read_port<DataBypass::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    rps_decode_2_execute_command[1] = make_read_port<typename DataBypass<ISA>::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                                 PORT_LATENCY);
 
     wp_decode_2_bypassing_unit = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT", PORT_BW, PORT_FANOUT);
@@ -101,7 +101,7 @@ void PerfSim<ISA>::run( const std::string& tr,
 
     set_PC( memory->startPC());
 
-    bypassing_unit = std::make_unique<DataBypass>();
+    bypassing_unit = std::make_unique<DataBypass<ISA>>();
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -281,14 +281,14 @@ void PerfSim<ISA>::clock_execute( Cycle cycle)
             const auto data = rps_stages_2_execute_sources_bypass[src_index][bypass_direction]->read( cycle);
 
             /* ignoring all other ports for a source register */
-            for ( uint8 i = 0; i < DataBypass::RegisterStage::get_bypassing_stages_number(); i++)
+            for ( uint8 i = 0; i < RegisterStage::BYPASSING_STAGES_NUMBER; i++)
             {    
                 if ( i != bypass_direction)
                     rps_stages_2_execute_sources_bypass[src_index][i]->ignore( cycle);
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = DataBypass::adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = DataBypass<ISA>::adapt_bypassed_data( bypass_command, data);
 
             instr.set_v_src( adapted_data, src_index);
         }

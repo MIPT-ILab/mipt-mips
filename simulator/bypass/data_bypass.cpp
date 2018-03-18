@@ -8,27 +8,34 @@
 
 #include "data_bypass.h"
 
-#include <mips/mips_instr.h>
-#include <infra/ports/timing.h>
+#include <mips/mips.h>
 
-void DataBypass::trace_new_register( const MIPSInstr& instr, MIPSRegister num)
+
+const RegisterStage RegisterStage::IN_RF     = RegisterStage( MAX_VAL8);
+const RegisterStage RegisterStage::WRITEBACK = RegisterStage( 2);
+
+
+
+// *****************************************************
+// ***               MIPS SPECILIZATION              ***
+// *****************************************************
+template <>
+uint64 DataBypass<MIPS>::adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
 {
-    auto& entry = scoreboard.get_entry( num);
+    const auto register_num = bypass_command.get_register_num();
 
-    entry.current_stage = 0_RSG; // first execute stage
+    auto adapted_data = bypassed_data;
 
-    if ( instr.is_conditional_move())
-        entry.ready_stage = RegisterStage::in_RF();
-    else
-        entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
-                                            : 0_RSG; // EXECUTE
-
-    entry.is_bypassible = ( entry.current_stage == entry.ready_stage);
-    traced_registers.emplace( num);
+    if ( register_num.is_mips_hi())
+        adapted_data >>= 32;
+            
+    return adapted_data;
 }
 
-void DataBypass::trace_new_instr( const MIPSInstr& instr)
-{    
+
+template <> 
+void DataBypass<MIPS>::trace_new_instr( const FuncInstr& instr)
+{
     const auto dst_reg_num = instr.get_dst_num();
 
     if ( dst_reg_num.is_zero())
@@ -36,8 +43,8 @@ void DataBypass::trace_new_instr( const MIPSInstr& instr)
 
     if ( dst_reg_num.is_mips_hi_lo())
     {
-        trace_new_register( instr, MIPSRegister::mips_lo );
-        trace_new_register( instr, MIPSRegister::mips_hi );
+        trace_new_register( instr, Register::mips_lo );
+        trace_new_register( instr, Register::mips_hi );
         return;
     }
 
@@ -45,32 +52,8 @@ void DataBypass::trace_new_instr( const MIPSInstr& instr)
 }
 
 
-void DataBypass::update()
-{
-    for ( auto it = traced_registers.begin(); it != traced_registers.end();)
-    {
-        auto& entry = scoreboard.get_entry( *it);
-
-        if ( entry.current_stage == RegisterStage::get_last_bypassing_stage())
-        {
-            entry.current_stage = RegisterStage::in_RF();
-            entry.is_bypassible = false;
-            it = traced_registers.erase( it);
-        }
-        else
-        {
-            entry.current_stage.inc();
-
-            if ( entry.current_stage == entry.ready_stage)
-                entry.is_bypassible = true;
-
-            ++it;
-        }
-    }
-}
-
-
-void DataBypass::untrace_instr( const MIPSInstr& instr)
+template <>
+void DataBypass<MIPS>::untrace_instr( const FuncInstr& instr)
 {
     auto dst_reg_num = instr.get_dst_num();
 
@@ -79,8 +62,8 @@ void DataBypass::untrace_instr( const MIPSInstr& instr)
 
     if ( dst_reg_num.is_mips_hi_lo())
     {
-        untrace_register( MIPSRegister::mips_hi );
-        untrace_register( MIPSRegister::mips_lo );
+        untrace_register( Register::mips_hi );
+        untrace_register( Register::mips_lo );
         return;
     }
 
