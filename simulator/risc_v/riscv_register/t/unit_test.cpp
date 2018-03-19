@@ -57,7 +57,7 @@ TEST( RISCV_registers, no_mips)
     auto reg_lo = RISCVRegister::mips_lo;
     auto reg_hi_lo = RISCVRegister::mips_hi_lo;
     for( size_t i = 0; i < 32; ++i)
-	{
+    {
         // Ensure that there no mips regs
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_hi.to_size_t());
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_lo.to_size_t());
@@ -65,7 +65,7 @@ TEST( RISCV_registers, no_mips)
         ASSERT_FALSE( RISCVRegister(i).is_mips_hi());
         ASSERT_FALSE( RISCVRegister(i).is_mips_lo());
         ASSERT_FALSE( RISCVRegister(i).is_mips_hi_lo());
-	}
+    }
 }
 
 TEST( RISCV_registers, return_address)

@@ -43,11 +43,11 @@ public:
         return out << regTable[ rhs.value];
     }
 
-    bool is_zero()       const { return value == RISCV_REG_zero; }
-    bool is_mips_hi()    const { return false; }
-    bool is_mips_lo()    const { return false; }
-    bool is_mips_hi_lo() const { return false; }
-    size_t to_size_t()   const { return value; }
+    bool is_zero()                 const { return value == RISCV_REG_zero; }
+    constexpr bool is_mips_hi()    const { return false; }
+    constexpr bool is_mips_lo()    const { return false; }
+    constexpr bool is_mips_hi_lo() const { return false; }
+    size_t to_size_t()             const { return value; }
 
     static const RISCVRegister zero;
     static const RISCVRegister return_address;
