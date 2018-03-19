@@ -65,13 +65,4 @@ private:
     explicit MIPSRegister( RegNum id) : value( id) { }
 };
 
-namespace std {
-
-template<> struct hash<MIPSRegister>
-{
-    auto operator()( const MIPSRegister& v) const noexcept { return hash<size_t>()( v.to_size_t()); }
-};
-
-} // namespace std
-
 #endif
