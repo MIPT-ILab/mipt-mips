@@ -15,7 +15,7 @@ class RF
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
-	using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename ISA::RegisterUInt;
 
     struct Reg {
 		RegisterUInt value = 0u;
@@ -26,7 +26,7 @@ class RF
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
 protected:
-    RegisterUInt read( Register num) const
+    auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_entry( num).value;

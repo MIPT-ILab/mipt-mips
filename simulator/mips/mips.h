@@ -15,7 +15,7 @@ struct MIPS
     using FuncInstr = MIPSInstr;
     using Register = MIPSRegister;
     using Memory = InstrMemory<MIPSInstr>;
-	using RegisterUInt = uint32;
+    using RegisterUInt = uint32;
 };
 
 #endif // MIPS_H_

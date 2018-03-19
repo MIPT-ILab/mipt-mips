@@ -62,24 +62,29 @@ TEST( RISCV_registers, no_mips)
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_hi.to_size_t());
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_lo.to_size_t());
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_hi_lo.to_size_t());
-        ASSERT_FALSE( RISCVRegister(i).is_mips());
+        ASSERT_FALSE( RISCVRegister(i).is_mips_hi());
+        ASSERT_FALSE( RISCVRegister(i).is_mips_lo());
+        ASSERT_FALSE( RISCVRegister(i).is_mips_hi_lo());
 	}
 }
 
 TEST( RISCV_registers, return_address)
 {
     auto reg = RISCVRegister::return_address;
-    ASSERT_TRUE( reg.is_riscv_rs());
+    ASSERT_EQ( reg.to_size_t(), 1u);
     ASSERT_FALSE( reg.is_zero());
-    ASSERT_FALSE( reg.is_mips());
+    ASSERT_FALSE( reg.is_mips_hi());
+    ASSERT_FALSE( reg.is_mips_lo());
+    ASSERT_FALSE( reg.is_mips_hi_lo());
 }
 
 TEST( RISCV_registers, Zero)
 {
     auto reg = RISCVRegister::zero;
     ASSERT_TRUE( reg.is_zero());
-    ASSERT_FALSE( reg.is_riscv_rs());
-    ASSERT_FALSE( reg.is_mips());
+    ASSERT_FALSE( reg.is_mips_hi());
+    ASSERT_FALSE( reg.is_mips_lo());
+    ASSERT_FALSE( reg.is_mips_hi_lo());
 }
 
 int main( int argc, char* argv[])
