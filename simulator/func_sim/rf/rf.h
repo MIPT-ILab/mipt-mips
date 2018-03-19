@@ -18,7 +18,7 @@ class RF
     using RegisterUInt = typename ISA::RegisterUInt;
 
     struct Reg {
-		RegisterUInt value = 0u;
+        RegisterUInt value = 0u;
     };
     std::array<Reg, Register::MAX_REG> array = {};
 
