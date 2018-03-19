@@ -40,8 +40,12 @@ protected:
             write( Register::mips_hi, val >> 32);
             write( Register::mips_lo, val);
             return;
-        }            
-
+        }
+        if( num.is_mips_acc()){
+          auto& entry = get_entry(num);
+          entry.value += val;
+          return;
+        }
         auto& entry = get_entry(num);
         entry.value = val;
     }
@@ -72,4 +76,3 @@ public:
 };
 
 #endif
-
