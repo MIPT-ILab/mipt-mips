@@ -16,9 +16,9 @@ Execute<ISA>::Execute( bool log) : Log( log)
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
     rps_command[0] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                             PORT_LATENCY);
+                                                                           PORT_LATENCY);
     rps_command[1] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                             PORT_LATENCY);
+                                                                           PORT_LATENCY);
 
     wp_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 

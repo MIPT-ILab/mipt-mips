@@ -20,9 +20,9 @@ Decode<ISA>::Decode( bool log) : Log( log)
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
     wps_command[0] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                              PORT_BW, PORT_FANOUT);
+                                                                            PORT_BW, PORT_FANOUT);
     wps_command[1] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                              PORT_BW, PORT_FANOUT);
+                                                                            PORT_BW, PORT_FANOUT);
     
     wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
