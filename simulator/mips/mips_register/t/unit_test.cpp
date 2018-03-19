@@ -11,7 +11,7 @@
 // Google Test library
 #include <gtest/gtest.h>
 
-// MIPS-MIPS modules
+// MIPT-MIPS modules
 #include "../mips_register.h"
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
