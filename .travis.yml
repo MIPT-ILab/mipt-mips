@@ -44,9 +44,8 @@ install:
   - if [ $CXX == g++-7 ]; then git fetch boost-multiprecision master; fi
   - if [ $CXX == g++-7 ]; then git show --no-prefix $BOOST_PATCH > ~/boost.patch; fi
   - if [ $CXX == g++-7 ]; then pushd /usr; fi
-  - if [ $CXX == g++-7 ]; then sudo patch -p0 < ~/boost.patch; fi
-  - cat ~/boost.patch
-  - cat include/boost/multiprecision/cpp_int.hpp.rej
+  - if [ $CXX == g++-7 ]; then cat ~/boost.patch; fi
+  - if [ $CXX == g++-7 ]; then sudo patch -p0 < ~/boost.patch || cat include/boost/multiprecision/cpp_int.hpp.rej ; fi
   - if [ $CXX == g++-7 ]; then popd; fi
 # Install OS X packages
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
