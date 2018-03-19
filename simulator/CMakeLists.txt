@@ -45,6 +45,7 @@ set(TESTS
 # Test MIPS
     mips/mips_register
     mips
+	risc_v/riscv_register
     func_sim/rf
 # Test units
     bpu

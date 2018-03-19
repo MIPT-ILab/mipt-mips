@@ -15,9 +15,10 @@ class RF
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
+	using RegisterUInt = typename ISA::RegisterUInt;
 
     struct Reg {
-        uint32 value = 0;
+		RegisterUInt value = 0u;
     };
     std::array<Reg, Register::MAX_REG> array = {};
 
@@ -25,7 +26,7 @@ class RF
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
 protected:
-    uint32 read( Register num) const
+    RegisterUInt read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_entry( num).value;
