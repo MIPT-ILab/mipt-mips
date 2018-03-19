@@ -8,13 +8,14 @@
 #define RF_H
 
 #include <array>
+#include <infra/types.h>
 
 template<typename ISA>
 class RF
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
-public:
+
     struct Reg {
         uint32 value = 0;
     };
@@ -23,6 +24,7 @@ public:
     Reg& get_entry( Register num) { return array.at( num.to_size_t()); }
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
+protected:
     uint32 read( Register num) const
     {
         assert( !num.is_mips_hi_lo());

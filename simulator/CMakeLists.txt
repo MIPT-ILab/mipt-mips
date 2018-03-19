@@ -23,7 +23,6 @@ set(CPPS infra/macro_test.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
-    bypass/data_bypass.cpp
     fetch/fetch.cpp
     core/perf_sim.cpp
     func_sim/func_sim.cpp
@@ -45,6 +44,7 @@ set(TESTS
 # Test MIPS
     mips/mips_register
     mips
+    func_sim/rf
 # Test units
     bpu
 # Overall tests

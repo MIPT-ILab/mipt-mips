@@ -12,7 +12,7 @@
 
 #include <simulator.h>
 
-#include "rf.h"
+#include "rf/rf.h"
 
 template <typename ISA>
 class FuncSim : public Simulator

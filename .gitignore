@@ -77,3 +77,4 @@ CTestTestfile.cmake
 ehthumbs.db
 Thumbs.db
 *.swp
+*.swo
