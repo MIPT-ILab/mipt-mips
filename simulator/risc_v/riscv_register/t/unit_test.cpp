@@ -53,10 +53,10 @@ TEST( RISCV_registers, Equal)
 
 TEST( RISCV_registers, no_mips)
 {
-	auto reg_hi = RISCVRegister::mips_hi;
+    auto reg_hi = RISCVRegister::mips_hi;
     auto reg_lo = RISCVRegister::mips_lo;
     auto reg_hi_lo = RISCVRegister::mips_hi_lo;
-	for( size_t i = 0; i < 32; ++i)
+    for( size_t i = 0; i < 32; ++i)
 	{
         // Ensure that there no mips regs
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_hi.to_size_t());
@@ -64,6 +64,22 @@ TEST( RISCV_registers, no_mips)
         ASSERT_NE( RISCVRegister(i).to_size_t(), reg_hi_lo.to_size_t());
         ASSERT_FALSE( RISCVRegister(i).is_mips());
 	}
+}
+
+TEST( RISCV_registers, return_address)
+{
+    auto reg = RISCVRegister::return_address;
+    ASSERT_TRUE( reg.is_riscv_rs());
+    ASSERT_FALSE( reg.is_zero());
+    ASSERT_FALSE( reg.is_mips());
+}
+
+TEST( RISCV_registers, Zero)
+{
+    auto reg = RISCVRegister::zero;
+    ASSERT_TRUE( reg.is_zero());
+    ASSERT_FALSE( reg.is_riscv_rs());
+    ASSERT_FALSE( reg.is_mips());
 }
 
 int main( int argc, char* argv[])

@@ -1,5 +1,7 @@
  /* riscv_register.cpp - RISCV register info class
- */
+  * @author Alexandr Misevich
+  * Copyright 2018 MIPT-MIPS 
+  */
 
 #include "riscv_register.h"
 

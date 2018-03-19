@@ -1,4 +1,8 @@
- /* riscv_register.h - RISCV register info class */
+/* riscv_register.h - RISCV register info class 
+ * @author Alexandr Misevich
+ * Copyright 2018 MIPT-MIPS
+ */
+
 
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
