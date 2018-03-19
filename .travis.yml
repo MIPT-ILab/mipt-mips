@@ -41,10 +41,11 @@ install:
   - if [ $CXX == g++-7 ]; then cd $TRAVIS_BUILD_DIR; fi
   - if [ $CXX == g++-7 ]; then export BOOST_PATCH=f9c8f9ec; fi
   - if [ $CXX == g++-7 ]; then git remote add boost-multiprecision https://github.com/boostorg/multiprecision.git; fi
-  - if [ $CXX == g++-7 ]; then git fetch boost-multiprecision $BOOST_PATCH; fi
+  - if [ $CXX == g++-7 ]; then git fetch boost-multiprecision master; fi
   - if [ $CXX == g++-7 ]; then git show --no-prefix $BOOST_PATCH > ~/boost.patch; fi
   - if [ $CXX == g++-7 ]; then pushd /usr; fi
-  - if [ $CXX == g++-7 ]; then sudo patch -p0 < ~/boost.patch; fi
+  - if [ $CXX == g++-7 ]; then cat ~/boost.patch; fi
+  - if [ $CXX == g++-7 ]; then sudo patch -p0 < ~/boost.patch || cat include/boost/multiprecision/cpp_int.hpp.rej ; fi
   - if [ $CXX == g++-7 ]; then popd; fi
 # Install OS X packages
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
