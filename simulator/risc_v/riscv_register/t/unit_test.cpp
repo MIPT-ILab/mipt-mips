@@ -44,17 +44,38 @@ TEST( RISCV_registers, Equal)
 {
     for ( size_t i = 0; i < 32; ++i)
     {
-        ASSERT_EQ( RISCVRegister(i).to_size_t(), RISCVRegister(i).to_size_t());
+        ASSERT_EQ( RISCVRegister(i), RISCVRegister(i));
         if (i > 0) {
-            ASSERT_NE(RISCVRegister(i - 1).to_size_t(), RISCVRegister(i).to_size_t());
+            ASSERT_NE(RISCVRegister(i - 1), RISCVRegister(i));
         }
     }
 }
 
 TEST( RISCV_registers, no_mips_hi)
 {
-	auto reg = RISCVRegister(0);
-	ASSERT_NE( RISCVRegister(2).to_size_t(), reg.to_size_t());
+	auto reg = RISCVRegister::mips_hi;
+	for( size_t i = 0; i < 32; ++i)
+	{
+		ASSERT_NE( RISCVRegister(i).to_size_t(), reg.to_size_t());
+	}
+}
+
+TEST( RISCV_registers, no_mips_lo)
+{
+	auto reg = RISCVRegister::mips_lo;
+	for( size_t i = 0; i < 32; ++i)
+	{
+		ASSERT_NE( RISCVRegister(i).to_size_t(), reg.to_size_t());
+	}
+}
+
+TEST( RISCV_registers, no_mips_hi_lo)
+{
+	auto reg = RISCVRegister::mips_hi_lo;
+	for( size_t i = 0; i < 32; ++i)
+	{
+		ASSERT_NE( RISCVRegister(i).to_size_t(), reg.to_size_t());
+	}
 }
 
 int main( int argc, char* argv[])
