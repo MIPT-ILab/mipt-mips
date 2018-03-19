@@ -46,11 +46,13 @@ public:
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }
     bool is_mips_lo()    const { return value == MIPS_REG_lo; }
     bool is_mips_hi_lo() const { return value == MIPS_REG_hi_lo; }
+    bool is_mips_acc()   const { return value == MIPS_REG_acc; }
     size_t to_size_t()   const { return value; }
 
     static const MIPSRegister mips_hi;
     static const MIPSRegister mips_lo;
     static const MIPSRegister mips_hi_lo;
+    static const MIPSRegister mips_acc;
     static const MIPSRegister zero;
     static const MIPSRegister return_address;
 
@@ -67,9 +69,9 @@ namespace std {
 
 template<> struct hash<MIPSRegister>
 {
-    auto operator()( const MIPSRegister& v) const noexcept { return hash<size_t>()( v.to_size_t()); }    
+    auto operator()( const MIPSRegister& v) const noexcept { return hash<size_t>()( v.to_size_t()); }
 };
-    
+
 } // namespace std
 
 #endif
