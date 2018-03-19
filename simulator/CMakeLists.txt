@@ -28,6 +28,7 @@ set(CPPS infra/macro_test.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
+    risc_v/riscv_register/riscv_register.cpp
     simulator.cpp
     writeback/writeback.cpp
     )
@@ -45,6 +46,8 @@ set(TESTS
     mips/mips_register
     mips
     func_sim/rf
+# Test RISCV
+    risc_v/riscv_register
 # Test units
     bpu
 # Overall tests
