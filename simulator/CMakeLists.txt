@@ -24,6 +24,9 @@ set(CPPS infra/macro_test.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
     fetch/fetch.cpp
+    decode/decode.cpp
+    execute/execute.cpp
+    mem/mem.cpp
     core/perf_sim.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp

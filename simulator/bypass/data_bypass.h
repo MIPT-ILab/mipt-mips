@@ -106,7 +106,7 @@ class DataBypass
 
         // returns an index of the port where bypassed data should be get from
         // in accordance with passed bypass command
-        auto get_bypass_direction( const BypassCommand& bypass_command) const
+        static uint8 get_bypass_direction( const BypassCommand& bypass_command)
         {
             const auto bypassing_stage = bypass_command.get_bypassing_stage();
             return static_cast<uint8>( bypassing_stage);

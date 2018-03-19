@@ -10,6 +10,8 @@
 #include <array>
 #include <infra/types.h>
 
+#include <cassert>
+
 template<typename ISA>
 class RF
 {
