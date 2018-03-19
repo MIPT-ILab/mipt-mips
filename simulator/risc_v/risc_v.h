@@ -16,7 +16,7 @@ struct RISCV
     using FuncInstr = RISCVInstr;
     using RF = RISCVRF;
     using Memory = InstrMemory<RISCVInstr>;
-    using RegisterUInt = MyType;
+//    using RegisterUInt;
 };
 
 #endif // RISC_V_H_
