@@ -18,7 +18,7 @@
 class RegisterStage
 {
     public:
-        explicit RegisterStage( uint8 value) : value( value) { }
+        constexpr explicit RegisterStage( uint8 value) : value( value) { }
 
         auto operator==( const RegisterStage& rhs) const { return value == rhs.value; }
         explicit operator uint8() const { return value; }
@@ -26,7 +26,7 @@ class RegisterStage
         void inc() { ++value; }
 
         static constexpr const uint8 BYPASSING_STAGES_NUMBER = 3;        
-        static RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
+        static constexpr RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
 
         auto is_writeback() const { return value == WRITEBACK_STAGE_VALUE; }
 
