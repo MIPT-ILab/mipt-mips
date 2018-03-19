@@ -36,18 +36,19 @@ public:
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
-		return out << regTable[ rhs.value];
-	}
+        return out << regTable[ rhs.value];
+    }
 
     bool is_zero()     const { return value == RISCV_REG_zero; }
-	bool is_riscv_rs() const { return value == RISCV_REG_rs;   }
+    bool is_riscv_rs() const { return value == RISCV_REG_rs;   }
+    bool is_mips()     const { return value == MAX_REG;        }
     size_t to_size_t() const { return value; }
 
     static const RISCVRegister zero;
     static const RISCVRegister return_address;
-	static const RISCVRegister mips_hi;
-	static const RISCVRegister mips_lo;
-	static const RISCVRegister mips_hi_lo;
+    static const RISCVRegister mips_hi;
+    static const RISCVRegister mips_lo;
+    static const RISCVRegister mips_hi_lo;
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
