@@ -36,17 +36,6 @@ addons:
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-# Magically download patch for Boost
-# Remove this when Travis CI updates Boost to 1.61 at long last
-  - if [ $CXX == g++-7 ]; then cd $TRAVIS_BUILD_DIR; fi
-  - if [ $CXX == g++-7 ]; then export BOOST_PATCH=f9c8f9ec; fi
-  - if [ $CXX == g++-7 ]; then git remote add boost-multiprecision https://github.com/boostorg/multiprecision.git; fi
-  - if [ $CXX == g++-7 ]; then git fetch boost-multiprecision master; fi
-  - if [ $CXX == g++-7 ]; then git show --no-prefix $BOOST_PATCH > ~/boost.patch; fi
-  - if [ $CXX == g++-7 ]; then pushd /usr; fi
-  - if [ $CXX == g++-7 ]; then cat ~/boost.patch; fi
-  - if [ $CXX == g++-7 ]; then sudo patch -p0 < ~/boost.patch || cat include/boost/multiprecision/cpp_int.hpp.rej ; fi
-  - if [ $CXX == g++-7 ]; then popd; fi
 # Install OS X packages
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
 # Install GNU Binutils
