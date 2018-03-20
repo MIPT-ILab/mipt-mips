@@ -2,7 +2,7 @@ notifications:
   email: false
 
 language: cpp
-sudo: false
+sudo: true
 
 osx_image: xcode9.1
 
