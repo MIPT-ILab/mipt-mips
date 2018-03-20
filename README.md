@@ -23,10 +23,10 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 ## Getting started
 
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
+1. [Install LibELF and Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries)
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
 1. Install CMake 3.8 or higher.
-1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details.
+1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details about CMake build.
 
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
