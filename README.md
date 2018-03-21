@@ -23,10 +23,10 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 ## Getting started
 
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-1. Install LibELF and Boost ([instruction](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries))
+1. [Install LibELF and Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries)
 1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
 1. Install CMake 3.8 or higher.
-1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details.
+1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details about CMake build.
 
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
@@ -40,12 +40,26 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 * Apple LLVM 7.3.0
 * MS Visual Studio 2017 (Boost 1.66 and CMake 3.10.2 are required)
 
-### Basic command line options
+## Command line options
 
-* `-b <filename>` — provide path to ELF binary file to execute
-* `-n <number>` — number of instructions to run
+### Basic options
+
+* `-b <filename>` — provide path to ELF binary file to execute.
+* `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
 * `-f` — enables functional simulation only
 * `-d` — enables detailed output of each cycle
+
+### Performance mode options
+
+#### Branch prediction
+* `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model).
+* `--bp-size` — branch prediction cache size (amount of tracked branch instructions)
+* `--bp-ways` — # of ways in branch prediction cache
+
+#### Instruction cache
+* `--icache-size` — instruction cache size in bytes
+* `--icache-ways` — # of ways in instruction cache
+* `--icache-line-size` — line size of instruction cache
 
 ## About MIPT-MIPS
 
