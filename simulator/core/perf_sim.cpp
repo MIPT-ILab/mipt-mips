@@ -5,6 +5,8 @@
 
 #include "perf_sim.h"
 
+
+
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     Simulator( log),
