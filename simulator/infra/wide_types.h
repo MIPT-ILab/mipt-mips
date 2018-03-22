@@ -9,12 +9,21 @@
 #ifndef WIDE_TYPES_H
 #define WIDE_TYPES_H
 
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <infra/types.h>
+
+#ifdef UINT128MAX // Use native GCC type if available as Boost may contain bugs
+
+using int128 = __int128;
+using uint128 = unsigned __int128
+
+#else // UINT128MAX
+
+#include <boost/multiprecision/cpp_int.hpp>
 
 using int128 = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
+
+#endif // UINT128MAX
 
 template<> struct sign<uint128>  { using type = int128; };
 template<> struct unsign<int128> { using type = uint128; };
