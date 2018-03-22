@@ -12,7 +12,6 @@
 
 // C++11 fixed width integer types
 #include <cstdint>
-#include <boost/multiprecision/cpp_int.hpp>
 
 /* Signed 8-bit integer type */
 using int8 = int8_t;
