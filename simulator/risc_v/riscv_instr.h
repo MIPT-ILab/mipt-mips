@@ -17,9 +17,12 @@
 #include <infra/string/cow_string.h>
 
 #include "riscv_register/riscv_register.h"
+#include "risc_v.h"
 
+template <typename T>
 class RISCVInstr
 {
+    using RegisterUInt = T;
     private:
         uint32 instr = NO_VAL32;
 
@@ -27,9 +30,9 @@ class RISCVInstr
         RISCVRegister src2 = RISCVRegister::zero;
         RISCVRegister dst = RISCVRegister::zero;
         
-        uint32 v_src1 = NO_VAL32;
-        uint32 v_src2 = NO_VAL32;
-        uint64 v_dst = NO_VAL64;
+        RegisterUInt v_src1 = NO_VAL32;
+        RegisterUInt v_src2 = NO_VAL32;
+        RegisterUInt v_dst = NO_VAL32;
 
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -80,8 +83,8 @@ class RISCVInstr
         constexpr bool get_writes_dst() const { return false; }
 
         constexpr bool is_bubble() const { return false; }
-
-        void set_v_src( uint32 value, uint8 index)
+        
+        void set_v_src( const T& value, uint8 index)
         {
             if ( index == 0)
                 v_src1 = value;
@@ -89,17 +92,17 @@ class RISCVInstr
                 v_src2 = value;
         }
 
-        uint64 get_v_dst() const { return v_dst; }
+        auto get_v_dst() const { return v_dst; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
         Addr get_new_PC() const { return new_PC; }
         Addr get_PC() const { return PC; }
 
-        void set_v_dst( uint32 value) { v_dst = value; } // for loads
-        uint32 get_v_src2() const { return v_src2; } // for stores
+        void set_v_dst( const T& value) { v_dst = value; } // for loads
+        auto get_v_src2() const { return v_src2; } // for stores
 
-        uint64 get_bypassing_data() const
+        RegisterUInt get_bypassing_data() const
         {
             return v_dst; 
         }
@@ -108,7 +111,8 @@ class RISCVInstr
         void check_trap() {};
 };
 
-static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr& instr)
+template <typename T>
+static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& instr)
 {
         return out << instr.Dump();
 }
