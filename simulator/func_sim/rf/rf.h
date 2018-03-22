@@ -9,6 +9,7 @@
 
 #include <array>
 #include <infra/types.h>
+#include <infra/wide_types.h>
 
 #include <cassert>
 
@@ -31,7 +32,7 @@ protected:
     auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
-        return get_entry( num).value;
+        return static_cast<uint32>(get_entry( num).value);
     }
 
     void write( Register num, uint64 val)
@@ -42,7 +43,7 @@ protected:
             write( Register::mips_hi, val >> 32);
             write( Register::mips_lo, val);
             return;
-        }            
+        } 
 
         auto& entry = get_entry(num);
         entry.value = val;

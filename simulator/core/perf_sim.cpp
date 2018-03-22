@@ -5,8 +5,6 @@
 
 #include "perf_sim.h"
 
-
-
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     Simulator( log),
@@ -84,6 +82,40 @@ void PerfSim<ISA>::run( const std::string& tr,
 
 
 #include <mips/mips.h>
+#include <risc_v/risc_v.h>
 
 template class PerfSim<MIPS>;
+//General fields of RISCVs
+template class InstrMemory<RISCVInstr>;
+template class PerfInstr<RISCVInstr>;
+
+// RISCV32
+template class RF<RISCV32>;
+template class DataBypass<RISCV32>; 
+template class FuncSim<RISCV32>; 
+template class Fetch<RISCV32>; 
+template class Decode<RISCV32>;
+template class Execute<RISCV32>;
+template class Mem<RISCV32>;
+template class Writeback<RISCV32>;
+
+// RISCV64
+template class RF<RISCV64>;
+template class DataBypass<RISCV64>;
+template class FuncSim<RISCV64>;
+template class Fetch<RISCV64>;
+template class Decode<RISCV64>;
+template class Execute<RISCV64>;
+template class Mem<RISCV64>;
+template class Writeback<RISCV64>;
+
+// RISCV128
+template class RF<RISCV128>;
+template class DataBypass<RISCV128>;
+template class FuncSim<RISCV128>;
+template class Fetch<RISCV128>;
+template class Decode<RISCV128>;
+template class Execute<RISCV128>;
+template class Mem<RISCV128>;
+template class Writeback<RISCV128>;
 
