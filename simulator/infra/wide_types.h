@@ -11,19 +11,19 @@
 
 #include <infra/types.h>
 
-#ifdef UINT128MAX // Use native GCC type if available as Boost may contain bugs
+#ifdef __SIZEOF_INT128__ // Use native GCC type if available as Boost may contain bugs
 
 using int128 = __int128;
 using uint128 = unsigned __int128
 
-#else // UINT128MAX
+#else // __SIZEOF_INT128__
 
 #include <boost/multiprecision/cpp_int.hpp>
 
 using int128 = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
 
-#endif // UINT128MAX
+#endif // __SIZEOF_INT128__
 
 template<> struct sign<uint128>  { using type = int128; };
 template<> struct unsign<int128> { using type = uint128; };
