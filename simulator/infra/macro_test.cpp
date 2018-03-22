@@ -38,6 +38,14 @@ static_assert(std::is_same_v<int16, sign_t<uint16>>);
 static_assert(std::is_same_v<int32, sign_t<uint32>>);
 static_assert(std::is_same_v<int64, sign_t<uint64>>);
 
+static_assert(bitwidth<doubled_t<int8>> == 2 * bitwidth<int8>);
+static_assert(bitwidth<doubled_t<int16>> == 2 * bitwidth<int16>);
+static_assert(bitwidth<doubled_t<int32>> == 2 * bitwidth<int32>);
+
+static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
+static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
+static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
+
 /*
 static_assert(popcount(0) == 0);
 static_assert(popcount(1) == 1);
