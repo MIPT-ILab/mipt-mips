@@ -59,7 +59,7 @@ template<> struct doubled<int8>   { using type = int16;  };
 template<> struct doubled<uint16> { using type = uint32; };
 template<> struct doubled<int16>  { using type = int32;  };
 template<> struct doubled<uint32> { using type = uint64; };
-template<> struct doubled<int64>  { using type = int64;  };
+template<> struct doubled<int32>  { using type = int64;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
