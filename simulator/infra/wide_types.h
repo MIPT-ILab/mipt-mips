@@ -11,10 +11,16 @@
 
 #include <infra/types.h>
 
-#ifdef __SIZEOF_INT128__ // Use native GCC type if available as Boost may contain bugs
+// Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
+#if defined(__GNUC__) && !defined(__clang__) && defined(__SIZEOF_INT128__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 
 using int128 = __int128;
-using uint128 = unsigned __int128
+using uint128 = unsigned __int128;
+
+#pragma GCC diagnostic pop
 
 #else // __SIZEOF_INT128__
 
