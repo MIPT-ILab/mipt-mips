@@ -87,9 +87,13 @@ void PerfSim<ISA>::run( const std::string& tr,
 #include <risc_v/risc_v.h>
 
 template class PerfSim<MIPS>;
-//General fields of RISCVs
-template class InstrMemory<RISCVInstr>;
-template class PerfInstr<RISCVInstr>;
+
+template class InstrMemory<RISCVInstr<uint32>>;
+template class PerfInstr<RISCVInstr<uint32>>;
+template class InstrMemory<RISCVInstr<uint64>>;
+template class PerfInstr<RISCVInstr<uint64>>;
+template class InstrMemory<RISCVInstr<uint128>>;
+template class PerfInstr<RISCVInstr<uint128>>;
 
 // RISCV32
 template class RF<RISCV32>;

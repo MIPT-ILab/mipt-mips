@@ -128,5 +128,17 @@ void Decode<ISA>::clock( Cycle cycle)
 
 
 #include <mips/mips.h>
+#include <risc_v/risc_v.h>
 
 template class Decode<MIPS>;
+template class Decode<RISCV32>;
+template class Decode<RISCV64>;
+template class Decode<RISCV128>;
+
+template class InstrMemory<RISCVInstr<uint32>>;
+template class PerfInstr<RISCVInstr<uint32>>;
+template class InstrMemory<RISCVInstr<uint64>>;
+template class PerfInstr<RISCVInstr<uint64>>;
+template class InstrMemory<RISCVInstr<uint128>>;
+template class PerfInstr<RISCVInstr<uint128>>;
+
