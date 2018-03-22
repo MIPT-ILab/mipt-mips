@@ -99,10 +99,3 @@ template class Mem<RISCV32>;
 template class Mem<RISCV64>;
 template class Mem<RISCV128>;
 
-template class InstrMemory<RISCVInstr<uint32>>;
-template class PerfInstr<RISCVInstr<uint32>>;
-template class InstrMemory<RISCVInstr<uint64>>;
-template class PerfInstr<RISCVInstr<uint64>>;
-template class InstrMemory<RISCVInstr<uint128>>;
-template class PerfInstr<RISCVInstr<uint128>>;
-

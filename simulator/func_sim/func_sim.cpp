@@ -89,6 +89,3 @@ template class FuncSim<RISCV32>;
 template class FuncSim<RISCV64>;
 template class FuncSim<RISCV128>;
 
-template class InstrMemory<RISCVInstr<uint32>>;
-template class InstrMemory<RISCVInstr<uint64>>;
-template class InstrMemory<RISCVInstr<uint128>>;

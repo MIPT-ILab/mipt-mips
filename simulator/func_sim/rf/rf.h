@@ -29,7 +29,7 @@ class RF
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
 protected:
-    auto read( Register num) const
+    RegisterUInt read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return static_cast<RegisterUInt>(get_entry( num).value);

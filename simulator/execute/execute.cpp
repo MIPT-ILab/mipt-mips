@@ -141,11 +141,3 @@ template class Execute<RISCV32>;
 template class Execute<RISCV64>;
 template class Execute<RISCV128>;
 
-template class InstrMemory<RISCVInstr<uint32>>;
-template class PerfInstr<RISCVInstr<uint32>>;
-template class InstrMemory<RISCVInstr<uint64>>;
-template class PerfInstr<RISCVInstr<uint64>>;
-template class InstrMemory<RISCVInstr<uint128>>;
-template class PerfInstr<RISCVInstr<uint128>>;
-
-

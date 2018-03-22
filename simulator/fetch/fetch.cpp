@@ -199,11 +199,3 @@ template class Fetch<RISCV32>;
 template class Fetch<RISCV64>;
 template class Fetch<RISCV128>;
 
-template class InstrMemory<RISCVInstr<uint32>>;
-template class PerfInstr<RISCVInstr<uint32>>;
-template class InstrMemory<RISCVInstr<uint64>>;
-template class PerfInstr<RISCVInstr<uint64>>;
-template class InstrMemory<RISCVInstr<uint128>>;
-template class PerfInstr<RISCVInstr<uint128>>;
-
-
