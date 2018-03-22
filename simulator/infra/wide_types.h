@@ -31,7 +31,9 @@ using uint128 = boost::multiprecision::uint128_t;
 
 #endif // __SIZEOF_INT128__
 
-template<> struct sign<uint128>  { using type = int128; };
-template<> struct unsign<int128> { using type = uint128; };
+template<> struct sign<uint128>   { using type = int128;  };
+template<> struct unsign<int128>  { using type = uint128; };
+template<> struct doubled<uint64> { using type = uint128; };
+template<> struct doubled<int64>  { using type = int128;  };
 
 #endif // WIDE_TYPES_H
