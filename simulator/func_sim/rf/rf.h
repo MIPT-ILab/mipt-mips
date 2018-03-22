@@ -9,6 +9,7 @@
 
 #include <array>
 #include <infra/types.h>
+#include <infra/wide_types.h>
 
 #include <cassert>
 
@@ -28,22 +29,22 @@ class RF
     const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
 
 protected:
-    auto read( Register num) const
+    RegisterUInt read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
-        return get_entry( num).value;
+        return static_cast<RegisterUInt>(get_entry( num).value);
     }
 
-    void write( Register num, uint64 val)
+    template <typename T>
+    void write( Register num, const T& val)
     {
         if ( num.is_zero())
             return;
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, val >> 32);
+            write( Register::mips_hi, static_cast<uint64>(val) >> 32);
             write( Register::mips_lo, val);
             return;
-        }            
-
+        }
         auto& entry = get_entry(num);
         entry.value = val;
     }

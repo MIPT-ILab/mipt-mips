@@ -57,6 +57,7 @@ class DataBypass
     using FuncInstr = typename ISA::FuncInstr;
     using Register  = typename ISA::Register;
     using Instr     = PerfInstr<FuncInstr>;
+    using RegDstUInt = typename ISA::RegDstUInt;
 
     public:
         class BypassCommand
@@ -113,7 +114,7 @@ class DataBypass
         }
 
         // transforms bypassed data if needed in accordance with passed bypass command
-        static uint64 adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data);
+        static RegDstUInt adapt_bypassed_data( const BypassCommand& bypass_command, RegDstUInt bypassed_data);
 
         // introduces new instruction to bypassing unit
         void trace_new_instr( const Instr& instr);
@@ -169,7 +170,7 @@ class DataBypass
 
 
 template <typename ISA>
-uint64 DataBypass<ISA>::adapt_bypassed_data( const BypassCommand& bypass_command, uint64 bypassed_data)
+typename ISA::RegDstUInt DataBypass<ISA>::adapt_bypassed_data( const BypassCommand& bypass_command, RegDstUInt bypassed_data)
 {
     const auto register_num = bypass_command.get_register_num();
 

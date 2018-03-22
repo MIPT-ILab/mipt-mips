@@ -20,16 +20,16 @@ Execute<ISA>::Execute( bool log) : Log( log)
     rps_command[1] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                            PORT_LATENCY);
 
-    wp_bypass = make_write_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 
-    rps_sources_bypass[0][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][0] = make_read_port<uint64>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[0][0] = make_read_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][0] = make_read_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][1] = make_read_port<uint64>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[0][1] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][1] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][2] = make_read_port<uint64>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[0][2] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][2] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 
     wp_bypassing_unit_flush_notify = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH_NOTIFY",
                                                             PORT_BW, PORT_FANOUT);
@@ -134,5 +134,10 @@ void Execute<ISA>::clock( Cycle cycle)
 
 
 #include <mips/mips.h>
+#include <risc_v/risc_v.h>
 
 template class Execute<MIPS>;
+template class Execute<RISCV32>;
+template class Execute<RISCV64>;
+template class Execute<RISCV128>;
+

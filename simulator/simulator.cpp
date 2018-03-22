@@ -9,6 +9,7 @@
 
 // ISAs
 #include <mips/mips.h>
+#include <risc_v/risc_v.h>
 
 #include "simulator.h"
 
