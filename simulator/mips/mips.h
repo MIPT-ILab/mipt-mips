@@ -16,7 +16,7 @@ struct MIPS
     using Register = MIPSRegister;
     using Memory = InstrMemory<MIPSInstr>;
     using RegisterUInt = uint32;
-    using RegDstUInt = uint64; 
+    using RegDstUInt = doubled_t<uint32>; // MIPS may produce output to 2x HI/LO register
 };
 
 #endif // MIPS_H_
