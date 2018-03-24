@@ -41,8 +41,9 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  24<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
  03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) | |
  10<br/>Mar | **_No lecture_** | • Use the time slot to progress with your tasks |
- 17<br/>Mar | **L13: Out-of-Order execution, pt. II** | |
-
+ 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions and Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) | |
+ 24<br/>Mar | **L15: Memory disambiguation** | |
+ 
  
 ### MSU Seminars
 
@@ -62,8 +63,8 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 Year | Name | Score | Comments
 :----: |:----: | ------------------------------ | ------------------------------
 **2017/2018** | Denis Los | 10 + 5 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31) |
+**2017/2018** | Alexander Misevich | 3 + 10 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
 2016/2017 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
-**2017/2018** | Alexander Misevich | 3 + 7 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283) |
 **2017/2018** | Kirill Nedostoev | 7 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93) |
 **2017/2018** | Konstantin Soshin | + 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |

@@ -19,6 +19,8 @@ class Mem : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
+    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegDstUInt = typename ISA::RegDstUInt;
 
     private:
         Memory* memory = nullptr;
@@ -34,7 +36,7 @@ class Mem : public Log
 
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
-        std::unique_ptr<WritePort<uint64>> wp_bypass = nullptr;
+        std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
 
         std::unique_ptr<WritePort<Instr>> wp_bypassing_unit_flush_notify = nullptr;
     

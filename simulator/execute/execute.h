@@ -19,6 +19,7 @@ class Execute : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using BypassingUnit = DataBypass<ISA>;
+    using RegDstUInt = typename ISA::RegDstUInt;
 
     private:
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -31,10 +32,10 @@ class Execute : public Log
         std::array<std::unique_ptr<ReadPort<typename BypassingUnit::BypassCommand>>, SRC_REGISTERS_NUM>
             rps_command;
         
-        std::array<std::array<std::unique_ptr<ReadPort<uint64>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
+        std::array<std::array<std::unique_ptr<ReadPort<RegDstUInt>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
             rps_sources_bypass;
         
-        std::unique_ptr<WritePort<uint64>> wp_bypass = nullptr;
+        std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
 
         std::unique_ptr<WritePort<Instr>> wp_bypassing_unit_flush_notify = nullptr;
     

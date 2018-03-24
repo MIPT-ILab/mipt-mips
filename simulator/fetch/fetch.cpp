@@ -193,6 +193,9 @@ void Fetch<ISA>::clock( Cycle cycle)
 }
 
 #include <mips/mips.h>
-
+#include <risc_v/risc_v.h>
 template class Fetch<MIPS>;
+template class Fetch<RISCV32>;
+template class Fetch<RISCV64>;
+template class Fetch<RISCV128>;
 
