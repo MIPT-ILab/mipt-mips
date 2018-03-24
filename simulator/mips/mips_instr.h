@@ -27,18 +27,19 @@ template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
-uint64 mips_multiplication(T x, T y) {
-    return static_cast<uint64>(x) * static_cast<uint64>(y);
+uint128 mips_multiplication(T x, T y) {
+    return static_cast<doubled_t<T>>(x) * static_cast<doubled_t<T>>(y);
 }
 
 template<typename T>
-uint64 mips_division(T x, T y) {
-    using T64 = doubled_t<T>;
+uint128 mips_division(T x, T y) {
+    using T2 = doubled_t<T>;
     if (y == 0)
         return 0;
-    auto x1 = static_cast<T64>(x);
-    auto y1 = static_cast<T64>(y);
-    return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32u);
+    auto x1 = static_cast<T2>(x);
+    auto y1 = static_cast<T2>(y);
+    return (static_cast<uint128>(static_cast<T2>(x1 / y1)) & bitmask<uint128>(bitwidth<T>))
+         | (static_cast<uint128>(static_cast<T2>(x1 % y1)) << bitwidth<T>);
 }
 
 class MIPSInstr
@@ -145,10 +146,11 @@ class MIPSInstr
         MIPSRegister dst = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
-        uint32 v_src1 = NO_VAL32;
-        uint32 v_src2 = NO_VAL32;
-        uint64 v_dst = NO_VAL64;
+        uint64 v_src1 = NO_VAL64;
+        uint64 v_src2 = NO_VAL64;
+        uint128 v_dst = NO_VAL64;
         uint64 mask = all_ones<uint64>();
+
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -193,32 +195,56 @@ class MIPSInstr
         bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
         bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
 
-        void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
-        void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
-        void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
+        template <typename T>
+        void execute_add()   { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
 
-        void execute_addu()  { v_dst = v_src1 + v_src2; }
-        void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
+        template <typename T>
+        void execute_sub()   { v_dst = static_cast<T>( static_cast<sign_t<T>>( v_src1) - static_cast<sign_t<T>>( v_src2)); }
 
-        void execute_mult()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_multu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
-        void execute_div()   { v_dst = mips_division<int32>(v_src1, v_src2); }
-        void execute_divu()  { v_dst = mips_division<uint32>(v_src1, v_src2); }
-        void execute_move()  { v_dst = v_src1; }
+        template <typename T>
+        void execute_addi()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( sign_extend( v_imm)); }
 
-        void execute_sll()   { v_dst = v_src1 << shamt; }
+        template <typename T>
+        void execute_addu()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
+
+        template <typename T>
+        void execute_subu()  { v_dst = static_cast<T>( v_src1) - static_cast<T>( v_src2); }
+
+        template <typename T>
+        void execute_addiu() { v_dst = static_cast<T>(static_cast<sign_t<T>>(v_src1) + static_cast<sign_t<T>>( sign_extend(v_imm))); }
+
+        void execute_mult()   { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_multu()  { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_dmult()  { v_dst = mips_multiplication<int64>(v_src1, v_src2); }
+        void execute_dmultu() { v_dst = mips_multiplication<uint64>(v_src1, v_src2); }
+        void execute_div()    { v_dst = mips_division<int32>(v_src1, v_src2); }
+        void execute_ddiv()   { v_dst = mips_division<int64>(v_src1, v_src2); }
+        void execute_divu()   { v_dst = mips_division<uint32>(v_src1, v_src2); }
+        void execute_ddivu()  { v_dst = mips_division<uint64>(v_src1, v_src2); }
+        void execute_move()   { v_dst = v_src1; }
+
+        template <typename T>
+        void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
+        void execute_dsll32() { v_dst = v_src1 << (shamt + 32); }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = arithmetic_rs( v_src1, shamt); }
-        void execute_sllv()  { v_dst = v_src1 << v_src2; }
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = arithmetic_rs( v_src1, v_src2); }
-        void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
 
+        template <typename T>
+        void execute_sra()    { v_dst = arithmetic_rs(static_cast<T>(v_src1), shamt); }
+        void execute_dsra32() { v_dst = arithmetic_rs(v_src1, shamt + 32); }
+        void execute_sllv()   { v_dst = static_cast<uint32>( v_src1) << v_src2; }
+        void execute_dsllv()  { v_dst = v_src1 << v_src2; }
+        template <typename T>
+        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> static_cast<T>( v_src2); }
+        void execute_dsrl()   { v_dst = v_src1 >> shamt; }
+        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32); }
+        template <typename T>
+        void execute_srav()   { v_dst = arithmetic_rs(static_cast<T>(v_src1), v_src2); }
+        void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm) << 0x10); }
+        
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-        void execute_nor()   { v_dst = ~static_cast<uint64>(v_src1 | v_src2); }
+        void execute_nor()   { v_dst = ~static_cast<uint32>(v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
@@ -242,8 +268,10 @@ class MIPSInstr
                 new_PC += sign_extend( v_imm) * 4;
         }
 
-        void execute_clo() { v_dst = count_leading_zeroes( ~v_src1); }
-        void execute_clz() { v_dst = count_leading_zeroes(  v_src1); }
+        void execute_clo()  { v_dst = count_leading_zeroes<uint32>( ~v_src1); }
+        void execute_clz()  { v_dst = count_leading_zeroes<uint32>(  v_src1); }
+        void execute_dclo() { v_dst = count_leading_zeroes<uint64>( ~v_src1); }
+        void execute_dclz() { v_dst = count_leading_zeroes<uint64>(  v_src1); }
 
         void execute_jump( Addr target)
         {
@@ -391,9 +419,11 @@ class MIPSInstr
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
+        bool is_muldiv() const { return operation == OUT_R_DIVMULT; }
+
         bool is_bubble() const { return is_nop() && PC == 0; }
 
-        void set_v_src( uint32 value, uint8 index)
+        void set_v_src( uint64 value, uint8 index)
         {
             if ( index == 0)
                 v_src1 = value;
@@ -409,10 +439,10 @@ class MIPSInstr
         Addr get_new_PC() const { return new_PC; }
         Addr get_PC() const { return PC; }
 
-        void set_v_dst(uint32 value); // for loads
-        uint32 get_v_src2() const { return v_src2; } // for stores
+        void set_v_dst(uint64 value); // for loads
+        uint64 get_v_src2() const { return v_src2; } // for stores
 
-        uint64 get_bypassing_data() const
+        uint128 get_bypassing_data() const
         {
             return ( dst.is_mips_hi()) ? v_dst << 32u : v_dst;
         }
