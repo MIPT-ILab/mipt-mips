@@ -34,18 +34,20 @@ protected:
         return get_entry( num).value;
     }
 
-    void write( Register num, uint64 val)
+    void write( Register num, uint64 val, bool accumulating_instr = false)
     {
         if ( num.is_zero())
             return;
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, val >> 32);
-            write( Register::mips_lo, val);
+            write( Register::mips_hi, val >> 32, accumulating_instr);
+            write( Register::mips_lo, val, accumulating_instr);
             return;
-        }            
-
+        }
         auto& entry = get_entry(num);
-        entry.value = val;
+        if(accumulating_instr)
+              entry.value += val;
+        else
+              entry.value = val;
     }
 
 public:
@@ -66,12 +68,12 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
+        bool accumulating_instr = instr.is_accumulating_instr();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst());
+            write( reg_num, instr.get_v_dst(), accumulating_instr);
         else
             write( reg_num, read(reg_num));
     }
 };
 
 #endif
-

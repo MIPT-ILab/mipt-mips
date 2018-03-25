@@ -164,6 +164,7 @@ class MIPSInstr
         // convert this to bitset
         bool complete   = false;
         bool writes_dst = true;
+        bool accumulating_instr = false;
         bool _is_jump_taken = false;      // actual result
 
         Addr new_PC = NO_VAL32;
@@ -254,6 +255,9 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
+        void execute_madd()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); accumulating_instr = true; }
+        void execute_maddu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); accumulating_instr = true; }
+
         void execute_jump( Addr target)
         {
             _is_jump_taken = true;
@@ -326,6 +330,8 @@ class MIPSInstr
 
         bool get_writes_dst() const { return writes_dst; }
 
+        bool is_accumulating_instr() const { return accumulating_instr; }
+
         bool is_bubble() const { return is_nop() && PC == 0; }
 
         void set_v_src( uint32 value, uint8 index)
@@ -348,7 +354,7 @@ class MIPSInstr
 
         uint64 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst;
         }
 
         void execute();
