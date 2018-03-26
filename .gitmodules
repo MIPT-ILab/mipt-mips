@@ -6,7 +6,7 @@
 	url = https://github.com/bminor/binutils-gdb.git
 [submodule "traces"]
 	path = traces
-	url = https://github.com/MIPT-ILab/mips-traces.git
+	url = https://github.com/MIPT-ILab/traces
 [submodule "codeguidelines"]
 	path = codeguidelines
 	url = https://github.com/inedostoev/codeguidelines.git
