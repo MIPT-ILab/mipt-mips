@@ -36,10 +36,18 @@ protected:
     }
 
     template <typename T>
-    void write( Register num, const T& val)
+    void write( Register num, const T& val, bool accumulating_instr = false)
     {
         if ( num.is_zero())
             return;
+        if(accumulating_instr){
+            auto& entry_hi = get_entry(Register::mips_hi);
+            auto& entry_lo = get_entry(Register::mips_lo);
+            uint64 hi_lo = static_cast<uint64>(entry_hi.value);
+            hi_lo <<= 32;
+            hi_lo += static_cast<uint64>(entry_lo.value);
+            hi_lo += static_cast<uint64>(val);
+        }
         if ( num.is_mips_hi_lo()) {
             write( Register::mips_hi, static_cast<uint128>(val) >> 64);
             write( Register::mips_lo, static_cast<uint64>(val));
@@ -67,12 +75,12 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
+        bool accumulating_instr = instr.is_accumulating_instr();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst());
+            write( reg_num, instr.get_v_dst(), accumulating_instr);
         else
-            write( reg_num, read(reg_num));
+            write( reg_num, read(reg_num), accumulating_instr);
     }
 };
 
 #endif
-
