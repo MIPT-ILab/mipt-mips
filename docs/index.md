@@ -43,6 +43,7 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  10<br/>Mar | **_No lecture_** | • Use the time slot to progress with your tasks |
  17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) | |
  24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) | |
+ 31<br/>Mar | **L16: Virtual memory** | |
  
  
 ### MSU Seminars
