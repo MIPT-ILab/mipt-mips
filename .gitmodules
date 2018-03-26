@@ -10,3 +10,6 @@
 [submodule "codeguidelines"]
 	path = codeguidelines
 	url = https://github.com/inedostoev/codeguidelines.git
+[submodule "mips-traces"]
+	path = mips-traces
+	url = https://github.com/MIPT-ILab/mips-traces/
