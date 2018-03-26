@@ -29,7 +29,7 @@ class RISCVInstr
         RISCVRegister src1 = RISCVRegister::zero;
         RISCVRegister src2 = RISCVRegister::zero;
         RISCVRegister dst = RISCVRegister::zero;
-        
+
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
@@ -50,30 +50,30 @@ class RISCVInstr
         RISCVInstr() = delete;
 
         explicit
-        RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC), 
+        RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC),
                                                  new_PC( PC + 4)
                                                  {};
-        
+
         bool is_same( const RISCVInstr& rhs) const {
             return PC == rhs.PC && instr == rhs.instr;
         }
 
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
-        
+
         RISCVRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         RISCVRegister get_dst_num()  const { return dst; }
 
         /* Checks if instruction can change PC in unusual way. */
         constexpr bool is_jump() const { return false; }
-        
+
         constexpr bool is_jump_taken() const { return false; }
 
         constexpr bool is_load()  const { return false; }
-        
+
         constexpr bool is_store() const { return false; }
-        
+
         constexpr bool is_nop() const { return false; }
-        
+
         constexpr bool is_halt() const { return false; }
 
         constexpr bool is_conditional_move() const { return false; }
@@ -83,7 +83,9 @@ class RISCVInstr
         constexpr bool get_writes_dst() const { return false; }
 
         constexpr bool is_bubble() const { return false; }
-        
+
+        constexpr bool is_accumulating_instr() const { return false; }
+
         void set_v_src( const T& value, uint8 index)
         {
             if ( index == 0)
@@ -104,7 +106,7 @@ class RISCVInstr
 
         RegisterUInt get_bypassing_data() const
         {
-            return v_dst; 
+            return v_dst;
         }
 
         void execute() {};
