@@ -73,7 +73,7 @@ using Addr = uint32;
 static const uint8  NO_VAL8  = 0xBA;
 static const uint16 NO_VAL16 = 0xf00d;
 static const uint32 NO_VAL32 = 0xdeadbeeful;
-static const uint64 NO_VAL64 = 0xfeedfacecafebeafull;
+static const uint64 NO_VAL64 = 0xdeadfacecafebeafull;
 
 static const uint8  MAX_VAL8  = UINT8_MAX;
 static const uint16 MAX_VAL16 = UINT16_MAX;

@@ -41,12 +41,12 @@ protected:
         if ( num.is_zero())
             return;
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>(val) >> 32);
-            write( Register::mips_lo, val);
+            write( Register::mips_hi, static_cast<uint128>(val) >> 64);
+            write( Register::mips_lo, static_cast<uint64>(val));
             return;
         }
         auto& entry = get_entry(num);
-        entry.value = val;
+        entry.value = static_cast<uint64>( val);
     }
 
 public:

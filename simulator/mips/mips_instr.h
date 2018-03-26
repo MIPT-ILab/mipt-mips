@@ -46,13 +46,13 @@ uint64 mips_multiplication(T x, T y) {
 }
 
 template<typename T>
-uint64 mips_division(T x, T y) {
+uint128 mips_division(T x, T y) {
     using T64 = doubled_t<T>;
     if (y == 0)
         return 0;
     auto x1 = static_cast<T64>(x);
     auto y1 = static_cast<T64>(y);
-    return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32);
+    return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
 }
 
 class MIPSInstr
@@ -367,9 +367,9 @@ class MIPSInstr
         void set_v_dst(uint64 value); // for loads
         uint64 get_v_src2() const { return v_src2; } // for stores
 
-        uint64 get_bypassing_data() const
+        uint128 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 64 : v_dst; 
         }
 
         void execute();
