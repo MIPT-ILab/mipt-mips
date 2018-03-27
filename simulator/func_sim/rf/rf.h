@@ -40,20 +40,21 @@ protected:
     {
         if ( num.is_zero())
             return;
-        if(accumulating_instr){
-            auto& entry_hi = get_entry(Register::mips_hi);
-            auto& entry_lo = get_entry(Register::mips_lo);
-            uint64 hi_lo = static_cast<uint64>(entry_hi.value);
+        if( accumulating_instr){
+            const auto entry_hi = get_entry( Register::mips_hi);
+            const auto entry_lo = get_entry( Register::mips_lo);
+            uint64 hi_lo = static_cast<uint64>( entry_hi.value);
             hi_lo <<= 32;
-            hi_lo += static_cast<uint64>(entry_lo.value);
-            hi_lo += static_cast<uint64>(val);
+            hi_lo += static_cast<uint64>( entry_lo.value);
+            hi_lo += static_cast<uint64>( val);
+            new_val = static_cast<T>( hi_lo);
         }
         if ( num.is_mips_hi_lo()) {
             write( Register::mips_hi, static_cast<uint128>(val) >> 64);
             write( Register::mips_lo, static_cast<uint64>(val));
             return;
         }
-        auto& entry = get_entry(num);
+        auto& entry = get_entry( num);
         entry.value = static_cast<uint64>( val);
     }
 
