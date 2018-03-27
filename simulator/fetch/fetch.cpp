@@ -4,7 +4,7 @@
  */
 
 #include <infra/config/config.h>
- 
+
 #include "fetch.h"
 
 namespace config {
@@ -44,13 +44,13 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     BPFactory bp_factory;
     bp = bp_factory.create( config::bp_mode, config::bp_size, config::bp_ways);
-    tags = std::make_unique<CacheTagArray>( config::instruction_cache_size, 
-                                            config::instruction_cache_ways, 
+    tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
+                                            config::instruction_cache_ways,
                                             config::instruction_cache_line_size);
 }
 
 template <typename ISA>
-Addr Fetch<ISA>::get_PC( Cycle cycle) 
+Addr Fetch<ISA>::get_PC( Cycle cycle)
 {
     /* receive flush and stall signals */
     const bool is_stall = rp_stall->is_ready( cycle) && rp_stall->read( cycle);
@@ -73,7 +73,7 @@ Addr Fetch<ISA>::get_PC( Cycle cycle)
 
     if ( hold_PC != 0)
         return hold_PC;
-    
+
     return 0;
 }
 
@@ -86,18 +86,18 @@ void Fetch<ISA>::clock_bp( Cycle cycle)
 }
 
 template <typename ISA>
-void Fetch<ISA>::clock_instr_cache( Cycle cycle) 
+void Fetch<ISA>::clock_instr_cache( Cycle cycle)
 {
     ignore( cycle);
-    
+
     if( rp_long_latency_pc_holder->is_ready( cycle))
     {
         /* get PC from long-latency port if it's possible */
         auto PC = rp_long_latency_pc_holder->read( cycle);
-        
+
         /* write new PC to tags array */
         tags->write( PC);
-        
+
         /* save PC to the next stage */
         wp_hold_pc->write( PC, cycle);
         return;
@@ -108,11 +108,11 @@ void Fetch<ISA>::clock_instr_cache( Cycle cycle)
 template <typename ISA>
 void Fetch<ISA>::ignore( Cycle cycle)
 {
-    /* ignore PC from other ports in the case of cache miss */ 
+    /* ignore PC from other ports in the case of cache miss */
     rp_external_target->ignore( cycle);
     rp_hold_pc->ignore( cycle);
     rp_target->ignore( cycle);
-
+    rp_stall->ignore( cycle);
     /* ignore miss signal */
     rp_hit_or_miss->ignore( cycle);
 }
@@ -149,7 +149,7 @@ Addr Fetch<ISA>::get_cached_PC( Cycle cycle)
 
     /* hit or miss */
     auto is_hit = tags->lookup( PC);
-    
+
     if( !is_hit)
     {
         /* send miss to the next cycle */
@@ -173,7 +173,7 @@ void Fetch<ISA>::clock( Cycle cycle)
 
     /* push bubble */
     if( PC == 0)
-        return;  
+        return;
 
     /* hold PC for the stall case */
     wp_hold_pc->write( PC, cycle);
@@ -198,4 +198,3 @@ template class Fetch<MIPS>;
 template class Fetch<RISCV32>;
 template class Fetch<RISCV64>;
 template class Fetch<RISCV128>;
-
