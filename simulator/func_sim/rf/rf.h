@@ -43,7 +43,7 @@ protected:
         if( accumulating_instr){
             const auto entry_hi = get_entry( Register::mips_hi);
             const auto entry_lo = get_entry( Register::mips_lo);
-            uint64 hi_lo = static_cast<uint64>( entry_hi.value);
+            auto hi_lo = static_cast<uint64>( entry_hi.value);
             hi_lo <<= 32;
             hi_lo += static_cast<uint64>( entry_lo.value);
             hi_lo += static_cast<uint64>( val);
