@@ -257,10 +257,10 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_madd()  { v_dst = mips_multiplication<int32>(v_src1, v_src2);  }
-        void execute_maddu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
-        void execute_msub()  { v_dst = mips_multiplication<int32>(v_src1, v_src2);  }
-        void execute_msubu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_madd()  { execute_mult();  }
+        void execute_maddu() { execute_multu(); }
+        void execute_msub()  { execute_mult();  }
+        void execute_msubu() { execute_multu(); }
 
         void execute_jump( Addr target)
         {

@@ -36,7 +36,7 @@ protected:
     }
 
     template <typename T>
-    void addition( T& new_val, const T& val)
+    T addition( const T& val)
     {
       const auto entry_hi = get_entry( Register::mips_hi);
       const auto entry_lo = get_entry( Register::mips_lo);
@@ -44,11 +44,11 @@ protected:
       hi_lo <<= 32;
       hi_lo += static_cast<uint64>( entry_lo.value);
       hi_lo += static_cast<uint64>( val);
-      new_val = static_cast<T>( hi_lo);
+      return static_cast<T>( hi_lo);
     }
 
     template <typename T>
-    void subtraction( T& new_val, const T& val)
+    T subtraction( const T& val)
     {
       const auto entry_hi = get_entry( Register::mips_hi);
       const auto entry_lo = get_entry( Register::mips_lo);
@@ -56,7 +56,7 @@ protected:
       hi_lo <<= 32;
       hi_lo += static_cast<uint64>( entry_lo.value);
       hi_lo -= static_cast<uint64>( val);
-      new_val = static_cast<T>( hi_lo);
+      return static_cast<T>( hi_lo);
     }
 
     template <typename T>
@@ -65,12 +65,12 @@ protected:
         T new_val = val;
         if ( num.is_zero())
             return;
-        if( accumulating_instr == 1)
-            addition(new_val, val);
-        if( accumulating_instr == -1)
-            subtraction(new_val, val);
+        if ( accumulating_instr == 1)
+            new_val = addition( val);
+        if ( accumulating_instr == -1)
+            new_val = subtraction( val);
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>(new_val) >> 32);
+            write( Register::mips_hi, static_cast<uint64>( new_val) >> 32);
             write( Register::mips_lo, new_val);
             return;
         }
