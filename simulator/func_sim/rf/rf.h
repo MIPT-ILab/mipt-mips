@@ -19,6 +19,7 @@ class RF
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
+    using RegDstUInt = typename ISA::RegDstUInt;
 
     struct Reg {
         RegisterUInt value = 0u;
@@ -35,24 +36,45 @@ protected:
         return static_cast<RegisterUInt>(get_entry( num).value);
     }
 
-    template <typename T>
-    void write( Register num, const T& val, bool accumulating_instr = false)
+    RegDstUInt get_hi_lo() const
     {
-        T new_val = val;
+        const auto entry_hi = get_entry( Register::mips_hi);
+        const auto entry_lo = get_entry( Register::mips_lo);
+        auto hi_lo = static_cast<uint64>( entry_hi.value);
+        hi_lo <<= 32;
+        hi_lo += static_cast<uint64>( entry_lo.value);
+        return hi_lo;
+    }
+
+    template <typename T>
+    T addition( const T& val)
+    {
+        auto hi_lo = get_hi_lo();
+        hi_lo += static_cast<uint64>( val);
+        return hi_lo;
+    }
+
+    template <typename T>
+    T subtraction( const T& val)
+    {
+        auto hi_lo = get_hi_lo();
+        hi_lo -= static_cast<uint64>( val);
+        return hi_lo;
+    }
+
+    template <typename T>
+    void write( Register num, T val, int8 accumulating_instr = 0)
+    {
         if ( num.is_zero())
             return;
-        if( accumulating_instr){
-            const auto entry_hi = get_entry( Register::mips_hi);
-            const auto entry_lo = get_entry( Register::mips_lo);
-            auto hi_lo = static_cast<uint64>( entry_hi.value);
-            hi_lo <<= 32;
-            hi_lo += static_cast<uint64>( entry_lo.value);
-            hi_lo += static_cast<uint64>( val);
-            new_val = static_cast<T>( hi_lo);
-        }
+        if ( accumulating_instr == 1)
+            val = addition( val);
+        else
+            if ( accumulating_instr == -1)
+                val = subtraction( val);
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>(new_val) >> 32);
-            write( Register::mips_lo, new_val);
+            write( Register::mips_hi, static_cast<uint64>( val) >> 32);
+            write( Register::mips_lo, val);
             return;
         }
         auto& entry = get_entry( num);
@@ -77,7 +99,7 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
-        bool accumulating_instr = instr.is_accumulating_instr();
+        auto accumulating_instr = instr.is_accumulating_instr();
         if ( !reg_num.is_zero() && writes_dst)
             write( reg_num, instr.get_v_dst(), accumulating_instr);
         else
