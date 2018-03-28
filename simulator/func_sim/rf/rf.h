@@ -10,6 +10,7 @@
 #include <array>
 #include <infra/types.h>
 #include <infra/wide_types.h>
+#include <infra/macro.h>
 
 #include <cassert>
 
@@ -21,64 +22,56 @@ class RF
     using RegisterUInt = typename ISA::RegisterUInt;
     using RegDstUInt = typename ISA::RegDstUInt;
 
-    struct Reg {
-        RegisterUInt value = 0u;
-    };
-    std::array<Reg, Register::MAX_REG> array = {};
+    std::array<RegisterUInt, Register::MAX_REG> array = {};
 
-    Reg& get_entry( Register num) { return array.at( num.to_size_t()); }
-    const Reg& get_entry( Register num) const { return array.at( num.to_size_t()); }
+    auto& get_value( Register num) { return array.at( num.to_size_t()); }
+    const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
 protected:
-    RegisterUInt read( Register num) const
+    static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 32;
+
+    auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
-        return static_cast<RegisterUInt>(get_entry( num).value);
+        return get_value( num);
     }
-
-    RegDstUInt get_hi_lo() const
+    
+    template <typename U = RegDstUInt>
+    std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
-        const auto entry_hi = get_entry( Register::mips_hi);
-        const auto entry_lo = get_entry( Register::mips_lo);
-        auto hi_lo = static_cast<uint64>( entry_hi.value);
-        hi_lo <<= 32;
-        hi_lo += static_cast<uint64>( entry_lo.value);
-        return hi_lo;
+        const auto hi = static_cast<RegDstUInt>( read( Register::mips_hi));
+        const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & ((RegDstUInt(1) << 32) - 1);
+        return (hi << 32) | lo;
     }
 
-    template <typename T>
-    T addition( const T& val)
+    // Makes no sense if output is 32 bit
+    template <typename U = RegDstUInt>
+    std::enable_if_t<!HAS_WIDE_DST, U> read_hi_lo() const
     {
-        auto hi_lo = get_hi_lo();
-        hi_lo += static_cast<uint64>( val);
-        return hi_lo;
+        assert( false);
+        return 0u;
     }
 
-    template <typename T>
-    T subtraction( const T& val)
-    {
-        auto hi_lo = get_hi_lo();
-        hi_lo -= static_cast<uint64>( val);
-        return hi_lo;
-    }
-
-    template <typename T>
-    void write( Register num, T val, int8 accumulating_instr = 0)
+    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0)
     {
         if ( num.is_zero())
             return;
+
+        // Hacks for MIPS madds/msubs
         if ( accumulating_instr == 1)
-            val = addition( val);
-        else
-            if ( accumulating_instr == -1)
-                val = subtraction( val);
+            val = read_hi_lo() + val;
+        else if ( accumulating_instr == -1)
+            val = read_hi_lo() - val;
+
+        // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>( val) >> 32);
+            write( Register::mips_hi, HAS_WIDE_DST ? val >> 32 : 0);
             write( Register::mips_lo, val);
             return;
         }
-        auto& entry = get_entry( num);
-        entry.value = val;
+ 
+        // No hacks
+        get_value( num) = val;
     }
 
 public:
