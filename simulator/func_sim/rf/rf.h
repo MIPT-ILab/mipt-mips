@@ -36,20 +36,39 @@ protected:
     }
 
     template <typename T>
-    void write( Register num, const T& val, bool accumulating_instr = false)
+    void addition( T& new_val, const T& val)
+    {
+      const auto entry_hi = get_entry( Register::mips_hi);
+      const auto entry_lo = get_entry( Register::mips_lo);
+      auto hi_lo = static_cast<uint64>( entry_hi.value);
+      hi_lo <<= 32;
+      hi_lo += static_cast<uint64>( entry_lo.value);
+      hi_lo += static_cast<uint64>( val);
+      new_val = static_cast<T>( hi_lo);
+    }
+
+    template <typename T>
+    void subtraction( T& new_val, const T& val)
+    {
+      const auto entry_hi = get_entry( Register::mips_hi);
+      const auto entry_lo = get_entry( Register::mips_lo);
+      auto hi_lo = static_cast<uint64>( entry_hi.value);
+      hi_lo <<= 32;
+      hi_lo += static_cast<uint64>( entry_lo.value);
+      hi_lo -= static_cast<uint64>( val);
+      new_val = static_cast<T>( hi_lo);
+    }
+
+    template <typename T>
+    void write( Register num, const T& val, int8 accumulating_instr = 0)
     {
         T new_val = val;
         if ( num.is_zero())
             return;
-        if( accumulating_instr){
-            const auto entry_hi = get_entry( Register::mips_hi);
-            const auto entry_lo = get_entry( Register::mips_lo);
-            auto hi_lo = static_cast<uint64>( entry_hi.value);
-            hi_lo <<= 32;
-            hi_lo += static_cast<uint64>( entry_lo.value);
-            hi_lo += static_cast<uint64>( val);
-            new_val = static_cast<T>( hi_lo);
-        }
+        if( accumulating_instr == 1)
+            addition(new_val, val);
+        if( accumulating_instr == -1)
+            subtraction(new_val, val);
         if ( num.is_mips_hi_lo()) {
             write( Register::mips_hi, static_cast<uint64>(new_val) >> 32);
             write( Register::mips_lo, new_val);
@@ -77,7 +96,7 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
-        bool accumulating_instr = instr.is_accumulating_instr();
+        int8 accumulating_instr = instr.is_accumulating_instr();
         if ( !reg_num.is_zero() && writes_dst)
             write( reg_num, instr.get_v_dst(), accumulating_instr);
         else
