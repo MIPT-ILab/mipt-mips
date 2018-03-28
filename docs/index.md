@@ -34,15 +34,20 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  
 ### Term 3: Breaking the Memory Wall
 
- Date | Event | Hometask
+ Date | Event
+ :-: |:---- 
+ 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Feb | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 10<br/>Mar | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) |
+ 
+### Term 4: Performing Multiple Tasks
+ 
+  Date | Event | Hometask
  :-: |:---- |:----------------
- 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) | |
- 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) | |
- 24<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
- 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) | |
- 10<br/>Mar | **_No lecture_** | • Use the time slot to progress with your tasks |
- 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) | |
- 24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) | |
  31<br/>Mar | **L16: Virtual memory** | |
  
  
