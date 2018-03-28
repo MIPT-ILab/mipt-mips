@@ -257,11 +257,6 @@ class MIPSInstr
         void execute_clo() { v_dst = count_zeros( ~v_src1); }
         void execute_clz() { v_dst = count_zeros(  v_src1); }
 
-        void execute_madd()  { execute_mult();  }
-        void execute_maddu() { execute_multu(); }
-        void execute_msub()  { execute_mult();  }
-        void execute_msubu() { execute_multu(); }
-
         void execute_jump( Addr target)
         {
             _is_jump_taken = true;
