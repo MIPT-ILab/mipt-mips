@@ -51,6 +51,18 @@ TEST( RF, read_write_rf)
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
     ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);
+
+    // Check accumulating writes
+    rf->write( MIPSRegister::mips_hi_lo, 1u, -1 /* subtract */);
+    ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 0u);
+    ASSERT_EQ( rf->read( MIPSRegister::mips_lo), MAX_VAL32);
+    ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32));
+
+    // Check accumulating writes
+    rf->write( MIPSRegister::mips_hi_lo, 1u, +1 /* add */);
+    ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
+    ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
+    ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);
 }
 
 TEST( RF, read_sources_write_dst_rf)
