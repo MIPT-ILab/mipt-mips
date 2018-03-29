@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include <infra/types.h>
+#include <infra/wide_types.h>
 
 /* Returns size of a static array */
 template<typename T, size_t N>
@@ -39,6 +40,10 @@ constexpr size_t max_sizeof() noexcept { return std::max({sizeof(Args)...}); }
 /* Bit width of integer type */
 template<typename T>
 constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
+
+/* 128 types have no std::numeric_limits */
+template<> constexpr size_t bitwidth<uint128> = 128u;
+template<> constexpr size_t bitwidth<int128> = 128u;
 
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T,
