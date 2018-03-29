@@ -27,6 +27,13 @@ class RF
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
+    static RegDstUInt get_hi_part( RegDstUInt value)
+    {
+        if constexpr( HAS_WIDE_DST)
+            return value >> 32;
+        return 0;
+    }
+
 protected:
     static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 32;
 
@@ -65,7 +72,7 @@ protected:
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>( val) >> 32);
+            write( Register::mips_hi, get_hi_part( val));
             write( Register::mips_lo, val);
             return;
         }
