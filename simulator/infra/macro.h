@@ -36,12 +36,9 @@ constexpr size_t min_sizeof() noexcept { return std::min({sizeof(Args)...}); }
 template<typename ... Args>
 constexpr size_t max_sizeof() noexcept { return std::max({sizeof(Args)...}); }
 
+/* Bit width of integer type */
 template<typename T>
-constexpr auto bitwidth = sizeof(T) * 8;
-
-// Does not work well with 128 bit types, both boost and GCC native
-// template<typename T>
-// constexpr auto bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
+constexpr auto bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T,
