@@ -36,7 +36,4 @@ template<> struct unsign<int128>  { using type = uint128; };
 template<> struct doubled<uint64> { using type = uint128; };
 template<> struct doubled<int64>  { using type = int128;  };
 
-template<> constexpr size_t bitwidth<uint128> = 128u;
-template<> constexpr size_t bitwidth<int128> = 128u;
-
 #endif // WIDE_TYPES_H
