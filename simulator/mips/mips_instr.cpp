@@ -183,8 +183,8 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     //       0x2F   cache
 
     // Advanced loads and stores
-    {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr, 1} },
-    {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
+    {0x30, { "ll",  OUT_I_LOAD,   4, &MIPSInstr::calculate_load_addr, 2} },
+    {0x38, { "sc",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 2} },
 };
 
 const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
