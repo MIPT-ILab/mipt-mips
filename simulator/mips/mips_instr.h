@@ -69,6 +69,7 @@ class MIPSInstr
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
+            OUT_R_SUBTR,
             OUT_R_TRAP,
             OUT_R_MFLO,
             OUT_R_MTLO,
@@ -276,9 +277,6 @@ class MIPSInstr
         void execute_dclo() { v_dst = count_zeros<uint64, 0x8000000000000000>( ~v_src1); }
         void execute_dclz() { v_dst = count_zeros<uint64, 0x8000000000000000>(  v_src1); }
 
-        void execute_madd()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_maddu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
-
         void execute_jump( Addr target)
         {
             _is_jump_taken = true;
@@ -339,7 +337,10 @@ class MIPSInstr
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
                                        operation == OUT_I_LOADL; }
-        bool is_accumulating_instr() const { return operation == OUT_R_ACCUM; }
+        int8 is_accumulating_instr() const
+        {
+            return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
+        }
         bool is_store() const { return operation == OUT_I_STORE  ||
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }

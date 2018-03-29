@@ -34,15 +34,20 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  
 ### Term 3: Breaking the Memory Wall
 
- Date | Event | Hometask
+ Date | Event
+ :-: |:---- 
+ 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Feb | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 10<br/>Mar | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) |
+ 
+### Term 4: Performing Multiple Tasks
+ 
+  Date | Event | Hometask
  :-: |:---- |:----------------
- 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) | |
- 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) | |
- 24<br/>Feb | **_No lecture_** | • Use the time slot to progress with your tasks |
- 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) | |
- 10<br/>Mar | **_No lecture_** | • Use the time slot to progress with your tasks |
- 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) | |
- 24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) | |
  31<br/>Mar | **L16: Virtual memory** | |
  
  
@@ -71,6 +76,7 @@ Year | Name | Score | Comments
 2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 **2017/2018** | Alexander Timofeev | 3 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 **2017/2018** | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
+**2017/2018** | Andrew Sultan | + 2 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282) |
 **2017/2018** | Yan Logovskiy | 2 | [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92) |
 **2017/2018** | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
