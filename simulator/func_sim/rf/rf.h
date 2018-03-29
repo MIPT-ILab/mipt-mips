@@ -30,7 +30,7 @@ class RF
 
     // We have to put a separate function with 'if constexpr' here as Visual Studio
     // produces a false positive warning in a case of RegDstUInt == uint32
-    // (shifting uint32 left by 32 is an undefined behavior)
+    // (shifting uint32 right by 32 is an undefined behavior)
     // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
     static RegDstUInt get_hi_part( RegDstUInt value)
     {
