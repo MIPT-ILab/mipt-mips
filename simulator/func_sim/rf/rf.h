@@ -28,10 +28,17 @@ class RF
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
+    // We have to put a separate function here as Visual Studio has a false positive
+    // in a case of RegDstUInt == uint32.
+    // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
     static RegDstUInt get_hi_part( RegDstUInt value)
     {
         if constexpr( HAS_WIDE_DST)
             return value >> 32;
+
+        // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
+        // Wrong warning with unused-but-set-parameter within 'if constexpr'
+        (void)(value); 
         return 0;
     }
 
