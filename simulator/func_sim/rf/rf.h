@@ -21,6 +21,7 @@ class RF
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
     using RegDstUInt = typename ISA::RegDstUInt;
+    static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 32;
 
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
@@ -35,8 +36,6 @@ class RF
     }
 
 protected:
-    static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 32;
-
     auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
