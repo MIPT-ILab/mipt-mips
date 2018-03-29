@@ -65,8 +65,8 @@ protected:
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, static_cast<uint64>( val) >> 32);
-            write( Register::mips_lo, val);
+            write( Register::mips_hi, static_cast<uint128>(val) >> 64);
+            write( Register::mips_lo, static_cast<uint64>(val));
             return;
         }
  

@@ -15,6 +15,7 @@
 
 // MIPT-MIPS modules
 #include <infra/types.h>
+#include <infra/wide_types.h>
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
@@ -23,10 +24,11 @@
 inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
 
-inline uint32 count_zeros(uint32 value)
+template <typename T, size_t N>
+inline T count_zeros(T value)
 {
-    uint32_t count = 0;
-    for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
+    T count = 0;
+    for ( T i = N; i > 0; i >>= 1)
     {
         if ( ( value & i) != 0)
            break;
@@ -44,13 +46,13 @@ uint64 mips_multiplication(T x, T y) {
 }
 
 template<typename T>
-uint64 mips_division(T x, T y) {
+uint128 mips_division(T x, T y) {
     using T64 = doubled_t<T>;
     if (y == 0)
         return 0;
     auto x1 = static_cast<T64>(x);
     auto y1 = static_cast<T64>(y);
-    return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32);
+    return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
 }
 
 class MIPSInstr
@@ -157,9 +159,9 @@ class MIPSInstr
         MIPSRegister dst = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
-        uint32 v_src1 = NO_VAL32;
-        uint32 v_src2 = NO_VAL32;
-        uint64 v_dst = NO_VAL64;
+        uint64 v_src1 = NO_VAL64;
+        uint64 v_src2 = NO_VAL64;
+        uint128 v_dst = NO_VAL64;
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -205,26 +207,43 @@ class MIPSInstr
         bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
         bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
 
-        void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
-        void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
-        void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
+        template <typename T>
+        void execute_add()   { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
 
-        void execute_addu()  { v_dst = v_src1 + v_src2; }
-        void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
+        template <typename UT, typename T>
+        void execute_sub()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) - static_cast<T>( v_src2)); }
+        template <typename T>
+        void execute_addi()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( sign_extend( v_imm)); }
+
+        template <typename T>
+        void execute_addu()  { v_dst = static_cast<T>( v_src1) + static_cast<T>( v_src2); }
+        template <typename T>
+        void execute_subu()  { v_dst = static_cast<T>( v_src1) - static_cast<T>( v_src2); }
+        template <typename UT, typename T>
+        void execute_addiu() { v_dst = static_cast<UT>(static_cast<T>(v_src1) + static_cast<T>( sign_extend(v_imm))); }
 
         void execute_mult()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
         void execute_multu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
         void execute_div()   { v_dst = mips_division<int32>(v_src1, v_src2); }
         void execute_divu()  { v_dst = mips_division<uint32>(v_src1, v_src2); }
         void execute_move()  { v_dst = v_src1; }
-
-        void execute_sll()   { v_dst = v_src1 << shamt; }
+       
+        template <typename T>    
+        void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
+        void execute_dsll32() { v_dst = v_src1 << (shamt + 32); }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; }
-        void execute_sllv()  { v_dst = v_src1 << v_src2; }
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
+      
+        template <typename T, typename UT>
+        void execute_sra()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> shamt); }
+        void execute_dsra32() { v_dst = v_src1 >> (shamt + 32); }       
+        void execute_sllv()  { v_dst = static_cast<uint32>( v_src1) << v_src2; }
+        void execute_dsllv()  { v_dst = v_src1 << v_src2; }
+        template <typename T>
+        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> static_cast<T>( v_src2); }
+        void execute_dsrl()   { v_dst = v_src1 >> shamt; }
+        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32); }
+        template <typename T, typename UT>
+        void execute_srav()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> static_cast<UT>( v_src2)); }
         void execute_lui()   { v_dst = sign_extend( v_imm) << 0x10; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
@@ -253,9 +272,10 @@ class MIPSInstr
             if ( _is_jump_taken)
                 new_PC += sign_extend( v_imm) << 2;
         }
-
-        void execute_clo() { v_dst = count_zeros( ~v_src1); }
-        void execute_clz() { v_dst = count_zeros(  v_src1); }
+        void execute_clo()  { v_dst = count_zeros<uint32,         0x80000000>( ~v_src1); }
+        void execute_clz()  { v_dst = count_zeros<uint32,         0x80000000>(  v_src1); }
+        void execute_dclo() { v_dst = count_zeros<uint64, 0x8000000000000000>( ~v_src1); }
+        void execute_dclz() { v_dst = count_zeros<uint64, 0x8000000000000000>(  v_src1); }
 
         void execute_jump( Addr target)
         {
@@ -350,12 +370,12 @@ class MIPSInstr
         Addr get_new_PC() const { return new_PC; }
         Addr get_PC() const { return PC; }
 
-        void set_v_dst(uint32 value); // for loads
-        uint32 get_v_src2() const { return v_src2; } // for stores
+        void set_v_dst(uint64 value); // for loads
+        uint64 get_v_src2() const { return v_src2; } // for stores
 
-        uint64 get_bypassing_data() const
+        uint128 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst;
+            return ( dst.is_mips_hi()) ? v_dst << 64 : v_dst; 
         }
 
         void execute();
