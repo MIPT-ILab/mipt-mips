@@ -29,7 +29,7 @@ class RF
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
     // We have to put a separate function here as Visual Studio has a false positive
-    // in a case of RegDstUInt == uint32.
+    // warning in a case of RegDstUInt == uint32 (shift left by 32 is an UB)
     // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
     static RegDstUInt get_hi_part( RegDstUInt value)
     {
