@@ -177,7 +177,7 @@ typename ISA::RegDstUInt DataBypass<ISA>::adapt_bypassed_data( const BypassComma
     auto adapted_data = bypassed_data;
 
     if ( register_num.is_mips_hi())
-        adapted_data >>= 64;
+        adapted_data >>= 32;
             
     return adapted_data;
 }

@@ -61,8 +61,10 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x19, { "multu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_multu, 1} },
     {0x1A, { "div",   OUT_R_DIVMULT, 0, &MIPSInstr::execute_div,   1} },
     {0x1B, { "divu",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_divu,  1} },
-
-    // 0x1C - 0x1F double width multiplication/division
+    {0x1C, { "dmult", OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmult,  64} },
+    {0x1D, { "dmultu",OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmultu, 64} },
+    {0x1E, { "ddiv",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddiv,    3} },
+    {0x1F, { "ddivu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddivu,    3} },
 
     // Addition/Subtraction
     //key      name   operation  memsize           pointer
@@ -478,12 +480,12 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint64>( v_dst >> 64) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
 
-        oss << " = 0x" << static_cast<uint64>( v_dst) << " ]";
+        oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
         disasm += oss.str();
     }
 }

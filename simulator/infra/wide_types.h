@@ -25,7 +25,6 @@ using uint128 = unsigned __int128;
 #else // __SIZEOF_INT128__
 
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/integer.hpp>
 using int128 = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
 
