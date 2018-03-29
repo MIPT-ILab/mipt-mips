@@ -28,13 +28,17 @@ class RF
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
-    // We have to put a separate function here as Visual Studio has a false positive
-    // warning in a case of RegDstUInt == uint32 (shift left by 32 is an UB)
+    // We have to put a separate function with 'if constexpr' here as Visual Studio
+    // produces a false positive warning in a case of RegDstUInt == uint32
+    // (shifting uint32 left by 32 is an undefined behavior)
     // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
     static RegDstUInt get_hi_part( RegDstUInt value)
     {
+        // Clang-Tidy generates a false positive 'misc-suspicious-semicolon' warning
+        // on `if constexpr ()` with template
+        // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr( HAS_WIDE_DST)
-            return value >> 32;
+            return value >> 32; // NOLINT
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
