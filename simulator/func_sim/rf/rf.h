@@ -9,7 +9,6 @@
 
 #include <array>
 #include <infra/types.h>
-#include <infra/wide_types.h>
 #include <infra/macro.h>
 
 #include <cassert>

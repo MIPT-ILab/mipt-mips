@@ -7,11 +7,10 @@
 #ifndef RISC_V_H_
 #define RISC_V_H_
 
+#include <infra/types.h>
 #include <infra/instrcache/instr_cache_memory.h>
-#include <infra/wide_types.h>
-#include "riscv_instr.h"
 
-class MyType { }; // Dummy type to treat the file as C++
+#include "riscv_instr.h"
 
 template <typename T>
 struct RISCV

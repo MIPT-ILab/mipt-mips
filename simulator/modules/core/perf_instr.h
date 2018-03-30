@@ -7,7 +7,7 @@
 #define PERF_INSTR_H
 
 #include <infra/types.h>
-#include <bpu/bp_interface.h>
+#include <modules/fetch/bpu/bp_interface.h>
 
 template <typename FuncInstr>
 class PerfInstr : public FuncInstr

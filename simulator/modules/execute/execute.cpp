@@ -15,9 +15,9 @@ Execute<ISA>::Execute( bool log) : Log( log)
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
-    rps_command[0] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    rps_command[0] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                            PORT_LATENCY);
-    rps_command[1] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    rps_command[1] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                            PORT_LATENCY);
 
     wp_bypass = make_write_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
@@ -96,7 +96,7 @@ void Execute<ISA>::clock( Cycle cycle)
             const auto bypass_command = rps_command[src_index]->read( cycle);
 
             /* get a port which should be used for bypassing and receive data */
-            const auto bypass_direction = BypassingUnit::get_bypass_direction( bypass_command);
+            const auto bypass_direction = bypass_command.get_bypass_direction();
             const auto data = rps_sources_bypass[src_index][bypass_direction]->read( cycle);
 
             /* ignoring all other ports for a source register */
@@ -107,7 +107,7 @@ void Execute<ISA>::clock( Cycle cycle)
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = BypassingUnit::adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = bypass_command.adapt_bypassed_data( data);
 
             instr.set_v_src( adapted_data, src_index);
         }

@@ -7,11 +7,8 @@
 #ifndef MEM_H
 #define MEM_H
 
-
 #include <infra/ports/ports.h>
-#include <core/perf_instr.h>
-#include <bpu/bpu.h>
-
+#include <modules/core/perf_instr.h>
 
 template <typename ISA>
 class Mem : public Log
