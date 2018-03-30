@@ -146,11 +146,11 @@ class BPFactory {
 
 public:
     BPFactory() :
-        map({ { std::string("static_always_taken"),   new BPCreator<BPEntryAlwaysTaken>},
-              { std::string("static_backward_jumps"), new BPCreator<BPEntryBackwardJumps>},
-              { std::string("dynamic_one_bit"),       new BPCreator<BPEntryOneBit>},
-              { std::string("dynamic_two_bit"),       new BPCreator<BPEntryTwoBit>},
-              { std::string("adaptive_two_level"),    new BPCreator<BPEntryAdaptive<2>>}
+        map({ { std::string("static_always_taken"),   std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryAlwaysTaken>)},
+              { std::string("static_backward_jumps"), std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryBackwardJumps>)},
+              { std::string("dynamic_one_bit"),       std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryOneBit>)},
+              { std::string("dynamic_two_bit"),       std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryTwoBit>)},
+              { std::string("adaptive_two_level"),    std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryAdaptive<2>>)}
             })
     { }
 
