@@ -23,7 +23,7 @@ class FuncSim : public Simulator
     private:
         std::unique_ptr<RF<ISA>> rf;
         Addr PC = NO_VAL32;
-        Memory* mem = nullptr;
+        std::unique_ptr<Memory> mem = nullptr;
 
         uint64 nops_in_a_row = 0;
         void update_nop_counter( const FuncInstr& instr);
