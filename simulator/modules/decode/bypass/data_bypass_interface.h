@@ -9,6 +9,7 @@
 #define DATA_BYPASS_INTERFACE_H
 
 #include <infra/types.h>
+#include <infra/macro.h>
 
 class RegisterStage
 {
