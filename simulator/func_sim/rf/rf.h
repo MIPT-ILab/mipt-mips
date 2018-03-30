@@ -34,11 +34,8 @@ class RF
     // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
     static RegDstUInt get_hi_part( RegDstUInt value)
     {
-        // Clang-Tidy generates a false positive 'misc-suspicious-semicolon' warning
-        // on `if constexpr ()` with template
-        // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr( HAS_WIDE_DST)
-            return value >> 32u; // NOLINT(misc-suspicious-semicolon)
+            return value >> 32u;
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
