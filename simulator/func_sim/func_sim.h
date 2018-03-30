@@ -30,13 +30,6 @@ class FuncSim : public Simulator
 
     public:
         explicit FuncSim( bool log = false);
-        ~FuncSim() final;
-
-        // Rule of five
-        FuncSim( const FuncSim&) = delete;
-        FuncSim( FuncSim&&) = delete;
-        FuncSim operator=( const FuncSim&) = delete;
-        FuncSim operator=( FuncSim&&) = delete;
 
         void init( const std::string& tr);
         FuncInstr step();
