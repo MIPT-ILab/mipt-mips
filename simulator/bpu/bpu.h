@@ -164,7 +164,7 @@ public:
                  uint32 ways,
                  uint32 branch_ip_size_in_bits = 32) const
     {
-        auto it = map.find();
+        auto it = map.find( name);
         if ( it == map.end())
         {
              std::cerr << "ERROR. Invalid branch prediction mode " << name << std::endl
