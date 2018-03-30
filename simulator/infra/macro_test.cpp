@@ -11,10 +11,10 @@
 static char array[] = "Hello World!";
 static_assert(countof(array) == sizeof(array) / sizeof(char));
 
-static_assert(is_power_of_two(1));
-static_assert(is_power_of_two(2));
-static_assert(is_power_of_two(4));
-static_assert(!is_power_of_two(5));
+static_assert(is_power_of_two(1u));
+static_assert(is_power_of_two(2u));
+static_assert(is_power_of_two(4u));
+static_assert(!is_power_of_two(5u));
 
 static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
 static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));

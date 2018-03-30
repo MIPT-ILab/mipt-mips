@@ -26,7 +26,8 @@ private:
     using View_t = std::basic_string_view<CharT, Traits>;
     using String_t = std::basic_string<CharT, Traits>;
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init) We don't want to initialize arena
+    // We don't want to initialize arena here, so suppress ClangTidy
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     struct InternalString {
         using SizeType = typename boost::uint_t<sizeof(CharT) * 8>::exact;
         static_assert(sizeof(SizeType) == sizeof(CharT));

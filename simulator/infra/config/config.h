@@ -69,7 +69,8 @@ public:
 
     RequiredValue<T>() = delete;
 
-    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    // Converter is implicit intentionally, so bypass Clang-Tidy check
+    // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
     
     friend std::ostream& operator<<( std::ostream& out, const RequiredValue& rhs)

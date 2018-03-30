@@ -21,8 +21,8 @@
 
 #include "mips_register/mips_register.h"
 
-inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
-inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
+inline int32  sign_extend(int16 v)  { return static_cast<int32>(v); }
+inline uint32 zero_extend(uint16 v) { return static_cast<uint32>(v); }
 
 template <typename T, size_t N>
 inline T count_zeros(T value)
@@ -276,7 +276,15 @@ class MIPSInstr
         template <typename T, typename UT>
         void execute_srav()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> static_cast<UT>( v_src2)); }
         void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm) << 0x10); }
-
+/*
+=======
+        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_sllv()  { v_dst = v_src1 << v_src2; }
+        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
+        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
+>>>>>>> upstream/master
+*/
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -301,7 +309,7 @@ class MIPSInstr
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
+                new_PC += sign_extend( v_imm) * 4;
         }
         void execute_clo()  { v_dst = count_zeros<uint32,         0x80000000>( ~v_src1); }
         void execute_clz()  { v_dst = count_zeros<uint32,         0x80000000>(  v_src1); }
@@ -314,9 +322,9 @@ class MIPSInstr
             new_PC = target;
         }
 
-        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
         void execute_jr() { execute_jump(align_up<2>(v_src1)); }
-        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2)); }
+        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
         void execute_jalr() { v_dst = new_PC; execute_jump(align_up<2>(v_src1)); }
 
         template<Predicate p>
@@ -326,7 +334,7 @@ class MIPSInstr
             if ( _is_jump_taken)
             {
                 v_dst = new_PC;
-                new_PC += sign_extend( v_imm) << 2;
+                new_PC += sign_extend( v_imm) * 4;
             }
         }
 
@@ -406,7 +414,7 @@ class MIPSInstr
 
         uint128 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 64 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 32u : v_dst;
         }
 
         void execute();
