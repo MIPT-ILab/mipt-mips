@@ -6,14 +6,15 @@
  */
 
 #include <infra/macro.h>
+#include <infra/wide_types.h>
  
 static char array[] = "Hello World!";
 static_assert(countof(array) == sizeof(array) / sizeof(char));
 
-static_assert(is_power_of_two(1));
-static_assert(is_power_of_two(2));
-static_assert(is_power_of_two(4));
-static_assert(!is_power_of_two(5));
+static_assert(is_power_of_two(1u));
+static_assert(is_power_of_two(2u));
+static_assert(is_power_of_two(4u));
+static_assert(!is_power_of_two(5u));
 
 static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
 static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));
@@ -22,11 +23,13 @@ static_assert(bitwidth<int8> == 8);
 static_assert(bitwidth<int16> == 16);
 static_assert(bitwidth<int32> == 32);
 static_assert(bitwidth<int64> == 64);
+static_assert(bitwidth<int128> == 128);
 
 static_assert(bitwidth<uint8> == 8);
 static_assert(bitwidth<uint16> == 16);
 static_assert(bitwidth<uint32> == 32);
 static_assert(bitwidth<uint64> == 64);
+static_assert(bitwidth<uint128> == 128);
 
 static_assert(std::is_same_v<uint8,  unsign_t<int8>>);
 static_assert(std::is_same_v<uint16, unsign_t<int16>>);

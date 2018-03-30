@@ -11,12 +11,6 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF<ISA>) { }
 
 template <typename ISA>
-FuncSim<ISA>::~FuncSim()
-{
-    delete mem;
-}
-
-template <typename ISA>
 void FuncSim<ISA>::update_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
 {
     if ( instr.is_nop())
@@ -63,8 +57,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    assert( mem == nullptr);
-    mem = new Memory( tr);
+    mem.reset( new Memory( tr));
     PC = mem->startPC();
     nops_in_a_row = 0;
 }

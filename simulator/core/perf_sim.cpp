@@ -35,10 +35,10 @@ template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr,
                     uint64 instrs_to_run)
 {
-    memory = new Memory( tr);
-    fetch.set_memory( memory);
+    memory.reset( new Memory( tr));
+    fetch.set_memory( memory.get());
     decode.set_RF( rf.get());
-    mem.set_memory( memory);
+    mem.set_memory( memory.get());
     writeback.set_instrs_to_run( instrs_to_run);
     writeback.set_RF( rf.get());
     writeback.init_checker( tr);

@@ -183,8 +183,8 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     //       0x2F   cache
 
     // Advanced loads and stores
-    {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr, 1} },
-    {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
+    {0x30, { "ll",  OUT_I_LOAD,   4, &MIPSInstr::calculate_load_addr, 2} },
+    {0x38, { "sc",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 2} },
 };
 
 const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
@@ -192,11 +192,11 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     // ********************* MIPS32 INSTRUCTIONS *************************
     //SPECIAL 2
     //key     name    operation  memsize      pointer       mips version
-    {0x00, { "madd",  OUT_R_ACCUM,   0, &MIPSInstr::execute_madd,    32} },
-    {0x01, { "maddu", OUT_R_ACCUM,   0, &MIPSInstr::execute_maddu,   32} },
+    {0x00, { "madd",  OUT_R_ACCUM,   0, &MIPSInstr::execute_mult,    32} },
+    {0x01, { "maddu", OUT_R_ACCUM,   0, &MIPSInstr::execute_multu,   32} },
     {0x02, { "mul",   OUT_R_ARITHM,  0, &MIPSInstr::execute_mult,    32} },
-    {0x04, { "msub",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
-    {0x05, { "msubu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_unknown, 32} },
+    {0x04, { "msub",  OUT_R_SUBTR,   0, &MIPSInstr::execute_mult,    32} },
+    {0x05, { "msubu", OUT_R_SUBTR,   0, &MIPSInstr::execute_multu,   32} },
     {0x20, { "clz",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz,     32} },
     {0x21, { "clo",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo,     32} },
 };
@@ -279,6 +279,7 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
             dst  = MIPSRegister::mips_lo;
             oss <<  " $" << src1;
             break;
+        case OUT_R_SUBTR:
         case OUT_R_ACCUM:
         case OUT_R_DIVMULT:
             src2 = MIPSRegister(instr.asR.rt);
@@ -459,7 +460,7 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32u) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
