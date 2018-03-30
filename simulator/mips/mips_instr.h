@@ -47,15 +47,37 @@ uint128 mips_multiplication(T x, T y) {
 
 template<typename T>
 uint128 mips_division(T x, T y) {
-    using T64 = doubled_t<T>;
+    //using T64 = doubled_t<T>;
     if (y == 0)
         return 0;
-    auto x1 = static_cast<T64>(x);
-    auto y1 = static_cast<T64>(y);
+    //auto x1 = static_cast<T>(x);
+    //auto y1 = static_cast<T>(y);
+
+    using UT = doubled_t<T>; 
+    //std::cout << static_cast<UT>(x) / static_cast<UT>(y) << "  " << static_cast<UT>(x) % static_cast<UT>(y) << std::endl;
+    //const uint128 hi = static_cast<uint32>((static_cast<int32>(x) % static_cast<int32>(y))) & 0x000000000000000000000000ffffffff;
+    //const uint64 lo = static_cast<uint32>((static_cast<int32>(x) / static_cast<int32>(y))) & 0x00000000ffffffff;
+   
+    const uint128 hi = ((static_cast<uint32>(static_cast<UT>(x) % static_cast<UT>(y))) & 0x000000000000000000000000ffffffff);
+    const auto lo = static_cast<uint32>((static_cast<UT>(x) / static_cast<UT>(y))) & 0x00000000ffffffff;
+    
+    const uint64 hi1 = static_cast<uint32>((static_cast<UT>(x) % static_cast<UT>(y))) & 0x00000000ffffffff;
+
+    std::cout << hi1 << "   " << lo << std::endl;
+    
+    return (hi << 64) | lo;
+
+    /*
+    const auto hi = static_cast<uint64>(x / y);
+    const auto lo = static_cast<uint64>(x % y) & (((1) << 64) - 1);
+    return (hi << 64) | lo;
+    */
+    /*
     if ( sizeof(T) == 4)
-        return static_cast<uint64>(static_cast<uint32>(x1 / y1)) | (static_cast<uint64>(static_cast<uint32>(x1 % y1)) << 32);
+        return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
     else
-        return static_cast<uint128>(static_cast<uint64>(x1 / y1)) | (static_cast<uint128>(static_cast<uint64>(x1 % y1)) << 64);
+        return static_cast<uint128>(static_cast<uint64>(x / y)) | (static_cast<uint128>(static_cast<uint64>(x % y)) << 64);
+    */
 }
 
 class MIPSInstr
@@ -72,6 +94,7 @@ class MIPSInstr
             OUT_R_JUMP,
             OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
+            OUT_R_SUBTR,
             OUT_R_TRAP,
             OUT_R_MFLO,
             OUT_R_MTLO,
@@ -193,7 +216,9 @@ class MIPSInstr
 
         // Predicate helpers - binary
         bool eq()  const { return v_src1 == v_src2; }
-        bool ne()  const { return v_src1 != v_src2; }
+        bool ne()  const { 
+        //    std::cout << static_cast<int64>( v_src1) << "    " << static_cast<int64>( v_src2) << std::endl;
+            return static_cast<int64>( v_src1) != static_cast<int64>( v_src2); }
         bool geu() const { return v_src1 >= v_src2; }
         bool ltu() const { return v_src1 <  v_src2; }
         bool ge()  const { return static_cast<int32>( v_src1) >= static_cast<int32>( v_src2); }
@@ -250,7 +275,7 @@ class MIPSInstr
         void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32); }
         template <typename T, typename UT>
         void execute_srav()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> static_cast<UT>( v_src2)); }
-        void execute_lui()    { v_dst = sign_extend( v_imm) << 0x10; }
+        void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm) << 0x10); }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -282,9 +307,6 @@ class MIPSInstr
         void execute_clz()  { v_dst = count_zeros<uint32,         0x80000000>(  v_src1); }
         void execute_dclo() { v_dst = count_zeros<uint64, 0x8000000000000000>( ~v_src1); }
         void execute_dclz() { v_dst = count_zeros<uint64, 0x8000000000000000>(  v_src1); }
-
-        void execute_madd()  { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_maddu() { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
 
         void execute_jump( Addr target)
         {
@@ -346,7 +368,10 @@ class MIPSInstr
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
                                        operation == OUT_I_LOADL; }
-        bool is_accumulating_instr() const { return operation == OUT_R_ACCUM; }
+        int8 is_accumulating_instr() const
+        {
+            return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
+        }
         bool is_store() const { return operation == OUT_I_STORE  ||
                                        operation == OUT_I_STORER ||
                                        operation == OUT_I_STOREL; }
@@ -361,7 +386,7 @@ class MIPSInstr
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 
-        void set_v_src( uint32 value, uint8 index)
+        void set_v_src( uint64 value, uint8 index)
         {
             if ( index == 0)
                 v_src1 = value;
@@ -379,9 +404,9 @@ class MIPSInstr
         void set_v_dst(uint64 value); // for loads
         uint64 get_v_src2() const { return v_src2; } // for stores
 
-        uint64 get_bypassing_data() const
+        uint128 get_bypassing_data() const
         {
-            return ( dst.is_mips_hi()) ? v_dst << 32 : v_dst; 
+            return ( dst.is_mips_hi()) ? v_dst << 64 : v_dst; 
         }
 
         void execute();
