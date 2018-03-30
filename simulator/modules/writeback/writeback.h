@@ -8,7 +8,7 @@
 
 #include <infra/ports/ports.h>
 #include <func_sim/func_sim.h>
-#include <core/perf_instr.h>
+#include <modules/core/perf_instr.h>
 
 template <typename ISA>
 class Writeback : public Log
