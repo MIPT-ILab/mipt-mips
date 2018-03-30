@@ -147,7 +147,7 @@ class BPFactory {
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static auto generate_map() {
         decltype(map) my_map;
-        my_map.emplace("static_always_taken",   new BPCreator<BPEntryAlwaysTaken>>);
+        my_map.emplace("static_always_taken",   new BPCreator<BPEntryAlwaysTaken>);
         my_map.emplace("static_backward_jumps", new BPCreator<BPCreator<BPEntryBackwardJumps>);
         my_map.emplace("dynamic_one_bit",       new BPCreator<BPCreator<BPEntryOneBit>);
         my_map.emplace("dynamic_two_bit",       new BPCreator<BPCreator<BPEntryTwoBit>);
