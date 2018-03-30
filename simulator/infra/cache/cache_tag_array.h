@@ -24,6 +24,7 @@ class LRUCacheInfo
 
         void touch( std::size_t way);
         std::size_t update();
+        std::size_t get_ways() const { return ways; }
 
     private:
         std::list<std::size_t> lru_list{};
