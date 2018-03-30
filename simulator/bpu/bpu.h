@@ -144,15 +144,19 @@ class BPFactory {
 
     const std::map<std::string, std::unique_ptr<BaseBPCreator>> map;
 
+    // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
+    static auto generate_map() {
+        decltype(map) my_map;
+        my_map.emplace("static_always_taken",   new BPCreator<BPEntryAlwaysTaken>>);
+        my_map.emplace("static_backward_jumps", new BPCreator<BPCreator<BPEntryBackwardJumps>);
+        my_map.emplace("dynamic_one_bit",       new BPCreator<BPCreator<BPEntryOneBit>);
+        my_map.emplace("dynamic_two_bit",       new BPCreator<BPCreator<BPEntryTwoBit>);
+        my_map.emplace("adaptive_two_level",    new BPCreator<<BPEntryAdaptive<2>>);
+        return my_map;
+    }
+
 public:
-    BPFactory() :
-        map({ { std::string("static_always_taken"),   std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryAlwaysTaken>)},
-              { std::string("static_backward_jumps"), std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryBackwardJumps>)},
-              { std::string("dynamic_one_bit"),       std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryOneBit>)},
-              { std::string("dynamic_two_bit"),       std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryTwoBit>)},
-              { std::string("adaptive_two_level"),    std::unique_ptr<BaseBPCreator>(new BPCreator<BPEntryAdaptive<2>>)}
-            })
-    { }
+    BPFactory() : map( generate_map()) { }
 
     auto create( const std::string& name,
                  uint32 size_in_entries,
