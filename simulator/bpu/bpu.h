@@ -151,7 +151,7 @@ class BPFactory {
         my_map.emplace("static_backward_jumps", new BPCreator<BPCreator<BPEntryBackwardJumps>);
         my_map.emplace("dynamic_one_bit",       new BPCreator<BPCreator<BPEntryOneBit>);
         my_map.emplace("dynamic_two_bit",       new BPCreator<BPCreator<BPEntryTwoBit>);
-        my_map.emplace("adaptive_two_level",    new BPCreator<<BPEntryAdaptive<2>>);
+        my_map.emplace("adaptive_two_level",    new BPCreator<BPEntryAdaptive<2>>);
         return my_map;
     }
 
