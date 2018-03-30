@@ -5,51 +5,14 @@
  * Copyright 2018 MIPT-MIPS Project
  */
 
-
 #ifndef DATA_BYPASS_H
 #define DATA_BYPASS_H
 
-
 #include <array>
 
-#include <core/perf_instr.h>
+#include <modules/core/perf_instr.h>
 
-
-class RegisterStage
-{
-    public:
-        constexpr explicit RegisterStage( uint8 value) : value( value) { }
-
-        auto operator==( const RegisterStage& rhs) const { return value == rhs.value; }
-        explicit operator uint8() const { return value; }
-
-        void inc() { ++value; }
-
-        static constexpr const uint8 BYPASSING_STAGES_NUMBER = 3;        
-        static constexpr RegisterStage in_RF() { return RegisterStage( IN_RF_STAGE_VALUE); }
-
-        auto is_writeback() const { return value == WRITEBACK_STAGE_VALUE; }
-
-    private:
-        uint8 value = 0;  // distance from first execute stage
-                
-        // EXECUTE   - 0  | Bypassing stage
-        // MEMORY    - 1  | Bypassing stage
-        // WRITEBACK - 2  | Bypassing stage
-        // IN_RF     - MAX_VAL8
-
-        static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
-        static constexpr const uint8 WRITEBACK_STAGE_VALUE = 2;
-};
-
-
-// NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
-inline auto operator""_RSG( unsigned long long int number)
-{
-    return RegisterStage( static_cast<uint8>( number));
-}
-
-
+#include "data_bypass_interface.h"
 
 template <typename ISA>
 class DataBypass
@@ -60,22 +23,6 @@ class DataBypass
     using RegDstUInt = typename ISA::RegDstUInt;
 
     public:
-        class BypassCommand
-        {
-            public:
-                BypassCommand( RegisterStage bypassing_stage, Register register_num)
-                    : bypassing_stage( bypassing_stage)
-                    , register_num( register_num)
-                { }
-
-                auto get_bypassing_stage() const { return bypassing_stage; }
-                auto get_register_num() const { return register_num; }
-
-            private:
-                const RegisterStage bypassing_stage;
-                const Register register_num;
-        };
-
         // checks whether the source register of passed instruction is in RF  
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
@@ -102,19 +49,8 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand( get_current_stage( reg_num), reg_num);
+            return BypassCommand<Register>( get_current_stage( reg_num), reg_num);
         }
-
-        // returns an index of the port where bypassed data should be get from
-        // in accordance with passed bypass command
-        static uint8 get_bypass_direction( const BypassCommand& bypass_command)
-        {
-            const auto bypassing_stage = bypass_command.get_bypassing_stage();
-            return static_cast<uint8>( bypassing_stage);
-        }
-
-        // transforms bypassed data if needed in accordance with passed bypass command
-        static RegDstUInt adapt_bypassed_data( const BypassCommand& bypass_command, RegDstUInt bypassed_data);
 
         // introduces new instruction to bypassing unit
         void trace_new_instr( const Instr& instr);
@@ -166,22 +102,6 @@ class DataBypass
             entry.is_traced = false; 
         }
 };
-
-
-
-template <typename ISA>
-typename ISA::RegDstUInt DataBypass<ISA>::adapt_bypassed_data( const BypassCommand& bypass_command, RegDstUInt bypassed_data)
-{
-    const auto register_num = bypass_command.get_register_num();
-
-    auto adapted_data = bypassed_data;
-
-    if ( register_num.is_mips_hi())
-        adapted_data >>= 32;
-            
-    return adapted_data;
-}
-
 
 template <typename ISA>
 void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
@@ -262,7 +182,5 @@ void DataBypass<ISA>::untrace_instr( const Instr& instr)
 
     untrace_register( dst_reg_num);
 }
-
-
 
 #endif // DATA_BYPASS_H
