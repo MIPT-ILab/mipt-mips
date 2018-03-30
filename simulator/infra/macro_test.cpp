@@ -6,8 +6,7 @@
  */
 
 #include <infra/macro.h>
-#include <infra/wide_types.h>
- 
+
 static char array[] = "Hello World!";
 static_assert(countof(array) == sizeof(array) / sizeof(char));
 
