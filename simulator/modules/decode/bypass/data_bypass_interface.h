@@ -63,6 +63,7 @@ public:
     template <typename T>
     T adapt_bypassed_data( T data) const
     {
+        // NOLINTNEXTLINE(misc-suspicious-semicolon) https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr(bitwidth<T> > 32) {
             if ( register_num.is_mips_hi())
                 data >>= 32u;
