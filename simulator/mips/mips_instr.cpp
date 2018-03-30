@@ -460,7 +460,7 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32u) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;

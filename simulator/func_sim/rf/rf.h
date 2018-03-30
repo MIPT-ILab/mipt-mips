@@ -38,7 +38,7 @@ class RF
         // on `if constexpr ()` with template
         // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr( HAS_WIDE_DST)
-            return value >> 32; // NOLINT
+            return value >> 32u; // NOLINT(misc-suspicious-semicolon)
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
@@ -57,8 +57,8 @@ protected:
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
         const auto hi = static_cast<RegDstUInt>( read( Register::mips_hi));
-        const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & ((RegDstUInt(1) << 32) - 1);
-        return (hi << 32) | lo;
+        const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & ((RegDstUInt(1) << 32u) - 1);
+        return (hi << 32u) | lo;
     }
 
     // Makes no sense if output is 32 bit
