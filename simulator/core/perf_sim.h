@@ -28,12 +28,11 @@ class PerfSim : public Simulator
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
 
-private:
     Cycle curr_cycle = 0_Cl;
 
     /* simulator units */
     std::unique_ptr<RF<ISA>> rf = nullptr;
-    Memory* memory = nullptr;
+    std::unique_ptr<Memory> memory = nullptr;
     Fetch<ISA> fetch;
     Decode<ISA> decode;
     Execute<ISA> execute;
