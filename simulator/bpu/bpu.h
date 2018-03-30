@@ -142,15 +142,16 @@ class BPFactory {
         BPCreator() = default;
     };
 
-    const std::map<std::string, std::unique_ptr<BaseBPCreator>> map;
+    using Map = std::map<std::string, std::unique_ptr<BaseBPCreator>>;
+    const Map map;
 
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
-    static auto generate_map() {
-        decltype(map) my_map;
+    static Map generate_map() {
+        Map my_map;
         my_map.emplace("static_always_taken",   new BPCreator<BPEntryAlwaysTaken>);
-        my_map.emplace("static_backward_jumps", new BPCreator<BPCreator<BPEntryBackwardJumps>);
-        my_map.emplace("dynamic_one_bit",       new BPCreator<BPCreator<BPEntryOneBit>);
-        my_map.emplace("dynamic_two_bit",       new BPCreator<BPCreator<BPEntryTwoBit>);
+        my_map.emplace("static_backward_jumps", new BPCreator<BPEntryBackwardJumps>);
+        my_map.emplace("dynamic_one_bit",       new BPCreator<BPEntryOneBit>);
+        my_map.emplace("dynamic_two_bit",       new BPCreator<BPEntryTwoBit>);
         my_map.emplace("adaptive_two_level",    new BPCreator<BPEntryAdaptive<2>>);
         return my_map;
     }
@@ -163,7 +164,8 @@ public:
                  uint32 ways,
                  uint32 branch_ip_size_in_bits = 32) const
     {
-        if ( map.find(name) == map.end())
+        auto it = map.find();
+        if ( it == map.end())
         {
              std::cerr << "ERROR. Invalid branch prediction mode " << name << std::endl
                        << "Supported modes:" << std::endl;
@@ -173,7 +175,7 @@ public:
              std::exit( EXIT_FAILURE);
         }
 
-        return map.at( name)->create( size_in_entries, ways, branch_ip_size_in_bits);
+        return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);
     }
 };
 
