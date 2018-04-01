@@ -21,7 +21,7 @@ public:
 
     void inc() { ++value; }
 
-    static constexpr const uint8 BYPASSING_STAGES_NUMBER = 3;
+    static constexpr const uint8 BYPASSING_STAGES_NUMBER = 4;
     static constexpr RegisterStage in_RF() { return RegisterStage(IN_RF_STAGE_VALUE); }
 
     auto is_writeback() const { return value == WRITEBACK_STAGE_VALUE; }
@@ -29,13 +29,15 @@ public:
 private:
     uint8 value = 0;  // distance from first execute stage
 
-                      // EXECUTE   - 0  | Bypassing stage
-                      // MEMORY    - 1  | Bypassing stage
-                      // WRITEBACK - 2  | Bypassing stage
-                      // IN_RF     - MAX_VAL8
+    // EXECUTE_0  - 0 | Bypassing stage
+    // EXECUTE_1  - 1
+    // EXECUTE_2  - 2 | Bypassing stage
+    // MEMORY     - 3 | Bypassing stage
+    // WRITEBACK  - 4 | Bypassing stage
+    // IN_RF      - MAX_VAL8
 
     static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
-    static constexpr const uint8 WRITEBACK_STAGE_VALUE = 2;
+    static constexpr const uint8 WRITEBACK_STAGE_VALUE = 4;
 };
 
 // NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
@@ -58,7 +60,11 @@ public:
 
     // returns an index of the port where bypassed data should be get from
     // in accordance with passed bypass command
-    auto get_bypass_direction() const { return static_cast<uint8>( get_bypassing_stage()); }
+    auto get_bypass_direction() const
+    {
+        const auto bypass_direction = static_cast<uint8>( bypassing_stage);
+        return ( bypassing_stage == 0_RSG) ? bypass_direction : bypass_direction - 1; 
+    }
 
     template <typename T>
     T adapt_bypassed_data( T data) const

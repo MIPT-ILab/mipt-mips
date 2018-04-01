@@ -22,6 +22,23 @@ public:
     BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_jump_taken(), this->get_new_PC()); }
 
     auto is_bypassible() const { return !this->is_conditional_move() && !this->is_accumulating_instr(); }
+    
+    auto is_complex_arithmetic() const { return this->is_divmult(); }
+    auto is_mem_stage_required() const { return this->is_load()  ||
+                                                this->is_store() ||
+                                                this->is_jump()  ||
+                                                this->is_explicit_trap()  ||
+                                                this->is_special(); }
+    
+    auto get_cycles_till_writeback() const
+    {
+        if ( is_complex_arithmetic())
+            return 3_Cl;
+        else if ( is_mem_stage_required())
+            return 2_Cl;
+        else
+            return 1_Cl;
+    }
 };
 
 #endif // PERF_INSTR_H

@@ -25,6 +25,7 @@ class Cycle : public boost::totally_ordered<Cycle>
         constexpr auto operator<( const Cycle& rhs) const { return value < rhs.value; }
 
         constexpr void inc() { ++value; }
+        constexpr void dec() { if ( value) --value; }
         constexpr explicit operator double() const { return static_cast<double>( value); }
 
         constexpr uint64 operator%( uint64 number) const { return value % number; }

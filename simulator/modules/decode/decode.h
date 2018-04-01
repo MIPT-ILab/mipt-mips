@@ -36,14 +36,13 @@ class Decode : public Log
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
         
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
-        static constexpr const uint8 BYPASSING_UNIT_FLUSH_NOTIFIERS_NUM = 2;
 
         std::array<std::unique_ptr<WritePort<BypassCommand<Register>>>, SRC_REGISTERS_NUM> wps_command;
 
         std::unique_ptr<WritePort<Instr>> wp_bypassing_unit_notify = nullptr;
         std::unique_ptr<ReadPort<Instr>> rp_bypassing_unit_notify = nullptr;
 
-        std::array<std::unique_ptr<ReadPort<Instr>>, BYPASSING_UNIT_FLUSH_NOTIFIERS_NUM> rps_bypassing_unit_flush_notify;
+        std::unique_ptr<ReadPort<bool>> rp_bypassing_unit_flush_notify = nullptr;
         
         Instr read_instr( Cycle cycle);
 

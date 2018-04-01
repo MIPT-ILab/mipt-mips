@@ -35,7 +35,7 @@ class Mem : public Log
 
         std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
 
-        std::unique_ptr<WritePort<Instr>> wp_bypassing_unit_flush_notify = nullptr;
+        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
     
     public:
         explicit Mem( bool log);
