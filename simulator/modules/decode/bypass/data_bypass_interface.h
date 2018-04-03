@@ -76,7 +76,7 @@ public:
     auto get_bypass_direction() const
     {
         const auto bypassing_stage = get_bypassing_stage();
-        uint8 bypass_direction;
+        uint8 bypass_direction = 0;
 
         if ( bypassing_stage.is_first_execution_stage())
             bypass_direction = 0;
