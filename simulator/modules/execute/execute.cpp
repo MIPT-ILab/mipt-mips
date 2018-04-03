@@ -3,8 +3,13 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
+#include <infra/config/config.h>
 
 #include "execute.h"
+
+namespace config {
+    static Value<uint64> complex_alu_latency = { "complex-alu-latency", 3, "Latency of complex arithmetic logic unit"};  
+} // namespace config
 
 
 template <typename ISA>
@@ -14,8 +19,19 @@ Execute<ISA>::Execute( bool log) : Log( log)
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
+    if ( config::complex_alu_latency < 2)
+        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1"
+             << std::endl << critical;
+    
+    if ( config::complex_alu_latency > 64)
+        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64"
+             << std::endl << critical;
+    
+    RegisterStage::set_complex_arithmetic_latency_value( static_cast<uint8>( config::complex_alu_latency));
+
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
-    rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", COMPLEX_ALU_LATENCY);
+    rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
+                                                           RegisterStage::get_last_execution_stage_latency());
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
@@ -51,7 +67,7 @@ void Execute<ISA>::clock( Cycle cycle)
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
     
     /* update information about mispredictions */
-    saved_flush.update();
+    clock_saved_flush();
 
     /* branch misprediction */
     if ( is_flush)
@@ -73,7 +89,7 @@ void Execute<ISA>::clock( Cycle cycle)
                 port->ignore( cycle);
         }
 
-        saved_flush.set();
+        save_flush();
 
         sout << "flush\n";
         return;
@@ -85,7 +101,7 @@ void Execute<ISA>::clock( Cycle cycle)
     {
         auto instr = rp_long_latency_execution_unit->read( cycle);
 
-        if ( saved_flush.has_expired())
+        if ( has_flush_expired())
         {
             wp_complex_arithmetic_bypass->write( instr.get_bypassing_data(), cycle);
             wp_writeback_datapath->write( instr, cycle);

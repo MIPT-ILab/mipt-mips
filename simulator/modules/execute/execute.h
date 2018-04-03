@@ -20,7 +20,6 @@ class Execute : public Log
 
     private:   
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
-        static constexpr const Latency COMPLEX_ALU_LATENCY = 2_Lt;
 
         /* Inputs */
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
@@ -37,22 +36,16 @@ class Execute : public Log
         std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
         std::unique_ptr<WritePort<RegDstUInt>> wp_complex_arithmetic_bypass = nullptr;
 
-        class SavedFlushHandler
+        Latency flush_expiration_latency = 0_Lt;
+
+        void save_flush() { flush_expiration_latency = RegisterStage::get_last_execution_stage_latency(); }
+        void clock_saved_flush()
         {
-            public:
-                void set() 
-                { 
-                    cycles_till_expiration = cycles_till_expiration + COMPLEX_ALU_LATENCY; 
-                }
+            if ( !( flush_expiration_latency == 0_Lt))
+                flush_expiration_latency = flush_expiration_latency - 1_Lt;
+        }
+        auto has_flush_expired() const { return flush_expiration_latency == 0_Lt; }
 
-                auto has_expired() const { return cycles_till_expiration == 0_Cl; }
-                void update() { cycles_till_expiration.dec(); }
-
-            private:
-                Cycle cycles_till_expiration = 0_Cl;
-        };
-
-        SavedFlushHandler saved_flush;
 
     public:
         explicit Execute( bool log);

@@ -27,7 +27,7 @@ class DataBypass
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return get_entry( reg_num).current_stage == RegisterStage::in_RF();
+            return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether the source register of passed instruction is bypassible
@@ -40,12 +40,11 @@ class DataBypass
         // checks if the stall needed for passed instruction
         auto is_stall( const Instr& instr) const
         {
-            // add 1_Lt taking into account the fact that is_stall is invoked on the Decode stage
-            const auto cycles_till_writeback = instr.get_cycles_till_writeback() + 1_Lt;
-
+            const auto instruction_latency = instr.get_instruction_latency();
+    
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
-                    ( cycles_till_writeback <= writeback_stage_info.cycles_till_busy));
+                    ( instruction_latency < writeback_stage_info.operation_latency));
         }
 
         // returns bypass command for passed instruction and its source register
@@ -68,59 +67,36 @@ class DataBypass
     private:
         struct RegisterInfo
         {
-            private:
-                class PipelineRoute
+            RegisterStage current_stage;
+            RegisterStage ready_stage;
+            RegisterStage next_stage_after_first_execution_stage;
+            bool is_bypassible = false;
+            bool is_traced = false;
+
+            void change_current_stage()
+            {
+                if ( current_stage.is_first_execution_stage())
                 {
-                    public:
-                        void set( const Instr& instr)
-                        {
-                            if ( instr.is_complex_arithmetic())
-                                route_tag = 2; // COMPLEX_ARITHMETIC_ROUTE
-                            else if ( instr.is_mem_stage_required())
-                                route_tag = 1; // MEM_STAGE_ROUTE
-                            else 
-                                route_tag = 0; // SIMPLE_ROUTE
-                        }
-
-                        auto is_simple_route() const { return route_tag == 0; }
-                        auto is_mem_stage_route() const { return route_tag == 1; }
-                        auto is_complex_arithmetic_route() const { return route_tag == 2; }
-                    
-                    private:
-                        uint8 route_tag;
-                };
-
-            public:
-                RegisterStage current_stage = RegisterStage::in_RF();
-                RegisterStage ready_stage = RegisterStage::in_RF();
-                PipelineRoute pipeline_route;
-                bool is_bypassible = false;
-                bool is_traced = false;
-
-                void set_pipeline_route( const Instr& instr) { pipeline_route.set( instr); }
-                void change_current_stage()
-                {
-                    if ( current_stage == 0_RSG) // EXECUTE_0
-                    {
-                        if ( pipeline_route.is_complex_arithmetic_route())
-                            current_stage = 1_RSG; // EXECUTE_1
-                        else if ( pipeline_route.is_mem_stage_route())
-                            current_stage = 3_RSG; // MEM
-                        else 
-                            current_stage = 4_RSG; // WRITEBACK
-                    }
-                    else if ( current_stage == 2_RSG) // EXECUTE_2
-                    {
-                        current_stage = 4_RSG; // WRITEBACK
-                    }
-                    else
-                        current_stage.inc();
+                    current_stage = next_stage_after_first_execution_stage;
                 }
+                else if ( current_stage.is_last_execution_stage())
+                {
+                    current_stage.set_to_writeback();
+                }
+                else
+                    current_stage.inc();
+            }
         };
 
         struct FuncUnitInfo
         {
-            Cycle cycles_till_busy = 0_Cl;
+            Latency operation_latency = 0_Lt;
+
+            void update()
+            {
+                if ( !( operation_latency == 0_Lt))
+                    operation_latency = operation_latency - 1_Lt;
+            }
         };
 
         std::array<RegisterInfo, Register::MAX_REG> scoreboard = {};
@@ -152,22 +128,30 @@ void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
 {
     auto& entry = get_entry( num);
 
-    entry.current_stage = 0_RSG; // first execute stage
+    entry.current_stage.set_to_first_execution_stage();
+    entry.ready_stage.set_to_first_execution_stage();
 
-    entry.set_pipeline_route( instr);
 
+    if ( instr.is_complex_arithmetic())
+    {
+        entry.ready_stage.set_to_last_execution_stage();
 
-    if ( !instr.is_bypassible()) {
-        entry.ready_stage = RegisterStage::in_RF();
+        entry.next_stage_after_first_execution_stage.set_to_first_execution_stage();
+        entry.next_stage_after_first_execution_stage.inc();
     }
-    else if ( instr.is_complex_arithmetic()) {
-        entry.ready_stage = 2_RSG;  // EXECUTE_2
-    }
-    else if ( instr.is_load()) {
-        entry.ready_stage = 3_RSG;  // MEMORY
+    else if ( instr.is_mem_stage_required())
+    {
+        entry.next_stage_after_first_execution_stage.set_to_mem_stage();
+
+        if ( instr.is_load())
+            entry.ready_stage.set_to_mem_stage();
     }
     else
-        entry.ready_stage = 0_RSG;  // EXECUTE_0
+        entry.next_stage_after_first_execution_stage.set_to_writeback();
+
+
+    if ( !instr.is_bypassible())
+        entry.ready_stage.set_to_in_RF();
 
 
     entry.is_bypassible = ( entry.current_stage == entry.ready_stage);
@@ -180,7 +164,7 @@ void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
 
-    writeback_stage_info.cycles_till_busy = instr.get_cycles_till_writeback();
+    writeback_stage_info.operation_latency = instr.get_instruction_latency();
 
     if ( dst_reg_num.is_zero())
         return;
@@ -205,7 +189,7 @@ void DataBypass<ISA>::update()
         {
             if ( entry.current_stage.is_writeback())
             {
-                entry.current_stage = RegisterStage::in_RF();
+                entry.current_stage.set_to_in_RF();
                 entry.is_bypassible = false;
                 entry.is_traced = false;
             }
@@ -219,7 +203,7 @@ void DataBypass<ISA>::update()
         }
     }
 
-    writeback_stage_info.cycles_till_busy.dec();
+    writeback_stage_info.update();
 }
 
 
@@ -230,13 +214,13 @@ void DataBypass<ISA>::handle_flush()
     {
         if ( entry.is_traced)
         {
-            entry.current_stage = RegisterStage::in_RF();
+            entry.current_stage.set_to_in_RF();
             entry.is_bypassible = false;
             entry.is_traced = false;
         }
     }
 
-    writeback_stage_info.cycles_till_busy = 0_Cl;
+    writeback_stage_info.operation_latency = 0_Lt;
 }
 
 #endif // DATA_BYPASS_H

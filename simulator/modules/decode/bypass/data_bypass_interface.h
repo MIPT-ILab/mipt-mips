@@ -9,42 +9,55 @@
 #define DATA_BYPASS_INTERFACE_H
 
 #include <infra/types.h>
+#include <infra/ports/timing.h>
 #include <infra/macro.h>
 
 class RegisterStage
 {
 public:
-    constexpr explicit RegisterStage(uint8 value) : value(value) { }
-
     auto operator==(const RegisterStage& rhs) const { return value == rhs.value; }
-    explicit operator uint8() const { return value; }
 
     void inc() { ++value; }
 
     static constexpr const uint8 BYPASSING_STAGES_NUMBER = 4;
-    static constexpr RegisterStage in_RF() { return RegisterStage(IN_RF_STAGE_VALUE); }
 
-    auto is_writeback() const { return value == WRITEBACK_STAGE_VALUE; }
+    static void set_complex_arithmetic_latency_value( uint8 value) 
+    { 
+        LAST_EXECUTION_STAGE_VALUE = value - 1;
+    }
+
+    // returns the latency between the first and the last execution stages
+    static auto get_last_execution_stage_latency()
+    {
+        return Latency( LAST_EXECUTION_STAGE_VALUE);
+    }
+
+    void set_to_first_execution_stage() { value = 0; }
+    void set_to_last_execution_stage() { value = LAST_EXECUTION_STAGE_VALUE; }
+    void set_to_mem_stage() { value = LAST_EXECUTION_STAGE_VALUE + 1; }
+    void set_to_writeback() { value = LAST_EXECUTION_STAGE_VALUE + 2; }
+    void set_to_in_RF() { value = IN_RF_STAGE_VALUE; }
+
+    auto is_first_execution_stage() const { return value == 0; }
+    auto is_last_execution_stage() const { return value == LAST_EXECUTION_STAGE_VALUE; }
+    auto is_mem_stage() const { return value == LAST_EXECUTION_STAGE_VALUE + 1; }
+    auto is_writeback() const { return value == LAST_EXECUTION_STAGE_VALUE + 2; }
+    auto is_in_RF() const { return value == IN_RF_STAGE_VALUE; }
 
 private:
-    uint8 value = 0;  // distance from first execute stage
+    uint8 value = IN_RF_STAGE_VALUE;
 
-    // EXECUTE_0  - 0 | Bypassing stage
-    // EXECUTE_1  - 1
-    // EXECUTE_2  - 2 | Bypassing stage
-    // MEMORY     - 3 | Bypassing stage
-    // WRITEBACK  - 4 | Bypassing stage
+    // EXECUTE_0  - 0                              | Bypassing stage
+    //  .......
+    // EXECUTE_N  - LAST_EXECUTION_STAGE_VALUE     | Bypassing stage
+    // MEM        - LAST_EXECUTION_STAGE_VALUE + 1 | Bypassing stage
+    // WRITEBACK  - LAST_EXECUTION_STAGE_VALUE + 2 | Bypassing stage
     // IN_RF      - MAX_VAL8
 
+    static uint8 LAST_EXECUTION_STAGE_VALUE;
     static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
-    static constexpr const uint8 WRITEBACK_STAGE_VALUE = 4;
 };
 
-// NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
-inline auto operator""_RSG(unsigned long long int number)
-{
-    return RegisterStage(static_cast<uint8>(number));
-}
 
 template<typename Register>
 class BypassCommand
@@ -62,8 +75,22 @@ public:
     // in accordance with passed bypass command
     auto get_bypass_direction() const
     {
-        const auto bypass_direction = static_cast<uint8>( bypassing_stage);
-        return ( bypassing_stage == 0_RSG) ? bypass_direction : bypass_direction - 1; 
+        const auto bypassing_stage = get_bypassing_stage();
+        uint8 bypass_direction;
+
+        if ( bypassing_stage.is_first_execution_stage())
+            bypass_direction = 0;
+
+        if ( bypassing_stage.is_last_execution_stage())
+            bypass_direction = 1;
+
+        if ( bypassing_stage.is_mem_stage())
+            bypass_direction = 2;
+
+        if ( bypassing_stage.is_writeback())
+            bypass_direction = 3;
+        
+        return bypass_direction;
     }
 
     template <typename T>
