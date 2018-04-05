@@ -7,8 +7,9 @@
 #define FETCH_H
 
 #include <infra/ports/ports.h>
-#include <core/perf_instr.h>
-#include <bpu/bpu.h>
+#include <modules/core/perf_instr.h>
+
+#include "bpu/bpu.h"
  
 template <typename ISA>
 class Fetch : public Log

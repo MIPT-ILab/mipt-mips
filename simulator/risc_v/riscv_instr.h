@@ -84,7 +84,11 @@ class RISCVInstr
 
         constexpr bool is_bubble() const { return false; }
 
+        constexpr bool is_muldiv() const { return false; }
+
         constexpr int8 is_accumulating_instr() const { return 0; }
+
+        constexpr bool is_32() const { return false; }
 
         void set_v_src( const T& value, uint8 index)
         {

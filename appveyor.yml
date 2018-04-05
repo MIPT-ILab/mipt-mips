@@ -1,5 +1,5 @@
 version: "{branch}-ci-{build}"
-image: Previous Visual Studio 2017
+image: Visual Studio 2017
 
 branches:
   only:
@@ -10,14 +10,14 @@ environment:
   #- build: msvc
   #  platform: x86
   #  MINGW_ROOT: C:\msys64\mingw32
-  #  BOOST_ROOT: C:\Libraries\boost_1_65_1
+  #  BOOST_ROOT: C:\Libraries\boost_1_66_0
   #  LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
   #  MINGW_ARCH: i686
   #  CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
     MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\Libraries\boost_1_65_1
+    BOOST_ROOT: C:\Libraries\boost_1_66_0
     LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
     MINGW_ARCH: x86_64
     CMAKEFILE: "Visual Studio 15 Win64"

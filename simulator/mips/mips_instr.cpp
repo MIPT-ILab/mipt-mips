@@ -103,7 +103,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x3B, { "dsra"   , OUT_R_SHAMT, 0, &MIPSInstr::execute_sra<int64, uint64>,    4} },
     {0x3C, { "dsll32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsll32,                4} },
     {0x3E, { "dsrl32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsrl32,                4} },
-    {0x3F, { "dsra32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsra32,                4} }  
+    {0x3F, { "dsra32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsra32,                4} }
 };
 
 //unordered map for RI-instructions
@@ -173,7 +173,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     {0x18, { "daddi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_addi<int64>,  1} },
     {0x19, { "daddiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_addiu<uint64, int64>, 1} },
-    
+
     // Loads
     //key     name  operation  memsize       pointer
     {0x20, { "lb",  OUT_I_LOAD,  1, &MIPSInstr::calculate_load_addr, 1} },
@@ -198,7 +198,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     // Advanced loads and stores
     {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr,  1} },
-    
+
     {0x37, { "ld",  OUT_I_LOAD,   8, &MIPSInstr::calculate_load_addr,  3} },
     {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
 
@@ -482,7 +482,6 @@ void MIPSInstr::execute()
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
             oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint64>( v_dst >> 64) << ", $"
-     //       oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32u) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
@@ -498,10 +497,10 @@ void MIPSInstr::set_v_dst( uint64 value)
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = static_cast<int32>( static_cast<int8>( value)); break;
-            case 2: v_dst = static_cast<int32>( static_cast<int16>( value)); break;
+            case 1: v_dst = static_cast<uint32>( static_cast<int8>( value)); break;
+            case 2: v_dst = static_cast<uint32>( static_cast<int16>( value)); break;
             case 4: v_dst = static_cast<uint32>( value); break;
-            case 8: v_dst = static_cast<int64>( value); break;
+            case 8: v_dst = static_cast<uint64>( value); break;
             default: assert( false);
         }
     }

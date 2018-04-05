@@ -23,17 +23,17 @@ set(CPPS infra/macro_test.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
-    fetch/fetch.cpp
-    decode/decode.cpp
-    execute/execute.cpp
-    mem/mem.cpp
-    core/perf_sim.cpp
+    modules/fetch/fetch.cpp
+    modules/decode/decode.cpp
+    modules/execute/execute.cpp
+    modules/mem/mem.cpp
+    modules/core/perf_sim.cpp
+    modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp
     simulator.cpp
-    writeback/writeback.cpp
     )
 
 set(TESTS
@@ -52,14 +52,14 @@ set(TESTS
 # Test RISCV
     risc_v/riscv_register
 # Test units
-    bpu
+    modules/fetch/bpu
 # Overall tests
     func_sim
-    core
+    modules/core
     )
 
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /D_HAS_AUTO_PTR_ETC=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /std:c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /std:c++17")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
     set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")

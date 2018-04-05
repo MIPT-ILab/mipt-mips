@@ -5,7 +5,6 @@
 
 #include "decode.h"
 
-
 template <typename ISA>
 Decode<ISA>::Decode( bool log) : Log( log)
 {
@@ -19,11 +18,11 @@ Decode<ISA>::Decode( bool log) : Log( log)
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
-    wps_command[0] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                             PORT_BW, PORT_FANOUT);
-    wps_command[1] = make_write_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                             PORT_BW, PORT_FANOUT);
-    
+
     wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
 
@@ -31,7 +30,7 @@ Decode<ISA>::Decode( bool log) : Log( log)
                                                                PORT_LATENCY);
     rps_bypassing_unit_flush_notify[1] = make_read_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY",
                                                                PORT_LATENCY);
-    
+
     bypassing_unit = std::make_unique<BypassingUnit>();
 }
 
@@ -96,12 +95,12 @@ void Decode<ISA>::clock( Cycle cycle)
     auto instr = read_instr( cycle);
 
     if ( bypassing_unit->is_stall( instr))
-    {   
+    {
         // data hazard, stalling pipeline
         wp_stall->write( true, cycle);
         wp_stall_datapath->write( instr, cycle);
         sout << instr << " (data hazard)\n";
-        return;   
+        return;
     }
 
     for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)

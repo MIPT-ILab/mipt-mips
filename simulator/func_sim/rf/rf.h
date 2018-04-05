@@ -9,7 +9,6 @@
 
 #include <array>
 #include <infra/types.h>
-#include <infra/wide_types.h>
 #include <infra/macro.h>
 
 #include <cassert>
@@ -21,11 +20,10 @@ class RF
     using Register = typename ISA::Register;
     //using RegisterUInt = typename ISA::RegisterUInt;
     //using RegDstUInt = typename ISA::RegDstUInt;
-    
+
     using RegisterUInt = uint64;
     using RegDstUInt = uint128;
     static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 64;
-
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
@@ -35,28 +33,29 @@ class RF
     // produces a false positive warning in a case of RegDstUInt == uint32
     // (shifting uint32 right by 32 is an undefined behavior)
     // See: https://developercommunity.visualstudio.com/content/problem/225040/c4293-false-positive-on-unreacheable-code.html
-    static RegDstUInt get_hi_part( RegDstUInt value)
+    static RegDstUInt get_hi_part( RegDstUInt value, bool is32)
     {
         // Clang-Tidy generates a false positive 'misc-suspicious-semicolon' warning
         // on `if constexpr ()` with template
         // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr( HAS_WIDE_DST) {
+            if(is32) return value >> 32;
             return value >> 64; //NOLINT
         }
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
-        (void)(value); 
+        (void)(value);
         return 0;
     }
-
 protected:
+
     auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_value( num);
     }
-    
+
     template <typename U = RegDstUInt>
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
@@ -73,11 +72,11 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0)
+    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0, bool is32 = false)
     {
         if ( num.is_zero())
             return;
-        
+
         // Hacks for MIPS madds/msubs
         if ( accumulating_instr == 1)
             val = read_hi_lo() + val;
@@ -86,19 +85,24 @@ protected:
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            std::cout << static_cast<uint64>(get_hi_part(val)) << std::endl;
-            std::cout << static_cast<uint64>(val) << std::endl;
-
-            write( Register::mips_hi, get_hi_part( val));
-            write( Register::mips_lo, val);
-            return;
+            if(is32) {
+                write( Register::mips_hi, get_hi_part( val, is32));
+                write( Register::mips_lo, static_cast<uint32>( val));
+                return;
+            }
+            else {
+                write( Register::mips_hi, get_hi_part( val, is32));
+                write( Register::mips_lo, val);
+                return;
+            }
         }
- 
+
         // No hacks
         get_value( num) = val;
     }
 
 public:
+
     RF() = default;
 
     inline void read_source( FuncInstr* instr, uint8 index) const
@@ -117,10 +121,12 @@ public:
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
         auto accumulating_instr = instr.is_accumulating_instr();
+        bool is32 = false;
+        if(instr.is_32()) is32 = true;
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr);
+            write( reg_num, instr.get_v_dst(), accumulating_instr, is32);
         else
-            write( reg_num, read(reg_num), accumulating_instr);
+            write( reg_num, read(reg_num), accumulating_instr, is32);
     }
 };
 

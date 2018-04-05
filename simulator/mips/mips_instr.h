@@ -15,7 +15,6 @@
 
 // MIPT-MIPS modules
 #include <infra/types.h>
-#include <infra/wide_types.h>
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
@@ -42,42 +41,28 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 uint128 mips_multiplication(T x, T y) {
-    return static_cast<uint128>(x) * static_cast<uint128>(y);
+    return static_cast<uint64>(x) * static_cast<uint64>(y);
 }
 
 template<typename T>
 uint128 mips_division(T x, T y) {
-    //using T64 = doubled_t<T>;
+    using T64 = doubled_t<T>;
     if (y == 0)
         return 0;
-    //auto x1 = static_cast<T>(x);
-    //auto y1 = static_cast<T>(y);
+    auto x1 = static_cast<T64>(x);
+    auto y1 = static_cast<T64>(y);
+/*
+    using UT = doubled_t<T>;
 
-    using UT = doubled_t<T>; 
-    //std::cout << static_cast<UT>(x) / static_cast<UT>(y) << "  " << static_cast<UT>(x) % static_cast<UT>(y) << std::endl;
-    //const uint128 hi = static_cast<uint32>((static_cast<int32>(x) % static_cast<int32>(y))) & 0x000000000000000000000000ffffffff;
-    //const uint64 lo = static_cast<uint32>((static_cast<int32>(x) / static_cast<int32>(y))) & 0x00000000ffffffff;
-   
     const uint128 hi = ((static_cast<uint32>(static_cast<UT>(x) % static_cast<UT>(y))) & 0x000000000000000000000000ffffffff);
-    const auto lo = static_cast<uint32>((static_cast<UT>(x) / static_cast<UT>(y))) & 0x00000000ffffffff;
-    
-    const uint64 hi1 = static_cast<uint32>((static_cast<UT>(x) % static_cast<UT>(y))) & 0x00000000ffffffff;
+    const auto lo = static_cast<uint32>((static_cast<UT>(x) / static_cast<UT>(y))) & 0x000000000000000000000000ffffffff;
 
-    std::cout << hi1 << "   " << lo << std::endl;
-    
     return (hi << 64) | lo;
-
-    /*
-    const auto hi = static_cast<uint64>(x / y);
-    const auto lo = static_cast<uint64>(x % y) & (((1) << 64) - 1);
-    return (hi << 64) | lo;
-    */
-    /*
+*/
     if ( sizeof(T) == 4)
         return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
     else
-        return static_cast<uint128>(static_cast<uint64>(x / y)) | (static_cast<uint128>(static_cast<uint64>(x % y)) << 64);
-    */
+        return static_cast<uint128>(static_cast<uint64>(x1 / y1)) | (static_cast<uint128>(static_cast<uint64>(x1 % y1)) << 64);
 }
 
 class MIPSInstr
@@ -196,6 +181,8 @@ class MIPSInstr
         bool writes_dst = true;
         bool _is_jump_taken = false;      // actual result
 
+        bool is32 = false;
+
         Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
@@ -216,9 +203,7 @@ class MIPSInstr
 
         // Predicate helpers - binary
         bool eq()  const { return v_src1 == v_src2; }
-        bool ne()  const { 
-        //    std::cout << static_cast<int64>( v_src1) << "    " << static_cast<int64>( v_src2) << std::endl;
-            return static_cast<int64>( v_src1) != static_cast<int64>( v_src2); }
+        bool ne()  const { return v_src1 != v_src2; }
         bool geu() const { return v_src1 >= v_src2; }
         bool ltu() const { return v_src1 <  v_src2; }
         bool ge()  const { return static_cast<int32>( v_src1) >= static_cast<int32>( v_src2); }
@@ -249,8 +234,8 @@ class MIPSInstr
         template <typename UT, typename T>
         void execute_addiu() { v_dst = static_cast<UT>(static_cast<T>(v_src1) + static_cast<T>( sign_extend(v_imm))); }
 
-        void execute_mult()   { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_multu()  { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_mult()   { is32 = true; v_dst = mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_multu()  { is32 = true; v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
         void execute_dmult()  { v_dst = mips_multiplication<int64>(v_src1, v_src2); }
         void execute_dmultu() { v_dst = mips_multiplication<uint64>(v_src1, v_src2); }
         void execute_div()    { v_dst = mips_division<int32>(v_src1, v_src2); }
@@ -258,15 +243,15 @@ class MIPSInstr
         void execute_divu()   { v_dst = mips_division<uint32>(v_src1, v_src2); }
         void execute_ddivu()  { v_dst = mips_division<uint64>(v_src1, v_src2); }
         void execute_move()   { v_dst = v_src1; }
-       
-        template <typename T>    
+
+        template <typename T>
         void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
         void execute_dsll32() { v_dst = v_src1 << (shamt + 32); }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-      
+
         template <typename T, typename UT>
         void execute_sra()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> shamt); }
-        void execute_dsra32() { v_dst = v_src1 >> (shamt + 32); }       
+        void execute_dsra32() { v_dst = v_src1 >> (shamt + 32); }
         void execute_sllv()  { v_dst = static_cast<uint32>( v_src1) << v_src2; }
         void execute_dsllv()  { v_dst = v_src1 << v_src2; }
         template <typename T>
@@ -288,7 +273,7 @@ class MIPSInstr
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-        void execute_nor()   { v_dst = ~static_cast<uint64>(v_src1 | v_src2); }
+        void execute_nor()   { v_dst = ~static_cast<uint32>(v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
@@ -392,7 +377,11 @@ class MIPSInstr
 
         bool get_writes_dst() const { return writes_dst; }
 
+        bool is_muldiv() const { return operation == OUT_R_DIVMULT; }
+
         bool is_bubble() const { return is_nop() && PC == 0; }
+
+        bool is_32() const { return is32; }
 
         void set_v_src( uint64 value, uint8 index)
         {
@@ -402,7 +391,7 @@ class MIPSInstr
                 v_src2 = value;
         }
 
-        uint64 get_v_dst() const { return v_dst; }
+        uint128 get_v_dst() const { return v_dst; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }

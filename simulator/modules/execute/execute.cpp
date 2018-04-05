@@ -15,9 +15,9 @@ Execute<ISA>::Execute( bool log) : Log( log)
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
-    rps_command[0] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    rps_command[0] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                            PORT_LATENCY);
-    rps_command[1] = make_read_port<typename BypassingUnit::BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    rps_command[1] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                            PORT_LATENCY);
 
     wp_bypass = make_write_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
@@ -33,7 +33,7 @@ Execute<ISA>::Execute( bool log) : Log( log)
 
     wp_bypassing_unit_flush_notify = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH_NOTIFY",
                                                             PORT_BW, PORT_FANOUT);
-}    
+}
 
 
 template <typename ISA>
@@ -51,7 +51,7 @@ void Execute<ISA>::clock( Cycle cycle)
         if ( rp_datapath->is_ready( cycle))
         {
             const auto& instr = rp_datapath->read( cycle);
-            
+
             /* notifying bypassing unit about invalid instruction */
             wp_bypassing_unit_flush_notify->write( instr, cycle);
         }
@@ -59,14 +59,14 @@ void Execute<ISA>::clock( Cycle cycle)
         /* ignoring information from command ports */
         for ( auto& port:rps_command)
             port->ignore( cycle);
-        
+
         /* ignoring all bypassed data for source registers */
         for ( auto& rps_src_ports:rps_sources_bypass)
         {
             for ( auto& port:rps_src_ports)
                 port->ignore( cycle);
         }
-        
+
         sout << "flush\n";
         return;
     }
@@ -89,25 +89,25 @@ void Execute<ISA>::clock( Cycle cycle)
 
 
     for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
-    {   
-        /* check whether bypassing is needed for a source register */ 
+    {
+        /* check whether bypassing is needed for a source register */
         if ( rps_command[src_index]->is_ready( cycle))
         {
             const auto bypass_command = rps_command[src_index]->read( cycle);
 
             /* get a port which should be used for bypassing and receive data */
-            const auto bypass_direction = BypassingUnit::get_bypass_direction( bypass_command);
+            const auto bypass_direction = bypass_command.get_bypass_direction();
             const auto data = rps_sources_bypass[src_index][bypass_direction]->read( cycle);
 
             /* ignoring all other ports for a source register */
             for ( uint8 i = 0; i < RegisterStage::BYPASSING_STAGES_NUMBER; i++)
-            {    
+            {
                 if ( i != bypass_direction)
                     rps_sources_bypass[src_index][i]->ignore( cycle);
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = BypassingUnit::adapt_bypassed_data( bypass_command, data);
+            const auto adapted_data = bypass_command.adapt_bypassed_data( data);
 
             instr.set_v_src( adapted_data, src_index);
         }
@@ -118,11 +118,11 @@ void Execute<ISA>::clock( Cycle cycle)
                 port->ignore( cycle);
         }
     }
-    
+
 
     /* perform execution */
     instr.execute();
-    
+
     /* bypass data */
     wp_bypass->write( instr.get_bypassing_data(), cycle);
 

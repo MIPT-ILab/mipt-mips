@@ -5,7 +5,7 @@
  
 // Simulators
 #include <func_sim/func_sim.h>
-#include <core/perf_sim.h>
+#include <modules/core/perf_sim.h>
 
 // ISAs
 #include <mips/mips.h>
@@ -24,3 +24,4 @@ Simulator::create_simulator( const std::string& isa, bool functional_only, bool 
 
     return nullptr;
 }
+

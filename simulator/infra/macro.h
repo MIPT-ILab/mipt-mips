@@ -15,7 +15,6 @@
 #include <algorithm>
 
 #include <infra/types.h>
-#include <infra/wide_types.h>
 
 /* Returns size of a static array */
 template<typename T, size_t N>

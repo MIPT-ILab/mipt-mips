@@ -13,11 +13,11 @@
 
 #include <simulator.h>
 #include <infra/ports/ports.h>
-#include <fetch/fetch.h>
-#include <decode/decode.h>
-#include <execute/execute.h>
-#include <mem/mem.h>
-#include <writeback/writeback.h>
+#include <modules/fetch/fetch.h>
+#include <modules/decode/decode.h>
+#include <modules/execute/execute.h>
+#include <modules/mem/mem.h>
+#include <modules/writeback/writeback.h>
 
 #include "perf_instr.h"
 
