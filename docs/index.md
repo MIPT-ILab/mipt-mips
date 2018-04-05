@@ -46,9 +46,12 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  
 ### Term 4: Performing Multiple Tasks
  
-  Date | Event | Hometask
- :-: |:---- |:----------------
- 31<br/>Mar | **L16: Virtual memory** | |
+  Date | Event
+ :-: |:-------------------
+ 31<br/>Mar | **L16: Virtual memory** |
+ 07<br/>Apr | **L17: Multiprocessor and Multicore Systems** |
+ 14<br/>Apr | **L18: Simultaneous Multithreading** |
+ 21<br/>Apr | **Test 3**<br/> • Review **L11−L18** material |
  
  
 ### MSU Seminars
