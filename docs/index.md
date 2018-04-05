@@ -48,7 +48,7 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  
   Date | Event
  :-: |:-------------------
- 31<br/>Mar | **L16: Virtual memory** |
+ 31<br/>Mar | **L16: Virtual memory**<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_16__31_Mar__Virtual_Memory__Eng_text__No_audio.pptx?raw=true) |
  07<br/>Apr | **L17: Multiprocessor and Multicore Systems** |
  14<br/>Apr | **L18: Simultaneous Multithreading** |
  21<br/>Apr | **Test 3**<br/> • Review **L11−L18** material |
