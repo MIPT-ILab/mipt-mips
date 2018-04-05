@@ -2,7 +2,7 @@
  * mips.h - all the aliases to MIPS ISA
  * @author Aleksandr Misevich
  * Copyright 2018 MIPT-MIPS
- */ 
+ */
 
 #ifndef MIPS_H_
 #define MIPS_H_

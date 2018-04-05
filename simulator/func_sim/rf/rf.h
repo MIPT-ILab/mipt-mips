@@ -18,11 +18,10 @@ class RF
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
-    //using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegDstUInt = uint128;
     //using RegDstUInt = typename ISA::RegDstUInt;
 
-    using RegisterUInt = uint64;
-    using RegDstUInt = uint128;
     static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 64;
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
