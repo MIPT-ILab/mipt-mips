@@ -41,7 +41,14 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 uint128 mips_multiplication(T x, T y) {
-    return static_cast<uint64>(x) * static_cast<uint64>(y);
+    if( sizeof(T) == 4) {
+        uint64 val = static_cast<uint64>(x) * static_cast<uint64>(y);
+        uint64 lo = static_cast<uint64>( static_cast<uint32>( val));
+        uint128 hi = static_cast<uint128>( static_cast<uint64>( val) >> 32);
+        return (hi << 64) | lo;
+
+    }
+    else return static_cast<uint128>(x) * static_cast<uint128>(y);
 }
 
 template<typename T>
@@ -51,14 +58,6 @@ uint128 mips_division(T x, T y) {
         return 0;
     auto x1 = static_cast<T64>(x);
     auto y1 = static_cast<T64>(y);
-/*
-    using UT = doubled_t<T>;
-
-    const uint128 hi = ((static_cast<uint32>(static_cast<UT>(x) % static_cast<UT>(y))) & 0x000000000000000000000000ffffffff);
-    const auto lo = static_cast<uint32>((static_cast<UT>(x) / static_cast<UT>(y))) & 0x000000000000000000000000ffffffff;
-
-    return (hi << 64) | lo;
-*/
     if ( sizeof(T) == 4)
         return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
     else
@@ -181,8 +180,6 @@ class MIPSInstr
         bool writes_dst = true;
         bool _is_jump_taken = false;      // actual result
 
-        bool is32 = false;
-
         Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
@@ -234,8 +231,8 @@ class MIPSInstr
         template <typename UT, typename T>
         void execute_addiu() { v_dst = static_cast<UT>(static_cast<T>(v_src1) + static_cast<T>( sign_extend(v_imm))); }
 
-        void execute_mult()   { is32 = true; v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_multu()  { is32 = true; v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_mult()   { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_multu()  { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
         void execute_dmult()  { v_dst = mips_multiplication<int64>(v_src1, v_src2); }
         void execute_dmultu() { v_dst = mips_multiplication<uint64>(v_src1, v_src2); }
         void execute_div()    { v_dst = mips_division<int32>(v_src1, v_src2); }
@@ -261,15 +258,7 @@ class MIPSInstr
         template <typename T, typename UT>
         void execute_srav()   { v_dst = static_cast<UT>( static_cast<T>( v_src1) >> static_cast<UT>( v_src2)); }
         void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm) << 0x10); }
-/*
-=======
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
-        void execute_sllv()  { v_dst = v_src1 << v_src2; }
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
-        void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
->>>>>>> upstream/master
-*/
+        
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -380,8 +369,6 @@ class MIPSInstr
         bool is_muldiv() const { return operation == OUT_R_DIVMULT; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
-
-        bool is_32() const { return is32; }
 
         void set_v_src( uint64 value, uint8 index)
         {
