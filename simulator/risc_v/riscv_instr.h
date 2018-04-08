@@ -86,6 +86,8 @@ class RISCVInstr
 
         constexpr int8 is_accumulating_instr() const { return 0; }
 
+        constexpr int8 is_loadlr() const { return 0; }
+
         void set_v_src( const T& value, uint8 index)
         {
             if ( index == 0)

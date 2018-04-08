@@ -41,9 +41,14 @@ class RF
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
-        (void)(value); 
+        (void)(value);
         return 0;
     }
+
+    uint32 mask[6] = {
+      0xFF000000, 0xFFFF0000, 0xFFFFFF00,
+      0x00FFFFFF, 0x0000FFFF, 0x000000FF
+    };
 
 protected:
     auto read( Register num) const
@@ -68,7 +73,7 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0)
+    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0, int8 loadlr = 0)
     {
         if ( num.is_zero())
             return;
@@ -79,13 +84,29 @@ protected:
         else if ( accumulating_instr == -1)
             val = read_hi_lo() - val;
 
+        if( loadlr)
+        {
+            if(loadlr > 0)
+            {
+                uint32 reg_val = static_cast<uint32>(get_value( num));
+                int8 shift = static_cast<int8>(val >> 24);
+                reg_val &= mask[shift - 1];
+                val &= mask[shift + 2];
+                val += reg_val;
+            }/*
+            else
+            {
+                // loadl execute
+            }*/
+        }
+
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
             write( Register::mips_hi, get_hi_part( val));
             write( Register::mips_lo, val);
             return;
         }
- 
+
         // No hacks
         get_value( num) = val;
     }
@@ -109,10 +130,11 @@ public:
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
         auto accumulating_instr = instr.is_accumulating_instr();
+        auto loadlr = instr.is_loadlr();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr);
+            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr);
         else
-            write( reg_num, read(reg_num), accumulating_instr);
+            write( reg_num, read(reg_num), accumulating_instr, loadlr);
     }
 };
 

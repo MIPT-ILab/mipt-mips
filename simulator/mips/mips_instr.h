@@ -317,6 +317,10 @@ class MIPSInstr
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
                                        operation == OUT_I_LOADL; }
+        int8 is_loadlr() const
+        {
+            return (operation == OUT_I_LOADR) ? 1 : (operation == OUT_I_LOADL) ? -1 : 0;
+        }
         int8 is_accumulating_instr() const
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
