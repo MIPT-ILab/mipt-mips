@@ -32,6 +32,7 @@ class RISCVInstr
 
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
+        RegisterUInt v_imm = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
 
         Addr mem_addr = NO_VAL32;
@@ -97,6 +98,7 @@ class RISCVInstr
         }
 
         auto get_v_dst() const { return v_dst; }
+        auto get_v_imm() const { return v_imm; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }

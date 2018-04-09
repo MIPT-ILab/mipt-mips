@@ -73,7 +73,7 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0, int8 loadlr = 0)
+    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0, int8 loadlr = 0, int32 offset = 0)
     {
         if ( num.is_zero())
             return;
@@ -88,11 +88,13 @@ protected:
         {
             if(loadlr > 0)
             {
-                uint32 reg_val = static_cast<uint32>(get_value( num)); // read register value
-                int8 shift = static_cast<int8>(val >> 24);             // find out the number of bytes that I should load
-                reg_val &= mask[shift - 1];                            // delete right bytes and save the rest
-                val &= mask[shift + 2];                                // delete left bytes and save the rest
-                val += reg_val;
+                if( offset %= 4)
+                {
+                    uint32 reg_val = static_cast<uint32>(get_value( num));
+                    reg_val &= mask[offset - 1];
+                    val &= mask[offset + 2];
+                    val += reg_val;
+                }
             }/*
             else
             {
@@ -131,8 +133,9 @@ public:
         bool writes_dst = instr.get_writes_dst();
         auto accumulating_instr = instr.is_accumulating_instr();
         auto loadlr = instr.is_loadlr();
+        auto offset = instr.get_v_imm();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr);
+            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, offset);
         else
             write( reg_num, read(reg_num), accumulating_instr, loadlr);
     }

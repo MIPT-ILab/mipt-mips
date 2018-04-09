@@ -348,6 +348,7 @@ class MIPSInstr
         }
 
         uint64 get_v_dst() const { return v_dst; }
+        uint32 get_v_imm() const { return v_imm; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
