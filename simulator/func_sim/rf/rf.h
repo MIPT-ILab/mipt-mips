@@ -56,7 +56,7 @@ protected:
         assert( !num.is_mips_hi_lo());
         return get_value( num);
     }
-    
+
     template <typename U = RegDstUInt>
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
@@ -88,10 +88,10 @@ protected:
         {
             if(loadlr > 0)
             {
-                uint32 reg_val = static_cast<uint32>(get_value( num));
-                int8 shift = static_cast<int8>(val >> 24);
-                reg_val &= mask[shift - 1];
-                val &= mask[shift + 2];
+                uint32 reg_val = static_cast<uint32>(get_value( num)); // read register value
+                int8 shift = static_cast<int8>(val >> 24);             // find out the number of bytes that I should load
+                reg_val &= mask[shift - 1];                            // delete right bytes and save the rest
+                val &= mask[shift + 2];                                // delete left bytes and save the rest
                 val += reg_val;
             }/*
             else
