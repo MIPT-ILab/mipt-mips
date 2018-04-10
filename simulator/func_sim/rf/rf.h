@@ -79,13 +79,17 @@ protected:
         else if ( is_special == -1)
             val = read_hi_lo() - val;
 
-        if( is_special == 2) // lwr
+        if ( is_special == 2) // lwr
         {
             int8 i = 0;
             val &= mask;
-            while(!(mask & 0xFF) && i++ < 4)
-                val = static_cast<uint32>(val) >> 8;
-            mask >>= i*8;
+            for ( ; i < 4; i ++)                    // if mask starts with zeros we should move val and mask
+            {
+                if (( mask & 0xFF) != 0)
+                    break;
+                val = static_cast<uint32>(val) >> 8; // here we move val
+            }
+            mask >>= i*8;                            // here mask
             uint32 reg_val = static_cast<uint32>(get_value( num));
             reg_val &= ~mask;
             val += reg_val;
