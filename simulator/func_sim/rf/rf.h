@@ -45,11 +45,6 @@ class RF
         return 0;
     }
 
-    uint32 mask[6] = {
-      0xFF000000, 0xFFFF0000, 0xFFFFFF00,
-      0x00FFFFFF, 0x0000FFFF, 0x000000FF
-    };
-
 protected:
     auto read( Register num) const
     {
@@ -73,34 +68,33 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0, int8 loadlr = 0, int32 offset = 0)
+    void write( Register num, RegDstUInt val, int8 is_special = 0, uint32 mask = 0x0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
-        if ( accumulating_instr == 1)
+        if ( is_special == 1)
             val = read_hi_lo() + val;
-        else if ( accumulating_instr == -1)
+        else if ( is_special == -1)
             val = read_hi_lo() - val;
 
-        if( loadlr)
+        if( is_special == 2) // lwr
         {
-            if(loadlr > 0)
-            {
-                if( offset %= 4)
-                {
-                    uint32 reg_val = static_cast<uint32>(get_value( num));
-                    reg_val &= mask[offset - 1];
-                    val &= mask[offset + 2];
-                    val += reg_val;
-                }
-            }/*
+            int8 i = 0;
+            val &= mask;
+            while(!(mask & 0xFF) && i++ < 4)
+                val = static_cast<uint32>(val) >> 8;
+            mask >>= i*8;
+            uint32 reg_val = static_cast<uint32>(get_value( num));
+            reg_val &= ~mask;
+            val += reg_val;
+        }
+        /*
             else
             {
-                // loadl execute
+                // lwl execute
             }*/
-        }
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
@@ -131,13 +125,10 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
-        auto accumulating_instr = instr.is_accumulating_instr();
-        auto loadlr = instr.is_loadlr();
-        auto offset = instr.get_v_imm();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, offset);
+            write( reg_num, instr.get_v_dst(), instr.is_special_instr(), instr.get_lwrl_mask());
         else
-            write( reg_num, read(reg_num), accumulating_instr, loadlr);
+            write( reg_num, read(reg_num));
     }
 };
 
