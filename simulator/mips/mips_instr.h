@@ -321,10 +321,9 @@ class MIPSInstr
         {
             return (operation == OUT_I_LOADR) ? 1 : (operation == OUT_I_LOADL) ? -1 : 0;
         }
-        int8 is_special_instr() const
+        int8 is_accumulating_instr() const
         {
-            return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 :
-                   (operation == OUT_I_LOADR) ? 2 : (operation == OUT_I_LOADL) ? -2 : 0;
+            return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
         bool is_store() const { return operation == OUT_I_STORE  ||
                                        operation == OUT_I_STORER ||

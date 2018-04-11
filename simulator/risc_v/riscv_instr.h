@@ -85,7 +85,7 @@ class RISCVInstr
 
         constexpr bool is_bubble() const { return false; }
 
-        constexpr int8 is_special_instr() const { return 0; }
+        constexpr int8 is_accumulating_instr() const { return 0; }
 
         constexpr int8 is_loadlr() const { return 0; }
 

@@ -68,18 +68,18 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 is_special = 0, uint32 mask = 0x0)
+    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, uint32 mask = 0x0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
-        if ( is_special == 1)
+        if ( is_accumulating_instr == 1)
             val = read_hi_lo() + val;
-        else if ( is_special == -1)
+        else if ( is_accumulating_instr == -1)
             val = read_hi_lo() - val;
 
-        if ( is_special == 2) // lwr
+        if ( loadlr == 1) // lwr
         {
             int8 i = 0;
             val &= mask;
@@ -129,8 +129,11 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
+        auto accumulating_instr = instr.is_accumulating_instr();
+        auto loadlr = instr.is_loadlr();
+        auto lwrl_mask = instr.get_lwrl_mask();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), instr.is_special_instr(), instr.get_lwrl_mask());
+            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, lwrl_mask);
         else
             write( reg_num, read(reg_num));
     }
