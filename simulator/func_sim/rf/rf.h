@@ -89,9 +89,9 @@ protected:
                     break;
                 val = static_cast<uint32>(val) >> 8; // here we move val
             }
-            mask >>= i*8;                            // here mask
+            mask = static_cast<uint32>(mask >> i*8);                            // here mask
             uint32 reg_val = static_cast<uint32>(get_value( num));
-            reg_val &= ~mask;
+            reg_val &= static_cast<uint32>(~mask);
             val += reg_val;
         }
         /*
@@ -131,9 +131,8 @@ public:
         bool writes_dst = instr.get_writes_dst();
         auto accumulating_instr = instr.is_accumulating_instr();
         auto loadlr = instr.is_loadlr();
-        auto lwrl_mask = instr.get_lwrl_mask();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, lwrl_mask);
+            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, instr.get_lwrl_mask());
         else
             write( reg_num, read(reg_num));
     }
