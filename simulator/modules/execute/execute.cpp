@@ -3,15 +3,35 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
+#include <infra/config/config.h>
 
 #include "execute.h"
+
+namespace config {
+    static Value<uint64> complex_alu_latency = { "complex-alu-latency", 3, "Latency of complex arithmetic logic unit"};  
+} // namespace config
 
 
 template <typename ISA>
 Execute<ISA>::Execute( bool log) : Log( log)
 {
-    wp_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
+
+    if ( config::complex_alu_latency < 2)
+        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1"
+             << std::endl << critical;
+    
+    if ( config::complex_alu_latency > 64)
+        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64"
+             << std::endl << critical;
+    
+    RegisterStage::set_complex_arithmetic_latency_value( static_cast<uint8>( config::complex_alu_latency));
+
+    wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
+    rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
+                                                           RegisterStage::get_last_execution_stage_latency());
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
@@ -21,18 +41,20 @@ Execute<ISA>::Execute( bool log) : Log( log)
                                                                            PORT_LATENCY);
 
     wp_bypass = make_write_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_complex_arithmetic_bypass = make_write_port<RegDstUInt>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
+                                                               PORT_BW, SRC_REGISTERS_NUM);
 
     rps_sources_bypass[0][0] = make_read_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_sources_bypass[1][0] = make_read_port<RegDstUInt>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][1] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][1] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[0][1] = make_read_port<RegDstUInt>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][1] = make_read_port<RegDstUInt>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][2] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][2] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[0][2] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][2] = make_read_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    wp_bypassing_unit_flush_notify = make_write_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH_NOTIFY",
-                                                            PORT_BW, PORT_FANOUT);
+    rps_sources_bypass[0][3] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_sources_bypass[1][3] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
 
@@ -43,18 +65,18 @@ void Execute<ISA>::clock( Cycle cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    
+    /* update information about mispredictions */
+    clock_saved_flush();
 
     /* branch misprediction */
     if ( is_flush)
     {
         /* ignoring the upcoming instruction as it is invalid */
-        if ( rp_datapath->is_ready( cycle))
-        {
-            const auto& instr = rp_datapath->read( cycle);
-            
-            /* notifying bypassing unit about invalid instruction */
-            wp_bypassing_unit_flush_notify->write( instr, cycle);
-        }
+        rp_datapath->ignore( cycle);
+
+        /* ignoring the instruction from complex ALU */
+        rp_long_latency_execution_unit->ignore( cycle);
 
         /* ignoring information from command ports */
         for ( auto& port:rps_command)
@@ -66,10 +88,26 @@ void Execute<ISA>::clock( Cycle cycle)
             for ( auto& port:rps_src_ports)
                 port->ignore( cycle);
         }
-        
+
+        save_flush();
+
         sout << "flush\n";
         return;
     }
+
+
+    /* get the instruction from complex ALU if it is ready */
+    if ( rp_long_latency_execution_unit->is_ready( cycle))
+    {
+        auto instr = rp_long_latency_execution_unit->read( cycle);
+
+        if ( has_flush_expired())
+        {
+            wp_complex_arithmetic_bypass->write( instr.get_bypassing_data(), cycle);
+            wp_writeback_datapath->write( instr, cycle);
+        }
+    }
+
 
     /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
@@ -84,6 +122,7 @@ void Execute<ISA>::clock( Cycle cycle)
         sout << "bubble\n";
         return;
     }
+
 
     auto instr = rp_datapath->read( cycle);
 
@@ -122,11 +161,23 @@ void Execute<ISA>::clock( Cycle cycle)
 
     /* perform execution */
     instr.execute();
-    
-    /* bypass data */
-    wp_bypass->write( instr.get_bypassing_data(), cycle);
 
-    wp_datapath->write( instr, cycle);
+
+    if ( instr.is_complex_arithmetic()) 
+    {
+        wp_long_latency_execution_unit->write( instr, cycle);
+    }
+    else
+    {
+        /* bypass data */
+        wp_bypass->write( instr.get_bypassing_data(), cycle);
+        
+        if ( instr.is_mem_stage_required())
+            wp_mem_datapath->write( instr, cycle);
+        else
+            wp_writeback_datapath->write( instr, cycle);
+    }
+
 
     /* log */
     sout << instr << std::endl;

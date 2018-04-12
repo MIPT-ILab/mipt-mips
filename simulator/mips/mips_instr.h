@@ -329,6 +329,13 @@ class MIPSInstr
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
+        bool is_divmult() const { return operation == OUT_R_DIVMULT; }
+
+        bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
+                                               operation == OUT_RI_TRAP; }
+        
+        bool is_special() const { return operation == OUT_R_SPECIAL; }
+
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
         bool get_writes_dst() const { return writes_dst; }

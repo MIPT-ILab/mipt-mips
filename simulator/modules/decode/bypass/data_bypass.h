@@ -27,7 +27,7 @@ class DataBypass
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return get_entry( reg_num).current_stage == RegisterStage::in_RF();
+            return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether the source register of passed instruction is bypassible
@@ -40,8 +40,11 @@ class DataBypass
         // checks if the stall needed for passed instruction
         auto is_stall( const Instr& instr) const
         {
-            return ( (!is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
-                     (!is_in_RF( instr, 1) && !is_bypassible( instr, 1)) );
+            const auto instruction_latency = instr.get_instruction_latency();
+    
+            return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
+                    ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
+                    ( instruction_latency < writeback_stage_info.operation_latency));
         }
 
         // returns bypass command for passed instruction and its source register
@@ -58,19 +61,46 @@ class DataBypass
         // updates the scoreboard
         void update();
 
-        // removes the information about passed instruction from the scoreboard
-        void untrace_instr( const Instr& instr);
+        // handle pipeline flush
+        void handle_flush();
     
     private:
         struct RegisterInfo
         {
-            RegisterStage current_stage = RegisterStage::in_RF();
-            RegisterStage ready_stage = RegisterStage::in_RF();
+            RegisterStage current_stage;
+            RegisterStage ready_stage;
+            RegisterStage next_stage_after_first_execution_stage;
             bool is_bypassible = false;
             bool is_traced = false;
+
+            void change_current_stage()
+            {
+                if ( current_stage.is_first_execution_stage())
+                {
+                    current_stage = next_stage_after_first_execution_stage;
+                }
+                else if ( current_stage.is_last_execution_stage())
+                {
+                    current_stage.set_to_writeback();
+                }
+                else
+                    current_stage.inc();
+            }
+        };
+
+        struct FuncUnitInfo
+        {
+            Latency operation_latency = 0_Lt;
+
+            void update()
+            {
+                if ( !( operation_latency == 0_Lt))
+                    operation_latency = operation_latency - 1_Lt;
+            }
         };
 
         std::array<RegisterInfo, Register::MAX_REG> scoreboard = {};
+        FuncUnitInfo writeback_stage_info = {};
 
         RegisterInfo& get_entry( Register num)
         {
@@ -91,16 +121,6 @@ class DataBypass
 
         // introduces a source register of a passed instruction to scoreboard 
         void trace_new_register( const Instr& instr, Register num);
-
-        // discards the information about passed register
-        void untrace_register( Register num)
-        {
-            auto& entry = get_entry( num);
-
-            entry.current_stage = RegisterStage::in_RF();
-            entry.is_bypassible = false;
-            entry.is_traced = false; 
-        }
 };
 
 template <typename ISA>
@@ -108,13 +128,31 @@ void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
 {
     auto& entry = get_entry( num);
 
-    entry.current_stage = 0_RSG; // first execute stage
+    entry.current_stage.set_to_first_execution_stage();
+    entry.ready_stage.set_to_first_execution_stage();
+
+
+    if ( instr.is_complex_arithmetic())
+    {
+        entry.ready_stage.set_to_last_execution_stage();
+
+        entry.next_stage_after_first_execution_stage.set_to_first_execution_stage();
+        entry.next_stage_after_first_execution_stage.inc();
+    }
+    else if ( instr.is_mem_stage_required())
+    {
+        entry.next_stage_after_first_execution_stage.set_to_mem_stage();
+
+        if ( instr.is_load())
+            entry.ready_stage.set_to_mem_stage();
+    }
+    else
+        entry.next_stage_after_first_execution_stage.set_to_writeback();
+
 
     if ( !instr.is_bypassible())
-        entry.ready_stage = RegisterStage::in_RF();
-    else
-        entry.ready_stage = instr.is_load() ? 1_RSG  // MEMORY
-                                            : 0_RSG; // EXECUTE
+        entry.ready_stage.set_to_in_RF();
+
 
     entry.is_bypassible = ( entry.current_stage == entry.ready_stage);
     entry.is_traced = true;
@@ -125,6 +163,8 @@ template <typename ISA>
 void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
+
+    writeback_stage_info.operation_latency = instr.get_instruction_latency();
 
     if ( dst_reg_num.is_zero())
         return;
@@ -149,38 +189,38 @@ void DataBypass<ISA>::update()
         {
             if ( entry.current_stage.is_writeback())
             {
-                entry.current_stage = RegisterStage::in_RF();
+                entry.current_stage.set_to_in_RF();
                 entry.is_bypassible = false;
                 entry.is_traced = false;
             }
             else
             {
-                entry.current_stage.inc();
+                entry.change_current_stage();
 
                 if ( entry.current_stage == entry.ready_stage)
                     entry.is_bypassible = true;   
             }
         }
     }
+
+    writeback_stage_info.update();
 }
 
 
 template <typename ISA>
-void DataBypass<ISA>::untrace_instr( const Instr& instr)
+void DataBypass<ISA>::handle_flush()
 {
-    auto dst_reg_num = instr.get_dst_num();
-
-    if ( dst_reg_num.is_zero())
-        return;
-
-    if ( dst_reg_num.is_mips_hi_lo())
+    for ( auto& entry:scoreboard)
     {
-        untrace_register( Register::mips_hi );
-        untrace_register( Register::mips_lo );
-        return;
-    }    
+        if ( entry.is_traced)
+        {
+            entry.current_stage.set_to_in_RF();
+            entry.is_bypassible = false;
+            entry.is_traced = false;
+        }
+    }
 
-    untrace_register( dst_reg_num);
+    writeback_stage_info.operation_latency = 0_Lt;
 }
 
 #endif // DATA_BYPASS_H
