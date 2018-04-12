@@ -68,7 +68,7 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, uint32 mask = 0x0)
+    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, RegDstUInt mask = 0x0)
     {
         if ( num.is_zero())
             return;

@@ -352,8 +352,8 @@ class MIPSInstr
         {
             uint32 mask = 0x0;
             uint32 i = 0;
-            for (i = 0; i < 4; ++i)                   // in this cycle we found byte in v_dst which is equal to v_imm
-                if ( v_imm == (v_dst >> i*8 & v_imm)) // and fill all previous bytes with zeros
+            for (i = 0; i < 4; ++i)                   // in this cycle we found byte from which we should start to do lwr
+                if ( v_imm == ( mem_addr % 4 >> i*8 & v_imm)) // and fill all previous bytes with zeros
                     break;
             mask |= 0xFF << i*8;
             i ++;
