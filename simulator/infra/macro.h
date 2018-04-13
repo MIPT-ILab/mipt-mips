@@ -62,7 +62,7 @@ static constexpr T bitmask(unsigned int const onecount)
 }
 
 template <typename T>
-static constexpr inline size_t count_leading_zeros(const T& value) noexcept
+static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 {
     size_t count = 0;
     constexpr T start_value = static_cast<T>(1) << (bitwidth<T> - 1);
