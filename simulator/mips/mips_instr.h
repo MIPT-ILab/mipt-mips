@@ -23,18 +23,6 @@
 inline int32  sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline uint32 zero_extend(uint16 v) { return static_cast<uint32>(v); }
 
-inline uint32 count_zeros(uint32 value)
-{
-    uint32_t count = 0;
-    for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
-    {
-        if ( ( value & i) != 0)
-           break;
-        count++;
-    }
-    return count;
-}
-
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
@@ -254,8 +242,8 @@ class MIPSInstr
                 new_PC += sign_extend( v_imm) * 4;
         }
 
-        void execute_clo() { v_dst = count_zeros( ~v_src1); }
-        void execute_clz() { v_dst = count_zeros(  v_src1); }
+        void execute_clo() { v_dst = count_leading_zeros( ~v_src1); }
+        void execute_clz() { v_dst = count_leading_zeros(  v_src1); }
 
         void execute_jump( Addr target)
         {
