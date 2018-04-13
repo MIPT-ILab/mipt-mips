@@ -242,8 +242,8 @@ class MIPSInstr
                 new_PC += sign_extend( v_imm) * 4;
         }
 
-        void execute_clo() { v_dst = count_leading_zeros( ~v_src1); }
-        void execute_clz() { v_dst = count_leading_zeros(  v_src1); }
+        void execute_clo() { v_dst = count_leading_zeroes( ~v_src1); }
+        void execute_clz() { v_dst = count_leading_zeroes(  v_src1); }
 
         void execute_jump( Addr target)
         {
