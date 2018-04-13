@@ -353,13 +353,13 @@ class MIPSInstr
             uint32 mask = 0x0;
             uint32 i = 0;
             for (i = 0; i < 4; ++i)                   // in this cycle we found byte from which we should start to do lwr
-                if ( v_imm == ( mem_addr % 4 >> i*8 & v_imm)) // and fill all previous bytes with zeros
+                if ( (mem_addr % 4) == (v_dst >> i*8 & (mem_addr % 4))) // and fill all previous bytes with zeros
                     break;
             mask |= 0xFF << i*8;
             i ++;
             for (; i < 4; ++i)                        // in this cycle we found byte which is a multiple of four
             {
-                if (( v_imm + i) % 4 == 0)
+                if (( (mem_addr % 4) + i) % 4 == 0)
                     break;
                 mask |= 0xFF << i*8;                  // and fill all bytes with ones
             }
