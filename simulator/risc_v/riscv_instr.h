@@ -32,6 +32,7 @@ class RISCVInstr
 
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
+        RegisterUInt mask = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
 
         Addr mem_addr = NO_VAL32;
@@ -86,6 +87,8 @@ class RISCVInstr
 
         constexpr int8 is_accumulating_instr() const { return 0; }
 
+        constexpr int8 is_loadlr() const { return 0; }
+
         void set_v_src( const T& value, uint8 index)
         {
             if ( index == 0)
@@ -95,6 +98,7 @@ class RISCVInstr
         }
 
         auto get_v_dst() const { return v_dst; }
+        auto get_lwrl_mask() const { return mask; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
