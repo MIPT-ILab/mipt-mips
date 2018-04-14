@@ -66,9 +66,9 @@ static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 {
     size_t count = 0;
     constexpr T start_value = static_cast<T>(1) << (bitwidth<T> - 1);
-    for ( T i = start_value; i > 0; i >>= 1)
+    for ( T mask = start_value; mask > 0; mask >>= 1)
     {
-        if ( ( value & i) != 0)
+        if ( ( value & mask) != 0)
            break;
         count++;
     }
