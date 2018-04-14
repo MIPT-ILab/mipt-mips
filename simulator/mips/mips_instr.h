@@ -350,7 +350,7 @@ class MIPSInstr
         uint64 get_v_dst() const { return v_dst; }
         auto get_lwrl_mask() const
         {
-            uint32 mask = 0x0;
+            uint32 mask = 0xFF;
             for (uint32 i = 1; i < 4; ++i)  // in this cycle we found byte which is a multiple of four
             {
                 if (( (mem_addr % 4) + i) % 4 == 0)
