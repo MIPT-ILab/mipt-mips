@@ -41,7 +41,7 @@ class RF
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
-        (void)(value); 
+        (void)(value);
         return 0;
     }
 
@@ -51,7 +51,7 @@ protected:
         assert( !num.is_mips_hi_lo());
         return get_value( num);
     }
-    
+
     template <typename U = RegDstUInt>
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
@@ -68,16 +68,37 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 accumulating_instr = 0)
+    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, RegDstUInt mask = 0x0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
-        if ( accumulating_instr == 1)
+        if ( is_accumulating_instr == 1)
             val = read_hi_lo() + val;
-        else if ( accumulating_instr == -1)
+        else if ( is_accumulating_instr == -1)
             val = read_hi_lo() - val;
+
+        if ( loadlr == 1) // lwr
+        {
+            int8 i = 0;
+            val &= mask;
+            for ( ; i < 4; i ++)                    // if mask starts with zeros we should move val and mask
+            {
+                if (( mask & 0xFF) != 0)
+                    break;
+                val = static_cast<uint32>(val) >> 8; // here we move val
+            }
+            mask = static_cast<uint32>(mask >> i*8);                            // here mask
+            uint32 reg_val = static_cast<uint32>(get_value( num));
+            reg_val &= static_cast<uint32>(~mask);
+            val += reg_val;
+        }
+        /*
+            else
+            {
+                // lwl execute
+            }*/
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
@@ -85,7 +106,7 @@ protected:
             write( Register::mips_lo, val);
             return;
         }
- 
+
         // No hacks
         get_value( num) = val;
     }
@@ -109,10 +130,11 @@ public:
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
         auto accumulating_instr = instr.is_accumulating_instr();
+        auto loadlr = instr.is_loadlr();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr);
+            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, instr.get_lwrl_mask());
         else
-            write( reg_num, read(reg_num), accumulating_instr);
+            write( reg_num, read(reg_num));
     }
 };
 
