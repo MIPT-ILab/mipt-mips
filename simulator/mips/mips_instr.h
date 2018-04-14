@@ -356,7 +356,7 @@ class MIPSInstr
             // case 2: return 0x0000'FFFF;
             // case 3: return 0x0000'00FF;
             // }
-            return bitmask<uint32>( ( 4 - mem_addr % 4) * 8));
+            return bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
         }
 
         Addr get_mem_addr() const { return mem_addr; }
