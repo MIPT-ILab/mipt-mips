@@ -351,17 +351,11 @@ class MIPSInstr
         auto get_lwrl_mask() const
         {
             uint32 mask = 0x0;
-            uint32 i = 0;
-            for (i = 0; i < 4; ++i)                   // in this cycle we found byte from which we should start to do lwr
-                if ( (v_imm % 4) == (mem_addr % 4 + i) ) // and fill all previous bytes with zeros
-                    break;
-            mask |= 0xFF << i*8;
-            i ++;
-            for (; i < 4; ++i)                        // in this cycle we found byte which is a multiple of four
+            for (uint32 i = 1; i < 4; ++i)  // in this cycle we found byte which is a multiple of four
             {
                 if (( (mem_addr % 4) + i) % 4 == 0)
                     break;
-                mask |= 0xFF << i*8;                  // and fill all bytes with ones
+                mask |= 0xFF << i*8; // and fill all bytes with ones
             }
             return mask;
         }
