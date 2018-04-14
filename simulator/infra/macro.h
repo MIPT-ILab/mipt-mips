@@ -58,7 +58,7 @@ constexpr auto popcount( T x) noexcept
 template <typename T>
 static constexpr T bitmask(unsigned int const onecount)
 {
-    return static_cast<T>(-(onecount != 0)) & (static_cast<T>(-1) >> (bitwidth<T> - onecount));
+    return onecount != 0 ? (~static_cast<T>(0) >> (bitwidth<T> - onecount)) : static_cast<T>(0);
 }
 
 template <typename T>
