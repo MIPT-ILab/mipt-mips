@@ -65,7 +65,7 @@ template <typename T>
 static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 {
     size_t count = 0;
-    constexpr T start_value = static_cast<T>(1) << (bitwidth<T> - 1);
+    constexpr T start_value = ~bitmask<T>(bitwidth<T> - 1); // set only the first bit
     for ( T mask = start_value; mask > 0; mask >>= 1)
     {
         if ( ( value & mask) != 0)
