@@ -68,9 +68,9 @@ static_assert(count_leading_zeroes<uint64>(0xFF) == 56);
 static_assert(count_leading_zeroes<uint8>(0x0) == 8);
 static_assert(count_leading_zeroes<uint32>(0x0) == 32);
 static_assert(count_leading_zeroes<uint64>(0x0) == 64);
-static_assert(count_leading_zeroes<uint8>(~0x0u) == 0);
-static_assert(count_leading_zeroes<uint32>(~0x0u) == 0);
-static_assert(count_leading_zeroes<uint64>(~0x0u) == 0);
+static_assert(count_leading_zeroes<uint8>(~static_cast<uint8>(0)) == 0);
+static_assert(count_leading_zeroes<uint32>(~static_cast<uint32>(0)) == 0);
+static_assert(count_leading_zeroes<uint64>(~~static_cast<uint64>(0)) == 0);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);
