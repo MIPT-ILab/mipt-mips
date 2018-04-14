@@ -81,18 +81,10 @@ protected:
 
         if ( loadlr == 1) // lwr
         {
-            int8 i = 0;
-            val &= mask;
-            for ( ; i < 4; i ++)                    // if mask starts with zeros we should move val and mask
-            {
-                if (( mask & 0xFF) != 0)
-                    break;
-                val = static_cast<uint32>(val) >> 8; // here we move val
-            }
-            mask = static_cast<uint32>(mask >> i*8);                            // here mask
-            uint32 reg_val = static_cast<uint32>(get_value( num));
-            reg_val &= static_cast<uint32>(~mask);
-            val += reg_val;
+            // Shift value to match it with beginning of mask
+            val >>= count_leading_zeroes( mask);
+            // Combine old and new values
+            val = ( val & mask) | ( static_cast<RegisterDstUInt>(get_value( num)) & ~mask);
         }
         /*
             else
