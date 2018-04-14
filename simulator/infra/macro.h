@@ -61,4 +61,18 @@ static constexpr T bitmask(unsigned int const onecount)
     return onecount != 0 ? (~static_cast<T>(0) >> (bitwidth<T> - onecount)) : static_cast<T>(0);
 }
 
+template <typename T>
+static constexpr T arifmetic_rs(const T& value, size_t shamt)
+{
+    using ST = sign_t<T>;
+    //NOLINTNEXTLINE
+    if constexpr ((static_cast<ST>(-2) >> 1u) == static_cast<ST>(-1)) {
+        // Compiler does arithmetic shift for signed values, trust it
+        //NOLINTNEXTLINE : clang warns about implementation defined code, but we checked it
+        return static_cast<ST>(value) >> shamt;
+    }
+    return (value & ~bitmask<T>(bitwidth<T> - 1)) == 0 // check MSB
+             ? value >> shamt // just shift for positives
+             : ~((~value) >> shamt); // propagate ones
+}
 #endif
