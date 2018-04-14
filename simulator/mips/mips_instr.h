@@ -221,10 +221,10 @@ class MIPSInstr
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_sra()   { v_dst = arithmetic_rs( v_src1, shamt); }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_srav()  { v_dst = arithmetic_rs( v_src1, v_src2); }
         void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
