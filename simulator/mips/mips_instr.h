@@ -356,7 +356,7 @@ class MIPSInstr
             // case 2: return 0x0000'FFFF;
             // case 3: return 0x0000'00FF;
             // }
-            auto all_ones = ~static_cast<uint32>(0);
+            constexpr const auto all_ones = ~static_cast<uint32>(0);
             return all_ones >> ((mem_addr % 4) * 8);
         }
 
