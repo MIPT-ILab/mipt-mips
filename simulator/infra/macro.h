@@ -81,10 +81,9 @@ template <typename T>
 static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 {
     size_t count = 0;
-    constexpr T start_value = static_cast<T>(1) << (bitwidth<T> - 1);
-    for ( T i = start_value; i > 0; i >>= 1)
+    for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
     {
-        if ( ( value & i) != 0)
+        if ( ( value & mask) != 0)
            break;
         count++;
     }
@@ -94,7 +93,7 @@ static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
- * 0xF0 rs>> 2 -> 0xFC
+ * 0xF0 sra 2 -> 0xFC
  */
 template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
