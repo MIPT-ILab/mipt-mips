@@ -209,10 +209,10 @@ class MIPSInstr
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_sra()   { v_dst = arithmetic_rs( v_src1, shamt); }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_srav()  { v_dst = arithmetic_rs( v_src1, v_src2); }
         void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
@@ -338,20 +338,13 @@ class MIPSInstr
         uint64 get_v_dst() const { return v_dst; }
         auto get_lwrl_mask() const
         {
-            uint32 mask = 0x0;
-            uint32 i = 0;
-            for (i = 0; i < 4; ++i)                   // in this cycle we found byte from which we should start to do lwr
-                if ( (v_imm % 4) == (mem_addr % 4 + i) ) // and fill all previous bytes with zeros
-                    break;
-            mask |= 0xFF << i*8;
-            i ++;
-            for (; i < 4; ++i)                        // in this cycle we found byte which is a multiple of four
-            {
-                if (( (mem_addr % 4) + i) % 4 == 0)
-                    break;
-                mask |= 0xFF << i*8;                  // and fill all bytes with ones
-            }
-            return mask;
+            // switch (mem_addr % 4) {
+            // case 0: return 0xFFFF'FFFF;
+            // case 1: return 0x00FF'FFFF;
+            // case 2: return 0x0000'FFFF;
+            // case 3: return 0x0000'00FF;
+            // }
+            return bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
         }
 
         Addr get_mem_addr() const { return mem_addr; }
