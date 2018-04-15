@@ -84,7 +84,7 @@ protected:
             // Shift value to match it with beginning of mask
             val >>= count_leading_zeroes( mask);
             // Combine old and new values
-            val = ( val & mask) | ( static_cast<RegisterDstUInt>(get_value( num)) & ~mask);
+            val = ( val & mask) | ( static_cast<RegDstUInt>(get_value( num)) & ~mask);
         }
         /*
             else
