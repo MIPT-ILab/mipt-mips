@@ -62,7 +62,7 @@ static constexpr T bitmask(unsigned int const onecount)
 }
 
 template <typename T>
-static constexpr T arifmetic_rs(const T& value, size_t shamt)
+static constexpr T arithmetic_rs(const T& value, size_t shamt)
 {
     using ST = sign_t<T>;
     //NOLINTNEXTLINE
