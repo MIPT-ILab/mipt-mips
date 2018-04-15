@@ -77,10 +77,23 @@ static constexpr T msb_set()
     return static_cast<T>(1u) << (bitwidth<T> - 1);
 }
 
+template <typename T>
+static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
+{
+    size_t count = 0;
+    for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
+    {
+        if ( ( value & mask) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
- * 0xF0 rs>> 2 -> 0xFC
+ * 0xF0 sra 2 -> 0xFC
  */
 template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
@@ -100,4 +113,5 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
              ? value >> shamt          // just shift if MSB is zero
              : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
+
 #endif
