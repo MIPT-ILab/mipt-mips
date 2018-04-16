@@ -68,15 +68,15 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, RegDstUInt mask = 0x0)
+    void write( Register num, RegDstUInt val, int8 accumulation = 0, int8 loadlr = 0, RegDstUInt mask = 0x0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
-        if ( is_accumulating_instr == 1)
+        if ( accumulation == 1)
             val = read_hi_lo() + val;
-        else if ( is_accumulating_instr == -1)
+        else if ( accumulation == -1)
             val = read_hi_lo() - val;
 
         if ( loadlr == 1) // lwr
@@ -129,10 +129,9 @@ public:
     {
         Register reg_num  = instr.get_dst_num();
         bool writes_dst = instr.get_writes_dst();
-        auto accumulating_instr = instr.is_accumulating_instr();
         auto loadlr = instr.is_loadlr();
         if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, instr.get_lwrl_mask());
+            write( reg_num, instr.get_v_dst(), instr.get_accumulation_type(), loadlr, instr.get_mask());
         else
             write( reg_num, read(reg_num));
     }
