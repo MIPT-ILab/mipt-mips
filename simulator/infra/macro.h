@@ -55,6 +55,17 @@ constexpr auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( static_cast<typename std::make_unsigned<T>::type>( x)).count();
 }
 
+/*
+ * Returns a value full on one bits.
+ * all_ones<uint8>()  -> 0xFF
+ * all_ones<uint32>() -> 0xFFFF'FFFF
+ */
+template <typename T>
+static constexpr T all_ones()
+{
+    return static_cast<T>(~static_cast<T>(0));
+}
+
 /* Returns a bitmask with desired amount of LSB set to '1'
  * Examples: bitmask<uint32>(0)  -> 0x0
  *           bitmask<uint32>(5)  -> 0x1F
@@ -63,8 +74,7 @@ constexpr auto popcount( T x) noexcept
 template <typename T>
 static constexpr T bitmask(unsigned int const onecount)
 {
-    constexpr const auto all_ones = static_cast<T>(~static_cast<T>(0));
-    return onecount != 0 ? all_ones >> (bitwidth<T> - onecount) : static_cast<T>(0);
+    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : static_cast<T>(0);
 }
 
 /*

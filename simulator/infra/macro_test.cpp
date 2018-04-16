@@ -48,6 +48,14 @@ static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
 static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
 static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
 
+static_assert(all_ones<uint8>()  == 0xFFull);
+static_assert(all_ones<uint16>() == 0xFFFFull);
+static_assert(all_ones<uint32>() == 0xFFFF'FFFFull);
+
+static_assert(msb_set<uint8>()  == 0x80ull);
+static_assert(msb_set<uint16>() == 0x8000ull);
+static_assert(msb_set<uint32>() == 0x80000'0000ull);
+
 /*
 static_assert(popcount(0) == 0);
 static_assert(popcount(1) == 1);
