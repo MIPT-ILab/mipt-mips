@@ -54,7 +54,7 @@ static_assert(all_ones<uint32>() == 0xFFFF'FFFFull);
 
 static_assert(msb_set<uint8>()  == 0x80ull);
 static_assert(msb_set<uint16>() == 0x8000ull);
-static_assert(msb_set<uint32>() == 0x80000'0000ull);
+static_assert(msb_set<uint32>() == 0x8000'0000ull);
 
 /*
 static_assert(popcount(0) == 0);
