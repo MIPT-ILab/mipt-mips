@@ -56,7 +56,7 @@ protected:
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
         const auto hi = static_cast<RegDstUInt>( read( Register::mips_hi));
-        const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & ((RegDstUInt(1) << 32u) - 1);
+        const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & bitmask<RegDstUInt>(32);
         return (hi << 32u) | lo;
     }
 
