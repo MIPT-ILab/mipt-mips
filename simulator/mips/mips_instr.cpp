@@ -161,17 +161,17 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     // 0x1A - 0x1B load double word left/right
 
     // Loads
-    //key     name  operation  memsize       pointer
-    {0x20, { "lb",  OUT_I_LOAD,  1, &MIPSInstr::calculate_load_addr, 1} },
-    {0x21, { "lh",  OUT_I_LOAD,  2, &MIPSInstr::calculate_load_addr, 1} },
-    {0x22, { "lwl", OUT_I_LOADL, 4, &MIPSInstr::calculate_load_addr, 1} },
-    {0x23, { "lw",  OUT_I_LOAD,  4, &MIPSInstr::calculate_load_addr, 1} },
-    {0x24, { "lbu", OUT_I_LOADU, 1, &MIPSInstr::calculate_load_addr, 1} },
-    {0x25, { "lhu", OUT_I_LOADU, 2, &MIPSInstr::calculate_load_addr, 1} },
-    {0x26, { "lwr", OUT_I_LOADR, 4, &MIPSInstr::calculate_load_addr, 1} },
-    {0x27, { "lwu", OUT_I_LOADU, 4, &MIPSInstr::calculate_load_addr, 1} },
+    //key     name  operation         memsize       pointer
+    {0x20, { "lb",  OUT_I_LOAD,         1, &MIPSInstr::calculate_load_addr,         1} },
+    {0x21, { "lh",  OUT_I_LOAD,         2, &MIPSInstr::calculate_load_addr_aligned, 1} },
+    {0x22, { "lwl", OUT_I_PARTIAL_LOAD, 4, &MIPSInstr::calculate_load_addr_left,    1} },
+    {0x23, { "lw",  OUT_I_LOAD,         4, &MIPSInstr::calculate_load_addr_aligned, 1} },
+    {0x24, { "lbu", OUT_I_LOADU,        1, &MIPSInstr::calculate_load_addr,         1} },
+    {0x25, { "lhu", OUT_I_LOADU,        2, &MIPSInstr::calculate_load_addr_aligned, 1} },
+    {0x26, { "lwr", OUT_I_PARTIAL_LOAD, 4, &MIPSInstr::calculate_load_addr_right,   1} },
+    {0x27, { "lwu", OUT_I_LOADU,        4, &MIPSInstr::calculate_load_addr_aligned, 1} },
 
-    // Store
+    // Stores
     //key     name   operation  memsize       pointer
     {0x28, { "sb",  OUT_I_STORE,  1, &MIPSInstr::calculate_store_addr, 1} },
     {0x29, { "sh",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
@@ -183,7 +183,7 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     //       0x2F   cache
 
     // Advanced loads and stores
-    {0x30, { "ll",  OUT_I_LOAD,   4, &MIPSInstr::calculate_load_addr, 2} },
+    {0x30, { "ll",  OUT_I_LOAD,   4, &MIPSInstr::calculate_load_addr_aligned, 2} },
     {0x38, { "sc",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 2} },
 };
 
@@ -386,8 +386,7 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
 
         case OUT_I_LOAD:
         case OUT_I_LOADU:
-        case OUT_I_LOADL:
-        case OUT_I_LOADR:
+        case OUT_I_PARTIAL_LOAD:
             v_imm = instr.asI.imm;
             src1 = MIPSRegister(instr.asI.rs);
             dst  = MIPSRegister(instr.asI.rt);
@@ -455,7 +454,7 @@ void MIPSInstr::execute()
     (this->*function)();
     complete = true;
 
-    if ( !dst.is_zero() && !is_load() && get_writes_dst())
+    if ( !dst.is_zero() && !is_load() && get_mask() != 0)
     {
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
@@ -465,14 +464,14 @@ void MIPSInstr::execute()
         else
             oss <<  dst;
 
-        oss << " = 0x" << static_cast<uint32>( v_dst) << " ]";
+        oss << " = 0x" << static_cast<uint32>( v_dst & mask) << " ]";
         disasm += oss.str();
     }
 }
 
 void MIPSInstr::set_v_dst( uint32 value)
 {
-    if ( operation == OUT_I_LOAD || operation == OUT_I_LOADR)
+    if ( operation == OUT_I_LOAD || is_partial_load())
     {
         switch ( get_mem_size())
         {
