@@ -63,7 +63,7 @@ constexpr auto popcount( T x) noexcept
 template <typename T>
 static constexpr T all_ones()
 {
-    return static_cast<T>(~static_cast<T>(0));
+    return static_cast<T>(~T(0));
 }
 
 /* Returns a bitmask with desired amount of LSB set to '1'
