@@ -81,8 +81,6 @@ protected:
 
         if ( loadlr == 1) // lwr
         {
-            // Shift value to match it with beginning of mask
-            val >>= count_leading_zeroes( static_cast<uint32>( mask));
             // Combine old and new values
             val = ( val & mask) | ( static_cast<RegDstUInt>(get_value( num)) & ~mask);
         }
