@@ -301,15 +301,19 @@ class MIPSInstr
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
 
-        bool is_load()  const { return operation == OUT_I_LOAD  ||
-                                       operation == OUT_I_LOADU ||
-                                       operation == OUT_I_LOADR ||
-                                       operation == OUT_I_LOADL; }
-        int8 is_loadlr() const
+        bool is_partial_load() const
         {
-            return (operation == OUT_I_LOADR) ? 1 : (operation == OUT_I_LOADL) ? -1 : 0;
+            return operation == OUT_I_LOADR || operation == OUT_I_LOADL;
         }
-        int8 is_accumulating_instr() const
+
+        bool is_load() const
+        {
+            return operation == OUT_I_LOAD
+                || operation == OUT_I_LOADU
+                || is_partial_load();
+        }
+
+        int8 get_accumulation_type() const
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
@@ -336,7 +340,7 @@ class MIPSInstr
         }
 
         uint64 get_v_dst() const { return v_dst; }
-        auto get_lwrl_mask() const
+        auto get_mask() const
         {
             // switch (mem_addr % 4) {
             // case 0: return 0xFFFF'FFFF;
