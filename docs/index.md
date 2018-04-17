@@ -46,9 +46,12 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  
 ### Term 4: Performing Multiple Tasks
  
-  Date | Event | Hometask
- :-: |:---- |:----------------
- 31<br/>Mar | **L16: Virtual memory** | |
+  Date | Event
+ :-: |:-------------------
+ 31<br/>Mar | **L16: Virtual memory**<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_16__31_Mar__Virtual_Memory__Eng_text__No_audio.pptx?raw=true) |
+ 07<br/>Apr | **L17: Multiprocessor and Multicore Systems**<br/>_— Thread-level parallelism (TLP)_<br/>_— Memory coherence problem_<br/>_— Coherence protocol: MESI_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_17__7_Apr__Multiprocessor_Systems__Eng_text__No_audio.pptx?raw=true) |
+ 14<br/>Apr | **L18: Simultaneous Multithreading** |
+ 21<br/>Apr | **Test 3**<br/> • Review **L11−L18** material |
  
  
 ### MSU Seminars

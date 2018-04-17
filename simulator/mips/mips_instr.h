@@ -23,18 +23,6 @@
 inline int32  sign_extend(int16 v)  { return static_cast<int32>(v); }
 inline uint32 zero_extend(uint16 v) { return static_cast<uint32>(v); }
 
-inline uint32 count_zeros(uint32 value)
-{
-    uint32_t count = 0;
-    for ( uint32_t i = 0x80000000; i > 0; i >>= 1)
-    {
-        if ( ( value & i) != 0)
-           break;
-        count++;
-    }
-    return count;
-}
-
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
@@ -221,10 +209,10 @@ class MIPSInstr
 
         void execute_sll()   { v_dst = v_src1 << shamt; }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_sra()   { v_dst = arithmetic_rs( v_src1, shamt); }
         void execute_sllv()  { v_dst = v_src1 << v_src2; }
         void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; } // NOLINT(hicpp-signed-bitwise) Implementation defined actually
+        void execute_srav()  { v_dst = arithmetic_rs( v_src1, v_src2); }
         void execute_lui()   { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
@@ -254,8 +242,8 @@ class MIPSInstr
                 new_PC += sign_extend( v_imm) * 4;
         }
 
-        void execute_clo() { v_dst = count_zeros( ~v_src1); }
-        void execute_clz() { v_dst = count_zeros(  v_src1); }
+        void execute_clo() { v_dst = count_leading_zeroes( ~v_src1); }
+        void execute_clz() { v_dst = count_leading_zeroes(  v_src1); }
 
         void execute_jump( Addr target)
         {
@@ -317,6 +305,10 @@ class MIPSInstr
                                        operation == OUT_I_LOADU ||
                                        operation == OUT_I_LOADR ||
                                        operation == OUT_I_LOADL; }
+        int8 is_loadlr() const
+        {
+            return (operation == OUT_I_LOADR) ? 1 : (operation == OUT_I_LOADL) ? -1 : 0;
+        }
         int8 is_accumulating_instr() const
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
@@ -351,6 +343,16 @@ class MIPSInstr
         }
 
         uint64 get_v_dst() const { return v_dst; }
+        auto get_lwrl_mask() const
+        {
+            // switch (mem_addr % 4) {
+            // case 0: return 0xFFFF'FFFF;
+            // case 1: return 0x00FF'FFFF;
+            // case 2: return 0x0000'FFFF;
+            // case 3: return 0x0000'00FF;
+            // }
+            return bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
+        }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }

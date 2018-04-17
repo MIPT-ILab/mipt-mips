@@ -472,7 +472,7 @@ void MIPSInstr::execute()
 
 void MIPSInstr::set_v_dst( uint32 value)
 {
-    if ( operation == OUT_I_LOAD)
+    if ( operation == OUT_I_LOAD || operation == OUT_I_LOADR)
     {
         switch ( get_mem_size())
         {
