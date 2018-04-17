@@ -293,8 +293,8 @@ class MIPSInstr
             // Endian specific
             calculate_load_addr();
             // Actually we read word LEFT to instruction pointer
-            mem_addr += 3;
             mask = ~bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
+            mem_addr -= 3;
         }
 
         Execute function = &MIPSInstr::execute_unknown;
