@@ -68,37 +68,27 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, int8 is_accumulating_instr = 0, int8 loadlr = 0, RegDstUInt mask = 0x0)
+    void write( Register num, RegDstUInt val, RegDstUInt mask = all_ones<RegDstUInt>(), int8 accumulation = 0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
-        if ( is_accumulating_instr == 1)
+        if ( accumulation == 1)
             val = read_hi_lo() + val;
-        else if ( is_accumulating_instr == -1)
+        else if ( accumulation == -1)
             val = read_hi_lo() - val;
-
-        if ( loadlr == 1) // lwr
-        {
-            // Combine old and new values
-            val = ( val & mask) | ( static_cast<RegDstUInt>(get_value( num)) & ~mask);
-        }
-        /*
-            else
-            {
-                // lwl execute
-            }*/
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, get_hi_part( val));
-            write( Register::mips_lo, val);
+            write( Register::mips_hi, get_hi_part( val), bitmask<RegDstUInt>(32));
+            write( Register::mips_lo, val,               bitmask<RegDstUInt>(32));
             return;
         }
 
         // No hacks
-        get_value( num) = val;
+        get_value( num) &= ~mask;         // Clear old bits
+        get_value( num) |= ( val & mask); // Set new bits
     }
 
 public:
@@ -117,14 +107,10 @@ public:
 
     inline void write_dst( const FuncInstr& instr)
     {
-        Register reg_num  = instr.get_dst_num();
-        bool writes_dst = instr.get_writes_dst();
-        auto accumulating_instr = instr.is_accumulating_instr();
-        auto loadlr = instr.is_loadlr();
-        if ( !reg_num.is_zero() && writes_dst)
-            write( reg_num, instr.get_v_dst(), accumulating_instr, loadlr, instr.get_lwrl_mask());
-        else
-            write( reg_num, read(reg_num));
+        write( instr.get_dst_num(),
+               instr.get_v_dst(),
+               instr.get_mask(),
+               instr.get_accumulation_type());
     }
 };
 
