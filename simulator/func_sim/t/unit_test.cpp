@@ -37,7 +37,7 @@ TEST( Func_Sim, Make_A_Step)
 
 TEST( Func_Sim, Run_Full_Trace)
 {
-    FuncSim<MIPS> mips( true);
+    FuncSim<MIPS> mips;
     GTEST_ASSERT_NO_DEATH( mips.run_no_limit( valid_elf_file); );
 }
 
