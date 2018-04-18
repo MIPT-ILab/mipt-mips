@@ -286,14 +286,28 @@ class MIPSInstr
         void calculate_load_addr_right() {
             // Endian specific
             calculate_load_addr();
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFFFF'FFFF;
+               case 1: return 0x00FF'FFFF;
+               case 2: return 0x0000'FFFF;
+               case 3: return 0x0000'00FF;
+               }
+             */
             mask = bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
         }
 
         void calculate_load_addr_left() {
             // Endian specific
             calculate_load_addr();
-            mask = ~bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
-            // Actually we read word LEFT to instruction pointer
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFF00'0000;
+               case 1: return 0xFFFF'0000;
+               case 2: return 0xFFFF'FF00;
+               case 3: return 0xFFFF'FFFF;
+               }
+             */
+            mask = ~bitmask<uint64>( ( 3 - mem_addr % 4) * 8);
+            // Actually we read a word LEFT to effective address
             mem_addr -= 3;
         }
 
