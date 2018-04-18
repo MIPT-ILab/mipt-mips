@@ -494,7 +494,7 @@ void MIPSInstr::set_v_dst( uint32 value)
     {
         std::ostringstream oss;
         oss << "\t [ $" << dst << " = 0x" << std::hex << v_dst;
-        if (get_mask() != all_ones<uint32>())
+        if (get_mask() != all_ones<decltype(get_mask)>())
             oss << ", mask = 0x" << std::hex << mask;
         oss << " ]";
         disasm += oss.str();
