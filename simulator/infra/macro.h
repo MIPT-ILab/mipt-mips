@@ -88,6 +88,12 @@ static constexpr T msb_set()
 }
 
 template <typename T>
+static constexpr bool has_zero( const T& value)
+{
+    return T(~value) != T();
+}
+
+template <typename T>
 static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 {
     size_t count = 0;
