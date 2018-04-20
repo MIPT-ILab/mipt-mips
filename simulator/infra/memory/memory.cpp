@@ -79,7 +79,7 @@ uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
     for ( size_t i = 0; i < num_of_bytes; ++i)
         value |= read_byte( addr + i) << i * 8;
 
-    return value.val;
+    return value;
 }
 
 void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
