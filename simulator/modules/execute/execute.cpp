@@ -7,14 +7,15 @@
 
 #include "execute.h"
 
-
 namespace config {
-    static Value<uint64> complex_alu_latency = { "complex-alu-latency", 3, "Latency of complex arithmetic logic unit"};  
+    Value<uint64> complex_alu_latency = { "complex-alu-latency", 3, "Latency of complex arithmetic logic unit"};
 } // namespace config
 
 
 template <typename ISA>
-Execute<ISA>::Execute( bool log) : Log( log)
+Execute<ISA>::Execute( bool log) 
+    : Log( log)
+    , last_execution_stage_latency( Latency( config::complex_alu_latency - 1))
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
@@ -27,12 +28,10 @@ Execute<ISA>::Execute( bool log) : Log( log)
     if ( config::complex_alu_latency > 64)
         serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64"
              << std::endl << critical;
-    
-    RegisterStage::set_complex_alu_latency_value( config::complex_alu_latency);
 
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
-                                                           RegisterStage::get_last_execution_stage_latency());
+                                                           last_execution_stage_latency);
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 

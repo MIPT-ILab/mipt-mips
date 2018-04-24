@@ -20,6 +20,7 @@ class Execute : public Log
 
     private:   
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
+        const Latency last_execution_stage_latency;
 
         /* Inputs */
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
@@ -38,7 +39,7 @@ class Execute : public Log
 
         Latency flush_expiration_latency = 0_Lt;
 
-        void save_flush() { flush_expiration_latency = RegisterStage::get_last_execution_stage_latency(); }
+        void save_flush() { flush_expiration_latency = last_execution_stage_latency; }
         void clock_saved_flush()
         {
             if ( flush_expiration_latency != 0_Lt)

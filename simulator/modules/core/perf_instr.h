@@ -8,7 +8,6 @@
 
 #include <infra/types.h>
 #include <modules/fetch/bpu/bp_interface.h>
-#include <modules/decode/bypass/data_bypass_interface.h>
 
 template <typename FuncInstr>
 class PerfInstr : public FuncInstr
@@ -34,17 +33,6 @@ public:
                                                 this->is_jump()  ||
                                                 this->is_explicit_trap() ||
                                                 this->is_special(); }
-    
-    auto get_instruction_latency() const
-    {
-        if ( is_mem_stage_required())
-            return 2_Lt;
-
-        if ( is_complex_arithmetic())
-            return 1_Lt + RegisterStage::get_last_execution_stage_latency();
-        
-        return 1_Lt;
-    
 };
 
 #endif // PERF_INSTR_H

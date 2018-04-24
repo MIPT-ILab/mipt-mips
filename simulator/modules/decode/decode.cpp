@@ -3,8 +3,13 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
+#include <infra/config/config.h>
+
 #include "decode.h"
 
+namespace config {
+    extern Value<uint64> complex_alu_latency;
+} // namespace config
 
 template <typename ISA>
 Decode<ISA>::Decode( bool log) : Log( log)
@@ -30,7 +35,7 @@ Decode<ISA>::Decode( bool log) : Log( log)
     rp_bypassing_unit_flush_notify = make_read_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY",
                                                            PORT_LATENCY);
 
-    bypassing_unit = std::make_unique<BypassingUnit>();
+    bypassing_unit = std::make_unique<BypassingUnit>( config::complex_alu_latency);
 }
 
 

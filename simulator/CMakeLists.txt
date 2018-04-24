@@ -25,7 +25,6 @@ set(CPPS infra/macro_test.cpp
     infra/cache/cache_tag_array.cpp
     modules/fetch/fetch.cpp
     modules/decode/decode.cpp
-    modules/decode/bypass/data_bypass_interface.cpp
     modules/execute/execute.cpp
     modules/mem/mem.cpp
     modules/core/perf_sim.cpp

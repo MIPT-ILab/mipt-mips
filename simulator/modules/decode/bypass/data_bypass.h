@@ -23,6 +23,10 @@ class DataBypass
     using RegDstUInt = typename ISA::RegDstUInt;
 
     public:
+        explicit DataBypass( uint64 complex_alu_latency)
+            : last_execution_stage_value( static_cast<uint8>(complex_alu_latency - 1))
+        { }
+
         // checks whether the source register of passed instruction is in RF  
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
@@ -40,7 +44,7 @@ class DataBypass
         // checks if the stall needed for passed instruction
         auto is_stall( const Instr& instr) const
         {
-            const auto instruction_latency = instr.get_instruction_latency();
+            const auto instruction_latency = get_instruction_latency( instr);
     
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
@@ -52,7 +56,7 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand<Register>( get_current_stage( reg_num), reg_num);
+            return BypassCommand<Register>( get_current_stage( reg_num), reg_num, last_execution_stage_value);
         }
 
         // introduces new instruction to bypassing unit
@@ -65,6 +69,8 @@ class DataBypass
         void handle_flush();
     
     private:
+        const uint8 last_execution_stage_value;
+
         struct RegisterInfo
         {
             RegisterStage current_stage;
@@ -73,19 +79,7 @@ class DataBypass
             bool is_bypassible = false;
             bool is_traced = false;
 
-            void change_current_stage()
-            {
-                if ( current_stage.is_first_execution_stage())
-                {
-                    current_stage = next_stage_after_first_execution_stage;
-                }
-                else if ( current_stage.is_last_execution_stage())
-                {
-                    current_stage.set_to_writeback();
-                }
-                else
-                    current_stage.inc();
-            }
+            void reset() { *this = RegisterInfo(); }
         };
 
         struct FuncUnitInfo
@@ -119,7 +113,20 @@ class DataBypass
             return get_entry( num).current_stage;
         }
 
-        // introduces a source register of a passed instruction to scoreboard 
+        // returns a latency of passed instruction
+        // in accordance with a type of the instruction
+        Latency get_instruction_latency( const Instr& instr) const
+        {
+            if ( instr.is_mem_stage_required())
+                return 2_Lt;
+            
+            if ( instr.is_complex_arithmetic())
+                return Latency( last_execution_stage_value + 1);
+            
+            return 1_Lt;
+        }
+
+        // introduces a source register of passed instruction to the scoreboard 
         void trace_new_register( const Instr& instr, Register num);
 };
 
@@ -134,7 +141,7 @@ void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
 
     if ( instr.is_complex_arithmetic())
     {
-        entry.ready_stage.set_to_last_execution_stage();
+        entry.ready_stage.set_to_last_execution_stage( last_execution_stage_value);
 
         entry.next_stage_after_first_execution_stage.set_to_first_execution_stage();
         entry.next_stage_after_first_execution_stage.inc();
@@ -164,7 +171,7 @@ void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 {    
     const auto dst_reg_num = instr.get_dst_num();
 
-    writeback_stage_info.operation_latency = instr.get_instruction_latency();
+    writeback_stage_info.operation_latency = get_instruction_latency( instr);
 
     if ( dst_reg_num.is_zero())
         return;
@@ -189,13 +196,21 @@ void DataBypass<ISA>::update()
         {
             if ( entry.current_stage.is_writeback())
             {
-                entry.current_stage.set_to_in_RF();
-                entry.is_bypassible = false;
-                entry.is_traced = false;
+                entry.reset();
             }
             else
             {
-                entry.change_current_stage();
+                if ( entry.current_stage.is_first_execution_stage())
+                {
+                    entry.current_stage = entry.next_stage_after_first_execution_stage;
+                }
+                else if ( entry.current_stage.is_last_execution_stage( last_execution_stage_value))
+                {
+                    entry.current_stage.set_to_writeback();
+                }
+                else
+                    entry.current_stage.inc();
+                
 
                 if ( entry.current_stage == entry.ready_stage)
                     entry.is_bypassible = true;   
@@ -213,11 +228,7 @@ void DataBypass<ISA>::handle_flush()
     for ( auto& entry:scoreboard)
     {
         if ( entry.is_traced)
-        {
-            entry.current_stage.set_to_in_RF();
-            entry.is_bypassible = false;
-            entry.is_traced = false;
-        }
+            entry.reset();
     }
 
     writeback_stage_info.operation_latency = 0_Lt;
