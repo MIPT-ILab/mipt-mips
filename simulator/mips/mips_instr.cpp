@@ -173,13 +173,13 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     // Stores
     //key     name   operation  memsize       pointer
-    {0x28, { "sb",  OUT_I_STORE,  1, &MIPSInstr::calculate_store_addr, 1} },
-    {0x29, { "sh",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
-    {0x2A, { "swl", OUT_I_STOREL, 4, &MIPSInstr::calculate_store_addr, 1} },
-    {0x2B, { "sw",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 1} },
+    {0x28, { "sb",  OUT_I_STORE,         1, &MIPSInstr::calculate_store_addr,        1} },
+    {0x29, { "sh",  OUT_I_STORE,         2, &MIPSInstr::calculate_store_addr,        1} },
+    {0x2A, { "swl", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_left,   1} },
+    {0x2B, { "sw",  OUT_I_STORE,         4, &MIPSInstr::calculate_store_addr_aligned, 1} },
     //       0x2C   store double word left
     //       0x2D   store double word right
-    {0x2E, { "swr", OUT_I_STORER, 4, &MIPSInstr::calculate_store_addr, 1 } },
+    {0x2E, { "swr", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_right,  1 } },
     //       0x2F   cache
 
     // Advanced loads and stores
@@ -397,8 +397,7 @@ void MIPSInstr::init( const MIPSInstr::ISAEntry& entry)
             break;
 
         case OUT_I_STORE:
-        case OUT_I_STOREL:
-        case OUT_I_STORER:
+        case OUT_I_PARTIAL_STORE:
             v_imm = instr.asI.imm;
             src2 = MIPSRegister(instr.asI.rt);
             src1 = MIPSRegister(instr.asI.rs);

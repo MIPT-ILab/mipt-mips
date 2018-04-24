@@ -71,8 +71,7 @@ class MIPSInstr
             OUT_I_PARTIAL_LOAD,
             OUT_I_CONST,
             OUT_I_STORE,
-            OUT_I_STOREL,
-            OUT_I_STORER,
+            OUT_I_PARTIAL_STORE,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_RI_BRANCH_LINK,
@@ -311,6 +310,25 @@ class MIPSInstr
             mem_addr -= 3;
         }
 
+        // store functions done by analogy with loads
+        void calculate_store_addr_aligned() {
+            calculate_store_addr();
+            if ( mem_addr % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+        }
+
+        void calculate_store_addr_right() {
+            calculate_store_addr();
+            mask = bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
+        }
+
+        void calculate_store_addr_left() {
+            calculate_store_addr();
+            mask = ~bitmask<uint64>( ( 3 - mem_addr % 4) * 8);
+            mem_addr -= 3;
+        }
+
+
         Execute function = &MIPSInstr::execute_unknown;
     public:
         MIPSInstr() = delete;
@@ -342,6 +360,11 @@ class MIPSInstr
             return operation == OUT_I_PARTIAL_LOAD;
         }
 
+        bool is_partial_store() const
+        {
+            return operation == OUT_I_PARTIAL_STORE;
+        }
+
         bool is_load() const { return operation == OUT_I_LOAD ||
                                        operation == OUT_I_LOADU ||
                                        is_partial_load(); }
@@ -350,9 +373,10 @@ class MIPSInstr
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
+
         bool is_store() const { return operation == OUT_I_STORE  ||
-                                       operation == OUT_I_STORER ||
-                                       operation == OUT_I_STOREL; }
+                                       operation == OUT_I_PARTIAL_STORE; }
+
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
