@@ -68,12 +68,10 @@ class MIPSInstr
             OUT_RI_TRAP,
             OUT_I_LOAD,
             OUT_I_LOADU,
-            OUT_I_LOADR,
-            OUT_I_LOADL,
+            OUT_I_PARTIAL_LOAD,
             OUT_I_CONST,
             OUT_I_STORE,
-            OUT_I_STOREL,
-            OUT_I_STORER,
+            OUT_I_PARTIAL_STORE,
             OUT_J_JUMP,
             OUT_J_JUMP_LINK,
             OUT_RI_BRANCH_LINK,
@@ -86,8 +84,10 @@ class MIPSInstr
         {
             NO_TRAP,
             EXPLICIT_TRAP,
+            UNALIGNED_ADDRESS,
         } trap = TrapType::NO_TRAP;
 
+        // Endian specific
         const union _instr
         {
             const struct AsR
@@ -148,13 +148,13 @@ class MIPSInstr
         uint32 v_src1 = NO_VAL32;
         uint32 v_src2 = NO_VAL32;
         uint64 v_dst = NO_VAL64;
+        uint64 mask = all_ones<uint64>();
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
         // convert this to bitset
         bool complete   = false;
-        bool writes_dst = true;
         bool _is_jump_taken = false;      // actual result
 
         Addr new_PC = NO_VAL32;
@@ -224,8 +224,8 @@ class MIPSInstr
         void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
         void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
 
-        void execute_movn()  { execute_move(); writes_dst = (v_src2 != 0);}
-        void execute_movz()  { execute_move(); writes_dst = (v_src2 == 0);}
+        void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
+        void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
 
         // MIPStion-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
@@ -271,9 +271,63 @@ class MIPSInstr
         void execute_break()  { };
 
         void execute_unknown();
+        void calculate_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
 
-        void calculate_load_addr()  { mem_addr = v_src1 + sign_extend(v_imm); }
-        void calculate_store_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
+        void calculate_load_addr()  { calculate_addr(); }
+        void calculate_store_addr() { calculate_addr(); }
+
+        void calculate_load_addr_aligned() {
+            calculate_load_addr();
+            if ( mem_addr % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+        }
+
+        void calculate_load_addr_right() {
+            // Endian specific
+            calculate_load_addr();
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFFFF'FFFF;
+               case 1: return 0x00FF'FFFF;
+               case 2: return 0x0000'FFFF;
+               case 3: return 0x0000'00FF;
+               }
+             */
+            mask = bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
+        }
+
+        void calculate_load_addr_left() {
+            // Endian specific
+            calculate_load_addr();
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFF00'0000;
+               case 1: return 0xFFFF'0000;
+               case 2: return 0xFFFF'FF00;
+               case 3: return 0xFFFF'FFFF;
+               }
+             */
+            mask = ~bitmask<uint64>( ( 3 - mem_addr % 4) * 8);
+            // Actually we read a word LEFT to effective address
+            mem_addr -= 3;
+        }
+
+        // store functions done by analogy with loads
+        void calculate_store_addr_aligned() {
+            calculate_store_addr();
+            if ( mem_addr % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+        }
+
+        void calculate_store_addr_right() {
+            calculate_store_addr();
+            mask = bitmask<uint64>( ( 4 - mem_addr % 4) * 8);
+        }
+
+        void calculate_store_addr_left() {
+            calculate_store_addr();
+            mask = ~bitmask<uint64>( ( 3 - mem_addr % 4) * 8);
+            mem_addr -= 3;
+        }
+
 
         Execute function = &MIPSInstr::execute_unknown;
     public:
@@ -301,21 +355,28 @@ class MIPSInstr
                                       operation == OUT_I_BRANCH;     }
         bool is_jump_taken() const { return  _is_jump_taken; }
 
-        bool is_load()  const { return operation == OUT_I_LOAD  ||
-                                       operation == OUT_I_LOADU ||
-                                       operation == OUT_I_LOADR ||
-                                       operation == OUT_I_LOADL; }
-        int8 is_loadlr() const
+        bool is_partial_load() const
         {
-            return (operation == OUT_I_LOADR) ? 1 : (operation == OUT_I_LOADL) ? -1 : 0;
+            return operation == OUT_I_PARTIAL_LOAD;
         }
-        int8 is_accumulating_instr() const
+
+        bool is_partial_store() const
+        {
+            return operation == OUT_I_PARTIAL_STORE;
+        }
+
+        bool is_load() const { return operation == OUT_I_LOAD ||
+                                       operation == OUT_I_LOADU ||
+                                       is_partial_load(); }
+
+        int8 get_accumulation_type() const
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
+
         bool is_store() const { return operation == OUT_I_STORE  ||
-                                       operation == OUT_I_STORER ||
-                                       operation == OUT_I_STOREL; }
+                                       operation == OUT_I_PARTIAL_STORE; }
+
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
@@ -330,8 +391,6 @@ class MIPSInstr
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
-        bool get_writes_dst() const { return writes_dst; }
-
         bool is_bubble() const { return is_nop() && PC == 0; }
 
         void set_v_src( uint32 value, uint8 index)
@@ -342,17 +401,8 @@ class MIPSInstr
                 v_src2 = value;
         }
 
-        uint64 get_v_dst() const { return v_dst; }
-        auto get_lwrl_mask() const
-        {
-            // switch (mem_addr % 4) {
-            // case 0: return 0xFFFF'FFFF;
-            // case 1: return 0x00FF'FFFF;
-            // case 2: return 0x0000'FFFF;
-            // case 3: return 0x0000'00FF;
-            // }
-            return bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
-        }
+        auto get_v_dst() const { return v_dst; }
+        auto get_mask()  const { return mask;  }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
