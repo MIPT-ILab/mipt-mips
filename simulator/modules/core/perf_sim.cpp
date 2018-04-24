@@ -30,8 +30,7 @@ void PerfSim<ISA>::set_PC( Addr value)
 }
 
 template<typename ISA>
-void PerfSim<ISA>::run( const std::string& tr,
-                    uint64 instrs_to_run)
+void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     memory.reset( new Memory( tr));
     fetch.set_memory( memory.get());

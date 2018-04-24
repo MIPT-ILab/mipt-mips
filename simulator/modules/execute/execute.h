@@ -41,7 +41,7 @@ class Execute : public Log
         void save_flush() { flush_expiration_latency = RegisterStage::get_last_execution_stage_latency(); }
         void clock_saved_flush()
         {
-            if ( !( flush_expiration_latency == 0_Lt))
+            if ( flush_expiration_latency != 0_Lt)
                 flush_expiration_latency = flush_expiration_latency - 1_Lt;
         }
         auto has_flush_expired() const { return flush_expiration_latency == 0_Lt; }

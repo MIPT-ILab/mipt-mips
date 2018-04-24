@@ -5,6 +5,7 @@
 
 #include "decode.h"
 
+
 template <typename ISA>
 Decode<ISA>::Decode( bool log) : Log( log)
 {
@@ -66,7 +67,7 @@ void Decode<ISA>::clock( Cycle cycle)
     /* update bypassing unit because of misprediction */
     if ( rp_bypassing_unit_flush_notify->is_ready( cycle))
     {
-        rp_bypassing_unit_flush_notify->read( cycle);
+        rp_bypassing_unit_flush_notify->ignore( cycle);
         bypassing_unit->handle_flush();
     }
 

@@ -22,7 +22,7 @@ public:
     auto get_predicted_target() const { return bp_data.target; }
     BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_jump_taken(), this->get_new_PC()); }
 
-    auto is_bypassible() const { return !this->is_conditional_move() && !this->is_accumulating_instr(); }
+    auto is_bypassible() const { return !this->is_conditional_move() && !this->is_accumulating_instr() && !this->is_loadlr(); }
     
     auto is_complex_arithmetic() const { return this->is_divmult(); }
     auto is_mem_stage_required() const { return this->is_load()  ||

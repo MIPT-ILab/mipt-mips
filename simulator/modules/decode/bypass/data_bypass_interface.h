@@ -21,7 +21,7 @@ public:
 
     static constexpr const uint8 BYPASSING_STAGES_NUMBER = 4;
 
-    static void set_complex_arithmetic_latency_value( uint8 value) 
+    static void set_complex_alu_latency_value( uint8 value) 
     { 
         LAST_EXECUTION_STAGE_VALUE = value - 1;
     }

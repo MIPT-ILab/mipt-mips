@@ -94,7 +94,7 @@ class DataBypass
 
             void update()
             {
-                if ( !( operation_latency == 0_Lt))
+                if ( operation_latency != 0_Lt)
                     operation_latency = operation_latency - 1_Lt;
             }
         };
