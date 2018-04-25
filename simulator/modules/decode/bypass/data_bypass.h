@@ -56,7 +56,7 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand<Register>( get_current_stage( reg_num), reg_num, last_execution_stage_value);
+            return BypassCommand<Register>( get_entry( reg_num).current_stage, reg_num, last_execution_stage_value);
         }
 
         // introduces new instruction to bypassing unit
@@ -106,12 +106,6 @@ class DataBypass
             return scoreboard.at( num.to_size_t());
         }
 
-        // returns current stage of passed register
-        // in accordance with the current state of the scoreboard
-        RegisterStage get_current_stage( Register num) const
-        {
-            return get_entry( num).current_stage;
-        }
 
         // returns a latency of passed instruction
         // in accordance with a type of the instruction
