@@ -27,21 +27,21 @@ class DataBypass
             : last_execution_stage_value( static_cast<uint8>(complex_alu_latency - 1))
         { }
 
-        // checks whether the source register of passed instruction is in RF  
+        // checks whether a source register of an instruction is in the RF  
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).current_stage.is_in_RF();
         }
 
-        // checks whether the source register of passed instruction is bypassible
+        // checks whether a source register of an instruction is bypassible
         auto is_bypassible( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).is_bypassible;
         }
 
-        // checks if the stall needed for passed instruction
+        // checks whether the stall is needed for an instruction
         auto is_stall( const Instr& instr) const
         {
             const auto instruction_latency = get_instruction_latency( instr);
@@ -51,21 +51,21 @@ class DataBypass
                     ( instruction_latency < writeback_stage_info.operation_latency));
         }
 
-        // returns bypass command for passed instruction and its source register
-        // in accordance with current state of the scoreboard
+        // returns a bypass command for a source register of an instruction
+        // in accordance with a current state of the scoreboard
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand<Register>( get_current_stage( reg_num), reg_num, last_execution_stage_value);
+            return BypassCommand<Register>( get_entry( reg_num).current_stage, reg_num, last_execution_stage_value);
         }
 
-        // introduces new instruction to bypassing unit
+        // garners the information about a new instruction
         void trace_new_instr( const Instr& instr);
 
         // updates the scoreboard
         void update();
 
-        // handle pipeline flush
+        // handles a flush of the pipeline
         void handle_flush();
     
     private:
@@ -106,14 +106,7 @@ class DataBypass
             return scoreboard.at( num.to_size_t());
         }
 
-        // returns current stage of passed register
-        // in accordance with the current state of the scoreboard
-        RegisterStage get_current_stage( Register num) const
-        {
-            return get_entry( num).current_stage;
-        }
-
-        // returns a latency of passed instruction
+        // returns a latency of an instruction
         // in accordance with a type of the instruction
         Latency get_instruction_latency( const Instr& instr) const
         {
@@ -126,7 +119,7 @@ class DataBypass
             return 1_Lt;
         }
 
-        // introduces a source register of passed instruction to the scoreboard 
+        // garners the information about a new register
         void trace_new_register( const Instr& instr, Register num);
 };
 
