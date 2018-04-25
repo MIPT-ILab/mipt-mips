@@ -63,7 +63,7 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 * `--icache-line-size` — line size of instruction cache
 
 #### Complex pipeline
-* `--complex_alu_latency` - number of execution stages required for complex arithmetic instructions to be complete
+* `--complex-alu-latency` - number of execution stages required for complex arithmetic instructions to be complete
 
 ## About MIPT-MIPS
 
