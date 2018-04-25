@@ -65,7 +65,6 @@ public:
     auto get_register_num() const { return register_num; }
 
     // returns an index of the port where bypassed data should be get from
-    // in accordance with passed bypass command
     auto get_bypass_direction() const
     {
         uint8 bypass_direction = 0;
