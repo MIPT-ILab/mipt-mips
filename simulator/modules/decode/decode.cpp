@@ -3,7 +3,13 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
+#include <infra/config/config.h>
+
 #include "decode.h"
+
+namespace config {
+    extern Value<uint64> complex_alu_latency;
+} // namespace config
 
 template <typename ISA>
 Decode<ISA>::Decode( bool log) : Log( log)
@@ -25,13 +31,11 @@ Decode<ISA>::Decode( bool log) : Log( log)
     
     wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
-
-    rps_bypassing_unit_flush_notify[0] = make_read_port<Instr>("EXECUTE_2_BYPASSING_UNIT_FLUSH_NOTIFY",
-                                                               PORT_LATENCY);
-    rps_bypassing_unit_flush_notify[1] = make_read_port<Instr>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY",
-                                                               PORT_LATENCY);
     
-    bypassing_unit = std::make_unique<BypassingUnit>();
+    rp_bypassing_unit_flush_notify = make_read_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY",
+                                                           PORT_LATENCY);
+
+    bypassing_unit = std::make_unique<BypassingUnit>( config::complex_alu_latency);
 }
 
 
@@ -55,16 +59,6 @@ void Decode<ISA>::clock( Cycle cycle)
     /* receive flush signal */
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
 
-    // untrace instructions from flushed stages
-    for ( auto& port:rps_bypassing_unit_flush_notify)
-    {
-        if ( port->is_ready( cycle))
-        {
-            const auto& instr = port->read( cycle);
-            bypassing_unit->untrace_instr( instr);
-        }
-    }
-
     /* update bypassing unit */
     bypassing_unit->update();
 
@@ -73,6 +67,13 @@ void Decode<ISA>::clock( Cycle cycle)
     {
         auto instr = rp_bypassing_unit_notify->read( cycle);
         bypassing_unit->trace_new_instr( instr);
+    }
+
+    /* update bypassing unit because of misprediction */
+    if ( rp_bypassing_unit_flush_notify->is_ready( cycle))
+    {
+        rp_bypassing_unit_flush_notify->ignore( cycle);
+        bypassing_unit->handle_flush();
     }
 
     /* branch misprediction */

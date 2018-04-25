@@ -21,12 +21,18 @@ public:
     auto get_predicted_target() const { return bp_data.target; }
     BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_jump_taken(), this->get_new_PC()); }
 
-    bool is_bypassible() const {
-        return !this->is_conditional_move()
-            && !this->is_partial_load()
-            && !this->is_partial_store()
-            && this->get_accumulation_type() == 0;
-    }
+    bool is_bypassible() const { return !this->is_conditional_move() &&
+                                        !this->is_partial_load()     &&
+                                        !this->is_partial_store()    &&
+                                        this->get_accumulation_type() == 0; }
+
+    auto is_complex_arithmetic() const { return this->is_divmult(); }
+    
+    auto is_mem_stage_required() const { return this->is_load()  ||
+                                                this->is_store() ||
+                                                this->is_jump()  ||
+                                                this->is_explicit_trap() ||
+                                                this->is_special(); }
 };
 
 #endif // PERF_INSTR_H

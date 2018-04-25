@@ -31,7 +31,8 @@ private:
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
     /* Input */
-    std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
 
     /* Output */
     std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
