@@ -23,10 +23,11 @@ public:
 
     bool is_bypassible() const { return !this->is_conditional_move() &&
                                         !this->is_partial_load()     &&
+                                        !this->is_partial_store()    &&
                                         this->get_accumulation_type() == 0; }
 
     auto is_complex_arithmetic() const { return this->is_divmult(); }
-
+    
     auto is_mem_stage_required() const { return this->is_load()  ||
                                                 this->is_store() ||
                                                 this->is_jump()  ||
