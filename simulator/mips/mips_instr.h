@@ -375,7 +375,7 @@ class MIPSInstr
         }
 
         bool is_store() const { return operation == OUT_I_STORE  ||
-                                       operation == OUT_I_PARTIAL_STORE; }
+                                       is_partial_store(); }
 
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
@@ -386,7 +386,7 @@ class MIPSInstr
 
         bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
                                                operation == OUT_RI_TRAP; }
-        
+
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
