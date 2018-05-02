@@ -48,45 +48,45 @@ TEST( RF, read_write_rf)
 
     for( size_t i = 1; i < 32; ++i)
     {
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x78); // only one byte must go
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x78u); // only one byte must go
 
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF00);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5600);
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5600u);
 
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFFFF);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5678);
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5678u);
 
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFFFF00);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x345600);
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x345600u);
 
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFFFFFF00);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x12345600);
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFFFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x12345600u);
 
-        rf->write( MIPSRegister(i), 0);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF0000);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340000);
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340000u);
 
-        rf->write( MIPSRegister(i), 0x1);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF0000);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340001);
+        rf->write( MIPSRegister(i), 0x1u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340001u);
 
-        rf->write( MIPSRegister(i), 0x9876);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF0000);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x349876);
+        rf->write( MIPSRegister(i), 0x9876u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x349876u);
 
-        rf->write( MIPSRegister(i), 0x5500);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5578);
+        rf->write( MIPSRegister(i), 0x5500u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5578u);
 
-        rf->write( MIPSRegister(i), 0x558700);
-        rf->write( MIPSRegister(i), 0x12345678, 0xFF0000);
-        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x348700);
+        rf->write( MIPSRegister(i), 0x558700u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x348700u);
     }
 
     // Additional checks for mips_hi_lo
