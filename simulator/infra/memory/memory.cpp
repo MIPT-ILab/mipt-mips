@@ -82,7 +82,7 @@ uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
     return value;
 }
 
-void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
+void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes, uint32 mask)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
@@ -94,6 +94,9 @@ void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
 
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
+
+    value &= mask; // Clear unnecessary bits
+    value |= (read( addr, num_of_bytes) & ~mask);
 
     // Endian specific
     for ( size_t i = 0; i < num_of_bytes; ++i)

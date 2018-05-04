@@ -45,7 +45,10 @@ class InstrMemory : private FuncMemory
         {
             instr_cache.erase( instr.get_mem_addr());
             // potential bug for RISCV128
-            write(static_cast<uint64>(instr.get_v_src2()), instr.get_mem_addr(), instr.get_mem_size());
+            write( static_cast<uint64>(instr.get_v_src2()),
+                   instr.get_mem_addr(),
+                   instr.get_mem_size(),
+                   static_cast<uint64>(instr.get_mask()));
         }
 
         void load_store(Instr* instr)
@@ -58,4 +61,3 @@ class InstrMemory : private FuncMemory
 };
 
 #endif // INSTR_CACHE_H
-
