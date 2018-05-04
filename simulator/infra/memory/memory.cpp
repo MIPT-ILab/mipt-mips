@@ -96,6 +96,7 @@ void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes, uint32 mas
     alloc( addr + num_of_bytes - 1);
 
     value &= mask; // Clear unnecessary bits
+    value |= (read( addr, num_of_bytes) & ~mask);
 
     // Endian specific
     for ( size_t i = 0; i < num_of_bytes; ++i)
