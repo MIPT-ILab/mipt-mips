@@ -16,13 +16,6 @@
 
 #include "memory.h"
 
-union uint64_8
-{
-    uint8 bytes[sizeof(uint64) / sizeof(uint8)];
-    uint64 val;
-    explicit uint64_8( uint64 value) : val( value) { }
-};
-
 FuncMemory::FuncMemory( const std::string& executable_file_name,
                         uint32 addr_bits,
                         uint32 page_bits,
@@ -80,15 +73,16 @@ uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
     if ( !check( addr) || !check( addr + num_of_bytes - 1))
          return NO_VAL64;
 
-    uint64_8 value(0ull);
+    uint64 value = 0ull;
 
+    // Endian specific
     for ( size_t i = 0; i < num_of_bytes; ++i)
-        value.bytes[i] = read_byte( addr + i);
+        value |= read_byte( addr + i) << i * 8;
 
-    return value.val;
+    return value;
 }
 
-void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
+void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes, uint32 mask)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
@@ -101,10 +95,12 @@ void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes)
     alloc( addr);
     alloc( addr + num_of_bytes - 1);
 
-    const uint64_8 value_( value);
+    value &= mask; // Clear unnecessary bits
+    value |= (read( addr, num_of_bytes) & ~mask);
 
+    // Endian specific
     for ( size_t i = 0; i < num_of_bytes; ++i)
-        write_byte( addr + i, value_.bytes[i]);
+        write_byte( addr + i, static_cast<uint8>((value >> i * 8) & 0xFFu));
 }
 
 void FuncMemory::alloc( Addr addr)

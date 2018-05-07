@@ -18,10 +18,10 @@
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
 
-class TestRF : public RF<MIPS> 
+class TestRF : public RF<MIPS>
 {
     public:
-        TestRF() : RF<MIPS>() {}; 
+        TestRF() : RF<MIPS>() {};
         using RF<MIPS>::read;
         using RF<MIPS>::write;
         using RF<MIPS>::read_hi_lo;
@@ -32,37 +32,82 @@ static_assert(MIPSRegister::MAX_REG >= 32);
 TEST( RF, read_write_rf)
 {
     auto rf = std::make_unique<TestRF>();
-    
+
     // Fill array using write() and check correctness using read()
     for( size_t i = 0; i < 32; ++i)
-    {   
+    {
         rf->write( MIPSRegister(i), i);
-        
+
         // Try to write something in zero register
         rf->write( MIPSRegister::zero, i);
-        
+
         // Checks
         ASSERT_EQ( rf->read( MIPSRegister(i)), i);
         ASSERT_EQ( rf->read( MIPSRegister::zero), 0u);
     }
 
-    // Additional checks for mips_hi_lo 
+    for( size_t i = 1; i < 32; ++i)
+    {
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x78u); // only one byte must go
+
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5600u);
+
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5678u);
+
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x345600u);
+
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFFFFF00u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x12345600u);
+
+        rf->write( MIPSRegister(i), 0u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340000u);
+
+        rf->write( MIPSRegister(i), 0x1u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x340001u);
+
+        rf->write( MIPSRegister(i), 0x9876u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x349876u);
+
+        rf->write( MIPSRegister(i), 0x5500u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFFu);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x5578u);
+
+        rf->write( MIPSRegister(i), 0x558700u);
+        rf->write( MIPSRegister(i), 0x12345678u, 0xFF0000u);
+        ASSERT_EQ( rf->read( MIPSRegister(i)), 0x348700u);
+    }
+
+    // Additional checks for mips_hi_lo
+    // Write 1 to HI and 1 to LO
     rf->write( MIPSRegister::mips_hi_lo, static_cast<uint128>(MAX_VAL64) + 1u);
+
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
-    ASSERT_EQ( rf->read_hi_lo(false), static_cast<uint128>(MAX_VAL64) + 1u);
+    ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi_lo, 1u, -1 /* subtract */);
+    rf->write( MIPSRegister::mips_hi_lo, 1u, all_ones<uint64>(), -1 /* subtract */);
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 0u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), MAX_VAL32);
-    ASSERT_EQ( rf->read_hi_lo(true), static_cast<uint64>(MAX_VAL32));
+    ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32));
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi_lo, 1u, +1 /* add */);
+    rf->write( MIPSRegister::mips_hi_lo, 1u, all_ones<uint64>(), +1 /* add */);
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
-    ASSERT_EQ( rf->read_hi_lo(true), static_cast<uint64>(MAX_VAL32) + 1u);
+    ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);
 }
 
 TEST( RF, read_sources_write_dst_rf)
@@ -82,7 +127,7 @@ TEST( RF, read_sources_write_dst_rf)
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
 
-    // Same 
+    // Same
     instr = std::make_unique<MIPSInstr>( 0x01398821);
     rf->read_sources( instr.get());
     instr->execute();
@@ -154,11 +199,10 @@ TEST( RF, read_sources_write_dst_rf)
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
 }
-    
+
 int main( int argc, char* argv[])
 {
     ::testing::InitGoogleTest( &argc, argv);
     ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     return RUN_ALL_TESTS();
 }
-

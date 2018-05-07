@@ -48,6 +48,14 @@ static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
 static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
 static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
 
+static_assert(all_ones<uint8>()  == 0xFFull);
+static_assert(all_ones<uint16>() == 0xFFFFull);
+static_assert(all_ones<uint32>() == 0xFFFF'FFFFull);
+
+static_assert(msb_set<uint8>()  == 0x80ull);
+static_assert(msb_set<uint16>() == 0x8000ull);
+static_assert(msb_set<uint32>() == 0x8000'0000ull);
+
 /*
 static_assert(popcount(0) == 0);
 static_assert(popcount(1) == 1);
@@ -61,3 +69,20 @@ static_assert(popcount(~static_cast<uint64>(MAX_VAL32)) == 0);
 static_assert(bitmask<uint32>(1) == 1);
 static_assert(bitmask<uint32>(3) == 7);
 static_assert(bitmask<uint32>(32) == MAX_VAL32);
+
+static_assert(count_leading_zeroes<uint8>(0xFF) == 0);
+static_assert(count_leading_zeroes<uint32>(0xFF) == 24);
+static_assert(count_leading_zeroes<uint64>(0xFF) == 56);
+static_assert(count_leading_zeroes<uint8>(0x0) == 8);
+static_assert(count_leading_zeroes<uint32>(0x0) == 32);
+static_assert(count_leading_zeroes<uint64>(0x0) == 64);
+static_assert(count_leading_zeroes<uint8>(static_cast<uint8>(0xFF)) == 0);
+static_assert(count_leading_zeroes<uint32>(~static_cast<uint32>(0)) == 0);
+static_assert(count_leading_zeroes<uint64>(~static_cast<uint64>(0)) == 0);
+
+/* Boost cannot instantiate count_leading_zeroes in constexpr context
+static_assert(count_leading_zeroes<uint128>(0x0) == 128);
+static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
+static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
+*/
+

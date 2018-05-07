@@ -78,15 +78,23 @@ class RISCVInstr
 
         constexpr bool is_conditional_move() const { return false; }
 
+        constexpr bool is_divmult() const { return false; }
+
+        constexpr bool is_explicit_trap() const { return false; }
+        
+        constexpr bool is_special() const { return false; }
+
         constexpr bool has_trap() const { return false; }
 
         constexpr bool get_writes_dst() const { return false; }
 
         constexpr bool is_bubble() const { return false; }
 
-        constexpr bool is_muldiv() const { return false; }
+        constexpr int8 get_accumulation_type() const { return 0; }
 
-        constexpr int8 is_accumulating_instr() const { return 0; }
+        constexpr bool is_partial_load() const { return false; }
+
+        constexpr bool is_partial_store() const { return false; }
 
         void set_v_src( const T& value, uint8 index)
         {
@@ -97,6 +105,7 @@ class RISCVInstr
         }
 
         auto get_v_dst() const { return v_dst; }
+        auto get_mask() const { return 0; }
 
         Addr get_mem_addr() const { return mem_addr; }
         uint32 get_mem_size() const { return mem_size; }
