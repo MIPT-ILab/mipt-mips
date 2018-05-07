@@ -96,6 +96,8 @@ class RISCVInstr
 
         constexpr bool is_partial_store() const { return false; }
 
+        constexpr bool is_mthi() const { return false; }
+
         void set_v_src( const T& value, uint8 index)
         {
             if ( index == 0)

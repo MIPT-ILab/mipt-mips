@@ -425,6 +425,8 @@ class MIPSInstr
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
+        bool is_mthi() const { return operation == OUT_R_MTHI; }
+
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
         bool is_muldiv() const { return operation == OUT_R_DIVMULT; }
@@ -449,11 +451,6 @@ class MIPSInstr
 
         void set_v_dst(uint64 value); // for loads
         uint64 get_v_src2() const { return v_src2; } // for stores
-
-        uint64 get_bypassing_data() const
-        {
-            return ( dst.is_mips_hi()) ? v_dst << 32u : v_dst;
-        }
 
         void execute();
         void check_trap();

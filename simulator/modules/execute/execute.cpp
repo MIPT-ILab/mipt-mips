@@ -102,7 +102,7 @@ void Execute<ISA>::clock( Cycle cycle)
 
         if ( has_flush_expired())
         {
-            wp_complex_arithmetic_bypass->write( instr.get_bypassing_data(), cycle);
+            wp_complex_arithmetic_bypass->write( instr.get_v_dst(), cycle);
             wp_writeback_datapath->write( instr, cycle);
         }
     }
@@ -122,9 +122,7 @@ void Execute<ISA>::clock( Cycle cycle)
         return;
     }
 
-
     auto instr = rp_datapath->read( cycle);
-
 
     for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {
@@ -168,7 +166,7 @@ void Execute<ISA>::clock( Cycle cycle)
     else
     {
         /* bypass data */
-        wp_bypass->write( instr.get_bypassing_data(), cycle);
+        wp_bypass->write( instr.get_v_dst(), cycle);
         
         if ( instr.is_mem_stage_required())
             wp_mem_datapath->write( instr, cycle);
