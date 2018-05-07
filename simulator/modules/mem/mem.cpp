@@ -77,7 +77,7 @@ void Mem<ISA>::clock( Cycle cycle)
     memory->load_store( &instr);
     
     /* bypass data */
-    wp_bypass->write( instr.get_bypassing_data(), cycle);
+    wp_bypass->write( instr.get_v_dst(), cycle);
 
     wp_datapath->write( instr, cycle);
 
