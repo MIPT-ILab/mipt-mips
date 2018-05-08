@@ -86,14 +86,14 @@ protected:
         return 0u;
     }
 
-    static uint64 get_hi_lo_64(uint128 val) 
+    static uint64 get_hi_lo_64(const uint128& val) 
     {
-        const uint64 lo = static_cast<uint64>(val);
-        const uint64 hi = static_cast<uint64>(val >> 64);
-        return (hi << 32) | lo;
+        const auto lo = static_cast<uint64>(val);
+        const auto hi = static_cast<uint64>(val >> 64u);
+        return (hi << 32u) | lo;
     }
 
-    void write( Register num, RegDstUInt val, RegDstUInt mask = all_ones<RegDstUInt>(), int8 accumulation = 0)
+    void write( Register num, RegDstUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
     {
         if ( num.is_zero())
             return;
@@ -107,18 +107,18 @@ protected:
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
             if (accumulation != 0) {
-                write( Register::mips_hi, get_hi_part_accum( val), bitmask<RegDstUInt>(32));
-                write( Register::mips_lo, val,                     bitmask<RegDstUInt>(32));
+                write( Register::mips_hi, get_hi_part_accum( val), bitmask<RegisterUInt>(32));
+                write( Register::mips_lo, val,                     bitmask<RegisterUInt>(32));
                 return;
             }
-            write( Register::mips_hi, get_hi_part( val), bitmask<RegDstUInt>(64));
-            write( Register::mips_lo, val,               bitmask<RegDstUInt>(64));
+            write( Register::mips_hi, get_hi_part( val), bitmask<RegisterUInt>(64));
+            write( Register::mips_lo, val,               bitmask<RegisterUInt>(64));
             return;
         }
 
         // No hacks
         get_value( num) &= ~mask;         // Clear old bits
-        get_value( num) |= ( val & mask); // Set new bits
+        get_value( num) |= static_cast<RegisterUInt>( val) & mask; // Set new bits
     }
 
 public:

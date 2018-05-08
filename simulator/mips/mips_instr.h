@@ -28,12 +28,11 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 uint128 mips_multiplication(T x, T y) {
-    if constexpr ( bitwidth<T> == 32) {
-        uint64 val = static_cast<uint64>(x) * static_cast<uint64>(y);
-        uint64 lo  = static_cast<uint64>( static_cast<uint32>( val));
-        uint128 hi = static_cast<uint128>( static_cast<uint64>( val) >> 32);
-        return (hi << 64) | lo;
-
+    if constexpr ( bitwidth<T> == 32) { // NOLINT(misc-suspicious-semicolon)
+        auto val = static_cast<uint64>(x) * static_cast<uint64>(y);
+        auto lo  = static_cast<uint64>( static_cast<uint32>( val));
+        auto hi  = static_cast<uint128>( static_cast<uint64>( val) >> 32u);
+        return (hi << 64u) | lo;
     }
     return static_cast<uint128>(x) * static_cast<uint128>(y);
 }
@@ -45,7 +44,7 @@ uint128 mips_division(T x, T y) {
         return 0;
     auto x1 = static_cast<T64>(x);
     auto y1 = static_cast<T64>(y);
-    if constexpr ( bitwidth<T> == 32)
+    if constexpr ( bitwidth<T> == 32) // NOLINTNEXTLINE(misc-suspicious-semicolon)
         return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
 
     return static_cast<uint128>(static_cast<uint64>(x1 / y1)) | (static_cast<uint128>(static_cast<uint64>(x1 % y1)) << 64);
@@ -231,7 +230,7 @@ class MIPSInstr
 
         template <typename T>
         void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
-        void execute_dsll32() { v_dst = v_src1 << (shamt + 32); }
+        void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
         void execute_srl()   { v_dst = v_src1 >> shamt; }
 
         template <typename T>
@@ -243,11 +242,11 @@ class MIPSInstr
         template <typename T>
         void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> static_cast<T>( v_src2); }
         void execute_dsrl()   { v_dst = v_src1 >> shamt; }
-        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32); }
+        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
 
         template <typename T>
         void execute_srav()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), v_src2); }
-        void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm) << 0x10); }
+        void execute_lui()    { v_dst = static_cast<uint32>( sign_extend( v_imm)) << 0x10u; }
         
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
