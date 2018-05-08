@@ -20,8 +20,9 @@ class RF
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
     using RegDstUInt = typename ISA::RegDstUInt;
-    static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 32;
 
+    static const constexpr bool HAS_WIDE_DST = bitwidth<RegDstUInt> > 64;
+    static const constexpr bool HAS_32_BIT_DST = bitwidth<RegDstUInt> > 32;
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
@@ -37,7 +38,7 @@ class RF
         // on `if constexpr ()` with template
         // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
         if constexpr( HAS_WIDE_DST)
-            return value >> 32u; // NOLINT(misc-suspicious-semicolon)
+            return value >> 64u; // NOLINT(misc-suspicious-semicolon)
 
         // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
         // Wrong warning with unused-but-set-parameter within 'if constexpr'
@@ -45,17 +46,34 @@ class RF
         return 0;
     }
 
+    static RegDstUInt get_hi_part_accum( RegDstUInt value)
+    {
+        // Clang-Tidy generates a false positive 'misc-suspicious-semicolon' warning
+        // on `if constexpr ()` with template
+        // LLVM bug 35824: https://bugs.llvm.org/show_bug.cgi?id=35824
+        if constexpr( HAS_32_BIT_DST)
+            return value >> 32u; // NOLINT(misc-suspicious-semicolon)
+
+        // GCC bug 81676 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81676
+        // Wrong warning with unused-but-set-parameter within 'if constexpr'
+        (void)(value);
+        return 0;
+    }
 protected:
+
     auto read( Register num) const
     {
         assert( !num.is_mips_hi_lo());
         return get_value( num);
     }
 
+    // Used only by accumulating instructions
+    // According to MIPS64 ISA, result is unpredictable
+    // if upper 32 bits of HI or LO are not trivial
     template <typename U = RegDstUInt>
     std::enable_if_t<HAS_WIDE_DST, U> read_hi_lo() const
     {
-        const auto hi = static_cast<RegDstUInt>( read( Register::mips_hi));
+        const auto hi = static_cast<RegDstUInt>( read( Register::mips_hi)) & bitmask<RegDstUInt>(32);
         const auto lo = static_cast<RegDstUInt>( read( Register::mips_lo)) & bitmask<RegDstUInt>(32);
         return (hi << 32u) | lo;
     }
@@ -68,30 +86,43 @@ protected:
         return 0u;
     }
 
-    void write( Register num, RegDstUInt val, RegDstUInt mask = all_ones<RegDstUInt>(), int8 accumulation = 0)
+    static uint64 get_hi_lo_64(const uint128& val) 
+    {
+        const auto lo = static_cast<uint64>(val);
+        const auto hi = static_cast<uint64>(val >> 64u);
+        return (hi << 32u) | lo;
+    }
+
+    void write( Register num, RegDstUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
     {
         if ( num.is_zero())
             return;
 
         // Hacks for MIPS madds/msubs
         if ( accumulation == 1)
-            val = read_hi_lo() + val;
+            val = read_hi_lo() + get_hi_lo_64(val);
         else if ( accumulation == -1)
-            val = read_hi_lo() - val;
+            val = read_hi_lo() - get_hi_lo_64(val);
 
         // Hacks for MIPS multiplication register
         if ( num.is_mips_hi_lo()) {
-            write( Register::mips_hi, get_hi_part( val), bitmask<RegDstUInt>(32));
-            write( Register::mips_lo, val,               bitmask<RegDstUInt>(32));
+            if (accumulation != 0) {
+                write( Register::mips_hi, get_hi_part_accum( val), bitmask<RegisterUInt>(32));
+                write( Register::mips_lo, val,                     bitmask<RegisterUInt>(32));
+                return;
+            }
+            write( Register::mips_hi, get_hi_part( val), bitmask<RegisterUInt>(64));
+            write( Register::mips_lo, val,               bitmask<RegisterUInt>(64));
             return;
         }
 
         // No hacks
         get_value( num) &= ~mask;         // Clear old bits
-        get_value( num) |= ( val & mask); // Set new bits
+        get_value( num) |= static_cast<RegisterUInt>( val) & mask; // Set new bits
     }
 
 public:
+
     RF() = default;
 
     inline void read_source( FuncInstr* instr, uint8 index) const

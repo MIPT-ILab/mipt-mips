@@ -28,7 +28,7 @@ Decode<ISA>::Decode( bool log) : Log( log)
                                                                             PORT_BW, PORT_FANOUT);
     wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
                                                                             PORT_BW, PORT_FANOUT);
-    
+
     wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
     
@@ -96,12 +96,12 @@ void Decode<ISA>::clock( Cycle cycle)
     auto instr = read_instr( cycle);
 
     if ( bypassing_unit->is_stall( instr))
-    {   
+    {
         // data hazard, stalling pipeline
         wp_stall->write( true, cycle);
         wp_stall_datapath->write( instr, cycle);
         sout << instr << " (data hazard)\n";
-        return;   
+        return;
     }
 
     for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)

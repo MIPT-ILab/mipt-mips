@@ -90,7 +90,9 @@ TEST( RF, read_write_rf)
     }
 
     // Additional checks for mips_hi_lo
-    rf->write( MIPSRegister::mips_hi_lo, static_cast<uint64>(MAX_VAL32) + 1u);
+    // Write 1 to HI and 1 to LO
+    rf->write( MIPSRegister::mips_hi_lo, static_cast<uint128>(MAX_VAL64) + 1u);
+
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
     ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);

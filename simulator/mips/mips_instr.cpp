@@ -16,17 +16,17 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
     //key      name  operation  memsize           pointer
-    {0x0, { "sll" , OUT_R_SHAMT, 0, &MIPSInstr::execute_sll, 1} },
+    {0x0, { "sll" , OUT_R_SHAMT, 0, &MIPSInstr::execute_sll<uint32>, 1} },
     //       0x1 movci
     {0x2, { "srl", OUT_R_SHAMT, 0, &MIPSInstr::execute_srl, 1} },
-    {0x3, { "sra", OUT_R_SHAMT, 0, &MIPSInstr::execute_sra, 1} },
+    {0x3, { "sra", OUT_R_SHAMT, 0, &MIPSInstr::execute_sra<uint32>, 1} },
 
     // Variable shifts
     //key      name  operation  memsize           pointer
     {0x4, { "sllv", OUT_R_SHIFT, 0, &MIPSInstr::execute_sllv, 1} },
     //        0x5 reserved
-    {0x6, { "srlv", OUT_R_SHIFT, 0, &MIPSInstr::execute_srlv, 1} },
-    {0x7, { "srav", OUT_R_SHIFT, 0, &MIPSInstr::execute_srav, 1} },
+    {0x6, { "srlv", OUT_R_SHIFT, 0, &MIPSInstr::execute_srlv<uint32>, 1} },
+    {0x7, { "srav", OUT_R_SHIFT, 0, &MIPSInstr::execute_srav<uint32>, 1} },
 
     // Indirect branches
     //key      name   operation  memsize           pointer
@@ -51,8 +51,12 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x11, { "mthi", OUT_R_MTHI, 0, &MIPSInstr::execute_move, 1} },
     {0x12, { "mflo", OUT_R_MFLO, 0, &MIPSInstr::execute_move, 1} },
     {0x13, { "mtlo", OUT_R_MTLO, 0, &MIPSInstr::execute_move, 1} },
-
-    // 0x14 - 0x17 double width shifts
+  
+    // Doubleword variable shifts
+    //key      name   operation  memsize           pointer
+    {0x14, { "dsllv", OUT_R_SHIFT, 0, &MIPSInstr::execute_dsllv,        4} },
+    {0x16, { "dsrlv", OUT_R_SHIFT, 0, &MIPSInstr::execute_srlv<uint64>, 4} },
+    {0x17, { "dsrav", OUT_R_SHIFT, 0, &MIPSInstr::execute_srav<uint64>, 4} },
 
     // Multiplication/Division
     //key      name    operation  memsize           pointer
@@ -60,15 +64,17 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x19, { "multu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_multu, 1} },
     {0x1A, { "div",   OUT_R_DIVMULT, 0, &MIPSInstr::execute_div,   1} },
     {0x1B, { "divu",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_divu,  1} },
-
-    // 0x1C - 0x1F double width multiplication/division
+    {0x1C, { "dmult", OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmult,  64} },
+    {0x1D, { "dmultu",OUT_R_DIVMULT, 0, &MIPSInstr::execute_dmultu, 64} },
+    {0x1E, { "ddiv",  OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddiv,    3} },
+    {0x1F, { "ddivu", OUT_R_DIVMULT, 0, &MIPSInstr::execute_ddivu,    3} },
 
     // Addition/Subtraction
     //key      name   operation  memsize           pointer
-    {0x20, { "add",  OUT_R_ARITHM, 0, &MIPSInstr::execute_add,  1} },
-    {0x21, { "addu", OUT_R_ARITHM, 0, &MIPSInstr::execute_addu, 1} },
-    {0x22, { "sub",  OUT_R_ARITHM, 0, &MIPSInstr::execute_sub,  1} },
-    {0x23, { "subu", OUT_R_ARITHM, 0, &MIPSInstr::execute_subu, 1} },
+    {0x20, { "add",  OUT_R_ARITHM, 0, &MIPSInstr::execute_add<int32>,          1} },
+    {0x21, { "addu", OUT_R_ARITHM, 0, &MIPSInstr::execute_addu<uint32>,        1} },
+    {0x22, { "sub",  OUT_R_ARITHM, 0, &MIPSInstr::execute_sub<uint32, int32>,  1} },
+    {0x23, { "subu", OUT_R_ARITHM, 0, &MIPSInstr::execute_subu<uint32>,        1} },
 
     // Logical operations
     //key      name   operation  memsize           pointer
@@ -80,8 +86,10 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     //        0x29 reserved
     {0x2A, { "slt",  OUT_R_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::lt>,  1} },
     {0x2B, { "sltu", OUT_R_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::ltu>, 1} },
-
-    // 0x2C - 0x2F double width addition/substraction
+    {0x2C, { "dadd",  OUT_R_ARITHM, 0, &MIPSInstr::execute_add<int64>,          1} },
+    {0x2D, { "daddu", OUT_R_ARITHM, 0, &MIPSInstr::execute_addu<uint64>,        1} },
+    {0x2E, { "dsub",  OUT_R_ARITHM, 0, &MIPSInstr::execute_sub<uint64, int64>,  4} },
+    {0x2F, { "dsubu", OUT_R_ARITHM, 0, &MIPSInstr::execute_subu<uint64>,        4} },
 
     // Conditional traps (MIPS II)
     //key      name operation  memsize           pointer
@@ -91,9 +99,17 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapR =
     {0x33, { "tltu", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ltu>, 2} },
     {0x34, { "teq",  OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::eq>,  2} },
     //        0x35 reserved
-    {0x36, { "tne", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ne>,  2} }
+    {0x36, { "tne", OUT_R_TRAP, 0, &MIPSInstr::execute_trap<&MIPSInstr::ne>,   2} },
     //        0x37 reserved
-    // 0x38 - 0x3F double width shifts
+
+    // Doubleword shifts
+    //key      name   operation  memsize           pointer
+    {0x38, { "dsll"   , OUT_R_SHAMT, 0, &MIPSInstr::execute_sll<uint64>, 4} },
+    {0x3A, { "dsrl"   , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsrl,        4} },
+    {0x3B, { "dsra"   , OUT_R_SHAMT, 0, &MIPSInstr::execute_sra<uint64>, 4} },
+    {0x3C, { "dsll32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsll32,      4} },
+    {0x3E, { "dsrl32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsrl32,      4} },
+    {0x3F, { "dsra32" , OUT_R_SHAMT, 0, &MIPSInstr::execute_dsra32,      4} }
 };
 
 //unordered map for RI-instructions
@@ -136,17 +152,17 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     // Addition/Subtraction
     //key     name  operation  memsize       pointer
-    {0x8, { "addi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_addi,  1} },
-    {0x9, { "addiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_addiu, 1} },
+    {0x8, { "addi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_addi<int32>,  1} },
+    {0x9, { "addiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_addiu<uint32, int32>, 1} },
 
     // Logical operations
     //key     name   operation  memsize       pointer
     {0xA, { "slti",  OUT_I_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::lti>,  1} },
     {0xB, { "sltiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_set<&MIPSInstr::ltiu>, 1} },
     {0xC, { "andi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_andi,  1} },
-    {0xD, { "ori",  OUT_I_ARITHM, 0, &MIPSInstr::execute_ori,   1} },
-    {0xE, { "xori", OUT_I_ARITHM, 0, &MIPSInstr::execute_xori,  1} },
-    {0xF, { "lui",  OUT_I_CONST,  0, &MIPSInstr::execute_lui,   1} },
+    {0xD, { "ori",  OUT_I_ARITHM, 0, &MIPSInstr::execute_ori,    1} },
+    {0xE, { "xori", OUT_I_ARITHM, 0, &MIPSInstr::execute_xori,   1} },
+    {0xF, { "lui",  OUT_I_CONST,  0, &MIPSInstr::execute_lui,    1} },
 
     // 0x10 - 0x13 coprocessor operations
 
@@ -158,7 +174,11 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
     {0x17, { "bgtzl", OUT_I_BRANCH_0, 0, &MIPSInstr::execute_branch<&MIPSInstr::gtz>, 2} },
 
     // 0x18 - 0x19 double width addition
-    // 0x1A - 0x1B load double word left/right
+    {0x1A, { "ldl",  OUT_I_LOAD, 8, &MIPSInstr::calculate_load_addr, 3} },
+    {0x1B, { "ldr",  OUT_I_LOAD, 8, &MIPSInstr::calculate_load_addr, 3} },
+
+    {0x18, { "daddi",  OUT_I_ARITHM, 0, &MIPSInstr::execute_addi<int64>,  1} },
+    {0x19, { "daddiu", OUT_I_ARITHM, 0, &MIPSInstr::execute_addiu<uint64, int64>, 1} },
 
     // Loads
     //key     name  operation         memsize       pointer
@@ -173,18 +193,22 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapIJ =
 
     // Stores
     //key     name   operation  memsize       pointer
-    {0x28, { "sb",  OUT_I_STORE,         1, &MIPSInstr::calculate_store_addr,        1} },
-    {0x29, { "sh",  OUT_I_STORE,         2, &MIPSInstr::calculate_store_addr,        1} },
-    {0x2A, { "swl", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_left,   1} },
+    {0x28, { "sb",  OUT_I_STORE,         1, &MIPSInstr::calculate_store_addr,         1} },
+    {0x29, { "sh",  OUT_I_STORE,         2, &MIPSInstr::calculate_store_addr,         1} },
+    {0x2A, { "swl", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_left,    1} },
     {0x2B, { "sw",  OUT_I_STORE,         4, &MIPSInstr::calculate_store_addr_aligned, 1} },
-    //       0x2C   store double word left
-    //       0x2D   store double word right
-    {0x2E, { "swr", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_right,  1 } },
+    {0x2C, { "sdl", OUT_I_PARTIAL_STORE, 8, &MIPSInstr::calculate_store_addr,         3} },
+    {0x2D, { "sdr", OUT_I_PARTIAL_STORE, 8, &MIPSInstr::calculate_store_addr,         3} },
+    {0x2E, { "swr", OUT_I_PARTIAL_STORE, 4, &MIPSInstr::calculate_store_addr_right,   1} },
     //       0x2F   cache
 
     // Advanced loads and stores
-    {0x30, { "ll",  OUT_I_LOAD,   4, &MIPSInstr::calculate_load_addr_aligned, 2} },
-    {0x38, { "sc",  OUT_I_STORE,  4, &MIPSInstr::calculate_store_addr, 2} },
+    {0x30, { "ll",  OUT_I_LOAD,   2, &MIPSInstr::calculate_load_addr,  1} },
+
+    {0x37, { "ld",  OUT_I_LOAD,   8, &MIPSInstr::calculate_load_addr,  3} },
+    {0x38, { "sc",  OUT_I_STORE,  2, &MIPSInstr::calculate_store_addr, 1} },
+
+    {0x3F, { "sd",  OUT_I_STORE,  8, &MIPSInstr::calculate_store_addr, 3} }
 };
 
 const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
@@ -199,6 +223,9 @@ const std::unordered_map <uint8, MIPSInstr::ISAEntry> MIPSInstr::isaMapMIPS32 =
     {0x05, { "msubu", OUT_R_SUBTR,   0, &MIPSInstr::execute_multu,   32} },
     {0x20, { "clz",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clz,     32} },
     {0x21, { "clo",   OUT_SP2_COUNT, 0, &MIPSInstr::execute_clo,     32} },
+
+    {0x24, { "dclz",  OUT_SP2_COUNT, 0, &MIPSInstr::execute_dclz,    64} },
+    {0x25, { "dclo",  OUT_SP2_COUNT, 0, &MIPSInstr::execute_dclo,    64} }
 };
 
 MIPSInstr::MIPSInstr( uint32 bytes, Addr PC) :
@@ -458,31 +485,32 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint32>( v_dst >> 32u) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint64>( v_dst >> 64) << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
 
-        oss << " = 0x" << static_cast<uint32>( v_dst & mask) << " ]";
+        oss << " = 0x" << static_cast<uint64>( v_dst & mask) << " ]";
         disasm += oss.str();
     }
 }
 
-void MIPSInstr::set_v_dst( uint32 value)
+void MIPSInstr::set_v_dst( uint64 value)
 {
     if ( operation == OUT_I_LOAD || is_partial_load())
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = static_cast<int32>( static_cast<int8>( value)); break;
-            case 2: v_dst = static_cast<int32>( static_cast<int16>( value)); break;
-            case 4: v_dst = value; break;
+            case 1: v_dst = static_cast<uint32>( static_cast<int8>( value)); break;
+            case 2: v_dst = static_cast<uint32>( static_cast<int16>( value)); break;
+            case 4: v_dst = static_cast<uint32>( value); break;
+            case 8: v_dst = static_cast<uint64>( value); break;
             default: assert( false);
         }
     }
     else if ( operation == OUT_I_LOADU)
     {
-        v_dst = value;
+        v_dst = static_cast<uint32>( value);
     }
     else
     {
@@ -492,7 +520,9 @@ void MIPSInstr::set_v_dst( uint32 value)
     if ( !dst.is_zero())
     {
         std::ostringstream oss;
-        oss << "\t [ $" << dst << " = 0x" << std::hex << v_dst;
+        oss << "\t [ $" << dst
+            << " = 0x" << std::hex << static_cast<uint64>( v_dst) << "]";
+
         if (has_zero(get_mask()))
             oss << ", mask = 0x" << std::hex << mask;
         oss << " ]";

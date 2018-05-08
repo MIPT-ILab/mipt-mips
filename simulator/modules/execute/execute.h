@@ -17,6 +17,7 @@ class Execute : public Log
     using Register = typename ISA::Register;
     using Instr = PerfInstr<FuncInstr>;
     using RegDstUInt = typename ISA::RegDstUInt;
+    using RegisterUInt = typename ISA::RegisterUInt;
 
     private:   
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;

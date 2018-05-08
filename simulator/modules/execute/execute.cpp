@@ -57,7 +57,6 @@ Execute<ISA>::Execute( bool log)
     rps_sources_bypass[1][3] = make_read_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
-
 template <typename ISA>
 void Execute<ISA>::clock( Cycle cycle)
 {
@@ -81,7 +80,7 @@ void Execute<ISA>::clock( Cycle cycle)
         /* ignoring information from command ports */
         for ( auto& port:rps_command)
             port->ignore( cycle);
-        
+
         /* ignoring all bypassed data for source registers */
         for ( auto& rps_src_ports:rps_sources_bypass)
         {
@@ -126,8 +125,8 @@ void Execute<ISA>::clock( Cycle cycle)
     auto instr = rp_datapath->read( cycle);
 
     for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
-    {   
-        /* check whether bypassing is needed for a source register */ 
+    {
+        /* check whether bypassing is needed for a source register */
         if ( rps_command[src_index]->is_ready( cycle))
         {
             const auto bypass_command = rps_command[src_index]->read( cycle);
@@ -138,13 +137,13 @@ void Execute<ISA>::clock( Cycle cycle)
 
             /* ignoring all other ports for a source register */
             for ( uint8 i = 0; i < RegisterStage::BYPASSING_STAGES_NUMBER; i++)
-            {    
+            {
                 if ( i != bypass_direction)
                     rps_sources_bypass[src_index][i]->ignore( cycle);
             }
 
             /* transform received data in accordance with bypass command */
-            const auto adapted_data = bypass_command.adapt_bypassed_data( data);
+            const auto adapted_data = static_cast<RegisterUInt>( bypass_command.adapt_bypassed_data( data));
 
             instr.set_v_src( adapted_data, src_index);
         }
@@ -155,11 +154,10 @@ void Execute<ISA>::clock( Cycle cycle)
                 port->ignore( cycle);
         }
     }
-    
+
 
     /* perform execution */
     instr.execute();
-
 
     if ( instr.is_complex_arithmetic()) 
     {
