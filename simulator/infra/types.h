@@ -62,11 +62,16 @@ using int128 = boost::multiprecision::int128_t;
 
 /* Convert signed type to unsigned type */
 template<typename> struct unsign;
-template<> struct unsign<int8>   { using type = uint8; };
-template<> struct unsign<int16>  { using type = uint16; };
-template<> struct unsign<int32>  { using type = uint32; };
-template<> struct unsign<int64>  { using type = uint64; };
-template<> struct unsign<int128> { using type = uint128; };
+template<> struct unsign<int8>    { using type = uint8; };
+template<> struct unsign<int16>   { using type = uint16; };
+template<> struct unsign<int32>   { using type = uint32; };
+template<> struct unsign<int64>   { using type = uint64; };
+template<> struct unsign<int128>  { using type = uint128; };
+template<> struct unsign<uint8>   { using type = uint8; };
+template<> struct unsign<uint16>  { using type = uint16; };
+template<> struct unsign<uint32>  { using type = uint32; };
+template<> struct unsign<uint64>  { using type = uint64; };
+template<> struct unsign<uint128> { using type = uint128; };
 
 template<typename T> using unsign_t = typename unsign<T>::type;
 

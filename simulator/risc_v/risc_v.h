@@ -19,7 +19,6 @@ struct RISCV
     using Register = RISCVRegister;
     using Memory = InstrMemory<RISCVInstr<T>>;
     using RegisterUInt = T;
-    using RegDstUInt = T;
 };
 
 using RISCV32 = RISCV<uint32>;

@@ -485,7 +485,7 @@ void MIPSInstr::execute()
         std::ostringstream oss;
         oss << "\t [ $" << std::hex;
         if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << static_cast<uint64>( v_dst >> 64) << ", $"
+            oss <<  MIPSRegister::mips_hi << " = 0x" << v_dst2 << ", $"
                 <<  MIPSRegister::mips_lo;
         else
             oss <<  dst;
@@ -521,7 +521,7 @@ void MIPSInstr::set_v_dst( uint64 value)
     {
         std::ostringstream oss;
         oss << "\t [ $" << dst
-            << " = 0x" << std::hex << static_cast<uint64>( v_dst) << "]";
+            << " = 0x" << std::hex << v_dst << "]";
 
         if (has_zero(get_mask()))
             oss << ", mask = 0x" << std::hex << mask;

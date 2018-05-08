@@ -25,6 +25,7 @@ class TestRF : public RF<MIPS>
         using RF<MIPS>::read;
         using RF<MIPS>::write;
         using RF<MIPS>::read_hi_lo;
+        using RF<MIPS>::write_hi_lo;
 };
 
 static_assert(MIPSRegister::MAX_REG >= 32);
@@ -90,21 +91,21 @@ TEST( RF, read_write_rf)
     }
 
     // Additional checks for mips_hi_lo
-    // Write 1 to HI and 1 to LO
-    rf->write( MIPSRegister::mips_hi_lo, static_cast<uint128>(MAX_VAL64) + 1u);
+    // Write 1 to HI and 0 to LO
+    rf->write_hi_lo( 0u, 1u);
 
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
     ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi_lo, 1u, all_ones<uint64>(), -1 /* subtract */);
+    rf->write_hi_lo( 1u, 0, -1 /* subtract */);
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 0u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), MAX_VAL32);
     ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32));
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi_lo, 1u, all_ones<uint64>(), +1 /* add */);
+    rf->write_hi_lo( 1u, 0, +1 /* subtract */);
     ASSERT_EQ( rf->read( MIPSRegister::mips_hi), 1u);
     ASSERT_EQ( rf->read( MIPSRegister::mips_lo), 0u);
     ASSERT_EQ( rf->read_hi_lo(), static_cast<uint64>(MAX_VAL32) + 1u);

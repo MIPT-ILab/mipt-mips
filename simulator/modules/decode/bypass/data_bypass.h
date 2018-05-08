@@ -20,7 +20,6 @@ class DataBypass
     using FuncInstr = typename ISA::FuncInstr;
     using Register  = typename ISA::Register;
     using Instr     = PerfInstr<FuncInstr>;
-    using RegDstUInt = typename ISA::RegDstUInt;
 
     public:
         explicit DataBypass( uint64 complex_alu_latency)

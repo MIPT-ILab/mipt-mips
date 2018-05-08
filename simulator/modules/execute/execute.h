@@ -16,7 +16,6 @@ class Execute : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
     using Instr = PerfInstr<FuncInstr>;
-    using RegDstUInt = typename ISA::RegDstUInt;
     using RegisterUInt = typename ISA::RegisterUInt;
 
     private:   
@@ -28,15 +27,15 @@ class Execute : public Log
         std::unique_ptr<ReadPort<Instr>> rp_long_latency_execution_unit = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
         std::array<std::unique_ptr<ReadPort<BypassCommand<Register>>>, SRC_REGISTERS_NUM> rps_command;
-        std::array<std::array<std::unique_ptr<ReadPort<RegDstUInt>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
+        std::array<std::array<std::unique_ptr<ReadPort<std::pair<RegisterUInt, RegisterUInt>>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
             rps_sources_bypass;
 
         /* Outputs */
         std::unique_ptr<WritePort<Instr>> wp_mem_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_writeback_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_long_latency_execution_unit = nullptr;
-        std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
-        std::unique_ptr<WritePort<RegDstUInt>> wp_complex_arithmetic_bypass = nullptr;
+        std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
+        std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_complex_arithmetic_bypass = nullptr;
 
         Latency flush_expiration_latency = 0_Lt;
 
