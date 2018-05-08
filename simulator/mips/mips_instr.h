@@ -27,27 +27,25 @@ template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
-uint128 mips_multiplication(T x, T y) {
-    if constexpr ( bitwidth<T> == 32) { // NOLINT(misc-suspicious-semicolon)
-        auto val = static_cast<uint64>(x) * static_cast<uint64>(y);
-        auto lo  = static_cast<uint64>( static_cast<uint32>( val));
-        auto hi  = static_cast<uint128>( static_cast<uint64>( val) >> 32u);
-        return (hi << 64u) | lo;
-    }
-    return static_cast<uint128>(x) * static_cast<uint128>(y);
+auto mips_multiplication(T x, T y) {
+    using T2 = doubled_t<T>;
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    auto value = static_cast<T2>(x) * static_cast<T2>(y);
+    return ReturnType(value, value >> bitwidth<T>);
 }
 
 template<typename T>
-uint128 mips_division(T x, T y) {
-    using T64 = doubled_t<T>;
-    if (y == 0)
-        return 0;
-    auto x1 = static_cast<T64>(x);
-    auto y1 = static_cast<T64>(y);
-    if constexpr ( bitwidth<T> == 32) // NOLINTNEXTLINE(misc-suspicious-semicolon)
-        return static_cast<uint128>(static_cast<uint32>(x1 / y1)) | (static_cast<uint128>(static_cast<uint32>(x1 % y1)) << 64);
+auto mips_division(T x, T y) {
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    if ( y == 0)
+        return ReturnType();
 
-    return static_cast<uint128>(static_cast<uint64>(x1 / y1)) | (static_cast<uint128>(static_cast<uint64>(x1 % y1)) << 64);
+    // NOLINTNEXTLINE(misc-suspicious-semicolon)
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type
+        if ( y == -1 && x == static_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
+            return ReturnType();
+
+    return ReturnType(x / y, x % y);
 }
 
 class MIPSInstr
@@ -156,7 +154,8 @@ class MIPSInstr
         uint32 v_imm = NO_VAL32;
         uint64 v_src1 = NO_VAL64;
         uint64 v_src2 = NO_VAL64;
-        uint128 v_dst = NO_VAL64;
+        uint64 v_dst = NO_VAL64;
+        uint64 v_dst2 = NO_VAL64;
         uint64 mask = all_ones<uint64>();
 
         uint16 shamt = NO_VAL16;
@@ -218,14 +217,15 @@ class MIPSInstr
         template <typename UT, typename T>
         void execute_addiu() { v_dst = static_cast<UT>(static_cast<T>(v_src1) + static_cast<T>( sign_extend(v_imm))); }
 
-        void execute_mult()   { v_dst = mips_multiplication<int32>(v_src1, v_src2); }
-        void execute_multu()  { v_dst = mips_multiplication<uint32>(v_src1, v_src2); }
-        void execute_dmult()  { v_dst = mips_multiplication<int64>(v_src1, v_src2); }
-        void execute_dmultu() { v_dst = mips_multiplication<uint64>(v_src1, v_src2); }
-        void execute_div()    { v_dst = mips_division<int32>(v_src1, v_src2); }
-        void execute_ddiv()   { v_dst = mips_division<int64>(v_src1, v_src2); }
-        void execute_divu()   { v_dst = mips_division<uint32>(v_src1, v_src2); }
-        void execute_ddivu()  { v_dst = mips_division<uint64>(v_src1, v_src2); }
+        void execute_mult()   { std::tie(v_dst, v_dst2) = mips_multiplication<int32>(v_src1, v_src2); }
+        void execute_multu()  { std::tie(v_dst, v_dst2) = mips_multiplication<uint32>(v_src1, v_src2); }
+        void execute_dmult()  { std::tie(v_dst, v_dst2) = mips_multiplication<int64>(v_src1, v_src2); }
+        void execute_dmultu() { std::tie(v_dst, v_dst2) = mips_multiplication<uint64>(v_src1, v_src2); }
+        void execute_div()    { std::tie(v_dst, v_dst2) = mips_division<int32>(v_src1, v_src2); }
+        void execute_ddiv()   { std::tie(v_dst, v_dst2) = mips_division<int64>(v_src1, v_src2); }
+        void execute_divu()   { std::tie(v_dst, v_dst2) = mips_division<uint32>(v_src1, v_src2); }
+        void execute_ddivu()  { std::tie(v_dst, v_dst2) = mips_division<uint64>(v_src1, v_src2); }
+
         void execute_move()   { v_dst = v_src1; }
 
         template <typename T>
@@ -440,7 +440,8 @@ class MIPSInstr
                 v_src2 = value;
         }
 
-        auto get_v_dst() const { return v_dst; }
+        auto get_v_dst()  const { return v_dst; }
+        auto get_v_dst2() const { return v_dst2; }
         auto get_mask()  const { return mask;  }
 
         Addr get_mem_addr() const { return mem_addr; }

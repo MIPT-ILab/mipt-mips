@@ -20,7 +20,7 @@ Mem<ISA>::Mem( bool log) : Log( log)
     wp_flush_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     wp_bp_update = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
 
-    wp_bypass = make_write_port<RegDstUInt>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 
     wp_bypassing_unit_flush_notify = make_write_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                             PORT_BW, PORT_FANOUT);
@@ -77,7 +77,7 @@ void Mem<ISA>::clock( Cycle cycle)
     memory->load_store( &instr);
     
     /* bypass data */
-    wp_bypass->write( instr.get_v_dst(), cycle);
+    wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
     wp_datapath->write( instr, cycle);
 

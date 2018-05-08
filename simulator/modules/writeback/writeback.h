@@ -16,7 +16,6 @@ class Writeback : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename ISA::RegisterUInt;
-    using RegDstUInt = typename ISA::RegDstUInt;
 private:
     /* Instrumentation */
     uint64 instrs_to_run = 0;
@@ -35,7 +34,7 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
 
     /* Output */
-    std::unique_ptr<WritePort<RegDstUInt>> wp_bypass = nullptr;
+    std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
 
 public:

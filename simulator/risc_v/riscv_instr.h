@@ -107,6 +107,7 @@ class RISCVInstr
         }
 
         auto get_v_dst() const { return v_dst; }
+        auto get_v_dst2() const { return v_dst; }
         auto get_mask() const { return 0; }
 
         Addr get_mem_addr() const { return mem_addr; }

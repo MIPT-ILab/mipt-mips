@@ -10,7 +10,7 @@ Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
-    wp_bypass = make_write_port<RegDstUInt>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW, PORT_FANOUT);
 }
 
@@ -45,7 +45,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     instr.check_trap();
 
     /* bypass data */
-    wp_bypass->write( instr.get_v_dst(), cycle);
+    wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
     /* log */
     sout << instr << std::endl;
