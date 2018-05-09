@@ -164,6 +164,7 @@ class MIPSInstr
             RegType dst;
             MIPSInstr::Execute function;
             uint8 mips_version;
+            ISAEntry() = delete;
         };
 
         using MapType = std::unordered_map <uint8, MIPSInstr<RegisterUInt>::ISAEntry>;
