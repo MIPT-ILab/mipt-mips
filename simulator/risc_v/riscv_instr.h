@@ -62,6 +62,7 @@ class RISCVInstr
 
         RISCVRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         RISCVRegister get_dst_num()  const { return dst; }
+        RISCVRegister get_dst2_num() const { return dst; }
 
         /* Checks if instruction can change PC in unusual way. */
         constexpr bool is_jump() const { return false; }

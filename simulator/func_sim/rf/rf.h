@@ -32,9 +32,8 @@ class RF
 
 protected:
 
-    auto read( Register num) const
+    const auto& read( Register num) const
     {
-        assert( !num.is_mips_hi_lo());
         return get_value( num);
     }
 
@@ -78,13 +77,8 @@ public:
 
     inline void write_dst( const FuncInstr& instr)
     {
-        if (instr.get_dst_num().is_mips_hi_lo()) {
-            write( Register::mips_lo, instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
-            write( Register::mips_hi, instr.get_v_dst2(), instr.get_mask(), instr.get_accumulation_type());
-        }
-        else {
-            write( instr.get_dst_num(), instr.get_v_dst(), instr.get_mask());
-        }
+        write( instr.get_dst_num(),  instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
+        write( instr.get_dst2_num(), instr.get_v_dst2(), instr.get_mask(), instr.get_accumulation_type());
     }
 };
 

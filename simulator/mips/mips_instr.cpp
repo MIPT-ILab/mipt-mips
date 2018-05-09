@@ -298,7 +298,7 @@ MIPSRegister MIPSInstr<RegisterUInt>::get_register( RegType type) const
     switch ( type) {
     case RegType::HI:    return MIPSRegister::mips_hi;
     case RegType::LO:    return MIPSRegister::mips_lo;
-    case RegType::HI_LO: return MIPSRegister::mips_hi_lo;
+    case RegType::HI_LO: return MIPSRegister::mips_lo;
     case RegType::ZERO:  return MIPSRegister::zero;
     case RegType::RA:    return MIPSRegister::return_address;
     case RegType::RS:    return MIPSRegister( instr.asR.rs);
@@ -319,6 +319,8 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
     src1 = get_register( entry.src1);
     src2 = get_register( entry.src2);
     dst  = get_register( entry.dst);
+    if ( entry.dst == RegType::HI_LO)
+        dst2 = MIPSRegister::mips_hi;
 
     const bool print_dst  = is_explicit_register( entry.dst);
     const bool print_src1 = is_explicit_register( entry.src1);
@@ -431,14 +433,10 @@ void MIPSInstr<RegisterUInt>::execute()
     if ( !dst.is_zero() && !is_load() && get_mask() != 0)
     {
         std::ostringstream oss;
-        oss << "\t [ $" << std::hex;
-        if ( dst.is_mips_hi_lo())
-            oss <<  MIPSRegister::mips_hi << " = 0x" << v_dst2 << ", $"
-                <<  MIPSRegister::mips_lo;
-        else
-            oss <<  dst;
-
-        oss << " = 0x" << static_cast<uint64>( v_dst & mask) << " ]";
+        oss << "\t [ $" << dst << " = 0x" << std::hex << (v_dst & mask);
+        if ( !dst2.is_zero())
+            oss << ", $" << dst2 << " = 0x" << v_dst2;
+        oss << " ]";
         disasm += oss.str();
     }
 }

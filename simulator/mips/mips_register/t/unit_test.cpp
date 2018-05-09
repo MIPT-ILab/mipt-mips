@@ -58,7 +58,6 @@ TEST( MIPS_registers, Hi_Lo_impossible)
         MIPSRegister reg(i);
         ASSERT_FALSE(reg.is_mips_hi());
         ASSERT_FALSE(reg.is_mips_lo());
-        ASSERT_FALSE(reg.is_mips_hi_lo());
     }
 }
 
@@ -68,7 +67,6 @@ TEST( MIPS_registers, Zero)
     ASSERT_TRUE(reg.is_zero());
     ASSERT_FALSE(reg.is_mips_hi());
     ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
     ASSERT_TRUE(reg.to_size_t() == 0);
 }
 
@@ -78,7 +76,6 @@ TEST( MIPS_registers, Return_address)
     ASSERT_FALSE(reg.is_zero());
     ASSERT_FALSE(reg.is_mips_hi());
     ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
     ASSERT_TRUE(reg.to_size_t() == 31);
 }
 
@@ -88,7 +85,6 @@ TEST( MIPS_registers, Hi_register)
     ASSERT_FALSE(reg.is_zero());
     ASSERT_TRUE(reg.is_mips_hi());
     ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
     ASSERT_FALSE(reg.to_size_t() < 32);
 }
 
@@ -98,17 +94,6 @@ TEST( MIPS_registers, Lo_register)
     ASSERT_FALSE(reg.is_zero());
     ASSERT_FALSE(reg.is_mips_hi());
     ASSERT_TRUE(reg.is_mips_lo());
-    ASSERT_FALSE(reg.is_mips_hi_lo());
-    ASSERT_FALSE(reg.to_size_t() < 32);
-}
-
-TEST( MIPS_registers, Hi_Lo_register)
-{
-    auto reg = MIPSRegister::mips_hi_lo;
-    ASSERT_FALSE(reg.is_zero());
-    ASSERT_FALSE(reg.is_mips_hi());
-    ASSERT_FALSE(reg.is_mips_lo());
-    ASSERT_TRUE(reg.is_mips_hi_lo());
     ASSERT_FALSE(reg.to_size_t() < 32);
 }
 
