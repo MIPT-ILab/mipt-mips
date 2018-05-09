@@ -145,6 +145,13 @@ class MIPSInstr
             RA
         };
 
+        static bool is_explicit_register( RegType type)
+        {
+            return type == RegType::RS
+                || type == RegType::RT
+                || type == RegType::RD;
+        }
+
         MIPSRegister get_register( RegType type) const;
 
         struct ISAEntry
