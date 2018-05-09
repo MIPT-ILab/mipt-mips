@@ -175,7 +175,8 @@ class MIPSInstr
 
         MIPSRegister src1 = MIPSRegister::zero;
         MIPSRegister src2 = MIPSRegister::zero;
-        MIPSRegister dst = MIPSRegister::zero;
+        MIPSRegister dst  = MIPSRegister::zero;
+        MIPSRegister dst2 = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
         auto sign_extend() const { return static_cast<RegisterSInt>( static_cast<int16>(v_imm)); }
@@ -401,6 +402,7 @@ class MIPSInstr
 
         MIPSRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         MIPSRegister get_dst_num()  const { return dst;  }
+        MIPSRegister get_dst2_num() const { return dst2; }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP         ||

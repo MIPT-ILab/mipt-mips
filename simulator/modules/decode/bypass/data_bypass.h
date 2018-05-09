@@ -161,21 +161,13 @@ void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
 template <typename ISA>
 void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 {    
-    const auto dst_reg_num = instr.get_dst_num();
+    const auto& dst_reg_nums = { instr.get_dst_num(), instr.get_dst2_num() };
 
     writeback_stage_info.operation_latency = get_instruction_latency( instr);
 
-    if ( dst_reg_num.is_zero())
-        return;
-    
-    if ( dst_reg_num.is_mips_hi_lo())
-    {
-        trace_new_register( instr, Register::mips_lo );
-        trace_new_register( instr, Register::mips_hi );
-        return;
-    }
-
-    trace_new_register( instr, dst_reg_num);
+    for (const auto& reg : dst_reg_nums)
+        if ( !reg.is_zero())
+            trace_new_register( instr, reg );
 }
 
 
