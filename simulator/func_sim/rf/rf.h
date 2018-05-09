@@ -44,7 +44,7 @@ protected:
     {
         return merge_hi_lo( read( Register::mips_lo), read( Register::mips_hi));
     }
-    
+
     void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>())
     {
         if ( num.is_zero())

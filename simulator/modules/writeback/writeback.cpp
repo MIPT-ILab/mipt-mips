@@ -78,7 +78,8 @@ void Writeback<ISA>::check( const FuncInstr& instr)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Writeback<MIPS>;
+template class Writeback<MIPS32>;
+template class Writeback<MIPS64>;
 template class Writeback<RISCV32>;
 template class Writeback<RISCV64>;
 template class Writeback<RISCV128>;
