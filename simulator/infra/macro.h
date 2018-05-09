@@ -106,6 +106,12 @@ static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
     return count;
 }
 
+template <typename T>
+static constexpr inline size_t count_leading_ones(const T& value) noexcept
+{
+    return count_leading_zeroes<T>( ~value);
+}
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.

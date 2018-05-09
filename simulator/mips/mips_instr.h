@@ -296,9 +296,9 @@ class MIPSInstr
                 new_PC += sign_extend() * 4;
         }
 
-        void execute_clo()  { v_dst = count_leading_zeroes<uint32>( ~v_src1); }
+        void execute_clo()  { v_dst = count_leading_ones<uint32>( v_src1); }
+        void execute_dclo() { v_dst = count_leading_ones<uint64>( v_src1); }
         void execute_clz()  { v_dst = count_leading_zeroes<uint32>(  v_src1); }
-        void execute_dclo() { v_dst = count_leading_zeroes<uint64>( ~v_src1); }
         void execute_dclz() { v_dst = count_leading_zeroes<uint64>(  v_src1); }
 
         void execute_jump( Addr target)
@@ -452,8 +452,6 @@ class MIPSInstr
         bool is_mthi() const { return operation == OUT_R_MTHI; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
-
-        bool is_muldiv() const { return operation == OUT_R_DIVMULT; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 
