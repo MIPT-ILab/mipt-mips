@@ -99,8 +99,11 @@ void FuncMemory::write( T value, Addr addr, T mask)
             alloc( addr + i);
             write_byte( addr + i, static_cast<uint8>(value & 0xFFu));
         }
-        mask >>= 8;
-        value >>= 8;
+        // NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if constexpr ( bitwidth<T> > 8) {
+            mask >>= 8;
+            value >>= 8;
+        }
     }
 }
 
