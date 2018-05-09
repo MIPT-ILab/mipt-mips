@@ -59,7 +59,7 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
             startPC_addr = section.get_start_addr();
 
         for ( size_t offset = 0; offset < section.get_size(); ++offset)
-            write( section.get_byte(offset), section.get_start_addr() + offset, 1);
+            write<uint8>( section.get_byte(offset), section.get_start_addr() + offset);
     }
 }
 
@@ -82,26 +82,36 @@ uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
     return value;
 }
 
-void FuncMemory::write( uint64 value, Addr addr, uint32 num_of_bytes, uint32 mask)
+template<typename T>
+void FuncMemory::write( T value, Addr addr, T mask)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
-    if ( num_of_bytes == 0 || num_of_bytes > 8)
+    if ( mask == 0)
     {
-        std::cerr << "ERROR. Writing " << num_of_bytes << " bytes)\n";
+        std::cerr << "ERROR. Writing zero bytes)\n";
         std::exit( EXIT_FAILURE);
     }
 
-    alloc( addr);
-    alloc( addr + num_of_bytes - 1);
-
-    value &= mask; // Clear unnecessary bits
-    value |= (read( addr, num_of_bytes) & ~mask);
-
     // Endian specific
-    for ( size_t i = 0; i < num_of_bytes; ++i)
-        write_byte( addr + i, static_cast<uint8>((value >> i * 8) & 0xFFu));
+    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
+        if ((mask & 0xFFu) == 0xFFu) {
+            alloc( addr + i);
+            write_byte( addr + i, static_cast<uint8>(value & 0xFFu));
+        }
+        // NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if constexpr ( bitwidth<T> > 8) {
+            mask >>= 8;
+            value >>= 8;
+        }
+    }
 }
+
+template void FuncMemory::write<uint8>( uint8 value, Addr addr, uint8 mask);
+template void FuncMemory::write<uint16>( uint16 value, Addr addr, uint16 mask);
+template void FuncMemory::write<uint32>( uint32 value, Addr addr, uint32 mask);
+template void FuncMemory::write<uint64>( uint64 value, Addr addr, uint64 mask);
+template void FuncMemory::write<uint128>( uint128 value, Addr addr, uint128 mask);
 
 void FuncMemory::alloc( Addr addr)
 {

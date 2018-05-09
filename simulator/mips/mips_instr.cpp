@@ -470,7 +470,7 @@ void MIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
     {
         std::ostringstream oss;
         oss << "\t [ $" << dst
-            << " = 0x" << std::hex << v_dst << "]";
+            << " = 0x" << std::hex << v_dst;
 
         if (has_zero(get_mask()))
             oss << ", mask = 0x" << std::hex << mask;

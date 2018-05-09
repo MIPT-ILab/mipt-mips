@@ -78,22 +78,22 @@ TEST( Func_memory, Write_Read_Initialized_Mem_Test)
     uint64 data_sect_addr = 0x4100c0;
 
     // write 1 into the byte pointed by data_sect_addr
-    func_mem.write( 1, data_sect_addr, sizeof( uint8));
+    func_mem.write<uint8>( 1, data_sect_addr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
     ASSERT_EQ( func_mem.read( data_sect_addr), right_ret);
 
     // write 0x7777 into the two bytes pointed by ( data_sect_addr + 1)
-    func_mem.write( 0x7777, data_sect_addr + 1, sizeof( uint16));
+    func_mem.write<uint16>( 0x7777, data_sect_addr + 1);
     right_ret = 0x03777701; // before write it was 0x03020101
     ASSERT_EQ( func_mem.read( data_sect_addr), right_ret);
 
     // write 0x00000000 into the four bytes pointed by data_sect_addr
-    func_mem.write( 0x00000000, data_sect_addr, sizeof( uint32));
+    func_mem.write<uint32>( 0x00000000, data_sect_addr, 0xFFFFFFFFull);
     right_ret = 0x00000000; // before write it was 0x03777701
     ASSERT_EQ( func_mem.read( data_sect_addr), right_ret);
 
     // check hadling the situation when 0 number of bytes is written
-    ASSERT_EXIT( func_mem.write( 1, data_sect_addr, 0),
+    ASSERT_EXIT( func_mem.write<uint32>( 1, data_sect_addr, 0),
                  ::testing::ExitedWithCode( EXIT_FAILURE), ".*");
 }
 
@@ -104,7 +104,7 @@ TEST( Func_memory, Write_Read_Not_Initialized_Mem_Test)
     uint64 write_addr = 0x3FFFFE;
 
     // write 0x03020100 into the four bytes pointed by write_addr
-    func_mem.write( 0x03020100, write_addr, sizeof( uint64));
+    func_mem.write<uint32>( 0x03020100, write_addr);
     uint64 right_ret = 0x0100;
     ASSERT_EQ( func_mem.read( write_addr, sizeof( uint16)), right_ret);
 
