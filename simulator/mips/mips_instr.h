@@ -93,7 +93,7 @@ class MIPSInstr
             EXPLICIT_TRAP,
             UNALIGNED_ADDRESS,
         } trap = TrapType::NO_TRAP;
-
+ 
         // Endian specific
         const union _instr
         {
@@ -133,11 +133,28 @@ class MIPSInstr
         using Execute = void (MIPSInstr::*)();
         using Predicate = bool (MIPSInstr::*)() const;
 
+        enum class RegType : uint8
+        {
+            RS,
+            RT,
+            RD,
+            ZERO,
+            HI,
+            LO,
+            HI_LO,
+            RA
+        };
+
+        MIPSRegister get_register( RegType type) const;
+
         struct ISAEntry
         {
             std::string_view name;
             OperationType operation;
             uint8 mem_size;
+            RegType src1;
+            RegType src2;
+            RegType dst;
             MIPSInstr::Execute function;
             uint8 mips_version;
         };
