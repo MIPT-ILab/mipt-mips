@@ -450,16 +450,16 @@ void MIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = static_cast<uint32>( static_cast<int8>( value)); break;
-            case 2: v_dst = static_cast<uint32>( static_cast<int16>( value)); break;
-            case 4: v_dst = static_cast<uint32>( value); break;
-            case 8: v_dst = static_cast<uint64>( value); break;
+            case 1: v_dst = static_cast<int8>( value)); break;
+            case 2: v_dst = static_cast<int16>( value)); break;
+            case 4: v_dst = static_cast<int32>( value)); break;
+            case 8: v_dst = value; break;
             default: assert( false);
         }
     }
     else if ( operation == OUT_I_LOADU)
     {
-        v_dst = static_cast<uint32>( value);
+        v_dst = value;
     }
     else
     {
