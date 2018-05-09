@@ -153,7 +153,7 @@ class MIPSInstr
         }
 
         MIPSRegister get_register( RegType type) const;
-            
+
         struct ISAEntry
         {
             std::string_view name;
