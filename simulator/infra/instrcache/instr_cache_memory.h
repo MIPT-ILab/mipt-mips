@@ -25,7 +25,7 @@ class InstrMemory : private FuncMemory
 
         using FuncMemory::startPC;
 
-        uint32 fetch( Addr pc) const { return read( pc); }
+        auto fetch( Addr pc) const { return read<uint32>( pc); }
 
         Instr fetch_instr( Addr PC)
         {
@@ -38,7 +38,8 @@ class InstrMemory : private FuncMemory
 
         void load( Instr* instr) const
         {
-            instr->set_v_dst(read(instr->get_mem_addr(), instr->get_mem_size()));
+            using DstType = decltype(instr->get_v_dst());
+            instr->set_v_dst(read<DstType>(instr->get_mem_addr(), bitmask<DstType>(instr->get_mem_size() * 8)));
         }
 
         void store( const Instr& instr)

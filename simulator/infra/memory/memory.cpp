@@ -63,24 +63,35 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
     }
 }
 
-uint64 FuncMemory::read( Addr addr, uint32 num_of_bytes) const
+template<typename T>
+T FuncMemory::read( Addr addr, T mask) const
 {
-    if ( num_of_bytes == 0 || num_of_bytes > 8) {
-        std::cerr << "ERROR. Reading " << num_of_bytes << " bytes)\n";
-        std::exit( EXIT_FAILURE);
-    }
     assert( addr <= addr_mask);
-    if ( !check( addr) || !check( addr + num_of_bytes - 1))
-         return NO_VAL64;
 
-    uint64 value = 0ull;
+    T value = 0;
 
     // Endian specific
-    for ( size_t i = 0; i < num_of_bytes; ++i)
-        value |= read_byte( addr + i) << i * 8;
+    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
+        if (( mask & 0xFFu) == 0xFFu) {
+            auto byte = NO_VAL8;
+            if ( check( addr + i))
+                byte = read_byte( addr + i);
+            value |= static_cast<T>(static_cast<T>(byte) << (i * 8));
+        }
+        // NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if constexpr ( bitwidth<T> > 8) {
+            mask >>= 8u;
+        }
+    }
 
     return value;
 }
+
+template uint8 FuncMemory::read<uint8>( Addr addr, uint8 mask) const;
+template uint16 FuncMemory::read<uint16>( Addr addr, uint16 mask) const;
+template uint32 FuncMemory::read<uint32>( Addr addr, uint32 mask) const;
+template uint64 FuncMemory::read<uint64>( Addr addr, uint64 mask) const;
+template uint128 FuncMemory::read<uint128>( Addr addr, uint128 mask) const;
 
 template<typename T>
 void FuncMemory::write( T value, Addr addr, T mask)

@@ -78,7 +78,8 @@ class FuncMemory
                      uint32 page_bits = 10,
                      uint32 offset_bits = 12);
 
-        uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
+        template<typename T>
+        T read( Addr addr, T mask = all_ones<T>()) const;
 
         template<typename T>
         void write( T value, Addr addr, T mask = all_ones<T>());
