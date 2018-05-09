@@ -319,7 +319,11 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
     src1 = get_register( entry.src1);
     src2 = get_register( entry.src2);
     dst  = get_register( entry.dst);
-    
+
+    const bool print_dst  = is_explicit_register( entry.dst);
+    const bool print_src1 = is_explicit_register( entry.src1);
+    const bool print_src2 = is_explicit_register( entry.src2);
+
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
@@ -327,40 +331,10 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
 
     switch ( operation)
     {
-        case OUT_R_MFHI:
-        case OUT_R_MFLO:
-            oss <<  " $" << dst;
-            break;
-        case OUT_R_MTHI:
-        case OUT_R_MTLO:
-        case OUT_R_JUMP:
-            oss <<  " $" << src1;
-            break;
-        case OUT_R_SUBTR:
-        case OUT_R_ACCUM:
-        case OUT_R_DIVMULT:
-        case OUT_R_TRAP:
-            oss <<  " $" << src1
-                << ", $" << src2;
-            break;
-        case OUT_R_ARITHM:
-        case OUT_R_CONDM:
-        case OUT_R_SHIFT:
-            oss <<  " $" << dst
-                << ", $" << src1
-                << ", $" << src2;
-            break;
         case OUT_R_SHAMT:
             oss <<  " $" << dst
                 << ", $" << src1
                 <<  ", " << std::dec << shamt;
-            break;
-        case OUT_R_JUMP_LINK:
-        case OUT_SP2_COUNT:
-            oss <<  " $" << dst
-                << ", $" << src1;
-            break;
-        case OUT_R_SPECIAL:
             break;
         case OUT_I_ARITHM:
             v_imm = instr.asI.imm;
@@ -424,7 +398,16 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
                 << std::hex << static_cast<uint16>(v_imm) << std::dec;
             break;
         default:
-            assert( false);
+            if (print_dst) {
+                oss <<  " $" << dst;
+                if (print_src1)
+                    oss << ",";
+            }
+            if (print_src1)
+                oss <<  " $" << src1;
+            if (print_src2)
+                oss << ", $" << src2;
+            break;
     }
     if ( instr.raw == 0x0ul)
         disasm = "nop ";
