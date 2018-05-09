@@ -153,7 +153,7 @@ class MIPSInstr
         }
 
         MIPSRegister get_register( RegType type) const;
-
+            
         struct ISAEntry
         {
             std::string_view name;
@@ -328,7 +328,10 @@ class MIPSInstr
         void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
 
         void calculate_load_addr()  { calculate_addr(); }
-        void calculate_store_addr() { calculate_addr(); }
+        void calculate_store_addr() {
+            calculate_addr();
+            mask = bitmask<RegisterUInt>(mem_size * 8);
+        }
 
         void calculate_load_addr_aligned() {
             calculate_load_addr();
