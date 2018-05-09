@@ -25,10 +25,9 @@ class RF
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
-    // Used only by accumulation instructions which work only in 32-bit mode
-    static uint64 merge_hi_lo(const RegisterUInt& lo, const RegisterUInt& hi) 
+    static uint32 carry( uint32 x, uint32 y, int8 accumulation)
     {
-        return (uint64(hi) << 32u) | uint64(lo);
+        return (accumulation == +1 && MAX_VAL32 - x < y) || (accumulation == -1 && x < y) ? 1 : 0;
     }
 
 protected:
@@ -39,40 +38,26 @@ protected:
         return get_value( num);
     }
 
-    // Used only by accumulation instructions which work only in 32-bit mode
-    auto read_hi_lo() const
-    {
-        return merge_hi_lo( read( Register::mips_lo), read( Register::mips_hi));
-    }
-
-    void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>())
+    void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
     {
         if ( num.is_zero())
             return;
 
-        assert( !num.is_mips_hi_lo());
+        if ( accumulation != 0) {
+            assert( num.is_mips_hi() || num.is_mips_lo());
+            const auto old_val = get_value( num);
+            // Handle carry to HI register
+            if ( num.is_mips_lo())
+                write ( Register::mips_hi, carry(old_val, val, accumulation), mask, accumulation);
 
-        // No hacks
-        get_value( num) &= ~mask;         // Clear old bits
+            if (accumulation == 1)
+                val = old_val + val;
+            else
+                val = old_val - val;
+        }
+
+        get_value( num) &= ~mask;      // Clear old bits
         get_value( num) |= val & mask; // Set new bits
-    }
-
-    void write_hi_lo( RegisterUInt lo, RegisterUInt hi, int8 accumulation = 0)
-    {
-        // Hacks for MIPS madds/msubs
-        if ( accumulation == 1) {
-            auto val = read_hi_lo() + merge_hi_lo(lo, hi);
-            hi = val >> 32;
-            lo = val & bitmask<RegisterUInt>(32);
-        }
-        else if ( accumulation == -1) {
-            auto val = read_hi_lo() - merge_hi_lo(lo, hi);
-            hi = val >> 32;
-            lo = val & bitmask<RegisterUInt>(32);
-        }
-
-        write( Register::mips_hi, hi);
-        write( Register::mips_lo, lo);
     }
 public:
 
@@ -91,10 +76,13 @@ public:
 
     inline void write_dst( const FuncInstr& instr)
     {
-        if (instr.get_dst_num().is_mips_hi_lo())
-            write_hi_lo( instr.get_v_dst(), instr.get_v_dst2(), instr.get_accumulation_type());
-        else
+        if (instr.get_dst_num().is_mips_hi_lo()) {
+            write( Register::mips_lo, instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
+            write( Register::mips_hi, instr.get_v_dst2(), instr.get_mask(), instr.get_accumulation_type());
+        }
+        else {
             write( instr.get_dst_num(), instr.get_v_dst(), instr.get_mask());
+        }
     }
 };
 
