@@ -25,7 +25,7 @@ class RF
     auto& get_value( Register num) { return array.at( num.to_size_t()); }
     const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
 
-    static uint32 carry( uint32 x, uint32 y, int8 accumulation)
+    static uint32 get_carry( uint32 x, uint32 y, int8 accumulation)
     {
         return (accumulation == +1 && MAX_VAL32 - x < y) || (accumulation == -1 && x < y) ? 1 : 0;
     }
@@ -47,8 +47,10 @@ protected:
             assert( num.is_mips_hi() || num.is_mips_lo());
             const auto old_val = get_value( num);
             // Handle carry to HI register
-            if ( num.is_mips_lo())
-                write ( Register::mips_hi, carry(old_val, val, accumulation), mask, accumulation);
+            if ( num.is_mips_lo()) {
+                auto carry = get_carry( static_cast<uint32>( old_val), static_cast<uint32>( val), accumulation);
+                write( Register::mips_hi, carry, mask, accumulation);
+            }
 
             if (accumulation == 1)
                 val = old_val + val;
