@@ -16,10 +16,15 @@
 std::unique_ptr<Simulator>
 Simulator::create_simulator( const std::string& isa, bool functional_only, bool log)
 {
-    if ( isa == "mips") {
+    if ( isa == "mips32") {
         if (functional_only)
-            return std::make_unique<FuncSim<MIPS>>( log);
-        return std::make_unique<PerfSim<MIPS>>( log);
+            return std::make_unique<FuncSim<MIPS32>>( log);
+        return std::make_unique<PerfSim<MIPS32>>( log);
+    }
+    else if ( isa == "mips64") {
+        if (functional_only)
+            return std::make_unique<FuncSim<MIPS64>>( log);
+        return std::make_unique<PerfSim<MIPS64>>( log);
     }
 
     return nullptr;

@@ -44,7 +44,7 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 
 ### Basic options
 
-* `-I` — modeled ISA, default option is "mips"
+* `-I` — modeled ISA, default option is "mips32"
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
 * `-f` — enables functional simulation only

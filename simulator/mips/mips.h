@@ -10,11 +10,19 @@
 #include <infra/instrcache/instr_cache_memory.h>
 #include "mips_instr.h"
 
-struct MIPS
+struct MIPS32
 {
-    using FuncInstr = MIPSInstr;
+    using FuncInstr = MIPS32Instr;
     using Register = MIPSRegister;
-    using Memory = InstrMemory<MIPSInstr>;
+    using Memory = InstrMemory<MIPS32Instr>;
+    using RegisterUInt = uint32;
+};
+
+struct MIPS64
+{
+    using FuncInstr = MIPS64Instr;
+    using Register = MIPSRegister;
+    using Memory = InstrMemory<MIPS64Instr>;
     using RegisterUInt = uint64;
 };
 

@@ -18,14 +18,14 @@
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
 
-class TestRF : public RF<MIPS>
+class TestRF : public RF<MIPS32>
 {
     public:
-        TestRF() : RF<MIPS>() {};
-        using RF<MIPS>::read;
-        using RF<MIPS>::write;
-        using RF<MIPS>::read_hi_lo;
-        using RF<MIPS>::write_hi_lo;
+        TestRF() : RF<MIPS32>() {};
+        using RF<MIPS32>::read;
+        using RF<MIPS32>::write;
+        using RF<MIPS32>::read_hi_lo;
+        using RF<MIPS32>::write_hi_lo;
 };
 
 static_assert(MIPSRegister::MAX_REG >= 32);
@@ -119,7 +119,7 @@ TEST( RF, read_sources_write_dst_rf)
     rf->write( MIPSRegister(25), 1);
 
     // Create the instr( for example, "add")
-    auto instr = std::make_unique<MIPSInstr>( 0x01398820);
+    auto instr = std::make_unique<MIPS32Instr>( 0x01398820);
     // Use read_sources( "add") method( initialize src1 and src2)
     rf->read_sources( instr.get());
     // Execute instruction( to change v_dst field)
@@ -129,72 +129,72 @@ TEST( RF, read_sources_write_dst_rf)
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
 
     // Same
-    instr = std::make_unique<MIPSInstr>( 0x01398821);
+    instr = std::make_unique<MIPS32Instr>( 0x01398821);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398824);
+    instr = std::make_unique<MIPS32Instr>( 0x01398824);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x0139880a);
+    instr = std::make_unique<MIPS32Instr>( 0x0139880a);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x0139880b);
+    instr = std::make_unique<MIPS32Instr>( 0x0139880b);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x71398802);
+    instr = std::make_unique<MIPS32Instr>( 0x71398802);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398827);
+    instr = std::make_unique<MIPS32Instr>( 0x01398827);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398825);
+    instr = std::make_unique<MIPS32Instr>( 0x01398825);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x03298804);
+    instr = std::make_unique<MIPS32Instr>( 0x03298804);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x03298806);
+    instr = std::make_unique<MIPS32Instr>( 0x03298806);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398822);
+    instr = std::make_unique<MIPS32Instr>( 0x01398822);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398823);
+    instr = std::make_unique<MIPS32Instr>( 0x01398823);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x01398826);
+    instr = std::make_unique<MIPS32Instr>( 0x01398826);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x0139882a);
+    instr = std::make_unique<MIPS32Instr>( 0x0139882a);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
-    instr = std::make_unique<MIPSInstr>( 0x0139882b);
+    instr = std::make_unique<MIPS32Instr>( 0x0139882b);
     rf->read_sources( instr.get());
     instr->execute();
     ASSERT_EQ( instr->get_v_src2(), 1u);

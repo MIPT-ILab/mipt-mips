@@ -18,32 +18,32 @@ static const std::string smc_code = TEST_PATH "/smc.out";
 TEST( Perf_Sim_init, Process_Correct_Args_Of_Constr)
 {
     // Just call a constructor
-    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS> mips( false); );
+    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS32> MIPS32( false); );
 }
 
 TEST( Perf_Sim_init, Make_A_Step)
 {
     // Call constructor and run one instr
-    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS>( false).run( valid_elf_file, 1); );
+    GTEST_ASSERT_NO_DEATH( PerfSim<MIPS32>( false).run( valid_elf_file, 1); );
 }
 
 TEST( Perf_Sim_init, Process_Wrong_Args)
 {
     // Do bad init
-    ASSERT_EXIT( PerfSim<MIPS>( false).run( "./1234567890/qwertyuop", 1),
+    ASSERT_EXIT( PerfSim<MIPS32>( false).run( "./1234567890/qwertyuop", 1),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
 TEST( Perf_Sim, Run_Full_Trace)
 {
-    PerfSim<MIPS> mips( false);
-    GTEST_ASSERT_NO_DEATH( mips.run_no_limit( valid_elf_file); );
+    PerfSim<MIPS32> MIPS32( false);
+    GTEST_ASSERT_NO_DEATH( MIPS32.run_no_limit( valid_elf_file); );
 }
 
 TEST( Perf_Sim, Run_SMC_Trace)
 {
-    PerfSim<MIPS> mips( false);
-    ASSERT_EXIT( mips.run_no_limit( smc_code);,
+    PerfSim<MIPS32> MIPS32( false);
+    ASSERT_EXIT( MIPS32.run_no_limit( smc_code);,
                  ::testing::ExitedWithCode( EXIT_FAILURE), "Mismatch:.*");
 }
 
