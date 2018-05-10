@@ -135,14 +135,9 @@ class MIPSInstr
 
         enum class RegType : uint8
         {
-            RS,
-            RT,
-            RD,
-            ZERO,
-            HI,
-            LO,
-            HI_LO,
-            RA
+            RS, RT, RD,
+            ZERO, RA,
+            HI, LO, HI_LO
         };
 
         static bool is_explicit_register( RegType type)
@@ -182,11 +177,11 @@ class MIPSInstr
         auto sign_extend() const { return static_cast<RegisterSInt>( static_cast<int16>(v_imm)); }
         auto zero_extend() const { return static_cast<RegisterUInt>( static_cast<uint16>(v_imm)); }
   
-        RegisterUInt v_src1 = static_cast<RegisterUInt>(NO_VAL64);
-        RegisterUInt v_src2 = static_cast<RegisterUInt>(NO_VAL64);
-        RegisterUInt v_dst  = static_cast<RegisterUInt>(NO_VAL64);
-        RegisterUInt v_dst2 = static_cast<RegisterUInt>(NO_VAL64);
-        RegisterUInt mask = all_ones<RegisterUInt>();
+        RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
+        RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
+        RegisterUInt v_dst  = NO_VAL<RegisterUInt>;
+        RegisterUInt v_dst2 = NO_VAL<RegisterUInt>;
+        RegisterUInt mask   = all_ones<RegisterUInt>();
 
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
