@@ -2,7 +2,7 @@
  * memory.cpp - the module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012 uArchSim iLab project
+ * Copyright 2012-2018 uArchSim iLab project
  */
 
 // Generic C++
@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
 // MIPT-MIPS modules
 #include <infra/macro.h>
@@ -23,7 +24,7 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),
-    addr_mask( bitmask<Addr>( addr_bits)),
+    addr_mask( bitmask<Addr>( std::min( addr_bits, bitwidth<Addr>))),
     offset_mask( bitmask<Addr>( offset_bits)),
     page_mask ( bitmask<Addr>( page_bits) << offset_bits),
     set_mask ( bitmask<Addr>( set_bits) << ( page_bits + offset_bits)),
