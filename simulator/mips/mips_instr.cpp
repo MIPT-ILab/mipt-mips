@@ -390,14 +390,9 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
                 << "($" << src1 << ")" << std::dec;
             break;
         case OUT_J_JUMP_LINK:
-            v_imm = instr.asJ.imm;
-            oss << " 0x"
-                << std::hex << static_cast<uint16>(v_imm) << std::dec;
-            break;
         case OUT_J_JUMP:
             v_imm = instr.asJ.imm;
-            oss << " 0x"
-                << std::hex << static_cast<uint16>(v_imm) << std::dec;
+            oss << " 0x" << std::hex << v_imm << std::dec;
             break;
         default:
             if (print_dst) {
