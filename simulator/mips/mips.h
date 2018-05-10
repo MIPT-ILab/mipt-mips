@@ -10,20 +10,19 @@
 #include <infra/instrcache/instr_cache_memory.h>
 #include "mips_instr.h"
 
-struct MIPS32
+template<typename T>
+struct MIPS
 {
-    using FuncInstr = MIPS32Instr;
     using Register = MIPSRegister;
-    using Memory = InstrMemory<MIPS32Instr>;
-    using RegisterUInt = uint32;
+    using RegisterUInt = T;
+    using FuncInstr = MIPSInstr<T>;
+    using Memory = InstrMemory<FuncInstr>;
 };
 
-struct MIPS64
-{
-    using FuncInstr = MIPS64Instr;
-    using Register = MIPSRegister;
-    using Memory = InstrMemory<MIPS64Instr>;
-    using RegisterUInt = uint64;
-};
+using MIPS32 = MIPS<uint32>;
+using MIPS64 = MIPS<uint64>;
+
+static_assert( std::is_same_v<MIPS32Instr, MIPS32::FuncInstr>);
+static_assert( std::is_same_v<MIPS64Instr, MIPS64::FuncInstr>);
 
 #endif // MIPS_H_
