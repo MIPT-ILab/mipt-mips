@@ -112,6 +112,15 @@ static constexpr inline size_t count_leading_ones(const T& value) noexcept
     return count_leading_zeroes<T>( ~value);
 }
 
+/* 
+ * Templated no-value (non-trivial data of given size)
+ */
+template<typename T> constexpr T NO_VAL = all_ones<T>();
+template<> constexpr uint8  NO_VAL<uint8>  = NO_VAL8;
+template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16;
+template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32;
+template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64;
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
