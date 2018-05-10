@@ -2,7 +2,7 @@
  * macro_test.cpp - Compile-time testing of useful inline functions
  *
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
- * Copyright 2017 MIPT-MIPS
+ * Copyright 2017-2018 MIPT-MIPS
  */
 
 #include <infra/macro.h>
@@ -56,6 +56,20 @@ static_assert(msb_set<uint8>()  == 0x80ull);
 static_assert(msb_set<uint16>() == 0x8000ull);
 static_assert(msb_set<uint32>() == 0x8000'0000ull);
 
+/* Check that NO_VAL values are really non-trivial */
+static_assert(NO_VAL<uint8> != 0);
+static_assert(NO_VAL<uint8> != all_ones<uint8>());
+static_assert(NO_VAL<uint8> != msb_set<uint8>());
+static_assert(NO_VAL<uint16> != 0);
+static_assert(NO_VAL<uint16> != all_ones<uint16>());
+static_assert(NO_VAL<uint16> != msb_set<uint16>());
+static_assert(NO_VAL<uint32> != 0);
+static_assert(NO_VAL<uint32> != all_ones<uint32>());
+static_assert(NO_VAL<uint32> != msb_set<uint32>());
+static_assert(NO_VAL<uint64> != 0);
+static_assert(NO_VAL<uint64> != all_ones<uint64>());
+static_assert(NO_VAL<uint64> != msb_set<uint64>());
+
 /*
 static_assert(popcount(0) == 0);
 static_assert(popcount(1) == 1);
@@ -85,4 +99,3 @@ static_assert(count_leading_zeroes<uint128>(0x0) == 128);
 static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
-
