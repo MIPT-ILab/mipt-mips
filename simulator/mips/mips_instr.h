@@ -26,8 +26,9 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 template<typename T>
 auto mips_multiplication(T x, T y) {
     using T2 = doubled_t<T>;
+    using UT2 = unsign_t<T2>;
     using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    auto value = static_cast<T2>(x) * static_cast<T2>(y);
+    auto value = static_cast<UT2>(static_cast<T2>(x) * static_cast<T2>(y));
     return ReturnType(value, value >> bitwidth<T>);
 }
 
@@ -37,8 +38,7 @@ auto mips_division(T x, T y) {
     if ( y == 0)
         return ReturnType();
 
-    // NOLINTNEXTLINE(misc-suspicious-semicolon)
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(misc-suspicious-semicolon)
         if ( y == -1 && x == static_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
             return ReturnType();
 
