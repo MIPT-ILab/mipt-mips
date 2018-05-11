@@ -179,9 +179,9 @@ TEST( MIPS32_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPS32Instr(0x0633fffb).Dump(), "bgezall $s1, -5");
     ASSERT_EQ(MIPS32Instr(0x0633000a).Dump(), "bgezall $s1, 10");
 
-    ASSERT_EQ(MIPS32Instr(0x0bfffb2e).Dump(), "j 0xfb2e");
+    ASSERT_EQ(MIPS32Instr(0x0bfffb2e).Dump(), "j 0x3fffb2e");
     ASSERT_EQ(MIPS32Instr(0x080004d2).Dump(), "j 0x4d2");
-    ASSERT_EQ(MIPS32Instr(0x0ffffb2e).Dump(), "jal 0xfb2e");
+    ASSERT_EQ(MIPS32Instr(0x0ffffb2e).Dump(), "jal 0x3fffb2e");
     ASSERT_EQ(MIPS32Instr(0x0c0004d2).Dump(), "jal 0x4d2");
 }
 
