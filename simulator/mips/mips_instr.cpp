@@ -107,7 +107,7 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapR
     //        0x37 reserved
 
     // Doubleword shifts
-    //key     name    operation       ms   source1       source2     destination       pointer                                    mips version
+    //key     name    operation     ms   source1       source2     destination       pointer                           mips version
     {0x38, { "dsll"   , OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &MIPSInstr<RegisterUInt>::execute_sll<uint64>, 4} },
     {0x3A, { "dsrl"   , OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &MIPSInstr<RegisterUInt>::execute_dsrl,        4} },
     {0x3B, { "dsra"   , OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &MIPSInstr<RegisterUInt>::execute_sra<uint64>, 4} },
@@ -129,13 +129,13 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapR
     {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_branch<&MIPSInstr<RegisterUInt>::gez>, 2} },
 
     // Traps
-    //key     name    operation memsize     source1        source2      destination      pointer                                                       mips version
-    {0x8,  { "tgei",  OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::gei>,  2} },
-    {0x9,  { "tgeiu", OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::geiu>, 2} },
-    {0xA,  { "tlti",  OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::lti>,  2} },
-    {0xB,  { "tltiu", OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::ltiu>, 2} },
-    {0xC,  { "teqi",  OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::eqi>,  2} },
-    {0xE,  { "tnei",  OUT_RI_TRAP,      0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::nei>,  2} },
+    //key     name    operation    ms  source1        source2      destination      pointer                                                       mips version
+    {0x8,  { "tgei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::gei>,  2} },
+    {0x9,  { "tgeiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::geiu>, 2} },
+    {0xA,  { "tlti",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::lti>,  2} },
+    {0xB,  { "tltiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::ltiu>, 2} },
+    {0xC,  { "teqi",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::eqi>,  2} },
+    {0xE,  { "tnei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_trap<&MIPSInstr<RegisterUInt>::nei>,  2} },
 
     // Linking branches
     //key     name    operation   memsize     source1        source2      destination      pointer                                                             mips version
@@ -208,10 +208,10 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapI
 
     // Stores
     //key     name    operation  memsize    source1      source2      destination      pointer                                         mips version
-    {0x28, { "sb",  OUT_I_STORE,         1, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         1} },
-    {0x29, { "sh",  OUT_I_STORE,         2, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         1} },
+    {0x28, { "sb",  OUT_I_STORE, 1, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         1} },
+    {0x29, { "sh",  OUT_I_STORE, 2, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         1} },
     {0x2A, { "swl", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr_left,    1} },
-    {0x2B, { "sw",  OUT_I_STORE,         4, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr_aligned, 1} },
+    {0x2B, { "sw",  OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr_aligned, 1} },
     {0x2C, { "sdl", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         3} },
     {0x2D, { "sdr", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr,         3} },
     {0x2E, { "swr", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &MIPSInstr<RegisterUInt>::calculate_store_addr_right,   1} },
