@@ -52,14 +52,6 @@ Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
  07<br/>Apr | **L17: Multiprocessor and Multicore Systems**<br/>_— Thread-level parallelism (TLP)_<br/>_— Memory coherence problem_<br/>_— Coherence protocol: MESI_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_17__7_Apr__Multiprocessor_Systems__Eng_text__No_audio.pptx?raw=true) |
  14<br/>Apr | **L18: Simultaneous Multithreading**<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_18__14_Apr__Simultaneous_Multithreading__Eng_text__No_audio.pptx?raw=true) |
  21<br/>Apr | **Test 3**<br/> • Review **L11−L18** material |
- 
- 
-### MSU Seminars
-
- Date | Event 
- :-: |:---- 
- 24<br/>Nov | **Caches and Memory Hierarchy**<br/>• [Rus text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_01__24_Nov__Caches__No_audio.pptx?raw=true) |
- 15<br/>Dec | **Out-of-Order Execution**<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_02__15_Dec__Out-of-Order__No_audio.pptx?raw=true) |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
