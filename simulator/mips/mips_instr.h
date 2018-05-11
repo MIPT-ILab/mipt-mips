@@ -55,12 +55,9 @@ class MIPSInstr
         {
             OUT_R_ARITHM,
             OUT_R_ACCUM,
-            OUT_R_DIVMULT,
             OUT_R_CONDM,
-            OUT_R_SHIFT,
             OUT_R_SHAMT,
             OUT_R_JUMP,
-            OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
             OUT_R_SUBTR,
             OUT_R_TRAP,
@@ -70,7 +67,6 @@ class MIPSInstr
             OUT_R_MTHI,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
-            OUT_I_BRANCH_0,
             OUT_RI_BRANCH_0,
             OUT_RI_TRAP,
             OUT_I_LOAD,
@@ -78,12 +74,8 @@ class MIPSInstr
             OUT_I_PARTIAL_LOAD,
             OUT_I_CONST,
             OUT_I_STORE,
-            OUT_I_PARTIAL_STORE,
             OUT_J_JUMP,
-            OUT_J_JUMP_LINK,
-            OUT_RI_BRANCH_LINK,
             OUT_J_SPECIAL,
-            OUT_SP2_COUNT,
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
@@ -400,24 +392,15 @@ class MIPSInstr
         MIPSRegister get_dst2_num() const { return dst2; }
 
         /* Checks if instruction can change PC in unusual way. */
-        bool is_jump() const { return operation == OUT_J_JUMP         ||
-                                      operation == OUT_J_JUMP_LINK    ||
-                                      operation == OUT_RI_BRANCH_LINK ||
-                                      operation == OUT_R_JUMP         ||
-                                      operation == OUT_R_JUMP_LINK    ||
-                                      operation == OUT_I_BRANCH_0     ||
-                                      operation == OUT_RI_BRANCH_0    ||
-                                      operation == OUT_I_BRANCH;     }
+        bool is_jump() const { return operation == OUT_J_JUMP      ||
+                                      operation == OUT_RI_BRANCH_0 ||
+                                      operation == OUT_R_JUMP      ||
+                                      operation == OUT_I_BRANCH;}
         bool is_jump_taken() const { return  _is_jump_taken; }
 
         bool is_partial_load() const
         {
             return operation == OUT_I_PARTIAL_LOAD;
-        }
-
-        bool is_partial_store() const
-        {
-            return operation == OUT_I_PARTIAL_STORE;
         }
 
         bool is_load() const { return operation == OUT_I_LOAD ||
@@ -429,15 +412,14 @@ class MIPSInstr
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
 
-        bool is_store() const { return operation == OUT_I_STORE  ||
-                                       is_partial_store(); }
+        bool is_store() const { return operation == OUT_I_STORE; }
 
         bool is_nop() const { return instr.raw == 0x0u; }
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
-        bool is_divmult() const { return operation == OUT_R_DIVMULT; }
+        bool is_divmult() const { return dst.is_mips_lo() && dst2.is_mips_hi() }
 
         bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
                                                operation == OUT_RI_TRAP; }
