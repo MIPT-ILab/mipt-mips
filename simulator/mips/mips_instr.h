@@ -419,7 +419,7 @@ class MIPSInstr
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
-        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi() }
+        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
 
         bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
                                                operation == OUT_RI_TRAP; }
