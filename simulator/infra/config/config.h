@@ -1,6 +1,6 @@
 /*
  * config.h - class for analysing and handling of inputed arguments
- * Copyright 2017 MIPT-MIPS
+ * Copyright 2017-2018 MIPT-MIPS
  */
 
 #ifndef CONFIG_H
