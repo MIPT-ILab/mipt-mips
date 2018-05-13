@@ -79,9 +79,8 @@ add_executable(${PROJECT_NAME} main.cpp)
 #include headers
 include_directories(SRCDIRS ./.)
 
-#include Boost libs
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS program_options REQUIRED)
+#include Boost headers
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 #libelf
