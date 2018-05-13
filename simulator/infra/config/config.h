@@ -1,6 +1,6 @@
 /*
  * config.h - class for analysing and handling of inputed arguments
- * Copyright 2017 MIPT-MIPS
+ * Copyright 2017-2018 MIPT-MIPS
  */
 
 #ifndef CONFIG_H
@@ -13,40 +13,27 @@
 
 #include <infra/types.h>
 
-// small hack to include boost only in config.cpp
-namespace boost { namespace program_options {
-    class options_description;
-} // namespace program_options
-} // namespace boost
+/* POPL */
+#include "popl.hpp"
 
 namespace config {
-
-using bod = boost::program_options::options_description;
 
 class BaseValue
 {
     friend void handleArgs( int argc, const char* argv[]);
-    virtual void reg( bod* d) = 0;
-
-    static std::map<std::string, BaseValue*>& values() {
-        static std::map<std::string, BaseValue*> instance;
-        return instance;
-    }
-
 protected:
+    const std::string alias;
     const std::string name;
     const std::string desc;
 
-    BaseValue( const char* name, const char* desc) : name( name), desc( desc)
-    {
-        if (values().find( name) != values().end()) {
-            std::cerr << "ERROR. Duplicate option with the same name ("
-                      << name << ")" << std::endl;
-            std::exit( EXIT_FAILURE);
-        }
-        values()[name] = this;
-    }
+    BaseValue( const char* alias, const char* name, const char* desc)
+        : alias( alias), name( name), desc( desc) { }
     virtual ~BaseValue() = default;
+
+    static popl::OptionParser& values() {
+        static popl::OptionParser instance( "Allowed options");
+        return instance;
+    }
 public:
     // Do not move or copy
     BaseValue( const BaseValue&) = delete;
@@ -56,42 +43,77 @@ public:
 };
 
 template<typename T>
-class RequiredValue : public BaseValue {
+class AliasedRequiredValue : public BaseValue {
 protected:
     T value;
-
-    void reg( bod* d) override;
+    AliasedRequiredValue<T>( const char* alias, const char* name, const char* desc, int) noexcept
+        : BaseValue( alias, name, desc)
+        , value( ) { }
 public:
-    RequiredValue<T>( const char* name, const char* desc) noexcept
-        : BaseValue( name, desc)
-        , value( )
-    { }
+    AliasedRequiredValue<T>( const char* alias, const char* name, const char* desc) noexcept
+        : AliasedRequiredValue<T>( alias, name, desc, 1)
+    {
+        this->values().template add<popl::MandatoryValue<T>>(alias, name, desc, &value);
+    }
 
-    RequiredValue<T>() = delete;
+    AliasedRequiredValue<T>() = delete;
 
     // Converter is implicit intentionally, so bypass Clang-Tidy check
     // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
     
-    friend std::ostream& operator<<( std::ostream& out, const RequiredValue& rhs)
+    friend std::ostream& operator<<( std::ostream& out, const AliasedRequiredValue& rhs)
     {
         return out << rhs.value;
     }
 };
 
 template<typename T>
-class Value : public RequiredValue<T> {
-    const T default_value;
-
-    void reg( bod* d) final;
-public:
-    Value<T>( const char* name, const T& val, const char* desc) noexcept
-        : RequiredValue<T>( name, desc)
+class AliasedValue : public AliasedRequiredValue<T> {
+protected:
+    using Base = AliasedRequiredValue<T>;
+    using Base::values;
+    AliasedValue<T>( const char* alias, const char* name, const T& val, const char* desc, int x) noexcept
+        : AliasedRequiredValue<T>( alias, name, desc, x)
         , default_value( val)
-    { this->value = val; }
+    {
+         this->value = val;
+    }
+public:
+    AliasedValue<T>( const char* alias, const char* name, const T& val, const char* desc) noexcept
+        : AliasedValue<T>( alias, name, val, desc, 1)
+    {
+        popl::OptionParser& options = values();
+        options.add<popl::Value<T>>(this->alias, this->name, this->desc, default_value, &this->value);
+    }
 
-    Value<T>() = delete;
+    AliasedValue<T>() = delete;
+private:
+    const T default_value;
 };
+
+class AliasedSwitch : public AliasedValue<bool> {
+public:
+    AliasedSwitch( const char* alias, const char* name, const char* desc) noexcept
+        : AliasedValue<bool>( alias, name, false, desc, 1)
+    {
+        values().add<popl::Switch>(this->alias, this->name, this->desc, &this->value);
+    }
+
+    AliasedSwitch() = delete;
+};
+
+template<typename T>
+class Unaliased : public T
+{
+public:
+    Unaliased<T>() = delete;
+    template<typename ... Args> Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
+};
+
+template<typename T> using Value = Unaliased<AliasedValue<T>>;
+template<typename T> using RequiredValue = Unaliased<AliasedRequiredValue<T>>;
+using Switch = Unaliased<AliasedSwitch>;
 
 /* methods */
 void handleArgs( int argc, const char* argv[]);

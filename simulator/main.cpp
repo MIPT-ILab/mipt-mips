@@ -16,12 +16,12 @@
 #include <simulator.h>
 
 namespace config {
-    static RequiredValue<std::string> binary_filename = { "binary,b", "input binary file"};
+    static AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
 
-    static Value<uint64> num_steps = { "numsteps,n", MAX_VAL64, "number of instructions to run"};
-    static Value<std::string> isa = { "isa,I", "mips32", "modeled ISA"};
-    static Value<bool> disassembly_on = { "disassembly,d", false, "print disassembly"};
-    static Value<bool> functional_only = { "functional-only,f", false, "run functional simulation only"};
+    static AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
+    static AliasedValue<std::string> isa = { "I", "isa", "mips32", "modeled ISA"};
+    static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
+    static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
 
 auto create_simulator()

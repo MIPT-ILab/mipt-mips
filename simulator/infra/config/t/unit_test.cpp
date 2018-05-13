@@ -13,11 +13,11 @@
 #include "infra/macro.h"
 
 namespace config {
-    RequiredValue<std::string> string_config = { "string_config_name,b", "string config description"};
-    RequiredValue<uint64> uint64_config = { "uint64_config_name,n", "uint64 config description"};
+    AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
+    AliasedRequiredValue<uint64> uint64_config = { "n", "uint64_config_name", "uint64 config description"};
 
-    Value<bool> bool_config_1 = { "bool_config_1,d", false, "first bool config description"};
-    Value<bool> bool_config_2 = { "bool_config_2,f", false, "second bool config description"};
+    AliasedSwitch bool_config_1 = { "d", "bool_config_1", "first bool config description"};
+    AliasedSwitch bool_config_2 = { "f", "bool_config_2", "second bool config description"};
 } // namespace config
 
 //
@@ -139,6 +139,7 @@ TEST( config_parse, Pass_Args_With_Unrecognised_Option)
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
+#if 0
 //
 // Pass a binary option multiple times
 //
@@ -156,6 +157,7 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
     // should throw
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
+#endif
 
 //
 // Pass a binary option without an argument
@@ -193,6 +195,7 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
     ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
 }
 
+#if 0
 //
 // To check whether providing configuration parser
 // with the same option is a failure
@@ -223,6 +226,7 @@ TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
     // should exit with EXIT_FAILURE
     ASSERT_EXIT( test_function(), ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
+#endif
 
 int main( int argc, char** argv)
 {
