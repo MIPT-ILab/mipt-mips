@@ -83,7 +83,7 @@ template<typename T>
 struct Unaliased : public T
 {
     Unaliased<T>() = delete;
-    template<typename ... Args> explicit Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
+    template<typename ... Args> Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
 };
 
 template<typename T> using Value = Unaliased<AliasedValue<T>>;
