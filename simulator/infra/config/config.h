@@ -22,93 +22,68 @@ class BaseValue
 {
     friend void handleArgs( int argc, const char* argv[]);
 protected:
-    const std::string alias;
-    const std::string name;
-    const std::string desc;
-
-    BaseValue( const char* alias, const char* name, const char* desc)
-        : alias( alias), name( name), desc( desc) { }
-    virtual ~BaseValue() = default;
-
-    static popl::OptionParser& values() {
+    static popl::OptionParser& options() {
         static popl::OptionParser instance( "Allowed options");
         return instance;
     }
-public:
-    // Do not move or copy
-    BaseValue( const BaseValue&) = delete;
-    BaseValue( BaseValue&&) = delete;
-    BaseValue& operator=( const BaseValue&) = delete;
-    BaseValue& operator=( BaseValue&&) = delete;
 };
 
 template<typename T>
-class AliasedRequiredValue : public BaseValue {
+class BaseTValue : public BaseValue
+{
 protected:
-    T value;
-    AliasedRequiredValue<T>( const char* alias, const char* name, const char* desc, int) noexcept
-        : BaseValue( alias, name, desc)
-        , value( ) { }
+    T value = T();
+    BaseTValue<T>( T val ) noexcept : value( std::move(val)) { }
+    BaseTValue<T>( ) = default;
 public:
-    AliasedRequiredValue<T>( const char* alias, const char* name, const char* desc) noexcept
-        : AliasedRequiredValue<T>( alias, name, desc, 1)
-    {
-        this->values().template add<popl::Value<T>, popl::Attribute::required>(alias, name, desc, T(), &value);
-    }
-
-    AliasedRequiredValue<T>() = delete;
 
     // Converter is implicit intentionally, so bypass Clang-Tidy check
     // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
     
-    friend std::ostream& operator<<( std::ostream& out, const AliasedRequiredValue& rhs)
+    friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
         return out << rhs.value;
     }
 };
+    
+template<typename T>
+struct AliasedRequiredValue : public BaseTValue<T> {
+    AliasedRequiredValue<T>( const std::string& alias, const std::string& name, const std::string& desc) noexcept
+        : BaseTValue<T>( )
+    {
+        this->options().template add<popl::Value<T>, popl::Attribute::required>(alias, name, desc, T(), &this->value);
+    }
+
+    AliasedRequiredValue<T>() = delete;
+};
 
 template<typename T>
-class AliasedValue : public AliasedRequiredValue<T> {
-protected:
-    using Base = AliasedRequiredValue<T>;
-    using Base::values;
-    AliasedValue<T>( const char* alias, const char* name, const T& val, const char* desc, int x) noexcept
-        : AliasedRequiredValue<T>( alias, name, desc, x)
-        , default_value( val)
+struct AliasedValue : public BaseTValue<T> {
+    AliasedValue<T>( const std::string& alias, const std::string& name, const T& val, const std::string& desc) noexcept
+        : BaseTValue<T>( val)
     {
-         this->value = val;
-    }
-public:
-    AliasedValue<T>( const char* alias, const char* name, const T& val, const char* desc) noexcept
-        : AliasedValue<T>( alias, name, val, desc, 1)
-    {
-        popl::OptionParser& options = values();
-        options.add<popl::Value<T>>(this->alias, this->name, this->desc, default_value, &this->value);
+        this->options().template add<popl::Value<T>>(alias, name, desc, val, &this->value);
     }
 
     AliasedValue<T>() = delete;
-private:
-    const T default_value;
 };
 
-class AliasedSwitch : public AliasedValue<bool> {
-public:
-    AliasedSwitch( const char* alias, const char* name, const char* desc) noexcept
-        : AliasedValue<bool>( alias, name, false, desc, 1)
+struct AliasedSwitch : public BaseTValue<bool> {
+    AliasedSwitch( const std::string& alias, const std::string& name, const std::string& desc) noexcept
+        : BaseTValue<bool>( false)
     {
-        values().add<popl::Switch>(this->alias, this->name, this->desc, &this->value);
+        options().add<popl::Switch>(alias, name, desc, &this->value);
     }
 
     AliasedSwitch() = delete;
 };
 
 template<typename T>
-class Unaliased : public T
+struct Unaliased : public T
 {
-public:
     Unaliased<T>() = delete;
-    template<typename ... Args> Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
+    template<typename ... Args> explicit Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
 };
 
 template<typename T> using Value = Unaliased<AliasedValue<T>>;
