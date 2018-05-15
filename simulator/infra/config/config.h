@@ -53,7 +53,7 @@ public:
     AliasedRequiredValue<T>( const char* alias, const char* name, const char* desc) noexcept
         : AliasedRequiredValue<T>( alias, name, desc, 1)
     {
-        this->values().template add<popl::MandatoryValue<T>>(alias, name, desc, &value);
+        this->values().template add<popl::Value<T>, popl::Attribute::required>(alias, name, desc, T(), &value);
     }
 
     AliasedRequiredValue<T>() = delete;
