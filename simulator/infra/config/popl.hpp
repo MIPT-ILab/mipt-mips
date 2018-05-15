@@ -116,7 +116,7 @@ public:
 	void set_default(const T& value);
 	bool has_default() const;
 	T get_default() const;
-	bool get_default(std::ostream& out) const;
+	bool get_default(std::ostream& out) const override;
 
 	Argument argument_type() const override;
 
