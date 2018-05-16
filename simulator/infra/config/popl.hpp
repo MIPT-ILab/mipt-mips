@@ -208,12 +208,6 @@ public:
 	const std::vector<Option_ptr>& options() const;
 	const std::vector<std::string>& non_option_args() const;
 	const std::vector<std::string>& unknown_options() const;
-
-	template<typename T>
-	std::shared_ptr<T> get_option(const std::string& long_opt) const;
-	template<typename T>
-	std::shared_ptr<T> get_option(char short_opt) const;
-
 protected:
 	std::vector<Option_ptr> options_;
 	std::string description_;
@@ -647,33 +641,6 @@ inline Option_ptr OptionParser::find_option(char short_opt) const
 			return option;
 	return nullptr;
 }
-
-
-template<typename T>
-inline std::shared_ptr<T> OptionParser::get_option(const std::string& long_opt) const
-{
-	Option_ptr option = find_option(long_opt);
-	if (!option)
-		throw std::invalid_argument("option not found: " + long_opt);
-	auto result = std::dynamic_pointer_cast<T>(option);
-	if (!result)
-		throw std::invalid_argument("cannot cast option to T: " + long_opt);
-	return result;
-}
-
-
-template<typename T>
-inline std::shared_ptr<T> OptionParser::get_option(char short_opt) const
-{
-	Option_ptr option = find_option(short_opt);
-	if (!option)
-		throw std::invalid_argument("option not found: " + std::string(1, short_opt));
-	auto result = std::dynamic_pointer_cast<T>(option);
-	if (!result)
-		throw std::invalid_argument("cannot cast option to T: " + std::string(1, short_opt));
-	return result;
-}
-
 
 inline void OptionParser::parse(int argc, const char * const argv[])
 {

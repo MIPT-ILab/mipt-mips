@@ -35,7 +35,7 @@ using float32 = float;
 using float64 = double;
 
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
-#if defined(__GNUC__) && !defined(__clang__) && defined(__SIZEOF_INT128__)
+#if defined(__GNUC__) && defined(__SIZEOF_INT128__)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
