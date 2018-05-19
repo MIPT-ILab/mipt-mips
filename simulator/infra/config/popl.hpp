@@ -129,7 +129,6 @@ protected:
 	virtual void add_value(const T& value);
 	virtual void clear() override;
 
-	unsigned int count_;
 	T* assign_to_;
 	std::vector<T> values_;
 };
@@ -208,6 +207,12 @@ public:
 	const std::vector<Option_ptr>& options() const;
 	const std::vector<std::string>& non_option_args() const;
 	const std::vector<std::string>& unknown_options() const;
+
+	template<typename T>
+	std::shared_ptr<T> get_option(const std::string& long_opt) const;
+	template<typename T>
+	std::shared_ptr<T> get_option(char short_opt) const;
+
 protected:
 	std::vector<Option_ptr> options_;
 	std::string description_;
@@ -296,7 +301,6 @@ inline std::string Option::to_string() const
 template<class T>
 inline Value<T>::Value(const std::string& short_option, const std::string& long_option, const std::string& description) :
 	Option(short_option, long_option, description),
-	count_(0),
 	assign_to_(nullptr)
 {
 }
@@ -314,14 +318,14 @@ inline Value<T>::Value(const std::string& short_option, const std::string& long_
 template<class T>
 inline unsigned int Value<T>::count() const
 {
-	return count_;
+	return values_.size();
 }
 
 
 template<class T>
 inline bool Value<T>::is_set() const
 {
-	return (count() > 0);
+	return !values_.empty();
 }
 
 
@@ -347,10 +351,10 @@ inline T Value<T>::value(size_t idx) const
 	if (!this->is_set() && default_)
 		return *default_;
 
-	if (!is_set() || (idx >= count_))
+	if (!is_set() || (idx >= count()))
 	{
 		std::stringstream optionStr;
-		if (!!is_set())
+		if (!is_set())
 			optionStr << "option not set: \"";
 		else
 			optionStr << "index out of range (" << idx << ") for \"";
@@ -485,7 +489,6 @@ template<class T>
 inline void Value<T>::add_value(const T& value)
 {
 	values_.push_back(value);
-	++count_;
 	update_reference();
 }
 
@@ -494,7 +497,6 @@ template<class T>
 inline void Value<T>::clear()
 {
 	values_.clear();
-	count_ = 0;
 	update_reference();
 }
 
@@ -641,6 +643,33 @@ inline Option_ptr OptionParser::find_option(char short_opt) const
 			return option;
 	return nullptr;
 }
+
+
+template<typename T>
+inline std::shared_ptr<T> OptionParser::get_option(const std::string& long_opt) const
+{
+	Option_ptr option = find_option(long_opt);
+	if (!option)
+		throw std::invalid_argument("option not found: " + long_opt);
+	auto result = std::dynamic_pointer_cast<T>(option);
+	if (!result)
+		throw std::invalid_argument("cannot cast option to T: " + long_opt);
+	return result;
+}
+
+
+template<typename T>
+inline std::shared_ptr<T> OptionParser::get_option(char short_opt) const
+{
+	Option_ptr option = find_option(short_opt);
+	if (!option)
+		throw std::invalid_argument("option not found: " + std::string(1, short_opt));
+	auto result = std::dynamic_pointer_cast<T>(option);
+	if (!result)
+		throw std::invalid_argument("cannot cast option to T: " + std::string(1, short_opt));
+	return result;
+}
+
 
 inline void OptionParser::parse(int argc, const char * const argv[])
 {
