@@ -52,9 +52,9 @@ protected:
             }
 
             if (accumulation == 1)
-                val = old_val + val;
+                val = static_cast<uint32>(old_val) + static_cast<uint32>(val);
             else
-                val = old_val - val;
+                val = static_cast<uint32>(old_val) - static_cast<uint32>(val);
         }
 
         get_value( num) &= ~mask;      // Clear old bits
