@@ -314,8 +314,11 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
     operation = entry.operation;
     mem_size  = entry.mem_size;
     function  = entry.function;
-    is64      = entry.bits == ISA64;
-    shamt     = instr.asR.shamt;
+    if constexpr (std::is_same_v<RegisterUInt, uint32>)
+        if (entry.bits == ISA64)
+            function = &MIPSInstr<RegisterUInt>::execute_unknown;
+   
+    shamt = instr.asR.shamt;
 
     src1 = get_register( entry.src1);
     src2 = get_register( entry.src2);
@@ -419,13 +422,6 @@ void MIPSInstr<RegisterUInt>::execute_unknown()
 template<typename RegisterUInt>
 void MIPSInstr<RegisterUInt>::execute()
 {
-    if constexpr (std::is_same_v<RegisterUInt, uint32>) {
-        if (is64) {
-            std::cerr << "ERROR.Executing 64 bit instruction on 32 bit CPU: " << disasm << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-
     (this->*function)();
     complete = true;
 
