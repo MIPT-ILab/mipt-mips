@@ -141,6 +141,11 @@ class MIPSInstr
 
         MIPSRegister get_register( RegType type) const;
 
+        enum Bits {
+            ISA32,
+            ISA64
+        };
+
         struct ISAEntry
         {
             std::string_view name;
@@ -151,6 +156,7 @@ class MIPSInstr
             RegType dst;
             MIPSInstr::Execute function;
             uint8 mips_version;
+            Bits bits;
             ISAEntry() = delete;
         };
 
@@ -182,6 +188,7 @@ class MIPSInstr
         // convert this to bitset
         bool complete   = false;
         bool _is_jump_taken = false;      // actual result
+        bool is64 = false;
 
         Addr new_PC = NO_VAL32;
 
