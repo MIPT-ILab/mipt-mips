@@ -187,8 +187,7 @@ class MIPSInstr
 
         // convert this to bitset
         bool complete   = false;
-        bool _is_jump_taken = false;      // actual result
-        bool is64 = false;
+        bool _is_jump_taken = false; // actual result  
 
         Addr new_PC = NO_VAL32;
 
