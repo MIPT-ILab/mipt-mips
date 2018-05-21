@@ -239,7 +239,12 @@ class MIPSInstr
         template <typename T>
         void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
         void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
-        void execute_srl()   { v_dst = v_src1 >> shamt; }
+        
+        void execute_srl()
+        {
+            // On 64-bit CPUs the result word is sign-extended
+            v_dst = static_cast<RegisterUInt>(static_cast<RegisterSInt>(static_cast<int32>(static_cast<uint32>(v_src1) >> shamt)));
+        }
 
         template <typename T>
         void execute_sra()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), shamt); }
