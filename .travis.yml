@@ -28,7 +28,6 @@ addons:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-6.0
     packages:
-    - binutils-mips-linux-gnu
     - g++-7
     - clang-tidy-6.0
     - libelf-dev
@@ -41,11 +40,14 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
 # Install GNU Binutils
   - cd $TRAVIS_BUILD_DIR/binutils
+  - BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
+  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+  - make all install MAKEINFO=true > /dev/null
 
 script:
 # Build traces
   - cd $TRAVIS_BUILD_DIR/traces
-  - make MIPS_AS=mips-linux-gnu-as MIPS_LD=mips-linux-gnu-ld
+  - make MIPS_AS=$BINUTILS/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
