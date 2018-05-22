@@ -31,9 +31,9 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapR
 
     // Indirect branches
     //key     name    operation  ms  source1      source2      destination      pointer                           mips version
-    {0x8, { "jr"  , OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_jr,   1} },
+    {0x8, { "jr"  , OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_jr,   1, ISA32} },
     {0x9, { "jalr", OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::RD,
-                               &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_jr>, 1} },
+                               &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_jr>, 1, ISA32} },
 
     // Conditional moves (MIPS IV)
     //key     name    operation   ms  source1      source2      destination      pointer                        mips version
@@ -153,9 +153,9 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapI
     // ********************* I and J INSTRUCTIONS *************************
     // Direct jumps
     //key     name    operation  memsize    source1      source2      destination      pointer                          mips version
-    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_j,    1 } },
+    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_j,    1, ISA32 } },
     {0x3, { "jal", OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::RA,
-                                &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_j>,  1 } },
+                                &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_j>,  1, ISA32 } },
 
     // Branches
     //key     name    operation  memsize    source1      source2      destination      pointer                                                     mips version
