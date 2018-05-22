@@ -32,7 +32,8 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapR
     // Indirect branches
     //key     name    operation  ms  source1      source2      destination      pointer                           mips version
     {0x8, { "jr"  , OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_jr,   1, ISA32} },
-    {0x9, { "jalr", OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::RD,   &MIPSInstr<RegisterUInt>::execute_jalr, 1, ISA32} },
+    {0x9, { "jalr", OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::RD,
+                               &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_jr>, 1, ISA32} },
 
     // Conditional moves (MIPS IV)
     //key     name    operation   ms  source1      source2      destination      pointer                        mips version
@@ -153,7 +154,8 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapI
     // Direct jumps
     //key     name    operation  memsize    source1      source2      destination      pointer                          mips version
     {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &MIPSInstr<RegisterUInt>::execute_j,    1, ISA32 } },
-    {0x3, { "jal", OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::RA,   &MIPSInstr<RegisterUInt>::execute_jal,  1, ISA32 } },
+    {0x3, { "jal", OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::RA,
+                                &MIPSInstr<RegisterUInt>::execute_jump_and_link<&MIPSInstr<RegisterUInt>::execute_j>,  1, ISA32 } },
 
     // Branches
     //key     name    operation  memsize    source1      source2      destination      pointer                                                     mips version
@@ -190,7 +192,7 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapI
     {0x1A, { "ldl",  OUT_I_LOAD, 8, RegType::RS, RegType::ZERO, RegType::RT, &MIPSInstr<RegisterUInt>::calculate_load_addr, 3, ISA64} },
     {0x1B, { "ldr",  OUT_I_LOAD, 8, RegType::RS, RegType::ZERO, RegType::RT, &MIPSInstr<RegisterUInt>::calculate_load_addr, 3, ISA64} },
 
-    // Doubleword addition 
+    // Doubleword addition
     //key     name    operation  memsize    source1      source2     destination      pointer                                        mips version
     {0x18, { "daddi",  OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &MIPSInstr<RegisterUInt>::execute_addition_imm<int64>,  3, ISA64} },
     {0x19, { "daddiu", OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &MIPSInstr<RegisterUInt>::execute_addition_imm<uint64>, 3, ISA64} },
@@ -238,7 +240,7 @@ const typename MIPSInstr<RegisterUInt>::MapType MIPSInstr<RegisterUInt>::isaMapM
     {0x04, { "msub",  OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &MIPSInstr<RegisterUInt>::execute_multiplication<int32>,  32, ISA32} },
     {0x05, { "msubu", OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &MIPSInstr<RegisterUInt>::execute_multiplication<uint32>, 32, ISA32} },
 
-    // Count leading zeroes/ones 
+    // Count leading zeroes/ones
     //key     name    operation  memsize    source1      source2      destination      pointer                       mips version
     {0x20, { "clz",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &MIPSInstr<RegisterUInt>::execute_clz,     32, ISA32} },
     {0x21, { "clo",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &MIPSInstr<RegisterUInt>::execute_clo,     32, ISA32} },
@@ -317,7 +319,7 @@ void MIPSInstr<RegisterUInt>::init( const MIPSInstr<RegisterUInt>::ISAEntry& ent
     if constexpr (std::is_same_v<RegisterUInt, uint32>)
         if (entry.bits == ISA64)
             function = &MIPSInstr<RegisterUInt>::execute_unknown;
-   
+
     shamt = instr.asR.shamt;
 
     src1 = get_register( entry.src1);
