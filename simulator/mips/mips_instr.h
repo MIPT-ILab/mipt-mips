@@ -19,6 +19,7 @@
 #include <infra/string/cow_string.h>
 
 #include "mips_register/mips_register.h"
+#include "mips_version.h"
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
@@ -46,7 +47,7 @@ auto mips_division(T x, T y) {
 }
 
 template<typename RegisterUInt>
-class MIPSInstr
+class BaseMIPSInstr
 {
     private:
         using RegisterSInt = sign_t<RegisterUInt>;
@@ -122,8 +123,8 @@ class MIPSInstr
             static_assert( sizeof( uint32) == 4);
         } instr;
 
-        using Execute = void (MIPSInstr::*)();
-        using Predicate = bool (MIPSInstr::*)() const;
+        using Execute = void (BaseMIPSInstr::*)();
+        using Predicate = bool (BaseMIPSInstr::*)() const;
 
         enum class RegType : uint8
         {
@@ -141,11 +142,6 @@ class MIPSInstr
 
         MIPSRegister get_register( RegType type) const;
 
-        enum Bits {
-            ISA32,
-            ISA64
-        };
-
         struct ISAEntry
         {
             std::string_view name;
@@ -154,13 +150,12 @@ class MIPSInstr
             RegType src1;
             RegType src2;
             RegType dst;
-            MIPSInstr::Execute function;
-            uint8 mips_version;
-            Bits bits;
+            BaseMIPSInstr::Execute function;
+            int versions;
             ISAEntry() = delete;
         };
 
-        using MapType = std::unordered_map <uint8, MIPSInstr<RegisterUInt>::ISAEntry>;
+        using MapType = std::unordered_map <uint8, BaseMIPSInstr<RegisterUInt>::ISAEntry>;
         static const MapType isaMapR;
         static const MapType isaMapRI;
         static const MapType isaMapIJ;
@@ -198,8 +193,7 @@ class MIPSInstr
 #else
         CowString disasm = {};
 #endif
-
-        void init( const ISAEntry& entry);
+        void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
         bool lez() const { return static_cast<RegisterSInt>( v_src1) <= 0; }
@@ -246,22 +240,23 @@ class MIPSInstr
         void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
         void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
 
+        template <typename T>
         void execute_srl()
         {
             // On 64-bit CPUs the result word is sign-extended
-            v_dst = static_cast<RegisterUInt>(static_cast<RegisterSInt>(static_cast<int32>(static_cast<uint32>(v_src1) >> shamt)));
+            v_dst = static_cast<RegisterUInt>(static_cast<RegisterSInt>(static_cast<unsign_t<T>>(static_cast<T>(v_src1) >> shamt)));
         }
+        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
 
         template <typename T>
         void execute_sra()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), shamt); }
-
         void execute_dsra32() { v_dst = arithmetic_rs( v_src1, shamt + 32); }
-        void execute_sllv()   { v_dst = static_cast<uint32>( v_src1) << v_src2; }
-        void execute_dsllv()  { v_dst = v_src1 << v_src2; }
+
         template <typename T>
-        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> static_cast<T>( v_src2); }
-        void execute_dsrl()   { v_dst = v_src1 >> shamt; }
-        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
+        void execute_sllv()   { v_dst = static_cast<T>( v_src1) << v_src2; }
+
+        template <typename T>
+        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> v_src2; }
 
         template <typename T>
         void execute_srav()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), v_src2); }
@@ -279,7 +274,7 @@ class MIPSInstr
         void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
         void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
 
-        // MIPStion-templated method is a little-known feature of C++, but useful here
+        // Function-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
         void execute_set() { v_dst = (this->*p)(); }
 
@@ -395,15 +390,14 @@ class MIPSInstr
         }
 
 
-        Execute function = &MIPSInstr::execute_unknown;
+        Execute function = &BaseMIPSInstr::execute_unknown;
+    protected:
+        BaseMIPSInstr() = delete;
+
+        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
-        MIPSInstr() = delete;
-
-        explicit
-        MIPSInstr( uint32 bytes, Addr PC = 0);
-
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
-        bool is_same( const MIPSInstr& rhs) const {
+        bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
@@ -477,12 +471,22 @@ class MIPSInstr
 };
 
 template<typename RegisterUInt>
-static inline std::ostream& operator<<( std::ostream& out, const MIPSInstr<RegisterUInt>& instr)
+static inline std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& instr)
 {
     return out << instr.Dump();
 }
 
-using MIPS32Instr = MIPSInstr<uint32>;
-using MIPS64Instr = MIPSInstr<uint64>;
+template<MIPSVersion V>
+class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
+{
+    using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
+public:
+    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
+        : Base( V, bytes, PC) { }
+};
+
+
+using MIPS32Instr = MIPSInstr<MIPS_32>;
+using MIPS64Instr = MIPSInstr<MIPS_64>;
 
 #endif //MIPS_INSTR_H

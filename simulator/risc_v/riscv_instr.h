@@ -50,9 +50,7 @@ class RISCVInstr
         RISCVInstr() = delete;
 
         explicit
-        RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC),
-                                                 new_PC( PC + 4)
-                                                 {};
+        RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC), new_PC( PC + 4) {};
 
         bool is_same( const RISCVInstr& rhs) const {
             return PC == rhs.PC && instr == rhs.instr;

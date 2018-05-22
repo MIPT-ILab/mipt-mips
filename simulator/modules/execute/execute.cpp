@@ -19,7 +19,7 @@ Execute<ISA>::Execute( bool log)
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("Execute_2_EXECUTE", PORT_LATENCY);
 
     if ( config::complex_alu_latency < 2)
         serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1"
@@ -35,9 +35,9 @@ Execute<ISA>::Execute( bool log)
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
-    rps_command[0] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
+    rps_command[0] = make_read_port<BypassCommand<Register>>("Execute_2_EXECUTE_SRC1_COMMAND",
                                                                            PORT_LATENCY);
-    rps_command[1] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
+    rps_command[1] = make_read_port<BypassCommand<Register>>("Execute_2_EXECUTE_SRC2_COMMAND",
                                                                            PORT_LATENCY);
 
     wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
@@ -183,6 +183,10 @@ void Execute<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class Execute<MIPSI>;
+template class Execute<MIPSII>;
+template class Execute<MIPSIII>;
+template class Execute<MIPSIV>;
 template class Execute<MIPS32>;
 template class Execute<MIPS64>;
 template class Execute<RISCV32>;
