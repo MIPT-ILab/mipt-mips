@@ -312,7 +312,7 @@ class MIPSInstr
             execute_jump(align_up<2>(v_src1));
         }
 
-        template<Jumping j>
+        template<Execute j>
         void execute_jump_and_link()
         {
             v_dst = new_PC; // link
