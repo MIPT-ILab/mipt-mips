@@ -85,7 +85,7 @@ class MIPSInstr
             EXPLICIT_TRAP,
             UNALIGNED_ADDRESS,
         } trap = TrapType::NO_TRAP;
- 
+
         // Endian specific
         const union _instr
         {
@@ -174,7 +174,7 @@ class MIPSInstr
         uint32 v_imm = NO_VAL32;
         auto sign_extend() const { return static_cast<RegisterSInt>( static_cast<int16>(v_imm)); }
         auto zero_extend() const { return static_cast<RegisterUInt>( static_cast<uint16>(v_imm)); }
-  
+
         RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
         RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
         RegisterUInt v_dst  = NO_VAL<RegisterUInt>;
@@ -187,7 +187,7 @@ class MIPSInstr
 
         // convert this to bitset
         bool complete   = false;
-        bool _is_jump_taken = false; // actual result  
+        bool _is_jump_taken = false; // actual result
 
         Addr new_PC = NO_VAL32;
 
@@ -245,7 +245,7 @@ class MIPSInstr
         template <typename T>
         void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
         void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
-        
+
         void execute_srl()
         {
             // On 64-bit CPUs the result word is sign-extended
@@ -266,7 +266,7 @@ class MIPSInstr
         template <typename T>
         void execute_srav()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), v_src2); }
         void execute_lui()    { v_dst = static_cast<RegisterUInt>( sign_extend()) << 0x10u; }
-  
+
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
@@ -306,9 +306,18 @@ class MIPSInstr
         }
 
         void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
-        void execute_jr() { execute_jump(align_up<2>(v_src1)); }
-        void execute_jal()  { v_dst = new_PC; execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
-        void execute_jalr() { v_dst = new_PC; execute_jump(align_up<2>(v_src1)); }
+        void execute_jr() {
+            if (v_src1 % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+            execute_jump(align_up<2>(v_src1));
+        }
+
+        template<Jumping j>
+        void execute_jump_and_link()
+        {
+            v_dst = new_PC; // link
+            (this->*j)();   // jump
+        }
 
         template<Predicate p>
         void execute_branch_and_link()
