@@ -67,6 +67,10 @@ friend class OptionParser;
 public:
 	Option(const std::string& short_option, const std::string& long_option, std::string description);
 	virtual ~Option() = default;
+	Option(const Option&) = default;
+	Option(Option&&) = default;
+	Option& operator=(const Option&) = default;
+	Option& operator=(Option&&) = default;
 
 	char short_option() const;
 	std::string long_option() const;
@@ -77,12 +81,12 @@ public:
 	Attribute attribute() const;
 
 	virtual Argument argument_type() const = 0;
+	virtual unsigned int count() const = 0;
 	virtual bool is_set() const = 0;
 
 protected:
 	virtual void parse(const std::string& what_option, const char* value) = 0;
 	virtual void clear() = 0;
-	virtual std::string to_string() const;
 
 	std::string short_option_;
 	std::string long_option_;
@@ -105,7 +109,7 @@ public:
 	Value(const std::string& short_option, const std::string& long_option, const std::string& description);
 	Value(const std::string& short_option, const std::string& long_option, const std::string& description, const T& default_val, T* assign_to = nullptr);
 
-	unsigned int count() const;
+	unsigned int count() const override;
 	bool is_set() const override;
 
 	void assign_to(T* var);
@@ -122,12 +126,11 @@ public:
 
 protected:
 	void parse(const std::string& what_option, const char* value) override;
-	std::string to_string() const override;
 	std::unique_ptr<T> default_;
 
 	virtual void update_reference();
 	virtual void add_value(const T& value);
-	virtual void clear() override;
+	void clear() override;
 
 	T* assign_to_;
 	std::vector<T> values_;
@@ -153,7 +156,6 @@ public:
 
 protected:
 	void parse(const std::string& what_option, const char* value) override;
-	std::string to_string() const override;
 };
 
 
@@ -175,7 +177,6 @@ public:
 
 protected:
 	void parse(const std::string& what_option, const char* value) override;
-	std::string to_string() const override;
 };
 
 
@@ -226,6 +227,54 @@ protected:
 
 
 
+class HelpPrinter
+{
+public:
+	HelpPrinter(const OptionParser* option_parser) : option_parser_(option_parser)
+	{
+	}
+
+	virtual ~HelpPrinter() = default;
+
+	virtual std::string help(const Attribute& max_attribute = Attribute::optional) const = 0;
+
+protected:
+	const OptionParser* option_parser_;
+};
+
+
+
+
+class ConsoleHelpPrinter : public HelpPrinter
+{
+public:
+	ConsoleHelpPrinter(const OptionParser* option_parser);
+	virtual ~ConsoleHelpPrinter() = default;
+
+	std::string help(const Attribute& max_attribute = Attribute::optional) const override;
+
+private:
+	std::string to_string(Option_ptr option) const;
+};
+
+
+
+
+class GroffHelpPrinter : public HelpPrinter
+{
+public:
+	GroffHelpPrinter(const OptionParser* option_parser);
+	virtual ~GroffHelpPrinter() = default;
+
+	std::string help(const Attribute& max_attribute = Attribute::optional) const override;
+
+private:
+	std::string to_string(Option_ptr option) const;
+};
+
+
+
+
 /// Option implementation /////////////////////////////////
 
 inline Option::Option(const std::string& short_option, const std::string& long_option, std::string description) :
@@ -271,26 +320,6 @@ inline void Option::set_attribute(const Attribute& attribute)
 inline Attribute Option::attribute() const
 {
 	return attribute_;
-}
-
-
-
-inline std::string Option::to_string() const
-{
-	std::stringstream line;
-	if (short_option() != 0)
-	{
-		line << "  -" << short_option();
-		if (!long_option().empty())
-			line << ", ";
-	}
-	else
-		line << "  ";
-
-	if (!long_option().empty())
-		line << "--" << long_option();
-
-	return line.str();
 }
 
 
@@ -459,22 +488,6 @@ inline void Value<T>::parse(const std::string& what_option, const char* value)
 
 
 template<class T>
-inline std::string Value<T>::to_string() const
-{
-	std::stringstream ss;
-	ss << Option::to_string() << " arg";
-	if (default_)
-	{
-		std::stringstream defaultStr;
-		defaultStr << *default_;
-		if (!defaultStr.str().empty())
-			ss << " (=" << *default_ << ")";
-	}
-	return ss.str();
-}
-
-
-template<class T>
 void Value<T>::update_reference()
 {
 	if (this->assign_to_)
@@ -528,15 +541,6 @@ inline void Implicit<T>::parse(const std::string& what_option, const char* value
 }
 
 
-template<class T>
-inline std::string Implicit<T>::to_string() const
-{
-	std::stringstream ss;
-	ss << Option::to_string() << " [=arg(=" << *this->default_ << ")]";
-	return ss.str();
-}
-
-
 
 
 /// Switch implementation /////////////////////////////////
@@ -556,12 +560,6 @@ inline void Switch::parse(const std::string& /*what_option*/, const char* /*valu
 inline Argument Switch::argument_type() const
 {
 	return Argument::no;
-}
-
-
-inline std::string Switch::to_string() const
-{
-	return Option::to_string();
 }
 
 
@@ -685,9 +683,7 @@ inline void OptionParser::parse(int argc, const char * const argv[])
 		{
 			///from here on only non opt args
 			for (int m=n+1; m<argc; ++m)
-				non_option_args_.push_back(argv[m]);
-
-			break;
+				non_option_args_.emplace_back(argv[m]);
 		}
 		else if (arg.find("--") == 0)
 		{
@@ -723,7 +719,7 @@ inline void OptionParser::parse(int argc, const char * const argv[])
 			else
 				unknown_options_.push_back(arg);
 		}
-		else if (arg.find("-") == 0)
+		else if (arg.find('-') == 0)
 		{
 			/// short option arg
 			std::string opt = arg.substr(1);
@@ -784,27 +780,79 @@ inline void OptionParser::parse(int argc, const char * const argv[])
 
 inline std::string OptionParser::help(const Attribute& max_attribute) const
 {
+	GroffHelpPrinter help_printer(this);
+	return help_printer.help(max_attribute);
+}
+
+
+
+
+ConsoleHelpPrinter::ConsoleHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+{
+}
+
+
+std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
+{
+	std::stringstream line;
+	if (option->short_option() != 0)
+	{
+		line << "  -" << option->short_option();
+		if (!option->long_option().empty())
+			line << ", ";
+	}
+	else
+		line << "  ";
+	if (!option->long_option().empty())
+		line << "--" << option->long_option();
+
+	if (option->argument_type() == Argument::required)
+	{
+		line << " arg";
+		std::stringstream defaultStr;
+		if (option->get_default(defaultStr))
+		{
+			if (!defaultStr.str().empty())
+				line << " (=" << defaultStr.str() << ")";
+		}
+	}
+	else if (option->argument_type() == Argument::optional)
+	{
+		std::stringstream defaultStr;
+		if (option->get_default(defaultStr))
+			line << " [=arg(=" << defaultStr.str() << ")]";
+	}
+
+	return line.str();
+}
+
+
+std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) const
+{
+	if (!option_parser_)
+		return "";
+
 	if (max_attribute < Attribute::optional)
-		throw std::invalid_argument("attribute must be at least optional");
+		throw std::invalid_argument("attribute must be 'optional', 'advanced', or 'default'");
 
 	std::stringstream s;
-	if (!description_.empty())
-		s << description_ << ":\n";
+	if (!option_parser_->description().empty())
+		s << option_parser_->description() << ":\n";
 
 	size_t optionRightMargin(20);
 	const size_t maxDescriptionLeftMargin(40);
 //	const size_t descriptionRightMargin(80);
 
-	for (const auto& option: options_)
-		optionRightMargin = std::max(optionRightMargin, option->to_string().size() + 2);
+	for (const auto& option: option_parser_->options())
+		optionRightMargin = std::max(optionRightMargin, to_string(option).size() + 2);
 	optionRightMargin = std::min(maxDescriptionLeftMargin - 2, optionRightMargin);
 
-	for (const auto& option: options_)
+	for (const auto& option: option_parser_->options())
 	{
 		if ((option->attribute() <= Attribute::hidden) || 
 			(option->attribute() > max_attribute))
 			continue;
-		std::string optionStr = option->to_string();
+		std::string optionStr = to_string(option);
 		if (optionStr.size() < optionRightMargin)
 			optionStr.resize(optionRightMargin, ' ');
 		else
@@ -825,6 +873,72 @@ inline std::string OptionParser::help(const Attribute& max_attribute) const
 			s << lines[n];
 		}
 		s << "\n";
+	}
+
+	return s.str();
+}
+
+
+
+
+GroffHelpPrinter::GroffHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+{
+}
+
+
+std::string GroffHelpPrinter::to_string(Option_ptr option) const
+{
+	std::stringstream line;
+	if (option->short_option() != 0)
+	{
+		line << "-" << option->short_option();
+		if (!option->long_option().empty())
+			line << ", ";
+	}
+	if (!option->long_option().empty())
+		line << "--" << option->long_option();
+
+	if (option->argument_type() == Argument::required)
+	{
+		line << " arg";
+		std::stringstream defaultStr;
+		if (option->get_default(defaultStr))
+		{
+			if (!defaultStr.str().empty())
+				line << " (=" << defaultStr.str() << ")";
+		}
+	}
+	else if (option->argument_type() == Argument::optional)
+	{
+		std::stringstream defaultStr;
+		if (option->get_default(defaultStr))
+			line << " [=arg(=" << defaultStr.str() << ")]";
+	}
+
+	return line.str();
+}
+
+
+std::string GroffHelpPrinter::help(const Attribute& max_attribute) const
+{
+	if (!option_parser_)
+		return "";
+
+	if (max_attribute < Attribute::optional)
+		throw std::invalid_argument("attribute must be 'optional', 'advanced', or 'default'");
+
+	std::stringstream s;
+	if (!option_parser_->description().empty())
+		s << ".SS " << option_parser_->description() << ":\n";
+
+	for (const auto& option: option_parser_->options())
+	{
+		if ((option->attribute() <= Attribute::hidden) || 
+			(option->attribute() > max_attribute))
+			continue;
+		s << ".TP\n\\fB" << to_string(option) << "\\fR\n";
+		if (!option->description().empty())
+			s << option->description() << "\n";
 	}
 
 	return s.str();
