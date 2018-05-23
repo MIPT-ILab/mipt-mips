@@ -12,7 +12,7 @@ template <typename ISA>
 Mem<ISA>::Mem( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_datapath = make_read_port<Instr>("Mem_2_MEMORY", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
 
     wp_flush_all = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
@@ -20,7 +20,7 @@ Mem<ISA>::Mem( bool log) : Log( log)
     wp_flush_target = make_write_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     wp_bp_update = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
 
-    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_Mem_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 
     wp_bypassing_unit_flush_notify = make_write_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                             PORT_BW, PORT_FANOUT);
