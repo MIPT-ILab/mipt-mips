@@ -17,42 +17,42 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
     //key     name    operation  ms  source1      source2      destination      pointer                              mips version
-    {0x0, { "sll" , OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sll<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x0, { "sll" , OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sll<uint32>, MIPS_I_Instr} },
     //       0x1 movci
-    {0x2, { "srl", OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srl<uint32>, MIPS_I_Instr | MIPS_32} },
-    {0x3, { "sra", OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sra<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x2, { "srl", OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srl<uint32>, MIPS_I_Instr} },
+    {0x3, { "sra", OUT_R_SHAMT, 0, RegType::RT, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sra<uint32>, MIPS_I_Instr} },
 
     // Variable shifts
     //key     name    operation   ms  source1      source2      destination      pointer                       mips version
-    {0x4, { "sllv", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sllv<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x4, { "sllv", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_sllv<uint32>, MIPS_I_Instr} },
     //        0x5 reserved
-    {0x6, { "srlv", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srlv<uint32>, MIPS_I_Instr | MIPS_32} },
-    {0x7, { "srav", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srav<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x6, { "srlv", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srlv<uint32>, MIPS_I_Instr} },
+    {0x7, { "srav", OUT_R_ARITHM, 0, RegType::RT, RegType::RS, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_srav<uint32>, MIPS_I_Instr} },
 
     // Indirect branches
     //key     name    operation  ms  source1      source2      destination      pointer                           mips version
-    {0x8, { "jr"  , OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_jr,   MIPS_I_Instr | MIPS_32} },
+    {0x8, { "jr"  , OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_jr,   MIPS_I_Instr} },
     {0x9, { "jalr", OUT_R_JUMP, 0, RegType::RS, RegType::ZERO, RegType::RD,
-                               &BaseMIPSInstr<RegisterUInt>::execute_jump_and_link<&BaseMIPSInstr<RegisterUInt>::execute_jr>, MIPS_I_Instr | MIPS_32} },
+                               &BaseMIPSInstr<RegisterUInt>::execute_jump_and_link<&BaseMIPSInstr<RegisterUInt>::execute_jr>, MIPS_I_Instr} },
 
     // Conditional moves (MIPS IV)
     //key     name    operation   ms  source1      source2      destination      pointer                        mips version
-    {0xA,  { "movz", OUT_R_CONDM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_movz, MIPS_IV_Instr | MIPS_32} },
-    {0xB,  { "movn", OUT_R_CONDM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_movn, MIPS_IV_Instr | MIPS_32} },
+    {0xA,  { "movz", OUT_R_CONDM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_movz, MIPS_IV_Instr | MIPS_32_Instr} },
+    {0xB,  { "movn", OUT_R_CONDM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_movn, MIPS_IV_Instr | MIPS_32_Instr} },
 
     // System calls
     //key     name    operation       ms     source1       source2      destination      pointer                        mips version
-    {0xC, { "syscall", OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_syscall, MIPS_I_Instr | MIPS_32} },
-    {0xD, { "break",   OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_break,   MIPS_I_Instr | MIPS_32} },
+    {0xC, { "syscall", OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_syscall, MIPS_I_Instr} },
+    {0xD, { "break",   OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_break,   MIPS_I_Instr} },
     //          0xE reserved
     //          0xF SYNC
 
     // HI/LO manipulations
     //key     name    operation  ms     source1       source2   destination      pointer                      mips version
-    {0x10, { "mfhi", OUT_R_MFHI, 0, RegType::HI, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr | MIPS_32} },
-    {0x11, { "mthi", OUT_R_MTHI, 0, RegType::RS, RegType::ZERO, RegType::HI, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr | MIPS_32} },
-    {0x12, { "mflo", OUT_R_MFLO, 0, RegType::LO, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr | MIPS_32} },
-    {0x13, { "mtlo", OUT_R_MTLO, 0, RegType::RS, RegType::ZERO, RegType::LO, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr | MIPS_32} },
+    {0x10, { "mfhi", OUT_R_MFHI, 0, RegType::HI, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x11, { "mthi", OUT_R_MTHI, 0, RegType::RS, RegType::ZERO, RegType::HI, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x12, { "mflo", OUT_R_MFLO, 0, RegType::LO, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x13, { "mtlo", OUT_R_MTLO, 0, RegType::RS, RegType::ZERO, RegType::LO, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
 
     // Doubleword variable shifts
     //key     name    operation  ms     source1       source2   destination       pointer                             mips version
@@ -62,10 +62,10 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 
     // Multiplication/Division
     //key     name    operation  ms     source1       source2        destination       pointer                                       mips version
-    {0x18, { "mult",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_I_Instr | MIPS_32} },
-    {0x19, { "multu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_I_Instr | MIPS_32} },
-    {0x1A, { "div",   OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_division<int32>,        MIPS_I_Instr | MIPS_32} },
-    {0x1B, { "divu",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_division<uint32>,       MIPS_I_Instr | MIPS_32} },
+    {0x18, { "mult",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_I_Instr} },
+    {0x19, { "multu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_I_Instr} },
+    {0x1A, { "div",   OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_division<int32>,        MIPS_I_Instr} },
+    {0x1B, { "divu",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_division<uint32>,       MIPS_I_Instr} },
     {0x1C, { "dmult", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int64>,  MIPS_III_Instr} },
     {0x1D, { "dmultu",OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint64>, MIPS_III_Instr} },
     {0x1E, { "ddiv",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_division<int64>,        MIPS_III_Instr} },
@@ -73,38 +73,38 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 
     // Addition/Subtraction
     //key     name    operation    ms   source1       source2   destination       pointer                             mips version
-    {0x20, { "add",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<int32>,     MIPS_I_Instr | MIPS_32} },
-    {0x21, { "addu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<uint32>,    MIPS_I_Instr | MIPS_32} },
-    {0x22, { "sub",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<int32>,  MIPS_I_Instr | MIPS_32} },
-    {0x23, { "subu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x20, { "add",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<int32>,     MIPS_I_Instr} },
+    {0x21, { "addu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<uint32>,    MIPS_I_Instr} },
+    {0x22, { "sub",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<int32>,  MIPS_I_Instr} },
+    {0x23, { "subu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<uint32>, MIPS_I_Instr} },
 
     // Logical operations
     //key     name    operation   ms   source1       source2   destination       pointer                       mips version
-    {0x24, { "and", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_and,  MIPS_I_Instr | MIPS_32} },
-    {0x25, { "or",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_or,   MIPS_I_Instr | MIPS_32} },
-    {0x26, { "xor", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_xor,  MIPS_I_Instr | MIPS_32} },
-    {0x27, { "nor", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_nor,  MIPS_I_Instr | MIPS_32} },
+    {0x24, { "and", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_and,  MIPS_I_Instr} },
+    {0x25, { "or",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_or,   MIPS_I_Instr} },
+    {0x26, { "xor", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_xor,  MIPS_I_Instr} },
+    {0x27, { "nor", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_nor,  MIPS_I_Instr} },
     //        0x28 reserved
     //        0x29 reserved
-    {0x2A, { "slt",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::lt>,  MIPS_I_Instr | MIPS_32} },
-    {0x2B, { "sltu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::ltu>, MIPS_I_Instr | MIPS_32} },
+    {0x2A, { "slt",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::lt>,  MIPS_I_Instr} },
+    {0x2B, { "sltu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::ltu>, MIPS_I_Instr} },
 
     // Doubleword addition/Subtraction
     //key     name    operation   ms   source1       source2     destination       pointer                                  mips version
-    {0x2C, { "dadd",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<int64>,     MIPS_I_Instr | MIPS_32} },
-    {0x2D, { "daddu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<uint64>,    MIPS_I_Instr | MIPS_32} },
+    {0x2C, { "dadd",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<int64>,     MIPS_I_Instr} },
+    {0x2D, { "daddu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_addition<uint64>,    MIPS_I_Instr} },
     {0x2E, { "dsub",  OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<int64>,  MIPS_III_Instr} },
     {0x2F, { "dsubu", OUT_R_ARITHM, 0, RegType::RS, RegType::RT, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_subtraction<uint64>, MIPS_III_Instr} },
 
     // Conditional traps (MIPS II)
     //key     name    operation  ms   source1       source2     destination       pointer                                                    mips version
-    {0x30, { "tge",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ge>,  MIPS_II_Instr | MIPS_32} },
-    {0x31, { "tgeu", OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::geu>, MIPS_II_Instr | MIPS_32} },
-    {0x32, { "tlt",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::lt>,  MIPS_II_Instr | MIPS_32} },
-    {0x33, { "tltu", OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ltu>, MIPS_II_Instr | MIPS_32} },
-    {0x34, { "teq",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_II_Instr | MIPS_32} },
+    {0x30, { "tge",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ge>,  MIPS_II_Instr} },
+    {0x31, { "tgeu", OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::geu>, MIPS_II_Instr} },
+    {0x32, { "tlt",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::lt>,  MIPS_II_Instr} },
+    {0x33, { "tltu", OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ltu>, MIPS_II_Instr} },
+    {0x34, { "teq",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_II_Instr} },
     //        0x35 reserved
-    {0x36, { "tne",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ne>,   MIPS_II_Instr | MIPS_32} },
+    {0x36, { "tne",  OUT_R_TRAP, 0, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ne>,   MIPS_II_Instr} },
     //        0x37 reserved
 
     // Doubleword shifts
@@ -124,26 +124,26 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 // ********************** REGIMM INSTRUCTIONS *************************
     // Branches
     //key     name    operation   memsize    source1        source2      destination      pointer                                                       mips version
-    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_I_Instr | MIPS_32} },
-    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_I_Instr | MIPS_32} },
-    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_II_Instr | MIPS_32} },
-    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_II_Instr | MIPS_32} },
+    {0x0,  { "bltz",  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_I_Instr} },
+    {0x1,  { "bgez",  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_I_Instr} },
+    {0x2,  { "bltzl", OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_II_Instr} },
+    {0x3,  { "bgezl", OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_II_Instr} },
 
     // Traps
     //key     name    operation    ms  source1        source2      destination      pointer                                                       mips version
-    {0x8,  { "tgei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::gei>,  MIPS_II_Instr | MIPS_32} },
-    {0x9,  { "tgeiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::geiu>, MIPS_II_Instr | MIPS_32} },
-    {0xA,  { "tlti",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::lti>,  MIPS_II_Instr | MIPS_32} },
-    {0xB,  { "tltiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ltiu>, MIPS_II_Instr | MIPS_32} },
-    {0xC,  { "teqi",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::eqi>,  MIPS_II_Instr | MIPS_32} },
-    {0xE,  { "tnei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::nei>,  MIPS_II_Instr | MIPS_32} },
+    {0x8,  { "tgei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::gei>,  MIPS_II_Instr} },
+    {0x9,  { "tgeiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::geiu>, MIPS_II_Instr} },
+    {0xA,  { "tlti",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::lti>,  MIPS_II_Instr} },
+    {0xB,  { "tltiu", OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::ltiu>, MIPS_II_Instr} },
+    {0xC,  { "teqi",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::eqi>,  MIPS_II_Instr} },
+    {0xE,  { "tnei",  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_trap<&BaseMIPSInstr<RegisterUInt>::nei>,  MIPS_II_Instr} },
 
     // Linking branches
     //key     name    operation   memsize     source1        source2      destination      pointer                                                             mips version
-    {0x10, { "bltzal",  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_I_Instr | MIPS_32} },
-    {0x11, { "bgezal",  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_I_Instr | MIPS_32} },
-    {0x12, { "bltzall", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_II_Instr | MIPS_32} },
-    {0x13, { "bgezall", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_II_Instr | MIPS_32} }
+    {0x10, { "bltzal",  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_I_Instr} },
+    {0x11, { "bgezal",  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_I_Instr} },
+    {0x12, { "bltzall", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::ltz>, MIPS_II_Instr} },
+    {0x13, { "bgezall", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, &BaseMIPSInstr<RegisterUInt>::execute_branch_and_link<&BaseMIPSInstr<RegisterUInt>::gez>, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -153,39 +153,39 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
     // ********************* I and J INSTRUCTIONS *************************
     // Direct jumps
     //key     name    operation  memsize    source1      source2      destination      pointer                          mips version
-    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_j,     MIPS_I_Instr | MIPS_32 } },
+    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_j,     MIPS_I_Instr } },
     {0x3, { "jal", OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::RA,
-                                &BaseMIPSInstr<RegisterUInt>::execute_jump_and_link<&BaseMIPSInstr<RegisterUInt>::execute_j>,   MIPS_I_Instr | MIPS_32 } },
+                                &BaseMIPSInstr<RegisterUInt>::execute_jump_and_link<&BaseMIPSInstr<RegisterUInt>::execute_j>,   MIPS_I_Instr } },
 
     // Branches
     //key     name    operation  memsize    source1      source2      destination      pointer                                                     mips version
-    {0x4, { "beq",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_I_Instr | MIPS_32} },
-    {0x5, { "bne",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ne>,  MIPS_I_Instr | MIPS_32} },
-    {0x6, { "blez", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::lez>, MIPS_I_Instr | MIPS_32} },
-    {0x7, { "bgtz", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gtz>, MIPS_I_Instr | MIPS_32} },
+    {0x4, { "beq",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_I_Instr} },
+    {0x5, { "bne",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ne>,  MIPS_I_Instr} },
+    {0x6, { "blez", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::lez>, MIPS_I_Instr} },
+    {0x7, { "bgtz", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gtz>, MIPS_I_Instr} },
 
     // Addition/Subtraction
     //key     name    operation  memsize    source1      source2   destination      pointer                                     mips version
-    {0x8, { "addi",  OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_addition_imm<int32>,  MIPS_I_Instr | MIPS_32} },
-    {0x9, { "addiu", OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_addition_imm<uint32>, MIPS_I_Instr | MIPS_32} },
+    {0x8, { "addi",  OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_addition_imm<int32>,  MIPS_I_Instr} },
+    {0x9, { "addiu", OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_addition_imm<uint32>, MIPS_I_Instr} },
 
     // Logical operations
     //key     name    operation  memsize    source1      source2      destination      pointer                                                     mips version
-    {0xA, { "slti",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::lti>,  MIPS_I_Instr | MIPS_32} },
-    {0xB, { "sltiu", OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::ltiu>, MIPS_I_Instr | MIPS_32} },
-    {0xC, { "andi",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_andi,   MIPS_I_Instr | MIPS_32} },
-    {0xD, { "ori",   OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_ori,    MIPS_I_Instr | MIPS_32} },
-    {0xE, { "xori",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_xori,   MIPS_I_Instr | MIPS_32} },
-    {0xF, { "lui",   OUT_I_CONST,  0, RegType::ZERO, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_lui,    MIPS_I_Instr | MIPS_32} },
+    {0xA, { "slti",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::lti>,  MIPS_I_Instr} },
+    {0xB, { "sltiu", OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_set<&BaseMIPSInstr<RegisterUInt>::ltiu>, MIPS_I_Instr} },
+    {0xC, { "andi",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_andi,   MIPS_I_Instr} },
+    {0xD, { "ori",   OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_ori,    MIPS_I_Instr} },
+    {0xE, { "xori",  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_xori,   MIPS_I_Instr} },
+    {0xF, { "lui",   OUT_I_CONST,  0, RegType::ZERO, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::execute_lui,    MIPS_I_Instr} },
 
     // 0x10 - 0x13 coprocessor operations
 
     // Likely branches (MIPS II)
     //key     name    operation   memsize    source1      source2      destination      pointer                                                           mips version
-    {0x14, { "beql",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_II_Instr | MIPS_32} },
-    {0x15, { "bnel",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ne>,  MIPS_II_Instr | MIPS_32} },
-    {0x16, { "blezl", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::lez>, MIPS_II_Instr | MIPS_32} },
-    {0x17, { "bgtzl", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gtz>, MIPS_II_Instr | MIPS_32} },
+    {0x14, { "beql",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::eq>,  MIPS_II_Instr} },
+    {0x15, { "bnel",  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::ne>,  MIPS_II_Instr} },
+    {0x16, { "blezl", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::lez>, MIPS_II_Instr} },
+    {0x17, { "bgtzl", OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_branch<&BaseMIPSInstr<RegisterUInt>::gtz>, MIPS_II_Instr} },
 
     // Doubleword unaligned loads
     //key     name    operation  memsize    source1      source2      destination      pointer                         mips version
@@ -199,31 +199,31 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 
     // Loads
     //key     name    operation     memsize    source1      source2      destination      pointer                                 mips version
-    {0x20, { "lb",  OUT_I_LOAD,         1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr | MIPS_32} },
-    {0x21, { "lh",  OUT_I_LOAD,         2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr | MIPS_32} },
-    {0x22, { "lwl", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_left,    MIPS_I_Instr | MIPS_32} },
-    {0x23, { "lw",  OUT_I_LOAD,         4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr | MIPS_32} },
-    {0x24, { "lbu", OUT_I_LOADU,        1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr | MIPS_32} },
-    {0x25, { "lhu", OUT_I_LOADU,        2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr | MIPS_32} },
-    {0x26, { "lwr", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_right,   MIPS_I_Instr | MIPS_32} },
-    {0x27, { "lwu", OUT_I_LOADU,        4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr | MIPS_32} },
+    {0x20, { "lb",  OUT_I_LOAD,         1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr} },
+    {0x21, { "lh",  OUT_I_LOAD,         2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
+    {0x22, { "lwl", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_left,    MIPS_I_Instr} },
+    {0x23, { "lw",  OUT_I_LOAD,         4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
+    {0x24, { "lbu", OUT_I_LOADU,        1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr} },
+    {0x25, { "lhu", OUT_I_LOADU,        2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
+    {0x26, { "lwr", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_right,   MIPS_I_Instr} },
+    {0x27, { "lwu", OUT_I_LOADU,        4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
 
     // Stores
     //key     name    operation  memsize    source1      source2      destination      pointer                                         mips version
-    {0x28, { "sb",  OUT_I_STORE, 1, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr | MIPS_32} },
-    {0x29, { "sh",  OUT_I_STORE, 2, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr | MIPS_32} },
-    {0x2A, { "swl", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_left,    MIPS_I_Instr | MIPS_32} },
-    {0x2B, { "sw",  OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_aligned, MIPS_I_Instr | MIPS_32} },
+    {0x28, { "sb",  OUT_I_STORE, 1, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr} },
+    {0x29, { "sh",  OUT_I_STORE, 2, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr} },
+    {0x2A, { "swl", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_left,    MIPS_I_Instr} },
+    {0x2B, { "sw",  OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_aligned, MIPS_I_Instr} },
     {0x2C, { "sdl", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_III_Instr} },
     {0x2D, { "sdr", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_III_Instr} },
-    {0x2E, { "swr", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_right,   MIPS_I_Instr | MIPS_32} },
+    {0x2E, { "swr", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_right,   MIPS_I_Instr} },
     //       0x2F   cache
 
     // Advanced loads and stores
-    {0x30, { "ll",  OUT_I_LOAD,   2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,  MIPS_I_Instr | MIPS_32} },
+    {0x30, { "ll",  OUT_I_LOAD,   2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,  MIPS_I_Instr} },
 
     {0x37, { "ld",  OUT_I_LOAD,   8, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,  MIPS_III_Instr} },
-    {0x38, { "sc",  OUT_I_STORE,  2, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr, MIPS_I_Instr | MIPS_32} },
+    {0x38, { "sc",  OUT_I_STORE,  2, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr, MIPS_I_Instr} },
 
     {0x3F, { "sd",  OUT_I_STORE,  8, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr, MIPS_III_Instr} }
 };
@@ -234,18 +234,18 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
     // ********************* MIPS32 INSTRUCTIONS *************************
     // Advanced multiplication
     //key     name    operation  memsize    source1      source2      destination      pointer                                         mips version
-    {0x00, { "madd",  OUT_R_ACCUM,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32} },
-    {0x01, { "maddu", OUT_R_ACCUM,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_32} },
-    {0x02, { "mul",   OUT_R_ARITHM,  0, RegType::RS, RegType::RT, RegType::RD,    &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32} },
-    {0x04, { "msub",  OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32} },
-    {0x05, { "msubu", OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_32} },
+    {0x00, { "madd",  OUT_R_ACCUM,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32_Instr} },
+    {0x01, { "maddu", OUT_R_ACCUM,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_32_Instr} },
+    {0x02, { "mul",   OUT_R_ARITHM,  0, RegType::RS, RegType::RT, RegType::RD,    &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32_Instr} },
+    {0x04, { "msub",  OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<int32>,  MIPS_32_Instr} },
+    {0x05, { "msubu", OUT_R_SUBTR,   0, RegType::RS, RegType::RT, RegType::HI_LO, &BaseMIPSInstr<RegisterUInt>::execute_multiplication<uint32>, MIPS_32_Instr} },
 
     // Count leading zeroes/ones
     //key     name    operation  memsize    source1      source2      destination      pointer                       mips version
-    {0x20, { "clz",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_clz,     MIPS_32 | MIPS_64} },
-    {0x21, { "clo",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_clo,     MIPS_32 | MIPS_64} },
-    {0x24, { "dclz",  OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_dclz,    MIPS_64} },
-    {0x25, { "dclo",  OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_dclo,    MIPS_64} }
+    {0x20, { "clz",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_clz,     MIPS_32_Instr} },
+    {0x21, { "clo",   OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_clo,     MIPS_32_Instr} },
+    {0x24, { "dclz",  OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_dclz,    MIPS_64_Instr} },
+    {0x25, { "dclo",  OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_dclo,    MIPS_64_Instr} }
 };
 
 template<typename RegisterUInt>
@@ -315,7 +315,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 {
     operation = entry.operation;
     mem_size  = entry.mem_size;
-    function  = is_supported( MIPSVersion(entry.versions), version)
+    function  = entry.versions.is_supported(version)
         ? entry.function
         : &BaseMIPSInstr<RegisterUInt>::execute_unknown;
 

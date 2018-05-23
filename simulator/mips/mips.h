@@ -23,14 +23,14 @@ struct MIPS
 };
 
 // 32 bit MIPS
-using MIPSI   = MIPS<MIPS_I>;
-using MIPSII  = MIPS<MIPS_II>;
-using MIPS32  = MIPS<MIPS_32>;
+using MIPSI   = MIPS<MIPSVersion::I>;
+using MIPSII  = MIPS<MIPSVersion::II>;
+using MIPS32  = MIPS<MIPSVersion::v32>;
 
 // 64 bit MIPS
-using MIPSIII = MIPS<MIPS_III>;
-using MIPSIV  = MIPS<MIPS_IV>;
-using MIPS64  = MIPS<MIPS_64>;
+using MIPSIII = MIPS<MIPSVersion::III>;
+using MIPSIV  = MIPS<MIPSVersion::IV>;
+using MIPS64  = MIPS<MIPSVersion::v64>;
 
 static_assert( std::is_same_v<MIPS32Instr, MIPS32::FuncInstr>);
 static_assert( std::is_same_v<MIPS64Instr, MIPS64::FuncInstr>);
