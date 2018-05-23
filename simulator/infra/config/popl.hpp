@@ -787,12 +787,12 @@ inline std::string OptionParser::help(const Attribute& max_attribute) const
 
 
 
-inline ConsoleHelpPrinter::ConsoleHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+ConsoleHelpPrinter::ConsoleHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
 {
 }
 
 
-inline std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
+std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
 {
 	std::stringstream line;
 	if (option->short_option() != 0)
@@ -827,7 +827,7 @@ inline std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
 }
 
 
-inline std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) const
+std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) const
 {
 	if (!option_parser_)
 		return "";
@@ -881,12 +881,12 @@ inline std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) cons
 
 
 
-inline GroffHelpPrinter::GroffHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+GroffHelpPrinter::GroffHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
 {
 }
 
 
-inline std::string GroffHelpPrinter::to_string(Option_ptr option) const
+std::string GroffHelpPrinter::to_string(Option_ptr option) const
 {
 	std::stringstream line;
 	if (option->short_option() != 0)
@@ -919,7 +919,7 @@ inline std::string GroffHelpPrinter::to_string(Option_ptr option) const
 }
 
 
-inline std::string GroffHelpPrinter::help(const Attribute& max_attribute) const
+std::string GroffHelpPrinter::help(const Attribute& max_attribute) const
 {
 	if (!option_parser_)
 		return "";
