@@ -9,38 +9,51 @@
 
 #include <infra/types.h>
 
-enum MIPSVersion {
-    MIPS_I   = 1 << 1,
-    MIPS_II  = 1 << 2,
-    MIPS_III = 1 << 3,
-    MIPS_IV  = 1 << 4,
-    MIPS_V   = 1 << 5,
-    MIPS_32  = 1 << 6,
-    MIPS_64  = 1 << 7,
-    // MIPS64 is a superset of MIPSV
-    MIPS_64_Instr  = MIPS_64,
-    MIPS_V_Instr   = MIPS_V   | MIPS_64,
-    // MIPSI-V are supersets of precedessors
-    MIPS_IV_Instr  = MIPS_IV  | MIPS_V_Instr,
-    MIPS_III_Instr = MIPS_III | MIPS_IV_Instr,
-    MIPS_II_Instr  = MIPS_II  | MIPS_III_Instr,
-    MIPS_I_Instr   = MIPS_I   | MIPS_II_Instr,
+enum class MIPSVersion : unsigned {
+    I, II, III, IV, V,
+    v32,
+    v64,
 };
 
-constexpr static inline bool is_supported( MIPSVersion mask, MIPSVersion version)
-{
-    return (mask & version) != 0;
-}
-
 template<MIPSVersion V> struct MIPSRegisterUIntGen;
-template<> struct MIPSRegisterUIntGen<MIPS_I>   { using type = uint32; };
-template<> struct MIPSRegisterUIntGen<MIPS_II>  { using type = uint32; };
-template<> struct MIPSRegisterUIntGen<MIPS_III> { using type = uint64; };
-template<> struct MIPSRegisterUIntGen<MIPS_IV>  { using type = uint64; };
-template<> struct MIPSRegisterUIntGen<MIPS_V>   { using type = uint64; };
-template<> struct MIPSRegisterUIntGen<MIPS_32>  { using type = uint32; };
-template<> struct MIPSRegisterUIntGen<MIPS_64>  { using type = uint64; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::I>   { using type = uint32; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::II>  { using type = uint32; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::III> { using type = uint64; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::IV>  { using type = uint64; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::V>   { using type = uint64; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::v32>  { using type = uint32; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::v64>  { using type = uint64; };
 
 template<MIPSVersion V> using MIPSRegisterUInt = typename MIPSRegisterUIntGen<V>::type;
+
+class MIPSVersionMask {
+    uint64 mask = 0;
+public:
+    constexpr MIPSVersionMask() = default;
+    constexpr bool is_supported( MIPSVersion version) const {
+        return ((mask >> static_cast<unsigned>(version)) & 0x1) != 0;
+    }
+    constexpr MIPSVersionMask operator|( MIPSVersion rhs) const {
+        MIPSVersionMask result = *this;
+        result.mask |= ( 1u << static_cast<unsigned>(rhs));
+        return result;
+    }
+    constexpr MIPSVersionMask operator|( MIPSVersionMask rhs) const {
+        MIPSVersionMask result = *this;
+        result.mask |= rhs.mask;
+        return result;
+    }
+};
+
+static constexpr MIPSVersionMask MIPS_64_Instr  = MIPSVersionMask() | MIPSVersion::v64;
+static constexpr MIPSVersionMask MIPS_32_Instr  = MIPS_64_Instr | MIPSVersion::v32;
+// MIPS64 is a superset of MIPSV
+static constexpr MIPSVersionMask MIPS_V_Instr   = MIPS_64_Instr | MIPSVersion::V;
+// MIPSI-V are supersets of precedessors
+static constexpr MIPSVersionMask MIPS_IV_Instr  = MIPS_V_Instr   | MIPSVersion::IV;
+static constexpr MIPSVersionMask MIPS_III_Instr = MIPS_IV_Instr  | MIPSVersion::III;
+// MIPS32 is a superset of MIPSII
+static constexpr MIPSVersionMask MIPS_II_Instr  = MIPS_III_Instr | MIPS_32_Instr | MIPSVersion::II;
+static constexpr MIPSVersionMask MIPS_I_Instr   = MIPS_II_Instr  | MIPSVersion::I;
 
 #endif // MIPS_VERSION_H

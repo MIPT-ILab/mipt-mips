@@ -151,7 +151,7 @@ class BaseMIPSInstr
             RegType src2;
             RegType dst;
             BaseMIPSInstr::Execute function;
-            int versions;
+            MIPSVersionMask versions;
             ISAEntry() = delete;
         };
 
@@ -486,7 +486,7 @@ public:
 };
 
 
-using MIPS32Instr = MIPSInstr<MIPS_32>;
-using MIPS64Instr = MIPSInstr<MIPS_64>;
+using MIPS32Instr = MIPSInstr<MIPSVersion::v32>;
+using MIPS64Instr = MIPSInstr<MIPSVersion::v64>;
 
 #endif //MIPS_INSTR_H
