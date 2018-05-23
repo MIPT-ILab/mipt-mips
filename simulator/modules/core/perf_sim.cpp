@@ -1,3 +1,8 @@
+/*
+ * perf_sim.cpp - mips performance simulator
+ * Copyright 2015-2018 MIPT-MIPS
+ */
+
 #include <cassert>
 
 #include <iostream>
@@ -7,7 +12,7 @@
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
-    Simulator( log),
+    BasicPerfSim( log),
     rf( new RF<ISA>),
     fetch( log),
     decode( log),
@@ -20,7 +25,6 @@ PerfSim<ISA>::PerfSim(bool log) :
 
     init_ports();
 }
-
 
 template <typename ISA>
 void PerfSim<ISA>::set_PC( Addr value)
@@ -61,11 +65,15 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 
     auto t_end = std::chrono::high_resolution_clock::now();
 
-    auto executed_instrs = writeback.get_executed_instrs();
-    auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-    auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
+    dump_simfreq(std::chrono::duration<double, std::milli>(t_end - t_start),
+                 writeback.get_executed_instrs(), sizeof(Instr));
+}
+
+void BasicPerfSim::dump_simfreq(const std::chrono::milliseconds& time, uint64 executed_instrs, size_t instr_size) const
+{
+    auto frequency = static_cast<double>( curr_cycle) / time.count(); // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
-    auto simips = executed_instrs / time;
+    auto simips = executed_instrs / time.count();
 
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
@@ -73,7 +81,7 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
               << std::endl << "IPC:        " << ipc
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
-              << std::endl << "instr size: " << sizeof(Instr) << " bytes"
+              << std::endl << "instr size: " << instr_size << " bytes"
               << std::endl << "****************************"
               << std::endl;
 }

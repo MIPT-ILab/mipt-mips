@@ -21,14 +21,22 @@
 
 #include "perf_instr.h"
 
+class BasicPerfSim : public Simulator
+{
+protected:
+    Cycle curr_cycle = 0_Cl;
+    void dump_simfreq(const std::chrono::milliseconds& time, uint64 executed_instrs, size_t instr_size) const;
+public:
+    explicit BasicPerfSim( bool log) : Simulator( log) { }
+    ~BasicPerfSim() override { destroy_ports(); }
+};
+
 template <typename ISA>
-class PerfSim : public Simulator
+class PerfSim : public BasicPerfSim
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
-
-    Cycle curr_cycle = 0_Cl;
 
     /* simulator units */
     std::unique_ptr<RF<ISA>> rf = nullptr;
@@ -43,9 +51,11 @@ class PerfSim : public Simulator
     std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
+    void dump_simfreq(const std::chrono::milliseconds& time, uint64 executed_instrs) const {
+        BasicPerfSim::dump_simfreq(time, executed_instrs, sizeof(Instr));
+    }
 public:
-    explicit PerfSim( bool log);
-    ~PerfSim() final { destroy_ports(); }
+    PerfSim( bool log);
     void run( const std::string& tr, uint64 instrs_to_run) final;
     void set_PC( Addr value) final;
 
