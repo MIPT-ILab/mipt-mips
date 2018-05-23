@@ -35,7 +35,7 @@ public:
     }
     constexpr MIPSVersionMask operator|( MIPSVersion rhs) const {
         MIPSVersionMask result = *this;
-        result.mask |= ( 1u << static_cast<unsigned>(rhs));
+        result.mask |= ( 1ull << static_cast<unsigned>(rhs));
         return result;
     }
     constexpr MIPSVersionMask operator|( MIPSVersionMask rhs) const {
