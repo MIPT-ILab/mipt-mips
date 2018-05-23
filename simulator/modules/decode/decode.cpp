@@ -130,6 +130,10 @@ void Decode<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class Decode<MIPSI>;
+template class Decode<MIPSII>;
+template class Decode<MIPSIII>;
+template class Decode<MIPSIV>;
 template class Decode<MIPS32>;
 template class Decode<MIPS64>;
 template class Decode<RISCV32>;

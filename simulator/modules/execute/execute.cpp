@@ -183,6 +183,10 @@ void Execute<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class Execute<MIPSI>;
+template class Execute<MIPSII>;
+template class Execute<MIPSIII>;
+template class Execute<MIPSIV>;
 template class Execute<MIPS32>;
 template class Execute<MIPS64>;
 template class Execute<RISCV32>;

@@ -81,5 +81,12 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class PerfSim<MIPSI>;
+template class PerfSim<MIPSII>;
+template class PerfSim<MIPSIII>;
+template class PerfSim<MIPSIV>;
 template class PerfSim<MIPS32>;
 template class PerfSim<MIPS64>;
+template class PerfSim<RISCV32>;
+template class PerfSim<RISCV64>;
+template class PerfSim<RISCV128>;

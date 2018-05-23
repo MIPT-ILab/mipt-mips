@@ -77,6 +77,10 @@ void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class FuncSim<MIPSI>;
+template class FuncSim<MIPSII>;
+template class FuncSim<MIPSIII>;
+template class FuncSim<MIPSIV>;
 template class FuncSim<MIPS32>;
 template class FuncSim<MIPS64>;
 template class FuncSim<RISCV32>;

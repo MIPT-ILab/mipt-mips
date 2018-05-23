@@ -89,6 +89,10 @@ void Mem<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
+template class Mem<MIPSI>;
+template class Mem<MIPSII>;
+template class Mem<MIPSIII>;
+template class Mem<MIPSIV>;
 template class Mem<MIPS32>;
 template class Mem<MIPS64>;
 template class Mem<RISCV32>;
