@@ -27,27 +27,36 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-6.0
+    - sourceline: deb http://ftp.de.debian.org/debian squeeze main
+    - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     packages:
     - g++-7
     - clang-tidy-6.0
     - libelf-dev
     - libboost-program-options1.54-dev
+    - binutils-mips-linux-gnu
 
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-# Install OS X packages
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libelf zlib; fi
-# Install GNU Binutils
-  - cd $TRAVIS_BUILD_DIR/binutils
-  - BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
-  - ./configure --target=mipsel-unknown-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-  - make all install MAKEINFO=true > /dev/null
+  - MIPS_AS_B=mips-linux-gnu-as
+  - MIPS_LD_B=mips-linux-gnu-ld
+# Install OS X packages and build binutils
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+        brew install libelf zlib
+        cd $TRAVIS_BUILD_DIR/binutils
+        BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
+        MIPS_AS_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-as
+        MIPS_LD_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
+        ./configure --target=mipsel-unknown-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+        make all install MAKEINFO=true > /dev/null
+    fi
 
 script:
 # Build traces
   - cd $TRAVIS_BUILD_DIR/traces
-  - make MIPS_AS=$BINUTILS/bin/mipsel-unknown-linux-gnu-as MIPS_LD=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
+  - make MIPS_AS=$MIPS_AS_B MIPS_LD=$MIPS_LD_B
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
