@@ -42,8 +42,6 @@ addons:
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-  - MIPS_AS_B=mips-linux-gnu-as
-  - MIPS_LD_B=mips-linux-gnu-ld
 # Install OS X packages and build binutils
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -52,10 +50,9 @@ install:
         git submodule update --init binutils
         cd binutils
         BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
-        MIPS_AS_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-as
-        MIPS_LD_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
-        ./configure --target=mipsel-unknown-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+        ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
         make all install MAKEINFO=true > /dev/null
+        export PATH=$PATH:$BINUTILS/bin
     fi
 
 script:
@@ -64,7 +61,7 @@ script:
   - git submodule update --init googletest
   - git submodule update --init traces
   - cd traces
-  - make MIPS_AS=$MIPS_AS_B MIPS_LD=$MIPS_LD_B
+  - make MIPS_AS=mips-linux-gnu-as MIPS_LD=mips-linux-gnu-ld
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
