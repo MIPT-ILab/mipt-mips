@@ -49,9 +49,11 @@ install:
         cd $TRAVIS_BUILD_DIR
         git submodule update --init binutils
         cd binutils
-        ./configure --target=mips-linux-gnu --prefix=/usr --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-        make all MAKEINFO=true > /dev/null
-        sudo make install > /dev/null
+        ./configure --target=mips-linux-gnu --prefix=/opt/cross/bin --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+        make all install MAKEINFO=true > /dev/null
+        cd /usr/bin
+        sudo ln -s /opt/cross/bin/mips-linux-gnu-as /usr/bin/mips-linux-gnu-as
+        sudo ln -s /opt/cross/bin/mips-linux-gnu-ld /usr/bin/mips-linux-gnu-ld
     fi
 
 script:
