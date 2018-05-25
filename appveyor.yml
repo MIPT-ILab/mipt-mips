@@ -57,19 +57,20 @@ before_build:
 - if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 - set INCLUDE=%LIBELF_INCLUDE%;%INCLUDE%
 # install Boost
-- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost
+- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
 - set PATH=%LIBELF_INCLUDE%;%PATH%
 - set INCLUDE=%BOOST_ROOT%;%INCLUDE%
 # build binutils
 - set BINUTILS=/c/projects/mipt-mips/binutils
-- bash -lc "cd %BINUTILS%; ./configure --target=mipsel-unknown-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
+- bash -lc "cd %BINUTILS%; ./configure --target=mips-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
 - bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile" # disable optimizations to speed up build a little
 - bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
-# update environment with Boost and LIBELF
+# update environment
 - set CXX=%build%
+- set PATH=%PATH%;%BINUTILS%/cross/mips/bin
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make MIPS_AS=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-as MIPS_LD=%BINUTILS%/cross/mips/bin/mipsel-unknown-linux-gnu-ld"
+- bash -lc "cd /c/projects/mipt-mips/traces/; make"
 - mkdir C:\Projects\mipt-mips\simulator\build
 - cd C:\Projects\mipt-mips\simulator\build
 - cmake .. -G "%CMAKEFILE%"
