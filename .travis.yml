@@ -60,8 +60,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - git submodule update --init googletest
   - git submodule update --init traces
-  - cd traces
-  - make MIPS_AS=mips-linux-gnu-as MIPS_LD=mips-linux-gnu-ld
+  - cd traces && make
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
