@@ -17,6 +17,9 @@ os:
   - linux
   - osx
 
+git:
+  submodules: false
+
 matrix:
   exclude:
     - os: osx
@@ -45,7 +48,9 @@ install:
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         brew install libelf zlib
-        cd $TRAVIS_BUILD_DIR/binutils
+        cd $TRAVIS_BUILD_DIR
+        git submodule update --init binutils
+        cd binutils
         BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
         MIPS_AS_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-as
         MIPS_LD_B=$BINUTILS/bin/mipsel-unknown-linux-gnu-ld
@@ -55,7 +60,10 @@ install:
 
 script:
 # Build traces
-  - cd $TRAVIS_BUILD_DIR/traces
+  - cd $TRAVIS_BUILD_DIR
+  - git submodule update --init googletest
+  - git submodule update --init traces
+  - cd traces
   - make MIPS_AS=$MIPS_AS_B MIPS_LD=$MIPS_LD_B
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
