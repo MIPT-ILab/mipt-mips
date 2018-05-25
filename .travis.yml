@@ -49,9 +49,10 @@ install:
         cd $TRAVIS_BUILD_DIR
         git submodule update --init binutils
         cd binutils
-        ./configure --target=mips-linux-gnu --prefix=/opt/cross/bin --disable-gdb --disable-gprof --with-system-zlib > /dev/null
+        BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
+        ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
         make all install MAKEINFO=true > /dev/null
-        export PATH=$PATH:/opt/cross/bin
+        export PATH=$PATH:$BINUTILS/bin
     fi
 
 script:
