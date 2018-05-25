@@ -50,7 +50,8 @@ install:
         git submodule update --init binutils
         cd binutils
         ./configure --target=mips-linux-gnu --prefix=/usr --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-        make all install MAKEINFO=true > /dev/null
+        make all MAKEINFO=true > /dev/null
+        sudo make install > /dev/null
     fi
 
 script:
