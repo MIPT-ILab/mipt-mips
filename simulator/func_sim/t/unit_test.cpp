@@ -32,7 +32,7 @@ TEST( Func_Sim, Make_A_Step)
 {
     FuncSim<MIPS32> MIPS32;
     MIPS32.init( valid_elf_file);
-    ASSERT_EQ( MIPS32.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000 ]");
+    EXPECT_NE( MIPS32.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]"), std::string::npos);
 }
 
 TEST( Func_Sim, Run_Full_Trace)
