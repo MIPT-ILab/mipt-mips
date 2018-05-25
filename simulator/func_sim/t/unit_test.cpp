@@ -30,14 +30,14 @@ TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
 
 TEST( Func_Sim, Make_A_Step)
 {
-    FuncSim<MIPS32> MIPS32( true);
+    FuncSim<MIPS32> MIPS32;
     MIPS32.init( valid_elf_file);
     ASSERT_EQ( MIPS32.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000 ]");
 }
 
 TEST( Func_Sim, Run_Full_Trace)
 {
-    FuncSim<MIPS32> MIPS32( true);
+    FuncSim<MIPS32> MIPS32;
     GTEST_ASSERT_NO_DEATH( MIPS32.run_no_limit( valid_elf_file); );
 }
 
