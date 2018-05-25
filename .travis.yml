@@ -51,9 +51,7 @@ install:
         cd binutils
         ./configure --target=mips-linux-gnu --prefix=/opt/cross/bin --disable-gdb --disable-gprof --with-system-zlib > /dev/null
         make all install MAKEINFO=true > /dev/null
-        cd /usr/bin
-        sudo ln -s /opt/cross/bin/mips-linux-gnu-as /usr/bin/mips-linux-gnu-as
-        sudo ln -s /opt/cross/bin/mips-linux-gnu-ld /usr/bin/mips-linux-gnu-ld
+        export PATH=$PATH:/opt/cross/bin
     fi
 
 script:
