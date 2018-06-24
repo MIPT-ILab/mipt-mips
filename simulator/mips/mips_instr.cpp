@@ -49,10 +49,10 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 
     // HI/LO manipulations
     //key     name    operation  ms     source1       source2   destination      pointer                      mips version
-    {0x10, { "mfhi", OUT_R_MFHI, 0, RegType::HI, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
-    {0x11, { "mthi", OUT_R_MTHI, 0, RegType::RS, RegType::ZERO, RegType::HI, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
-    {0x12, { "mflo", OUT_R_MFLO, 0, RegType::LO, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
-    {0x13, { "mtlo", OUT_R_MTLO, 0, RegType::RS, RegType::ZERO, RegType::LO, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x10, { "mfhi", OUT_R_ARITHM, 0, RegType::HI, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x11, { "mthi", OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::HI, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x12, { "mflo", OUT_R_ARITHM, 0, RegType::LO, RegType::ZERO, RegType::RD, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
+    {0x13, { "mtlo", OUT_R_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::LO, &BaseMIPSInstr<RegisterUInt>::execute_move, MIPS_I_Instr} },
 
     // Doubleword variable shifts
     //key     name    operation  ms     source1       source2   destination       pointer                             mips version
