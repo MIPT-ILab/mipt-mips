@@ -62,10 +62,6 @@ class BaseMIPSInstr
             OUT_R_SPECIAL,
             OUT_R_SUBTR,
             OUT_R_TRAP,
-            OUT_R_MFLO,
-            OUT_R_MTLO,
-            OUT_R_MFHI,
-            OUT_R_MTHI,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
             OUT_RI_BRANCH_0,
@@ -440,7 +436,7 @@ class BaseMIPSInstr
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
-        bool is_mthi() const { return operation == OUT_R_MTHI; }
+        bool is_mthi() const { return dst.is_mips_hi(); }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
