@@ -3,7 +3,7 @@
     (  _ \ /  \(  _ \(  )  
      ) __/(  O )) __// (_/\
     (__)   \__/(__)  \____/
-    version 1.1.0
+    version 1.2.0
     https://github.com/badaix/popl
 
     This file is part of popl (program options parser lib)
@@ -36,7 +36,7 @@
 namespace popl
 {
 
-#define POPL_VERSION "1.1.0"
+#define POPL_VERSION "1.2.0"
 
 
 /// Option's argument type
@@ -426,26 +426,26 @@ private:
 
 
 
-/// Base class for a HelpPrinter
+/// Base class for an OptionPrinter
 /**
- * HelpPrinter creates a help message for a given OptionParser
+ * OptionPrinter creates a help message for a given OptionParser
  */
-class HelpPrinter
+class OptionPrinter
 {
 public:
 	/// Constructor
 	/// @param option_parser the OptionParser to create the help message from
-	explicit HelpPrinter(const OptionParser* option_parser) : option_parser_(option_parser)
+	explicit OptionPrinter(const OptionParser* option_parser) : option_parser_(option_parser)
 	{
 	}
 
 	/// Destructor
-	virtual ~HelpPrinter() = default;
+	virtual ~OptionPrinter() = default;
 
 	/// Create a help message
 	/// @param max_attribute show options up to this level (optional, advanced, expert)
 	/// @return the help message
-	virtual std::string help(const Attribute& max_attribute = Attribute::optional) const = 0;
+	virtual std::string print(const Attribute& max_attribute = Attribute::optional) const = 0;
 
 protected:
 	const OptionParser* option_parser_;
@@ -454,18 +454,18 @@ protected:
 
 
 
-/// Help printer for the console
+/// Option printer for the console
 /**
- * Standard console help printer
+ * Standard console option printer
  * Creates a human readable help message
  */
-class ConsoleHelpPrinter : public HelpPrinter
+class ConsoleOptionPrinter : public OptionPrinter
 {
 public:
-	explicit ConsoleHelpPrinter(const OptionParser* option_parser);
-	~ConsoleHelpPrinter() override = default;
+	explicit ConsoleOptionPrinter(const OptionParser* option_parser);
+	~ConsoleOptionPrinter() override = default;
 
-	std::string help(const Attribute& max_attribute = Attribute::optional) const override;
+	std::string print(const Attribute& max_attribute = Attribute::optional) const override;
 
 private:
 	std::string to_string(Option_ptr option) const;
@@ -474,17 +474,17 @@ private:
 
 
 
-/// Help printer for man pages
+/// Option printer for man pages
 /**
  * Creates help messages in groff format that can be used in man pages
  */
-class GroffHelpPrinter : public HelpPrinter
+class GroffOptionPrinter : public OptionPrinter
 {
 public:
-	explicit GroffHelpPrinter(const OptionParser* option_parser);
-	~GroffHelpPrinter() override = default;
+	explicit GroffOptionPrinter(const OptionParser* option_parser);
+	~GroffOptionPrinter() override = default;
 
-	std::string help(const Attribute& max_attribute = Attribute::optional) const override;
+	std::string print(const Attribute& max_attribute = Attribute::optional) const override;
 
 private:
 	std::string to_string(Option_ptr option) const;
@@ -493,17 +493,17 @@ private:
 
 
 
-/// Help printer for bash completion
+/// Option printer for bash completion
 /**
  * Creates a script with all options (short and long) that can be used for bash completion
  */
-class BashCompletionHelpPrinter : public HelpPrinter
+class BashCompletionOptionPrinter : public OptionPrinter
 {
 public:
-	BashCompletionHelpPrinter(const OptionParser* option_parser, std::string program_name);
-	~BashCompletionHelpPrinter() override = default;
+	BashCompletionOptionPrinter(const OptionParser* option_parser, std::string program_name);
+	~BashCompletionOptionPrinter() override = default;
 
-	std::string help(const Attribute& max_attribute = Attribute::optional) const override;
+	std::string print(const Attribute& max_attribute = Attribute::optional) const override;
 
 private:
 	std::string program_name_;
@@ -735,7 +735,7 @@ inline void Value<T>::parse(OptionName what_name, const char* value)
 
 
 template<class T>
-void Value<T>::update_reference()
+inline void Value<T>::update_reference()
 {
 	if (this->assign_to_)
 	{
@@ -1023,23 +1023,23 @@ inline void OptionParser::parse(int argc, const char * const argv[])
 }
 
 
-
-
 inline std::string OptionParser::help(const Attribute& max_attribute) const
 {
-	ConsoleHelpPrinter help_printer(this);
-	return help_printer.help(max_attribute);
+	ConsoleOptionPrinter option_printer(this);
+	return option_printer.print(max_attribute);
 }
 
 
 
 
-inline ConsoleHelpPrinter::ConsoleHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+/// ConsoleOptionPrinter implementation /////////////////////////////////
+
+inline ConsoleOptionPrinter::ConsoleOptionPrinter(const OptionParser* option_parser) : OptionPrinter(option_parser)
 {
 }
 
 
-inline std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
+inline std::string ConsoleOptionPrinter::to_string(Option_ptr option) const
 {
 	std::stringstream line;
 	if (option->short_name() != 0)
@@ -1074,7 +1074,7 @@ inline std::string ConsoleHelpPrinter::to_string(Option_ptr option) const
 }
 
 
-inline std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) const
+inline std::string ConsoleOptionPrinter::print(const Attribute& max_attribute) const
 {
 	if (option_parser_ == nullptr)
 		return "";
@@ -1128,12 +1128,14 @@ inline std::string ConsoleHelpPrinter::help(const Attribute& max_attribute) cons
 
 
 
-inline GroffHelpPrinter::GroffHelpPrinter(const OptionParser* option_parser) : HelpPrinter(option_parser)
+/// GroffOptionPrinter implementation /////////////////////////////////
+
+inline GroffOptionPrinter::GroffOptionPrinter(const OptionParser* option_parser) : OptionPrinter(option_parser)
 {
 }
 
 
-inline std::string GroffHelpPrinter::to_string(Option_ptr option) const
+inline std::string GroffOptionPrinter::to_string(Option_ptr option) const
 {
 	std::stringstream line;
 	if (option->short_name() != 0)
@@ -1166,7 +1168,7 @@ inline std::string GroffHelpPrinter::to_string(Option_ptr option) const
 }
 
 
-inline std::string GroffHelpPrinter::help(const Attribute& max_attribute) const
+inline std::string GroffOptionPrinter::print(const Attribute& max_attribute) const
 {
 	if (option_parser_ == nullptr)
 		return "";
@@ -1194,12 +1196,14 @@ inline std::string GroffHelpPrinter::help(const Attribute& max_attribute) const
 
 
 
-inline BashCompletionHelpPrinter::BashCompletionHelpPrinter(const OptionParser* option_parser, std::string program_name) : HelpPrinter(option_parser), program_name_(std::move(program_name))
+/// BashCompletionOptionPrinter implementation /////////////////////////////////
+
+inline BashCompletionOptionPrinter::BashCompletionOptionPrinter(const OptionParser* option_parser, std::string program_name) : OptionPrinter(option_parser), program_name_(std::move(program_name))
 {
 }
 
 
-inline std::string BashCompletionHelpPrinter::help(const Attribute& /*max_attribute*/) const
+inline std::string BashCompletionOptionPrinter::print(const Attribute& /*max_attribute*/) const
 {
 	if (option_parser_ == nullptr)
 		return "";
