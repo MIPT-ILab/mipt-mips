@@ -55,7 +55,7 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand<Register>( get_entry( reg_num).current_stage, reg_num, last_execution_stage_value);
+            return BypassCommand<Register>( get_entry( reg_num).current_stage, last_execution_stage_value);
         }
 
         // garners the information about a new instruction
@@ -149,7 +149,7 @@ void DataBypass<ISA>::trace_new_register( const Instr& instr, Register num)
         entry.next_stage_after_first_execution_stage.set_to_writeback();
 
 
-    if ( !instr.is_bypassible())
+    if ( !instr.is_bypassible() || num.is_mips_hi())
         entry.ready_stage.set_to_in_RF();
 
 
