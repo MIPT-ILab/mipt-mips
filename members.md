@@ -1,23 +1,4 @@
-List of 2017/2018 MIPT-MIPS project members:
+List of 2018/2019 MIPT-MIPS project members:
 1. Pavel Kryukov
-2. Ivan Uteshev
-3. Roman Glushenkov
-4. Alexey Steksov
-5. Alexandr Misevich
-6. Svyatoslav Pustoshilov
-7. Vadim Gizatulin
-8. Kirill Nedostoev
-9. Andrey Afonin
-10. Danil Yarovoy
-11. Maxim Kolodiazhniy
-12. Vyacheslav Kompan
-13. Konstantin Soshin
-14. Andrey Pokrovskiy
-15. Nikita Nikonov
-16. Ivan Tetyushkin
-17. Alexander Timofeev
-18. Andrei Sultan
-19. Denis Los
-20. Yan Logovskiy
-21. Nikita Hmurovich
-22. Egor Zyazev
+2. Vyacheslav Kompan
+3. Yan Logovskiy
