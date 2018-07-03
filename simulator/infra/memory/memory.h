@@ -15,9 +15,10 @@
 
 // uArchSim modules
 #include <infra/types.h>
+#include <infra/macro.h>
 #include <infra/elf_parser/elf_parser.h>
 
-class Memory
+class FuncMemory
 {
     private:
         const uint32 page_bits;
@@ -72,13 +73,17 @@ class Memory
         void alloc( Addr addr);
         bool check( Addr addr) const;
     public:
-        explicit Memory ( const std::string& executable_file_name,
+        explicit FuncMemory ( const std::string& executable_file_name,
                      uint32 addr_bits = 32,
                      uint32 page_bits = 10,
                      uint32 offset_bits = 12);
 
-        uint64 read( Addr addr, uint32 num_of_bytes = 4) const;
-        void write( uint64 value, Addr addr, uint32 num_of_bytes = 4);
+        template<typename T>
+        T read( Addr addr, T mask = all_ones<T>()) const;
+
+        template<typename T>
+        void write( T value, Addr addr, T mask = all_ones<T>());
+
         inline uint64 startPC() const { return startPC_addr; }
         std::string dump() const;
 };

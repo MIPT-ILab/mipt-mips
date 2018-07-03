@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 // generic C
 #include <cassert>
 #include <cstdlib>
@@ -10,10 +6,11 @@
 #include <gtest/gtest.h>
 
 // Module
+#include <mips/mips.h>
 #include "../func_sim.h"
 
-static const std::string valid_elf_file = TEST_PATH;
-static const int64 num_steps = 2039;
+static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
+static const std::string smc_code = TEST_PATH "/smc.out";
 
 #define GTEST_ASSERT_NO_DEATH(statement) \
     ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
@@ -21,27 +18,34 @@ static const int64 num_steps = 2039;
 TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
 {
     // Just call a constructor
-    ASSERT_NO_THROW( MIPS mips );
+    ASSERT_NO_THROW( FuncSim<MIPS32> MIPS32 );
 
     // Call constructor and init
-    ASSERT_NO_THROW( MIPS().init( valid_elf_file) );
-   
+    ASSERT_NO_THROW( FuncSim<MIPS32>().init( valid_elf_file) );
+
     // Do bad init
-    ASSERT_EXIT( MIPS().init( "./1234567890/qwertyuop"),
+    ASSERT_EXIT( FuncSim<MIPS32>().init( "./1234567890/qwertyuop"),
                  ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
 }
 
 TEST( Func_Sim, Make_A_Step)
 {
-    MIPS mips;
-    mips.init( valid_elf_file);
-    ASSERT_EQ( mips.step().Dump(), "0x4000f0: lui $at, 0x41\t [ $at = 0x410000]");
+    FuncSim<MIPS32> MIPS32;
+    MIPS32.init( valid_elf_file);
+    EXPECT_NE( MIPS32.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]"), std::string::npos);
 }
 
 TEST( Func_Sim, Run_Full_Trace)
 {
-    MIPS mips;
-    GTEST_ASSERT_NO_DEATH( mips.run( valid_elf_file, num_steps); );
+    FuncSim<MIPS32> MIPS32;
+    GTEST_ASSERT_NO_DEATH( MIPS32.run_no_limit( valid_elf_file); );
+}
+
+TEST( Func_Sim, Run_SMC_trace)
+{
+    FuncSim<MIPS32> MIPS32;
+    ASSERT_EXIT( MIPS32.run_no_limit( smc_code);,
+                 ::testing::ExitedWithCode( EXIT_FAILURE), "Bearings lost:.*");
 }
 
 int main( int argc, char* argv[])

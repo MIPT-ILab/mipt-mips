@@ -15,6 +15,7 @@
 #include <experimental/string_view>
 namespace std {
     using string_view = std::experimental::string_view;
+    using basic_string_view = std::experimental::basic_string_view;
     std::ostream& operator<<(std::ostream&, const std::experimental::string_view&);
 }
 #endif

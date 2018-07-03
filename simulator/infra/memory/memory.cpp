@@ -1,12 +1,8 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 /**
  * memory.cpp - the module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012 uArchSim iLab project
+ * Copyright 2012-2018 uArchSim iLab project
  */
 
 // Generic C++
@@ -14,30 +10,24 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
 #include "memory.h"
 
-union uint64_8
-{
-    uint8 bytes[sizeof(uint64) / sizeof(uint8)];
-    uint64 val;
-    explicit uint64_8( uint64 value) : val( value) { }
-};
-
-Memory::Memory( const std::string& executable_file_name,
+FuncMemory::FuncMemory( const std::string& executable_file_name,
                         uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),
-    addr_mask( addr_bits >= 64 ? MAX_VAL32 : ( 1ull << addr_bits) - 1),
-    offset_mask( ( 1ull << offset_bits) - 1),
-    page_mask ( ( ( 1ull << page_bits) - 1) << offset_bits),
-    set_mask ( (( 1ull << set_bits) - 1) << ( page_bits + offset_bits)),
+    addr_mask( bitmask<Addr>( std::min<uint32>( addr_bits, bitwidth<Addr>))),
+    offset_mask( bitmask<Addr>( offset_bits)),
+    page_mask ( bitmask<Addr>( page_bits) << offset_bits),
+    set_mask ( bitmask<Addr>( set_bits) << ( page_bits + offset_bits)),
     page_cnt ( 1ull << page_bits ),
     set_cnt ( 1ull << set_bits ),
     page_size ( 1ull << offset_bits)
@@ -70,48 +60,72 @@ Memory::Memory( const std::string& executable_file_name,
             startPC_addr = section.get_start_addr();
 
         for ( size_t offset = 0; offset < section.get_size(); ++offset)
-            write( section.get_byte(offset), section.get_start_addr() + offset, 1);
+            write<uint8>( section.get_byte(offset), section.get_start_addr() + offset);
     }
 }
 
-uint64 Memory::read( Addr addr, uint32 num_of_bytes) const
+template<typename T>
+T FuncMemory::read( Addr addr, T mask) const
 {
-    if ( num_of_bytes == 0 || num_of_bytes > 8) {
-        std::cerr << "ERROR. Reading " << num_of_bytes << " bytes)\n";
-        std::exit( EXIT_FAILURE);
-    }
     assert( addr <= addr_mask);
-    if ( !check( addr) || !check( addr + num_of_bytes - 1))
-         return NO_VAL64;
 
-    uint64_8 value(0ull);
+    T value = 0;
 
-    for ( size_t i = 0; i < num_of_bytes; ++i)
-        value.bytes[i] = read_byte( addr + i);
+    // Endian specific
+    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
+        if (( mask & 0xFFu) == 0xFFu) {
+            auto byte = NO_VAL8;
+            if ( check( addr + i))
+                byte = read_byte( addr + i);
+            value |= static_cast<T>(static_cast<T>(byte) << (i * 8));
+        }
+        // NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if constexpr ( bitwidth<T> > 8) {
+            mask >>= 8u;
+        }
+    }
 
-    return value.val;
+    return value;
 }
 
-void Memory::write( uint64 value, Addr addr, uint32 num_of_bytes)
+template uint8 FuncMemory::read<uint8>( Addr addr, uint8 mask) const;
+template uint16 FuncMemory::read<uint16>( Addr addr, uint16 mask) const;
+template uint32 FuncMemory::read<uint32>( Addr addr, uint32 mask) const;
+template uint64 FuncMemory::read<uint64>( Addr addr, uint64 mask) const;
+template uint128 FuncMemory::read<uint128>( Addr addr, uint128 mask) const;
+
+template<typename T>
+void FuncMemory::write( T value, Addr addr, T mask)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
-    if ( num_of_bytes == 0 || num_of_bytes > 8)
+    if ( mask == 0)
     {
-        std::cerr << "ERROR. Writing " << num_of_bytes << " bytes)\n";
+        std::cerr << "ERROR. Writing zero bytes)\n";
         std::exit( EXIT_FAILURE);
     }
 
-    alloc( addr);
-    alloc( addr + num_of_bytes - 1);
-
-    const uint64_8 value_( value);
-
-    for ( size_t i = 0; i < num_of_bytes; ++i)
-        write_byte( addr + i, value_.bytes[i]);
+    // Endian specific
+    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
+        if ((mask & 0xFFu) == 0xFFu) {
+            alloc( addr + i);
+            write_byte( addr + i, static_cast<uint8>(value & 0xFFu));
+        }
+        // NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if constexpr ( bitwidth<T> > 8) {
+            mask >>= 8;
+            value >>= 8;
+        }
+    }
 }
 
-void Memory::alloc( Addr addr)
+template void FuncMemory::write<uint8>( uint8 value, Addr addr, uint8 mask);
+template void FuncMemory::write<uint16>( uint16 value, Addr addr, uint16 mask);
+template void FuncMemory::write<uint32>( uint32 value, Addr addr, uint32 mask);
+template void FuncMemory::write<uint64>( uint64 value, Addr addr, uint64 mask);
+template void FuncMemory::write<uint128>( uint128 value, Addr addr, uint128 mask);
+
+void FuncMemory::alloc( Addr addr)
 {
     auto& set = memory[get_set(addr)];
     if ( set.empty())
@@ -122,13 +136,13 @@ void Memory::alloc( Addr addr)
         page.resize(page_size, 0);
 }
 
-bool Memory::check( Addr addr) const
+bool FuncMemory::check( Addr addr) const
 {
     const auto& set = memory[get_set(addr)];
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-std::string Memory::dump() const
+std::string FuncMemory::dump() const
 {
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;

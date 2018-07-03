@@ -1,26 +1,34 @@
 /*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
+ * func_sim.cpp - extremely simple simulator
+ * Copyright 2018 MIPT-MIPS
+ */
+#include <cassert>
 #include <iostream>
-
-#include <mips/mips_memory.h>
-#include <mips/mips_rf.h>
 
 #include "func_sim.h"
 
-MIPS::MIPS( bool log) : Log( log), rf( new RF) { }
+template <typename ISA>
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF<ISA>) { }
 
-MIPS::~MIPS()
+template <typename ISA>
+void FuncSim<ISA>::update_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
 {
-    delete mem;
+    if ( instr.is_nop())
+        ++nops_in_a_row;
+    else
+        nops_in_a_row = 0;
+
+    if (nops_in_a_row > 10)
+        serr << "Bearings lost: ten nops in a row. Simulation will be aborted."
+             << std::endl << std::endl << critical;
 }
 
-FuncInstr MIPS::step()
+template <typename ISA>
+typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
-        
+
     // read sources
     rf->read_sources( &instr);
 
@@ -39,21 +47,43 @@ FuncInstr MIPS::step()
     // PC update
     PC = instr.get_new_PC();
 
+    // Check whether we execute nops
+    update_nop_counter( instr);
+
     // dump
     return instr;
 }
 
-void MIPS::init( const std::string& tr)
+template <typename ISA>
+void FuncSim<ISA>::init( const std::string& tr)
 {
-    assert( mem == nullptr);
-    mem = new MIPSMemory( tr);
+    mem.reset( new Memory( tr));
     PC = mem->startPC();
+    nops_in_a_row = 0;
 }
 
-void MIPS::run( const std::string& tr, uint32 instrs_to_run)
+template <typename ISA>
+void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     init( tr);
-    for ( uint32 i = 0; i < instrs_to_run; ++i)
-        sout << step() << std::endl;
+    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+        const auto& instr = step();
+        sout << instr << std::endl;
+        if ( instr.is_halt())
+            break;
+    }
 }
+
+#include <mips/mips.h>
+#include <risc_v/risc_v.h>
+
+template class FuncSim<MIPSI>;
+template class FuncSim<MIPSII>;
+template class FuncSim<MIPSIII>;
+template class FuncSim<MIPSIV>;
+template class FuncSim<MIPS32>;
+template class FuncSim<MIPS64>;
+template class FuncSim<RISCV32>;
+template class FuncSim<RISCV64>;
+template class FuncSim<RISCV128>;
 

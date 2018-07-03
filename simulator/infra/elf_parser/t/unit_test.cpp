@@ -1,7 +1,3 @@
-/*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
 // generic C
 #include <cassert>
 #include <cstdlib>
@@ -12,7 +8,7 @@
 // uArchSim modules
 #include "../elf_parser.h"
 
-static const std::string valid_elf_file = TEST_PATH;
+static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 //static const std::string valid_section_name = ".data";
 
 //

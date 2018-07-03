@@ -9,10 +9,8 @@
 # Unignore all dirs
 !*/
 
-# Unignore Makefiles and License
+# Unignore License
 !LICENSE
-!*/Makefile
-!*/makefile
 
 # Compiled source #
 ######################
@@ -28,6 +26,21 @@
 *.dll
 *.exp
 *.lib
+
+# CMake stuff #
+###############
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+*.sln
+*.vcproj
+*.vcxproj
 
 # Packages #
 ######################
@@ -64,3 +77,4 @@
 ehthumbs.db
 Thumbs.db
 *.swp
+*.swo

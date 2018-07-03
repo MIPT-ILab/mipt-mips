@@ -1,13 +1,12 @@
-/*
- * func_instr.h - instruction parser for mips
+ /* mips_instr.h - instruction parser for mips
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2014-2017 MIPT-MIPS
  */
 
 /** Edited by Ladin Oleg. */
 
-#ifndef FUNC_INSTR_H
-#define FUNC_INSTR_H
+#ifndef MIPS_INSTR_H
+#define MIPS_INSTR_H
 
 // Generic C++
 #include <cassert>
@@ -19,82 +18,60 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
-enum RegNum : uint8
-{
-    REG_NUM_ZERO = 0,
-    REG_NUM_AT,
-    REG_NUM_V0,
-    REG_NUM_V1,
-    REG_NUM_A0,
-    REG_NUM_A1,
-    REG_NUM_A2,
-    REG_NUM_A3,
-    REG_NUM_T0,
-    REG_NUM_T1,
-    REG_NUM_T2,
-    REG_NUM_T3,
-    REG_NUM_T4,
-    REG_NUM_T5,
-    REG_NUM_T6,
-    REG_NUM_T7,
-    REG_NUM_S0,
-    REG_NUM_S1,
-    REG_NUM_S2,
-    REG_NUM_S3,
-    REG_NUM_S4,
-    REG_NUM_S5,
-    REG_NUM_S6,
-    REG_NUM_S7,
-    REG_NUM_T8,
-    REG_NUM_T9,
-    REG_NUM_K0,
-    REG_NUM_K1,
-    REG_NUM_GP,
-    REG_NUM_SP,
-    REG_NUM_FP,
-    REG_NUM_RA,
-    REG_NUM_MAX
-};
-
-inline int32 sign_extend(int16 v)  { return static_cast<int32>(v); }
-inline int32 zero_extend(uint16 v) { return static_cast<int32>(v); }
+#include "mips_register/mips_register.h"
+#include "mips_version.h"
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
-class FuncInstr
+template<typename T>
+auto mips_multiplication(T x, T y) {
+    using T2 = doubled_t<T>;
+    using UT2 = unsign_t<T2>;
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    auto value = static_cast<UT2>(static_cast<T2>(x) * static_cast<T2>(y));
+    return ReturnType(value, value >> bitwidth<T>);
+}
+
+template<typename T>
+auto mips_division(T x, T y) {
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    if ( y == 0)
+        return ReturnType();
+
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(misc-suspicious-semicolon)
+        if ( y == -1 && x == static_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
+            return ReturnType();
+
+    return ReturnType(x / y, x % y);
+}
+
+template<typename RegisterUInt>
+class BaseMIPSInstr
 {
     private:
-        enum Format : uint8
-        {
-            FORMAT_R,
-            FORMAT_I,
-            FORMAT_J,
-            FORMAT_UNKNOWN
-        };
+        using RegisterSInt = sign_t<RegisterUInt>;
 
         enum OperationType : uint8
         {
             OUT_R_ARITHM,
-            OUT_R_SHIFT,
+            OUT_R_ACCUM,
+            OUT_R_CONDM,
             OUT_R_SHAMT,
             OUT_R_JUMP,
-            OUT_R_JUMP_LINK,
             OUT_R_SPECIAL,
+            OUT_R_SUBTR,
             OUT_R_TRAP,
             OUT_I_ARITHM,
             OUT_I_BRANCH,
-            OUT_I_BRANCH_0,
+            OUT_RI_BRANCH_0,
+            OUT_RI_TRAP,
             OUT_I_LOAD,
             OUT_I_LOADU,
-            OUT_I_LOADR,
-            OUT_I_LOADL,
+            OUT_I_PARTIAL_LOAD,
             OUT_I_CONST,
             OUT_I_STORE,
-            OUT_I_STOREL,
-            OUT_I_STORER,
             OUT_J_JUMP,
-            OUT_J_JUMP_LINK,
             OUT_J_SPECIAL,
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
@@ -103,165 +80,188 @@ class FuncInstr
         {
             NO_TRAP,
             EXPLICIT_TRAP,
+            UNALIGNED_ADDRESS,
         } trap = TrapType::NO_TRAP;
 
+        // Endian specific
         const union _instr
         {
-            const struct
+            const struct AsR
             {
-                unsigned funct  :6;
-                unsigned shamt  :5;
-                unsigned rd     :5;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 funct  :6;
+                uint32 shamt  :5;
+                uint32 rd     :5;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asR;
-            const struct
+            const struct AsI
             {
-                unsigned imm    :16;
-                unsigned rt     :5;
-                unsigned rs     :5;
-                unsigned opcode :6;
+                uint32 imm    :16;
+                uint32 rt     :5;
+                uint32 rs     :5;
+                uint32 opcode :6;
             } asI;
-            const struct
+            const struct AsJ
             {
-                unsigned imm    :26;
-                unsigned opcode :6;
+                uint32 imm    :26;
+                uint32 opcode :6;
             } asJ;
+
             const uint32 raw;
 
             _instr() : raw(NO_VAL32) { };
             explicit _instr(uint32 bytes) : raw( bytes) { }
+
+            static_assert( sizeof( AsR) == sizeof( uint32));
+            static_assert( sizeof( AsI) == sizeof( uint32));
+            static_assert( sizeof( AsJ) == sizeof( uint32));
+            static_assert( sizeof( uint32) == 4);
         } instr;
 
-        using Execute = void (FuncInstr::*)();
+        using Execute = void (BaseMIPSInstr::*)();
+        using Predicate = bool (BaseMIPSInstr::*)() const;
+
+        enum class RegType : uint8
+        {
+            RS, RT, RD,
+            ZERO, RA,
+            HI, LO, HI_LO
+        };
+
+        static bool is_explicit_register( RegType type)
+        {
+            return type == RegType::RS
+                || type == RegType::RT
+                || type == RegType::RD;
+        }
+
+        MIPSRegister get_register( RegType type) const;
 
         struct ISAEntry
         {
             std::string_view name;
-
-            Format format;
             OperationType operation;
-
             uint8 mem_size;
-
-            FuncInstr::Execute function;
-
-            uint8 mips_version;
+            RegType src1;
+            RegType src2;
+            RegType dst;
+            BaseMIPSInstr::Execute function;
+            MIPSVersionMask versions;
+            ISAEntry() = delete;
         };
-        
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapR;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapRI;
-        static const std::unordered_map <uint8, FuncInstr::ISAEntry> isaMapIJ;
-                        
-        static std::string_view regTableName(RegNum reg);
-        static std::array<std::string_view, REG_NUM_MAX> regTable;
-        std::string_view name = {};
 
-        RegNum src1 = REG_NUM_ZERO;
-        RegNum src2 = REG_NUM_ZERO;
-        RegNum dst = REG_NUM_ZERO;
+        using MapType = std::unordered_map <uint8, BaseMIPSInstr<RegisterUInt>::ISAEntry>;
+        static const MapType isaMapR;
+        static const MapType isaMapRI;
+        static const MapType isaMapIJ;
+        static const MapType isaMapMIPS32;
+
+        MIPSRegister src1 = MIPSRegister::zero;
+        MIPSRegister src2 = MIPSRegister::zero;
+        MIPSRegister dst  = MIPSRegister::zero;
+        MIPSRegister dst2 = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
-        uint32 v_src1 = NO_VAL32;
-        uint32 v_src2 = NO_VAL32;
-        uint32 v_dst = NO_VAL32;
+        auto sign_extend() const { return static_cast<RegisterSInt>( static_cast<int16>(v_imm)); }
+        auto zero_extend() const { return static_cast<RegisterUInt>( static_cast<uint16>(v_imm)); }
+
+        RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
+        RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
+        RegisterUInt v_dst  = NO_VAL<RegisterUInt>;
+        RegisterUInt v_dst2 = NO_VAL<RegisterUInt>;
+        RegisterUInt mask   = all_ones<RegisterUInt>();
+
         uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
+        // convert this to bitset
         bool complete   = false;
-        bool writes_dst = true;
+        bool _is_jump_taken = false; // actual result
 
-        /* info for branch misprediction unit */
-        bool predicted_taken = false;     // Predicted direction
-        Addr predicted_target = NO_VAL32; // PC, predicted by BPU
-        bool _is_jump_taken = false;      // actual result
+        Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
-        Addr new_PC = NO_VAL32;
 
 #if 0
         std::string disasm = {};
 #else
         CowString disasm = {};
 #endif
-
-        Format initFormat();
-        void initR();
-        void initI();
-        void initJ();
-        void initUnknown();
+        void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
-        bool lez() const { return static_cast<int32>( v_src1) <= 0; }
-        bool gez() const { return static_cast<int32>( v_src1) >= 0; }
-        bool ltz() const { return static_cast<int32>( v_src1) < 0; }
-        bool gtz() const { return static_cast<int32>( v_src1) > 0; }
+        bool lez() const { return static_cast<RegisterSInt>( v_src1) <= 0; }
+        bool gez() const { return static_cast<RegisterSInt>( v_src1) >= 0; }
+        bool ltz() const { return static_cast<RegisterSInt>( v_src1) < 0; }
+        bool gtz() const { return static_cast<RegisterSInt>( v_src1) > 0; }
 
         // Predicate helpers - binary
         bool eq()  const { return v_src1 == v_src2; }
         bool ne()  const { return v_src1 != v_src2; }
         bool geu() const { return v_src1 >= v_src2; }
         bool ltu() const { return v_src1 <  v_src2; }
-        bool ge()  const { return static_cast<int32>( v_src1) >= static_cast<int32>( v_src2); }
-        bool lt()  const { return static_cast<int32>( v_src1) <  static_cast<int32>( v_src2); }
+        bool ge()  const { return static_cast<RegisterSInt>( v_src1) >= static_cast<RegisterSInt>( v_src2); }
+        bool lt()  const { return static_cast<RegisterSInt>( v_src1) <  static_cast<RegisterSInt>( v_src2); }
 
         // Predicate helpers - immediate
-        bool eqi() const { return static_cast<int32>( v_src1) == sign_extend( v_imm); }
-        bool nei() const { return static_cast<int32>( v_src1) != sign_extend( v_imm); }
-        bool lti() const { return static_cast<int32>( v_src1) <  sign_extend( v_imm); }
-        bool gei() const { return static_cast<int32>( v_src1) >= sign_extend( v_imm); }
+        bool eqi() const { return static_cast<RegisterSInt>( v_src1) == sign_extend(); }
+        bool nei() const { return static_cast<RegisterSInt>( v_src1) != sign_extend(); }
+        bool lti() const { return static_cast<RegisterSInt>( v_src1) <  sign_extend(); }
+        bool gei() const { return static_cast<RegisterSInt>( v_src1) >= sign_extend(); }
 
         // Predicate helpers - immediate unsigned
-        bool ltiu() const { return v_src1 <  static_cast<uint32>(sign_extend( v_imm)); }
-        bool geiu() const { return v_src1 >= static_cast<uint32>(sign_extend( v_imm)); }
+        bool ltiu() const { return v_src1 <  static_cast<RegisterUInt>(sign_extend()); }
+        bool geiu() const { return v_src1 >= static_cast<RegisterUInt>(sign_extend()); }
 
-        void execute_add()   { v_dst = static_cast<int32>( v_src1) + static_cast<int32>( v_src2); }
-        void execute_sub()   { v_dst = static_cast<int32>( v_src1) - static_cast<int32>( v_src2); }
-        void execute_addi()  { v_dst = static_cast<int32>( v_src1) + sign_extend( v_imm); }
+        template <typename T>
+        void execute_addition()     { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) + static_cast<T>( v_src2)); }
 
-        void execute_addu()  { v_dst = v_src1 + v_src2; }
-        void execute_subu()  { v_dst = v_src1 - v_src2; }
-        void execute_addiu() { v_dst = v_src1 + sign_extend(v_imm); }
+        template <typename T>
+        void execute_subtraction()  { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) - static_cast<T>( v_src2)); }
 
-        void execute_multu()
+        template <typename T>
+        void execute_addition_imm() { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) + static_cast<T>( sign_extend())); }
+
+        template <typename T>
+        void execute_multiplication() { std::tie(v_dst, v_dst2) = mips_multiplication<T>(v_src1, v_src2); }
+
+        template <typename T>
+        void execute_division() { std::tie(v_dst, v_dst2) = mips_division<T>(v_src1, v_src2); }
+
+        void execute_move()   { v_dst = v_src1; }
+
+        template <typename T>
+        void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
+        void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
+
+        template <typename T>
+        void execute_srl()
         {
-             uint64 mult_res = static_cast<uint64>(v_src1) * static_cast<uint64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
+            // On 64-bit CPUs the result word is sign-extended
+            v_dst = static_cast<RegisterUInt>(static_cast<RegisterSInt>(static_cast<unsign_t<T>>(static_cast<T>(v_src1) >> shamt)));
         }
+        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
 
-        void execute_mult()
-        {
-             uint64 mult_res = static_cast<int64>(v_src1) * static_cast<int64>(v_src2);
-             lo = mult_res & 0xFFFFFFFF;
-             hi = mult_res >> 0x20;
-        }
+        template <typename T>
+        void execute_sra()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), shamt); }
+        void execute_dsra32() { v_dst = arithmetic_rs( v_src1, shamt + 32); }
 
-        void execute_div()   { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_divu()  { lo = v_src2 / v_src1; hi = v_src2 % v_src1; };
-        void execute_mfhi()  { v_dst = hi; };
-        void execute_mthi()  { hi = v_src2; };
-        void execute_mflo()  { v_dst = lo; };
-        void execute_mtlo()  { lo = v_src2;};
+        template <typename T>
+        void execute_sllv()   { v_dst = static_cast<T>( v_src1) << v_src2; }
 
-        void execute_sll()   { v_dst = v_src1 << shamt; }
-        void execute_srl()   { v_dst = v_src1 >> shamt; }
-        void execute_sra()   { v_dst = static_cast<int32>( v_src1) >> shamt; }
-        void execute_sllv()  { v_dst = v_src1 << v_src2; }
-        void execute_srlv()  { v_dst = v_src1 >> v_src2; }
-        void execute_srav()  { v_dst = static_cast<int32>( v_src1) >> v_src2; }
-        void execute_lui()   { v_dst = sign_extend( v_imm) << 0x10; }
+        template <typename T>
+        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> v_src2; }
 
-        void execute_slt()   { v_dst = static_cast<uint32>( lt()); }
-        void execute_sltu()  { v_dst = static_cast<uint32>( ltu()); }
-        void execute_slti()  { v_dst = static_cast<uint32>( lti()); }
-        void execute_sltiu() { v_dst = static_cast<uint32>( ltiu()); }
+        template <typename T>
+        void execute_srav()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), v_src2); }
+        void execute_lui()    { v_dst = static_cast<RegisterUInt>( sign_extend()) << 0x10u; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
+<<<<<<< HEAD
         void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
@@ -279,110 +279,230 @@ class FuncInstr
         void execute_tne()  { if ( ne() ) trap = TrapType::EXPLICIT_TRAP; }
     
         void execute_beq()
+=======
+        void execute_nor()   { v_dst = ~(v_src1 | v_src2); }
+
+        void execute_andi()  { v_dst = v_src1 & zero_extend(); }
+        void execute_ori()   { v_dst = v_src1 | zero_extend(); }
+        void execute_xori()  { v_dst = v_src1 ^ zero_extend(); }
+
+        void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
+        void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
+
+        // Function-templated method is a little-known feature of C++, but useful here
+        template<Predicate p>
+        void execute_set() { v_dst = (this->*p)(); }
+
+        template<Predicate p>
+        void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
+
+        template<Predicate p>
+        void execute_branch()
+>>>>>>> upstream/master
         {
-            _is_jump_taken = eq();
+            _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
+                new_PC += sign_extend() * 4;
         }
 
-        void execute_bne()
+        void execute_clo()  { v_dst = count_leading_ones<uint32>( v_src1); }
+        void execute_dclo() { v_dst = count_leading_ones<uint64>( v_src1); }
+        void execute_clz()  { v_dst = count_leading_zeroes<uint32>(  v_src1); }
+        void execute_dclz() { v_dst = count_leading_zeroes<uint64>(  v_src1); }
+
+        void execute_jump( Addr target)
         {
-            _is_jump_taken = ne();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
+            _is_jump_taken = true;
+            new_PC = target;
         }
 
-        void execute_blez()
-        {
-            _is_jump_taken = lez();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
+        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
+        void execute_jr() {
+            if (v_src1 % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+            execute_jump(align_up<2>(v_src1));
         }
 
-        void execute_bgtz()
+        template<Execute j>
+        void execute_jump_and_link()
         {
-            _is_jump_taken = gtz();
-            if ( _is_jump_taken)
-                new_PC += sign_extend( v_imm) << 2;
+            v_dst = new_PC; // link
+            (this->*j)();   // jump
         }
 
-        void execute_j()      { _is_jump_taken = true; new_PC = (PC & 0xf0000000) | (v_imm << 2); }
-        void execute_jr()     { _is_jump_taken = true; new_PC = align_up<2>(v_src1); }
-
-        void execute_jal()    { _is_jump_taken = true; v_dst = new_PC; new_PC = (PC & 0xF0000000) | (v_imm << 2); };
-        void execute_jalr()   { _is_jump_taken = true; v_dst = new_PC; new_PC = align_up<2>(v_src1); };
+        template<Predicate p>
+        void execute_branch_and_link()
+        {
+            _is_jump_taken = (this->*p)();
+            if ( _is_jump_taken)
+            {
+                v_dst = new_PC;
+                new_PC += sign_extend() * 4;
+            }
+        }
 
         void execute_syscall(){ };
         void execute_break()  { };
 
         void execute_unknown();
+        void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
 
-        void calculate_load_addr()  { mem_addr = v_src1 + sign_extend(v_imm); }
-        void calculate_store_addr() { mem_addr = v_src1 + sign_extend(v_imm); }
+        void calculate_load_addr()  { calculate_addr(); }
+        void calculate_store_addr() {
+            calculate_addr();
+            mask = bitmask<RegisterUInt>(mem_size * 8);
+        }
 
-        Execute function = &FuncInstr::execute_unknown;
+        void calculate_load_addr_aligned() {
+            calculate_load_addr();
+            if ( mem_addr % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+        }
+
+        void calculate_load_addr_right() {
+            // Endian specific
+            calculate_load_addr();
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFFFF'FFFF;
+               case 1: return 0x00FF'FFFF;
+               case 2: return 0x0000'FFFF;
+               case 3: return 0x0000'00FF;
+               }
+             */
+            mask = bitmask<RegisterUInt>( ( 4 - mem_addr % 4) * 8);
+        }
+
+        void calculate_load_addr_left() {
+            // Endian specific
+            calculate_load_addr();
+            /* switch (mem_addr % 4) {
+               case 0: return 0xFF00'0000;
+               case 1: return 0xFFFF'0000;
+               case 2: return 0xFFFF'FF00;
+               case 3: return 0xFFFF'FFFF;
+               }
+             */
+            mask = ~bitmask<RegisterUInt>( ( 3 - mem_addr % 4) * 8);
+            // Actually we read a word LEFT to effective address
+            mem_addr -= 3;
+        }
+
+        // store functions done by analogy with loads
+        void calculate_store_addr_aligned() {
+            calculate_store_addr();
+            if ( mem_addr % 4 != 0)
+                trap = TrapType::UNALIGNED_ADDRESS;
+        }
+
+        void calculate_store_addr_right() {
+            calculate_store_addr();
+            mask = bitmask<RegisterUInt>( ( 4 - mem_addr % 4) * 8);
+        }
+
+        void calculate_store_addr_left() {
+            calculate_store_addr();
+            mask = ~bitmask<RegisterUInt>( ( 3 - mem_addr % 4) * 8);
+            mem_addr -= 3;
+        }
+
+
+        Execute function = &BaseMIPSInstr::execute_unknown;
+    protected:
+        BaseMIPSInstr() = delete;
+
+        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
-        uint32 hi = NO_VAL32;
-        uint32 lo = NO_VAL32;
-
-        FuncInstr() = delete;
-
-        explicit
-        FuncInstr( uint32 bytes, Addr PC = 0,
-                   bool predicted_taken = false,
-                   Addr predicted_target = 0);
-
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
-        bool is_same( const FuncInstr& rhs) const {
+        bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
         }
 
-        RegNum get_src1_num() const { return src1; }
-        RegNum get_src2_num() const { return src2; }
-        RegNum get_dst_num()  const { return dst;  }
+        MIPSRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
+        MIPSRegister get_dst_num()  const { return dst;  }
+        MIPSRegister get_dst2_num() const { return dst2; }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_J_JUMP_LINK ||
+                                      operation == OUT_RI_BRANCH_0 ||
                                       operation == OUT_R_JUMP      ||
-                                      operation == OUT_R_JUMP_LINK ||
-                                      operation == OUT_I_BRANCH_0  ||
-                                      operation == OUT_I_BRANCH; }
+                                      operation == OUT_I_BRANCH;}
         bool is_jump_taken() const { return  _is_jump_taken; }
-        bool is_misprediction() const { return predicted_taken != is_jump_taken() || predicted_target != new_PC; }
-        bool is_load()  const { return operation == OUT_I_LOAD  ||
+
+        bool is_partial_load() const
+        {
+            return operation == OUT_I_PARTIAL_LOAD;
+        }
+
+        bool is_load() const { return operation == OUT_I_LOAD ||
                                        operation == OUT_I_LOADU ||
-                                       operation == OUT_I_LOADR ||
-                                       operation == OUT_I_LOADL; }
-        bool is_store() const { return operation == OUT_I_STORE  ||
-                                       operation == OUT_I_STORER ||
-                                       operation == OUT_I_STOREL; }
+                                       is_partial_load(); }
+
+        int8 get_accumulation_type() const
+        {
+            return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
+        }
+
+        bool is_store() const { return operation == OUT_I_STORE; }
+
         bool is_nop() const { return instr.raw == 0x0u; }
+        bool is_halt() const { return is_jump() && new_PC == 0; }
+
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
+
+        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
+
+        bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
+                                               operation == OUT_RI_TRAP; }
+
+        bool is_special() const { return operation == OUT_R_SPECIAL; }
+
+        bool is_mthi() const { return dst.is_mips_hi(); }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
-        bool get_writes_dst() const { return writes_dst; }
+        bool is_bubble() const { return is_nop() && PC == 0; }
 
-        void set_v_src1(uint32 value) { v_src1 = value; }
-        void set_v_src2(uint32 value) { v_src2 = value; }
+        void set_v_src( RegisterUInt value, uint8 index)
+        {
+            if ( index == 0)
+                v_src1 = value;
+            else
+                v_src2 = value;
+        }
 
-        uint32 get_v_dst() const { return v_dst; }
+        auto get_v_dst()  const { return v_dst; }
+        auto get_v_dst2() const { return v_dst2; }
+        auto get_mask()  const { return mask;  }
 
-        Addr get_mem_addr() const { return mem_addr; }
-        uint32 get_mem_size() const { return mem_size; }
-        Addr get_new_PC() const { return new_PC; }
-        Addr get_PC() const { return PC; }
+        auto get_mem_addr() const { return mem_addr; }
+        auto get_mem_size() const { return mem_size; }
+        auto get_new_PC() const { return new_PC; }
+        auto get_PC() const { return PC; }
 
-        void set_v_dst(uint32 value); // for loads
-        uint32 get_v_src2() const { return v_src2; } // for stores
+        void set_v_dst(RegisterUInt value); // for loads
+        auto get_v_src2() const { return v_src2; } // for stores
 
         void execute();
         void check_trap();
 };
 
-static inline std::ostream& operator<<( std::ostream& out, const FuncInstr& instr)
+template<typename RegisterUInt>
+static inline std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& instr)
 {
     return out << instr.Dump();
 }
 
-#endif //FUNC_INSTR_H
+template<MIPSVersion V>
+class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
+{
+    using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
+public:
+    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
+        : Base( V, bytes, PC) { }
+};
+
+
+using MIPS32Instr = MIPSInstr<MIPSVersion::v32>;
+using MIPS64Instr = MIPSInstr<MIPSVersion::v64>;
+
+#endif //MIPS_INSTR_H

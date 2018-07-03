@@ -6,7 +6,7 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 
 MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture.
 
-Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
+Lectures are delivered every Saturday at 18:30 in **108 RT building** of MIPT.
 
 ### Term 1: CS Basics and Components
 
@@ -28,14 +28,30 @@ Lectures are delivered every Friday at 18:30 in **304 RT building** of MIPT.
  10<br/>Nov | **L7: Pipeline**<br/>• [Eng text, no audio, 0.8 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_07__10_Nov__Pipelining__No_audio.pptx?raw=true) | • Check simulator internals: [Ports](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports) and [Performance Simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator)<br/>• Assign yourself to [PerfSim tasks](https://github.com/MIPT-ILab/mipt-mips/milestone/3)|
  17<br/>Nov | **L8: Branch Prediction**<br/>• [Eng text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_08__17_Nov__Branch_Prediction__No_audio.pptx?raw=true) | • Check [branch prediction model manual](https://github.com/MIPT-ILab/mipt-mips/wiki/https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model)  |
  24<br/>Nov | **_No lecture_** | • Use the time slot to progress with your tasks |
- 01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_ | |
+ 01<br/>Dec | **L9: Advanced Pipelining**<br/>_— Traps_<br/>_— Complex Pipeline_<br/>_— Superscalar CPUs_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_09__01_Dec__Advanced_Pipelining__No_audio.pptx?raw=true) | |
+ 08<br/>Dec | **L10: Performance and Power**<br/>• [Eng text, no audio, 1.1 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_10__08_Dec__Performance_and_Power__Eng_text__No_audio.pptx?raw=true) | • Get ready for the upcoming test! |
+ 15<br/>Dec | **Test 2**<br/> • Review **L6−L10** material<br/>(excluding performance/timing formulas)<br/> • Review chapters **3-6** of Schildt C++ manual<br/> | |
  
-### MSU Seminars
+### Term 3: Breaking the Memory Wall
 
- Date | Event 
+ Date | Event
  :-: |:---- 
- 24<br/>Nov | **Caches and Memory Hierarchy**<br/>• [Rus text, no audio, 0.6 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/msu/Seminar_01__24_Nov__Caches__No_audio.pptx?raw=true) |
- 15<br/>Dec | **Out-of-Order Execution** |
+ 10<br/>Feb | **L11: Caches, pt. I**<br/>• [Eng text, no audio, 0.9 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_11__10_Feb__Caches_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 17<br/>Feb | **L12: Caches, pt. II**<br/>• [Eng text, no audio, 0.7 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_12__17_Feb__Caches_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Feb | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 03<br/>Mar | **L13: Out-of-Order execution, pt. I**<br/>_— Dataflow execution_<br/>_— Instruction window_<br/>_— Register renaming_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_13__03_Mar__Out_Of_Order_Execution_Part_I__Eng_text__No_audio.pptx?raw=true) |
+ 10<br/>Mar | **_No lecture_**<br/>• Use the time slot to progress with your tasks |
+ 17<br/>Mar | **L14: Out-of-Order execution, pt. II**<br/>_— Exceptions & Interrupts handling_<br/>_— ROB HW complexity_<br/>_— OOO scheduler − Scheduler Queue_<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_14__17_Mar__Out_Of_Order_Execution_Part_II__Eng_text__No_audio.pptx?raw=true) |
+ 24<br/>Mar | **L15: Memory disambiguation**<br/>_— Store forwarding_<br/>_— Store address / store data_<br/>_— MD speculation_<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_15__24_Mar__Memory_Disambiguation__Eng_text__No_audio.pptx?raw=true) |
+ 
+### Term 4: Performing Multiple Tasks
+ 
+  Date | Event
+ :-: |:-------------------
+ 31<br/>Mar | **L16: Virtual memory**<br/>• [Eng text, no audio, 0.3 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_16__31_Mar__Virtual_Memory__Eng_text__No_audio.pptx?raw=true) |
+ 07<br/>Apr | **L17: Multiprocessor and Multicore Systems**<br/>_— Thread-level parallelism (TLP)_<br/>_— Memory coherence problem_<br/>_— Coherence protocol: MESI_<br/>• [Eng text, no audio, 0.4 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_17__7_Apr__Multiprocessor_Systems__Eng_text__No_audio.pptx?raw=true) |
+ 14<br/>Apr | **L18: Simultaneous Multithreading**<br/>• [Eng text, no audio, 0.5 MB](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2017/Lecture_18__14_Apr__Simultaneous_Multithreading__Eng_text__No_audio.pptx?raw=true) |
+ 21<br/>Apr | **Test 3**<br/> • Review **L11−L18** material |
 
 You may find previous lectures with audio narrations: the most complete set from [2015](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2015) and others: [2016](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2016), [2014](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2014), [2013](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2013), [2012](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2012).
 
@@ -45,17 +61,22 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 
 ## Students Contribution Score
 
-N | Year | Name | Score | Comments
-:-: |:----: |:----: | ------------------------------ | ------------------------------
-1 | 2016/2017 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
-2 | 2017/2018 | Denis Los | 5 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [½#77](https://github.com/MIPT-ILab/mipt-mips/issues/77) |
-3 | 2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
-4 | 2017/2018 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
-4 | 2017/2018 | Alexander Misevich | 3 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216) |
-5 | 2017/2018 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
-5 | 2017/2018 | Kirill Nedostoev | 2 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147) |
-6 | 2017/2018 | Alexander Timofeev | 1 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69) |
-6 | 2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+Year | Name | Score | Comments
+:----: |:----: | ------------------------------ | ------------------------------
+2017/2018 | Denis Los | 19 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31), [#20](https://github.com/MIPT-ILab/mipt-mips/issues/20) |
+2017/2018 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
+2016/2017 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
+2017/2018 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+2017/2018 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+2017/2018 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
+2017/2018 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
+2016/2017 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
+2017/2018 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
+2017/2018 | Yan Logovskiy | 2 | [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92) |
+2017/2018 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
+2016/2017 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
+List of [Upcoming contributuions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
 ## About us
 

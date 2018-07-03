@@ -1,101 +1,40 @@
 /*
-* This is an open source non-commercial project. Dear PVS-Studio, please check it.
-* PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-*/
-/*
  * config.cpp - implementation of Config class
- * Copyright 2017 MIPT-MIPS
+ * Copyright 2017-2018 MIPT-MIPS
  */
 
-/* Boost */
-#include <boost/program_options.hpp>
+#include <infra/ports/timing.h>
 
 /* Simulator modules */
 #include "config.h"
 
 namespace config {
 
-namespace po = boost::program_options;
-
-template<>
-void RequiredValue<bool>::reg(bod* d)
-{
-    d->add_options()(name.c_str(),
-                    po::bool_switch( &value),
-                    desc.c_str());
-}
-
-template<>
-void Value<bool>::reg(bod* d)
-{
-    d->add_options()(name.c_str(),
-                    po::bool_switch( &value)->default_value( default_value),
-                    desc.c_str());
-}
-
-template<typename T>
-void RequiredValue<T>::reg(bod* d)
-{
-    d->add_options()(name.c_str(),
-                po::value<T>( &value)->required(),
-                desc.c_str());
-}
-
-template<typename T>
-void Value<T>::reg(bod* d)
-{
-    d->add_options()(this->name.c_str(),
-                po::value<T>( &this->value)->default_value( default_value),
-                this->desc.c_str());
-}
-
-template class RequiredValue<std::string>;
-template class RequiredValue<uint64>;
-template class RequiredValue<uint32>;
-template class RequiredValue<int32>;
-template class Value<std::string>;
-template class Value<uint64>;
-template class Value<uint32>;
-template class Value<int32>;
+static AliasedSwitch help_option = { "h", "help", "print help"};
 
 /* basic method */
 void handleArgs( int argc, const char* argv[])
 {
-    po::options_description description( "Allowed options");
+    BaseValue::options().parse( argc, argv);
 
-    for ( auto value : BaseValue::values())
-         value.second->reg(&description);
-
-    po::variables_map vm;
-
-    try
+    /* parsing help */
+    if ( help_option)
     {
-        po::store(po::command_line_parser(argc, argv).
-                                    options(description).
-                                    run(),
-                                    vm);
-
-
-        /* parsing help */
-        if ( vm.count( "help") != 0u)
-        {
-            std::cout << "Functional and performance simulators for MIPS-based CPU."
-                      << std::endl << std::endl
-                      << description << std::endl;
-            std::exit( EXIT_SUCCESS);
-        }
-
-        /* calling notify AFTER parsing help, as otherwise
-         * absent required args will cause errors
-         */
-        po::notify(vm);
-    }
-    catch ( const std::exception& e)
-    {
-        std::cerr << *argv << ": " << e.what()
+        std::cout << "Functional and performance simulators for MIPS-based CPU."
                   << std::endl << std::endl
-                  << description << std::endl;
-        std::exit( EXIT_FAILURE);
+                  << BaseValue::options() << std::endl;
+        std::exit( EXIT_SUCCESS);
+    }
+    else if ( !BaseValue::options().unknown_options().empty() && !BaseValue::options().non_option_args().empty()) {
+        std::cerr << "Unknown options:" << std::endl;
+        for ( const auto& opt: BaseValue::options().unknown_options())
+            std::cerr << opt << std::endl;
+        for ( const auto& opt: BaseValue::options().non_option_args())
+            std::cerr << opt << std::endl;
+        std::cerr << "Correct options are:"
+            << std::endl << std::endl
+            << BaseValue::options() << std::endl;
+        throw std::exception();
     }
 }
 
