@@ -261,25 +261,7 @@ class BaseMIPSInstr
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-<<<<<<< HEAD
-        void execute_nor()   { v_dst = ~( v_src1 | v_src2); }
 
-        void execute_andi()  { v_dst = v_src1 & zero_extend(v_imm); }
-        void execute_ori()   { v_dst = v_src1 | zero_extend(v_imm); }
-        void execute_xori()  { v_dst = v_src1 ^ zero_extend(v_imm); }
-    
-        void execute_movn()  { if(v_src2 != 0) v_dst = v_src1; else writes_dst = false;}
-        void execute_movz()  { if(v_src2 == 0) v_dst = v_src1; else writes_dst = false;}
-    
-        void execute_tge()  { if ( ge() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tgeu() { if ( geu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tlt()  { if ( lt() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tltu() { if ( ltu()) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_teq()  { if ( eq() ) trap = TrapType::EXPLICIT_TRAP; }
-        void execute_tne()  { if ( ne() ) trap = TrapType::EXPLICIT_TRAP; }
-    
-        void execute_beq()
-=======
         void execute_nor()   { v_dst = ~(v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(); }
@@ -298,7 +280,7 @@ class BaseMIPSInstr
 
         template<Predicate p>
         void execute_branch()
->>>>>>> upstream/master
+
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
