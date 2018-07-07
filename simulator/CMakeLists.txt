@@ -45,7 +45,6 @@ set(TESTS
     infra/config
     infra/instrcache
     infra/ports
-    infra/string
 # Test MIPS
     mips/mips_register
     mips
