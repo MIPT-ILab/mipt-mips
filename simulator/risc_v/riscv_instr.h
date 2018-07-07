@@ -11,10 +11,13 @@
 #include <array>
 #include <unordered_map>
 
+// COW string
+#include <external/kryucow_string.h>
+
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
-#include <infra/string/cow_string.h>
+#include <infra/string_view.h>
 
 #include "riscv_register/riscv_register.h"
 #include "risc_v.h"
@@ -43,7 +46,7 @@ class RISCVInstr
 #if 0
         std::string disasm = {};
 #else
-        CowString disasm = {};
+        KryuCowString disasm = {};
 #endif
 
     public:
