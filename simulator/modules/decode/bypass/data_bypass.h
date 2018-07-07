@@ -92,7 +92,9 @@ class DataBypass
                     next_stage_after_first_execution_stage.set_to_mem_stage();
                 }
                 else
+                {
                     next_stage_after_first_execution_stage.set_to_writeback();
+                }
             }
         };
 
@@ -159,8 +161,9 @@ void DataBypass<ISA>::trace_new_dst_register( const Instr& instr, Register num)
         entry.ready_stage.set_to_mem_stage();
     }
     else
+    {
         entry.ready_stage.set_to_first_execution_stage();
-
+    }
 
     if ( !instr.is_bypassible())
         entry.ready_stage.set_to_in_RF();
