@@ -13,10 +13,13 @@
 #include <array>
 #include <unordered_map>
 
+// COW string
+#include <external/kryucow_string.h>
+
 // MIPT-MIPS modules
 #include <infra/types.h>
 #include <infra/macro.h>
-#include <infra/string/cow_string.h>
+#include <infra/string_view.h>
 
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
@@ -187,7 +190,7 @@ class BaseMIPSInstr
 #if 0
         std::string disasm = {};
 #else
-        CowString disasm = {};
+        KryuCowString disasm = {};
 #endif
         void init( const ISAEntry& entry, MIPSVersion version);
 
