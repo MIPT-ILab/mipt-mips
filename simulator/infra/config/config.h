@@ -13,8 +13,7 @@
 
 #include <infra/types.h>
 
-/* POPL */
-#include "popl.hpp"
+#include <external/popl.hpp>
 
 namespace config {
 
