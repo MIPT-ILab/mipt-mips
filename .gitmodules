@@ -7,6 +7,3 @@
 [submodule "traces"]
 	path = traces
 	url = https://github.com/MIPT-ILab/mips-traces.git
-[submodule "codeguidelines"]
-	path = codeguidelines
-	url = https://github.com/inedostoev/codeguidelines.git
