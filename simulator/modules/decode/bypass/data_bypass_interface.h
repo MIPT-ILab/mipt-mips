@@ -55,14 +55,10 @@ template<typename Register>
 class BypassCommand
 {
 public:
-    BypassCommand(RegisterStage bypassing_stage, Register register_num, uint8 last_execution_stage_value)
+    BypassCommand(RegisterStage bypassing_stage, uint8 last_execution_stage_value)
         : bypassing_stage(bypassing_stage)
-        , register_num(register_num)
         , last_execution_stage_value(last_execution_stage_value)
     { }
-
-    auto get_bypassing_stage() const { return bypassing_stage; }
-    auto get_register_num() const { return register_num; }
 
     // returns an index of the port where bypassed data should be get from
     auto get_bypass_direction() const
@@ -84,18 +80,8 @@ public:
         return bypass_direction;
     }
 
-    template <typename T>
-    T adapt_bypassed_data( const std::pair<T, T> data) const
-    {
-        if ( register_num.is_mips_hi())
-            return data.second;
-
-        return data.first;
-    }
-
 private:
     const RegisterStage bypassing_stage;
-    const Register register_num;
     const uint8 last_execution_stage_value;
 };
 

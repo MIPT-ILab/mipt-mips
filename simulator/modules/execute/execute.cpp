@@ -142,10 +142,7 @@ void Execute<ISA>::clock( Cycle cycle)
                     rps_sources_bypass[src_index][i]->ignore( cycle);
             }
 
-            /* transform received data in accordance with bypass command */
-            const auto adapted_data = static_cast<RegisterUInt>( bypass_command.adapt_bypassed_data( data));
-
-            instr.set_v_src( adapted_data, src_index);
+            instr.set_v_src( data.first, src_index);
         }
         else
         {
