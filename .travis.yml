@@ -32,6 +32,7 @@ addons:
     - llvm-toolchain-trusty-6.0
     - sourceline: deb http://ftp.de.debian.org/debian squeeze main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
+    update: true
     packages:
     - g++-7
     - clang-tidy-6.0
