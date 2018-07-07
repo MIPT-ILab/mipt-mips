@@ -77,11 +77,12 @@ endif()
 add_executable(${PROJECT_NAME} main.cpp)
 
 #include headers
-include_directories(SRCDIRS ./.)
+include_directories(./.)
+include_directories(SYSTEM ./external)
 
 #include Boost headers
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 #libelf
 find_path(LIBELF_INCLUDE_DIRS
@@ -115,7 +116,7 @@ if(NOT LIBELF_LIBRARIES)
     message(SEND_ERROR "Can't find libelf")
 endif()
 
-include_directories(${LIBELF_INCLUDE_DIRS})
+include_directories(SYSTEM ${LIBELF_INCLUDE_DIRS})
 
 add_library(mipt-mips-src STATIC ${CPPS})
 
@@ -150,4 +151,4 @@ foreach(ITER IN LISTS TESTS)
 
 endforeach()
 #==================
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories(SYSTEM ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
