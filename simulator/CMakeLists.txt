@@ -78,7 +78,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 #include headers
 include_directories(./.)
-include_directories(SYSTEM ./external)
+include_directories(SYSTEM ../external)
 
 #include Boost headers
 find_package(Boost REQUIRED)
