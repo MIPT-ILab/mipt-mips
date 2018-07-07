@@ -190,7 +190,7 @@ class BaseMIPSInstr
 #if 0
         std::string disasm = {};
 #else
-        CowString disasm = {};
+        KryuCowString disasm = {};
 #endif
         void init( const ISAEntry& entry, MIPSVersion version);
 
