@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 // COW string
-#include <external/kryucow_string.h>
+#include <kryucow_string.h>
 
 // MIPT-MIPS modules
 #include <infra/types.h>
