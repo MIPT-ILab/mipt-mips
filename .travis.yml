@@ -33,14 +33,14 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - g++-7
+    - g++-8
     - clang-tidy-6.0
     - libelf-dev
     - libboost-program-options1.54-dev
 
 install:
   - export GTEST_COLOR=1
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
+  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
 # Install OS X packages
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
