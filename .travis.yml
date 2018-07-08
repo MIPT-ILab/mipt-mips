@@ -37,7 +37,6 @@ addons:
     - clang-tidy-6.0
     - libelf-dev
     - libboost-program-options1.54-dev
-    - emdebian-archive-keyring
 
 install:
   - export GTEST_COLOR=1
@@ -58,10 +57,10 @@ install:
         make all install MAKEINFO=true > /dev/null
         export PATH=$PATH:$BINUTILS/bin
     fi
-# Build binutils on OS X
+# Build binutils on Linux
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install binutils-mips-linux-gnu
+        sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
     fi
 
 script:
