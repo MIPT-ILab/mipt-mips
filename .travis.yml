@@ -24,14 +24,13 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
-
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-6.0
-    - sourceline: deb http://ftp.de.debian.org/debian squeeze main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
+      key_url: 'http://emdebian.org/tools/debian/emdebian-toolchain-archive.key'
     update: true
     packages:
     - g++-7
