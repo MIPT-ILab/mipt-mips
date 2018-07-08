@@ -72,9 +72,9 @@ script:
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
-  - make
+  - make mipt-mips
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*'; fi
+  - make test
   - ctest --verbose
-# Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*' '^.*simulator((?!unit_test).)*$'; fi
 # Run a trace to see simulation frequency
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
