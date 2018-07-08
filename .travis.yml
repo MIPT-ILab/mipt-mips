@@ -24,6 +24,13 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
+
+before_install:
+    -|
+     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+         sudo apt-get install emdebian-archive-keyring
+     fi
+
 addons:
   apt:
     sources:
