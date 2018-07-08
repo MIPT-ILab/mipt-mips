@@ -30,7 +30,7 @@ addons:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-6.0
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
-      key_url: 'http://emdebian.org/tools/debian/emdebian-toolchain-archive.key'
+      key_url: 'http://www.emdebian.org/debian/dists/squeeze/Release.gpg'
     update: true
     packages:
     - g++-7
