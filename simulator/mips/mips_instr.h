@@ -391,10 +391,10 @@ class BaseMIPSInstr
 
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
-        BaseMIPSInstr() = delete;
-
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
+        BaseMIPSInstr() = delete;
+
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
@@ -438,8 +438,6 @@ class BaseMIPSInstr
                                                operation == OUT_RI_TRAP; }
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
-
-        bool is_mthi() const { return dst.is_mips_hi(); }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 
