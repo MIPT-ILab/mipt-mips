@@ -32,7 +32,7 @@ class BaseTValue : public BaseValue
 {
 protected:
     T value = T();
-    BaseTValue<T>( T val ) noexcept : value( std::move(val)) { }
+    explicit BaseTValue<T>( T val ) noexcept : value( std::move(val)) { }
     BaseTValue<T>( ) = default;
 public:
 
@@ -82,7 +82,11 @@ template<typename T>
 struct Unaliased : public T
 {
     Unaliased<T>() = delete;
-    template<typename ... Args> Unaliased(Args&& ... args) noexcept : T( "", args...)  { }
+
+    template<typename Arg1, typename Arg2, typename ... Args>
+    Unaliased(Arg1&& arg1, Arg2&& arg2, Args&& ... args) noexcept
+        : T( "", arg1, arg2, args...)
+    { }
 };
 
 template<typename T> using Value = Unaliased<AliasedValue<T>>;
