@@ -25,12 +25,6 @@ matrix:
     - os: osx
       compiler: gcc
 
-before_install:
-    -|
-     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-         sudo apt-get install emdebian-archive-keyring
-     fi
-
 addons:
   apt:
     sources:
@@ -44,15 +38,18 @@ addons:
     - libelf-dev
     - libboost-program-options1.54-dev
     - emdebian-archive-keyring
-    - binutils-mips-linux-gnu
 
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-# Install OS X packages and build binutils
+# Install OS X packages
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         brew install libelf zlib
+    fi
+# Build binutils on OS X
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         cd $TRAVIS_BUILD_DIR
         git submodule update --init binutils
         cd binutils
@@ -60,6 +57,11 @@ install:
         ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
         make all install MAKEINFO=true > /dev/null
         export PATH=$PATH:$BINUTILS/bin
+    fi
+# Build binutils on OS X
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install binutils-mips-linux-gnu
     fi
 
 script:
