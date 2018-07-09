@@ -18,6 +18,7 @@
 #include <infra/macro.h>
 #include <infra/string/cow_string.h>
 
+    
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
 
@@ -183,6 +184,7 @@ class BaseMIPSInstr
         Addr new_PC = NO_VAL32;
 
         const Addr PC = NO_VAL32;
+
 
 #if 0
         std::string disasm = {};
@@ -393,7 +395,7 @@ class BaseMIPSInstr
         BaseMIPSInstr() = delete;
 
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
-    public:
+  public:
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
