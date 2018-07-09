@@ -30,22 +30,25 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     - llvm-toolchain-trusty-6.0
-    - sourceline: deb http://ftp.de.debian.org/debian squeeze main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
+    update: true
     packages:
-    - g++-7
+    - g++-8
     - clang-tidy-6.0
     - libelf-dev
     - libboost-program-options1.54-dev
-    - binutils-mips-linux-gnu
 
 install:
   - export GTEST_COLOR=1
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
-# Install OS X packages and build binutils
+  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
+# Install OS X packages
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         brew install libelf zlib
+    fi
+# Build binutils on OS X
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         cd $TRAVIS_BUILD_DIR
         git submodule update --init binutils
         cd binutils
@@ -53,6 +56,11 @@ install:
         ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
         make all install MAKEINFO=true > /dev/null
         export PATH=$PATH:$BINUTILS/bin
+    fi
+# Build binutils on Linux
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
     fi
 
 script:

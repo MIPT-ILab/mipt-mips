@@ -23,7 +23,6 @@ public:
 
     bool is_bypassible() const { return !this->is_conditional_move() &&
                                         !this->is_partial_load()     &&
-                                        !this->is_mthi()             &&
                                         this->get_accumulation_type() == 0; }
 
     auto is_complex_arithmetic() const { return this->is_divmult(); }

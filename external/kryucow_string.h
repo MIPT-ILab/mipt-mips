@@ -1,19 +1,50 @@
 /**
  * kryucow_string.h - implementation of fixed-size COW string
- * @author Pavel Kryukov
- * Copyright 2017 MIPT-MIPS team
+ * Copyright 2018 Pavel Kryukov
+ *
+ * MIT License
+ *
+ * Copyright (c) 2018 Pavel I. Kryukov
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-#ifndef COW_STRING_H
-#define COW_STRING_H
+#ifndef KRYUCOW_STRING_H
+#define KRYUCOW_STRING_H
 
 #include <memory>
 #include <string>
 #include <exception>
+#include <type_traits>
 
-#include <boost/integer.hpp>
+#ifndef __has_include
+#  error "KryuCowString requires __has_include macro"
+#endif
 
-#include <infra/string/string_view.h>
+// Support XCode without C++17
+#if __has_include("string_view")
+#  include <string_view>
+#elif __has_include("experimental/string_view")
+#  include <experimental/string_view>
+#else
+#  error "KryuCowString requires std::string_view"
+#endif
 
 // This class implements COW string with fixed maximum size.
 // It is very useful if you have to do A LOT of string copying
@@ -21,16 +52,19 @@
 // List of non-implemented features:
 //   * add more std::string compatibility by demand
 template<typename CharT, typename Traits = std::char_traits<CharT>>
-class BasicCowString { // KryuCowString, ha-ha, what a pun
+class BasicKryuCowString { // ha-ha, what a pun
 private:
+#if __has_include("string_view")
     using View_t = std::basic_string_view<CharT, Traits>;
+#else
+    using View_t = std::expertimental::basic_string_view<CharT, Traits>;
+#endif
     using String_t = std::basic_string<CharT, Traits>;
 
     // We don't want to initialize arena here, so suppress ClangTidy
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     struct InternalString {
-        using SizeType = typename boost::uint_t<sizeof(CharT) * 8>::exact;
-        static_assert(sizeof(SizeType) == sizeof(CharT));
+        using SizeType = std::make_unsigned_t<CharT>;
         static constexpr const size_t SIZE = 127;
         static_assert((1ull << (sizeof(SizeType) * 8)) > SIZE);
 
@@ -57,7 +91,7 @@ private:
 
         const auto my_size = pointer->size; // May be zero as well
         if ( my_size + app_size > InternalString::SIZE)
-            throw std::length_error("CowSting exceeded length\n");
+            throw std::length_error("KryuCowSting exceeded length\n");
 
         // The string has a full copy. That's the place 'copy-on-write' occurs
         if (pointer.use_count() > 1) {
@@ -106,19 +140,19 @@ public:
     // using const_reverse_iterator
 
     // ctor
-    BasicCowString() = default;
+    BasicKryuCowString() = default;
 
     // ctor from any type: just append the value
     // to an empty string
     template<typename T>
-    explicit BasicCowString( const T& value) {
+    explicit BasicKryuCowString( const T& value) {
         append( value);
     }
 
     // assignment: clear existing string and
     // append the value to the empty string
     template<typename T>
-    BasicCowString& operator=( const T& value) {
+    BasicKryuCowString& operator=( const T& value) {
         clear();
         append( value);
         return *this;
@@ -164,7 +198,7 @@ public:
 
     const CharT& at( size_t value) const {
         if ( empty() || value > pointer->size)
-            throw std::out_of_range("CowString index is out of range\n");
+            throw std::out_of_range("KryuCowString index is out of range\n");
         return operator[](value);
     }
 
@@ -187,7 +221,7 @@ public:
     // Equality comparators for obvious types
     // Actually I would like to generalize it with some conversion
     // of RHS types to std::string_view
-    bool operator==( const BasicCowString& rhs) const noexcept { return get_string_view() == rhs.get_string_view(); }
+    bool operator==( const BasicKryuCowString& rhs) const noexcept { return get_string_view() == rhs.get_string_view(); }
     bool operator==( const String_t& rhs) const noexcept { return get_string_view() == static_cast<decltype(get_string_view())>(rhs); }
     bool operator==( const View_t& rhs) const noexcept { return get_string_view() == rhs; }
     bool operator==( const CharT* rhs) const { return get_string_view() == View_t( rhs, Traits::length(rhs)); }
@@ -213,26 +247,26 @@ public:
     }
 
     // Dump operator. Very nice that we may reuse std::string_view here.
-    friend auto operator<<( std::basic_ostream<CharT, Traits>& out, const BasicCowString& value) -> decltype(out) {
+    friend auto operator<<( std::basic_ostream<CharT, Traits>& out, const BasicKryuCowString& value) -> decltype(out) {
         return out << value.get_string_view();
     }
 };
 
 // LHS comparators.
 // Some SFINAE here as we don't want to generate
-// operator==(const CowString&, const CowString&),
+// operator==(const KryuCowString&, const KryuCowString&),
 // explicit operator must be use instead
 template<typename T, typename CharT, typename Traits,
-         typename = typename std::enable_if_t<!std::is_same_v<std::remove_reference_t<T>, BasicCowString<CharT, Traits>>>>
-bool operator==( const T& lhs, const BasicCowString<CharT, Traits>& rhs) { return rhs == lhs; }
+         typename = typename std::enable_if_t<!std::is_same_v<std::remove_reference_t<T>, BasicKryuCowString<CharT, Traits>>>>
+bool operator==( const T& lhs, const BasicKryuCowString<CharT, Traits>& rhs) { return rhs == lhs; }
 
 template<typename T, typename CharT, typename Traits,
-         typename = typename std::enable_if_t<!std::is_same_v<std::remove_reference_t<T>, BasicCowString<CharT, Traits>>>>
-bool operator!=( const T& lhs, const BasicCowString<CharT, Traits>& rhs) { return rhs != lhs; }
+         typename = typename std::enable_if_t<!std::is_same_v<std::remove_reference_t<T>, BasicKryuCowString<CharT, Traits>>>>
+bool operator!=( const T& lhs, const BasicKryuCowString<CharT, Traits>& rhs) { return rhs != lhs; }
 
-// Typedefs for simple CowString and wide-char version
-using CowString = BasicCowString<char>;
-using WCowString = BasicCowString<wchar_t>;
+// Typedefs for simple KryuCowString and wide-char version
+using KryuCowString = BasicKryuCowString<char>;
+using WKryuCowString = BasicKryuCowString<wchar_t>;
 
-#endif // COW_STRING_H
+#endif // KRYUCOW_STRING_H
 
