@@ -86,7 +86,7 @@ class BaseMIPSInstr
             UNALIGNED_ADDRESS,
         } trap = TrapType::NO_TRAP;
 
-        // Endian specific
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access) see #465
         const union _instr
         {
             const struct AsR
