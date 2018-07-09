@@ -32,7 +32,7 @@ void PerfSim<ISA>::set_PC( Addr value)
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
-    memory.reset( new Memory( tr));
+    memory = std::make_unique<Memory>( tr);
     fetch.set_memory( memory.get());
     decode.set_RF( rf.get());
     mem.set_memory( memory.get());

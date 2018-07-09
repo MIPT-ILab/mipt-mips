@@ -38,15 +38,15 @@ class SimulatorFactory {
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static Map generate_map() {
         Map my_map;
-        my_map.emplace("mips1",  new TBuilder<MIPSI>);
-        my_map.emplace("mips2",  new TBuilder<MIPSII>);
-        my_map.emplace("mips3",  new TBuilder<MIPSIII>);
-        my_map.emplace("mips4",  new TBuilder<MIPSIV>);
-        my_map.emplace("mips32", new TBuilder<MIPS32>);
-        my_map.emplace("mips64", new TBuilder<MIPS64>);
-        my_map.emplace("riscv32", new TBuilder<RISCV32>);
-        my_map.emplace("riscv64", new TBuilder<RISCV64>);
-        my_map.emplace("riscv128", new TBuilder<RISCV128>);
+        my_map.emplace("mips1",  std::make_unique<TBuilder<MIPSI>>());
+        my_map.emplace("mips2",  std::make_unique<TBuilder<MIPSII>>());
+        my_map.emplace("mips3",  std::make_unique<TBuilder<MIPSIII>>());
+        my_map.emplace("mips4",  std::make_unique<TBuilder<MIPSIV>>());
+        my_map.emplace("mips32", std::make_unique<TBuilder<MIPS32>>());
+        my_map.emplace("mips64", std::make_unique<TBuilder<MIPS64>>());
+        my_map.emplace("riscv32", std::make_unique<TBuilder<RISCV32>>());
+        my_map.emplace("riscv64", std::make_unique<TBuilder<RISCV64>>());
+        my_map.emplace("riscv128", std::make_unique<TBuilder<RISCV128>>());
         return my_map;
     }
 
