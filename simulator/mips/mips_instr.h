@@ -187,6 +187,8 @@ class BaseMIPSInstr
 
         const Addr PC = NO_VAL32;
 
+        uint64 secuence_id = NO_VAL32;
+
 #if 0
         std::string disasm = {};
 #else
@@ -282,6 +284,7 @@ class BaseMIPSInstr
 
         template<Predicate p>
         void execute_branch()
+
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
@@ -391,7 +394,7 @@ class BaseMIPSInstr
 
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
-        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
+        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 secuence_id);
     public:
         BaseMIPSInstr() = delete;
 
@@ -478,8 +481,8 @@ class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
 {
     using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
 public:
-    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
-        : Base( V, bytes, PC) { }
+    explicit MIPSInstr( uint32 bytes, Addr PC = 0, uint64 secuence_id = NO_VAL32)
+        : Base( V, bytes, PC, secuence_id) { }
 };
 
 
