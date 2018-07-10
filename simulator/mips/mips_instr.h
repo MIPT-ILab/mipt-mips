@@ -282,6 +282,7 @@ class BaseMIPSInstr
 
         template<Predicate p>
         void execute_branch()
+
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
