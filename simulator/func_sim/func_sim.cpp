@@ -57,7 +57,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    mem.reset( new Memory( tr));
+    mem = std::make_unique<Memory>( tr);
     PC = mem->startPC();
     nops_in_a_row = 0;
 }
