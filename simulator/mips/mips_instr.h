@@ -394,7 +394,7 @@ class BaseMIPSInstr
 
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
-        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 sequence_id);
+        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
         BaseMIPSInstr() = delete;
 
@@ -468,6 +468,8 @@ class BaseMIPSInstr
 
         void execute();
         void check_trap();
+
+        void set_sequence_id(uint64 id) { sequence_id = id; }
 };
 
 template<typename RegisterUInt>
@@ -481,8 +483,8 @@ class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
 {
     using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
 public:
-    explicit MIPSInstr( uint32 bytes, Addr PC = 0, uint64 sequence_id = NO_VAL32)
-        : Base( V, bytes, PC, sequence_id) { }
+    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
+        : Base( V, bytes, PC) { }
 };
 
 
