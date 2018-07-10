@@ -21,7 +21,6 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 
-    
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
 
@@ -188,7 +187,6 @@ class BaseMIPSInstr
 
         const Addr PC = NO_VAL32;
 
-
 #if 0
         std::string disasm = {};
 #else
@@ -266,7 +264,6 @@ class BaseMIPSInstr
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
         void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-
         void execute_nor()   { v_dst = ~(v_src1 | v_src2); }
 
         void execute_andi()  { v_dst = v_src1 & zero_extend(); }
@@ -285,7 +282,6 @@ class BaseMIPSInstr
 
         template<Predicate p>
         void execute_branch()
-
         {
             _is_jump_taken = (this->*p)();
             if ( _is_jump_taken)
@@ -399,7 +395,6 @@ class BaseMIPSInstr
     public:
         BaseMIPSInstr() = delete;
 
->>>>>>> upstream/master
         const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
