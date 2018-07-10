@@ -1,9 +1,0 @@
-[submodule "googletest"]
-	path = googletest
-	url = https://github.com/google/googletest.git
-[submodule "binutils"]
-	path = binutils
-	url = https://github.com/bminor/binutils-gdb.git
-[submodule "traces"]
-	path = traces
-	url = https://github.com/MIPT-ILab/mips-traces.git

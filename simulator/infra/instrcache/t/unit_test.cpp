@@ -24,7 +24,7 @@ public:
     {
         return out << val.value;
     }
-    size_t secuence_id;
+    uint64 sequence_id;
 };
 
 TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
