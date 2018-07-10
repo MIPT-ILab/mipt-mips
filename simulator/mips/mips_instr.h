@@ -187,7 +187,7 @@ class BaseMIPSInstr
 
         const Addr PC = NO_VAL32;
 
-        uint64 secuence_id = NO_VAL32;
+        uint64 sequence_id = NO_VAL32;
 
 #if 0
         std::string disasm = {};
@@ -394,7 +394,7 @@ class BaseMIPSInstr
 
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
-        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 secuence_id);
+        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 sequence_id);
     public:
         BaseMIPSInstr() = delete;
 
@@ -481,8 +481,8 @@ class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
 {
     using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
 public:
-    explicit MIPSInstr( uint32 bytes, Addr PC = 0, uint64 secuence_id = NO_VAL32)
-        : Base( V, bytes, PC, secuence_id) { }
+    explicit MIPSInstr( uint32 bytes, Addr PC = 0, uint64 sequence_id = NO_VAL32)
+        : Base( V, bytes, PC, sequence_id) { }
 };
 
 

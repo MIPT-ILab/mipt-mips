@@ -249,11 +249,11 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 };
 
 template<typename RegisterUInt>
-BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 secuence_id) :
+BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC, uint64 sequence_id) :
     instr( bytes),
     new_PC( PC + 4),
     PC( PC),
-    secuence_id( secuence_id)
+    sequence_id( sequence_id)
 {
     bool valid = false;
     auto it = isaMapRI.cbegin();
