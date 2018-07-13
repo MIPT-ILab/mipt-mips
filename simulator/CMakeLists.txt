@@ -1,10 +1,10 @@
 #! cmake
-#! Building the scalar MIPS CPU simulator
+#! Build file for the scalar MIPS CPU simulator
 #! Soshin Konstantin
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(mipt-mips CXX)
 
@@ -122,33 +122,8 @@ add_library(mipt-mips-src STATIC ${CPPS})
 
 target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
-#clang-tidy
+# clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-###### googletest ######
-set(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib for GTest" FORCE)
-add_subdirectory(../googletest/googletest ./build)
-
-enable_testing()
-
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
-#==================
-foreach(ITER IN LISTS TESTS)
-    #copy all filesfrom */t to build
-    string(CONCAT GLOBBING_EXPR ${ITER} "/t/*.*")
-    file(GLOB INPFILES LIST_DIRECTORIES false ${GLOBBING_EXPR})
-    foreach(ITER2 IN LISTS INPFILES)
-        file(COPY ${ITER2} DESTINATION ./.)
-    endforeach()
-    
-    string(CONCAT SRC_UNIT_TEST ${ITER} "/t/unit_test.cpp")
-    string(REGEX REPLACE "/" "_"  EXEC_NAME_NOTFULL ${ITER})
-    string(CONCAT EXEC_NAME ${EXEC_NAME_NOTFULL} "_test")
-    
-    add_executable(${EXEC_NAME} ${SRC_UNIT_TEST})
-    target_link_libraries(${EXEC_NAME} gtest mipt-mips-src ${Boost_LIBRARIES} ${LIBELF_LIBRARIES})
-    add_test(NAME ${EXEC_NAME} COMMAND ${EXEC_NAME})
-
-endforeach()
-#==================
-include_directories(SYSTEM ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+# googletest
+include(tests/tests.cmake)

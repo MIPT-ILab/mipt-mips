@@ -149,9 +149,3 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
     miss_rate_file.close();
 }
 
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}

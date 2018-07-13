@@ -26,10 +26,3 @@ TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
     ASSERT_TRUE( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")).empty());
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-

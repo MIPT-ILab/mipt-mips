@@ -112,9 +112,3 @@ TEST( Func_memory, Write_Read_Not_Initialized_Mem_Test)
     ASSERT_EQ( func_mem.read<uint16>( write_addr + 2), right_ret);
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}

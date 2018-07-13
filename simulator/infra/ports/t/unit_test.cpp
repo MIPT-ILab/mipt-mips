@@ -169,18 +169,6 @@ TEST( test_ports, Test_Ports_A_B)
 }
 
 
-
-
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-
-
-
-
 namespace ports {
     namespace testing {
 

@@ -48,10 +48,3 @@ TEST( Func_Sim, Run_SMC_trace)
                  ::testing::ExitedWithCode( EXIT_FAILURE), "Bearings lost:.*");
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-

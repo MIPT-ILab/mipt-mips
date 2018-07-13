@@ -97,10 +97,3 @@ TEST( MIPS_registers, Lo_register)
     ASSERT_FALSE(reg.to_size_t() < 32);
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-
