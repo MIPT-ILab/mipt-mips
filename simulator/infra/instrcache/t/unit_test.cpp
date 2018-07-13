@@ -118,11 +118,3 @@ TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
     ASSERT_FALSE( cache.find( 2).first);
 }
 
-
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-

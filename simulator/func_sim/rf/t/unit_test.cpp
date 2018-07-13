@@ -199,9 +199,3 @@ TEST( RF, read_sources_write_dst_rf)
     ASSERT_NE( instr->get_v_dst(), NO_VAL64);
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
