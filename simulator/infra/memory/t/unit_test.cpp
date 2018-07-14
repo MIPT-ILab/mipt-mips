@@ -8,7 +8,7 @@
 // uArchSim modules
 #include "../memory.h"
 
-static const std::string valid_elf_file = "./mips_bin_exmpl.out";
+static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 
 //
 // Check that all incorect input params of the constructor

@@ -4,7 +4,7 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.8)
 
 project(mipt-mips CXX)
 
@@ -35,27 +35,6 @@ set(CPPS infra/macro_test.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp
     simulator.cpp
-    )
-
-set(TESTS
-# Test infrastructure
-    infra/cache
-    infra/elf_parser
-    infra/memory
-    infra/config
-    infra/instrcache
-    infra/ports
-# Test MIPS
-    mips/mips_register
-    mips
-    func_sim/rf
-# Test RISCV
-    risc_v/riscv_register
-# Test units
-    modules/fetch/bpu
-# Overall tests
-    func_sim
-    modules/core
     )
 
 if (MSVC)
