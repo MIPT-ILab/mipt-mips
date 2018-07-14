@@ -31,11 +31,6 @@ set(TESTS
 set(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib for GTest" FORCE)
 add_subdirectory(../googletest/googletest gtest-build)
 include_directories(SYSTEM ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
-    include(tests/GoogleTest.cmake)
-else (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
-    include(GoogleTest)
-endif (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../../traces\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/\")
@@ -52,4 +47,11 @@ target_link_libraries(tests gtest mipt-mips-src ${Boost_LIBRARIES} ${LIBELF_LIBR
 
 # Generate list for CTest
 enable_testing()
-gtest_discover_tests(tests)
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
+    # CMake < 3.10 would trait all tests as a single one
+    add_test(all_tests tests)
+else (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
+    # CMake >= 3.10 provides module to register GTests
+    include(GoogleTest)
+    gtest_discover_tests(tests)
+endif (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 3.10)
