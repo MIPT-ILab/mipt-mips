@@ -48,8 +48,17 @@ class LRUModule
         std::vector<LRUCacheInfo> lru_info;
 };
 
+struct CacheTagArrayInvalidSizeException final : std::exception
+{
+    const std::string message;
+    explicit CacheTagArrayInvalidSizeException(const char* msg) : message(std::string("Invalid cache size: ") + msg + '\n') {}
+    char const * what() const noexcept final {
+        return message.c_str();
+    }
+};
+
 // Cache tag array module implementation
-class CacheTagArraySizeCheck : private Log
+class CacheTagArraySizeCheck : public Log
 {
     public:
         CacheTagArraySizeCheck(

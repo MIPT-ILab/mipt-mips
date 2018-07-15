@@ -18,6 +18,15 @@
 #include <infra/macro.h>
 #include <infra/elf_parser/elf_parser.h>
 
+struct FuncMemoryBadMapping final : std::exception
+{
+    const std::string message;
+    explicit FuncMemoryBadMapping(const std::string& msg) : message(std::string("Invalid FuncMemory mapping: ") + msg + '\n') {}
+    char const * what() const noexcept final {
+        return message.c_str();
+    }
+};
+
 class FuncMemory
 {
     private:

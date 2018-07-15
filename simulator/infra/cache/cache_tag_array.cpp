@@ -58,42 +58,32 @@ CacheTagArraySizeCheck::CacheTagArraySizeCheck(
     , addr_size_in_bits( addr_size_in_bits)
 {
     if ( size_in_bytes == 0)
-        serr << "ERROR: Wrong arguments! Cache size should be greater than zero"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Cache size should be greater than zero");
 
     if ( ways == 0)
-        serr << "ERROR: Wrong arguments! Num of ways should be greater than zero"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Num of ways should be greater than zero");
 
     if ( line_size == 0)
-        serr << "ERROR: Wrong argument! Size of the line should be greater than zero"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Size of the line should be greater than zero");
 
     if ( addr_size_in_bits == 0)
-        serr << "ERROR: Wrong argument! Address size should be greater than zero"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Address size should be greater than zero");
 
     if ( addr_size_in_bits > 32)
-        serr << "ERROR: Wrong arguments! Address size should be less or equal than 32"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Address size should be less or equal than 32");
 
     if ( size_in_bytes < ways * line_size)
-        serr << "ERROR: Wrong arguments! Cache size should be greater"
-             << "than the number of ways multiplied by line size"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Cache size should be greater"
+            "than the number of ways multiplied by line size");
 
     if ( !is_power_of_two( size_in_bytes))
-        serr << "ERROR: Wrong argumets! Cache size should be a power of 2"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Cache size should be a power of 2");
 
     if ( !is_power_of_two( line_size))
-        serr << "ERROR: Wrong arguments! Block size should be a power of 2"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Block size should be a power of 2");
 
     if ( size_in_bytes % ( line_size * ways) != 0)
-        serr << "ERROR: Wrong arguments! Cache size should be multiple of"
-             << "the number of ways and line size"
-             << std::endl << critical;
+        throw CacheTagArrayInvalidSizeException("Cache size should be multiple of");
 }
 
 CacheTagArraySize::CacheTagArraySize(

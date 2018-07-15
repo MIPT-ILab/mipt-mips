@@ -104,5 +104,5 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_
 # clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# googletest
+# tests
 include(tests/tests.cmake)

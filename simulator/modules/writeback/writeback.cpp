@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <sstream>
 
 #include "writeback.h"
 
@@ -68,11 +69,14 @@ void Writeback<ISA>::check( const FuncInstr& instr)
 {
     const auto func_dump = checker.step();
 
-    if ( func_dump.Dump() != instr.Dump())
-        serr << "Mismatch: " << std::endl
-             << "Checker output: " << func_dump    << std::endl
-             << "PerfSim output: " << instr.Dump() << std::endl
-             << critical;
+    if ( func_dump.Dump() == instr.Dump())
+        return;
+    
+    std::ostringstream oss;
+    oss << "Checker output: " << func_dump    << std::endl
+        << "PerfSim output: " << instr.Dump() << std::endl;
+
+    throw CheckerMismatch(oss.str());
 }
 
 #include <mips/mips.h>

@@ -2,8 +2,8 @@
 #include <cassert>
 #include <cstdlib>
 
-// Google Test library
-#include <gtest/gtest.h>
+// Catch2
+#include <catch.hpp>
 
 // Module
 #include <mips/mips.h>
@@ -12,39 +12,34 @@
 static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
-#define GTEST_ASSERT_NO_DEATH(statement) \
-    ASSERT_EXIT({{ statement } ::exit(EXIT_SUCCESS); }, ::testing::ExitedWithCode(0), "")
-
-TEST( Func_Sim_init, Process_Wrong_Args_Of_Constr)
+TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 {
     // Just call a constructor
-    ASSERT_NO_THROW( FuncSim<MIPS32> MIPS32 );
+    CHECK_NOTHROW( FuncSim<MIPS32>() );
 
     // Call constructor and init
-    ASSERT_NO_THROW( FuncSim<MIPS32>().init( valid_elf_file) );
+    CHECK_NOTHROW( FuncSim<MIPS32>().init( valid_elf_file) );
 
     // Do bad init
-    ASSERT_EXIT( FuncSim<MIPS32>().init( "./1234567890/qwertyuop"),
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "ERROR.*");
+    CHECK_THROWS_AS( FuncSim<MIPS32>().init( "./1234567890/qwertyuop"), InvalidElfFile);
 }
 
-TEST( Func_Sim, Make_A_Step)
+TEST_CASE( "Make_A_Step: Func_Sim")
 {
     FuncSim<MIPS32> MIPS32;
     MIPS32.init( valid_elf_file);
-    EXPECT_NE( MIPS32.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]"), std::string::npos);
+    CHECK( MIPS32.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
-TEST( Func_Sim, Run_Full_Trace)
+TEST_CASE( "Run_Full_Trace: Func_Sim")
 {
     FuncSim<MIPS32> MIPS32;
-    GTEST_ASSERT_NO_DEATH( MIPS32.run_no_limit( valid_elf_file); );
+    MIPS32.run_no_limit( valid_elf_file);
 }
 
-TEST( Func_Sim, Run_SMC_trace)
+TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
     FuncSim<MIPS32> MIPS32;
-    ASSERT_EXIT( MIPS32.run_no_limit( smc_code);,
-                 ::testing::ExitedWithCode( EXIT_FAILURE), "Bearings lost:.*");
+    CHECK_THROWS_AS( MIPS32.run_no_limit( smc_code), BearingLost);
 }
 
