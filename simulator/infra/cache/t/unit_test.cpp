@@ -112,7 +112,7 @@ TEST_CASE( "miss_rate_sim: Miss_Rate_Sim_Test")
 
     // Cache parameters
     std::vector<uint32> associativities = { 1, 2, 4, 8, 16 };
-    std::vector<uint32>_sizes = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+    std::vector<uint32> test_sizes = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
    
     Addr addr;
     std::vector<uint32> values;
@@ -122,14 +122,13 @@ TEST_CASE( "miss_rate_sim: Miss_Rate_Sim_Test")
 
     // test CacheTagArray on different parameters
     for ( auto associativity : associativities)
-        for ( auto _size :_sizes)
-            test( miss_rate_file, values, associativity, 1024 *_size);
+        for ( auto test_size : test_sizes)
+            test( miss_rate_file, values, associativity, 1024 * test_size);
     
     // test full-assotiative
-    for ( auto _size :_sizes)
-        test( miss_rate_file, values, 1024 *_size / LINE_SIZE, 1024 *_size);
+    for ( auto test_size : test_sizes)
+        test( miss_rate_file, values, 1024 *_size / LINE_SIZE, 1024 * test_size);
 
     mem_trace_file.close();
     miss_rate_file.close();
 }
-
