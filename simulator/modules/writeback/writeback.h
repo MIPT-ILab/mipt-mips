@@ -13,10 +13,9 @@
 struct CheckerMismatch final : std::exception
 {
     const std::string message;
-    CheckerMismatch(std::string msg) : message(std::move(msg)) {}
+    explicit CheckerMismatch(const std::string& msg) : message(std::string("Checker mismatch: ") + msg + '\n') {}
     char const * what() const noexcept final {
-        using namespace std::literals::string_literals;
-        return ("Checker mismatch: "s + message).c_str();
+        return message.c_str();
     }
 };
 

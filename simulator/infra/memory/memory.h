@@ -21,10 +21,9 @@
 struct FuncMemoryBadMapping final : std::exception
 {
     const std::string message;
-    FuncMemoryBadMapping(std::string msg) : message(std::move(msg)) {}
+    explicit FuncMemoryBadMapping(const std::string& msg) : message(std::string("Invalid FuncMemory mapping: ") + msg + '\n') {}
     char const * what() const noexcept final {
-        using namespace std::literals::string_literals;
-        return ("Invalid FuncMemory mapping: "s + message).c_str();
+        return message.c_str();
     }
 };
 

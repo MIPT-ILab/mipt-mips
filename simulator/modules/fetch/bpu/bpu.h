@@ -44,10 +44,9 @@ public:
 struct BPInvalidMode final : std::exception
 {
     const std::string message;
-    BPInvalidMode(std::string msg) : message(std::move(msg)) {}
-    virtual char const * what() const noexcept {
-        using namespace std::literals::string_literals;
-        return ("Invalid mode of branch prediction: "s + message).c_str();
+    explicit BPInvalidMode(const std::string& msg) : message(std::string("Invalid mode of branch prediction: ") + msg + '\n') {}
+    char const * what() const noexcept final {
+        return message.c_str();
     }
 };
 

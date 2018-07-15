@@ -50,11 +50,10 @@ class LRUModule
 
 struct CacheTagArrayInvalidSizeException final : std::exception
 {
-    const char* const message;
-    CacheTagArrayInvalidSizeException(const char* msg) : message(msg) {}
+    const std::string message;
+    explicit CacheTagArrayInvalidSizeException(const char* msg) : message(std::string("Invalid cache size: ") + msg + '\n') {}
     char const * what() const noexcept final {
-        using namespace std::literals::string_literals;
-        return ("Invalid cache size: "s + message + '\n').c_str();
+        return message.c_str();
     }
 };
 
