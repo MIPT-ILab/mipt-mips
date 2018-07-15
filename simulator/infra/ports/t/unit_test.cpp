@@ -1,8 +1,10 @@
-
+/**
+ * Unit tests for ports
+ * @author Denis Los
+ */
 
 // Google Test Library
-#include <gtest/gtest.h>
-
+#include <catch.hpp>
 
 // Module
 #include "../ports.h"
@@ -108,64 +110,43 @@ namespace ports {
     } // namespace testing
 } // namespace ports
 
-
-
-
-
-
-
-#define GTEST_ASSERT_NO_DEATH( statement)                        \
-    ASSERT_EXIT( { statement}::exit(EXIT_SUCCESS),               \
-                 ::testing::ExitedWithCode(EXIT_SUCCESS), "");   \
-    statement
-
-
-
-
 using ports::testing::Logic;
 
-
-
-
-TEST( test_ports, Test_Ports_A_B)
+TEST_CASE( "test_ports: Test_Ports_A_B")
 {
-    GTEST_ASSERT_NO_DEATH( ports::testing::A a;);
-    GTEST_ASSERT_NO_DEATH( ports::testing::B b;);
+    ports::testing::A a;;
+    ports::testing::B b;;
 
-
-    GTEST_ASSERT_NO_DEATH( WritePort<int> init( "init_A", ports::testing::PORT_BANDWIDTH,
-                                                ports::testing::PORT_FANOUT););
-    GTEST_ASSERT_NO_DEATH( ReadPort<bool> stop( "stop", ports::testing::PORT_LATENCY););
-
+    WritePort<int> init( "init_A", ports::testing::PORT_BANDWIDTH, ports::testing::PORT_FANOUT);
+    ReadPort<bool> stop( "stop", ports::testing::PORT_LATENCY);;
 
     // connect all the ports
-    GTEST_ASSERT_NO_DEATH( init_ports(););
+    init_ports();;
 
     // init object A by value 0
-    GTEST_ASSERT_NO_DEATH( init.write( 0, 0_Cl););
-
+    init.write( 0, 0_Cl);;
 
     for ( auto cycle = 0_Cl; cycle < ports::testing::CLOCK_LIMIT; cycle.inc())
     {
         //check the stop port from object A
         bool is_ready;
-        GTEST_ASSERT_NO_DEATH( is_ready = stop.is_ready( cycle););
-        ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+        is_ready = stop.is_ready( cycle);;
+        CHECK( ports::testing::logic.check_readiness( cycle,
                                                             Logic::CheckCode::IS_STOP_READY,
                                                             is_ready));
         if ( is_ready)
         {
-            GTEST_ASSERT_NO_DEATH( stop.read( cycle););
+            stop.read( cycle);;
             break;
         }
 
         a.clock( cycle);
         b.clock( cycle);
 
-        GTEST_ASSERT_NO_DEATH( check_ports( cycle););
+        check_ports( cycle);;
     }
 
-    GTEST_ASSERT_NO_DEATH( destroy_ports(););
+    destroy_ports();;
 }
 
 
@@ -265,11 +246,11 @@ namespace ports {
             // stop signal will be sent
             if ( data > DATA_LIMIT)
             {
-                GTEST_ASSERT_NO_DEATH( stop->write( true, cycle););
+                stop->write( true, cycle);;
                 return;
             }
 
-            GTEST_ASSERT_NO_DEATH( to_B->write( data, cycle););
+            to_B->write( data, cycle);;
         }
 
         void A::clock( Cycle cycle)
@@ -280,27 +261,27 @@ namespace ports {
             bool is_from_B_ready;
             while( true)
             {
-                GTEST_ASSERT_NO_DEATH( is_init_ready = init->is_ready( cycle););
-                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                is_init_ready = init->is_ready( cycle);;
+                CHECK( ports::testing::logic.check_readiness( cycle,
                                                                     Logic::CheckCode::IS_INIT_READY,
                                                                     is_init_ready));
 
-                GTEST_ASSERT_NO_DEATH( is_from_B_ready = from_B->is_ready( cycle););
-                ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+                is_from_B_ready = from_B->is_ready( cycle);;
+                CHECK( ports::testing::logic.check_readiness( cycle,
                                                                     Logic::CheckCode::IS_FROM_B_READY,
                                                                     is_from_B_ready));
 
                 if( is_init_ready)
                 {
-                    GTEST_ASSERT_NO_DEATH( data = init->read( cycle););
-                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                    data = init->read( cycle);;
+                    CHECK( ports::testing::logic.check_data( cycle,
                                                                    Logic::CheckCode::DATA_INIT,
                                                                    data));
                 }
                 else if ( is_from_B_ready)
                 {
-                    GTEST_ASSERT_NO_DEATH( data = from_B->read( cycle););
-                    ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                    data = from_B->read( cycle);;
+                    CHECK( ports::testing::logic.check_data( cycle,
                                                                    Logic::CheckCode::DATA_FROM_B,
                                                                    data));
                 }
@@ -322,25 +303,25 @@ namespace ports {
         {
             ++data;
 
-            GTEST_ASSERT_NO_DEATH( to_A->write( data, cycle););
+            to_A->write( data, cycle);;
         }
 
         void B::clock( Cycle cycle)
         {
             bool is_from_A_ready;
-            GTEST_ASSERT_NO_DEATH( is_from_A_ready = from_A->is_ready( cycle););
-            ASSERT_TRUE( ports::testing::logic.check_readiness( cycle,
+            is_from_A_ready = from_A->is_ready( cycle);;
+            CHECK( ports::testing::logic.check_readiness( cycle,
                                                                 Logic::CheckCode::IS_FROM_A_READY,
                                                                 is_from_A_ready));
             if ( is_from_A_ready)
             {
                 int data;
-                GTEST_ASSERT_NO_DEATH( data = from_A->read( cycle););
-                ASSERT_TRUE( ports::testing::logic.check_data( cycle,
+                data = from_A->read( cycle);;
+                CHECK( ports::testing::logic.check_data( cycle,
                                                                Logic::CheckCode::DATA_FROM_A,
                                                                data));
 
-                GTEST_ASSERT_NO_DEATH( process_data( data, cycle););
+                process_data( data, cycle);;
             }
         }
 

@@ -10,6 +10,16 @@
 #include <func_sim/func_sim.h>
 #include <modules/core/perf_instr.h>
 
+struct CheckerMismatch : std::exception
+{
+    const std::string message;
+    CheckerMismatch(std::string msg) : message(std::move(msg)) {}
+    virtual char const * what() const noexcept {
+        using namespace std::literals::string_literals;
+        return ("Checker mismatch: "s + message).c_str();
+    }
+};
+
 template <typename ISA>
 class Writeback : public Log
 {

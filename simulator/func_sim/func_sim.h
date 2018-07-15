@@ -14,6 +14,14 @@
 
 #include "rf/rf.h"
 
+struct BearingLost : std::exception
+{
+    virtual char const * what() const noexcept {
+        return "Bearing lost: 10 nops in a row";
+    }
+};
+
+
 template <typename ISA>
 class FuncSim : public Simulator
 {
@@ -26,7 +34,7 @@ class FuncSim : public Simulator
         std::unique_ptr<Memory> mem = nullptr;
 
         uint64 nops_in_a_row = 0;
-        void update_nop_counter( const FuncInstr& instr);
+        void update_and_check_nop_counter( const FuncInstr& instr);
 
     public:
         explicit FuncSim( bool log = false);

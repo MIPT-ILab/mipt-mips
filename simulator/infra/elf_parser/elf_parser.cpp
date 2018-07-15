@@ -35,41 +35,28 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
     // because it is required by elf_begin function
     std::unique_ptr<FILE, decltype(&fclose)> file( fopen( elf_file_name.c_str(), "rb"), fclose);
     if ( file == nullptr)
-    {
-        std::cerr << "ERROR: Could not open file " << elf_file_name << ": "
-                  << std::strerror( errno) << std::endl;
-        return {};
-    }
+        throw InvalidElfFile(elf_file_name, " file is not readable");
 
     // set ELF library operating version
     if ( elf_version( EV_CURRENT) == EV_NONE)
-    {
-        std::cerr << "ERROR: Could not set ELF library operating version:"
-                  <<  elf_errmsg( elf_errno()) << std::endl;
-        return {};
-    }
+        throw InvalidElfFile(elf_file_name, elf_errmsg( elf_errno()));
 
     // open the file in ELF format
-    Elf* elf = elf_begin( fileno( file.get()), ELF_C_READ, nullptr);
-    if ( elf == nullptr)
-    {
-        std::cerr << "ERROR: Could not open file " << elf_file_name
-                  << " as ELF file: "
-                  <<  elf_errmsg( elf_errno()) << std::endl;
-        return {};
-    }
+    std::unique_ptr<Elf, decltype(&elf_end)> elf( elf_begin( fileno( file.get()), ELF_C_READ, nullptr), elf_end);
+    if (elf == nullptr)
+        throw InvalidElfFile(elf_file_name, elf_errmsg( elf_errno()));
 
     size_t shstrndx;
-    elf_getshdrstrndx( elf, &shstrndx);
+    elf_getshdrstrndx( elf.get(), &shstrndx);
 
     std::list<ElfSection> sections;
 
     Elf_Scn *section = nullptr;
-    while ( (section = elf_nextscn( elf, section)) != nullptr)
+    while ( (section = elf_nextscn( elf.get(), section)) != nullptr)
     {
         Elf32_Shdr shdr = *elf32_getshdr( section);
 
-        char* name = elf_strptr( elf, shstrndx, shdr.sh_name);
+        char* name = elf_strptr( elf.get(), shstrndx, shdr.sh_name);
         Addr start_addr = shdr.sh_addr;
 
         if ( start_addr == 0)
@@ -85,9 +72,6 @@ std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file
         ignored( std::fread( content.get(), sizeof( uint8), size, file.get()));
         sections.emplace( sections.end(), name, start_addr, size, std::move(content));
     }
-
-    // close all used files
-    elf_end( elf);
 
     return sections;
 }

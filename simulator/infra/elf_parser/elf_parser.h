@@ -16,6 +16,20 @@
 // uArchSim modules
 #include <infra/types.h>
 
+struct InvalidElfFile : std::exception
+{
+    const std::string filename;
+    const std::string message;
+    InvalidElfFile(std::string name, std::string msg)
+        : filename(std::move(name))
+        , message(std::move(msg))
+        {}
+    virtual char const * what() const noexcept {
+        using namespace std::literals::string_literals;
+        return (filename + " is not a valid ELF file:" + message).c_str();
+    }
+};
+
 class ElfSection
 {
     const std::string name; // name of the elf section (e.g. ".text", ".data", etc)

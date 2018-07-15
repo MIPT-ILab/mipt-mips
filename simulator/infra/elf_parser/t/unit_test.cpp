@@ -2,8 +2,8 @@
 #include <cassert>
 #include <cstdlib>
 
-// Google Test library
-#include <gtest/gtest.h>
+// Catch2
+#include <catch.hpp>
 
 // uArchSim modules
 #include "../elf_parser.h"
@@ -15,14 +15,14 @@ static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 // Check that all incorect input params of the constructor
 // are properly handled.
 //
-TEST( Elf_parser_init, Process_Args_Of_Constr)
+TEST_CASE( "Elf_parser_init: Process_Args_Of_Constr")
 {
-    ASSERT_NO_THROW( ElfSection::getAllElfSections( valid_elf_file));
+    CHECK_NOTHROW( ElfSection::getAllElfSections( valid_elf_file));
 }
 
-TEST( Elf_parser_init, Process_Wrong_Args_Of_Constr)
+TEST_CASE( "Elf_parser_init: Process_Wrong_Args_Of_Constr")
 {
     // must return empty list
-    ASSERT_TRUE( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")).empty());
+    CHECK_THROWS_AS( ElfSection::getAllElfSections( std::string("./1234567890/qwertyuiop")), InvalidElfFile);
 }
 

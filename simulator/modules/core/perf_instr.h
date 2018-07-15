@@ -9,6 +9,8 @@
 #include <infra/types.h>
 #include <modules/fetch/bpu/bp_interface.h>
 
+struct CheckerMismatch;
+
 template <typename FuncInstr>
 class PerfInstr : public FuncInstr
 {

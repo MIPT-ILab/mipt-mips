@@ -4,7 +4,7 @@
  */
 
 // Google test library
-#include <gtest/gtest.h>
+#include <catch.hpp>
 
 // Testing module
 #include "../config.h"
@@ -24,7 +24,7 @@ namespace config {
 // To check whether the returned values
 // are equal to passed arguments
 //
-TEST( config_parse, Pass_Valid_Args_1)
+TEST_CASE( "config_parse: Pass_Valid_Args_1")
 {
     const uint64 mandatory_int_value = 145;
     const std::string mandatory_string_value{ "file.elf"};
@@ -39,19 +39,19 @@ TEST( config_parse, Pass_Valid_Args_1)
     const int argc = countof(argv);
 
     // should not throw any exceptions
-    ASSERT_NO_THROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( config::handleArgs( argc, argv));
 
-    ASSERT_EQ( config::uint64_config, mandatory_int_value);
-    ASSERT_FALSE( mandatory_string_value.compare( config::string_config));
-    ASSERT_EQ( config::bool_config_1, false);
-    ASSERT_EQ( config::bool_config_2, true);
+    CHECK( config::uint64_config == mandatory_int_value);
+    CHECK( !mandatory_string_value.compare( config::string_config));
+    CHECK( config::bool_config_1 == false);
+    CHECK( config::bool_config_2 == true);
 }
 
 //
 // To check whether returned values
 // are equal to passed arguments
 //
-TEST( config_parse,  Pass_Valid_Args_2)
+TEST_CASE( "config_parse:  Pass_Valid_Args_2")
 {
     const uint64 mandatory_int_value = 356;
     const std::string mandatory_string_value{ "run_test.elf"};
@@ -66,18 +66,18 @@ TEST( config_parse,  Pass_Valid_Args_2)
     const int argc = countof(argv);
 
     // should not throw any exceptions
-    ASSERT_NO_THROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( config::handleArgs( argc, argv));
 
-    ASSERT_EQ( config::uint64_config, mandatory_int_value);
-    ASSERT_FALSE( mandatory_string_value.compare( config::string_config));
-    ASSERT_EQ( config::bool_config_1, true);
-    ASSERT_EQ( config::bool_config_2, false);
+    CHECK( config::uint64_config == mandatory_int_value);
+    CHECK( !mandatory_string_value.compare( config::string_config));
+    CHECK( config::bool_config_1 == true);
+    CHECK( config::bool_config_2 == false);
 }
 
 //
 // Pass no arguments
 //
-TEST( config_parse, Pass_No_Args)
+TEST_CASE( "config_parse: Pass_No_Args")
 {
     const char* argv[] =
     {
@@ -86,13 +86,13 @@ TEST( config_parse, Pass_No_Args)
     const int argc = countof(argv);
 
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 //
 // Pass arguments without a string_config_name option
 //
-TEST( config_parse, Pass_Args_Without_Binary_Option)
+TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
 {
     const char* argv[] =
     {
@@ -102,13 +102,13 @@ TEST( config_parse, Pass_Args_Without_Binary_Option)
     const int argc = countof(argv);
     
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 //
 // Pass arguments without a numsteps option
 //
-TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
+TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
 {
     const char* argv[] =
     {
@@ -118,13 +118,13 @@ TEST( config_parse,  Pass_Args_Without_Numsteps_Option)
     const int argc = countof(argv);
 
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 //
 // Pass arguments with unrecognised option
 //
-TEST( config_parse, Pass_Args_With_Unrecognised_Option)
+TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
 {
     const char* argv[] =
     {
@@ -136,14 +136,14 @@ TEST( config_parse, Pass_Args_With_Unrecognised_Option)
     const int argc = countof(argv);
 
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 #if 0
 //
 // Pass a binary option multiple times
 //
-TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
+TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
 {
     const char* argv[] =
     {
@@ -155,14 +155,14 @@ TEST( config_parse,  Pass_Binary_Option_Multiple_Times)
     const int argc = countof(argv);
     
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 #endif
 
 //
 // Pass a binary option without an argument
 //
-TEST( config_parse,  Pass_Binary_Option_Without_Arg)
+TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
 {
     const char* argv[] =
     {
@@ -173,13 +173,13 @@ TEST( config_parse,  Pass_Binary_Option_Without_Arg)
     const int argc = countof(argv);
 
     // should throw
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 //
 // Pass a numsteps option without an argument
 //
-TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
+TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
 {
     const char* argv[] =
     {
@@ -192,7 +192,7 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
     const int argc = countof(argv);
 
     // should exit with EXIT_FAILURE
-    ASSERT_THROW( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
 #if 0
@@ -200,7 +200,7 @@ TEST( config_parse,  Pass_Numsteps_Option_Without_Arg)
 // To check whether providing configuration parser
 // with the same option is a failure
 //
-TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
+TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twice")
 {
     const char* argv[] =
     {
@@ -211,7 +211,7 @@ TEST( config_provide_options, Provide_Config_Parser_With_Binary_Option_Twice)
     const int argc = countof(argv);
 
     // should not throw any exceptions
-    ASSERT_NO_THROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( config::handleArgs( argc, argv));
 
 
     auto test_function = []()
