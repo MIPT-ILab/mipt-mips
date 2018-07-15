@@ -52,7 +52,7 @@ struct CacheTagArrayInvalidSizeException final : std::exception
 {
     const char* const message;
     CacheTagArrayInvalidSizeException(const char* msg) : message(msg) {}
-    char const * what() const final noexcept {
+    char const * what() const noexcept final {
         using namespace std::literals::string_literals;
         return ("Invalid cache size: "s + message + '\n').c_str();
     }

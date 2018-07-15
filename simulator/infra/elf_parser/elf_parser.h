@@ -24,7 +24,7 @@ struct InvalidElfFile : std::exception
         : filename(std::move(name))
         , message(std::move(msg))
         {}
-    char const * what() const final noexcept {
+    char const * what() const noexcept final {
         using namespace std::literals::string_literals;
         return (filename + " is not a valid ELF file:" + message).c_str();
     }

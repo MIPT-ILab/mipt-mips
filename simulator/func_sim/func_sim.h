@@ -16,7 +16,7 @@
 
 struct BearingLost final : std::exception
 {
-    char const * what() const final noexcept {
+    char const * what() const noexcept final {
         return "Bearing lost: 10 nops in a row";
     }
 };
