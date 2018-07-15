@@ -41,7 +41,7 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
     CHECK_NOTHROW( config::handleArgs( argc, argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
-    CHECK( !mandatory_string_value.compare( config::string_config));
+    CHECK( mandatory_string_value == static_cast<std::string>( config::string_config));
     CHECK( config::bool_config_1 == false);
     CHECK( config::bool_config_2 == true);
 }
@@ -68,7 +68,7 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
     CHECK_NOTHROW( config::handleArgs( argc, argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
-    CHECK( !mandatory_string_value.compare( config::string_config));
+    CHECK( mandatory_string_value == static_cast<std::string>( config::string_config));
     CHECK( config::bool_config_1 == true);
     CHECK( config::bool_config_2 == false);
 }
