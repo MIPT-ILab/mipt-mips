@@ -22,8 +22,6 @@ public:
     {
         return out << val.value;
     }
-
-    uint64 sequence_id;
 };
 
 TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")

@@ -26,7 +26,7 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 #define TEST_BAD_OPCODE( opcode) \
     CHECK(MIPS32Instr( opcode).Dump() == std::string(#opcode) + "\tUnknown");
 
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm")
+TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
 {
     CHECK(MIPS32Instr(0x01398820).Dump() == "add $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x01398821).Dump() == "addu $s1, $t1, $t9");
@@ -84,7 +84,10 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm")
     CHECK(MIPS32Instr(0x02290036).Dump() == "tne $s1, $t1");
     CHECK(MIPS32Instr(0x01208809).Dump() == "jalr $s1, $t1");
     CHECK(MIPS32Instr(0x00000000).Dump() == "nop ");
+}
 
+TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
+{
     CHECK(MIPS32Instr(0x213104d2).Dump() == "addi $s1, $t1, 0x4d2");
     CHECK(MIPS32Instr(0x2131fb2e).Dump() == "addi $s1, $t1, 0xfb2e");
     CHECK(MIPS32Instr(0x613104d2).Dump() == "daddi $s1, $t1, 0x4d2");
@@ -113,6 +116,10 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm")
     CHECK(MIPS32Instr(0x062afb2e).Dump() == "tlti $s1, 0xfb2e");
     CHECK(MIPS32Instr(0x062b04d2).Dump() == "tltiu $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062bfb2e).Dump() == "tltiu $s1, 0xfb2e");
+}
+
+TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Load_Store")
+{
     CHECK(MIPS32Instr(0x813104d2).Dump() == "lb $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0x8131fb2e).Dump() == "lb $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0x913104d2).Dump() == "lbu $s1, 0x4d2($t1)");
@@ -153,6 +160,10 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm")
     CHECK(MIPS32Instr(0xb131fb2e).Dump() == "sdl $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0xb53104d2).Dump() == "sdr $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0xb531fb2e).Dump() == "sdr $s1, 0xfb2e($t1)");
+}
+
+TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
+{
     CHECK(MIPS32Instr(0x1229ffff).Dump() == "beq $s1, $t1, -1");
     CHECK(MIPS32Instr(0x1229000e).Dump() == "beq $s1, $t1, 14");
     CHECK(MIPS32Instr(0x0621fffc).Dump() == "bgez $s1, -4");

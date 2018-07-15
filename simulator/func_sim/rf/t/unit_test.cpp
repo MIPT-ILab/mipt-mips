@@ -18,7 +18,6 @@
 class TestRF : public RF<MIPS32>
 {
     public:
-        TestRF() : RF<MIPS32>() {};
         using RF<MIPS32>::read;
         using RF<MIPS32>::write;
 };
