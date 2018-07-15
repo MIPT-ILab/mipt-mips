@@ -3,7 +3,6 @@
  * @author Denis Los
  */
 
-// Google test library
 #include <catch.hpp>
 
 // Testing module

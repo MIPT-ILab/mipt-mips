@@ -3,8 +3,7 @@
  * @author Oleg Ladin, Denis Los 
  */
 
-// Google Test Library
-#include <catch.hpp> 
+#include <catch.hpp>
 
 // Module
 #include "../cache_tag_array.h"

@@ -3,12 +3,10 @@
  * @author Denis Los
  */
 
-// Google Test Library
 #include <catch.hpp>
 
 // Module
 #include "../ports.h"
-
 
 #include <cassert>
 #include <map>

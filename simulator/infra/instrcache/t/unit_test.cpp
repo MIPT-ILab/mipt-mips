@@ -3,9 +3,7 @@
  * @author Denis Los
 */
 
-// Google test library
 #include <catch.hpp>
-
 
 // Modules
 #include "../LRUCache.h"
