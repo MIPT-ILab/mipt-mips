@@ -113,8 +113,8 @@ static void test( std::ifstream& miss_rate_file, const std::vector<Addr>& values
 
 TEST( miss_rate_sim, Miss_Rate_Sim_Test)
 {
-    const std::string MEM_TRACE_FILENAME = "mem_trace.txt";
-    const std::string MISS_RATE_FILENAME = "miss_rate.txt";
+    const std::string MEM_TRACE_FILENAME = TEST_DATA_PATH "mem_trace.txt";
+    const std::string MISS_RATE_FILENAME = TEST_DATA_PATH "miss_rate.txt";
 
     // open and check mem_trace file
     std::ifstream mem_trace_file;
@@ -149,9 +149,3 @@ TEST( miss_rate_sim, Miss_Rate_Sim_Test)
     miss_rate_file.close();
 }
 
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}

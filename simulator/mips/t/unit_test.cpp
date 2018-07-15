@@ -185,9 +185,3 @@ TEST( MIPS32_instr_disasm, Process_Disasm)
     ASSERT_EQ(MIPS32Instr(0x0c0004d2).Dump(), "jal 0x4d2");
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}

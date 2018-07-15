@@ -24,6 +24,8 @@ public:
     {
         return out << val.value;
     }
+
+    uint64 sequence_id;
 };
 
 TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
@@ -116,13 +118,5 @@ TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
     ASSERT_EQ( cache.size(), CAPACITY);
     ASSERT_FALSE( cache.empty());
     ASSERT_FALSE( cache.find( 2).first);
-}
-
-
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
 }
 

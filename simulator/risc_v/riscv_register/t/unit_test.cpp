@@ -82,10 +82,3 @@ TEST( RISCV_registers, Zero)
     ASSERT_FALSE( reg.is_mips_lo());
 }
 
-int main( int argc, char* argv[])
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
-}
-
