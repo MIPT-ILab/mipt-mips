@@ -14,9 +14,9 @@
 
 #include "rf/rf.h"
 
-struct BearingLost : std::exception
+struct BearingLost final : std::exception
 {
-    virtual char const * what() const noexcept {
+    char const * what() const final noexcept {
         return "Bearing lost: 10 nops in a row";
     }
 };

@@ -10,11 +10,11 @@
 #include <func_sim/func_sim.h>
 #include <modules/core/perf_instr.h>
 
-struct CheckerMismatch : std::exception
+struct CheckerMismatch final : std::exception
 {
     const std::string message;
     CheckerMismatch(std::string msg) : message(std::move(msg)) {}
-    virtual char const * what() const noexcept {
+    char const * what() const final noexcept {
         using namespace std::literals::string_literals;
         return ("Checker mismatch: "s + message).c_str();
     }

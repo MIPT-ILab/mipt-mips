@@ -41,7 +41,7 @@ public:
     BaseBP& operator=( BaseBP&&) = default;
 };
 
-struct BPInvalidMode : std::exception
+struct BPInvalidMode final : std::exception
 {
     const std::string message;
     BPInvalidMode(std::string msg) : message(std::move(msg)) {}
