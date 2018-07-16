@@ -35,10 +35,11 @@ protected:
     explicit BaseTValue<T>( T val ) noexcept : value( std::move(val)) { }
     BaseTValue<T>( ) = default;
 public:
-
     // Converter is implicit intentionally, so bypass Clang-Tidy check
     // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
+    bool operator==( const T& rhs) const { return value == rhs; }
+    bool operator!=( const T& rhs) const { return !operator==(rhs); }
     
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
