@@ -45,6 +45,7 @@ struct BPInvalidMode final : std::exception
 {
     const std::string message;
     explicit BPInvalidMode(const std::string& msg) : message(std::string("Invalid mode of branch prediction: ") + msg + '\n') {}
+    explicit BPInvalidMode(const CacheTagArrayInvalidSizeException& src) : BPInvalidMode(src.message) {}
     char const * what() const noexcept final {
         return message.c_str();
     }
@@ -70,7 +71,7 @@ public:
 
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
-        throw BPInvalidMode(e.what());
+        throw BPInvalidMode(e);
     }
 
     /* prediction */
