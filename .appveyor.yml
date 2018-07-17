@@ -61,13 +61,11 @@ before_build:
 - set PATH=%LIBELF_INCLUDE%;%PATH%
 - set INCLUDE=%BOOST_ROOT%;%INCLUDE%
 # build binutils
-- set BINUTILS=/c/projects/mipt-mips/binutils
-- bash -lc "cd %BINUTILS%; ./configure --target=mips-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
-- bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile" # disable optimizations to speed up build a little
-- bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
+- cd C:\Projects\mipt-mips
+- copy get-binutils.sh traces\get-binutils.sh
+- bash "cd /c/projects/mipt-mips/; ./traces/get-binutils.sh"
 # update environment
 - set CXX=%build%
-- set PATH=%PATH%;%BINUTILS%/cross/mips/bin
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
