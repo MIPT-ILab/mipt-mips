@@ -63,7 +63,7 @@ before_build:
 # build binutils
 - cd C:\Projects\mipt-mips
 - copy get-binutils.sh traces\get-binutils.sh
-- bash ./traces/get-binutils.sh
+- bash -l ./traces/get-binutils.sh
 # update environment
 - set CXX=%build%
 
