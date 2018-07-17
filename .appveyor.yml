@@ -61,7 +61,10 @@ before_build:
 - set PATH=%LIBELF_INCLUDE%;%PATH%
 - set INCLUDE=%BOOST_ROOT%;%INCLUDE%
 # build binutils
-- set BINUTILS=/c/projects/mipt-mips/binutils
+- set BINUTILS_VER=binutils-2.31
+- bash -lc "cd /c/projects/mipt-mips; wget http://ftp.gnu.org/gnu/binutils/$BINUTILS_VER.tar.bz2"
+- bash -lc "cd /c/projects/mipt-mips; tar xjf $BINUTILS_VER.tar.bz2"
+- set BINUTILS=/c/projects/mipt-mips/%BINUTILS_VER%
 - bash -lc "cd %BINUTILS%; ./configure --target=mips-linux-gnu --prefix=%BINUTILS%/cross/mips --disable-gdb --disable-gprof > /dev/null"
 - bash -lc "cd %BINUTILS%; sed -i 's/-O2/-O0/g' Makefile" # disable optimizations to speed up build a little
 - bash -lc "cd %BINUTILS%; make all install MAKEINFO=true > /dev/null"
