@@ -41,6 +41,8 @@ addons:
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
+  - cd $TRAVIS_BUILD_DIR
+  - git submodule update --init
 # Install OS X packages
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -49,15 +51,9 @@ install:
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        export BINUTILS_VER=binutils-2.31
-        cd $TRAVIS_BUILD_DIR
-        wget http://ftp.gnu.org/gnu/binutils/$BINUTILS_VER.tar.bz2
-        tar xjf $BINUTILS_VER.tar.bz2
-        cd $BINUTILS_VER
-        BINUTILS=$TRAVIS_BUILD_DIR/binutils-2.31/cross/mips
-        ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-        make all install MAKEINFO=true > /dev/null
-        export PATH=$PATH:$BINUTILS/bin
+        mv get-binutils.sh traces
+        bash ./traces/get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
+        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
     fi
 # Download binutils on Linux
   - |
@@ -67,8 +63,6 @@ install:
 
 script:
 # Build traces
-  - cd $TRAVIS_BUILD_DIR
-  - git submodule update --init traces
   - cd traces && make
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
