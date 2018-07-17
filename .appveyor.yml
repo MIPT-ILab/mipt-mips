@@ -56,6 +56,7 @@ before_build:
 - if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
 - if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
 - set INCLUDE=%LIBELF_INCLUDE%;%INCLUDE%
+- cd C:\Projects\mipt-mips
 # install Boost
 - if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
 - set PATH=%LIBELF_INCLUDE%;%PATH%
