@@ -51,7 +51,6 @@ install:
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        mv get-binutils.sh traces
         bash ./traces/get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
         export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
     fi
