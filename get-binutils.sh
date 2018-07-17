@@ -5,6 +5,7 @@
 # To get MIPS GNU Binutils, please follow this instruction: 
 # https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils
 
+echo $PATH
 wget http://ftp.gnu.org/gnu/binutils/binutils-2.31.tar.bz2
 tar xjf binutils-2.31.tar.bz2
 cd binutils-2.31
