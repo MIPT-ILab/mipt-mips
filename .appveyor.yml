@@ -61,9 +61,9 @@ before_build:
 - set PATH=%LIBELF_INCLUDE%;%PATH%
 - set INCLUDE=%BOOST_ROOT%;%INCLUDE%
 # build binutils
-- cd C:\Projects\mipt-mips
 - copy get-binutils.sh traces\get-binutils.sh
-- bash -l ./traces/get-binutils.sh
+- bash: ./traces/get-binutils.sh /c/projects/mipt-mips/binutils/cross/mips
+- set PATH=%PATH%;C:\projects\mipt-mips\binutils\cross\mips
 # update environment
 - set CXX=%build%
 
