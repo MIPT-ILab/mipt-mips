@@ -105,4 +105,4 @@ add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
 # Tests
-include(${CMAKE_CURRENT_LIST_DIR}/tests/tests.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
