@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.8)
 project(mipt-mips CXX)
 
 set(default_build_type "Release")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -37,6 +38,7 @@ set(CPPS infra/macro_test.cpp
     simulator.cpp
     )
 
+# Compilation flags
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
@@ -55,17 +57,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} main.cpp)
-
-#include headers
+# Headers
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external)
 
-#include Boost headers
+# Boost
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-#libelf
+# Libelf
 find_path(LIBELF_INCLUDE_DIRS
     NAMES
         libelf.h
@@ -99,12 +99,10 @@ endif()
 
 include_directories(SYSTEM ${LIBELF_INCLUDE_DIRS})
 
+# Targets
 add_library(mipt-mips-src STATIC ${CPPS})
-
+add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
 
-# clang-tidy
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# tests
+# Tests
 include(${CMAKE_CURRENT_LIST_DIR}/tests/tests.cmake)
