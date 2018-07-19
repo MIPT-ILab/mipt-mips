@@ -25,7 +25,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
-
+    
     // read sources
     rf.read_sources( &instr);
 

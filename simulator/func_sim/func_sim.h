@@ -28,6 +28,7 @@ class FuncSim : public Simulator
     private:
         RF<ISA> rf;
         Addr PC = NO_VAL32;
+        uint64 sequence_id = 0;
         std::unique_ptr<Memory> mem = nullptr;
 
         uint64 nops_in_a_row = 0;
