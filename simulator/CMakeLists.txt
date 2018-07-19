@@ -59,7 +59,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 #include headers
 include_directories(${CMAKE_CURRENT_LIST_DIR})
-include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/external)
+include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external)
 
 #include Boost headers
 find_package(Boost REQUIRED)
