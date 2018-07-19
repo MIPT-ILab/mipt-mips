@@ -41,23 +41,20 @@ addons:
 install:
   - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
+  - cd $TRAVIS_BUILD_DIR
+  - git submodule update --init
 # Install OS X packages
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         brew install libelf zlib
     fi
-# Build binutils on OS X
+# Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        cd $TRAVIS_BUILD_DIR
-        git submodule update --init binutils
-        cd binutils
-        BINUTILS=$TRAVIS_BUILD_DIR/binutils/cross/mips
-        ./configure --target=mips-linux-gnu --prefix=$BINUTILS --disable-gdb --disable-gprof --with-system-zlib > /dev/null
-        make all install MAKEINFO=true > /dev/null
-        export PATH=$PATH:$BINUTILS/bin
+        bash ./traces/get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
+        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
     fi
-# Build binutils on Linux
+# Download binutils on Linux
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
@@ -65,9 +62,6 @@ install:
 
 script:
 # Build traces
-  - cd $TRAVIS_BUILD_DIR
-  - git submodule update --init googletest
-  - git submodule update --init traces
   - cd traces && make
 # Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
@@ -75,6 +69,6 @@ script:
   - make
   - ctest --verbose
 # Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*' '^.*simulator((?!unit_test).)*$'; fi
+  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*'; fi
 # Run a trace to see simulation frequency
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000

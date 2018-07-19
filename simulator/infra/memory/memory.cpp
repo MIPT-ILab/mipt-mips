@@ -32,27 +32,19 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
     set_cnt ( 1ull << set_bits ),
     page_size ( 1ull << offset_bits)
 {
-    if ( set_bits >= min_sizeof<uint32, size_t>() * 8) {
-        std::cerr << "ERROR. Memory is divided to too many (" << set_cnt << ") sets\n";
-        std::exit( EXIT_FAILURE);
-    }
-    if ( page_bits >= min_sizeof<uint32, size_t>() * 8) {
-        std::cerr << "ERROR. Each set is divided to too many (" << page_cnt << ") pages\n";
-        std::exit( EXIT_FAILURE);
-    }
-    if ( offset_bits >= min_sizeof<uint32, size_t>() * 8) {
-        std::cerr << "ERROR. Each page is too large (" << page_size << " bytes)\n";
-        std::exit( EXIT_FAILURE);
-    }
+    using namespace std::literals::string_literals;
+    if ( set_bits >= min_sizeof<uint32, size_t>() * 8)
+        throw FuncMemoryBadMapping("Too many ("s + std::to_string(set_cnt) + ") sets");
+
+    if ( page_bits >= min_sizeof<uint32, size_t>() * 8)
+        throw FuncMemoryBadMapping("Too many (" + std::to_string(page_cnt) + ") pages");
+
+    if ( offset_bits >= min_sizeof<uint32, size_t>() * 8)
+        throw FuncMemoryBadMapping("Each page is too large " + std::to_string(page_size) + " bytes");
 
     memory.resize(set_cnt);
 
     const auto& sections_array = ElfSection::getAllElfSections( executable_file_name);
-
-    if ( sections_array.empty()) {
-        std::cerr << "ERROR. No ELF sections read from " << executable_file_name << "\n";
-        std::exit( EXIT_FAILURE);
-    }
 
     for ( const auto& section : sections_array)
     {
@@ -99,11 +91,7 @@ void FuncMemory::write( T value, Addr addr, T mask)
 {
     assert( addr != 0);
     assert( addr <= addr_mask);
-    if ( mask == 0)
-    {
-        std::cerr << "ERROR. Writing zero bytes)\n";
-        std::exit( EXIT_FAILURE);
-    }
+    assert( mask != 0);
 
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {

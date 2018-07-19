@@ -11,7 +11,7 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF<ISA>) { }
 
 template <typename ISA>
-void FuncSim<ISA>::update_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
+void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
 {
     if ( instr.is_nop())
         ++nops_in_a_row;
@@ -19,8 +19,7 @@ void FuncSim<ISA>::update_nop_counter( const typename FuncSim<ISA>::FuncInstr& i
         nops_in_a_row = 0;
 
     if (nops_in_a_row > 10)
-        serr << "Bearings lost: ten nops in a row. Simulation will be aborted."
-             << std::endl << std::endl << critical;
+        throw BearingLost();
 }
 
 template <typename ISA>
@@ -48,7 +47,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     PC = instr.get_new_PC();
 
     // Check whether we execute nops
-    update_nop_counter( instr);
+    update_and_check_nop_counter( instr);
 
     // dump
     return instr;
