@@ -41,6 +41,15 @@ public:
     BaseBP& operator=( BaseBP&&) = default;
 };
 
+struct BPInvalidMode final : std::exception
+{
+    const std::string message;
+    explicit BPInvalidMode(const std::string& msg) : message(std::string("Invalid mode of branch prediction: ") + msg + '\n') {}
+    explicit BPInvalidMode(const CacheTagArrayInvalidSizeException& src) : BPInvalidMode(src.message) {}
+    char const * what() const noexcept final {
+        return message.c_str();
+    }
+};
 
 template<typename T>
 class BP final: public BaseBP
@@ -49,19 +58,21 @@ class BP final: public BaseBP
     CacheTagArray tags;
 
 public:
-    BP( uint32 size_in_entries,
-        uint32 ways,
-        uint32 branch_ip_size_in_bits) :
+    BP( uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
+        : data( ways, std::vector<T>( size_in_entries / ways))
+        , tags( size_in_entries,
+            ways,
+            // we're reusing existing CacheTagArray functionality,
+            // but here we don't split memory in blocks, storing
+            // IP's only, so hardcoding here the granularity of 4 bytes:
+            4,
+            branch_ip_size_in_bits)
+    {
 
-        data( ways, std::vector<T>( size_in_entries / ways)),
-        tags( size_in_entries,
-              ways,
-              // we're reusing existing CacheTagArray functionality,
-              // but here we don't split memory in blocks, storing
-              // IP's only, so hardcoding here the granularity of 4 bytes:
-              4,
-              branch_ip_size_in_bits)
-        { }
+    }
+    catch (const CacheTagArrayInvalidSizeException& e) {
+        throw BPInvalidMode(e);
+    }
 
     /* prediction */
     bool is_taken( Addr PC) const final
@@ -107,7 +118,6 @@ public:
         return BPInterface( PC, is_taken( PC), get_target( PC)); 
     }
 };
-
 
 /*
  *******************************************************************************
@@ -167,12 +177,11 @@ public:
         auto it = map.find( name);
         if ( it == map.end())
         {
-             std::cerr << "ERROR. Invalid branch prediction mode " << name << std::endl
-                       << "Supported modes:" << std::endl;
-             for ( const auto& map_name : map)
+            std::cout << "Supported branch prediction modes:" << std::endl;
+            for ( const auto& map_name : map)
                  std::cerr << "\t" << map_name.first << std::endl;
 
-             std::exit( EXIT_FAILURE);
+            throw BPInvalidMode(name);
         }
 
         return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);

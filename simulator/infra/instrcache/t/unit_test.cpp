@@ -3,9 +3,7 @@
  * @author Denis Los
 */
 
-// Google test library
-#include <gtest/gtest.h>
-
+#include <catch.hpp>
 
 // Modules
 #include "../LRUCache.h"
@@ -28,7 +26,7 @@ public:
     uint64 sequence_id;
 };
 
-TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
+TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")
 {
     LRUCache<Addr, Dummy, 8192> cache{};
 
@@ -38,11 +36,11 @@ TEST( update_and_find_int, Update_Find_And_Check_Using_Int)
     cache.update( PC, test_number);
     auto result = cache.find( PC);
 
-    ASSERT_TRUE( result.first);
-    ASSERT_EQ( result.second, test_number);
+    CHECK( result.first);
+    CHECK( result.second == test_number);
 }
 
-TEST( update_and_find, Update_Find_And_Check)
+TEST_CASE( "update_and_find: Update_Find_And_Check")
 {
     LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
@@ -51,10 +49,10 @@ TEST( update_and_find, Update_Find_And_Check)
     const MIPS32Instr instr( instr_bytes, PC);
 
     instr_cache.update( PC, instr);
-    ASSERT_TRUE( instr_cache.find( PC).first);
+    CHECK( instr_cache.find( PC).first);
 }
 
-TEST( check_method_erase, Check_Method_Erase)
+TEST_CASE( "check_method_erase: Check_Method_Erase")
 {
     LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
@@ -65,10 +63,10 @@ TEST( check_method_erase, Check_Method_Erase)
     instr_cache.update( PC, instr);
     instr_cache.erase( PC);
 
-    ASSERT_FALSE( instr_cache.find( PC).first);
+    CHECK( !instr_cache.find( PC).first);
 }
 
-TEST( check_method_empty, Check_Method_Empty)
+TEST_CASE( "check_method_empty: Check_Method_Empty")
 {
     LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
@@ -76,13 +74,13 @@ TEST( check_method_empty, Check_Method_Empty)
     const Addr PC = 0x400d05;
     const MIPS32Instr instr( instr_bytes, PC);
 
-    ASSERT_TRUE( instr_cache.empty());
+    CHECK( instr_cache.empty());
     instr_cache.update( PC, instr);
-    ASSERT_FALSE( instr_cache.empty());
+    CHECK( !instr_cache.empty());
 }
 
 
-TEST( check_method_size, Check_Method_Size)
+TEST_CASE( "check_method_size: Check_Method_Size")
 {
     LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
@@ -95,13 +93,13 @@ TEST( check_method_size, Check_Method_Size)
         MIPS32Instr instr( instr_bytes++, PC);
         instr_cache.update( PC++, instr);
     }
-    ASSERT_EQ( SIZE, instr_cache.size());
+    CHECK( SIZE == instr_cache.size());
 
     instr_cache.erase( PC - 1);
-    ASSERT_EQ( SIZE - 1, instr_cache.size());
+    CHECK( SIZE - 1 == instr_cache.size());
 }
 
-TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
+TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Check")
 {
     constexpr const auto CAPACITY = 8192u;
 
@@ -115,16 +113,8 @@ TEST( exceed_capacity_and_test_lru, Add_More_Elements_Than_Capacity_And_Check)
 
     cache.update( CAPACITY + 1, Dummy( CAPACITY + 1));
 
-    ASSERT_EQ( cache.size(), CAPACITY);
-    ASSERT_FALSE( cache.empty());
-    ASSERT_FALSE( cache.find( 2).first);
-}
-
-
-int main( int argc, char** argv)
-{
-    ::testing::InitGoogleTest( &argc, argv);
-    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
-    return RUN_ALL_TESTS();
+    CHECK( cache.size() == CAPACITY);
+    CHECK( !cache.empty());
+    CHECK( !cache.find( 2).first);
 }
 
