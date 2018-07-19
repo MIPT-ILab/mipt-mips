@@ -42,6 +42,8 @@ class RISCVInstr
         Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
 
+        uint64 sequence_id = NO_VAL64;
+
 #if 0
         std::string disasm = {};
 #else
@@ -124,6 +126,8 @@ class RISCVInstr
 
         void execute() {};
         void check_trap() {};
+
+        void set_sequence_id( uint64 id) { sequence_id = id; }
 };
 
 template <typename T>
