@@ -186,7 +186,7 @@ class BaseMIPSInstr
 
         const Addr PC = NO_VAL32;
 
-        uint64 sequence_id = NO_VAL32;
+        uint64 sequence_id = NO_VAL64;
 
 #if 0
         std::string disasm = {};
