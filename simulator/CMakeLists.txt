@@ -38,26 +38,28 @@ set(CPPS infra/macro_test.cpp
     )
 
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /I${CMAKE_CURRENT_LIST_DIR} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /std:c++17 /GR-")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
     set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
     set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Werror -fno-rtti")
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror -fno-rtti")
     set(CMAKE_CXX_FLAGS_RELEASE " -O3 -march=native")
+    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
     set(CMAKE_LD_FLAGS_RELEASE " -flto -fno-rtti")
+    set(CMAKE_LD_FLAGS_DEBUG " -fno-rtti")
 endif()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
 #include headers
-include_directories(./.)
-include_directories(SYSTEM ../external)
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external)
 
 #include Boost headers
 find_package(Boost REQUIRED)
@@ -105,4 +107,4 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # tests
-include(tests/tests.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/tests/tests.cmake)
