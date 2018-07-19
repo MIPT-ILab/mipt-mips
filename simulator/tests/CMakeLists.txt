@@ -25,7 +25,7 @@ add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/\")
 
 # Add 'tests' target
 add_executable(unit-tests tests/main.cpp ${TESTS_CPPS})
-target_link_libraries(unit-tests mipt-mips-src ${Boost_LIBRARIES} ${LIBELF_LIBRARIES})
+target_link_libraries(unit-tests mipt-mips-src)
 
 # Generate list for CTest
 enable_testing()
