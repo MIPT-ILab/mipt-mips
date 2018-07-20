@@ -16,7 +16,20 @@
 // uArchSim modules
 #include <infra/types.h>
 #include <infra/macro.h>
-#include <infra/elf_parser/elf_parser.h>
+
+struct InvalidElfFile : std::exception
+{
+    const std::string filename;
+    const std::string message;
+    InvalidElfFile(std::string name, std::string msg)
+        : filename(std::move(name))
+        , message(std::move(msg))
+        {}
+    char const * what() const noexcept final {
+        using namespace std::literals::string_literals;
+        return (filename + " is not a valid ELF file:" + message).c_str();
+    }
+};
 
 struct FuncMemoryBadMapping final : std::exception
 {
