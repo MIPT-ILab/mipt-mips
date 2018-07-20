@@ -95,10 +95,9 @@ class FuncMemory
         void alloc( Addr addr);
         bool check( Addr addr) const;
     public:
-        explicit FuncMemory ( const std::string& executable_file_name,
-                     uint32 addr_bits = 32,
-                     uint32 page_bits = 10,
-                     uint32 offset_bits = 12);
+        explicit FuncMemory ( uint32 addr_bits = 32,
+                              uint32 page_bits = 10,
+                              uint32 offset_bits = 12);
 
         template<typename T>
         T read( Addr addr, T mask = all_ones<T>()) const;
@@ -108,6 +107,8 @@ class FuncMemory
 
         inline uint64 startPC() const { return startPC_addr; }
         std::string dump() const;
+        
+        void load_elf_file(const std::string& executable_file_name);
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
