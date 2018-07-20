@@ -14,13 +14,10 @@
 
 #include "rf/rf.h"
 
-struct BearingLost final : std::exception
+struct BearingLost final : std::runtime_error
 {
-    char const * what() const noexcept final {
-        return "Bearing lost: 10 nops in a row";
-    }
+    BearingLost() : std::runtime_error("Bearing lost: 10 nops in a row") { }
 };
-
 
 template <typename ISA>
 class FuncSim : public Simulator

@@ -17,27 +17,18 @@
 #include <infra/types.h>
 #include <infra/macro.h>
 
-struct InvalidElfFile : std::exception
+struct InvalidElfFile final : std::runtime_error
 {
-    const std::string filename;
-    const std::string message;
-    InvalidElfFile(std::string name, std::string msg)
-        : filename(std::move(name))
-        , message(std::move(msg))
-        {}
-    char const * what() const noexcept final {
-        using namespace std::literals::string_literals;
-        return (filename + " is not a valid ELF file:" + message).c_str();
-    }
+    InvalidElfFile(const std::string& name, const std::string& msg)
+        : std::runtime_error(name + " is not a valid ELF file:" + msg + '\n')
+    {}
 };
 
-struct FuncMemoryBadMapping final : std::exception
+struct FuncMemoryBadMapping final : std::runtime_error
 {
-    const std::string message;
-    explicit FuncMemoryBadMapping(const std::string& msg) : message(std::string("Invalid FuncMemory mapping: ") + msg + '\n') {}
-    char const * what() const noexcept final {
-        return message.c_str();
-    }
+    explicit FuncMemoryBadMapping(const std::string& msg)
+        : std::runtime_error(std::string("Invalid FuncMemory mapping: ") + msg + '\n')
+    {}
 };
 
 class FuncMemory

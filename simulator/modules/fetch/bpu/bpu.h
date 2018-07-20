@@ -41,14 +41,14 @@ public:
     BaseBP& operator=( BaseBP&&) = default;
 };
 
-struct BPInvalidMode final : std::exception
+struct BPInvalidMode final : std::runtime_error
 {
-    const std::string message;
-    explicit BPInvalidMode(const std::string& msg) : message(std::string("Invalid mode of branch prediction: ") + msg + '\n') {}
-    explicit BPInvalidMode(const CacheTagArrayInvalidSizeException& src) : BPInvalidMode(src.message) {}
-    char const * what() const noexcept final {
-        return message.c_str();
-    }
+    explicit BPInvalidMode(const std::string& mode)
+        : std::runtime_error(std::string("Invalid mode of branch prediction: ") + mode + '\n')
+    { }
+    explicit BPInvalidMode(const CacheTagArrayInvalidSizeException& src)
+        : BPInvalidMode(src.what())
+    { }
 };
 
 template<typename T>
@@ -181,7 +181,7 @@ public:
             for ( const auto& map_name : map)
                  std::cerr << "\t" << map_name.first << std::endl;
 
-            throw BPInvalidMode(name);
+            throw BPInvalidMode( name);
         }
 
         return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);
