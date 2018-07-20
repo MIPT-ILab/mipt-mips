@@ -12,6 +12,9 @@
 #include <iostream>
 #include <utility>
 
+// ELFIO
+#include <elfio/elfio.hpp>
+
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
@@ -44,15 +47,20 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
 
     memory.resize(set_cnt);
 
-    const auto& sections_array = ElfSection::getAllElfSections( executable_file_name);
+    ELFIO::elfio reader;
 
-    for ( const auto& section : sections_array)
-    {
-        if ( section.get_name() == ".text")
-            startPC_addr = section.get_start_addr();
+    if ( !reader.load( executable_file_name))
+        throw InvalidElfFile( executable_file_name, " file is not readable");
 
-        for ( size_t offset = 0; offset < section.get_size(); ++offset)
-            write<uint8>( section.get_byte(offset), section.get_start_addr() + offset);
+    for ( const auto& section : reader.sections) {
+        if ( section->get_address() == 0)
+            continue;
+
+        if ( section->get_name() == ".text")
+            startPC_addr = section->get_address();
+
+        for ( size_t offset = 0; offset < section->get_size(); ++offset)
+            write<uint8>( section->get_data[offset], section->get_address() + offset);
     }
 }
 

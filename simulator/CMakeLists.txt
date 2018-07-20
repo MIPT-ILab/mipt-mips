@@ -19,7 +19,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/elf_parser/elf_parser.cpp
     infra/memory/memory.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
