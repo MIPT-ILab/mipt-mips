@@ -24,6 +24,7 @@ set(CPPS infra/macro_test.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
     modules/fetch/fetch.cpp
+    modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp
     modules/execute/execute.cpp
     modules/mem/mem.cpp
