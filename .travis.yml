@@ -33,7 +33,7 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - g++-8
+    - g++-7
     - clang-tidy-6.0
     - libboost-program-options1.54-dev
 

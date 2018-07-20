@@ -34,8 +34,8 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
-MIPT-MIPS build system is CMake. You should install CMake 3.8 or higher.
-Check [our Wiki page](https://cmake.org/) to get more details about CMake build.
+MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
+Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
 ## Build and test procedure
