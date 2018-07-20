@@ -10,7 +10,7 @@
  
 #include <infra/types.h>
 #include <infra/log.h>
- 
+
 class Simulator : public Log {
 public:
     explicit Simulator( bool log = false) : Log( log) {}
@@ -20,6 +20,7 @@ public:
     virtual void set_PC( Addr value) = 0;
 
     static std::unique_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
+    static std::unique_ptr<Simulator> create_configured_simulator();
 };
 
 #endif // SIMULATOR_H
