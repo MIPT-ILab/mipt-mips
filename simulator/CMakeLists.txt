@@ -4,7 +4,7 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 
 project(mipt-mips CXX)
 
@@ -40,22 +40,24 @@ set(CPPS infra/macro_test.cpp
 
 # Compilation flags
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-    set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
-    set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror -fno-rtti")
-    set(CMAKE_CXX_FLAGS_RELEASE " -O3 -march=native")
-    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
-    set(CMAKE_LD_FLAGS_RELEASE " -flto -fno-rtti")
-    set(CMAKE_LD_FLAGS_DEBUG " -fno-rtti")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+#include(CheckIPOSupported)
+#check_ipo_supported(RESULT result)
+#if(result)
+#  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else()
+#  message(WARNING "IPO is not supported")
+#endif()
 
 # Headers
 include_directories(${CMAKE_CURRENT_LIST_DIR})
