@@ -60,7 +60,7 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
             startPC_addr = section->get_address();
 
         for ( size_t offset = 0; offset < section->get_size(); ++offset)
-            write<uint8>( section->get_data[offset], section->get_address() + offset);
+            write<uint8>( section->get_data()[offset], section->get_address() + offset);
     }
 }
 
