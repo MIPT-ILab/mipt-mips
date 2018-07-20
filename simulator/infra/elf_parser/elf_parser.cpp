@@ -17,61 +17,32 @@
 #include <memory>
 
 // LibELF
-#include <libelf.h>
+#include <elfio/elfio.hpp>
 
 // uArchSim modules
 #include <infra/macro.h>
 #include "elf_parser.h"
 
-ElfSection::ElfSection( const ElfSection& that)
-    : name( that.name), size( that.size), start_addr( that.start_addr), content( new uint8[size])
+ElfSection::ElfSection( std::string name, Addr start_addr, Addr size, const void* ptr)
+    : name( std::move( name)), size( size), start_addr( start_addr), content( new uint8[size])
 {
-    std::memcpy(this->content.get(), that.content.get(), this->size);
+    std::memcpy(content.get(), ptr, size);
 }
 
 std::list<ElfSection> ElfSection::getAllElfSections( const std::string& elf_file_name)
 {
     // open the binary file, we have to use C-style open,
     // because it is required by elf_begin function
-    std::unique_ptr<FILE, decltype(&fclose)> file( fopen( elf_file_name.c_str(), "rb"), fclose);
-    if ( file == nullptr)
+    ELFIO::elfio reader;
+
+    if ( !reader.load( elf_file_name))
         throw InvalidElfFile(elf_file_name, " file is not readable");
-
-    // set ELF library operating version
-    if ( elf_version( EV_CURRENT) == EV_NONE)
-        throw InvalidElfFile(elf_file_name, elf_errmsg( elf_errno()));
-
-    // open the file in ELF format
-    std::unique_ptr<Elf, decltype(&elf_end)> elf( elf_begin( fileno( file.get()), ELF_C_READ, nullptr), elf_end);
-    if (elf == nullptr)
-        throw InvalidElfFile(elf_file_name, elf_errmsg( elf_errno()));
-
-    size_t shstrndx;
-    elf_getshdrstrndx( elf.get(), &shstrndx);
 
     std::list<ElfSection> sections;
 
-    Elf_Scn *section = nullptr;
-    while ( (section = elf_nextscn( elf.get(), section)) != nullptr)
-    {
-        Elf32_Shdr shdr = *elf32_getshdr( section);
-
-        char* name = elf_strptr( elf.get(), shstrndx, shdr.sh_name);
-        Addr start_addr = shdr.sh_addr;
-
-        if ( start_addr == 0)
-            continue;
-
-        size_t size = shdr.sh_size;
-        auto offset = shdr.sh_offset;
-        auto content = std::make_unique<uint8[]>( size);
-
-        fseek( file.get(), offset, SEEK_SET);
-
-        // fill the content by the section data
-        ignored( std::fread( content.get(), sizeof( uint8), size, file.get()));
-        sections.emplace( sections.end(), name, start_addr, size, std::move(content));
-    }
+    for ( const auto& sec : reader.sections)
+        if ( sec->get_address() != 0)
+            sections.emplace_back( sec->get_name(), sec->get_address(), sec->get_size(), sec->get_data());
 
     return sections;
 }

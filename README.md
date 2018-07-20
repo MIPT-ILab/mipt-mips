@@ -30,7 +30,7 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 * Apple LLVM 7.3.0
 * MS Visual Studio 2017 (Boost 1.66 and CMake 3.10.2 are required)
 
-We use Boost and Libelf. [Install LibELF and Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
+[Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
