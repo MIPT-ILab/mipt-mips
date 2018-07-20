@@ -134,7 +134,7 @@ class segment_impl : public segment
             return sections[num];
         }
 
-        return -1;
+        return Elf_Half(-1);
     }
 
 //------------------------------------------------------------------------------
