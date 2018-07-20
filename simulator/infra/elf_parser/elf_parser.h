@@ -37,18 +37,7 @@ class ElfSection
     const Addr start_addr; // the start address of the section
     std::unique_ptr<uint8[]> content; // the row data of the section
 public:
-    ElfSection( std::string name, Addr start_addr, Addr size, std::unique_ptr<uint8[]> ptr)
-        : name( std::move( name)), size( size), start_addr( start_addr), content( std::move(ptr))
-    { }
-    virtual ~ElfSection() = default;
-
-    // No assignment
-    ElfSection& operator= ( const ElfSection&) = delete;
-    ElfSection& operator= ( ElfSection&&) = delete;
-
-    // copy and move ctors
-    ElfSection( const ElfSection& that);
-    ElfSection( ElfSection&& that) = default;
+    ElfSection( std::string name, Addr start_addr, Addr size, const void* ptr);
 
     // Use this function to extract all sections from the ELF binary file.
     static std::list<ElfSection> getAllElfSections( const std::string& elf_file_name);

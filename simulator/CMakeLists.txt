@@ -65,43 +65,8 @@ include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external)
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-# Libelf
-find_path(LIBELF_INCLUDE_DIRS
-    NAMES
-        libelf.h
-    PATHS
-        /usr/include
-        /usr/include/libelf
-        /usr/local/include
-        /usr/local/include/libelf
-        /opt/local/include
-        /opt/local/include/libelf
-        /sw/include
-        /sw/include/libelf
-        /usr/local/Cellar/libelf/0.8.13_1/include/libelf
-        ENV CPATH)
-
-if(NOT LIBELF_INCLUDE_DIRS)
-    message(SEND_ERROR "Can't find libelf.h")
-endif()
-
-find_library (LIBELF_LIBRARIES
-    NAMES
-        elf libelf
-    PATHS
-        /usr/lib
-        ENV LIBRARY_PATH
-        ENV LD_LIBRARY_PATH)
-
-if(NOT LIBELF_LIBRARIES)
-    message(SEND_ERROR "Can't find libelf")
-endif()
-
-include_directories(SYSTEM ${LIBELF_INCLUDE_DIRS})
-
 # Targets
 add_library(mipt-mips-src STATIC ${CPPS})
-target_link_libraries(mipt-mips-src ${LIBELF_LIBRARIES})
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} mipt-mips-src)
