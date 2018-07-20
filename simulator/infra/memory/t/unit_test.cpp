@@ -17,28 +17,36 @@ static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
     // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory( valid_elf_file));
+    CHECK_NOTHROW( FuncMemory( ));
     // check memory initialization with custom parameters
-    CHECK_NOTHROW( FuncMemory( valid_elf_file, 48, 15, 10));
+    CHECK_NOTHROW( FuncMemory( 48, 15, 10));
     // check memory initialization with 4GB page
-    CHECK_THROWS_AS( FuncMemory( valid_elf_file, 64, 15, 32), FuncMemoryBadMapping);
+    CHECK_THROWS_AS( FuncMemory( 64, 15, 32), FuncMemoryBadMapping);
+}
 
+TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
+{
+    CHECK_NOTHROW( FuncMemory( ).load_elf_file( valid_elf_file));
+    CHECK_NOTHROW( FuncMemory( 48, 15, 10).load_elf_file( valid_elf_file));
+    
     // test behavior when the file name does not exist
-    const char * wrong_file_name = "./1234567890/qwertyuiop";
+    const std::string wrong_file_name = "./1234567890/qwertyuiop";
     // must exit and return EXIT_FAILURE
-    CHECK_THROWS_AS( FuncMemory( wrong_file_name), InvalidElfFile);
+    CHECK_THROWS_AS( FuncMemory( ).load_elf_file( wrong_file_name), InvalidElfFile);
 }
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    FuncMemory func_mem( valid_elf_file);
+    FuncMemory func_mem;
+    func_mem.load_elf_file( valid_elf_file);
 
     CHECK( func_mem.startPC() == 0x4000b0u /*address of the ".text" section*/);
 }
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    FuncMemory func_mem( valid_elf_file);
+    FuncMemory func_mem;
+    func_mem.load_elf_file( valid_elf_file);
 
     // the address of the ".data" section
     uint64 dataSectAddr = 0x4100c0;
@@ -67,7 +75,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    FuncMemory func_mem( valid_elf_file);
+    FuncMemory func_mem;
+    func_mem.load_elf_file( valid_elf_file);
 
     // the address of the ".data" func_memion
     uint64 data_sect_addr = 0x4100c0;
@@ -90,7 +99,8 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    FuncMemory func_mem( valid_elf_file);
+    FuncMemory func_mem;
+    func_mem.load_elf_file( valid_elf_file);
 
     uint64 write_addr = 0x3FFFFE;
 

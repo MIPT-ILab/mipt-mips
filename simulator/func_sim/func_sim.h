@@ -29,7 +29,7 @@ class FuncSim : public Simulator
     using Memory = typename ISA::Memory;
     
     private:
-        std::unique_ptr<RF<ISA>> rf;
+        RF<ISA> rf;
         Addr PC = NO_VAL32;
         std::unique_ptr<Memory> mem = nullptr;
 

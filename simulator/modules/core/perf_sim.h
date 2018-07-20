@@ -31,7 +31,7 @@ class PerfSim : public Simulator
     Cycle curr_cycle = 0_Cl;
 
     /* simulator units */
-    std::unique_ptr<RF<ISA>> rf = nullptr;
+    RF<ISA> rf;
     std::unique_ptr<Memory> memory = nullptr;
     Fetch<ISA> fetch;
     Decode<ISA> decode;

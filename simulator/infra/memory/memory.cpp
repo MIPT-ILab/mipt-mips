@@ -20,8 +20,7 @@
 
 #include "memory.h"
 
-FuncMemory::FuncMemory( const std::string& executable_file_name,
-                        uint32 addr_bits,
+FuncMemory::FuncMemory( uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
     page_bits( page_bits),
@@ -46,7 +45,10 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
         throw FuncMemoryBadMapping("Each page is too large " + std::to_string(page_size) + " bytes");
 
     memory.resize(set_cnt);
+}
 
+void FuncMemory::load_elf_file( const std::string& executable_file_name)
+{
     ELFIO::elfio reader;
 
     if ( !reader.load( executable_file_name))
