@@ -61,8 +61,10 @@ void FuncMemory::load_elf_file( const std::string& executable_file_name)
         if ( section->get_name() == ".text")
             startPC_addr = section->get_address();
 
-        for ( size_t offset = 0; offset < section->get_size(); ++offset)
+        for ( size_t offset = 0; offset < section->get_size(); ++offset) {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
             write<uint8>( section->get_data()[offset], section->get_address() + offset);
+        }
     }
 }
 
