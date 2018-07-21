@@ -31,10 +31,10 @@ environment:
 
 before_build:
 - git submodule update --init
-- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_66_0;%PATH%
+- if "%platform%"=="x86" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+- if "%platform%"=="x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 - bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
-- set INCLUDE=C:\Libraries\boost_1_66_0;%INCLUDE%
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
