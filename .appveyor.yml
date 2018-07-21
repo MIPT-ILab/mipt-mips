@@ -7,34 +7,30 @@ branches:
 
 environment:
   matrix:
-  #- build: msvc
-  #  platform: x86
-  #  MSYSTEM: mingw32
-  #  CMAKEFILE: "Visual Studio 15"
+  - build: msvc
+    platform: x86
+    CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
-    MSYSTEM: mingw64
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
     platform: x86
-    MSYSTEM: mingw32
     CMAKEFILE: "MSYS Makefiles"
   - build: g++
     platform: x64
-    MSYSTEM: mingw64
     CMAKEFILE: "MSYS Makefiles"
 #  - build: clang++
 #    platform: x64
-#    MINGW_ROOT: C:\msys64\mingw64
-#    MINGW_ARCH: x86_64
-#    MSYSTEM: MINGW64
+#    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
 - git submodule update --init
-- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
+- if "%platform%"=="x86" set MSYSTEM=mingw32
+- if "%platform%"=="x64" set MSYSTEM=mingw64
+- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_66_0;%PATH%
+- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
+- if "%platform%"=="x86" set platform=Win32 # oh dear
 - bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
-- set INCLUDE=C:\Libraries\boost_1_66_0;%INCLUDE%
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
