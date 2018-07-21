@@ -32,7 +32,7 @@ environment:
 before_build:
 - git submodule update --init
 - set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
+- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 - bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
 - set INCLUDE=C:\Libraries\boost_1_66_0;%INCLUDE%
 
