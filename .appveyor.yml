@@ -37,7 +37,7 @@ build_script:
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
-- type mipt-mips.sln
+- echo %platform%
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; make"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
