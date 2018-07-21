@@ -8,13 +8,13 @@ branches:
 environment:
   matrix:
   - build: msvc
-    platform: Win32
+    platform: x86
     CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
-    platform: Win32
+    platform: x86
     CMAKEFILE: "MSYS Makefiles"
   - build: g++
     platform: x64
@@ -25,11 +25,12 @@ environment:
 
 before_build:
 - git submodule update --init
-- if "%platform%"=="Win32" set MSYSTEM=mingw32
+- if "%platform%"=="x86" set MSYSTEM=mingw32
 - if "%platform%"=="x64" set MSYSTEM=mingw64
 - set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_66_0;%PATH%
-- if "%platform%"=="Win32" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+- if "%platform%"=="x86" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 - if "%platform%"=="x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+- if "%platform%"=="x86" set platform=Win32 # oh dear
 - bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
 
 build_script:
@@ -37,7 +38,6 @@ build_script:
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
-- echo %platform%
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; make"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
