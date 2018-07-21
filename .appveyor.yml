@@ -15,29 +15,28 @@ environment:
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
     platform: x86
-    CMAKEFILE: "MSYS Makefiles"
+    CMAKEFILE: "MinGW Makefiles"
   - build: g++
     platform: x64
-    CMAKEFILE: "MSYS Makefiles"
+    CMAKEFILE: "MinGW Makefiles"
 #  - build: clang++
 #    platform: x64
 #    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
 - git submodule update --init
-- if "%platform%"=="x86" set MSYSTEM=mingw32
-- if "%platform%"=="x64" set MSYSTEM=mingw64
-- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_66_0;%PATH%
+- set PATH=C:\Libraries\boost_1_66_0;C:\mips-binutils\bin;%PATH%
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
-- bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
+- C:\msys64\usr\bin\bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/mips-binutils/"
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make"
-- mkdir build
-- cd build
+- cd traces
+- C:\MinGW\bin\mingw32-make
+- mkdir ..\build
+- cd ..\build
 - cmake ../simulator -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; make"
+- if not "%build%"=="msvc" C:\MinGW\bin\mingw32-make
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:
