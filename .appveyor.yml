@@ -7,10 +7,10 @@ branches:
 
 environment:
   matrix:
-  #- build: msvc
-  #  platform: x86
-  #  MSYSTEM: mingw32
-  #  CMAKEFILE: "Visual Studio 15"
+  - build: msvc
+    platform: x86
+    MSYSTEM: mingw32
+    CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
     MSYSTEM: mingw64
