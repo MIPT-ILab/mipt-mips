@@ -8,31 +8,27 @@ branches:
 environment:
   matrix:
   - build: msvc
-    platform: x86
-    MSYSTEM: mingw32
+    platform: Win32
     CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
-    MSYSTEM: mingw64
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
-    platform: x86
-    MSYSTEM: mingw32
+    platform: Win32
     CMAKEFILE: "MSYS Makefiles"
   - build: g++
     platform: x64
-    MSYSTEM: mingw64
     CMAKEFILE: "MSYS Makefiles"
 #  - build: clang++
 #    platform: x64
-#    MINGW_ROOT: C:\msys64\mingw64
-#    MINGW_ARCH: x86_64
-#    MSYSTEM: MINGW64
+#    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
 - git submodule update --init
+- if "%platform%"=="Win32" set MSYSTEM=mingw32
+- if "%platform%"=="x64" set MSYSTEM=mingw64
 - set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_66_0;%PATH%
-- if "%platform%"=="x86" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+- if "%platform%"=="Win32" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 - if "%platform%"=="x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 - bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
 
@@ -43,7 +39,7 @@ build_script:
 - cmake ../simulator -G "%CMAKEFILE%"
 - type mipt-mips.sln
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; make"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release
+- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:
 - ctest -C Release --verbose
