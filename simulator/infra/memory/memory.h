@@ -31,8 +31,27 @@ struct FuncMemoryBadMapping final : std::runtime_error
     {}
 };
 
+namespace ELFIO {
+    class section;
+} // namespace ELFIO
+
 class FuncMemory
 {
+    public:
+        explicit FuncMemory ( uint32 addr_bits = 32,
+                              uint32 page_bits = 10,
+                              uint32 offset_bits = 12);
+
+        template<typename T>
+        T read( Addr addr, T mask = all_ones<T>()) const;
+
+        template<typename T>
+        void write( T value, Addr addr, T mask = all_ones<T>());
+
+        uint64 startPC() const { return startPC_addr; }
+        std::string dump() const;
+        
+        void load_elf_file(const std::string& executable_file_name);
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
@@ -53,53 +72,24 @@ class FuncMemory
         Mem memory = {};
         Addr startPC_addr = NO_VAL32;
 
-        inline size_t get_set( Addr addr) const
-        {
-            return ( addr & set_mask) >> ( page_bits + offset_bits);
-        }
+        size_t get_set( Addr addr) const;
+        size_t get_page( Addr addr) const;
+        size_t get_offset( Addr addr) const;
 
-        inline size_t get_page( Addr addr) const
-        {
-            return ( addr & page_mask) >> offset_bits;
-        }
+        Addr get_addr( Addr set, Addr page, Addr offset) const;
+        Addr get_addr(const Mem::const_iterator& set_it,
+                      const Set::const_iterator& page_it,
+                      const Page::const_iterator& byte_it) const;
 
-        inline size_t get_offset( Addr addr) const
-        {
-            return ( addr & offset_mask);
-        }
-
-        inline Addr get_addr( Addr set, Addr page, Addr offset) const
-        {
-            return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
-        }
-
-        inline uint8 read_byte( Addr addr) const
-        {
-            return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
-        }
-
-        inline void write_byte( Addr addr, uint8 value)
-        {
-            memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
-        }
+        bool check( Addr addr) const;
+        uint8 read_byte( Addr addr) const;
+        uint8 check_and_read_byte( Addr addr) const;
 
         void alloc( Addr addr);
-        bool check( Addr addr) const;
-    public:
-        explicit FuncMemory ( uint32 addr_bits = 32,
-                              uint32 page_bits = 10,
-                              uint32 offset_bits = 12);
-
-        template<typename T>
-        T read( Addr addr, T mask = all_ones<T>()) const;
-
-        template<typename T>
-        void write( T value, Addr addr, T mask = all_ones<T>());
-
-        inline uint64 startPC() const { return startPC_addr; }
-        std::string dump() const;
+        void write_byte( Addr addr, uint8 value);
+        void alloc_and_write_byte( Addr addr, uint8 value);
         
-        void load_elf_file(const std::string& executable_file_name);
+        void load_elf_section( const ELFIO::section* section);
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
