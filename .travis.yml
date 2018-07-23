@@ -38,7 +38,6 @@ addons:
     - libboost-program-options1.54-dev
 
 install:
-  - export GTEST_COLOR=1
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
   - cd $TRAVIS_BUILD_DIR
   - git submodule update --init
