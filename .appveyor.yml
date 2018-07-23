@@ -7,72 +7,37 @@ branches:
 
 environment:
   matrix:
-  #- build: msvc
-  #  platform: x86
-  #  MINGW_ROOT: C:\msys64\mingw32
-  #  BOOST_ROOT: C:\Libraries\boost_1_66_0
-  #  LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
-  #  MINGW_ARCH: i686
-  #  CMAKEFILE: "Visual Studio 15"
+  - build: msvc
+    platform: x86
+    CMAKEFILE: "Visual Studio 15"
   - build: msvc
     platform: x64
-    MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\Libraries\boost_1_66_0
-    LIBELF_INCLUDE: C:\Projects\mipt-mips\libelf\lib
-    MINGW_ARCH: x86_64
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
     platform: x86
-    MINGW_ROOT: C:\msys64\mingw32
-    BOOST_ROOT: C:\msys64\mingw32\include\boost
-    LIBELF_INCLUDE: C:\msys64\mingw32\include\libelf
-    MINGW_ARCH: i686
-    MSYSTEM: MINGW32
     CMAKEFILE: "MSYS Makefiles"
   - build: g++
     platform: x64
-    MINGW_ROOT: C:\msys64\mingw64
-    BOOST_ROOT: C:\msys64\mingw64\include\boost
-    LIBELF_INCLUDE: C:\msys64\mingw64\include\libelf
-    MINGW_ARCH: x86_64
-    MSYSTEM: MINGW64
     CMAKEFILE: "MSYS Makefiles"
 #  - build: clang++
 #    platform: x64
-#    MINGW_ROOT: C:\msys64\mingw64
-#    BOOST_ROOT: C:\msys64\mingw64\include\boost
-#    MINGW_ARCH: x86_64
-#    MSYSTEM: MINGW64
+#    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
-# install submodules
 - git submodule update --init
-# configure variable
-- set PATH=%MINGW_ROOT%;%MINGW_ROOT%\bin;C:\msys64\usr\bin\;"C:\Program Files\LLVM\bin";%PATH%
-# set variables for MSVC
-- if "%build%"=="msvc"  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%PLATFORM%
-# install LibELF
-- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-libelf"
-- if "%build%"=="msvc" cd C:\Projects\mipt-mips && git clone https://github.com/MIPT-ILab/libelf.git
-- if "%build%"=="msvc" cd C:\Projects\mipt-mips\libelf\lib && call build.bat
-- set INCLUDE=%LIBELF_INCLUDE%;%INCLUDE%
-- cd C:\Projects\mipt-mips
-# install Boost
-- if not "%build%"=="msvc" bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
-- set PATH=%LIBELF_INCLUDE%;%PATH%
-- set INCLUDE=%BOOST_ROOT%;%INCLUDE%
-# build binutils
-- bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/projects/mipt-mips/binutils/cross/mips"
-- set PATH=%PATH%;C:\projects\mipt-mips\binutils\cross\mips\bin
-# update environment
-- set CXX=%build%
+- if "%platform%"=="x86" set MSYSTEM=mingw32
+- if "%platform%"=="x64" set MSYSTEM=mingw64
+- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;%PATH%
+- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
+- if "%platform%"=="x86" set platform=Win32 # oh dear
+- bash -lc "/c/projects/mipt-mips/traces/.get-binutils.sh /c/msys64/usr"
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
-- mkdir C:\Projects\mipt-mips\simulator\build
-- cd C:\Projects\mipt-mips\simulator\build
-- cmake .. -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/simulator/build; make"
+- mkdir build
+- cd build
+- cmake ../simulator -G "%CMAKEFILE%"
+- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; make"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:

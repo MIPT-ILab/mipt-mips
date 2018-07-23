@@ -2,6 +2,9 @@
  * simulator.cpp - interface for simulator
  * Copyright 2018 MIPT-MIPS
  */
+
+// Configurations 
+#include <infra/config/config.h>
  
 // Simulators
 #include <func_sim/func_sim.h>
@@ -12,6 +15,19 @@
 #include <risc_v/risc_v.h>
 
 #include "simulator.h"
+
+namespace config {
+    static AliasedValue<std::string> isa = { "I", "isa", "mips32", "modeled ISA"};
+    static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
+    static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
+} // namespace config
+
+struct InvalidISA final : std::runtime_error
+{
+    explicit InvalidISA(const std::string& isa)
+        : std::runtime_error(std::string("Invalid ISA: ") + isa + '\n')
+    { }
+};
 
 class SimulatorFactory {
     struct Builder {
@@ -55,12 +71,11 @@ class SimulatorFactory {
         auto it = map.find( name);
         if ( it == map.end())
         {
-             std::cerr << "ERROR. Invalid ISA option " << name << std::endl
-                       << "Supported ISAs:" << std::endl;
-             for ( const auto& map_name : map)
-                 std::cerr << "\t" << map_name.first << std::endl;
+            std::cout << "Supported ISAs:" << std::endl;
+            for ( const auto& map_name : map)
+                std::cout << "\t" << map_name.first << std::endl;
 
-             std::exit( EXIT_FAILURE);
+            throw InvalidISA( name);
         }
 
         return it->second.get();
@@ -90,3 +105,8 @@ Simulator::create_simulator( const std::string& isa, bool functional_only, bool 
     return factory.get_perfsim( isa, log);
 }
 
+std::unique_ptr<Simulator>
+Simulator::create_configured_simulator()
+{
+    return create_simulator( config::isa, config::functional_only, config::disassembly_on);
+}

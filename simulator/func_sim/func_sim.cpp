@@ -8,7 +8,7 @@
 #include "func_sim.h"
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), rf( new RF<ISA>) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new Memory) { }
 
 template <typename ISA>
 void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
@@ -29,7 +29,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     FuncInstr instr = mem->fetch_instr( PC);
     
     // read sources
-    rf->read_sources( &instr);
+    rf.read_sources( &instr);
 
     // execute
     instr.execute();
@@ -38,7 +38,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     mem->load_store( &instr);
 
     // writeback
-    rf->write_dst( instr);
+    rf.write_dst( instr);
 
     // trap check
     instr.check_trap();
@@ -56,7 +56,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    mem = std::make_unique<Memory>( tr);
+    mem->load_elf_file( tr);
     PC = mem->startPC();
     nops_in_a_row = 0;
 }

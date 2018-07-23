@@ -22,25 +22,28 @@ Features modeled:
 
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
-## Getting started
-
-1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-1. [Install LibELF and Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries)
-1. [Build MIPS binutils](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you need to build MIPS ELF binaries.
-1. Install CMake 3.8 or higher.
-1. Create build directory somewhere, then cd into it and run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory. Check [our Wiki page](https://cmake.org/) to get more details about CMake build.
-
-Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
-
-To run all unit tests, call `ctest --verbose -C Release` from your build directory.
-
-### C++ requirements
+## Requirements
 
 MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of these versions or newer:
 * GCC 7
 * Clang 5.0
 * Apple LLVM 7.3.0
 * MS Visual Studio 2017 (Boost 1.66 and CMake 3.10.2 are required)
+
+[Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
+
+To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
+
+MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
+Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about.
+Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
+
+## Build and test procedure
+
+1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
+1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory && cd /path/to/your/build/directory`
+1. Run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory
+1. To run all unit tests, call `ctest --verbose -C Release` from your build directory.
 
 ## Command line options
 

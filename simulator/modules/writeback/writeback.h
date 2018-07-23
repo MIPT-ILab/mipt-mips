@@ -10,13 +10,11 @@
 #include <func_sim/func_sim.h>
 #include <modules/core/perf_instr.h>
 
-struct CheckerMismatch final : std::exception
+struct CheckerMismatch final : std::runtime_error
 {
-    const std::string message;
-    explicit CheckerMismatch(const std::string& msg) : message(std::string("Checker mismatch: ") + msg + '\n') {}
-    char const * what() const noexcept final {
-        return message.c_str();
-    }
+    explicit CheckerMismatch(const std::string& msg)
+        : std::runtime_error(std::string("Checker mismatch: ") + msg + '\n')
+    { }
 };
 
 template <typename ISA>
