@@ -30,7 +30,7 @@ before_build:
 - set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;%PATH%
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
-- bash -lc "/c/projects/mipt-mips/traces/get-binutils.sh /c/msys64/usr"
+- bash -lc "/c/projects/mipt-mips/traces/.get-binutils.sh /c/msys64/usr"
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
