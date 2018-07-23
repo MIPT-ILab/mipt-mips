@@ -1,8 +1,0 @@
-title: MIPT-MIPS
-description: Cycle-accurate pre-silicon simulator of MIPS CPU
-google_analytics: 
-show_downloads: true
-theme: jekyll-theme-slate
-
-gems:
-  - jekyll-mentions
