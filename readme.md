@@ -78,4 +78,4 @@ The main goal of the project is to teach the students the computer architecture 
 
 ### May I contribute?
 
-Yes, if you attend MIPT-MIPS lectures. See our [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
+Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
