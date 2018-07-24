@@ -10,6 +10,9 @@ project(mipt-mips CXX)
 
 set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external)
+
+option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -50,6 +53,16 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (ENABLE_COVERAGE)
+    if (WIN32)
+        message(FATAL_ERROR "CodeCov is not supported for Windows builds")
+    endif()
+    if (NOT CMAKE_COMPILER_IS_GNUCXX)
+        message(FATAL_ERROR "CodeCov is supported only for GCC builds")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g")
+endif()
 
 #include(CheckIPOSupported)
 #check_ipo_supported(RESULT result)
