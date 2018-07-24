@@ -29,3 +29,9 @@ target_link_libraries(unit-tests mipt-mips-src)
 # Generate list for CTest
 enable_testing()
 add_test(all_tests unit-tests)
+
+# Code coverage
+if(ENABLE_COVERAGE)
+    include(CodeCoverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage unit-tests coverage)
+endif()
