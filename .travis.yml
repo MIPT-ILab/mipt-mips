@@ -18,7 +18,7 @@ os:
   - osx
 
 git:
-  submodules: false
+  submodules: true
 
 matrix:
   exclude:
@@ -39,8 +39,6 @@ addons:
 
 install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
-  - cd $TRAVIS_BUILD_DIR
-  - git submodule update --init
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -54,14 +52,15 @@ install:
     fi
 
 script:
-# Build traces
   - cd traces && make
-# Build and test simulator
   - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
   - cmake ..
   - make
   - ctest --verbose
-# Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*'; fi
-# Run a trace to see simulation frequency
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
+
+after_success:
+  - |
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        run-clang-tidy-6.0.py -header-filter='.*'
+    fi
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
