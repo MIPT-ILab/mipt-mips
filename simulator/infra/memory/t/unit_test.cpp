@@ -1,11 +1,15 @@
-// generic C
-#include <cassert>
-#include <cstdlib>
+/**
+ * Unit tests for module implementing the concept of
+ * programer-visible memory space accesing via memory address.
+ * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
+ * Copyright 2012-2018 MIPT-MIPS iLab project
+ */
+#include <iostream>
 
 // Catch2
 #include <catch.hpp>
 
-// uArchSim modules
+// MIPT-MIPS modules
 #include "../memory.h"
 
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
@@ -28,7 +32,10 @@ TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
     CHECK_NOTHROW( FuncMemory( ).load_elf_file( valid_elf_file));
     CHECK_NOTHROW( FuncMemory( 48, 15, 10).load_elf_file( valid_elf_file));
-    
+}
+
+TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
+{
     // test behavior when the file name does not exist
     const std::string wrong_file_name = "./1234567890/qwertyuiop";
     // must exit and return EXIT_FAILURE
@@ -79,22 +86,22 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     func_mem.load_elf_file( valid_elf_file);
 
     // the address of the ".data" func_memion
-    uint64 data_sect_addr = 0x4100c0;
+    uint64 dataSectAddr = 0x4100c0;
 
-    // write 1 into the byte pointed by data_sect_addr
-    func_mem.write<uint8>( 1, data_sect_addr);
+    // write 1 into the byte pointed by dataSectAddr
+    func_mem.write<uint8>( 1, dataSectAddr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
-    CHECK( func_mem.read<uint32>( data_sect_addr) == right_ret);
+    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
 
-    // write 0x7777 into the two bytes pointed by ( data_sect_addr + 1)
-    func_mem.write<uint16>( 0x7777, data_sect_addr + 1);
+    // write 0x7777 into the two bytes pointed by ( dataSectAddr + 1)
+    func_mem.write<uint16>( 0x7777, dataSectAddr + 1);
     right_ret = 0x03777701; // before write it was 0x03020101
-    CHECK( func_mem.read<uint32>( data_sect_addr) == right_ret);
+    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
 
-    // write 0x00000000 into the four bytes pointed by data_sect_addr
-    func_mem.write<uint32>( 0x00000000, data_sect_addr, 0xFFFFFFFFull);
+    // write 0x00000000 into the four bytes pointed by dataSectAddr
+    func_mem.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
     right_ret = 0x00000000; // before write it was 0x03777701
-    CHECK( func_mem.read<uint32>( data_sect_addr) == right_ret);
+    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
@@ -116,3 +123,74 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
     CHECK( func_mem.read<uint16>( write_addr + 2) == right_ret);
 }
 
+TEST_CASE( "Func_memory: Dump")
+{
+    FuncMemory func_mem;
+    func_mem.load_elf_file( valid_elf_file);
+
+    CHECK( func_mem.dump() ==
+        "addr 0x400095: data 0xc\n"
+        "addr 0x4000a8: data 0x70\n"
+        "addr 0x4000a9: data 0x81\n"
+        "addr 0x4000aa: data 0x41\n"
+        "addr 0x4000b0: data 0x41\n"
+        "addr 0x4000b2: data 0xb\n"
+        "addr 0x4000b3: data 0x3c\n"
+        "addr 0x4000b4: data 0xcc\n"
+        "addr 0x4000b6: data 0x6b\n"
+        "addr 0x4000b7: data 0x25\n"
+        "addr 0x4000b8: data 0x4\n"
+        "addr 0x4000ba: data 0x6a\n"
+        "addr 0x4000bb: data 0x8d\n"
+        "addr 0x4100c1: data 0x1\n"
+        "addr 0x4100c2: data 0x2\n"
+        "addr 0x4100c3: data 0x3\n"
+        "addr 0x4100c4: data 0x4\n"
+        "addr 0x4100c5: data 0x5\n"
+        "addr 0x4100c6: data 0x6\n"
+        "addr 0x4100c7: data 0x7\n"
+        "addr 0x4100c8: data 0x8\n"
+        "addr 0x4100c9: data 0x9\n"
+        "addr 0x4100cc: data 0x7\n"
+        "addr 0x4100d0: data 0xb\n"
+        "addr 0x4100d4: data 0xd\n"
+    );
+}
+
+TEST_CASE( "Func_memory: Invariancy")
+{
+    FuncMemory mem1;
+    FuncMemory mem2( 48, 15, 10);
+    mem1.load_elf_file( valid_elf_file);
+    mem2.load_elf_file( valid_elf_file);
+    
+    CHECK( mem1.dump() == mem2.dump());
+
+    // the address of the ".data" section
+    uint64 dataSectAddr = 0x4100c0;
+
+    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
+    CHECK( mem1.read<uint32>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32>( dataSectAddr + 1, 0xFFFFFFull));
+    CHECK( mem1.read<uint32>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32>( dataSectAddr + 2, 0xFFFFull));
+    CHECK( mem1.read<uint16>( dataSectAddr + 2) == mem2.read<uint16>( dataSectAddr + 2));
+    CHECK( mem1.read<uint8>( dataSectAddr + 3) == mem2.read<uint8>( dataSectAddr + 3));
+    CHECK( mem1.read<uint8>( 0x300000) == mem2.read<uint8>( 0x300000));
+    
+    mem1.write<uint8>( 1, dataSectAddr);
+    CHECK( mem1.read<uint32>( dataSectAddr) != mem2.read<uint32>( dataSectAddr));
+
+    mem2.write<uint8>( 1, dataSectAddr);
+    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
+
+    mem1.write<uint16>( 0x7777, dataSectAddr + 1);
+    CHECK( mem1.read<uint32>( dataSectAddr) != mem2.read<uint32>( dataSectAddr));
+
+    mem2.write<uint16>( 0x7777, dataSectAddr + 1);
+    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
+
+    // write 0x00000000 into the four bytes pointed by dataSectAddr
+    mem1.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    mem2.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+
+    CHECK( mem1.read<uint32>( dataSectAddr) == mem1.read<uint32>( dataSectAddr));
+}
