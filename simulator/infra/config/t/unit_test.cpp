@@ -19,6 +19,14 @@ namespace config {
     AliasedSwitch bool_config_2 = { "f", "bool_config_2", "second bool config description"};
 } // namespace config
 
+template<typename T>
+std::string wrap_shift_operator(const T& value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
 //
 // To check whether the returned values
 // are equal to passed arguments
@@ -43,6 +51,11 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
     CHECK( config::string_config == mandatory_string_value);
     CHECK_FALSE( config::bool_config_1);
     CHECK( config::bool_config_2);
+
+    CHECK( wrap_shift_operator( config::uint64_config) == "145");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "false");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "true");
 }
 
 //
@@ -69,6 +82,11 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
     CHECK( config::string_config == mandatory_string_value);
     CHECK( config::bool_config_1);
     CHECK_FALSE( config::bool_config_2);
+    
+    CHECK( wrap_shift_operator( config::uint64_config) == "356");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "true");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "false");
 }
 
 //
