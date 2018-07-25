@@ -154,7 +154,7 @@ std::string FuncMemory::dump() const
             for ( auto byte_it = page_it->begin(); byte_it != page_it->end(); ++byte_it)
                 if ( *byte_it != 0)
                     oss << "addr 0x" << get_addr( set_it, page_it, byte_it)
-                        << ": data 0x" << *byte_it << std::endl;
+                        << ": data 0x" << uint32( *byte_it) << std::endl;
 
     return oss.str();
 }
