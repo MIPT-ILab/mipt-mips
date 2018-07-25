@@ -82,9 +82,6 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     FuncMemory func_mem;
     func_mem.load_elf_file( valid_elf_file);
 
-    // the address of the ".data" func_memion
-    uint64 dataSectAddr = 0x4100c0;
-
     // write 1 into the byte pointed by dataSectAddr
     func_mem.write<uint8>( 1, dataSectAddr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
