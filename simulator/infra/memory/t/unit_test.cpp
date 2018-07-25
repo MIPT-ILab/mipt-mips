@@ -4,8 +4,6 @@
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012-2018 MIPT-MIPS iLab project
  */
-#include <iostream>
-
 // Catch2
 #include <catch.hpp>
 
@@ -13,6 +11,8 @@
 #include "../memory.h"
 
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
+// the address of the ".data" section
+static const uint64 dataSectAddr = 0x4100c0;
 
 //
 // Check that all incorect input params of the constructor
@@ -54,9 +54,6 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 {
     FuncMemory func_mem;
     func_mem.load_elf_file( valid_elf_file);
-
-    // the address of the ".data" section
-    uint64 dataSectAddr = 0x4100c0;
 
     // read 4 bytes from the func_mem start addr
     uint64 right_ret = 0x03020100;
@@ -166,9 +163,6 @@ TEST_CASE( "Func_memory: Invariancy")
     
     CHECK( mem1.dump() == mem2.dump());
 
-    // the address of the ".data" section
-    uint64 dataSectAddr = 0x4100c0;
-
     CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
     CHECK( mem1.read<uint32>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32>( dataSectAddr + 1, 0xFFFFFFull));
     CHECK( mem1.read<uint32>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32>( dataSectAddr + 2, 0xFFFFull));
@@ -188,7 +182,6 @@ TEST_CASE( "Func_memory: Invariancy")
     mem2.write<uint16>( 0x7777, dataSectAddr + 1);
     CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
 
-    // write 0x00000000 into the four bytes pointed by dataSectAddr
     mem1.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
     mem2.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
 

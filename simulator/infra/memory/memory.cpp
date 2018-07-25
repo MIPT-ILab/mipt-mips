@@ -107,7 +107,7 @@ void FuncMemory::write( T value, Addr addr, T mask)
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
         if ((mask & 0xFFu) == 0xFFu)
-            alloc_and_write_byte( addr + i, static_cast<uint8>(value & 0xFFu));
+            alloc_and_write_byte( addr + i, static_cast<Byte>( value & 0xFFu));
         if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
             mask >>= 8;
             value >>= 8;
@@ -115,7 +115,7 @@ void FuncMemory::write( T value, Addr addr, T mask)
     }
 }
 
-void FuncMemory::alloc_and_write_byte( Addr addr, uint8 value)
+void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
 {
     alloc( addr);
     write_byte( addr, value);
@@ -135,7 +135,7 @@ void FuncMemory::alloc( Addr addr)
 
     auto& page = set[get_page(addr)];
     if ( page.empty())
-        page.resize(page_size, 0);
+        page.resize(page_size, Byte());
 }
 
 bool FuncMemory::check( Addr addr) const
@@ -152,7 +152,7 @@ std::string FuncMemory::dump() const
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
             for ( auto byte_it = page_it->begin(); byte_it != page_it->end(); ++byte_it)
-                if ( *byte_it != 0)
+                if ( uint32( *byte_it) != 0)
                     oss << "addr 0x" << get_addr( set_it, page_it, byte_it)
                         << ": data 0x" << uint32( *byte_it) << std::endl;
 
@@ -186,17 +186,17 @@ inline Addr FuncMemory::get_addr( Addr set, Addr page, Addr offset) const
     return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
 }
 
-inline uint8 FuncMemory::read_byte( Addr addr) const
+inline Byte FuncMemory::read_byte( Addr addr) const
 {
     return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
 }
 
-uint8 FuncMemory::check_and_read_byte( Addr addr) const
+Byte FuncMemory::check_and_read_byte( Addr addr) const
 {
-    return check( addr) ? read_byte( addr) : NO_VAL8;
+    return check( addr) ? read_byte( addr) : static_cast<Byte>( NO_VAL8);
 }
 
-inline void FuncMemory::write_byte( Addr addr, uint8 value)
+inline void FuncMemory::write_byte( Addr addr, Byte value)
 {
     memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
 }
