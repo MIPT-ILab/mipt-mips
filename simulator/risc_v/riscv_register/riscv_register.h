@@ -32,10 +32,7 @@ public:
 
     explicit RISCVRegister( uint8 id) : RISCVRegister( static_cast<RegNum>( id))
     {
-        if ( id >= 32u) {
-            std::cerr << "ERROR: Invalid RISCV register id = " << id;
-            exit( EXIT_FAILURE);
-        }
+        assert( id < 32u);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)

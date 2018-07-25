@@ -31,10 +31,7 @@ public:
 
     explicit MIPSRegister( uint8 id) : MIPSRegister( static_cast<RegNum>( id))
     {
-        if ( id >= 32u) {
-            std::cerr << "ERROR: Invalid MIPS register id = " << id;
-            exit( EXIT_FAILURE);
-        }
+        assert( id < 32u);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
