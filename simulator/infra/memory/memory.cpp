@@ -12,13 +12,15 @@
 #include <iostream>
 #include <utility>
 
+// ELFIO
+#include <elfio/elfio.hpp>
+
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
 #include "memory.h"
 
-FuncMemory::FuncMemory( const std::string& executable_file_name,
-                        uint32 addr_bits,
+FuncMemory::FuncMemory( uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
     page_bits( page_bits),
@@ -37,22 +39,36 @@ FuncMemory::FuncMemory( const std::string& executable_file_name,
         throw FuncMemoryBadMapping("Too many ("s + std::to_string(set_cnt) + ") sets");
 
     if ( page_bits >= min_sizeof<uint32, size_t>() * 8)
-        throw FuncMemoryBadMapping("Too many (" + std::to_string(page_cnt) + ") pages");
+        throw FuncMemoryBadMapping("Too many ("s + std::to_string(page_cnt) + ") pages");
 
     if ( offset_bits >= min_sizeof<uint32, size_t>() * 8)
-        throw FuncMemoryBadMapping("Each page is too large " + std::to_string(page_size) + " bytes");
+        throw FuncMemoryBadMapping("Each page is too large ("s + std::to_string(page_size) + " bytes)");
 
     memory.resize(set_cnt);
+}
 
-    const auto& sections_array = ElfSection::getAllElfSections( executable_file_name);
+void FuncMemory::load_elf_file( const std::string& executable_file_name)
+{
+    ELFIO::elfio reader;
 
-    for ( const auto& section : sections_array)
-    {
-        if ( section.get_name() == ".text")
-            startPC_addr = section.get_start_addr();
+    if ( !reader.load( executable_file_name))
+        throw InvalidElfFile( executable_file_name, " file is not readable");
 
-        for ( size_t offset = 0; offset < section.get_size(); ++offset)
-            write<uint8>( section.get_byte(offset), section.get_start_addr() + offset);
+    for ( const auto& section : reader.sections)
+        load_elf_section( section);
+}
+
+void FuncMemory::load_elf_section( const ELFIO::section* section)
+{
+    if ( section->get_address() == 0)
+        return;
+
+    if ( section->get_name() == ".text")
+        startPC_addr = section->get_address();
+
+    for ( size_t offset = 0; offset < section->get_size(); ++offset) {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
+        write<uint8>( section->get_data()[offset], section->get_address() + offset);
     }
 }
 
@@ -65,20 +81,15 @@ T FuncMemory::read( Addr addr, T mask) const
 
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if (( mask & 0xFFu) == 0xFFu) {
-            auto byte = NO_VAL8;
-            if ( check( addr + i))
-                byte = read_byte( addr + i);
-            value |= static_cast<T>(static_cast<T>(byte) << (i * 8));
-        }
-        // NOLINTNEXTLINE(misc-suspicious-semicolon)
-        if constexpr ( bitwidth<T> > 8) {
-            mask >>= 8u;
-        }
+        if (( mask & 0xFFu) == 0xFFu)
+            value |= static_cast<T>(static_cast<T>(check_and_read_byte( addr + i)) << (i * 8));
+        if constexpr ( bitwidth<T> > 8)
+            mask >>= 8u; // NOLINT(misc-suspicious-semicolon)
     }
 
     return value;
 }
+
 
 template uint8 FuncMemory::read<uint8>( Addr addr, uint8 mask) const;
 template uint16 FuncMemory::read<uint16>( Addr addr, uint16 mask) const;
@@ -95,16 +106,19 @@ void FuncMemory::write( T value, Addr addr, T mask)
 
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if ((mask & 0xFFu) == 0xFFu) {
-            alloc( addr + i);
-            write_byte( addr + i, static_cast<uint8>(value & 0xFFu));
-        }
-        // NOLINTNEXTLINE(misc-suspicious-semicolon)
-        if constexpr ( bitwidth<T> > 8) {
+        if ((mask & 0xFFu) == 0xFFu)
+            alloc_and_write_byte( addr + i, static_cast<Byte>( value & 0xFFu));
+        if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
             mask >>= 8;
             value >>= 8;
         }
     }
+}
+
+void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
+{
+    alloc( addr);
+    write_byte( addr, value);
 }
 
 template void FuncMemory::write<uint8>( uint8 value, Addr addr, uint8 mask);
@@ -121,7 +135,7 @@ void FuncMemory::alloc( Addr addr)
 
     auto& page = set[get_page(addr)];
     if ( page.empty())
-        page.resize(page_size, 0);
+        page.resize(page_size, Byte());
 }
 
 bool FuncMemory::check( Addr addr) const
@@ -135,21 +149,54 @@ std::string FuncMemory::dump() const
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;
 
-    for ( size_t set_n = 0; set_n < memory.size(); ++set_n)
-    {
-        const auto& set = memory[ set_n];
-        for ( size_t page_n = 0; page_n < set.size(); ++page_n)
-        {
-            const auto& page = set[ page_n];
-            for ( size_t byte_n = 0; byte_n < page.size(); ++byte_n)
-            {
-                const auto& byte = page[ byte_n];
-                if ( byte != 0)
-                    oss << "addr 0x" << get_addr( set_n, page_n, byte_n)
-                        << ": data 0x" << byte << std::endl;
-            }
-        }
-    }
+    for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
+        for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
+            for ( auto byte_it = page_it->begin(); byte_it != page_it->end(); ++byte_it)
+                if ( uint32( *byte_it) != 0)
+                    oss << "addr 0x" << get_addr( set_it, page_it, byte_it)
+                        << ": data 0x" << uint32( *byte_it) << std::endl;
 
     return oss.str();
+}
+
+Addr FuncMemory::get_addr(const Mem::const_iterator& set_it, const Set::const_iterator& page_it, const Page::const_iterator& byte_it) const
+{
+    return get_addr( std::distance( memory.begin(), set_it),
+                     std::distance( set_it->begin(), page_it),
+                     std::distance( page_it->begin(), byte_it));
+}
+
+inline size_t FuncMemory::get_set( Addr addr) const
+{
+    return ( addr & set_mask) >> ( page_bits + offset_bits);
+}
+
+inline size_t FuncMemory::get_page( Addr addr) const
+{
+    return ( addr & page_mask) >> offset_bits;
+}
+
+inline size_t FuncMemory::get_offset( Addr addr) const
+{
+    return ( addr & offset_mask);
+}
+
+inline Addr FuncMemory::get_addr( Addr set, Addr page, Addr offset) const
+{
+    return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
+}
+
+inline Byte FuncMemory::read_byte( Addr addr) const
+{
+    return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
+}
+
+Byte FuncMemory::check_and_read_byte( Addr addr) const
+{
+    return check( addr) ? read_byte( addr) : static_cast<Byte>( NO_VAL8);
+}
+
+inline void FuncMemory::write_byte( Addr addr, Byte value)
+{
+    memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
 }

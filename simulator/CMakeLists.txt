@@ -4,12 +4,15 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 
 project(mipt-mips CXX)
 
 set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external)
+
+option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -19,12 +22,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/elf_parser/elf_parser.cpp
     infra/memory/memory.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
     modules/fetch/fetch.cpp
+    modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp
     modules/execute/execute.cpp
     modules/mem/mem.cpp
@@ -40,22 +43,34 @@ set(CPPS infra/macro_test.cpp
 
 # Compilation flags
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D__LIBELF_INTERNAL__=1 /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-    set(CMAKE_LD_FLAGS_RELEASE "${CMAKE_LD_FLAGS_RELEASE} /MD")
-    set(CMAKE_LD_FLAGS_DEBUG "${CMAKE_LD_FLAGS_DEBUG} /MDd")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /GR-")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror -fno-rtti")
-    set(CMAKE_CXX_FLAGS_RELEASE " -O3 -march=native")
-    set(CMAKE_CXX_FLAGS_DEBUG " -O0 -g")
-    set(CMAKE_LD_FLAGS_RELEASE " -flto -fno-rtti")
-    set(CMAKE_LD_FLAGS_DEBUG " -fno-rtti")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (ENABLE_COVERAGE)
+    if (WIN32)
+        message(FATAL_ERROR "CodeCov is not supported for Windows builds")
+    endif()
+    if (NOT CMAKE_COMPILER_IS_GNUCXX)
+        message(FATAL_ERROR "CodeCov is supported only for GCC builds")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g")
+endif()
+
+#include(CheckIPOSupported)
+#check_ipo_supported(RESULT result)
+#if(result)
+#  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else()
+#  message(WARNING "IPO is not supported")
+#endif()
 
 # Headers
 include_directories(${CMAKE_CURRENT_LIST_DIR})
@@ -65,44 +80,11 @@ include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external)
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-# Libelf
-find_path(LIBELF_INCLUDE_DIRS
-    NAMES
-        libelf.h
-    PATHS
-        /usr/include
-        /usr/include/libelf
-        /usr/local/include
-        /usr/local/include/libelf
-        /opt/local/include
-        /opt/local/include/libelf
-        /sw/include
-        /sw/include/libelf
-        /usr/local/Cellar/libelf/0.8.13_1/include/libelf
-        ENV CPATH)
-
-if(NOT LIBELF_INCLUDE_DIRS)
-    message(SEND_ERROR "Can't find libelf.h")
-endif()
-
-find_library (LIBELF_LIBRARIES
-    NAMES
-        elf libelf
-    PATHS
-        /usr/lib
-        ENV LIBRARY_PATH
-        ENV LD_LIBRARY_PATH)
-
-if(NOT LIBELF_LIBRARIES)
-    message(SEND_ERROR "Can't find libelf")
-endif()
-
-include_directories(SYSTEM ${LIBELF_INCLUDE_DIRS})
-
 # Targets
 add_library(mipt-mips-src STATIC ${CPPS})
+
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} mipt-mips-src ${LIBELF_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 
 # Tests
-include(${CMAKE_CURRENT_LIST_DIR}/tests/tests.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)

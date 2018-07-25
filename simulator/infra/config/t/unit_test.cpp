@@ -19,6 +19,14 @@ namespace config {
     AliasedSwitch bool_config_2 = { "f", "bool_config_2", "second bool config description"};
 } // namespace config
 
+template<typename T>
+std::string wrap_shift_operator(const T& value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
 //
 // To check whether the returned values
 // are equal to passed arguments
@@ -37,13 +45,17 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
     };
     const int argc = countof(argv);
 
-    // should not throw any exceptions
     CHECK_NOTHROW( config::handleArgs( argc, argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
-    CHECK( config::bool_config_1 == false);
-    CHECK( config::bool_config_2 == true);
+    CHECK_FALSE( config::bool_config_1);
+    CHECK( config::bool_config_2);
+
+    CHECK( wrap_shift_operator( config::uint64_config) == "145");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "false");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "true");
 }
 
 //
@@ -64,13 +76,17 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
     };
     const int argc = countof(argv);
 
-    // should not throw any exceptions
     CHECK_NOTHROW( config::handleArgs( argc, argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
-    CHECK( config::bool_config_1 == true);
-    CHECK( config::bool_config_2 == false);
+    CHECK( config::bool_config_1);
+    CHECK_FALSE( config::bool_config_2);
+    
+    CHECK( wrap_shift_operator( config::uint64_config) == "356");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "true");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "false");
 }
 
 //
@@ -84,7 +100,6 @@ TEST_CASE( "config_parse: Pass_No_Args")
     };
     const int argc = countof(argv);
 
-    // should throw
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
@@ -100,7 +115,6 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
     };
     const int argc = countof(argv);
     
-    // should throw
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
@@ -116,7 +130,6 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
     };
     const int argc = countof(argv);
 
-    // should throw
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
@@ -134,7 +147,6 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
     };
     const int argc = countof(argv);
 
-    // should throw
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
@@ -152,8 +164,7 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
         "-n", "412",
     };
     const int argc = countof(argv);
-    
-    // should throw
+
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 #endif
@@ -171,7 +182,6 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
     };
     const int argc = countof(argv);
 
-    // should throw
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
 }
 
@@ -190,8 +200,37 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
     };
     const int argc = countof(argv);
 
-    // should exit with EXIT_FAILURE
     CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+}
+
+TEST_CASE( "config_parse: Pass help option alias")
+{
+    const char* argv[] =
+    {
+        "mipt-mips",
+        "-b", "run_test.elf",
+        "-n", "356",
+        "-d",
+        "-h"
+    };
+    const int argc = countof(argv);
+
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), config::HelpOption);
+}
+
+TEST_CASE( "config_parse: Pass help option")
+{
+    const char* argv[] =
+    {
+        "mipt-mips",
+        "-b", "run_test.elf",
+        "-n", "356",
+        "-d",
+        "--help"
+    };
+    const int argc = countof(argv);
+
+    CHECK_THROWS_AS( config::handleArgs( argc, argv), config::HelpOption);
 }
 
 #if 0

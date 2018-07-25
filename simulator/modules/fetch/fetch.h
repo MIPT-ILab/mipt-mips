@@ -7,6 +7,8 @@
 #define FETCH_H
 
 #include <infra/ports/ports.h>
+#include <infra/cache/cache_tag_array.h>
+
 #include <modules/core/perf_instr.h>
 
 #include "bpu/bpu.h"

@@ -8,7 +8,7 @@
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     Simulator( log),
-    rf( new RF<ISA>),
+    memory( new Memory),
     fetch( log),
     decode( log),
     execute( log),
@@ -18,9 +18,13 @@ PerfSim<ISA>::PerfSim(bool log) :
     wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
+    fetch.set_memory( memory.get());
+    decode.set_RF( &rf);
+    mem.set_memory( memory.get());
+    writeback.set_RF( &rf);
+
     init_ports();
 }
-
 
 template <typename ISA>
 void PerfSim<ISA>::set_PC( Addr value)
@@ -32,13 +36,10 @@ void PerfSim<ISA>::set_PC( Addr value)
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
-    memory = std::make_unique<Memory>( tr);
-    fetch.set_memory( memory.get());
-    decode.set_RF( rf.get());
-    mem.set_memory( memory.get());
-    writeback.set_instrs_to_run( instrs_to_run);
-    writeback.set_RF( rf.get());
+    memory->load_elf_file( tr);
+
     writeback.init_checker( tr);
+    writeback.set_instrs_to_run( instrs_to_run);
 
     set_PC( memory->startPC());
 

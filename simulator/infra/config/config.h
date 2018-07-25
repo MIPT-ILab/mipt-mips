@@ -43,7 +43,10 @@ public:
     
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
-        return out << rhs.value;
+        if constexpr (std::is_same_v<T, bool>)
+            return out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(misc-suspicious-semicolon)
+
+        return out << std::dec << rhs.value;
     }
 };
     
@@ -93,6 +96,10 @@ struct Unaliased : public T
 template<typename T> using Value = Unaliased<AliasedValue<T>>;
 template<typename T> using RequiredValue = Unaliased<AliasedRequiredValue<T>>;
 using Switch = Unaliased<AliasedSwitch>;
+
+struct HelpOption : std::runtime_error {
+    explicit HelpOption( const std::string& msg) : std::runtime_error( msg) {}
+};
 
 /* methods */
 void handleArgs( int argc, const char* argv[]);

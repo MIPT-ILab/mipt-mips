@@ -21,9 +21,8 @@ class InstrMemory : private FuncMemory
         LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 
     public:
-        explicit InstrMemory( const std::string& tr) : FuncMemory( tr) { }
-
         using FuncMemory::startPC;
+        using FuncMemory::load_elf_file;
 
         auto fetch( Addr pc) const { return read<uint32>( pc); }
 
