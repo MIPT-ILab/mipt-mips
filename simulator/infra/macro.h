@@ -134,12 +134,12 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    if constexpr ((static_cast<ST>(-2) >> 1u) == static_cast<ST>(-1)) {
+    if constexpr ((static_cast<ST>(-2) >> 1u) == static_cast<ST>(-1))
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
-        // NOLINTNEXTLINE(hicpp-signed-bitwise)
+        // NOLINTNEXTLINE(hicpp-signed-bitwise, misc-suspicious-semicolon)
         return static_cast<ST>(value) >> shamt;
-    }
+
     return (value & msb_set<T>()) == 0 // check MSB
              ? value >> shamt          // just shift if MSB is zero
              : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
