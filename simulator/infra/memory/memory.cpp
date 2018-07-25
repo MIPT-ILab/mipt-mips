@@ -107,7 +107,7 @@ void FuncMemory::write( T value, Addr addr, T mask)
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
         if ((mask & 0xFFu) == 0xFFu)
-            alloc_and_write_byte( addr + i, static_cast<Byte>( value & 0xFFu));
+            alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
         if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
             mask >>= 8;
             value >>= 8;
