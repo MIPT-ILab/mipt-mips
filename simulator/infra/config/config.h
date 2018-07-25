@@ -46,7 +46,7 @@ public:
         if constexpr (std::is_same_v<T, bool>)
             return out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(misc-suspicious-semicolon)
 
-        return out << rhs.value;
+        return out << std::dec << rhs.value;
     }
 };
     
