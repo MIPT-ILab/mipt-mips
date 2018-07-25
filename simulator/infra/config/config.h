@@ -94,6 +94,10 @@ template<typename T> using Value = Unaliased<AliasedValue<T>>;
 template<typename T> using RequiredValue = Unaliased<AliasedRequiredValue<T>>;
 using Switch = Unaliased<AliasedSwitch>;
 
+struct HelpOption : std::runtime_error {
+    explicit HelpOption( const std::string& msg) : std::runtime_error( msg) {}
+};
+
 /* methods */
 void handleArgs( int argc, const char* argv[]);
 
