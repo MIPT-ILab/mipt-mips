@@ -19,6 +19,11 @@ int main( int argc, const char* argv[]) try {
     Simulator::create_configured_simulator()->run( config::binary_filename, config::num_steps);
     return 0;
 }
+catch (const config::HelpOption& e) {
+    std::cout << "Functional and performance simulators for MIPS-based CPU."
+              << std::endl << std::endl << e.what() << std::endl;
+    return 0;
+}
 catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     return 2;
