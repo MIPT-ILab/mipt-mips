@@ -36,7 +36,7 @@ void Writeback<ISA>::clock( Cycle cycle)
                                                       : rp_execute_datapath->read( cycle);
 
     /* no bubble instructions */
-    assert( !instr.is_bubble())
+    assert( !instr.is_bubble());
 
     /* perform writeback */
     rf->write_dst( instr);
