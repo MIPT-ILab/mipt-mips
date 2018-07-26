@@ -35,12 +35,11 @@ void Writeback<ISA>::clock( Cycle cycle)
     auto instr = ( rp_mem_datapath->is_ready( cycle)) ? rp_mem_datapath->read( cycle)
                                                       : rp_execute_datapath->read( cycle);
 
+    /* no bubble instructions */
+    assert( !instr.is_bubble())
+
     /* perform writeback */
     rf->write_dst( instr);
-
-    /* check for bubble */
-    if ( instr.is_bubble())
-        return;
 
     /* check for traps */
     instr.check_trap();
