@@ -25,15 +25,14 @@ void Writeback<ISA>::clock( Cycle cycle)
     {
         sout << "bubble\n";
         if ( cycle >= last_writeback_cycle + 100_Lt)
-        {
-            serr << "Deadlock was detected. The process will be aborted."
-                 << std::endl << std::endl << critical;
-        }
+            throw Deadlock( "");
+
         return;
     }
 
-    auto instr = ( rp_mem_datapath->is_ready( cycle)) ? rp_mem_datapath->read( cycle)
-                                                      : rp_execute_datapath->read( cycle);
+    auto instr = ( rp_mem_datapath->is_ready( cycle))
+        ? rp_mem_datapath->read( cycle)
+        : rp_execute_datapath->read( cycle);
 
     /* no bubble instructions */
     assert( !instr.is_bubble());
