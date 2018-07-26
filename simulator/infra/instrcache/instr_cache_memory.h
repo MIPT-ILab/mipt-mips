@@ -28,7 +28,6 @@ class InstrMemory : private FuncMemory
 
         Instr fetch_instr( Addr PC)
         {
-            // NOLINTNEXTLINE(clang-analyzer-deadcode) https://bugs.llvm.org/show_bug.cgi?id=36283
             const auto [found, value] = instr_cache.find( PC);
             Instr instr = found ? value : Instr( fetch( PC), PC);
             instr_cache.update( PC, instr);
