@@ -32,10 +32,9 @@ public:
     }
 
     template<typename T>
-    LogOstream& operator<<(const T& v) {
-        if ( enable) {
-            stream << v;
-        }
+    LogOstream& operator<<(T&& v) {
+        if ( enable)
+            stream << std::forward<T>(v);
 
         return *this;
     }

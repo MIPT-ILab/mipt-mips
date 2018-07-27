@@ -27,6 +27,13 @@ std::string wrap_shift_operator(const T& value)
     return oss.str();
 }
 
+template<size_t N>
+void handleArgs( const char* (& array)[N])
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay) Let it decay
+    config::handleArgs( N, array);
+}
+
 //
 // To check whether the returned values
 // are equal to passed arguments
@@ -43,9 +50,8 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
         "-n", "145",
         "-f"
     };
-    const int argc = countof(argv);
 
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( handleArgs( argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
@@ -74,9 +80,8 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
         "-n", "356",
         "-d"
     };
-    const int argc = countof(argv);
 
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( handleArgs( argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
@@ -98,9 +103,8 @@ TEST_CASE( "config_parse: Pass_No_Args")
     {
         "mipt-mips"
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -113,9 +117,8 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
         "mipt-mips",
         "--uint64_config_name", "356",
     };
-    const int argc = countof(argv);
     
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -128,9 +131,8 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
         "mipt-mips",
         "--string_config_name", "test.elf", 
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -145,9 +147,8 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
         "-n", "356",
         "-koption"
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 #if 0
@@ -163,9 +164,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
         "--string_config_name", "run_test_2.elf",
         "-n", "412",
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 #endif
 
@@ -180,9 +180,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
         "-b",
         "-n", "412",
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -198,9 +197,8 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
         "-f",
         "-d"
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 TEST_CASE( "config_parse: Pass help option alias")
@@ -213,9 +211,8 @@ TEST_CASE( "config_parse: Pass help option alias")
         "-d",
         "-h"
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), config::HelpOption);
+    CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
 }
 
 TEST_CASE( "config_parse: Pass help option")
@@ -228,9 +225,8 @@ TEST_CASE( "config_parse: Pass help option")
         "-d",
         "--help"
     };
-    const int argc = countof(argv);
 
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), config::HelpOption);
+    CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
 }
 
 #if 0
@@ -246,11 +242,9 @@ TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twi
         "-b", "test.elf",
         "-n", "100"
     };
-    const int argc = countof(argv);
 
     // should not throw any exceptions
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
-
+    CHECK_NOTHROW( handleArgs( argv));
 
     auto test_function = []()
     {

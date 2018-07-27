@@ -89,7 +89,7 @@ struct Unaliased : public T
 
     template<typename Arg1, typename Arg2, typename ... Args>
     Unaliased(Arg1&& arg1, Arg2&& arg2, Args&& ... args) noexcept
-        : T( "", arg1, arg2, args...)
+        : T( "", std::forward<Arg1>(arg1), std::forward<Arg1>(arg2), std::forward<Args>(args)...)
     { }
 };
 
