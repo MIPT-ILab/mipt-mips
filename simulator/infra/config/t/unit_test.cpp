@@ -30,7 +30,8 @@ std::string wrap_shift_operator(const T& value)
 template<size_t N>
 void handleArgs( const char* (& array)[N])
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay) Let it decay
+    // Let it decay
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
     config::handleArgs( N, array);
 }
 
