@@ -20,7 +20,7 @@ struct CheckerMismatch final : std::runtime_error
 struct Deadlock final : std::runtime_error
 {
     explicit Deadlock(const std::string& msg)
-        : std::runtime_error(std::string("Deadlock was detected\n"))
+        : std::runtime_error(std::string("Deadlock was detected") + msg + '\n')
     { }
 };
 
