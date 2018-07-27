@@ -37,7 +37,7 @@ public:
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
-        return out << regTable[ rhs.value];
+        return out << regTable.at( rhs.value);
     }
 
     bool is_zero()                 const { return value == RISCV_REG_zero; }
