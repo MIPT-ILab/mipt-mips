@@ -43,10 +43,8 @@ template <typename ISA>
 typename Decode<ISA>::Instr Decode<ISA>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
-    {
-        rp_datapath->ignore( cycle);
         return rp_stall_datapath->read( cycle);
-    }
+
     return rp_datapath->read( cycle);
 }
 
@@ -71,21 +69,15 @@ void Decode<ISA>::clock( Cycle cycle)
 
     /* update bypassing unit because of misprediction */
     if ( rp_bypassing_unit_flush_notify->is_ready( cycle))
-    {
-        rp_bypassing_unit_flush_notify->ignore( cycle);
         bypassing_unit->handle_flush();
-    }
 
     /* branch misprediction */
     if ( is_flush)
     {
-        /* ignoring the upcoming instruction as it is invalid */
-        rp_datapath->ignore( cycle);
-        rp_stall_datapath->ignore( cycle);
-
         sout << "flush\n";
         return;
     }
+
     /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle) && !rp_stall_datapath->is_ready( cycle))
     {

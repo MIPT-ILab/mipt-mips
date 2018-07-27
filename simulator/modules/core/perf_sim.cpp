@@ -57,7 +57,7 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
         mem.clock( curr_cycle);
         curr_cycle.inc();
 
-        check_ports( curr_cycle);
+        clean_up_ports( curr_cycle);
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
