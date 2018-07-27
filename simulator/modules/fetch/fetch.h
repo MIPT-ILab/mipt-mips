@@ -50,7 +50,6 @@ private:
     void clock_bp( Cycle cycle);
     void clock_instr_cache( Cycle cycle);
     void save_flush( Cycle cycle);
-    void ignore( Cycle cycle);
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);

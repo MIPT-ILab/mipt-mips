@@ -141,7 +141,7 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
         a.clock( cycle);
         b.clock( cycle);
 
-        check_ports( cycle);;
+        clean_up_ports( cycle);;
     }
 
     destroy_ports();;

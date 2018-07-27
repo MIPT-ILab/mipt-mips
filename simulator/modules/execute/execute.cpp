@@ -69,31 +69,13 @@ void Execute<ISA>::clock( Cycle cycle)
     clock_saved_flush();
 
     /* branch misprediction */
-    if ( is_flush)
-    {
-        /* ignoring the upcoming instruction as it is invalid */
-        rp_datapath->ignore( cycle);
+	if (is_flush)
+	{
+		save_flush();
 
-        /* ignoring the instruction from complex ALU */
-        rp_long_latency_execution_unit->ignore( cycle);
-
-        /* ignoring information from command ports */
-        for ( auto& port:rps_command)
-            port->ignore( cycle);
-
-        /* ignoring all bypassed data for source registers */
-        for ( auto& rps_src_ports:rps_sources_bypass)
-        {
-            for ( auto& port:rps_src_ports)
-                port->ignore( cycle);
-        }
-
-        save_flush();
-
-        sout << "flush\n";
-        return;
-    }
-
+		sout << "flush\n";
+		return;
+	}
 
     /* get the instruction from complex ALU if it is ready */
     if ( rp_long_latency_execution_unit->is_ready( cycle))
@@ -111,13 +93,6 @@ void Execute<ISA>::clock( Cycle cycle)
     /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
     {
-        /* ignoring all bypassed data for source registers */
-        for ( auto& rps_src_ports:rps_sources_bypass)
-        {
-            for ( auto& port:rps_src_ports)
-                port->ignore( cycle);
-        }
-
         sout << "bubble\n";
         return;
     }
@@ -134,21 +109,7 @@ void Execute<ISA>::clock( Cycle cycle)
             /* get a port which should be used for bypassing and receive data */
             const auto bypass_direction = bypass_command.get_bypass_direction();
             const auto data = rps_sources_bypass[src_index][bypass_direction]->read( cycle);
-
-            /* ignoring all other ports for a source register */
-            for ( uint8 i = 0; i < RegisterStage::BYPASSING_STAGES_NUMBER; i++)
-            {
-                if ( i != bypass_direction)
-                    rps_sources_bypass[src_index][i]->ignore( cycle);
-            }
-
             instr.set_v_src( data.first, src_index);
-        }
-        else
-        {
-            /* ignoring all bypassed data for a source register */
-            for ( auto& port:rps_sources_bypass[src_index])
-                port->ignore( cycle);
         }
     }
 
