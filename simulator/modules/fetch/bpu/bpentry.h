@@ -214,7 +214,7 @@ public:
     /* prediction */
     bool is_taken( Addr /* unused */) const
     {
-        return state_table[ current_pattern.get_value()].is_taken();
+        return state_table.at( current_pattern.get_value()).is_taken();
     }
 
     /* update */
@@ -225,7 +225,7 @@ public:
             update_target( target);
         }
 
-        state_table[ current_pattern.get_value()].update( is_taken);
+        state_table.at( current_pattern.get_value()).update( is_taken);
         current_pattern.update( is_taken);
     }
 

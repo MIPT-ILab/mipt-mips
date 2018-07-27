@@ -105,7 +105,7 @@ void Decode<ISA>::clock( Cycle cycle)
         else if ( bypassing_unit->is_bypassible( instr, src_index))
         {
             const auto bypass_command = bypassing_unit->get_bypass_command( instr, src_index);
-            wps_command[ src_index]->write( bypass_command, cycle);
+            wps_command.at( src_index)->write( bypass_command, cycle);
         }
     }
 

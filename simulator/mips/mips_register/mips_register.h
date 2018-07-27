@@ -36,7 +36,7 @@ public:
 
     friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
     {
-        return out << regTable[ rhs.value];
+        return out << regTable.at( rhs.value);
     }
 
     bool is_zero()       const { return value == MIPS_REG_zero; }
