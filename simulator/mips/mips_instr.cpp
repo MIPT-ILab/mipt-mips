@@ -416,8 +416,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 template<typename RegisterUInt>
 void BaseMIPSInstr<RegisterUInt>::execute_unknown()
 {
-    std::cerr << "ERROR.Unknown or unsupported instruction: " << disasm << std::endl;
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("Unknown instruction ") + std::string(Dump()) + " is an unhandled trap\n");
 }
 
 template<typename RegisterUInt>
