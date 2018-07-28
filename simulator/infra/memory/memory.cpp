@@ -5,12 +5,7 @@
  * Copyright 2012-2018 uArchSim iLab project
  */
 
-// Generic C++
-#include <cassert>
-#include <sstream>
-#include <iomanip>
-#include <iostream>
-#include <utility>
+#include "memory.h"
 
 // ELFIO
 #include <elfio/elfio.hpp>
@@ -18,7 +13,12 @@
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
-#include "memory.h"
+// Generic C++
+#include <cassert>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <utility>
 
 FuncMemory::FuncMemory( uint32 addr_bits,
                         uint32 page_bits,

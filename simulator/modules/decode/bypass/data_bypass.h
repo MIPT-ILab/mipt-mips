@@ -8,11 +8,11 @@
 #ifndef DATA_BYPASS_H
 #define DATA_BYPASS_H
 
-#include <array>
+#include "data_bypass_interface.h"
 
 #include <modules/core/perf_instr.h>
 
-#include "data_bypass_interface.h"
+#include <array>
 
 template <typename ISA>
 class DataBypass

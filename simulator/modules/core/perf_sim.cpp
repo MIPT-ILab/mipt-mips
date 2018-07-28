@@ -1,9 +1,12 @@
-#include <cassert>
-
-#include <iostream>
-#include <chrono>
+/*
+ * perf_sim.cpp - mips performance simulator
+ * Copyright 2015-2018 MIPT-MIPS
+ */
 
 #include "perf_sim.h"
+
+#include <chrono>
+#include <iostream>
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 

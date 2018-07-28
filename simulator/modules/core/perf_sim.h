@@ -6,20 +6,20 @@
 #ifndef PERF_SIM_H
 #define PERF_SIM_H
 
-#include <array>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
+#include "perf_instr.h"
 
-#include <simulator.h>
 #include <infra/ports/ports.h>
-#include <modules/fetch/fetch.h>
 #include <modules/decode/decode.h>
 #include <modules/execute/execute.h>
+#include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
 #include <modules/writeback/writeback.h>
+#include <simulator.h>
 
-#include "perf_instr.h"
+#include <array>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 template <typename ISA>
 class PerfSim : public Simulator
