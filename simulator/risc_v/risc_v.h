@@ -7,10 +7,10 @@
 #ifndef RISC_V_H_
 #define RISC_V_H_
 
-#include <infra/types.h>
-#include <infra/instrcache/instr_cache_memory.h>
-
 #include "riscv_instr.h"
+
+#include <infra/instrcache/instr_cache_memory.h>
+#include <infra/types.h>
 
 template <typename T>
 struct RISCV

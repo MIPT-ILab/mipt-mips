@@ -7,16 +7,15 @@
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
 
-#include <cassert>
-
-#include <array>
-#include <iostream>
-#include <utility>
-
 // MIPT-MIPS modules
-#include <infra/types.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
+#include <infra/types.h>
+
+#include <array>
+#include <cassert>
+#include <iostream>
+#include <utility>
 
 class RISCVRegister {
     enum RegNum : uint8

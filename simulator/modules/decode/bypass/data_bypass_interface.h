@@ -8,9 +8,9 @@
 #ifndef DATA_BYPASS_INTERFACE_H
 #define DATA_BYPASS_INTERFACE_H
 
-#include <infra/types.h>
-#include <infra/ports/timing.h>
 #include <infra/macro.h>
+#include <infra/ports/timing.h>
+#include <infra/types.h>
 
 class RegisterStage
 {

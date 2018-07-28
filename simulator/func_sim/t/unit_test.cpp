@@ -1,13 +1,15 @@
-// generic C
-#include <cassert>
-#include <cstdlib>
+/*
+ * Unit testing for extremely simple simulator
+ * Copyright 2018 MIPT-MIPS
+ */
+
+#include "../func_sim.h"
 
 // Catch2
 #include <catch.hpp>
 
 // Module
 #include <mips/mips.h>
-#include "../func_sim.h"
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 static const std::string smc_code = TEST_PATH "/smc.out";

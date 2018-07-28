@@ -8,21 +8,20 @@
 #ifndef MIPS_INSTR_H
 #define MIPS_INSTR_H
 
-// Generic C++
-#include <cassert>
-#include <array>
-#include <unordered_map>
+#include "mips_register/mips_register.h"
+#include "mips_version.h"
+
+// MIPT-MIPS modules
+#include <infra/macro.h>
+#include <infra/string_view.h>
+#include <infra/types.h>
 
 // COW string
 #include <kryucow_string.h>
 
-// MIPT-MIPS modules
-#include <infra/types.h>
-#include <infra/macro.h>
-#include <infra/string_view.h>
-
-#include "mips_register/mips_register.h"
-#include "mips_version.h"
+// Generic C++
+#include <array>
+#include <unordered_map>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }

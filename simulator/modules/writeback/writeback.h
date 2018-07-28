@@ -6,8 +6,8 @@
 #ifndef WRITEBACK_H
 #define WRITEBACK_H
 
-#include <infra/ports/ports.h>
 #include <func_sim/func_sim.h>
+#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
 struct CheckerMismatch final : std::runtime_error

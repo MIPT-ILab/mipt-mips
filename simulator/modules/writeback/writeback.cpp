@@ -1,10 +1,7 @@
-#include <cassert>
-
-#include <iostream>
-#include <chrono>
-#include <sstream>
-
 #include "writeback.h"
+
+#include <cassert>
+#include <sstream>
 
 template <typename ISA>
 Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)

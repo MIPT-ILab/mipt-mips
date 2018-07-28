@@ -7,10 +7,13 @@
 #ifndef BRANCH_PREDICTION_UNIT
 #define BRANCH_PREDICTION_UNIT
 
+#include "bp_interface.h"
+
 // MIPT_MIPS modules
 #include <infra/types.h>
 
-#include "bp_interface.h"
+#include <memory>
+#include <string>
 
 struct BPInvalidMode final : std::runtime_error
 {

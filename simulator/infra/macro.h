@@ -5,16 +5,15 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
-// protection from multi-include
 #ifndef COMMON__MACRO_H
 #define COMMON__MACRO_H
 
+#include <infra/types.h>
+
+#include <algorithm>
 #include <bitset>
 #include <limits>
 #include <type_traits>
-#include <algorithm>
-
-#include <infra/types.h>
 
 /* Returns size of a static array */
 template<typename T, size_t N>
