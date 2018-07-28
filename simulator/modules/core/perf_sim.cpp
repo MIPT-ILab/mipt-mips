@@ -46,27 +46,34 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 
     set_PC( memory->startPC());
 
-    auto t_start = std::chrono::high_resolution_clock::now();
+    start_time = std::chrono::high_resolution_clock::now();
 
-    while (true)
+    while (!rp_halt->is_ready( curr_cycle))
     {
-        if (rp_halt->is_ready( curr_cycle) && rp_halt->read( curr_cycle))
-            break;
-
-        writeback.clock( curr_cycle);
-        fetch.clock( curr_cycle);
-        decode.clock( curr_cycle);
-        execute.clock( curr_cycle);
-        mem.clock( curr_cycle);
-        curr_cycle.inc();
-
         clean_up_ports( curr_cycle);
+        clock( curr_cycle);
+        curr_cycle.inc();
     }
 
-    auto t_end = std::chrono::high_resolution_clock::now();
+    dump_statistics();
+}
 
+template<typename ISA>
+void PerfSim<ISA>::clock( Cycle cycle)
+{
+    writeback.clock( cycle);
+    fetch.clock( cycle);
+    decode.clock( cycle);
+    execute.clock( cycle);
+    mem.clock( cycle);
+}
+
+template<typename ISA>
+void PerfSim<ISA>::dump_statistics() const
+{
     auto executed_instrs = writeback.get_executed_instrs();
-    auto time = std::chrono::duration<double, std::milli>(t_end - t_start).count();
+    auto now_time = std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::duration<double, std::milli>(now_time - start_time).count();
     auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
     auto simips = executed_instrs / time;
