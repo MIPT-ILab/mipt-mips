@@ -6,9 +6,9 @@
 
 #include "mips_instr.h"
 
-#include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 //unordered map for R-instructions
 template<typename RegisterUInt>
