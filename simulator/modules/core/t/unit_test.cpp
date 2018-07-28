@@ -12,7 +12,7 @@
 #include <mips/mips.h>
 #include <modules/writeback/writeback.h>
 
-static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
+static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
@@ -33,15 +33,28 @@ TEST_CASE( "Perf_Sim_init: Process_Wrong_Args")
     CHECK_THROWS_AS( PerfSim<MIPS32>( false).run( "./1234567890/qwertyuop", 1), InvalidElfFile);
 }
 
-TEST_CASE( "Perf_Sim: Run_Full_Trace")
+TEST_CASE( "Run_Full_Trace_MIPS32: Perf_Sim")
 {
-    PerfSim<MIPS32> MIPS32( false);
-    MIPS32.run_no_limit( valid_elf_file);
+    PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core32.out");
+}
+
+TEST_CASE( "Run_Full_Trace_MIPS32_universal: Perf_Sim")
+{
+    PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core.universal.out");
+}
+
+TEST_CASE( "Run_Full_Trace_MIPS64: Perf_Sim")
+{
+    PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core64.out");
+}
+
+TEST_CASE( "Run_Full_Trace_MIPS64_universal: Perf_Sim")
+{
+    PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core.universal.out");
 }
 
 TEST_CASE( "Perf_Sim: Run_SMC_Trace")
 {
-    PerfSim<MIPS32> MIPS32( false);
-    CHECK_THROWS_AS( MIPS32.run_no_limit( smc_code), CheckerMismatch);
+    CHECK_THROWS_AS( PerfSim<MIPS32>( false).run_no_limit( smc_code), CheckerMismatch);
 }
 
