@@ -2,9 +2,7 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
-#include <cassert>
-#include <iostream>
-
+ 
 #include "func_sim.h"
 
 template <typename ISA>

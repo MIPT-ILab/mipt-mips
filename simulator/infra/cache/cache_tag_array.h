@@ -7,14 +7,14 @@
 #ifndef CACHE_TAG_ARRAY_H
 #define CACHE_TAG_ARRAY_H
 
-#include <infra/types.h>
-#include <infra/log.h>
-#include <infra/macro.h>
-
-#include <vector>
+#include <list>
 #include <unordered_map>
 #include <utility>
-#include <list>
+#include <vector>
+
+#include <infra/log.h>
+#include <infra/macro.h>
+#include <infra/types.h>
 
 // Replacement algorithm modules (LRU)
 class LRUCacheInfo

@@ -1,14 +1,16 @@
-// generic C
-#include <cassert>
-#include <cstdlib>
+/**
+ * Test for Performance Simulation
+ * Copyright 2018 MIPT-MIPS
+ */
+
+#include "../perf_sim.h"
 
 // Catch2
 #include <catch.hpp>
 
 // Module
 #include <mips/mips.h>
-#include "../perf_sim.h"
-#include "../../writeback/writeback.h"
+#include <modules/writeback/writeback.h>
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.out";
 static const std::string smc_code = TEST_PATH "/smc.out";

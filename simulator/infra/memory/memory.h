@@ -5,17 +5,17 @@
  * Copyright 2012 uArchSim iLab project
  */
 
-// protection from multi-include
 #ifndef FUNC_MEMORY__FUNC_MEMORY_H
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
+// uArchSim modules
+#include <infra/macro.h>
+#include <infra/types.h>
+
 // Generic C++
+#include <stdexcept>
 #include <string>
 #include <vector>
-
-// uArchSim modules
-#include <infra/types.h>
-#include <infra/macro.h>
 
 struct InvalidElfFile final : std::runtime_error
 {

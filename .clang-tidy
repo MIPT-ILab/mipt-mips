@@ -1,2 +1,2 @@
 ---
-Checks: '*,-*braces-around-statements,-cppcoreguidelines-pro-type-union-access,-llvm-header-guard,-llvm-include-order,-cert-err58-cpp,-fuchsia-default-arguments,-fuchsia-overloaded-operator'
+Checks: '*,-*braces-around-statements,-cppcoreguidelines-pro-type-union-access,-llvm-header-guard,-cert-err58-cpp,-fuchsia-default-arguments,-fuchsia-overloaded-operator'

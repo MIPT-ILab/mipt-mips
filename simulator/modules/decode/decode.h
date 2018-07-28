@@ -7,11 +7,11 @@
 #ifndef DECODE_H
 #define DECODE_H
 
+#include "bypass/data_bypass.h"
+
+#include <func_sim/rf/rf.h>
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
-#include <func_sim/rf/rf.h>
-
-#include "bypass/data_bypass.h"
 
 template <typename ISA>
 class Decode : public Log

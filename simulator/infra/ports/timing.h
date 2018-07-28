@@ -8,10 +8,11 @@
 #ifndef INFRA_TIMING_H
 #define INFRA_TIMING_H
 
-#include <iostream>
+#include <infra/types.h>
+
 #include <boost/operators.hpp>
 
-#include <infra/types.h>
+#include <iostream>
 
 class Cycle;
 class Latency;

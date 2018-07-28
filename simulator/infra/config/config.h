@@ -6,14 +6,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <map>
-
 #include <infra/types.h>
 
 #include <popl.hpp>
+
+#include <iostream>
+#include <map>
+#include <string>
 
 namespace config {
 

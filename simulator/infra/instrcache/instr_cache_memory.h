@@ -6,9 +6,9 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
-#include <infra/types.h>
 #include <infra/instrcache/LRUCache.h>
 #include <infra/memory/memory.h>
+#include <infra/types.h>
 
 #ifndef INSTR_CACHE_CAPACITY
 #define INSTR_CACHE_CAPACITY 8192

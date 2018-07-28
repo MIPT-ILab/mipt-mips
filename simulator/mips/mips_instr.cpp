@@ -4,11 +4,11 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-#include <iostream>
+#include "mips_instr.h"
+
 #include <sstream>
 #include <iomanip>
-
-#include "mips_instr.h"
+#include <iostream>
 
 //unordered map for R-instructions
 template<typename RegisterUInt>

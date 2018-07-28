@@ -7,8 +7,9 @@
 #ifndef MIPS_H_
 #define MIPS_H_
 
-#include <infra/instrcache/instr_cache_memory.h>
 #include "mips_instr.h"
+
+#include <infra/instrcache/instr_cache_memory.h>
 
 template<MIPSVersion VERSION>
 struct MIPS

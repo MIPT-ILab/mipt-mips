@@ -7,17 +7,15 @@
 #ifndef PORTS_H
 #define PORTS_H
 
-#include <cstdlib>
-
-#include <unordered_map>
-#include <queue>
-#include <list>
-#include <string>
-#include <memory>
-
-#include "../types.h"
 #include "../log.h"
+#include "../types.h"
 #include "timing.h"
+
+#include <list>
+#include <memory>
+#include <queue>
+#include <string>
+#include <unordered_map>
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name
