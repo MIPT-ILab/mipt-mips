@@ -1,31 +1,26 @@
-// generic C
-#include <cassert>
-#include <cstdlib>
-
 // Catch2
 #include <catch.hpp>
 
 // uArchSim modules
 #include "../mips_instr.h"
 
-//
-// Check that all incorect input params of the constructor
-// are properly handled.
-//
 TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 {
     CHECK_NOTHROW( MIPS32Instr(0x0).execute());
 }
 
-/*
- * Tests by Orvar Segerstrom
- * Copyright 2015 GNU GPL 3.0
- * https://github.com/awestroke/MIPS32-dasm/blob/master/instructions_test.c
- */
-
-#define TEST_BAD_OPCODE( opcode) \
-    CHECK(MIPS32Instr( opcode).Dump() == std::string(#opcode) + "\tUnknown");
-
+TEST_CASE( "MIPS32_instr: Divmult")
+{
+    CHECK(MIPS32Instr(0x02290018).is_divmult());
+    CHECK(MIPS32Instr(0x0229001c).is_divmult());
+    CHECK(MIPS32Instr(0x02290019).is_divmult());
+    CHECK(MIPS32Instr(0x0229001d).is_divmult());
+    CHECK(MIPS32Instr(0x72290000).is_divmult());
+    CHECK(MIPS32Instr(0x72290001).is_divmult());
+    CHECK(MIPS32Instr(0x72290004).is_divmult());
+    CHECK(MIPS32Instr(0x72290005).is_divmult());
+}
+    
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
 {
     CHECK(MIPS32Instr(0x01398820).Dump() == "add $s1, $t1, $t9");

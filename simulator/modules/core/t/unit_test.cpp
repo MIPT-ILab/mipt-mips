@@ -18,13 +18,13 @@ static const std::string smc_code = TEST_PATH "/smc.out";
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 {
     // Just call a constructor
-    PerfSim<MIPS32>( false);
+    CHECK_NOTHROW( PerfSim<MIPS32>( false) );
 }
 
 TEST_CASE( "Perf_Sim_init: Make_A_Step")
 {
     // Call constructor and run one instr
-    PerfSim<MIPS32>( false).run( valid_elf_file, 1);
+    CHECK_NOTHROW( PerfSim<MIPS32>( false).run( valid_elf_file, 1) );
 }
 
 TEST_CASE( "Perf_Sim_init: Process_Wrong_Args")
@@ -33,24 +33,17 @@ TEST_CASE( "Perf_Sim_init: Process_Wrong_Args")
     CHECK_THROWS_AS( PerfSim<MIPS32>( false).run( "./1234567890/qwertyuop", 1), InvalidElfFile);
 }
 
-TEST_CASE( "Run_Full_Trace_MIPS32: Perf_Sim")
+TEST_CASE( "Torture_Test: Perf_Sim")
 {
-    PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core32.out");
-}
+    // MIPS 32 Little-Endian
+    CHECK_NOTHROW( PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core.universal.out") );
+    CHECK_NOTHROW( PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core32.out") );
+    CHECK_NOTHROW( PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core32.le.out") );
 
-TEST_CASE( "Run_Full_Trace_MIPS32_universal: Perf_Sim")
-{
-    PerfSim<MIPS32>( false).run_no_limit( TEST_PATH "/tt.core.universal.out");
-}
-
-TEST_CASE( "Run_Full_Trace_MIPS64: Perf_Sim")
-{
-    PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core64.out");
-}
-
-TEST_CASE( "Run_Full_Trace_MIPS64_universal: Perf_Sim")
-{
-    PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core.universal.out");
+    // MIPS 64 Little-Endian
+    CHECK_NOTHROW( PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core.universal.out") );
+    CHECK_NOTHROW( PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core64.out") );
+    CHECK_NOTHROW( PerfSim<MIPS64>( false).run_no_limit( TEST_PATH "/tt.core64.le.out") );
 }
 
 TEST_CASE( "Perf_Sim: Run_SMC_Trace")
