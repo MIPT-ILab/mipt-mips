@@ -6,16 +6,15 @@
 #ifndef MIPS_REG_H
 #define MIPS_REG_H
 
-#include <cassert>
-
-#include <array>
-#include <iostream>
-#include <utility>
-
 // MIPT-MIPS modules
-#include <infra/types.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
+#include <infra/types.h>
+
+#include <array>
+#include <cassert>
+#include <iostream>
+#include <utility>
 
 class MIPSRegister {
     enum RegNum : uint8
@@ -31,15 +30,12 @@ public:
 
     explicit MIPSRegister( uint8 id) : MIPSRegister( static_cast<RegNum>( id))
     {
-        if ( id >= 32u) {
-            std::cerr << "ERROR: Invalid MIPS register id = " << id;
-            exit( EXIT_FAILURE);
-        }
+        assert( id < 32u);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
     {
-        return out << regTable[ rhs.value];
+        return out << regTable.at( rhs.value);
     }
 
     bool is_zero()       const { return value == MIPS_REG_zero; }

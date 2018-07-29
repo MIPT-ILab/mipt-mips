@@ -5,11 +5,11 @@
 
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
+
+#include <infra/log.h> 
+#include <infra/types.h>
  
 #include <memory>
- 
-#include <infra/types.h>
-#include <infra/log.h>
 
 class Simulator : public Log {
 public:

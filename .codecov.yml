@@ -1,0 +1,7 @@
+ignore:
+  - "external/.*"
+  - "*/unit_test.cpp"
+
+codecov:
+  ci:
+    - !appveyor

@@ -6,21 +6,20 @@
 #ifndef RISCV_INSTR_H
 #define RISCV_INSTR_H
 
-// Generic C++
-#include <cassert>
-#include <array>
-#include <unordered_map>
+#include "risc_v.h"
+#include "riscv_register/riscv_register.h"
+
+// MIPT-MIPS modules
+#include <infra/macro.h>
+#include <infra/string_view.h>
+#include <infra/types.h>
 
 // COW string
 #include <kryucow_string.h>
 
-// MIPT-MIPS modules
-#include <infra/types.h>
-#include <infra/macro.h>
-#include <infra/string_view.h>
-
-#include "riscv_register/riscv_register.h"
-#include "risc_v.h"
+// Generic C++
+#include <array>
+#include <unordered_map>
 
 template <typename T>
 class RISCVInstr

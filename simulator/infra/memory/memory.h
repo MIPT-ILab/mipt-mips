@@ -5,17 +5,17 @@
  * Copyright 2012 uArchSim iLab project
  */
 
-// protection from multi-include
 #ifndef FUNC_MEMORY__FUNC_MEMORY_H
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
+// uArchSim modules
+#include <infra/macro.h>
+#include <infra/types.h>
+
 // Generic C++
+#include <stdexcept>
 #include <string>
 #include <vector>
-
-// uArchSim modules
-#include <infra/types.h>
-#include <infra/macro.h>
 
 struct InvalidElfFile final : std::runtime_error
 {
@@ -66,7 +66,7 @@ class FuncMemory
         const size_t set_cnt;
         const size_t page_size;
 
-        using Page = std::vector<uint8>;
+        using Page = std::vector<Byte>;
         using Set  = std::vector<Page>;
         using Mem  = std::vector<Set>;
         Mem memory = {};
@@ -82,12 +82,12 @@ class FuncMemory
                       const Page::const_iterator& byte_it) const;
 
         bool check( Addr addr) const;
-        uint8 read_byte( Addr addr) const;
-        uint8 check_and_read_byte( Addr addr) const;
+        Byte read_byte( Addr addr) const;
+        Byte check_and_read_byte( Addr addr) const;
 
         void alloc( Addr addr);
-        void write_byte( Addr addr, uint8 value);
-        void alloc_and_write_byte( Addr addr, uint8 value);
+        void write_byte( Addr addr, Byte value);
+        void alloc_and_write_byte( Addr addr, Byte value);
         
         void load_elf_section( const ELFIO::section* section);
 };

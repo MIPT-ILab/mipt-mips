@@ -4,16 +4,14 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-// generic C
-#include <cassert>
-#include <cstdlib>
+#include "../rf.h"
 
 // Catch2
 #include <catch.hpp>
 
 // MIPS-MIPS modules
 #include <mips/mips.h>
-#include "../rf.h"
+
 
 class TestRF : public RF<MIPS32>
 {

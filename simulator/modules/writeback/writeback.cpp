@@ -1,10 +1,7 @@
-#include <cassert>
-
-#include <iostream>
-#include <chrono>
-#include <sstream>
-
 #include "writeback.h"
+
+#include <cassert>
+#include <sstream>
 
 template <typename ISA>
 Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
@@ -25,22 +22,20 @@ void Writeback<ISA>::clock( Cycle cycle)
     {
         sout << "bubble\n";
         if ( cycle >= last_writeback_cycle + 100_Lt)
-        {
-            serr << "Deadlock was detected. The process will be aborted."
-                 << std::endl << std::endl << critical;
-        }
+            throw Deadlock( "");
+
         return;
     }
 
-    auto instr = ( rp_mem_datapath->is_ready( cycle)) ? rp_mem_datapath->read( cycle)
-                                                      : rp_execute_datapath->read( cycle);
+    auto instr = ( rp_mem_datapath->is_ready( cycle))
+        ? rp_mem_datapath->read( cycle)
+        : rp_execute_datapath->read( cycle);
+
+    /* no bubble instructions */
+    assert( !instr.is_bubble());
 
     /* perform writeback */
     rf->write_dst( instr);
-
-    /* check for bubble */
-    if ( instr.is_bubble())
-        return;
 
     /* check for traps */
     instr.check_trap();

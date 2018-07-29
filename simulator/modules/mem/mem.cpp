@@ -38,9 +38,6 @@ void Mem<ISA>::clock( Cycle cycle)
     /* branch misprediction */
     if ( is_flush)
     {
-        /* ignoring the upcoming instruction as it is invalid */
-        rp_datapath->ignore( cycle);
-
         sout << "flush\n";
         return;
     }

@@ -26,9 +26,12 @@ class Execute : public Log
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<ReadPort<Instr>> rp_long_latency_execution_unit = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        std::array<std::unique_ptr<ReadPort<BypassCommand<Register>>>, SRC_REGISTERS_NUM> rps_command;
-        std::array<std::array<std::unique_ptr<ReadPort<std::pair<RegisterUInt, RegisterUInt>>>, RegisterStage::BYPASSING_STAGES_NUMBER>, SRC_REGISTERS_NUM>
-            rps_sources_bypass;
+
+        struct BypassPorts {
+            std::unique_ptr<ReadPort<BypassCommand<Register>>> command_port;
+            std::array<std::unique_ptr<ReadPort<std::pair<RegisterUInt, RegisterUInt>>>, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
+        };
+        std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;
 
         /* Outputs */
         std::unique_ptr<WritePort<Instr>> wp_mem_datapath = nullptr;

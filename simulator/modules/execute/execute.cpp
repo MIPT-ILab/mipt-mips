@@ -35,26 +35,24 @@ Execute<ISA>::Execute( bool log)
 
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
 
-    rps_command[0] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                           PORT_LATENCY);
-    rps_command[1] = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                           PORT_LATENCY);
+    rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
+    rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
 
     wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     wp_complex_arithmetic_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
                                                                PORT_BW, SRC_REGISTERS_NUM);
 
-    rps_sources_bypass[0][0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_sources_bypass[0][3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_sources_bypass[1][3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
 template <typename ISA>
@@ -64,36 +62,17 @@ void Execute<ISA>::clock( Cycle cycle)
 
     /* receive flush signal */
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
-    
+
     /* update information about mispredictions */
     clock_saved_flush();
 
     /* branch misprediction */
-    if ( is_flush)
+    if (is_flush)
     {
-        /* ignoring the upcoming instruction as it is invalid */
-        rp_datapath->ignore( cycle);
-
-        /* ignoring the instruction from complex ALU */
-        rp_long_latency_execution_unit->ignore( cycle);
-
-        /* ignoring information from command ports */
-        for ( auto& port:rps_command)
-            port->ignore( cycle);
-
-        /* ignoring all bypassed data for source registers */
-        for ( auto& rps_src_ports:rps_sources_bypass)
-        {
-            for ( auto& port:rps_src_ports)
-                port->ignore( cycle);
-        }
-
         save_flush();
-
         sout << "flush\n";
         return;
     }
-
 
     /* get the instruction from complex ALU if it is ready */
     if ( rp_long_latency_execution_unit->is_ready( cycle))
@@ -111,47 +90,24 @@ void Execute<ISA>::clock( Cycle cycle)
     /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
     {
-        /* ignoring all bypassed data for source registers */
-        for ( auto& rps_src_ports:rps_sources_bypass)
-        {
-            for ( auto& port:rps_src_ports)
-                port->ignore( cycle);
-        }
-
         sout << "bubble\n";
         return;
     }
 
     auto instr = rp_datapath->read( cycle);
 
-    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    auto src_index = 0;
+    for ( auto& bypass_source : rps_bypass)
     {
         /* check whether bypassing is needed for a source register */
-        if ( rps_command[src_index]->is_ready( cycle))
+        if ( bypass_source.command_port->is_ready( cycle))
         {
-            const auto bypass_command = rps_command[src_index]->read( cycle);
-
-            /* get a port which should be used for bypassing and receive data */
-            const auto bypass_direction = bypass_command.get_bypass_direction();
-            const auto data = rps_sources_bypass[src_index][bypass_direction]->read( cycle);
-
-            /* ignoring all other ports for a source register */
-            for ( uint8 i = 0; i < RegisterStage::BYPASSING_STAGES_NUMBER; i++)
-            {
-                if ( i != bypass_direction)
-                    rps_sources_bypass[src_index][i]->ignore( cycle);
-            }
-
-            instr.set_v_src( data.first, src_index);
+            const auto bypass_direction = bypass_source.command_port->read( cycle).get_bypass_direction();
+            const auto data = bypass_source.data_ports.at( bypass_direction)->read( cycle).first;
+            instr.set_v_src( data, src_index);
         }
-        else
-        {
-            /* ignoring all bypassed data for a source register */
-            for ( auto& port:rps_sources_bypass[src_index])
-                port->ignore( cycle);
-        }
+        ++src_index;
     }
-
 
     /* perform execution */
     instr.execute();
@@ -170,7 +126,6 @@ void Execute<ISA>::clock( Cycle cycle)
         else
             wp_writeback_datapath->write( instr, cycle);
     }
-
 
     /* log */
     sout << instr << std::endl;

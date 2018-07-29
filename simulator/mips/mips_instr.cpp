@@ -4,11 +4,11 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
+#include "mips_instr.h"
+
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
-
-#include "mips_instr.h"
 
 //unordered map for R-instructions
 template<typename RegisterUInt>
@@ -201,22 +201,22 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
     //key     name    operation     memsize    source1      source2      destination      pointer                                 mips version
     {0x20, { "lb",  OUT_I_LOAD,         1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr} },
     {0x21, { "lh",  OUT_I_LOAD,         2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
-    {0x22, { "lwl", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_left,    MIPS_I_Instr} },
+    {0x22, { "lwl", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_left32,  MIPS_I_Instr} },
     {0x23, { "lw",  OUT_I_LOAD,         4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
     {0x24, { "lbu", OUT_I_LOADU,        1, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr,         MIPS_I_Instr} },
     {0x25, { "lhu", OUT_I_LOADU,        2, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
-    {0x26, { "lwr", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_right,   MIPS_I_Instr} },
+    {0x26, { "lwr", OUT_I_PARTIAL_LOAD, 4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_right32, MIPS_I_Instr} },
     {0x27, { "lwu", OUT_I_LOADU,        4, RegType::RS, RegType::ZERO, RegType::RT, &BaseMIPSInstr<RegisterUInt>::calculate_load_addr_aligned, MIPS_I_Instr} },
 
     // Stores
     //key     name    operation  memsize    source1      source2      destination      pointer                                         mips version
     {0x28, { "sb",  OUT_I_STORE, 1, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr} },
     {0x29, { "sh",  OUT_I_STORE, 2, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_I_Instr} },
-    {0x2A, { "swl", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_left,    MIPS_I_Instr} },
+    {0x2A, { "swl", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_left32,  MIPS_I_Instr} },
     {0x2B, { "sw",  OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_aligned, MIPS_I_Instr} },
     {0x2C, { "sdl", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_III_Instr} },
     {0x2D, { "sdr", OUT_I_STORE, 8, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr,         MIPS_III_Instr} },
-    {0x2E, { "swr", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_right,   MIPS_I_Instr} },
+    {0x2E, { "swr", OUT_I_STORE, 4, RegType::RS, RegType::RT, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::calculate_store_addr_right32, MIPS_I_Instr} },
     //       0x2F   cache
 
     // Advanced loads and stores
@@ -416,8 +416,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 template<typename RegisterUInt>
 void BaseMIPSInstr<RegisterUInt>::execute_unknown()
 {
-    std::cerr << "ERROR.Unknown or unsupported instruction: " << disasm << std::endl;
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("Unknown instruction ") + std::string(Dump()) + " is an unhandled trap\n");
 }
 
 template<typename RegisterUInt>
