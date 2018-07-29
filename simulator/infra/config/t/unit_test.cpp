@@ -19,6 +19,22 @@ namespace config {
     AliasedSwitch bool_config_2 = { "f", "bool_config_2", "second bool config description"};
 } // namespace config
 
+template<typename T>
+std::string wrap_shift_operator(const T& value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
+template<size_t N>
+void handleArgs( const char* (& array)[N])
+{
+    // Let it decay
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
+    config::handleArgs( N, array);
+}
+
 //
 // To check whether the returned values
 // are equal to passed arguments
@@ -35,15 +51,18 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
         "-n", "145",
         "-f"
     };
-    const int argc = countof(argv);
 
-    // should not throw any exceptions
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( handleArgs( argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
-    CHECK( config::bool_config_1 == false);
-    CHECK( config::bool_config_2 == true);
+    CHECK_FALSE( config::bool_config_1);
+    CHECK( config::bool_config_2);
+
+    CHECK( wrap_shift_operator( config::uint64_config) == "145");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "false");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "true");
 }
 
 //
@@ -62,15 +81,18 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
         "-n", "356",
         "-d"
     };
-    const int argc = countof(argv);
 
-    // should not throw any exceptions
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
+    CHECK_NOTHROW( handleArgs( argv));
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
-    CHECK( config::bool_config_1 == true);
-    CHECK( config::bool_config_2 == false);
+    CHECK( config::bool_config_1);
+    CHECK_FALSE( config::bool_config_2);
+    
+    CHECK( wrap_shift_operator( config::uint64_config) == "356");
+    CHECK( wrap_shift_operator( config::string_config) == mandatory_string_value);
+    CHECK( wrap_shift_operator( config::bool_config_1) == "true");
+    CHECK( wrap_shift_operator( config::bool_config_2) == "false");
 }
 
 //
@@ -82,10 +104,8 @@ TEST_CASE( "config_parse: Pass_No_Args")
     {
         "mipt-mips"
     };
-    const int argc = countof(argv);
 
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -98,10 +118,8 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
         "mipt-mips",
         "--uint64_config_name", "356",
     };
-    const int argc = countof(argv);
     
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -114,10 +132,8 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
         "mipt-mips",
         "--string_config_name", "test.elf", 
     };
-    const int argc = countof(argv);
 
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -132,10 +148,8 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
         "-n", "356",
         "-koption"
     };
-    const int argc = countof(argv);
 
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 #if 0
@@ -151,10 +165,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
         "--string_config_name", "run_test_2.elf",
         "-n", "412",
     };
-    const int argc = countof(argv);
-    
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 #endif
 
@@ -169,10 +181,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
         "-b",
         "-n", "412",
     };
-    const int argc = countof(argv);
 
-    // should throw
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
 }
 
 //
@@ -188,10 +198,36 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
         "-f",
         "-d"
     };
-    const int argc = countof(argv);
 
-    // should exit with EXIT_FAILURE
-    CHECK_THROWS_AS( config::handleArgs( argc, argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+}
+
+TEST_CASE( "config_parse: Pass help option alias")
+{
+    const char* argv[] =
+    {
+        "mipt-mips",
+        "-b", "run_test.elf",
+        "-n", "356",
+        "-d",
+        "-h"
+    };
+
+    CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
+}
+
+TEST_CASE( "config_parse: Pass help option")
+{
+    const char* argv[] =
+    {
+        "mipt-mips",
+        "-b", "run_test.elf",
+        "-n", "356",
+        "-d",
+        "--help"
+    };
+
+    CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
 }
 
 #if 0
@@ -207,11 +243,9 @@ TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twi
         "-b", "test.elf",
         "-n", "100"
     };
-    const int argc = countof(argv);
 
     // should not throw any exceptions
-    CHECK_NOTHROW( config::handleArgs( argc, argv));
-
+    CHECK_NOTHROW( handleArgs( argv));
 
     auto test_function = []()
     {

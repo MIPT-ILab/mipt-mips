@@ -7,16 +7,15 @@
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
 
-#include <cassert>
-
-#include <array>
-#include <iostream>
-#include <utility>
-
 // MIPT-MIPS modules
-#include <infra/types.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
+#include <infra/types.h>
+
+#include <array>
+#include <cassert>
+#include <iostream>
+#include <utility>
 
 class RISCVRegister {
     enum RegNum : uint8
@@ -32,15 +31,12 @@ public:
 
     explicit RISCVRegister( uint8 id) : RISCVRegister( static_cast<RegNum>( id))
     {
-        if ( id >= 32u) {
-            std::cerr << "ERROR: Invalid RISCV register id = " << id;
-            exit( EXIT_FAILURE);
-        }
+        assert( id < 32u);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
-        return out << regTable[ rhs.value];
+        return out << regTable.at( rhs.value);
     }
 
     bool is_zero()                 const { return value == RISCV_REG_zero; }

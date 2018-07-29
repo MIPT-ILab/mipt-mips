@@ -18,7 +18,7 @@ os:
   - osx
 
 git:
-  submodules: false
+  submodules: true
 
 matrix:
   exclude:
@@ -33,14 +33,13 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - g++-8
+    - lcov
+    - g++-7
     - clang-tidy-6.0
     - libboost-program-options1.54-dev
 
 install:
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-8; fi
-  - cd $TRAVIS_BUILD_DIR
-  - git submodule update --init
+  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -53,15 +52,27 @@ install:
         sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
     fi
 
+before_script:
+  - cd $TRAVIS_BUILD_DIR/traces && make
+  - cd $TRAVIS_BUILD_DIR/simulator
+  - mkdir release && cd release
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+
 script:
-# Build traces
-  - cd traces && make
-# Build and test simulator
-  - mkdir $TRAVIS_BUILD_DIR/simulator/build && cd $TRAVIS_BUILD_DIR/simulator/build
-  - cmake ..
   - make
   - ctest --verbose
-# Run Clang-Tidy
-  - if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then run-clang-tidy-6.0.py -header-filter='.*'; fi
-# Run a trace to see simulation frequency
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
+
+after_success:
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
+  - |
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        run-clang-tidy-6.0.py -header-filter='.*'
+    fi
+  - |
+    if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        cd $TRAVIS_BUILD_DIR/simulator
+        mkdir debug && cd debug
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
+        make && ctest
+        bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+    fi

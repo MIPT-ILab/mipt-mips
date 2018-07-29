@@ -7,17 +7,15 @@
 #ifndef PORTS_H
 #define PORTS_H
 
-#include <cstdlib>
-
-#include <unordered_map>
-#include <queue>
-#include <list>
-#include <string>
-#include <memory>
-
-#include "../types.h"
 #include "../log.h"
+#include "../types.h"
 #include "timing.h"
+
+#include <list>
+#include <memory>
+#include <queue>
+#include <string>
+#include <unordered_map>
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name
@@ -29,29 +27,29 @@ template<class T> class WritePort;
 
 // Global port handlers
 extern void init_ports();
-extern void check_ports( Cycle cycle);
+extern void clean_up_ports( Cycle cycle);
 extern void destroy_ports();
 
 class BasePort : protected Log
 {
         friend void init_ports();
-        friend void check_ports( Cycle cycle);
+        friend void clean_up_ports( Cycle cycle);
         friend void destroy_ports();
 
     protected:
         class BaseMap : public Log
         {
                 friend void init_ports();
-                friend void check_ports( Cycle cycle);
+                friend void clean_up_ports( Cycle cycle);
                 friend void destroy_ports();
 
                 virtual void init() const = 0;
-                virtual void check( Cycle cycle) const = 0;
+                virtual void clean_up( Cycle cycle) = 0;
                 virtual void destroy() = 0;
 
                 static std::list<BaseMap*> all_maps;
             protected:
-                BaseMap() : Log(true) { all_maps.push_back( this); }
+                BaseMap() : Log( false) { all_maps.push_back( this); }
         };
 
         // Key of port
@@ -61,7 +59,7 @@ class BasePort : protected Log
         bool _init = false;
 
         // Constructor of port
-        explicit BasePort( std::string key) : Log( true), _key( std::move( key)) { }
+        explicit BasePort( std::string key) : Log( false), _key( std::move( key)) { }
 };
 
 /*
@@ -92,7 +90,7 @@ template<class T> class Port : public BasePort
             void init() const final;
 
             // Finding lost elements
-            void check( Cycle cycle) const final;
+            void clean_up( Cycle cycle) final;
 
             // Destroy connections
             void destroy() final;
@@ -142,9 +140,9 @@ template<class T> class WritePort : public Port<T>
 
         void init( const ReadListType& readers);
 
-        void check( Cycle cycle) const {
+        void clean_up( Cycle cycle) {
             for ( const auto& reader : _destinations)
-                reader->check( cycle);
+                reader->clean_up( cycle);
         }
 
         // destroy all ports
@@ -183,6 +181,7 @@ template<class T> class ReadPort: public Port<T>
 {
         friend class WritePort<T>;
     private:
+        using Log::sout;
         using Log::serr;
         using Log::critical;
 
@@ -206,7 +205,7 @@ template<class T> class ReadPort: public Port<T>
         }
 
         // Tests if there is any ungot data
-        void check( Cycle cycle) const;
+        void clean_up( Cycle cycle);
     public:
         /*
          * Constructor
@@ -227,9 +226,6 @@ template<class T> class ReadPort: public Port<T>
 
         // Read method
         T read( Cycle cycle);
-
-        // Read but ignore the data
-        void ignore( Cycle cycle);
 };
 
 /*
@@ -361,25 +357,16 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
 }
 
 /*
- * Ignoring read method
- *
- * Reads all data which should be read in this cycle but does not copy it
- */
-template<class T> void ReadPort<T>::ignore( Cycle cycle)
-{
-    while ( this->is_ready( cycle))
-         _dataQueue.pop();
-}
-
-/*
  * Tests if there is any data that can not be used ever.
 */
-template<class T> void ReadPort<T>::check( Cycle cycle) const
+template<class T> void ReadPort<T>::clean_up( Cycle cycle)
 {
-    if ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle)
-        serr << "In " << this->_key << " port data was added at "
+    while ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle) {
+        sout << "In " << this->_key << " port data was added at "
              << (_dataQueue.front().cycle - _latency)
-             << " clock and will not be readed" << std::endl << critical;
+             << " clock and was not readed\n";
+        _dataQueue.pop();
+    }
 }
 
 /*
@@ -419,10 +406,10 @@ template<class T> void Port<T>::Map::destroy()
  * Argument is the number of current cycle.
  * If some token couldn't be get in future, warnings
 */
-template<class T> void Port<T>::Map::check( Cycle cycle) const
+template<class T> void Port<T>::Map::clean_up( Cycle cycle)
 {
     for ( const auto& cluster : _map)
-        cluster.second.writer->check( cycle);
+        cluster.second.writer->clean_up( cycle);
 }
 
 // External methods

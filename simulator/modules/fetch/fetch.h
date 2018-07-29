@@ -6,12 +6,11 @@
 #ifndef FETCH_H
 #define FETCH_H
 
-#include <infra/ports/ports.h>
-#include <infra/cache/cache_tag_array.h>
-
-#include <modules/core/perf_instr.h>
-
 #include "bpu/bpu.h"
+
+#include <infra/cache/cache_tag_array.h>
+#include <infra/ports/ports.h>
+#include <modules/core/perf_instr.h>
  
 template <typename ISA>
 class Fetch : public Log
@@ -50,7 +49,6 @@ private:
     void clock_bp( Cycle cycle);
     void clock_instr_cache( Cycle cycle);
     void save_flush( Cycle cycle);
-    void ignore( Cycle cycle);
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);

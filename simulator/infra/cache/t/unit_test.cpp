@@ -55,6 +55,12 @@ TEST_CASE( "pass_wrong_arguments: Pass_Wrong_Arguments_To_CacheTagArraySizeCheck
 
     // line_size is not power of 2
     CHECK_THROWS_AS( CacheTagArraySizeCheck( 512, 16, 12, 32), CacheTagArrayInvalidSizeException);
+
+    // address is 48 bits
+    CHECK_THROWS_AS( CacheTagArraySizeCheck( 128, 4, 4, 48), CacheTagArrayInvalidSizeException);
+
+    // too small cache
+    CHECK_THROWS_AS( CacheTagArraySizeCheck( 8, 4, 4, 32), CacheTagArrayInvalidSizeException);
 }
 
 static const uint32 LINE_SIZE = 4; // why not 32?

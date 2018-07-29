@@ -6,9 +6,9 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
-#include <infra/types.h>
 #include <infra/instrcache/LRUCache.h>
 #include <infra/memory/memory.h>
+#include <infra/types.h>
 
 #ifndef INSTR_CACHE_CAPACITY
 #define INSTR_CACHE_CAPACITY 8192
@@ -28,7 +28,6 @@ class InstrMemory : private FuncMemory
 
         Instr fetch_instr( Addr PC)
         {
-            // NOLINTNEXTLINE(clang-analyzer-deadcode) https://bugs.llvm.org/show_bug.cgi?id=36283
             const auto [found, value] = instr_cache.find( PC);
             Instr instr = found ? value : Instr( fetch( PC), PC);
             instr_cache.update( PC, instr);
@@ -43,6 +42,8 @@ class InstrMemory : private FuncMemory
 
         void store( const Instr& instr)
         {
+            if (instr.get_mem_addr() == 0)
+                throw std::runtime_error("Store data to zero is an unhandled trap\n");
             instr_cache.erase( instr.get_mem_addr());
             write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }

@@ -7,10 +7,10 @@
 #ifndef RF_H
 #define RF_H
 
-#include <array>
-#include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/types.h>
 
+#include <array>
 #include <cassert>
 
 template<typename ISA>

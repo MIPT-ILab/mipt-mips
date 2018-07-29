@@ -20,7 +20,8 @@ However, you are free to open new issues. Mentors will assign them to project me
 1. The guideline is to have no more than two tasks assigned simultaneuosly. Exceptions are possible with mentors' approves.
 
 ### Code and Merges
-1. Please follow our [code style guidelines](https://github.com/MIPT-ILab/mipt-mips/wiki/Code-guidelines).
+1. Please follow our [code style guidelines](https://github.com/MIPT-ILab/mipt-mips/wiki/Code-style-guidelines).
+1. Please follow our [C++ features guidelines](https://github.com/MIPT-ILab/mipt-mips/wiki/Cpp-guidelines).
 1. Students are granted with write access to repository, so they can assign themselves on issues and change wiki.
 1. Students cannot push the changes directly to the repository, but they may create new branches.
 1. Keep commit messages and pull request description clean.

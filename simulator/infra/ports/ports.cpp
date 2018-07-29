@@ -14,10 +14,10 @@ void init_ports()
         map->init();
 }
 
-void check_ports( Cycle cycle)
+void clean_up_ports( Cycle cycle)
 {
     for ( auto map : BasePort::BaseMap::all_maps)
-        map->check( cycle);
+        map->clean_up( cycle);
 }
 
 void destroy_ports()
