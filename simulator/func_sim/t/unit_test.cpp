@@ -33,24 +33,17 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     CHECK( simulator.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
-TEST_CASE( "Run_Full_Trace_MIPS32: Func_Sim")
+TEST_CASE( "Torture_Test: Func_Sim")
 {
-    FuncSim<MIPS32>().run_no_limit( TEST_PATH "/tt.core32.out");
-}
+    // MIPS 32 Little-endian
+    CHECK_NOTHROW( FuncSim<MIPS32>().run_no_limit( TEST_PATH "/tt.core.universal.out") );
+    CHECK_NOTHROW( FuncSim<MIPS32>().run_no_limit( TEST_PATH "/tt.core32.out") );
+    CHECK_NOTHROW( FuncSim<MIPS32>().run_no_limit( TEST_PATH "/tt.core32.le.out") );
 
-TEST_CASE( "Run_Full_Trace_MIPS32_universal: Func_Sim")
-{
-    FuncSim<MIPS32>().run_no_limit( TEST_PATH "/tt.core.universal.out");
-}
-
-TEST_CASE( "Run_Full_Trace_MIPS64: Func_Sim")
-{
-    FuncSim<MIPS64>().run_no_limit( TEST_PATH "/tt.core64.out");
-}
-
-TEST_CASE( "Run_Full_Trace_MIPS64_universal: Func_Sim")
-{
-    FuncSim<MIPS64>().run_no_limit( TEST_PATH "/tt.core.universal.out");
+    // MIPS 64 Little-Endian
+    CHECK_NOTHROW( FuncSim<MIPS64>().run_no_limit( TEST_PATH "/tt.core.universal.out") );
+    CHECK_NOTHROW( FuncSim<MIPS64>().run_no_limit( TEST_PATH "/tt.core64.out") );
+    CHECK_NOTHROW( FuncSim<MIPS64>().run_no_limit( TEST_PATH "/tt.core64.le.out") );
 }
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")
