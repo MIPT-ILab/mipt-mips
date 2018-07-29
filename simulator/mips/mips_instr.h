@@ -366,7 +366,7 @@ class BaseMIPSInstr
                case 3: return 0xFFFF'FFFF;
                }
              */
-            mask = RegisterUInt( ~bitmask<uint32>( ( 3 - mem_addr % 4) * 8));
+            mask = static_cast<RegisterUInt>( ~bitmask<uint32>( ( 3 - mem_addr % 4) * 8));
             // Actually we read a word LEFT to effective address
             mem_addr -= 3;
         }
@@ -385,7 +385,7 @@ class BaseMIPSInstr
 
         void calculate_store_addr_left32() {
             calculate_store_addr();
-            mask = RegisterUInt( ~bitmask<uint32>( ( 3 - mem_addr % 4) * 8));
+            mask = static_cast<RegisterUInt>( ~bitmask<uint32>( ( 3 - mem_addr % 4) * 8));
             mem_addr -= 3;
         }
 
