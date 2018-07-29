@@ -4,17 +4,17 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
- // C++ generic modules
-#include <vector>
-#include <memory>
-#include <map>
+#include "bpentry.h"
+#include "bpu.h"
 
 // MIPT_MIPS modules
 #include <infra/cache/cache_tag_array.h>
 #include <infra/config/config.h>
 
-#include "bpu.h"
-#include "bpentry.h"
+// C++ generic modules
+#include <map>
+#include <memory>
+#include <vector>
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};

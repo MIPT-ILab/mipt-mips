@@ -6,14 +6,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <map>
-
 #include <infra/types.h>
 
 #include <popl.hpp>
+
+#include <iostream>
+#include <map>
+#include <string>
 
 namespace config {
 
@@ -51,51 +50,56 @@ public:
 };
     
 template<typename T>
-struct AliasedRequiredValue : public BaseTValue<T> {
+struct AliasedRequiredValue : BaseTValue<T>
+{
     AliasedRequiredValue<T>( const std::string& alias, const std::string& name, const std::string& desc) noexcept
         : BaseTValue<T>( )
     {
         this->options().template add<popl::Value<T>, popl::Attribute::required>(alias, name, desc, T(), &this->value);
     }
-
-    AliasedRequiredValue<T>() = delete;
 };
 
 template<typename T>
-struct AliasedValue : public BaseTValue<T> {
+struct AliasedValue : BaseTValue<T>
+{
     AliasedValue<T>( const std::string& alias, const std::string& name, const T& val, const std::string& desc) noexcept
         : BaseTValue<T>( val)
     {
         this->options().template add<popl::Value<T>>(alias, name, desc, val, &this->value);
     }
-
-    AliasedValue<T>() = delete;
 };
 
-struct AliasedSwitch : public BaseTValue<bool> {
+struct AliasedSwitch : BaseTValue<bool>
+{
     AliasedSwitch( const std::string& alias, const std::string& name, const std::string& desc) noexcept
         : BaseTValue<bool>( false)
     {
         options().add<popl::Switch>(alias, name, desc, &this->value);
     }
-
-    AliasedSwitch() = delete;
 };
 
 template<typename T>
-struct Unaliased : public T
+struct Value : AliasedValue<T>
 {
-    Unaliased<T>() = delete;
-
-    template<typename Arg1, typename Arg2, typename ... Args>
-    Unaliased(Arg1&& arg1, Arg2&& arg2, Args&& ... args) noexcept
-        : T( "", arg1, arg2, args...)
+    Value( const std::string& name, const T& val, const std::string& desc) noexcept
+        : AliasedValue<T>( "", name, val, desc)
     { }
 };
 
-template<typename T> using Value = Unaliased<AliasedValue<T>>;
-template<typename T> using RequiredValue = Unaliased<AliasedRequiredValue<T>>;
-using Switch = Unaliased<AliasedSwitch>;
+template<typename T>
+struct RequiredValue : AliasedRequiredValue<T>
+{
+    RequiredValue( const std::string& name, const std::string& desc) noexcept
+        : AliasedRequiredValue<T>( "", name, desc)
+    { }
+};
+
+struct Switch : AliasedSwitch
+{
+    Switch( const std::string& name, const std::string& desc) noexcept
+        : AliasedSwitch( "", name, desc)
+    { }
+};
 
 struct HelpOption : std::runtime_error {
     explicit HelpOption( const std::string& msg) : std::runtime_error( msg) {}

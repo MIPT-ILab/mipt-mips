@@ -5,12 +5,7 @@
  * Copyright 2012-2018 uArchSim iLab project
  */
 
-// Generic C++
-#include <cassert>
-#include <sstream>
-#include <iomanip>
-#include <iostream>
-#include <utility>
+#include "memory.h"
 
 // ELFIO
 #include <elfio/elfio.hpp>
@@ -18,7 +13,12 @@
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
-#include "memory.h"
+// Generic C++
+#include <cassert>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <utility>
 
 FuncMemory::FuncMemory( uint32 addr_bits,
                         uint32 page_bits,
@@ -107,7 +107,7 @@ void FuncMemory::write( T value, Addr addr, T mask)
     // Endian specific
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
         if ((mask & 0xFFu) == 0xFFu)
-            alloc_and_write_byte( addr + i, static_cast<Byte>( value & 0xFFu));
+            alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
         if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
             mask >>= 8;
             value >>= 8;

@@ -6,21 +6,20 @@
 #ifndef RISCV_INSTR_H
 #define RISCV_INSTR_H
 
-// Generic C++
-#include <cassert>
-#include <array>
-#include <unordered_map>
+#include "risc_v.h"
+#include "riscv_register/riscv_register.h"
+
+// MIPT-MIPS modules
+#include <infra/macro.h>
+#include <infra/string_view.h>
+#include <infra/types.h>
 
 // COW string
 #include <kryucow_string.h>
 
-// MIPT-MIPS modules
-#include <infra/types.h>
-#include <infra/macro.h>
-#include <infra/string_view.h>
-
-#include "riscv_register/riscv_register.h"
-#include "risc_v.h"
+// Generic C++
+#include <array>
+#include <unordered_map>
 
 template <typename T>
 class RISCVInstr
@@ -42,6 +41,8 @@ class RISCVInstr
 
         Addr PC = NO_VAL32;
         Addr new_PC = NO_VAL32;
+
+        uint64 sequence_id = NO_VAL64;
 
 #if 0
         std::string disasm = {};
@@ -125,6 +126,8 @@ class RISCVInstr
 
         void execute() {};
         void check_trap() {};
+
+        void set_sequence_id( uint64 id) { sequence_id = id; }
 };
 
 template <typename T>

@@ -5,16 +5,15 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
-// protection from multi-include
 #ifndef COMMON__MACRO_H
 #define COMMON__MACRO_H
 
+#include <infra/types.h>
+
+#include <algorithm>
 #include <bitset>
 #include <limits>
 #include <type_traits>
-#include <algorithm>
-
-#include <infra/types.h>
 
 /* Returns size of a static array */
 template<typename T, size_t N>
@@ -45,13 +44,12 @@ template<> constexpr size_t bitwidth<uint128> = 128u;
 template<> constexpr size_t bitwidth<int128> = 128u;
 
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
-template<typename T,
-         typename = std::enable_if_t<std::is_integral<T>::value>,         // only integral
-         typename = std::enable_if_t<std::numeric_limits<T>::radix == 2>, // only binary
-         typename = std::enable_if_t<bitwidth<T> <= bitwidth<uint64>> // only narrow
-       >
+template<typename T>
 constexpr auto popcount( T x) noexcept
 {
+    static_assert( std::is_integral<T>::value, "popcount works only for integral types");
+    static_assert( std::numeric_limits<T>::radix == 2, "popcount works only for binary types");
+    static_assert( bitwidth<T> <= bitwidth<uint64>, "popcount works only for uint64 and narrower types");
     return std::bitset<bitwidth<T>>( static_cast<typename std::make_unsigned<T>::type>( x)).count();
 }
 

@@ -7,12 +7,12 @@
 #ifndef FUNC_SIM_H
 #define FUNC_SIM_H
 
-#include <memory>
-#include <string>
+#include "rf/rf.h"
 
 #include <simulator.h>
 
-#include "rf/rf.h"
+#include <memory>
+#include <string>
 
 struct BearingLost final : std::runtime_error
 {
@@ -28,6 +28,7 @@ class FuncSim : public Simulator
     private:
         RF<ISA> rf;
         Addr PC = NO_VAL32;
+        uint64 sequence_id = 0;
         std::unique_ptr<Memory> mem = nullptr;
 
         uint64 nops_in_a_row = 0;

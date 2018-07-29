@@ -8,21 +8,20 @@
 #ifndef MIPS_INSTR_H
 #define MIPS_INSTR_H
 
-// Generic C++
-#include <cassert>
-#include <array>
-#include <unordered_map>
+#include "mips_register/mips_register.h"
+#include "mips_version.h"
+
+// MIPT-MIPS modules
+#include <infra/macro.h>
+#include <infra/string_view.h>
+#include <infra/types.h>
 
 // COW string
 #include <kryucow_string.h>
 
-// MIPT-MIPS modules
-#include <infra/types.h>
-#include <infra/macro.h>
-#include <infra/string_view.h>
-
-#include "mips_register/mips_register.h"
-#include "mips_version.h"
+// Generic C++
+#include <array>
+#include <unordered_map>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
@@ -187,7 +186,7 @@ class BaseMIPSInstr
 
         const Addr PC = NO_VAL32;
 
-        uint64 sequence_id = NO_VAL32;
+        uint64 sequence_id = NO_VAL64;
 
 #if 0
         std::string disasm = {};
@@ -344,7 +343,7 @@ class BaseMIPSInstr
                 trap = TrapType::UNALIGNED_ADDRESS;
         }
 
-        void calculate_load_addr_right() {
+        void calculate_load_addr_right32() {
             // Endian specific
             calculate_load_addr();
             /* switch (mem_addr % 4) {
@@ -354,10 +353,10 @@ class BaseMIPSInstr
                case 3: return 0x0000'00FF;
                }
              */
-            mask = bitmask<RegisterUInt>( ( 4 - mem_addr % 4) * 8);
+            mask = bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
         }
 
-        void calculate_load_addr_left() {
+        void calculate_load_addr_left32() {
             // Endian specific
             calculate_load_addr();
             /* switch (mem_addr % 4) {
@@ -367,7 +366,7 @@ class BaseMIPSInstr
                case 3: return 0xFFFF'FFFF;
                }
              */
-            mask = ~bitmask<RegisterUInt>( ( 3 - mem_addr % 4) * 8);
+            mask = bitmask<RegisterUInt>( ( 1 + mem_addr % 4) * 8) << ( ( 3 - mem_addr % 4) * 8);
             // Actually we read a word LEFT to effective address
             mem_addr -= 3;
         }
@@ -379,14 +378,14 @@ class BaseMIPSInstr
                 trap = TrapType::UNALIGNED_ADDRESS;
         }
 
-        void calculate_store_addr_right() {
+        void calculate_store_addr_right32() {
             calculate_store_addr();
-            mask = bitmask<RegisterUInt>( ( 4 - mem_addr % 4) * 8);
+            mask = bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
         }
 
-        void calculate_store_addr_left() {
+        void calculate_store_addr_left32() {
             calculate_store_addr();
-            mask = ~bitmask<RegisterUInt>( ( 3 - mem_addr % 4) * 8);
+            mask = bitmask<RegisterUInt>( ( 1 + mem_addr % 4) * 8) << ( ( 3 - mem_addr % 4) * 8);
             mem_addr -= 3;
         }
 

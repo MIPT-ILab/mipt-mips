@@ -83,8 +83,6 @@ void Fetch<ISA>::clock_bp( Cycle cycle)
 template <typename ISA>
 void Fetch<ISA>::clock_instr_cache( Cycle cycle)
 {
-    ignore( cycle);
-
     if( rp_long_latency_pc_holder->is_ready( cycle))
     {
         /* get PC from long-latency port if it's possible */
@@ -101,18 +99,6 @@ void Fetch<ISA>::clock_instr_cache( Cycle cycle)
 }
 
 template <typename ISA>
-void Fetch<ISA>::ignore( Cycle cycle)
-{
-    /* ignore PC from other ports in the case of cache miss */
-    rp_external_target->ignore( cycle);
-    rp_hold_pc->ignore( cycle);
-    rp_target->ignore( cycle);
-    rp_stall->ignore( cycle);
-    /* ignore miss signal */
-    rp_hit_or_miss->ignore( cycle);
-}
-
-template <typename ISA>
 void Fetch<ISA>::save_flush( Cycle cycle)
 {
     /* save PC in the case of flush signal */
@@ -121,8 +107,6 @@ void Fetch<ISA>::save_flush( Cycle cycle)
     else if( rp_target->is_ready( cycle))
         wp_target->write( rp_target->read( cycle), cycle);
 }
-
-
 
 template <typename ISA>
 Addr Fetch<ISA>::get_cached_PC( Cycle cycle)

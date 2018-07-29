@@ -33,11 +33,15 @@ public:
 
     template<typename T>
     LogOstream& operator<<(const T& v) {
-        if ( enable) {
+        if ( enable)
             stream << v;
-        }
 
         return *this;
+    }
+
+    template<size_t N>
+    LogOstream& operator<<(const char (&array)[N]) {
+        return *this << static_cast<const char*>( array);
     }
 };
 

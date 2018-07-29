@@ -20,12 +20,11 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory( ));
-    // check memory initialization with custom parameters
-    CHECK_NOTHROW( FuncMemory( 48, 15, 10));
-    // check memory initialization with 4GB page
-    CHECK_THROWS_AS( FuncMemory( 64, 15, 32), FuncMemoryBadMapping);
+    CHECK_NOTHROW( FuncMemory( )); // check memory initialization with default parameters
+    CHECK_NOTHROW( FuncMemory( 48, 15, 10)); // check memory initialization with custom parameters
+    CHECK_THROWS_AS( FuncMemory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
+    CHECK_THROWS_AS( FuncMemory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
+    CHECK_THROWS_AS( FuncMemory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
@@ -81,9 +80,6 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
     FuncMemory func_mem;
     func_mem.load_elf_file( valid_elf_file);
-
-    // the address of the ".data" func_memion
-    uint64 dataSectAddr = 0x4100c0;
 
     // write 1 into the byte pointed by dataSectAddr
     func_mem.write<uint8>( 1, dataSectAddr);

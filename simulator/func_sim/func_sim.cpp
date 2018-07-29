@@ -2,9 +2,7 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
-#include <cassert>
-#include <iostream>
-
+ 
 #include "func_sim.h"
 
 template <typename ISA>
@@ -27,6 +25,10 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
     FuncInstr instr = mem->fetch_instr( PC);
+
+    // set sequence_id
+    instr.set_sequence_id(sequence_id);
+    sequence_id++;
 
     // read sources
     rf.read_sources( &instr);
