@@ -21,13 +21,11 @@ Execute<ISA>::Execute( bool log)
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
-    if ( config::complex_alu_latency < 2)
-        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1"
-             << std::endl << critical;
+    if (config::complex_alu_latency < 2)
+        throw std::runtime_error("ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1");
     
-    if ( config::complex_alu_latency > 64)
-        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64"
-             << std::endl << critical;
+    if (config::complex_alu_latency > 64)
+        throw std::runtime_error("ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64");
 
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",

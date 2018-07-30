@@ -13,6 +13,7 @@
 #include <boost/operators.hpp>
 
 #include <iostream>
+#include <string>
 
 class Cycle;
 class Latency;
@@ -42,6 +43,7 @@ class Cycle : public boost::totally_ordered<Cycle>
         {
             return is >> cycle.value;
         }
+        std::string to_string() const { return std::to_string( value); }
 
     private:
         uint64 value;
@@ -76,6 +78,7 @@ class Latency : public boost::totally_ordered<Latency>
 
         friend constexpr inline Cycle Cycle::operator+( const Latency& latency) const;
         friend constexpr inline Cycle Cycle::operator-( const Latency& latency) const;
+        std::string to_string() const { return std::to_string( value); }
 
     private:
         int64 value;
