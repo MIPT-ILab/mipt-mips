@@ -483,5 +483,14 @@ void BaseMIPSInstr<RegisterUInt>::check_trap()
     }
 }
 
+template<typename RegisterUInt>
+void BaseMIPSInstr<RegisterUInt>::set_sequence_id( uint64 id )
+{
+    sequence_id = id;
+    std::ostringstream oss;
+    oss << "\t{" << id << "}";
+
+}
+
 template class BaseMIPSInstr<uint32>;
 template class BaseMIPSInstr<uint64>;
