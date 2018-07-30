@@ -11,6 +11,11 @@
 #include <cassert>
 #include <map>
 
+TEST_CASE( "Latency to string")
+{
+    CHECK( (5_Cl).to_string() == "5");
+    CHECK( (2_Lt).to_string() == "2");
+}
 
 namespace ports {
     namespace testing {

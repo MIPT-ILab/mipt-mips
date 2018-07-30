@@ -11,11 +11,11 @@
 #include "../types.h"
 #include "timing.h"
 
-#include <list>
 #include <memory>
 #include <queue>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 /*
  * Known bugs: it is possible to create a pair of ports with the same name
@@ -24,6 +24,12 @@
 
 template<class T> class ReadPort;
 template<class T> class WritePort;
+
+struct PortError : std::runtime_error {
+    explicit PortError( const std::string& msg)
+        : std::runtime_error(std::string("Port error: ") + msg + '\n')
+    { }
+};
 
 // Global port handlers
 extern void init_ports();
@@ -47,7 +53,7 @@ class BasePort : protected Log
                 virtual void clean_up( Cycle cycle) = 0;
                 virtual void destroy() = 0;
 
-                static std::list<BaseMap*> all_maps;
+                static std::vector<BaseMap*> all_maps;
             protected:
                 BaseMap() : Log( false) { all_maps.push_back( this); }
         };
@@ -68,12 +74,9 @@ class BasePort : protected Log
 template<class T> class Port : public BasePort
 {
     protected:
-        using ReadListType = std::list<ReadPort<T>* >;
-
         /*
          * Map of ports
         */
-    protected:
         class Map : public BasePort::BaseMap
         {
         private:
@@ -81,7 +84,7 @@ template<class T> class Port : public BasePort
             struct Cluster
             {
                 WritePort<T>* writer = nullptr;
-                ReadListType readers = {};
+                std::vector<ReadPort<T>*> readers = {};
             };
 
             std::unordered_map<std::string, Cluster> _map = { };
@@ -122,8 +125,6 @@ template<class T> class WritePort : public Port<T>
         friend class Port<T>::Map;
 
         using Log::serr;
-        using Log::critical;
-        using ReadListType = typename Port<T>::ReadListType;
 
         // Number of tokens that can be added in one cycle;
         const uint32 _bandwidth;
@@ -132,13 +133,13 @@ template<class T> class WritePort : public Port<T>
         const uint32 _fanout;
 
         // List of readers
-        ReadListType _destinations = {};
+        std::vector<ReadPort<T>*> _destinations = {};
 
         // Variables for counting token in the last cycle
         Cycle _lastCycle = 0_Cl;
         uint32 _writeCounter = 0;
 
-        void init( const ReadListType& readers);
+        void init( std::vector<ReadPort<T>*> readers);
 
         void clean_up( Cycle cycle) {
             for ( const auto& reader : _destinations)
@@ -183,7 +184,6 @@ template<class T> class ReadPort: public Port<T>
     private:
         using Log::sout;
         using Log::serr;
-        using Log::critical;
 
         // Latency is the number of cycles after which we may take data from port.
         const Latency _latency;
@@ -201,7 +201,7 @@ template<class T> class ReadPort: public Port<T>
         // Pushes data from WritePort
         void pushData( const T& what, Cycle cycle)
         {
-             _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
+            _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
         }
 
         // Tests if there is any ungot data
@@ -218,7 +218,7 @@ template<class T> class ReadPort: public Port<T>
         ReadPort<T>( std::string key, Latency latency) :
             Port<T>::Port( std::move( key)), _latency( latency), _dataQueue()
         {
-            this->portMap[ this->_key].readers.push_front( this);
+            this->portMap[ this->_key].readers.push_back( this);
         }
 
         // Is ready? method
@@ -242,29 +242,20 @@ template<class T> class ReadPort: public Port<T>
 template<class T> void WritePort<T>::write( const T& what, Cycle cycle)
 {
     if ( !this->_init)
-    {
-    // If no init, asserts
-        serr << this->_key << " WritePort was not initializated" << std::endl << critical;
-        return;
-    }
+        throw PortError(this->_key + " WritePort was not initializated");
+
     if ( _lastCycle != cycle)
-    {
-        // If cycle number was changed, zero counter.
-        _lastCycle = cycle;
         _writeCounter = 0;
-    }
-    if ( _writeCounter < _bandwidth)
-    {
+
+    _lastCycle = cycle;
+
+    if ( _writeCounter >= _bandwidth)
+        throw PortError(this->_key + " port is overloaded by bandwidth");
+
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
-        _writeCounter++;
-        for ( auto dst : this->_destinations)
-            dst->pushData( what, cycle);
-    }
-    else
-    {
-    // If we overloaded port's bandwidth, assert
-        serr << this->_key << " port is overloaded by bandwidth" << std::endl << critical;
-    }
+    _writeCounter++;
+    for ( auto dst : this->_destinations)
+        dst->pushData( what, cycle);
 }
 
 /*
@@ -273,9 +264,9 @@ template<class T> void WritePort<T>::write( const T& what, Cycle cycle)
  * If there're any unconnected ports or fanout overload, asserts.
  * If ther's fanout underload, warnings.
 */
-template<class T> void WritePort<T>::init( const ReadListType& readers)
+template<class T> void WritePort<T>::init( std::vector<ReadPort<T>*> readers)
 {
-    _destinations = readers;
+    _destinations = std::move( readers);
     this->_init = true;
 
     // Initializing ports with setting their init flags.
@@ -284,11 +275,11 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
         reader->_init = true;
 
     if ( readersCounter == 0)
-        serr << "No ReadPorts for " << this->_key << " key" << std::endl << critical;
+        throw PortError( this->_key + " has no ReadPorts");
     else if ( readersCounter > _fanout)
-        serr << this->_key << " WritePort is overloaded by fanout" << std::endl << critical;
+        throw PortError( this->_key + " WritePort is overloaded by fanout");
     else if ( readersCounter != _fanout)
-        serr << this->_key << " WritePort is underloaded by fanout" << std::endl;
+        throw PortError( this->_key + " WritePort is underloaded by fanout");
 }
 
 /*
@@ -300,17 +291,13 @@ template<class T> void WritePort<T>::init( const ReadListType& readers)
 template<class T> void WritePort<T>::destroy()
 {
     if ( !this->_init)
-        serr << "Destroying uninitialized WritePort " << this->_key << std::endl << critical;
+        return;
 
     this->_init = false;
 
     for ( const auto reader : _destinations)
-    {
-        if ( !reader->_init)
-            serr << "Destroying uninitialized ReadPort " << this->_key << std::endl << critical;
+         reader->_init = false;
 
-        reader->_init = false;
-    }
     _destinations.clear();
 }
 
@@ -325,12 +312,6 @@ template<class T> void WritePort<T>::destroy()
 */
 template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
 {
-    if ( !this->_init)
-    {
-        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
-        return false;
-    }
-
     // there are some entries and they are ready to be read
     return !_dataQueue.empty() && _dataQueue.front().cycle == cycle;
 }
@@ -344,11 +325,8 @@ template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
 */
 template<class T> T ReadPort<T>::read( Cycle cycle)
 {
-    if ( !this->_init)
-        serr << this->_key << " ReadPort was not initializated" << std::endl << critical;
-
-    if ( _dataQueue.empty() || _dataQueue.front().cycle != cycle)
-        serr << this->_key << " ReadPort was not ready for read at cycle=" << cycle << std::endl << critical;
+    if ( !is_ready( cycle))
+        throw PortError( this->_key + " ReadPort was not ready for read at cycle=" + cycle.to_string());
 
     // data is successfully read
     auto tmp = _dataQueue.front().data; // NOTE: we copy data here
@@ -379,8 +357,8 @@ template<class T> void Port<T>::Map::init() const
     for ( const auto& cluster : _map)
     {
         auto writer = cluster.second.writer;
-        if ( writer == nullptr)
-            serr << "No WritePort for " << cluster.first << " key" << std::endl << critical;
+        if (writer == nullptr)
+            throw PortError( cluster.first + " has no WritePort");
 
         writer->init( cluster.second.readers);
     }

@@ -6,7 +6,7 @@
 
 #include "ports.h"
 
-std::list<BasePort::BaseMap*> BasePort::BaseMap::all_maps;
+std::vector<BasePort::BaseMap*> BasePort::BaseMap::all_maps;
 
 void init_ports()
 {
