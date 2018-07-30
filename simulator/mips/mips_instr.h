@@ -467,7 +467,7 @@ class BaseMIPSInstr
         void execute();
         void check_trap();
 
-        void set_sequence_id( uint64 id) { sequence_id = id; }
+        void set_sequence_id( uint64 id);
 };
 
 template<typename RegisterUInt>
