@@ -13,14 +13,14 @@
 struct CheckerMismatch final : std::runtime_error
 {
     explicit CheckerMismatch(const std::string& msg)
-        : std::runtime_error(std::string("Checker mismatch: ") + msg + '\n')
+        : std::runtime_error(std::string("Checker mismatch:\n") + msg + '\n')
     { }
 };
 
 struct Deadlock final : std::runtime_error
 {
     explicit Deadlock(const std::string& msg)
-        : std::runtime_error(std::string("Deadlock was detected") + msg + '\n')
+        : std::runtime_error(std::string("Deadlock was detected: ") + msg + '\n')
     { }
 };
 
