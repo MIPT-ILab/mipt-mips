@@ -66,6 +66,7 @@ void FuncMemory::load_elf_section( const ELFIO::section* section)
     if ( section->get_name() == ".text")
         startPC_addr = section->get_address();
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
     memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
 }
 
