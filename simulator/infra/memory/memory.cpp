@@ -66,11 +66,15 @@ void FuncMemory::load_elf_section( const ELFIO::section* section)
     if ( section->get_name() == ".text")
         startPC_addr = section->get_address();
 
-    for ( size_t offset = 0; offset < section->get_size(); ++offset) {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
-        write<uint8>( section->get_data()[offset], section->get_address() + offset);
-    }
+    memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
 }
+
+void FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+{
+    for ( size_t offset = 0; offset < size; ++offset)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
+        alloc_and_write_byte( dst + offset, *(src + offset));
+}    
 
 template<typename T>
 T FuncMemory::read( Addr addr, T mask) const
