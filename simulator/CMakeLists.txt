@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external)
 
 option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
+option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -62,6 +63,11 @@ if (ENABLE_COVERAGE)
         message(FATAL_ERROR "CodeCov is supported only for GCC builds")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g")
+endif()
+
+if (ENABLE_PROFILE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
 #include(CheckIPOSupported)
