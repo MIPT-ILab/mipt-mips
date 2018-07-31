@@ -276,9 +276,9 @@ template<class T> void WritePort<T>::init( std::vector<ReadPort<T>*> readers)
 
     if ( readersCounter == 0)
         throw PortError( this->_key + " has no ReadPorts");
-    else if ( readersCounter > _fanout)
+    if ( readersCounter > _fanout)
         throw PortError( this->_key + " WritePort is overloaded by fanout");
-    else if ( readersCounter != _fanout)
+    if ( readersCounter != _fanout)
         throw PortError( this->_key + " WritePort is underloaded by fanout");
 }
 
