@@ -329,7 +329,7 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
         throw PortError( this->_key + " ReadPort was not ready for read at cycle=" + cycle.to_string());
 
     // data is successfully read
-    auto tmp = _dataQueue.front().data; // NOTE: we copy data here
+    T tmp = std::move( _dataQueue.front().data);
     _dataQueue.pop();
     return tmp;
 }
