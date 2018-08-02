@@ -40,15 +40,15 @@ class Execute : public Log
         std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
         std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_complex_arithmetic_bypass = nullptr;
 
-        Latency flush_expiration_latency = 0_Lt;
+        Latency flush_expiration_latency = 0_lt;
 
         void save_flush() { flush_expiration_latency = last_execution_stage_latency; }
         void clock_saved_flush()
         {
-            if ( flush_expiration_latency != 0_Lt)
-                flush_expiration_latency = flush_expiration_latency - 1_Lt;
+            if ( flush_expiration_latency != 0_lt)
+                flush_expiration_latency = flush_expiration_latency - 1_lt;
         }
-        auto has_flush_expired() const { return flush_expiration_latency == 0_Lt; }
+        auto has_flush_expired() const { return flush_expiration_latency == 0_lt; }
 
 
     public:

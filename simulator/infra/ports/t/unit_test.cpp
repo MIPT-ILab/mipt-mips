@@ -13,19 +13,19 @@
 
 TEST_CASE( "Latency to string")
 {
-    CHECK( (5_Cl).to_string() == "5");
-    CHECK( (2_Lt).to_string() == "2");
+    CHECK( (5_cl).to_string() == "5");
+    CHECK( (2_lt).to_string() == "2");
 }
 
 namespace ports {
     namespace testing {
 
-        static const Latency PORT_LATENCY = 1_Lt;
+        static const Latency PORT_LATENCY = 1_lt;
         static const uint32 PORT_FANOUT = 1;
         static const uint32 PORT_BANDWIDTH = 1;
 
         static const int DATA_LIMIT = 5;
-        static const Cycle CLOCK_LIMIT = 10_Cl;
+        static const Cycle CLOCK_LIMIT = 10_cl;
 
         class Logic
         {
@@ -60,19 +60,19 @@ namespace ports {
                 std::map<Cycle, State> blogic=
                 //  | CYCLE |IS_FROM_A_READY|IS_FROM_B_READY|IS_INIT_READY|DATA_FROM_A|DATA_FROM_B|
                 {
-                   { 0_Cl, { false,          false,          false,        NONE,       NONE        }},
-                   { 1_Cl, { false,          false,          true,         NONE,       NONE        }},
-                   { 2_Cl, { true,           false,          false,        1,          NONE        }},
-                   { 3_Cl, { false,          true,           false,        NONE,       2           }},
-                   { 4_Cl, { true,           false,          false,        3,          NONE        }},
-                   { 5_Cl, { false,          true,           false,        NONE,       4           }},
-                   { 6_Cl, { true,           false,          false,        5,          NONE        }},
-                   { 7_Cl, { false,          true,           false,        NONE,       6           }},
-                   { 8_Cl, { false,          false,          false,        NONE,       NONE        }}
+                   { 0_cl, { false,          false,          false,        NONE,       NONE        }},
+                   { 1_cl, { false,          false,          true,         NONE,       NONE        }},
+                   { 2_cl, { true,           false,          false,        1,          NONE        }},
+                   { 3_cl, { false,          true,           false,        NONE,       2           }},
+                   { 4_cl, { true,           false,          false,        3,          NONE        }},
+                   { 5_cl, { false,          true,           false,        NONE,       4           }},
+                   { 6_cl, { true,           false,          false,        5,          NONE        }},
+                   { 7_cl, { false,          true,           false,        NONE,       6           }},
+                   { 8_cl, { false,          false,          false,        NONE,       NONE        }}
                 };
         };
 
-        const Cycle Logic::EXPECTED_MAX_CYCLE = 8_Cl;
+        const Cycle Logic::EXPECTED_MAX_CYCLE = 8_cl;
 
 
         class A
@@ -127,9 +127,9 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
     init_ports();;
 
     // init object A by value 0
-    init.write( 0, 0_Cl);;
+    init.write( 0, 0_cl);;
 
-    for ( auto cycle = 0_Cl; cycle < ports::testing::CLOCK_LIMIT; cycle.inc())
+    for ( auto cycle = 0_cl; cycle < ports::testing::CLOCK_LIMIT; cycle.inc())
     {
         //check the stop port from object A
         bool is_ready;
@@ -218,7 +218,7 @@ namespace ports {
                 case CheckCode::DATA_INIT:
                     // data from init port should be equal to 0
                     // merely in cycle 1
-                    return cycle == 1_Cl && data == 0;
+                    return cycle == 1_cl && data == 0;
 
                 case CheckCode::DATA_FROM_A:
                     return blogic[cycle].data_from_A == data;

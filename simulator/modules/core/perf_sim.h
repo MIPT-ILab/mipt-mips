@@ -41,7 +41,7 @@ private:
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
 
-    Cycle curr_cycle = 0_Cl;
+    Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
 
     /* simulator units */

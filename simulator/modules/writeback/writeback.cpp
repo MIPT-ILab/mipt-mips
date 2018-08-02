@@ -21,7 +21,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     if ( !rp_mem_datapath->is_ready( cycle) && !rp_execute_datapath->is_ready( cycle))
     {
         sout << "bubble\n";
-        if ( cycle >= last_writeback_cycle + 100_Lt)
+        if ( cycle >= last_writeback_cycle + 100_lt)
             throw Deadlock( "");
 
         return;

@@ -136,7 +136,7 @@ template<class T> class WritePort : public Port<T>
         std::vector<ReadPort<T>*> _destinations = {};
 
         // Variables for counting token in the last cycle
-        Cycle _lastCycle = 0_Cl;
+        Cycle _lastCycle = 0_cl;
         uint32 _writeCounter = 0;
 
         void init( std::vector<ReadPort<T>*> readers);
@@ -194,7 +194,7 @@ template<class T> class ReadPort: public Port<T>
         struct Cell
         {
             T data = T();
-            Cycle cycle = 0_Cl;
+            Cycle cycle = 0_cl;
             Cell() = delete;
             Cell( T v, Cycle c) : data( std::move( v)), cycle( c) { }
         };
@@ -417,8 +417,8 @@ decltype(auto) make_read_port(Args... args)
     return std::make_unique<ReadPort<T>>(args...);
 }
 
-static constexpr const Latency PORT_LATENCY = 1_Lt;
-static constexpr const Latency PORT_LONG_LATENCY = 30_Lt;
+static constexpr const Latency PORT_LATENCY = 1_lt;
+static constexpr const Latency PORT_LONG_LATENCY = 30_lt;
 static constexpr const uint32 PORT_FANOUT = 1;
 static constexpr const uint32 PORT_BW = 1;
 
