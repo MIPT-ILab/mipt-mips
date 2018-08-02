@@ -171,7 +171,8 @@ template<class T> class WritePort : public Port<T>
         }
 
         // Write Method
-        void write( T what, Cycle cycle);
+        template<typename U>
+        void write( U&& what, Cycle cycle);
 
         // Returns fanout for test of connection
         uint32 getFanout() const { return _fanout; }
@@ -196,16 +197,19 @@ template<class T> class ReadPort: public Port<T>
             T data = T();
             Cycle cycle = 0_Cl;
             Cell() = delete;
-            Cell( T v, Cycle c) : data( std::move( v)), cycle( c) { }
+
+            template<typename U>
+            Cell( U&& v, Cycle c) : data( std::forward<U>( v)), cycle( c) { }
         };
         std::queue<Cell> _dataQueue;
 
         // Pushes data from WritePort
-        void emplaceData( T what, Cycle cycle)
+        template<typename U>
+        void emplaceData( U&& what, Cycle cycle)
         {
-            _dataQueue.emplace( std::move( what), cycle + _latency);
+            _dataQueue.emplace( std::forward<U>( what), cycle + _latency);
         }
-
+ 
         // Tests if there is any ungot data
         void clean_up( Cycle cycle);
     public:
@@ -259,17 +263,22 @@ template<class T> void WritePort<T>::prepare_to_write( Cycle cycle)
  *
  * Forwards data to all connected ReadPorts
 */
-template<class T> void WritePort<T>::write( T what, Cycle cycle)
+template<class T> template<typename U>
+void WritePort<T>::write( U&& what, Cycle cycle)
 {
+    static_assert( std::is_same_v<std::remove_reference<T>, std::remove_reference<U>>,
+                  "Type mismatch between WritePort type and pushed value");
     prepare_to_write( cycle);
 
     // Copy data to all ports except first one
     auto it = std::next( this->_destinations.begin());
-    for ( ; it != this->_destinations.end(); ++it)
-        (*it)->emplaceData( what, cycle);
+    for ( ; it != this->_destinations.end(); ++it) {
+        const T& ref = what; // Force copy ctor
+        (*it)->emplaceData( ref, cycle);
+    }
 
     // Move data to the first port
-    this->_destinations.front()->emplaceData( std::move( what), cycle);
+    this->_destinations.front()->emplaceData( std::forward<U>( what), cycle);
 }
 
 /*
