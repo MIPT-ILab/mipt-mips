@@ -266,7 +266,7 @@ template<class T> void WritePort<T>::prepare_to_write( Cycle cycle)
 template<class T> template<typename U>
 void WritePort<T>::write( U&& what, Cycle cycle)
 {
-    static_assert( std::is_same_v<std::remove_reference<T>, std::remove_reference<U>>,
+    static_assert( std::is_same_v<std::remove_reference_t<T>, std::remove_reference_t<U>>,
                   "Type mismatch between WritePort type and pushed value");
     prepare_to_write( cycle);
 
