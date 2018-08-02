@@ -72,14 +72,15 @@ void Mem<ISA>::clock( Cycle cycle)
 
     /* perform required loads and stores */
     memory->load_store( &instr);
+
+    /* log */
+    sout << instr << std::endl;
     
     /* bypass data */
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
-    wp_datapath->write( instr, cycle);
-
-    /* log */
-    sout << instr << std::endl;
+    /* data path */
+    wp_datapath->write( std::move( instr), cycle);
 }
 
 

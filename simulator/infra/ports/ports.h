@@ -146,6 +146,8 @@ template<class T> class WritePort : public Port<T>
                 reader->clean_up( cycle);
         }
 
+        void prepare_to_write( Cycle cycle);
+
         // destroy all ports
         void destroy();
     public:
@@ -169,7 +171,7 @@ template<class T> class WritePort : public Port<T>
         }
 
         // Write Method
-        void write( const T& what, Cycle cycle);
+        void write( T what, Cycle cycle);
 
         // Returns fanout for test of connection
         uint32 getFanout() const { return _fanout; }
@@ -199,9 +201,9 @@ template<class T> class ReadPort: public Port<T>
         std::queue<Cell> _dataQueue;
 
         // Pushes data from WritePort
-        void pushData( const T& what, Cycle cycle)
+        void emplaceData( T what, Cycle cycle)
         {
-            _dataQueue.emplace( what, cycle + _latency); // NOTE: we copy data here
+            _dataQueue.emplace( std::move( what), cycle + _latency);
         }
 
         // Tests if there is any ungot data
@@ -229,17 +231,10 @@ template<class T> class ReadPort: public Port<T>
 };
 
 /*
- * Write method.
- *
- * First argument is data itself.
- * Second argument is the current cycle number.
- *
- * Forwards data to all connected ReadPorts
- *
  * If port wasn't initialized, asserts.
  * If port is overloaded by bandwidth (more than _bandwidth token during one cycle, asserts).
 */
-template<class T> void WritePort<T>::write( const T& what, Cycle cycle)
+template<class T> void WritePort<T>::prepare_to_write( Cycle cycle)
 {
     if ( !this->_init)
         throw PortError(this->_key + " WritePort was not initializated");
@@ -254,8 +249,27 @@ template<class T> void WritePort<T>::write( const T& what, Cycle cycle)
 
     // If we can add something more on that cycle, forwarding it to all ReadPorts.
     _writeCounter++;
-    for ( auto dst : this->_destinations)
-        dst->pushData( what, cycle);
+}
+
+/*
+ * Write method.
+ *
+ * First argument is data itself.
+ * Second argument is the current cycle number.
+ *
+ * Forwards data to all connected ReadPorts
+*/
+template<class T> void WritePort<T>::write( T what, Cycle cycle)
+{
+    prepare_to_write( cycle);
+
+    // Copy data to all ports except first one
+    auto it = std::next( this->_destinations.begin());
+    for ( ; it != this->_destinations.end(); ++it)
+        (*it)->emplaceData( what, cycle);
+
+    // Move data to the first port
+    this->_destinations.front()->emplaceData( std::move( what), cycle);
 }
 
 /*
