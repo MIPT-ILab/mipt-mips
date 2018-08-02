@@ -110,9 +110,12 @@ void Execute<ISA>::clock( Cycle cycle)
     /* perform execution */
     instr.execute();
 
+    /* log */
+    sout << instr << std::endl;
+
     if ( instr.is_complex_arithmetic()) 
     {
-        wp_long_latency_execution_unit->write( instr, cycle);
+        wp_long_latency_execution_unit->write( std::move( instr), cycle);
     }
     else
     {
@@ -120,13 +123,10 @@ void Execute<ISA>::clock( Cycle cycle)
         wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
         
         if ( instr.is_mem_stage_required())
-            wp_mem_datapath->write( instr, cycle);
+            wp_mem_datapath->write( std::move( instr), cycle);
         else
-            wp_writeback_datapath->write( instr, cycle);
+            wp_writeback_datapath->write( std::move( instr), cycle);
     }
-
-    /* log */
-    sout << instr << std::endl;
 }
 
 
