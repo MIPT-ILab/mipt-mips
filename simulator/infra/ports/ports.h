@@ -344,7 +344,7 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
         throw PortError( this->_key + " ReadPort was not ready for read at cycle=" + cycle.to_string());
 
     // data is successfully read
-    T tmp( std::move( std::get<T>(_dataQueue.front()));
+    T tmp( std::move( std::get<T>(_dataQueue.front())));
     _dataQueue.pop();
     return tmp;
 }
@@ -354,9 +354,9 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
 */
 template<class T> void ReadPort<T>::clean_up( Cycle cycle)
 {
-    while ( !_dataQueue.empty() && _dataQueue.front().cycle < cycle) {
+    while ( !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) < cycle) {
         sout << "In " << this->_key << " port data was added at "
-             << (_dataQueue.front().cycle - _latency)
+             << (std::get<Cycle>(_dataQueue.front()) - _latency)
              << " clock and was not readed\n";
         _dataQueue.pop();
     }
