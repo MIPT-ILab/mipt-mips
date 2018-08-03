@@ -50,7 +50,7 @@ class Cycle : public boost::totally_ordered<Cycle>
 };
 
 // NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
-constexpr inline auto operator""_Cl( unsigned long long int number)
+constexpr inline auto operator""_cl( unsigned long long int number)
 {
     return Cycle( static_cast<uint64>( number));
 }
@@ -85,7 +85,7 @@ class Latency : public boost::totally_ordered<Latency>
 };
 
 // NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
-constexpr inline auto operator""_Lt( unsigned long long int number)
+constexpr inline auto operator""_lt( unsigned long long int number)
 {
     return Latency( static_cast<int64>( number));
 }

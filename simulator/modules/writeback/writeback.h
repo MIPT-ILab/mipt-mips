@@ -34,7 +34,7 @@ private:
     /* Instrumentation */
     uint64 instrs_to_run = 0;
     uint64 executed_instrs = 0;
-    Cycle last_writeback_cycle = 0_Cl;
+    Cycle last_writeback_cycle = 0_cl;
     FuncSim<ISA> checker;
     void check( const FuncInstr& instr);
 
