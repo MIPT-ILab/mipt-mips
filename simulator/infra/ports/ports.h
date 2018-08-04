@@ -7,6 +7,7 @@
 #ifndef PORTS_H
 #define PORTS_H
 
+#include "../exception.h"
 #include "../log.h"
 #include "../types.h"
 #include "timing.h"
@@ -25,9 +26,9 @@
 template<class T> class ReadPort;
 template<class T> class WritePort;
 
-struct PortError : std::runtime_error {
+struct PortError final : Exception {
     explicit PortError( const std::string& msg)
-        : std::runtime_error(std::string("Port error: ") + msg + '\n')
+        : Exception("Port error", msg)
     { }
 };
 

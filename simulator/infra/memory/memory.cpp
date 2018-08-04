@@ -52,7 +52,7 @@ void FuncMemory::load_elf_file( const std::string& executable_file_name)
     ELFIO::elfio reader;
 
     if ( !reader.load( executable_file_name))
-        throw InvalidElfFile( executable_file_name, " file is not readable");
+        throw InvalidElfFile( executable_file_name);
 
     for ( const auto& section : reader.sections)
         load_elf_section( section);

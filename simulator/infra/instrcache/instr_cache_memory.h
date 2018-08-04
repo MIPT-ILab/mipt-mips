@@ -6,6 +6,7 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
+#include <infra/exception.h>
 #include <infra/instrcache/LRUCache.h>
 #include <infra/memory/memory.h>
 #include <infra/types.h>
@@ -43,7 +44,7 @@ class InstrMemory : private FuncMemory
         void store( const Instr& instr)
         {
             if (instr.get_mem_addr() == 0)
-                throw std::runtime_error("Store data to zero is an unhandled trap\n");
+                throw Exception("Store data to zero is an unhandled trap");
             instr_cache.erase( instr.get_mem_addr());
             write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }

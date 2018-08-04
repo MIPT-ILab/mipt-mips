@@ -10,15 +10,16 @@
 #include "bp_interface.h"
 
 // MIPT_MIPS modules
+#include <infra/exception.h>
 #include <infra/types.h>
 
 #include <memory>
 #include <string>
 
-struct BPInvalidMode final : std::runtime_error
+struct BPInvalidMode final : Exception
 {
     explicit BPInvalidMode(const std::string& mode)
-        : std::runtime_error(std::string("Invalid mode of branch prediction: ") + mode + '\n')
+        : Exception("Invalid mode of branch prediction", mode)
     { }
 };
 

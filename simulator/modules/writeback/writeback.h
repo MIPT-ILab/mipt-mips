@@ -7,20 +7,21 @@
 #define WRITEBACK_H
 
 #include <func_sim/func_sim.h>
+#include <infra/exception.h>
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
-struct CheckerMismatch final : std::runtime_error
+struct CheckerMismatch final : Exception
 {
     explicit CheckerMismatch(const std::string& msg)
-        : std::runtime_error(std::string("Checker mismatch:\n") + msg + '\n')
+        : Exception("Checker mismatch", msg)
     { }
 };
 
-struct Deadlock final : std::runtime_error
+struct Deadlock final : Exception
 {
     explicit Deadlock(const std::string& msg)
-        : std::runtime_error(std::string("Deadlock was detected: ") + msg + '\n')
+        : Exception("Deadlock was detected", msg)
     { }
 };
 

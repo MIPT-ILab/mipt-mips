@@ -24,8 +24,12 @@ catch (const config::HelpOption& e) {
               << std::endl << std::endl << e.what() << std::endl;
     return 0;
 }
-catch (const std::exception& e) {
+catch (const Exception& e) {
     std::cerr << e.what() << std::endl;
+    return 2;
+}
+catch (const std::exception& e) {
+    std::cerr << "System exception:\t\n" << e.what() << std::endl;
     return 2;
 }
 catch (...) {
