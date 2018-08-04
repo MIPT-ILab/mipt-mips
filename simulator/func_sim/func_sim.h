@@ -9,14 +9,16 @@
 
 #include "rf/rf.h"
 
+#include <infra/exception.h>
+
 #include <simulator.h>
 
 #include <memory>
 #include <string>
 
-struct BearingLost final : std::runtime_error
+struct BearingLost final : Exception
 {
-    BearingLost() : std::runtime_error("Bearing lost: 10 nops in a row") { }
+    BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
 };
 
 template <typename ISA>

@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <infra/exception.h>
 #include <infra/types.h>
 
 #include <popl.hpp>
@@ -101,8 +102,8 @@ struct Switch : AliasedSwitch
     { }
 };
 
-struct HelpOption : std::runtime_error {
-    explicit HelpOption( const std::string& msg) : std::runtime_error( msg) {}
+struct HelpOption : Exception {
+    explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
 };
 
 /* methods */

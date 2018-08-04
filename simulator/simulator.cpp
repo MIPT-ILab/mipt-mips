@@ -3,8 +3,9 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-// Configurations 
+// Configurations
 #include <infra/config/config.h>
+#include <infra/exception.h>
  
 // Simulators
 #include <func_sim/func_sim.h>
@@ -22,10 +23,10 @@ namespace config {
     static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
 
-struct InvalidISA final : std::runtime_error
+struct InvalidISA final : Exception
 {
     explicit InvalidISA(const std::string& isa)
-        : std::runtime_error(std::string("Invalid ISA: ") + isa + '\n')
+        : Exception("Invalid ISA", isa)
     { }
 };
 

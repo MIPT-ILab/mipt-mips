@@ -12,6 +12,7 @@
 #include "mips_version.h"
 
 // MIPT-MIPS modules
+#include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
@@ -47,6 +48,13 @@ auto mips_division(T x, T y) {
 
     return ReturnType(x / y, x % y);
 }
+
+struct UnknownMIPSInstruction final : Exception
+{
+    explicit UnknownMIPSInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
 
 template<typename RegisterUInt>
 class BaseMIPSInstr

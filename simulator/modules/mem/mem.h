@@ -17,6 +17,7 @@ class Mem : public Log
     using Instr = PerfInstr<FuncInstr>;
     using Memory = typename ISA::Memory;
     using RegisterUInt = typename ISA::RegisterUInt;
+    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
         Memory* memory = nullptr;
@@ -32,7 +33,7 @@ class Mem : public Log
 
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
-        std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
+        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
 
         std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
     

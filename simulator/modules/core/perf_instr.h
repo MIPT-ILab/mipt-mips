@@ -9,6 +9,8 @@
 #include <infra/types.h>
 #include <modules/fetch/bpu/bp_interface.h>
 
+#include <utility>
+
 struct CheckerMismatch;
 
 template <typename FuncInstr>
@@ -19,6 +21,8 @@ class PerfInstr : public FuncInstr
 public:
     PerfInstr( const FuncInstr& instr, const BPInterface& bp_info) : FuncInstr( instr), bp_data( bp_info) { }
 
+    auto get_dst_v() const { return std::make_pair( this->get_v_dst(), this->get_v_dst2()); }
+    
     bool is_misprediction() const { return bp_data.is_taken != this->is_jump_taken() || bp_data.target != this->get_new_PC(); }
     auto get_predicted_target() const { return bp_data.target; }
     BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_jump_taken(), this->get_new_PC()); }
