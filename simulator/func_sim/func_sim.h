@@ -42,7 +42,10 @@ class FuncSim : public Simulator
         void init( const std::string& tr);
         FuncInstr step();
         void run(const std::string& tr, uint64 instrs_to_run) final;
-        void set_PC(Addr value) final { PC = value; }
+        void set_target(const Target& target) final {
+            PC = target.address;
+            sequence_id = target.sequence_id;
+        }
 };
 
 #endif

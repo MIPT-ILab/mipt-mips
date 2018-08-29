@@ -29,7 +29,7 @@ public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
     void run( const std::string& tr, uint64 instrs_to_run) final;
-    void set_PC( Addr value) final;
+    void set_target( const Target& target) final;
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -54,7 +54,7 @@ private:
     Writeback<ISA> writeback;
 
     /* ports */
-    std::unique_ptr<WritePort<Addr>> wp_core_2_fetch_target = nullptr;
+    std::unique_ptr<WritePort<Target>> wp_core_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
     void clock( Cycle cycle);
