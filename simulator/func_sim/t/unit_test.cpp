@@ -30,7 +30,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
 {
     FuncSim<MIPS32> simulator;
     simulator.init( valid_elf_file);
-    CHECK( simulator.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
+    CHECK( simulator.step().Dump().find("lui $at, 0x41\t{0}\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
 TEST_CASE( "Torture_Test: Func_Sim")

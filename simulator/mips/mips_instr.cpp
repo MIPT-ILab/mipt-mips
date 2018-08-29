@@ -489,7 +489,7 @@ void BaseMIPSInstr<RegisterUInt>::set_sequence_id( uint64 id )
     sequence_id = id;
     std::ostringstream oss;
     oss << "\t{" << id << "}";
-
+    disasm += oss.str();
 }
 
 template class BaseMIPSInstr<uint32>;

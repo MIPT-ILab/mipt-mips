@@ -128,6 +128,7 @@ class RISCVInstr
         void check_trap() {};
 
         void set_sequence_id( uint64 id) { sequence_id = id; }
+        auto get_sequence_id() const { return sequence_id; }
 };
 
 template <typename T>

@@ -28,7 +28,7 @@ class Mem : public Log
         std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
 
-        std::unique_ptr<WritePort<Addr>> wp_flush_target = nullptr;
+        std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
         std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
 
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
