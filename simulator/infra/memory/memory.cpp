@@ -49,7 +49,7 @@ FuncMemory::FuncMemory( uint32 addr_bits,
 
 void FuncMemory::load_elf_file( const std::string& executable_file_name)
 {
-    ELFIO::elfio reader;
+    const ELFIO::elfio reader;
 
     if ( !reader.load( executable_file_name))
         throw InvalidElfFile( executable_file_name);
