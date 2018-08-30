@@ -35,7 +35,7 @@ addons:
     packages:
     - lcov
     - g++-7
-    - clang-tidy-7.0
+    - clang-tidy-7
     - libboost-program-options1.54-dev
 
 install:
@@ -66,7 +66,7 @@ after_success:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        run-clang-tidy-6.0.py -header-filter='.*'
+        run-clang-tidy-7.0.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
