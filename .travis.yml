@@ -29,13 +29,13 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-6.0
+    - llvm-toolchain-trusty-7.0
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
     - lcov
     - g++-7
-    - clang-tidy-6.0
+    - clang-tidy-7.0
     - libboost-program-options1.54-dev
 
 install:
