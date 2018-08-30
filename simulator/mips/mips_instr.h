@@ -17,9 +17,6 @@
 #include <infra/string_view.h>
 #include <infra/types.h>
 
-// COW string
-#include <kryucow_string.h>
-
 // Generic C++
 #include <array>
 #include <unordered_map>
@@ -196,11 +193,8 @@ class BaseMIPSInstr
 
         uint64 sequence_id = NO_VAL64;
 
-#if 0
         std::string disasm = {};
-#else
-        KryuCowString disasm = {};
-#endif
+
         void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
