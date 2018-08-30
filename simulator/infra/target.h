@@ -16,17 +16,18 @@
  *   * sequence_id of fetched instruction for instrumentation purposes
  *   * validity bit
  */
-struct Target {
+class Target {
+public:
     Addr address = NO_VAL32;
     uint64 sequence_id = NO_VAL64;
     bool valid = false;
 
     Target() = default;
 
-    Target(Addr a, uint64 id)
-        : address(a)
-        , sequence_id(id)
-        , valid(true)
+    Target( Addr a, uint64 id)
+        : address( a)
+        , sequence_id( id)
+        , valid( true)
     { }
 };
 
