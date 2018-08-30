@@ -89,7 +89,7 @@ T FuncMemory::read( Addr addr, T mask) const
         if (( mask & 0xFFu) == 0xFFu)
             value |= static_cast<T>(static_cast<T>(check_and_read_byte( addr + i)) << (i * 8));
         if constexpr ( bitwidth<T> > 8)
-            mask >>= 8u; // NOLINT(misc-suspicious-semicolon)
+            mask >>= 8u; // NOLINT(bugprone-suspicious-semicolon)
     }
 
     return value;
@@ -113,9 +113,9 @@ void FuncMemory::write( T value, Addr addr, T mask)
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
         if ((mask & 0xFFu) == 0xFFu)
             alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
-        if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
-            mask >>= 8;
-            value >>= 8;
+        if constexpr ( bitwidth<T> > 8) { // NOLINT(bugprone-suspicious-semicolon)
+            mask >>= 8u;
+            value >>= 8u;
         }
     }
 }

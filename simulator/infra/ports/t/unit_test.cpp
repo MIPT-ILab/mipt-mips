@@ -106,9 +106,6 @@ namespace ports {
                 void process_data ( int data, Cycle cycle);
         };
 
-
-
-
         static Logic logic{};
     } // namespace testing
 } // namespace ports
