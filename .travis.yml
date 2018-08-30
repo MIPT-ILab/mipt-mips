@@ -29,13 +29,11 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-6.0
+    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - lcov
     - g++-7
-    - clang-tidy-6.0
     - libboost-program-options1.54-dev
 
 install:
@@ -66,7 +64,8 @@ after_success:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        run-clang-tidy-6.0.py -header-filter='.*'
+        sudo apt-get install clang-tidy-7 --allow-unauthenticated
+        run-clang-tidy-7.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then

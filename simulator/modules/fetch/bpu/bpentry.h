@@ -198,7 +198,7 @@ class BPEntryAdaptive final : public BPEntry
         void update( bool is_taken)
         {
             /* updating pattern, simulating shift register */
-            value <<= 1;
+            value <<= 1u;
             value += static_cast<uint32>( is_taken);
             value &= pattern_mask;
         }

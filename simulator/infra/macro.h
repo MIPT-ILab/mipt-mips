@@ -135,7 +135,7 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     if constexpr ((static_cast<ST>(-2) >> 1u) == static_cast<ST>(-1))
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
-        // NOLINTNEXTLINE(hicpp-signed-bitwise, misc-suspicious-semicolon)
+        // NOLINTNEXTLINE(hicpp-signed-bitwise, bugprone-suspicious-semicolon)
         return static_cast<ST>(value) >> shamt;
 
     return (value & msb_set<T>()) == 0 // check MSB
