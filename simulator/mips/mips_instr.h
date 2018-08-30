@@ -196,11 +196,8 @@ class BaseMIPSInstr
 
         uint64 sequence_id = NO_VAL64;
 
-#if 0
         std::string disasm = {};
-#else
-        KryuCowString disasm = {};
-#endif
+
         void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
