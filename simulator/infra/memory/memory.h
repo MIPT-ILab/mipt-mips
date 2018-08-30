@@ -20,7 +20,7 @@
 
 struct InvalidElfFile final : Exception
 {
-    InvalidElfFile(const std::string& name)
+    explicit InvalidElfFile(const std::string& name)
         : Exception("Invalid elf file", name)
     { }
 };
