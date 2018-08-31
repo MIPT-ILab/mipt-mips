@@ -33,11 +33,11 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
+    - g++-8
     - libboost-program-options1.54-dev
 
 install:
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-         apt-get install g++-8
          CXX=g++-8;
     fi
 # Download and build binutils on OS X
