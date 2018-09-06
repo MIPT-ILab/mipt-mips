@@ -416,7 +416,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 template<typename RegisterUInt>
 void BaseMIPSInstr<RegisterUInt>::execute_unknown()
 {
-    throw std::runtime_error(std::string("Unknown instruction ") + std::string(Dump()) + " is an unhandled trap\n");
+    throw UnknownMIPSInstruction( std::string( Dump()));
 }
 
 template<typename RegisterUInt>
@@ -481,6 +481,15 @@ void BaseMIPSInstr<RegisterUInt>::check_trap()
         oss << "\t trap";
         disasm += oss.str();
     }
+}
+
+template<typename RegisterUInt>
+void BaseMIPSInstr<RegisterUInt>::set_sequence_id( uint64 id )
+{
+    sequence_id = id;
+    std::ostringstream oss;
+    oss << "\t{" << id << "}";
+    disasm += oss.str();
 }
 
 template class BaseMIPSInstr<uint32>;

@@ -14,9 +14,6 @@
 #include <infra/string_view.h>
 #include <infra/types.h>
 
-// COW string
-#include <kryucow_string.h>
-
 // Generic C++
 #include <array>
 #include <unordered_map>
@@ -44,11 +41,7 @@ class RISCVInstr
 
         uint64 sequence_id = NO_VAL64;
 
-#if 0
         std::string disasm = {};
-#else
-        KryuCowString disasm = {};
-#endif
 
     public:
         RISCVInstr() = delete;
@@ -128,6 +121,7 @@ class RISCVInstr
         void check_trap() {};
 
         void set_sequence_id( uint64 id) { sequence_id = id; }
+        auto get_sequence_id() const { return sequence_id; }
 };
 
 template <typename T>

@@ -18,7 +18,7 @@ PerfSim<ISA>::PerfSim(bool log) :
     mem( log),
     writeback( log)
 {
-    wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     fetch.set_memory( memory.get());
@@ -30,10 +30,10 @@ PerfSim<ISA>::PerfSim(bool log) :
 }
 
 template <typename ISA>
-void PerfSim<ISA>::set_PC( Addr value)
+void PerfSim<ISA>::set_target( const Target& target)
 {
-    wp_core_2_fetch_target->write( value, curr_cycle);
-    writeback.set_PC( value);
+    wp_core_2_fetch_target->write( target, curr_cycle);
+    writeback.set_target( target);
 }
 
 template<typename ISA>
@@ -44,7 +44,7 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
     writeback.init_checker( tr);
     writeback.set_instrs_to_run( instrs_to_run);
 
-    set_PC( memory->startPC());
+    set_target( Target( memory->startPC(), 0));
 
     start_time = std::chrono::high_resolution_clock::now();
 

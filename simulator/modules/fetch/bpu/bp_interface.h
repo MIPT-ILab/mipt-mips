@@ -7,6 +7,7 @@
 #ifndef BP_INTERFACE_H_
 #define BP_INTERFACE_H_
 
+#include <infra/target.h>
 #include <infra/types.h>
 
 /*the structure of data sent from memory to fetch stage */
@@ -19,7 +20,7 @@ struct BPInterface {
 
     BPInterface( Addr pc, bool is_taken, Addr target)
         : pc( pc)
-	, is_taken( is_taken)
+        , is_taken( is_taken)
         , target( target)
     { }
 };

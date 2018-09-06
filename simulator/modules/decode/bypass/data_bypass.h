@@ -100,12 +100,12 @@ class DataBypass
 
         struct FuncUnitInfo
         {
-            Latency operation_latency = 0_Lt;
+            Latency operation_latency = 0_lt;
 
             void update()
             {
-                if ( operation_latency != 0_Lt)
-                    operation_latency = operation_latency - 1_Lt;
+                if ( operation_latency != 0_lt)
+                    operation_latency = operation_latency - 1_lt;
             }
         };
 
@@ -127,12 +127,12 @@ class DataBypass
         Latency get_instruction_latency( const Instr& instr) const
         {
             if ( instr.is_mem_stage_required())
-                return 2_Lt;
+                return 2_lt;
             
             if ( instr.is_complex_arithmetic())
                 return Latency( last_execution_stage_value + 1);
             
-            return 1_Lt;
+            return 1_lt;
         }
 
         // garners the information about a new register used for the 1st destination
@@ -249,7 +249,7 @@ void DataBypass<ISA>::handle_flush()
             entry.reset();
     }
 
-    writeback_stage_info.operation_latency = 0_Lt;
+    writeback_stage_info.operation_latency = 0_lt;
 }
 
 #endif // DATA_BYPASS_H

@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
@@ -48,10 +49,10 @@ class LRUModule
         std::vector<LRUCacheInfo> lru_info;
 };
 
-struct CacheTagArrayInvalidSizeException final : std::runtime_error
+struct CacheTagArrayInvalidSizeException final : Exception
 {
-    explicit CacheTagArrayInvalidSizeException(const char* msg) 
-        : std::runtime_error(std::string("Invalid cache size: ") + msg + '\n')
+    explicit CacheTagArrayInvalidSizeException(const std::string& msg) 
+        : Exception("Invalid cache size", msg)
     { }
 };
 

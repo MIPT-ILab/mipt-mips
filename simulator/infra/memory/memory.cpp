@@ -52,7 +52,7 @@ void FuncMemory::load_elf_file( const std::string& executable_file_name)
     ELFIO::elfio reader;
 
     if ( !reader.load( executable_file_name))
-        throw InvalidElfFile( executable_file_name, " file is not readable");
+        throw InvalidElfFile( executable_file_name);
 
     for ( const auto& section : reader.sections)
         load_elf_section( section);
@@ -66,11 +66,16 @@ void FuncMemory::load_elf_section( const ELFIO::section* section)
     if ( section->get_name() == ".text")
         startPC_addr = section->get_address();
 
-    for ( size_t offset = 0; offset < section->get_size(); ++offset) {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
-        write<uint8>( section->get_data()[offset], section->get_address() + offset);
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
+    memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
 }
+
+void FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+{
+    for ( size_t offset = 0; offset < size; ++offset)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
+        alloc_and_write_byte( dst + offset, *(src + offset));
+}    
 
 template<typename T>
 T FuncMemory::read( Addr addr, T mask) const
@@ -84,7 +89,7 @@ T FuncMemory::read( Addr addr, T mask) const
         if (( mask & 0xFFu) == 0xFFu)
             value |= static_cast<T>(static_cast<T>(check_and_read_byte( addr + i)) << (i * 8));
         if constexpr ( bitwidth<T> > 8)
-            mask >>= 8u; // NOLINT(misc-suspicious-semicolon)
+            mask >>= 8u; // NOLINT(bugprone-suspicious-semicolon)
     }
 
     return value;
@@ -108,9 +113,9 @@ void FuncMemory::write( T value, Addr addr, T mask)
     for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
         if ((mask & 0xFFu) == 0xFFu)
             alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
-        if constexpr ( bitwidth<T> > 8) { // NOLINT(misc-suspicious-semicolon)
-            mask >>= 8;
-            value >>= 8;
+        if constexpr ( bitwidth<T> > 8) { // NOLINT(bugprone-suspicious-semicolon)
+            mask >>= 8u;
+            value >>= 8u;
         }
     }
 }

@@ -12,12 +12,10 @@
 #include "mips_version.h"
 
 // MIPT-MIPS modules
+#include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-
-// COW string
-#include <kryucow_string.h>
 
 // Generic C++
 #include <array>
@@ -41,12 +39,19 @@ auto mips_division(T x, T y) {
     if ( y == 0)
         return ReturnType();
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(misc-suspicious-semicolon)
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
         if ( y == -1 && x == static_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
             return ReturnType();
 
     return ReturnType(x / y, x % y);
 }
+
+struct UnknownMIPSInstruction final : Exception
+{
+    explicit UnknownMIPSInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
 
 template<typename RegisterUInt>
 class BaseMIPSInstr
@@ -188,11 +193,8 @@ class BaseMIPSInstr
 
         uint64 sequence_id = NO_VAL64;
 
-#if 0
         std::string disasm = {};
-#else
-        KryuCowString disasm = {};
-#endif
+
         void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
@@ -467,7 +469,8 @@ class BaseMIPSInstr
         void execute();
         void check_trap();
 
-        void set_sequence_id( uint64 id) { sequence_id = id; }
+        void set_sequence_id( uint64 id);
+        auto get_sequence_id() const { return sequence_id; }
 };
 
 template<typename RegisterUInt>

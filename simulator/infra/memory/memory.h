@@ -9,6 +9,7 @@
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
 // uArchSim modules
+#include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -17,18 +18,18 @@
 #include <string>
 #include <vector>
 
-struct InvalidElfFile final : std::runtime_error
+struct InvalidElfFile final : Exception
 {
-    InvalidElfFile(const std::string& name, const std::string& msg)
-        : std::runtime_error(name + " is not a valid ELF file:" + msg + '\n')
-    {}
+    explicit InvalidElfFile(const std::string& name)
+        : Exception("Invalid elf file", name)
+    { }
 };
 
-struct FuncMemoryBadMapping final : std::runtime_error
+struct FuncMemoryBadMapping final : Exception
 {
     explicit FuncMemoryBadMapping(const std::string& msg)
-        : std::runtime_error(std::string("Invalid FuncMemory mapping: ") + msg + '\n')
-    {}
+        : Exception("Invalid FuncMemory mapping", msg)
+    { }
 };
 
 namespace ELFIO {
@@ -88,6 +89,7 @@ class FuncMemory
         void alloc( Addr addr);
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
+        void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
         
         void load_elf_section( const ELFIO::section* section);
 };

@@ -112,10 +112,10 @@ void Decode<ISA>::clock( Cycle cycle)
     /* notify bypassing unit about new instruction */
     wp_bypassing_unit_notify->write( instr, cycle);
 
-    wp_datapath->write( instr, cycle);
-
     /* log */
     sout << instr << std::endl;
+
+    wp_datapath->write( std::move( instr), cycle);
 }
 
 

@@ -17,13 +17,7 @@ class LogOstream
     std::ostream& stream;
 
 public:
-    struct Critical { };
-
     LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
-
-    friend LogOstream& operator<<(LogOstream& /*stream*/, const Critical& /* dummy */) {
-         exit( EXIT_FAILURE);
-    }
 
     LogOstream& operator<<(std::ostream& (*F)(std::ostream&)) {
         if ( enable)
@@ -50,9 +44,8 @@ class Log
 public:
     mutable LogOstream sout;
     mutable LogOstream serr;
-    const LogOstream::Critical critical;
 
-    explicit Log(bool value) : sout(value, std::cout), serr(true, std::cerr), critical() { }
+    explicit Log(bool value) : sout(value, std::cout), serr(true, std::cerr) { }
 
     // Rule of five
     virtual ~Log() = default;
