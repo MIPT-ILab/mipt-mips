@@ -1,6 +1,3 @@
 [submodule "traces"]
 	path = traces
 	url = https://github.com/MIPT-ILab/mips-traces.git
-[submodule "binutils-gdb"]
-	path = binutils-gdb
-	url = https://github.com/bminor/binutils-gdb
