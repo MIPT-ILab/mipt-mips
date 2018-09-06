@@ -107,7 +107,7 @@ struct HelpOption : Exception {
 };
 
 /* methods */
-void handleArgs( int argc, const char* const argv[], int start_index);
+void handleArgs( int argc, const char* const argv[], int start_index = 1);
 
 } // namespace config
 

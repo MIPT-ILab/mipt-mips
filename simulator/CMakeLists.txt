@@ -6,7 +6,7 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-project(mipt-mips CXX)
+project(mipt-mips)
 
 set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
@@ -113,3 +113,6 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 
 # Tests
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
+
+# GDB libsim.a
+include(interface/gdb/mips-sim-gdb.cmake)

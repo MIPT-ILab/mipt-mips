@@ -89,21 +89,35 @@ Trap FuncSim<ISA>::handle_syscall()
     return Trap::NO_TRAP;
 }
 
+template<typename ISA>
+Trap FuncSim<ISA>::step_system()
+{
+    const auto& instr = step();
+    sout << instr << std::endl;
+
+    if ( instr.is_syscall())
+        return handle_syscall();
+
+    return instr.trap_type();
+}
+
 template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
-        const auto& instr = step();
-        sout << instr << std::endl;
-        auto trap = instr.trap_type();
-        if ( instr.is_syscall())
-            trap = handle_syscall();
-        
+        auto trap = step_system();
         if ( trap == Trap::HALT)
             return Trap::HALT;
     }
     return Trap::NO_TRAP;
+}
+
+template <typename ISA>
+Trap FuncSim<ISA>::run_single_step()
+{
+    auto trap = step_system();
+    return trap == Trap::NO_TRAP ? Trap::BREAKPOINT : trap;
 }
 
 #include <mips/mips.h>
