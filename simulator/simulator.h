@@ -10,8 +10,13 @@
 #include <infra/log.h>
 #include <infra/target.h>
 #include <infra/types.h>
- 
+#include <infra/exception.h>
+
 #include <memory>
+
+struct BearingLost final : Exception {
+    BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
+};
 
 class FuncMemory;
 class Kernel;
@@ -21,6 +26,7 @@ public:
     explicit Simulator( bool log = false) : Log( log) {}
 
     virtual Trap run( uint64 instrs_to_run) = 0;
+    virtual Trap run_single_step() = 0;
     virtual void set_target( const Target& target) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;

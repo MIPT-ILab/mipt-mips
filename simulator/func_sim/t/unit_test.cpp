@@ -78,6 +78,18 @@ TEST_CASE( "FuncSim: make a step with checker")
     CHECK( sim.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
+TEST_CASE( "FuncSim: make a system-level step")
+{
+    FuncSim<MIPS32> sim;
+    auto mem = FuncMemory::create_hierarchied_memory();
+    sim.set_memory( mem);
+    ElfLoader elf( valid_elf_file);
+    elf.load_to( mem.get());
+    sim.set_pc( elf.get_startPC());
+
+    CHECK( sim.run_single_step() == Trap::BREAKPOINT);
+}
+
 TEST_CASE( "Run one instruction: Func_Sim")
 {
     FuncSim<MIPS32> sim;

@@ -17,10 +17,6 @@
 #include <memory>
 #include <string>
 
-struct BearingLost final : Exception
-{
-    BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
-};
 
 template <typename ISA>
 class FuncSim : public Simulator
@@ -40,6 +36,7 @@ class FuncSim : public Simulator
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
         Trap handle_syscall();
+        Trap step_system();
 
     public:
         explicit FuncSim( bool log = false);
@@ -49,6 +46,8 @@ class FuncSim : public Simulator
         void init_checker() final { };
         FuncInstr step();
         Trap run(uint64 instrs_to_run) final;
+        Trap run_single_step() final;
+
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;
