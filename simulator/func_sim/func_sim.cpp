@@ -75,6 +75,26 @@ void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
     }
 }
 
+template <typename ISA>
+void FuncSim<ISA>::gdb_load( const std::string &tr) {
+    mem->load_elf_file( tr);
+    sout << "MIPT-MIPS: Binary file " << tr << " loaded" << std::endl;
+    //TODO: print more useful info
+}
+
+template <typename ISA>
+void FuncSim<ISA>::gdb_prepare() {
+    PC = mem->startPC();
+    nops_in_a_row = 0;
+    sout << "MIPT-MIPS: prepared to run" << std::endl;
+    //TODO: print more useful info
+}
+
+template <typename ISA>
+void FuncSim<ISA>::gdb_resume(int steps) {
+    sout << "MIPT-MIPS: resuming, steps: " << steps << std::endl;
+}
+
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 

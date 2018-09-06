@@ -46,6 +46,11 @@ class FuncSim : public Simulator
             PC = target.address;
             sequence_id = target.sequence_id;
         }
+
+        /* GDB interfaces */
+        void gdb_load( const std::string &tr);
+        void gdb_prepare();
+        void gdb_resume(int steps);
 };
 
 #endif
