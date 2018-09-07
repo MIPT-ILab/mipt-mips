@@ -64,12 +64,12 @@ void Writeback<ISA>::check( const FuncInstr& instr)
 {
     const auto func_dump = checker.step();
 
-    if ( func_dump.Dump() == instr.Dump())
+    if ( func_dump.is_same_checker(instr))
         return;
     
     std::ostringstream oss;
-    oss << "Checker output: " << func_dump    << std::endl
-        << "PerfSim output: " << instr.Dump() << std::endl;
+    oss << "Checker output: " << func_dump << std::endl
+        << "PerfSim output: " << instr     << std::endl;
 
     throw CheckerMismatch(oss.str());
 }

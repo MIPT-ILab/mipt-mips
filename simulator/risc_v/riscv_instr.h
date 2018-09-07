@@ -53,7 +53,7 @@ class RISCVInstr
             return PC == rhs.PC && instr == rhs.instr;
         }
 
-        const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
+        bool is_same_checker( const RISCVInstr&) const { return false; }
 
         RISCVRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         RISCVRegister get_dst_num()  const { return dst; }
@@ -125,9 +125,9 @@ class RISCVInstr
 };
 
 template <typename T>
-static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& instr)
+static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>&)
 {
-        return out << instr.Dump();
+    return out << "";
 }
 
 #endif //RISCV_INSTR_H
