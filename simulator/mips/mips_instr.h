@@ -16,6 +16,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
+#include <kryucow_string.h>
 
 // Generic C++
 #include <array>
@@ -186,6 +187,7 @@ class BaseMIPSInstr
         // convert this to bitset
         bool complete   = false;
         bool _is_jump_taken = false; // actual result
+        bool memory_complete = false;
 
         Addr new_PC = NO_VAL32;
 
@@ -193,7 +195,7 @@ class BaseMIPSInstr
 
         uint64 sequence_id = NO_VAL64;
 
-        std::string disasm = {};
+        KryuCowString disasm = {};
 
         void init( const ISAEntry& entry, MIPSVersion version);
 
@@ -391,21 +393,27 @@ class BaseMIPSInstr
             mem_addr -= 3;
         }
 
-
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
         BaseMIPSInstr() = delete;
 
-        const std::string_view Dump() const { return static_cast<std::string_view>(disasm); }
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && instr.raw == rhs.instr.raw;
+        }
+        
+        bool is_same_checker( const BaseMIPSInstr& rhs) const {
+            return is_same(rhs)
+                && sequence_id == rhs.sequence_id
+                && (dst.is_zero()  || v_dst == rhs.v_dst)
+                && (dst2.is_zero() || v_dst2 == rhs.v_dst2);
         }
 
         MIPSRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         MIPSRegister get_dst_num()  const { return dst;  }
         MIPSRegister get_dst2_num() const { return dst2; }
+        std::string_view get_disasm() const { return static_cast<std::string_view>( disasm); }
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP      ||
@@ -467,16 +475,19 @@ class BaseMIPSInstr
         auto get_v_src2() const { return v_src2; } // for stores
 
         void execute();
-        void check_trap();
+        void check_trap() { };
 
-        void set_sequence_id( uint64 id);
+        void set_sequence_id( uint64 id) { sequence_id = id; }
         auto get_sequence_id() const { return sequence_id; }
+        
+        std::ostream& dump( std::ostream& out) const;
+        std::string string_dump() const;
 };
 
 template<typename RegisterUInt>
-static inline std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& instr)
+std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& instr)
 {
-    return out << instr.Dump();
+    return instr.dump( out);
 }
 
 template<MIPSVersion V>
