@@ -48,9 +48,11 @@ class FuncSim : public Simulator
         }
 
         /* GDB interfaces */
-        void gdb_load( const std::string &tr);
-        void gdb_prepare();
-        void gdb_resume(int steps);
+        void gdb_load( const std::string &tr) final;
+        void gdb_prepare() final;
+        void gdb_resume(int steps) final;
+        int gdb_mem_read( unsigned int addr, unsigned char *buf, int length) final;
+        int gdb_mem_write( unsigned int addr, const unsigned char *buf, int length) final;
 };
 
 #endif

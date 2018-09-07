@@ -36,6 +36,18 @@ public:
     PerfSim( PerfSim&&) = delete;
     PerfSim operator=( const PerfSim&) = delete;
     PerfSim operator=( PerfSim&&) = delete;
+
+    /* GDB interfaces stubs */
+    void gdb_load( const std::string &tr) final { (void)tr; }
+    void gdb_prepare() final {}
+    void gdb_resume(int steps) final { (void)steps; }
+    int gdb_mem_read( unsigned int addr, unsigned char *buf, int length) final {
+        (void)addr; (void)buf; (void)length; return 0;
+    }
+    int gdb_mem_write( unsigned int addr, const unsigned char *buf, int length) final {
+        (void)addr; (void)buf; (void)length; return 0;
+    };
+
 private:
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;

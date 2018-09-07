@@ -91,8 +91,41 @@ void FuncSim<ISA>::gdb_prepare() {
 }
 
 template <typename ISA>
-void FuncSim<ISA>::gdb_resume(int steps) {
+void FuncSim<ISA>::gdb_resume( int steps) {
     sout << "MIPT-MIPS: resuming, steps: " << steps << std::endl;
+    uint32 instrs_to_run = ((steps == 0) ? MAX_VAL32 : steps);
+    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+        const auto& instr = step();
+        sout << instr << std::endl;
+        if ( instr.is_halt())
+            break;
+    }
+}
+
+template <typename ISA>
+int FuncSim<ISA>::gdb_mem_read (unsigned int addr, unsigned char *buf, int length) try {
+    int bytes_read = 0;
+    while ( length-- > 0) {
+        *buf++ = static_cast<unsigned char>( mem->_read_byte ( addr++));
+        bytes_read++;
+    }
+    return bytes_read;
+}
+catch (...) {
+    return 0;
+}
+
+template <typename ISA>
+int FuncSim<ISA>::gdb_mem_write (unsigned int addr, const unsigned char *buf, int length) try {
+    int bytes_written = 0;
+    while ( length-- > 0) {
+        mem->_write_byte( addr++, *buf++);
+        bytes_written++;
+    }
+    return bytes_written;
+}
+catch (...) {
+    return 0;
 }
 
 #include <mips/mips.h>

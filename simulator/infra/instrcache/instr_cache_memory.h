@@ -56,6 +56,14 @@ class InstrMemory : private FuncMemory
             else if (instr->is_store())
                 store(*instr);
         }
+
+        Byte _read_byte (Addr addr) {
+            return read_byte( addr);
+        };
+
+        void _write_byte (Addr addr, unsigned char value) {
+            return write_byte( addr, Byte( value));
+        }
 };
 
 #endif // INSTR_CACHE_H

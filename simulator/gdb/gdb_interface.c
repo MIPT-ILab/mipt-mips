@@ -5,17 +5,6 @@
  */
 
 
-/* Binary file can be set as GDB argument:
- *   $ gdb /path/to/binary
- *   target sim
- *   load
- * Or as simulator argument:
- *   $ gdb
- *   target sim -b /path/to/binary
- *   load
- */
-
-
 /* BFD config */
 #include <config.h>
 
@@ -36,7 +25,10 @@
 SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
                    struct bfd *abfd, char *const *argv) {
     SIM_DESC sd = sim_state_alloc (kind, callback);
-    mips_sim_create ((const char **) argv, abfd ? abfd->filename : NULL);
+    if (!abfd)
+        fprintf (stderr, "Input file not set; please re-run GDB with input file");
+    else
+        mips_sim_create ((const char **) argv, abfd->filename);
     return sd;
 }
 
@@ -59,10 +51,14 @@ SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
 };
 
 
-int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {};
+int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
+    return mips_sim_mem_read (mem, buf, length);
+};
 
 
-int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {};
+int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
+    return mips_sim_mem_write (mem, buf, length);
+};
 
 
 int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {};

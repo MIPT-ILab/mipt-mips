@@ -18,6 +18,9 @@ void mips_sim_load ();
 void mips_sim_prepare ();
 void mips_sim_resume (int steps);
 
+int mips_sim_mem_read (unsigned int mem, unsigned char *buf, int length);
+int mips_sim_mem_write (unsigned int mem, const unsigned char *buf, int length);
+
 #ifdef __cplusplus
 }
 #endif
