@@ -23,13 +23,15 @@
 #include <sstream>
 
 template <typename ISA>
-class PerfSim : public Simulator
+class PerfSim : public CycleAccurateSimulator
 {
 public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
     void run( const std::string& tr, uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
+    void clock() final;
+    void halt() final { force_halt = true; }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -43,6 +45,7 @@ private:
 
     Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
+    bool force_halt = false;    
 
     /* simulator units */
     RF<ISA> rf;
@@ -57,8 +60,9 @@ private:
     std::unique_ptr<WritePort<Target>> wp_core_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
-    void clock( Cycle cycle);
+    void clock_tree( Cycle cycle);
     void dump_statistics() const;
+    bool is_halt() const;
 };
 
 #endif
