@@ -19,7 +19,7 @@ template<typename Instr>
 class InstrMemory : public FuncMemory
 {
     private:
-        LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
+        AddressLRUCache<Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 
     public:
         auto fetch( Addr pc) const { return read<uint32>( pc); }
@@ -42,7 +42,7 @@ class InstrMemory : public FuncMemory
         {
             if (instr.get_mem_addr() == 0)
                 throw Exception("Store data to zero is an unhandled trap");
-            instr_cache.erase( instr.get_mem_addr());
+            instr_cache.range_erase( instr.get_mem_addr(), instr.get_mem_size());
             write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }
 
@@ -57,7 +57,7 @@ class InstrMemory : public FuncMemory
         template<typename T>
         void write(T value, Addr addr, T mask = all_ones<T>())
         {
-            instr_cache.erase( addr);
+            instr_cache.range_erase( addr, bitwidth<T> / 8);
             FuncMemory::write( value, addr, mask);
         }
 };
