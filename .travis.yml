@@ -57,7 +57,7 @@ before_script:
   - cmake .. -DCMAKE_BUILD_TYPE=Release
 
 script:
-  - make
+  - make all unit-tests
   - ctest --verbose
 
 after_success:
