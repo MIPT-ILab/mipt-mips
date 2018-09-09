@@ -94,7 +94,6 @@ TEST_CASE( "check_method_erase: Check_Method_Range_Erase")
 
     for ( std::size_t i = 0; i < SIZE; ++i)
     {
-        MIPS32Instr instr( instr_bytes, PC);
         instr_cache.update( PC + i, instr);
     }
     CHECK( SIZE == instr_cache.size());
