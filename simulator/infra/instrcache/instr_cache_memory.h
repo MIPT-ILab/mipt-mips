@@ -16,15 +16,12 @@
 #endif
 
 template<typename Instr>
-class InstrMemory : private FuncMemory
+class InstrMemory : public FuncMemory
 {
     private:
         LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 
     public:
-        using FuncMemory::startPC;
-        using FuncMemory::load_elf_file;
-
         auto fetch( Addr pc) const { return read<uint32>( pc); }
 
         Instr fetch_instr( Addr PC)
@@ -55,6 +52,13 @@ class InstrMemory : private FuncMemory
                 load(instr);
             else if (instr->is_store())
                 store(*instr);
+        }
+
+        template<typename T>
+        void write(T value, Addr addr, T mask = all_ones<T>())
+        {
+            instr_cache.erase( addr);
+            FuncMemory::write( value, addr, mask);
         }
 };
 
