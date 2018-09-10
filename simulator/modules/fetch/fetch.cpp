@@ -163,8 +163,7 @@ void Fetch<ISA>::clock( Cycle cycle)
     wp_target->write( instr.get_predicted_target(), cycle);
 
     /* log */
-    sout << "fetch   cycle " << std::dec << cycle << ": 0x"
-         << std::hex << target.address << ": 0x" << instr << std::endl;
+    sout << "fetch   cycle " << std::dec << cycle << ": " << instr << std::endl;
 
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);

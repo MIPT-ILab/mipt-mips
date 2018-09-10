@@ -31,4 +31,12 @@ public:
     virtual size_t gdb_mem_write( Addr addr, const unsigned char *buf, size_t length) = 0;
 };
 
+class CycleAccurateSimulator : public Simulator {
+public:
+    explicit CycleAccurateSimulator( bool log = false) : Simulator( log) {}
+    virtual void clock() = 0;
+    virtual void halt() = 0;
+    static std::unique_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa, bool log);
+};
+
 #endif // SIMULATOR_H

@@ -10,7 +10,7 @@
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
-    Simulator( log),
+    CycleAccurateSimulator( log),
     memory( new Memory),
     fetch( log),
     decode( log),
@@ -39,6 +39,7 @@ void PerfSim<ISA>::set_target( const Target& target)
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
+    force_halt = false;
     memory->load_elf_file( tr);
 
     writeback.init_checker( tr);
@@ -48,18 +49,28 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 
     start_time = std::chrono::high_resolution_clock::now();
 
-    while (!rp_halt->is_ready( curr_cycle))
-    {
-        clean_up_ports( curr_cycle);
-        clock( curr_cycle);
-        curr_cycle.inc();
-    }
+    while (!is_halt())
+        clock();
 
     dump_statistics();
 }
 
 template<typename ISA>
-void PerfSim<ISA>::clock( Cycle cycle)
+bool PerfSim<ISA>::is_halt() const
+{
+    return rp_halt->is_ready( curr_cycle) || force_halt;
+}
+
+template<typename ISA>
+void PerfSim<ISA>::clock()
+{
+    clean_up_ports( curr_cycle);
+    clock_tree( curr_cycle);
+    curr_cycle.inc();
+}
+
+template<typename ISA>
+void PerfSim<ISA>::clock_tree( Cycle cycle)
 {
     writeback.clock( cycle);
     fetch.clock( cycle);

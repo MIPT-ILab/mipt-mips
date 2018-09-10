@@ -33,7 +33,7 @@ struct InvalidISA final : Exception
 class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;
-        virtual std::unique_ptr<Simulator> get_perfsim( bool log) = 0;
+        virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) = 0;
         Builder() = default;
         virtual ~Builder() = default;
         Builder( const Builder&) = delete;
@@ -46,7 +46,7 @@ class SimulatorFactory {
     struct TBuilder : public Builder {
         TBuilder() = default;
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( log); }
-        std::unique_ptr<Simulator> get_perfsim( bool log) final { return std::make_unique<PerfSim<T>>( log); }
+        std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) final { return std::make_unique<PerfSim<T>>( log); }
     };
 
     using Map = std::map<std::string, std::unique_ptr<Builder>>;
@@ -94,16 +94,20 @@ public:
     {
         return get_factory( name)->get_perfsim( log);
     }
+    
+    static SimulatorFactory& get_instance() {
+        static SimulatorFactory sf;
+        return sf;
+    }
 };
     
 std::unique_ptr<Simulator>
 Simulator::create_simulator( const std::string& isa, bool functional_only, bool log)
 {
-    static const SimulatorFactory factory;
     if ( functional_only)
-        return factory.get_funcsim( isa, log);
+        return SimulatorFactory::get_instance().get_funcsim( isa, log);
 
-    return factory.get_perfsim( isa, log);
+    return CycleAccurateSimulator::create_simulator( isa, log);
 }
 
 std::unique_ptr<Simulator>
@@ -111,3 +115,10 @@ Simulator::create_configured_simulator()
 {
     return create_simulator( config::isa, config::functional_only, config::disassembly_on);
 }
+
+std::unique_ptr<CycleAccurateSimulator>
+CycleAccurateSimulator::create_simulator( const std::string& isa, bool log)
+{
+    return SimulatorFactory::get_instance().get_perfsim( isa, log);
+}
+
