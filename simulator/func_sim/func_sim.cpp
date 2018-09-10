@@ -103,12 +103,10 @@ void FuncSim<ISA>::gdb_resume( int steps) {
 }
 
 template <typename ISA>
-int FuncSim<ISA>::gdb_mem_read (unsigned int addr, unsigned char *buf, int length) try {
-    int bytes_read = 0;
-    while ( length-- > 0) {
-        *buf++ = static_cast<unsigned char>( mem->_read_byte ( addr++));
-        bytes_read++;
-    }
+size_t FuncSim<ISA>::gdb_mem_read (Addr addr, unsigned char *buf, size_t length) try {
+    size_t bytes_read = 0;
+    for (; bytes_read < length; bytes_read++)
+        buf[bytes_read] = static_cast<unsigned char>( mem->read_byte( addr + bytes_read));
     return bytes_read;
 }
 catch (...) {
@@ -116,12 +114,10 @@ catch (...) {
 }
 
 template <typename ISA>
-int FuncSim<ISA>::gdb_mem_write (unsigned int addr, const unsigned char *buf, int length) try {
-    int bytes_written = 0;
-    while ( length-- > 0) {
-        mem->_write_byte( addr++, *buf++);
-        bytes_written++;
-    }
+size_t FuncSim<ISA>::gdb_mem_write (Addr addr, const unsigned char *buf, size_t length) try {
+    size_t bytes_written = 0;
+    for (; bytes_written < length; bytes_written++)
+        mem->write_byte( addr + bytes_written, static_cast<Byte> (buf[bytes_written]));
     return bytes_written;
 }
 catch (...) {

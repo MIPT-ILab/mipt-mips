@@ -57,12 +57,12 @@ class InstrMemory : private FuncMemory
                 store(*instr);
         }
 
-        Byte _read_byte (Addr addr) {
-            return read_byte( addr);
+        Byte read_byte( Addr addr) {
+            return Byte( read<uint8>( addr));
         };
 
-        void _write_byte (Addr addr, unsigned char value) {
-            return write_byte( addr, Byte( value));
+        void write_byte( Addr addr, Byte value) {
+            write<uint8>( static_cast<uint8>( value), addr);
         }
 };
 

@@ -49,9 +49,6 @@ class FuncMemory
         template<typename T>
         void write( T value, Addr addr, T mask = all_ones<T>());
 
-        Byte read_byte( Addr addr) const;
-        void write_byte( Addr addr, Byte value);
-
         uint64 startPC() const { return startPC_addr; }
         std::string dump() const;
         
@@ -86,9 +83,11 @@ class FuncMemory
                       const Page::const_iterator& byte_it) const;
 
         bool check( Addr addr) const;
+        Byte read_byte( Addr addr) const;
         Byte check_and_read_byte( Addr addr) const;
 
         void alloc( Addr addr);
+        void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
         void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
         

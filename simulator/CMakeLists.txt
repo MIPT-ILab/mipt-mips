@@ -96,4 +96,4 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
 
 # GDB libsim.a
-include(gdb/mips-sim-gdb.cmake)
+include(interface/gdb/mips-sim-gdb.cmake)

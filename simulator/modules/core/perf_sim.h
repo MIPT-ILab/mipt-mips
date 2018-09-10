@@ -30,7 +30,7 @@ public:
     ~PerfSim() final { destroy_ports(); }
     void run( const std::string& tr, uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
-
+t
     // Rule of five
     PerfSim( const PerfSim&) = delete;
     PerfSim( PerfSim&&) = delete;
@@ -38,15 +38,11 @@ public:
     PerfSim operator=( PerfSim&&) = delete;
 
     /* GDB interfaces stubs */
-    void gdb_load( const std::string &tr) final { (void)tr; }
+    void gdb_load( const std::string &) final {}
     void gdb_prepare() final {}
-    void gdb_resume(int steps) final { (void)steps; }
-    int gdb_mem_read( unsigned int addr, unsigned char *buf, int length) final {
-        (void)addr; (void)buf; (void)length; return 0;
-    }
-    int gdb_mem_write( unsigned int addr, const unsigned char *buf, int length) final {
-        (void)addr; (void)buf; (void)length; return 0;
-    };
+    void gdb_resume( int) final {}
+    size_t gdb_mem_read( Addr, unsigned char *, size_t) final { return 0; }
+    size_t gdb_mem_write( Addr, const unsigned char *, size_t) final { return 0; }
 
 private:
     using FuncInstr = typename ISA::FuncInstr;

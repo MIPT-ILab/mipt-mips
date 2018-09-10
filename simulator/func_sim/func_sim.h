@@ -51,8 +51,8 @@ class FuncSim : public Simulator
         void gdb_load( const std::string &tr) final;
         void gdb_prepare() final;
         void gdb_resume(int steps) final;
-        int gdb_mem_read( unsigned int addr, unsigned char *buf, int length) final;
-        int gdb_mem_write( unsigned int addr, const unsigned char *buf, int length) final;
+        size_t gdb_mem_read( Addr addr, unsigned char *buf, size_t length) final;
+        size_t gdb_mem_write( Addr addr, const unsigned char *buf, size_t length) final;
 };
 
 #endif

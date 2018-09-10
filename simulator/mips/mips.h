@@ -7,6 +7,9 @@
 #ifndef MIPS_H_
 #define MIPS_H_
 
+/* Resolve intersection with BFD */
+#undef VERSION
+
 #include "mips_instr.h"
 
 #include <infra/instrcache/instr_cache_memory.h>

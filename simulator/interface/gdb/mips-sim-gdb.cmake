@@ -3,7 +3,7 @@
 # Copyright 2018 MIPT-MIPS
 
 
-set(GDB_SIM_COMMON_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../sim/common)
+set(GDB_SIM_COMMON_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../../sim/common)
 
 # Add mipt-mips-gdb target iff we are building under GDB
 if (EXISTS ${GDB_SIM_COMMON_PATH})
@@ -14,9 +14,8 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
             ${GDB_SIM_COMMON_PATH}/sim-io.c)
 
     add_library(mipt-mips-gdb STATIC ${CPPS}
-            gdb/gdb_interface.c
-            gdb/sim_wrapper.cpp
-            gdb/targ-vals.c
+            ${CMAKE_CURRENT_LIST_DIR}/gdb_interface.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/targ-vals.c
             ${GDB_SIM_SRCS})
 
     # Output: libsim.a stored in "simulator/gdb"
@@ -27,8 +26,8 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/")
 
     target_include_directories(mipt-mips-gdb SYSTEM PUBLIC
-            ../../bfd
-            ../../include
-            ../../sim/common)
+            ${CMAKE_CURRENT_LIST_DIR}/../../../..
+            ${CMAKE_CURRENT_LIST_DIR}/../../../../include
+            ${CMAKE_CURRENT_LIST_DIR}/../../../../sim/common)
 
 endif (EXISTS ${GDB_SIM_COMMON_PATH})

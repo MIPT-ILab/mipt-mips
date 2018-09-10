@@ -27,8 +27,8 @@ public:
     virtual void gdb_load( const std::string &tr) = 0;
     virtual void gdb_prepare() = 0;
     virtual void gdb_resume( int steps) = 0;
-    virtual int gdb_mem_read( unsigned int addr, unsigned char *buf, int length) = 0;
-    virtual int gdb_mem_write( unsigned int addr, const unsigned char *buf, int length) = 0;
+    virtual size_t gdb_mem_read( Addr addr, unsigned char *buf, size_t length) = 0;
+    virtual size_t gdb_mem_write( Addr addr, const unsigned char *buf, size_t length) = 0;
 };
 
 #endif // SIMULATOR_H

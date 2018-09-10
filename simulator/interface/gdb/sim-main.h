@@ -6,7 +6,7 @@
 
 
 /* BFD config */
-#include "config.h"
+#include "bfd/config.h"
 
 /* GDB simulator utilities */
 #include "sim-basics.h"
@@ -17,13 +17,14 @@
 
 
 struct _sim_cpu {
-
+    // Add new here, before base
     sim_cpu_base base;
 };
 
 
 struct sim_state {
     sim_cpu *cpu[CPU_NUM];
-
+    // Add new here, after cpu and before base
+    unsigned long instanceId;
     sim_state_base base;
 };
