@@ -19,7 +19,7 @@ namespace config {
 
 class BaseValue
 {
-    friend void handleArgs( int argc, const char* argv[]);
+    friend void handleArgs( int argc, const char* const argv[]);
 protected:
     static popl::OptionParser& options() {
         static popl::OptionParser instance( "Allowed options");
@@ -107,7 +107,7 @@ struct HelpOption : Exception {
 };
 
 /* methods */
-void handleArgs( int argc, const char* argv[]);
+void handleArgs( int argc, const char* const argv[]);
 
 } // namespace config
 
