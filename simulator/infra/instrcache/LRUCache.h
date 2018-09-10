@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include <infra/types.h>
+
 template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache
 {
@@ -94,6 +96,17 @@ class LRUCache
         std::size_t number_of_elements = 0u;
 };
 
+template <typename Value, size_t CAPACITY>
+class AddressLRUCache : public LRUCache<Addr, Value, CAPACITY>
+{
+public:
+    void range_erase( Addr start_address, size_t size)
+    {
+        Addr end_address = start_address + size;
+        for (Addr i = start_address; i < end_address; ++i)
+            this->erase( i);
+    }
+};
 
 #endif // LRUCACHE_H
 

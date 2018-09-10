@@ -13,7 +13,7 @@ namespace config {
 static AliasedSwitch help_option = { "h", "help", "print help"};
 
 /* basic method */
-void handleArgs( int argc, const char* argv[])
+void handleArgs( int argc, const char* const argv[])
 {
     BaseValue::options().parse( argc, argv);
 
