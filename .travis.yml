@@ -72,6 +72,6 @@ after_success:
         cd $TRAVIS_BUILD_DIR/simulator
         mkdir debug && cd debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
-        make && ctest
+        make unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
     fi
