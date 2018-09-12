@@ -326,7 +326,8 @@ public:
 	/// Parse the command line into the added Options
 	/// @param argc command line argument count
 	/// @param argv command line arguments
-	void parse(int argc, const char * const argv[]);
+	/// @param start_index index of starting argument
+	void parse(int argc, const char * const argv[], int start_index = 1);
 
 	/// Produce a help message
 	/// @param max_attribute show options up to this level (optional, advanced, expert)
@@ -916,14 +917,14 @@ inline std::shared_ptr<T> OptionParser::get_option(char short_name) const
 }
 
 
-inline void OptionParser::parse(int argc, const char * const argv[])
+inline void OptionParser::parse(int argc, const char * const argv[], int start_index)
 {
 	unknown_options_.clear();
 	non_option_args_.clear();
  	for (auto& opt : options_)
 		opt->clear();
 
-	for (int n=1; n<argc; ++n)
+	for (int n=start_index; n<argc; ++n)
 	{
 		const std::string arg(argv[n]);
 		if (arg == "--")
