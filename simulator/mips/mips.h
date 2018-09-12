@@ -14,15 +14,15 @@
 
 #include <infra/instrcache/instr_cache_memory.h>
 
-template<MIPSVersion VERSION>
+template<MIPSVersion version>
 struct MIPS
 {
     using Register = MIPSRegister;
-    using RegisterUInt = MIPSRegisterUInt<VERSION>;
-    using FuncInstr = MIPSInstr<VERSION>;
+    using RegisterUInt = MIPSRegisterUInt<version>;
+    using FuncInstr = MIPSInstr<version>;
     using Memory = InstrMemory<FuncInstr>;
     static const auto& get_instr( uint32 bytes, Addr PC) {
-        return FuncInstr( VERSION, bytes, PC);
+        return FuncInstr( version, bytes, PC);
     }
 };
 
