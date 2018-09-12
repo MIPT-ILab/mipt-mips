@@ -20,7 +20,6 @@
 /* MIPT-MIPS simulator interfaces */
 #include <simulator.h>
 #include <infra/config/config.h>
-#include <mips/mips.h>
 #include <func_sim/func_sim.h>
 /* STL */
 #include <vector>
@@ -41,7 +40,7 @@ static std::vector<SimulatorInstance> simInstances;
 int count_argc (char *const *argv) {
     /* Passed arguments start at argv[2], end with NULL */
     int argc = 0;
-    while (argv[2 + argc])
+    while (argv[2 + argc] != nullptr)
         argc++;
     return argc;
 }
@@ -53,7 +52,7 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
 
     if (!abfd) {
         std::cerr << "Input file not set; please re-run GDB with input file" << std::endl;
-        return NULL;
+        return nullptr;
     }
 
     int argc = count_argc (argv);
@@ -62,7 +61,7 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
     try {
         /* POPL seems to skips first passed argument, so we pass starting at
          * argv[1], which is "--sysroot=" */
-        config::handleArgs (argc, const_cast<const char **>(&argv[1]));
+        config::handleArgs (argc, static_cast<const char* const*>(&argv[1]));
 
         /* Create simulator instance */
         //TODO: add simulator arguments
@@ -74,17 +73,17 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
         std::cout << "Functional simulator for MIPS-based CPU (GDB)"
                   << std::endl << std::endl << e.what () << std::endl;
         sim_state_free (sd);
-        return NULL;
+        return nullptr;
     }
     catch (const std::exception &e) {
         std::cerr << e.what () << std::endl;
         sim_state_free (sd);
-        return NULL;
+        return nullptr;
     }
     catch (...) {
         std::cerr << "Unknown exception\n";
         sim_state_free (sd);
-        return NULL;
+        return nullptr;
     }
 
     std::cout << "MIPT-MIPS simulator instance created, id " << sd->instanceId << std::endl;
@@ -101,27 +100,29 @@ void sim_close (SIM_DESC sd, int) {
 
 SIM_RC sim_load (SIM_DESC sd, const char *, struct bfd *, int) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    simInst.ptr->gdb_load (simInst.filename);
+    simInst.ptr->load_binary_file (simInst.filename);
+    std::cout << "MIPT-MIPS: Binary file " << simInst.filename << " loaded" << std::endl;
     return SIM_RC_OK;
 }
 
 
 SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *,
                             char *const *, char *const *) {
-    simInstances.at (sd->instanceId).ptr->gdb_prepare ();
+    simInstances.at (sd->instanceId).ptr->prepare_to_run ();
+    std::cout << "MIPT-MIPS: prepared to run" << std::endl;
     return SIM_RC_OK;
 }
 
 
 int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    return static_cast<int> (simInst.ptr->gdb_mem_read (mem, buf, static_cast<size_t> (length)));
+    return static_cast<int> (simInst.ptr->mem_read (mem, buf, static_cast<size_t> (length)));
 }
 
 
 int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    return static_cast<int> (simInst.ptr->gdb_mem_write (mem, buf, static_cast<size_t> (length)));
+    return static_cast<int> (simInst.ptr->mem_write (mem, buf, static_cast<size_t> (length)));
 }
 
 
@@ -150,9 +151,12 @@ void sim_info (SIM_DESC sd, int verbose) {
 
 
 void sim_resume (SIM_DESC sd, int step, int) try {
-    simInstances.at (sd->instanceId).ptr->gdb_resume (step);
+    std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
+    uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
+    simInstances.at (sd->instanceId).ptr->run (instrs_to_run);
 }
-catch (BearingLost) {
+catch (const BearingLost &e) {
+    /* Should this be treated as an error? */
     std::cout << "MIPS-MIPS: Execution finished: 10 nops in a row" << std::endl;
 }
 
@@ -180,5 +184,12 @@ char **sim_complete_command (SIM_DESC sd, const char *text, const char *word) {
     (void) sd;
     (void) text;
     (void) word;
-    return NULL;
+    return nullptr;
+}
+
+/* Target values stub */
+extern "C" {
+CB_TARGET_DEFS_MAP cb_init_syscall_map[1] = {};
+CB_TARGET_DEFS_MAP cb_init_errno_map[1] = {};
+CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
 }

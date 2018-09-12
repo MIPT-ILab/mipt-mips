@@ -28,7 +28,8 @@ class PerfSim : public CycleAccurateSimulator
 public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
-    void run( const std::string& tr, uint64 instrs_to_run) final;
+    void init( const std::string& tr) final;
+    void run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void clock() final;
     void halt() final { force_halt = true; }
@@ -40,11 +41,10 @@ public:
     PerfSim operator=( PerfSim&&) = delete;
 
     /* GDB interfaces stubs */
-    void gdb_load( const std::string &) final {}
-    void gdb_prepare() final {}
-    void gdb_resume( int) final {}
-    size_t gdb_mem_read( Addr, unsigned char *, size_t) final { return 0; }
-    size_t gdb_mem_write( Addr, const unsigned char *, size_t) final { return 0; }
+    void load_binary_file( const std::string &) final {}
+    void prepare_to_run() final {}
+    size_t mem_read( Addr, unsigned char *, size_t) final { return 0; }
+    size_t mem_write( Addr, const unsigned char *, size_t) final { return 0; }
 
 private:
     using FuncInstr = typename ISA::FuncInstr;

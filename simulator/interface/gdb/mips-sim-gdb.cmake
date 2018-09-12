@@ -15,7 +15,6 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
 
     add_library(mipt-mips-gdb STATIC ${CPPS}
             ${CMAKE_CURRENT_LIST_DIR}/gdb_interface.cpp
-            ${CMAKE_CURRENT_LIST_DIR}/targ-vals.c
             ${GDB_SIM_SRCS})
 
     # Output: libsim.a stored in "simulator/gdb"

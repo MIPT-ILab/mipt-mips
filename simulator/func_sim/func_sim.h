@@ -39,20 +39,18 @@ class FuncSim : public Simulator
     public:
         explicit FuncSim( bool log = false);
 
-        void init( const std::string& tr);
         FuncInstr step();
-        void run(const std::string& tr, uint64 instrs_to_run) final;
+        void init( const std::string& tr) final;
+        void run( uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;
         }
 
-        /* GDB interfaces */
-        void gdb_load( const std::string &tr) final;
-        void gdb_prepare() final;
-        void gdb_resume(int steps) final;
-        size_t gdb_mem_read( Addr addr, unsigned char *buf, size_t length) final;
-        size_t gdb_mem_write( Addr addr, const unsigned char *buf, size_t length) final;
+        void load_binary_file( const std::string &tr) final;
+        void prepare_to_run() final;
+        size_t mem_read( Addr addr, unsigned char *buf, size_t length) final;
+        size_t mem_write( Addr addr, const unsigned char *buf, size_t length) final;
 };
 
 #endif

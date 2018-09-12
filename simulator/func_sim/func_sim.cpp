@@ -58,16 +58,14 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    mem->load_elf_file( tr);
-    PC = mem->startPC();
-    nops_in_a_row = 0;
+    load_binary_file( tr);
+    prepare_to_run();
 }
 
 template <typename ISA>
-void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+void FuncSim<ISA>::run( uint64 instrs_to_run)
 {
-    init( tr);
-    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+    for ( uint64 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
         if ( instr.is_halt())
@@ -76,37 +74,21 @@ void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 }
 
 template <typename ISA>
-void FuncSim<ISA>::gdb_load( const std::string &tr) {
+void FuncSim<ISA>::load_binary_file( const std::string &tr) {
     mem->load_elf_file( tr);
-    sout << "MIPT-MIPS: Binary file " << tr << " loaded" << std::endl;
-    //TODO: print more useful info
 }
 
 template <typename ISA>
-void FuncSim<ISA>::gdb_prepare() {
+void FuncSim<ISA>::prepare_to_run() {
     PC = mem->startPC();
     nops_in_a_row = 0;
-    sout << "MIPT-MIPS: prepared to run" << std::endl;
-    //TODO: print more useful info
 }
 
 template <typename ISA>
-void FuncSim<ISA>::gdb_resume( int steps) {
-    sout << "MIPT-MIPS: resuming, steps: " << steps << std::endl;
-    uint32 instrs_to_run = ((steps == 0) ? MAX_VAL32 : steps);
-    for ( uint32 i = 0; i < instrs_to_run; ++i) {
-        const auto& instr = step();
-        sout << instr << std::endl;
-        if ( instr.is_halt())
-            break;
-    }
-}
-
-template <typename ISA>
-size_t FuncSim<ISA>::gdb_mem_read (Addr addr, unsigned char *buf, size_t length) try {
+size_t FuncSim<ISA>::mem_read (Addr addr, unsigned char *buf, size_t length) try {
     size_t bytes_read = 0;
     for (; bytes_read < length; bytes_read++)
-        buf[bytes_read] = static_cast<unsigned char>( mem->read_byte( addr + bytes_read));
+        buf[bytes_read] = static_cast<unsigned char>( mem->template mem_read<uint8>( addr + bytes_read));
     return bytes_read;
 }
 catch (...) {
@@ -114,10 +96,10 @@ catch (...) {
 }
 
 template <typename ISA>
-size_t FuncSim<ISA>::gdb_mem_write (Addr addr, const unsigned char *buf, size_t length) try {
+size_t FuncSim<ISA>::mem_write (Addr addr, const unsigned char *buf, size_t length) try {
     size_t bytes_written = 0;
     for (; bytes_written < length; bytes_written++)
-        mem->write_byte( addr + bytes_written, static_cast<Byte> (buf[bytes_written]));
+        mem->template mem_write<uint8> ( static_cast<uint8> (buf[bytes_written]), addr + bytes_written);
     return bytes_written;
 }
 catch (...) {
