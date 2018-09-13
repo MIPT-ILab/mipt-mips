@@ -37,17 +37,25 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
+void PerfSim<ISA>::load_binary_file (const std::string &tr) {
+    memory->load_elf_file( tr);
+    binary_file_loaded = true;
+}
+
+template<typename ISA>
 void PerfSim<ISA>::init( const std::string& tr)
 {
     force_halt = false;
-    memory->load_elf_file( tr);
-
+    load_binary_file (tr);
     writeback.init_checker( tr);
 }
 
 template<typename ISA>
 void PerfSim<ISA>::run( uint64 instrs_to_run)
 {
+    if (!binary_file_loaded)
+        throw NoBinaryFile();
+
     writeback.set_instrs_to_run( instrs_to_run);
 
     set_target( Target( memory->startPC(), 0));

@@ -5,7 +5,7 @@
  */
 
 
-/* BFD config */
+/* BFD config (must be included first) */
 #include <bfd/config.h>
 /* GDB Interface */
 #include <gdb/remote-sim.h>
@@ -20,15 +20,13 @@
 /* MIPT-MIPS simulator interfaces */
 #include <simulator.h>
 #include <infra/config/config.h>
-#include <func_sim/func_sim.h>
-/* STL */
+/* Generic C++ */
 #include <vector>
 
 
 struct SimulatorInstance {
     std::unique_ptr<Simulator> ptr = nullptr;
     std::string filename;
-    bool loaded = false;
     size_t id = 0;
 
     SimulatorInstance (std::unique_ptr<Simulator> simPtr, const char *binary_filename, size_t id)
@@ -60,9 +58,7 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
     SIM_DESC sd = sim_state_alloc (kind, callback);
 
     try {
-        /* POPL seems to skips first passed argument, so we pass starting at
-         * argv[1], which is "--sysroot=" */
-        config::handleArgs (argc, static_cast<const char* const*> (argv), 1);
+        config::handleArgs (argc, static_cast<const char* const*> (argv), 2);
 
         /* Create simulator instance */
         //TODO: add simulator arguments
@@ -95,7 +91,6 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
 
 void sim_close (SIM_DESC sd, int) {
     simInstances.at (sd->instanceId).ptr.reset ();
-    simInstances.at (sd->instanceId).loaded = false;
     sim_state_free (sd);
 }
 
@@ -103,7 +98,6 @@ void sim_close (SIM_DESC sd, int) {
 SIM_RC sim_load (SIM_DESC sd, const char *, struct bfd *, int) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
     simInst.ptr->load_binary_file (simInst.filename);
-    simInst.loaded = true;
     std::cout << "MIPT-MIPS: Binary file " << simInst.filename << " loaded" << std::endl;
     return SIM_RC_OK;
 }
@@ -119,13 +113,13 @@ SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *,
 
 int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    return static_cast<int> (simInst.ptr->mem_read (mem, buf, static_cast<size_t> (length)));
+    return static_cast<int> (simInst.ptr->mem_read_noexcept (mem, buf, static_cast<size_t> (length)));
 }
 
 
 int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    return static_cast<int> (simInst.ptr->mem_write (mem, buf, static_cast<size_t> (length)));
+    return static_cast<int> (simInst.ptr->mem_write_noexcept (mem, buf, static_cast<size_t> (length)));
 }
 
 
@@ -155,19 +149,23 @@ void sim_info (SIM_DESC sd, int verbose) {
 
 void sim_resume (SIM_DESC sd, int step, int) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    if (!simInst.loaded) {
-        std::cerr << "MIPT-MIPS: Target program is not loaded!" << std::endl;
-        return;
-    }
 
     std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
     uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
     try {
-        simInstances.at (sd->instanceId).ptr->run (instrs_to_run);
+        simInst.ptr->run (instrs_to_run);
+    }
+    catch (const NoBinaryFile &e) {
+        std::cerr << "MIPT-MIPS: can't run without binary file" << std::endl;
     }
     catch (const BearingLost &e) {
-        /* Should this be treated as an error? */
-        std::cout << "MIPS-MIPS: Execution finished: 10 nops in a row" << std::endl;
+        std::cout << "MIPS-MIPS: execution finished: 10 nops in a row" << std::endl;
+    }
+    catch (const std::exception &e) {
+        std::cerr << e.what () << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception\n";
     }
 }
 

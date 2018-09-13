@@ -2,7 +2,7 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
+
 #include "func_sim.h"
 
 template <typename ISA>
@@ -56,15 +56,10 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::init( const std::string& tr)
-{
-    load_binary_file( tr);
-    prepare_to_run();
-}
-
-template <typename ISA>
 void FuncSim<ISA>::run( uint64 instrs_to_run)
 {
+    if (!binary_file_loaded)
+        throw NoBinaryFile();
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
@@ -76,6 +71,7 @@ void FuncSim<ISA>::run( uint64 instrs_to_run)
 template <typename ISA>
 void FuncSim<ISA>::load_binary_file( const std::string &tr) {
     mem->load_elf_file( tr);
+    binary_file_loaded = true;
 }
 
 template <typename ISA>
@@ -85,22 +81,27 @@ void FuncSim<ISA>::prepare_to_run() {
 }
 
 template <typename ISA>
-size_t FuncSim<ISA>::mem_read (Addr addr, unsigned char *buf, size_t length) try {
-    size_t bytes_read = 0;
-    for (; bytes_read < length; bytes_read++)
-        buf[bytes_read] = static_cast<unsigned char>( mem->template mem_read<uint8>( addr + bytes_read));
-    return bytes_read;
+size_t FuncSim<ISA>::mem_read( Addr addr, unsigned char *buf, size_t length) const {
+    return mem->memcpy_guest_to_host( reinterpret_cast<Byte *>(buf), addr, length);
+}
+
+template <typename ISA>
+size_t FuncSim<ISA>::mem_read_noexcept( Addr addr, unsigned char *buf, size_t length) const noexcept try {
+    return mem_read( addr, buf, length);
 }
 catch (...) {
     return 0;
 }
 
 template <typename ISA>
-size_t FuncSim<ISA>::mem_write (Addr addr, const unsigned char *buf, size_t length) try {
-    size_t bytes_written = 0;
-    for (; bytes_written < length; bytes_written++)
-        mem->template mem_write<uint8> ( static_cast<uint8> (buf[bytes_written]), addr + bytes_written);
-    return bytes_written;
+size_t FuncSim<ISA>::mem_write( Addr addr, const unsigned char *buf, size_t length) {
+    mem->erase_cache( addr, length);
+    return mem->memcpy_host_to_guest( addr, reinterpret_cast<const Byte *>(buf), length);
+}
+
+template <typename ISA>
+size_t FuncSim<ISA>::mem_write_noexcept( Addr addr, const unsigned char *buf, size_t length) noexcept try {
+    return mem_write( addr, buf, length);
 }
 catch (...) {
     return 0;

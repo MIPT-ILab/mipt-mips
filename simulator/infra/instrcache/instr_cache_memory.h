@@ -54,17 +54,15 @@ class InstrMemory : public FuncMemory
                 store(*instr);
         }
 
-        template<typename T>
-        void mem_write( T value, Addr addr, T mask = all_ones<T>())
-        {
-            instr_cache.range_erase( addr, bitwidth<T> / 8);
-            FuncMemory::write( value, addr, mask);
+        void erase_cache( Addr start_addr, size_t size) {
+            instr_cache.range_erase (start_addr, size);
         }
 
         template<typename T>
-        T mem_read( Addr addr, T mask = all_ones<T>())
+        void erase_cache_and_write( T value, Addr addr, T mask = all_ones<T>())
         {
-            return FuncMemory::read( addr, mask);
+            instr_cache.range_erase( addr, bitwidth<T> / 8);
+            write( value, addr, mask);
         }
 };
 

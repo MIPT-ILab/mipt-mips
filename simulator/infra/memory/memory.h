@@ -49,6 +49,9 @@ class FuncMemory
         template<typename T>
         void write( T value, Addr addr, T mask = all_ones<T>());
 
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
+        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size);
+
         uint64 startPC() const { return startPC_addr; }
         std::string dump() const;
         
@@ -89,8 +92,7 @@ class FuncMemory
         void alloc( Addr addr);
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
-        void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
-        
+
         void load_elf_section( const ELFIO::section* section);
 };
 

@@ -9,17 +9,11 @@
 
 #include "rf/rf.h"
 
-#include <infra/exception.h>
-
 #include <simulator.h>
 
 #include <memory>
 #include <string>
 
-struct BearingLost final : Exception
-{
-    BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
-};
 
 template <typename ISA>
 class FuncSim : public Simulator
@@ -40,17 +34,22 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         FuncInstr step();
-        void init( const std::string& tr) final;
+        void load_binary_file( const std::string &tr) final;
+        void prepare_to_run() final;
+        void init( const std::string& tr) final {
+            load_binary_file( tr);
+            prepare_to_run();
+        };
         void run( uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;
         }
 
-        void load_binary_file( const std::string &tr) final;
-        void prepare_to_run() final;
-        size_t mem_read( Addr addr, unsigned char *buf, size_t length) final;
+        size_t mem_read( Addr addr, unsigned char *buf, size_t length) const final;
+        size_t mem_read_noexcept( Addr addr, unsigned char *buf, size_t length) const noexcept final;
         size_t mem_write( Addr addr, const unsigned char *buf, size_t length) final;
+        size_t mem_write_noexcept( Addr addr, const unsigned char *buf, size_t length) noexcept final;
 };
 
 #endif
