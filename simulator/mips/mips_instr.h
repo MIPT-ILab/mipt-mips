@@ -67,7 +67,8 @@ class BaseMIPSInstr
             OUT_R_CONDM,
             OUT_R_SHAMT,
             OUT_R_JUMP,
-            OUT_R_SPECIAL,
+            OUT_R_SYSCALL,
+            OUT_R_BREAK,
             OUT_R_SUBTR,
             OUT_R_TRAP,
             OUT_I_ARITHM,
@@ -439,6 +440,13 @@ class BaseMIPSInstr
         bool is_store() const { return operation == OUT_I_STORE; }
 
         bool is_nop() const { return instr.raw == 0x0u; }
+
+        bool is_syscall() const { return operation == OUT_R_SYSCALL; }
+
+        bool is_break() const { return operation == OUT_R_BREAK; }
+
+        bool is_special() const { return is_syscall() || is_break(); }
+
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
@@ -447,8 +455,6 @@ class BaseMIPSInstr
 
         bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
                                                operation == OUT_RI_TRAP; }
-
-        bool is_special() const { return operation == OUT_R_SPECIAL; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
 

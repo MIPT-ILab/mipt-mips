@@ -31,7 +31,7 @@ public:
     void load_binary_file( const std::string &tr) final;
     void prepare_to_run() final {}
     void init( const std::string& tr) final;
-    void run( uint64 instrs_to_run) final;
+    StopReason run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void clock() final;
     void halt() final { force_halt = true; }

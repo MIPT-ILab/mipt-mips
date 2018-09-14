@@ -56,16 +56,22 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::run( uint64 instrs_to_run)
+Simulator::StopReason FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     if (!binary_file_loaded)
         throw NoBinaryFile();
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
+
+        if ( instrs_to_run == 1)
+            return StopReason::SingleStep;
+        if ( instr.is_break())
+            return StopReason::BreakpointHit;
         if ( instr.is_halt())
-            break;
+            break; /* Cant't return Halted here because of 'control reaches end of non-void' */
     }
+    return StopReason::Halted;
 }
 
 template <typename ISA>
@@ -95,7 +101,6 @@ catch (...) {
 
 template <typename ISA>
 size_t FuncSim<ISA>::mem_write( Addr addr, const unsigned char *buf, size_t length) {
-    mem->erase_cache( addr, length);
     return mem->memcpy_host_to_guest( addr, reinterpret_cast<const Byte *>(buf), length);
 }
 

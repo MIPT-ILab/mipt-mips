@@ -42,8 +42,8 @@ const typename BaseMIPSInstr<RegisterUInt>::MapType BaseMIPSInstr<RegisterUInt>:
 
     // System calls
     //key     name    operation       ms     source1       source2      destination      pointer                        mips version
-    {0xC, { "syscall", OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_syscall, MIPS_I_Instr} },
-    {0xD, { "break",   OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_break,   MIPS_I_Instr} },
+    {0xC, { "syscall", OUT_R_SYSCALL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_syscall, MIPS_I_Instr} },
+    {0xD, { "break",   OUT_R_BREAK,   0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_break,   MIPS_I_Instr} },
     //          0xE reserved
     //          0xF SYNC
 

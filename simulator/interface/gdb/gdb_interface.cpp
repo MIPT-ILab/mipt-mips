@@ -28,6 +28,7 @@ struct SimulatorInstance {
     std::unique_ptr<Simulator> ptr = nullptr;
     std::string filename;
     size_t id = 0;
+    Simulator::StopReason stopReason = Simulator::StopReason::Halted;
 
     SimulatorInstance (std::unique_ptr<Simulator> simPtr, const char *binary_filename, size_t id)
             : ptr (std::move (simPtr)), filename (binary_filename), id (id) {}
@@ -153,12 +154,13 @@ void sim_resume (SIM_DESC sd, int step, int) {
     std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
     uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
     try {
-        simInst.ptr->run (instrs_to_run);
+        simInst.stopReason = simInst.ptr->run (instrs_to_run);
     }
     catch (const NoBinaryFile &e) {
         std::cerr << "MIPT-MIPS: can't run without binary file" << std::endl;
     }
     catch (const BearingLost &e) {
+        simInst.stopReason = Simulator::StopReason::Halted;
         std::cout << "MIPS-MIPS: execution finished: 10 nops in a row" << std::endl;
     }
     catch (const std::exception &e) {
@@ -177,9 +179,17 @@ int sim_stop (SIM_DESC sd) {
 
 
 void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc) {
-    (void) sd;
-    (void) reason;
-    (void) sigrc;
+    SimulatorInstance &simInst = simInstances.at (sd->instanceId);
+
+    if (simInst.stopReason == Simulator::StopReason::Halted)
+        *reason = sim_exited;
+
+    if (simInst.stopReason == Simulator::StopReason::BreakpointHit ||
+        simInst.stopReason == Simulator::StopReason::SingleStep)
+    {
+        *reason = sim_stopped;
+        *sigrc = GDB_SIGNAL_TRAP;
+    }
 }
 
 

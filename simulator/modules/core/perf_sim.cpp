@@ -51,7 +51,7 @@ void PerfSim<ISA>::init( const std::string& tr)
 }
 
 template<typename ISA>
-void PerfSim<ISA>::run( uint64 instrs_to_run)
+Simulator::StopReason PerfSim<ISA>::run( uint64 instrs_to_run)
 {
     if (!binary_file_loaded)
         throw NoBinaryFile();
@@ -66,6 +66,8 @@ void PerfSim<ISA>::run( uint64 instrs_to_run)
         clock();
 
     dump_statistics();
+
+    return StopReason::Halted;
 }
 
 template<typename ISA>

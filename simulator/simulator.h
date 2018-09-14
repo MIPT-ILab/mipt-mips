@@ -25,10 +25,12 @@ class Simulator : public Log {
 public:
     explicit Simulator( bool log = false) : Log( log) {}
 
+    enum class StopReason : int { Halted, BreakpointHit, SingleStep };
+
     virtual void load_binary_file( const std::string &tr) = 0;
     virtual void prepare_to_run() = 0;
     virtual void init( const std::string& tr) = 0;
-    virtual void run( uint64 instrs_to_run) = 0;
+    virtual StopReason run( uint64 instrs_to_run) = 0;
     void run_no_limit( const std::string& tr) { init( tr); run( MAX_VAL64); }
     virtual void set_target( const Target& target) = 0;
 

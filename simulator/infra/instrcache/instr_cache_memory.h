@@ -54,9 +54,11 @@ class InstrMemory : public FuncMemory
                 store(*instr);
         }
 
-        void erase_cache( Addr start_addr, size_t size) {
-            instr_cache.range_erase (start_addr, size);
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final {
+            instr_cache.range_erase( dst, size);
+            return FuncMemory::memcpy_host_to_guest( dst, src, size);
         }
+
 
         template<typename T>
         void erase_cache_and_write( T value, Addr addr, T mask = all_ones<T>())
