@@ -1,12 +1,12 @@
 MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It is able to measure _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation.
 
-This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT). The project is being developed by a group of students under the guidance of Intel employees. Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and MIPT Software Teamwork Course.
+This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
+The project is being developed by a group of students under the guidance of Intel employees.
+Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and MIPT Software Teamwork Course.
 
 Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT building.
 
 ## Computer Architecture
-
-You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2017).
 
 Date | Event name
 :----: | ----------------------------
@@ -14,6 +14,7 @@ Date | Event name
 19 Sep | **Layers of Computer Science, ISA and uArch**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
+You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-the-computer-architecture-in-2017).
 
 ## Collaborative Software Development
 
@@ -50,8 +51,8 @@ The project is mentored by [Igor Smirnov](https://github.com/igorsmir-ilab), [Ki
 
 Additional repositories:
 * [MIPS traces](https://github.com/MIPT-ILab/mips-traces)
-* [Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)
 * [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
 * [MIPSim GDB](https://github.com/MIPT-ILab/mipt-sim-gdb)
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
-* [MSVC-compatible LibELF](https://github.com/MIPT-ILab/libelf)
+* _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
+* _[MSVC-compatible LibELF](https://github.com/MIPT-ILab/libelf)_
