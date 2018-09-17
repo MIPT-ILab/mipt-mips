@@ -44,7 +44,7 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory && cd /path/to/your/build/directory`
 1. Run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory
-1. To run all unit tests, call `ctest --verbose -C Release` from your build directory.
+1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## Command line options
 
