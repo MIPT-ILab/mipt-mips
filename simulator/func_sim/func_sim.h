@@ -40,7 +40,8 @@ class FuncSim : public Simulator
             load_binary_file( tr);
             prepare_to_run();
         };
-        StopReason run( uint64 instrs_to_run) final;
+        std::pair<StopReason, TrapType> run( uint64 instrs_to_run) final;
+        std::pair<StopReason, TrapType> run_single_step() final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;

@@ -16,6 +16,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
+#include <infra/trap_types.h>
 #include <kryucow_string.h>
 
 // Generic C++
@@ -57,6 +58,7 @@ struct UnknownMIPSInstruction final : Exception
 template<typename RegisterUInt>
 class BaseMIPSInstr
 {
+
     private:
         using RegisterSInt = sign_t<RegisterUInt>;
 
@@ -67,8 +69,7 @@ class BaseMIPSInstr
             OUT_R_CONDM,
             OUT_R_SHAMT,
             OUT_R_JUMP,
-            OUT_R_SYSCALL,
-            OUT_R_BREAK,
+            OUT_R_SPECIAL,
             OUT_R_SUBTR,
             OUT_R_TRAP,
             OUT_I_ARITHM,
@@ -85,12 +86,7 @@ class BaseMIPSInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
-        enum class TrapType : uint8
-        {
-            NO_TRAP,
-            EXPLICIT_TRAP,
-            UNALIGNED_ADDRESS,
-        } trap = TrapType::NO_TRAP;
+        TrapType trap = TrapType::NO_TRAP;
 
         // Endian specific
         const union _instr
@@ -330,8 +326,8 @@ class BaseMIPSInstr
             }
         }
 
-        void execute_syscall(){ };
-        void execute_break()  { };
+        void execute_syscall() { trap = TrapType::SYSCALL; };
+        void execute_break()   { trap = TrapType::BREAKPOINT; };
 
         void execute_unknown();
         void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
@@ -441,11 +437,7 @@ class BaseMIPSInstr
 
         bool is_nop() const { return instr.raw == 0x0u; }
 
-        bool is_syscall() const { return operation == OUT_R_SYSCALL; }
-
-        bool is_break() const { return operation == OUT_R_BREAK; }
-
-        bool is_special() const { return is_syscall() || is_break(); }
+        bool is_special() const { return operation == OUT_R_SPECIAL; }
 
         bool is_halt() const { return is_jump() && new_PC == 0; }
 
@@ -457,6 +449,8 @@ class BaseMIPSInstr
                                                operation == OUT_RI_TRAP; }
 
         bool has_trap() const { return trap != TrapType::NO_TRAP; }
+
+        TrapType trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 

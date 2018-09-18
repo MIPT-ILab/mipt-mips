@@ -29,6 +29,7 @@ struct SimulatorInstance {
     std::string filename;
     size_t id = 0;
     Simulator::StopReason stopReason = Simulator::StopReason::Halted;
+    TrapType trapType = TrapType::NO_TRAP;
 
     SimulatorInstance (std::unique_ptr<Simulator> simPtr, const char *binary_filename, size_t id)
             : ptr (std::move (simPtr)), filename (binary_filename), id (id) {}
@@ -154,13 +155,17 @@ void sim_resume (SIM_DESC sd, int step, int) {
     std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
     uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
     try {
-        simInst.stopReason = simInst.ptr->run (instrs_to_run);
+        if (instrs_to_run == 1)
+            std::tie (simInst.stopReason, simInst.trapType) = simInst.ptr->run_single_step ();
+        else
+            std::tie (simInst.stopReason, simInst.trapType) = simInst.ptr->run (instrs_to_run);
     }
     catch (const NoBinaryFile &e) {
         std::cerr << "MIPT-MIPS: can't run without binary file" << std::endl;
     }
     catch (const BearingLost &e) {
         simInst.stopReason = Simulator::StopReason::Halted;
+        simInst.trapType = TrapType::NO_TRAP;
         std::cout << "MIPS-MIPS: execution finished: 10 nops in a row" << std::endl;
     }
     catch (const std::exception &e) {
@@ -184,12 +189,23 @@ void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc) {
     if (simInst.stopReason == Simulator::StopReason::Halted)
         *reason = sim_exited;
 
-    if (simInst.stopReason == Simulator::StopReason::BreakpointHit ||
-        simInst.stopReason == Simulator::StopReason::SingleStep)
-    {
+    if (simInst.stopReason == Simulator::StopReason::TrapHit) {
         *reason = sim_stopped;
-        *sigrc = GDB_SIGNAL_TRAP;
+        switch (simInst.trapType) {
+            case TrapType::BREAKPOINT:
+            case TrapType::EXPLICIT_TRAP:
+                *sigrc = GDB_SIGNAL_TRAP;
+                break;
+            case TrapType::UNALIGNED_ADDRESS:
+                *sigrc = GDB_SIGNAL_BUS;
+                break;
+            default:
+                std::cerr << "Wrong or unhandled trap" << std::endl;
+        }
     }
+
+    if (simInst.stopReason == Simulator::StopReason::Error)
+        *reason = sim_polling;
 }
 
 

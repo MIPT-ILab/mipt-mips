@@ -13,6 +13,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
+#include <infra/trap_types.h>
 
 // Generic C++
 #include <array>
@@ -77,12 +78,12 @@ class RISCVInstr
         constexpr bool is_divmult() const { return false; }
 
         constexpr bool is_explicit_trap() const { return false; }
-
-        constexpr bool is_break() const { return false; }
-
+        
         constexpr bool is_special() const { return false; }
 
         constexpr bool has_trap() const { return false; }
+
+        TrapType trap_type() const { return TrapType::NO_TRAP; }
 
         constexpr bool get_writes_dst() const { return false; }
 

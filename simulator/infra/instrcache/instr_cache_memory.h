@@ -54,17 +54,17 @@ class InstrMemory : public FuncMemory
                 store(*instr);
         }
 
-        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final {
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) {
             instr_cache.range_erase( dst, size);
             return FuncMemory::memcpy_host_to_guest( dst, src, size);
         }
 
 
         template<typename T>
-        void erase_cache_and_write( T value, Addr addr, T mask = all_ones<T>())
+        void write( T value, Addr addr, T mask = all_ones<T>())
         {
             instr_cache.range_erase( addr, bitwidth<T> / 8);
-            write( value, addr, mask);
+            FuncMemory::write( value, addr, mask);
         }
 };
 

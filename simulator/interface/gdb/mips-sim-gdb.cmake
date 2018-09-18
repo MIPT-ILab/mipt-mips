@@ -13,9 +13,12 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
             ${GDB_SIM_COMMON_PATH}/callback.c
             ${GDB_SIM_COMMON_PATH}/sim-io.c)
 
-    add_library(mipt-mips-gdb STATIC ${CPPS}
+    add_library(mipt-mips-gdb STATIC
+            ${CPPS}
             ${CMAKE_CURRENT_LIST_DIR}/gdb_interface.cpp
             ${GDB_SIM_SRCS})
+
+    #target_link_libraries(mipt-mips-gdb mipt-mips-src)
 
     # Output: libsim.a stored in "simulator/gdb"
     set_target_properties(mipt-mips-gdb PROPERTIES
@@ -26,6 +29,7 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
 
     target_include_directories(mipt-mips-gdb SYSTEM PUBLIC
             ${CMAKE_CURRENT_LIST_DIR}/../../../..
+            ${CMAKE_CURRENT_LIST_DIR}/../../../../bfd
             ${CMAKE_CURRENT_LIST_DIR}/../../../../include
             ${CMAKE_CURRENT_LIST_DIR}/../../../../sim/common)
 

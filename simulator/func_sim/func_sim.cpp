@@ -56,22 +56,39 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-Simulator::StopReason FuncSim<ISA>::run( uint64 instrs_to_run)
+std::pair<Simulator::StopReason, TrapType> FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     if (!binary_file_loaded)
         throw NoBinaryFile();
+
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
 
-        if ( instrs_to_run == 1)
-            return StopReason::SingleStep;
-        if ( instr.is_break())
-            return StopReason::BreakpointHit;
+        if ( instr.has_trap())
+            return std::make_pair( StopReason::TrapHit, instr.trap_type());
         if ( instr.is_halt())
-            break; /* Cant't return Halted here because of 'control reaches end of non-void' */
+            break; /* Can't return Halted here because of 'control reaches end of non-void' */
     }
-    return StopReason::Halted;
+    return std::make_pair( StopReason::Halted, TrapType::NO_TRAP);
+}
+
+template <typename ISA>
+std::pair<Simulator::StopReason, TrapType> FuncSim<ISA>::run_single_step() {
+    if (!binary_file_loaded)
+        throw NoBinaryFile();
+
+    const auto& instr = step();
+    sout << instr << std::endl;
+
+    if ( instr.is_halt())
+        return std::make_pair( StopReason::Halted, TrapType::NO_TRAP);
+
+    TrapType trapType = instr.trap_type();
+    /* If no traps hit, then assume we have a breakpoint */
+    if (trapType == TrapType::NO_TRAP)
+        trapType = TrapType::BREAKPOINT;
+    return std::make_pair( StopReason::TrapHit, trapType);
 }
 
 template <typename ISA>

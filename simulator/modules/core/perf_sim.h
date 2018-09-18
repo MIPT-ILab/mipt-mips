@@ -31,7 +31,10 @@ public:
     void load_binary_file( const std::string &tr) final;
     void prepare_to_run() final {}
     void init( const std::string& tr) final;
-    StopReason run( uint64 instrs_to_run) final;
+    std::pair<StopReason, TrapType> run( uint64 instrs_to_run) final;
+    std::pair<StopReason, TrapType> run_single_step() final {
+        return std::make_pair( StopReason::Halted, TrapType::NO_TRAP);
+    };
     void set_target( const Target& target) final;
     void clock() final;
     void halt() final { force_halt = true; }
