@@ -10,8 +10,8 @@ Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT buildin
 
 Date | Event name
 :----: | ----------------------------
-13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion__15_Sep.pptx?raw=true)
-19 Sep | **Layers of Computer Science, ISA and uArch**
+13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
+19 Sep | **Layers of Computer Science, ISA and uArch**<br/> • [Slides](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Layers%20of%20Computer%20Science.pptx?raw=true)
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
