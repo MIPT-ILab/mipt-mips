@@ -56,7 +56,3 @@ Additional repositories:
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
 * _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
 * _[MSVC-compatible LibELF](https://github.com/MIPT-ILab/libelf)_
-
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/drec.gif?raw=true)](https://mipt.ru/drec/)
-[![Logo](https://avatars2.githubusercontent.com/u/13999586?s=100)](https://mipt-ilab.github.io/)
