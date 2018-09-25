@@ -73,6 +73,10 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 
 ## About MIPT-MIPS
 
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/drec.gif?raw=true)](https://mipt.ru/drec/)
+[![Logo](https://avatars2.githubusercontent.com/u/13999586?s=100)](https://mipt-ilab.github.io/)
+
 This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 
 The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
@@ -81,6 +85,3 @@ The main goal of the project is to teach the students the computer architecture 
 
 Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
 
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/drec.gif?raw=true)](https://mipt.ru/drec/)
-[![Logo](https://avatars2.githubusercontent.com/u/13999586?s=100)](https://mipt-ilab.github.io/)
