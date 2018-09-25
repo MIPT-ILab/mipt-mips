@@ -2,7 +2,7 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It is able to measure _perform
 
 This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 The project is being developed by a group of students under the guidance of Intel employees.
-Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and MIPT Software Teamwork Course.
+Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
 Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT building.
 
@@ -16,7 +16,7 @@ Date | Event name
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
 
-## Collaborative Software Development
+## Software Development
 
 Date | Event name
 :----: | ----------------------------

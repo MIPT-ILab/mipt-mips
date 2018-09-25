@@ -80,3 +80,7 @@ The main goal of the project is to teach the students the computer architecture 
 ### May I contribute?
 
 Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
+
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/drec.gif?raw=true)](https://mipt.ru/drec/)
+[![Logo](https://avatars2.githubusercontent.com/u/13999586?s=100)](https://mipt-ilab.github.io/)
