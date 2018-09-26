@@ -1,4 +1,3 @@
-
 1. Pavel Kryukov
 2. Vyacheslav Kompan
 3. Yan Logovskiy
