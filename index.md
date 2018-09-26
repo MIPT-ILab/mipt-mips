@@ -21,7 +21,7 @@ You may find lectures of previous year [in our archive](https://github.com/MIPT-
 Date | Event name
 :----: | ----------------------------
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion__15_Sep.pptx?raw=true)
-26 Sep | **Version control system**
+26 Sep | **Version control system**<br/> • Slides<br/> • Homework: read our [our cheat sheet](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet) and contribute to members.md<br/> • Further reading: *Pro Git* ([Rus](https://git-scm.com/book/ru/v2), [Eng](https://git-scm.com/book/en/v2)), *Git Flight Rules* ([Rus](https://github.com/k88hudson/git-flight-rules/blob/master/README_ru.md), [Eng](https://github.com/k88hudson/git-flight-rules))
 
 In addition, repository contains a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
