@@ -3,3 +3,4 @@ List of 2018/2019 MIPT-MIPS project members:
 2. Vyacheslav Kompan
 3. Yan Logovskiy
 4. Oleg Ladin
+6. Alexander Chernyavskiy
