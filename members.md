@@ -9,3 +9,4 @@ List of 2018/2019 MIPT-MIPS project members:
 8. Yauheni Sharamed
 9. Mikita Stryzhak
 10. Vsevolod Pukhov
+11. Startsev Ivan
