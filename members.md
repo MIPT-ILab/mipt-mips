@@ -11,4 +11,4 @@ List of 2018/2019 MIPT-MIPS project members:
 10. Vsevolod Pukhov
 11. Ivan Startsev
 12. Kirill Anokhin
-
+13. Alexander Chernyavskiy
