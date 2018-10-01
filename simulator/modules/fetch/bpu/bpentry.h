@@ -20,11 +20,11 @@
 
 class BPEntry
 {
-protected:
+    protected:
     Addr _target = NO_VAL32;
 
 public:
-    Addr getTarget() const { return _target; }
+    Addr getTarget() const { return _target;}
     void reset() { _target = NO_VAL32; }
     void update_target(Addr target) { _target = target; }
 };
@@ -42,6 +42,12 @@ class BPEntryAlwaysTaken final : public BPEntryStatic
 {
 public:
     bool is_taken( Addr /* unused */) const { return true; }
+};
+
+class BPEntryAlwaysNotTaken final : public BPEntryStatic
+{
+public:
+    bool is_taken( Addr /* unused */) const { return false; }
 };
 
 class BPEntryBackwardJumps final : public BPEntryStatic
