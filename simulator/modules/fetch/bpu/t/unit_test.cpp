@@ -110,3 +110,16 @@ TEST_CASE( "Overload: LRU")
     CHECK( bp->get_target(PCconst) == target);
 }
 
+TEST_CASE( "Static predictions")
+{
+    /* backward jumps */
+    auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+    
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+
+}
