@@ -38,17 +38,15 @@ public:
     void update( bool is_taken, Addr target) {if (is_taken) _target = target; }
 };
 
-class BPEntryAlwaysTaken final : public BPEntryStatic
+template<bool DIRECTION>
+class BPEntryAlwaysOneDirection final : public BPEntryStatic
 {
 public:
-    bool is_taken( Addr /* unused */) const { return true; }
+    bool is_taken( Addr /* unused */) const { return DIRECTION; }
 };
 
-class BPEntryAlwaysNotTaken final : public BPEntryStatic
-{
-public:
-    bool is_taken( Addr /* unused */) const { return false; }
-};
+using BPEntryAlwaysTaken = BPEntryAlwaysOneDirection<true>;
+using BPEntryAlwaysNotTaken = BPEntryAlwaysOneDirection<false>;
 
 class BPEntryBackwardJumps final : public BPEntryStatic
 {
@@ -56,7 +54,6 @@ public:
     /* prediction */
     bool is_taken( Addr PC) const { return _target < PC ; }
 };
-
 
 /* dynamic predictors */
 
