@@ -124,11 +124,12 @@ class BPFactory {
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static Map generate_map() {
         Map my_map;
-        my_map.emplace("static_always_taken",   std::make_unique<BPCreator<BPEntryAlwaysTaken>>());
-        my_map.emplace("static_backward_jumps", std::make_unique<BPCreator<BPEntryBackwardJumps>>());
-        my_map.emplace("dynamic_one_bit",       std::make_unique<BPCreator<BPEntryOneBit>>());
-        my_map.emplace("dynamic_two_bit",       std::make_unique<BPCreator<BPEntryTwoBit>>());
-        my_map.emplace("adaptive_two_level",    std::make_unique<BPCreator<BPEntryAdaptive<2>>>());
+        my_map.emplace("static_always_taken",     std::make_unique<BPCreator<BPEntryAlwaysTaken>>());
+        my_map.emplace("static_always_not_taken", std::make_unique<BPCreator<BPEntryAlwaysNotTaken>>());
+        my_map.emplace("static_backward_jumps",   std::make_unique<BPCreator<BPEntryBackwardJumps>>());
+        my_map.emplace("dynamic_one_bit",         std::make_unique<BPCreator<BPEntryOneBit>>());
+        my_map.emplace("dynamic_two_bit",         std::make_unique<BPCreator<BPEntryTwoBit>>());
+        my_map.emplace("adaptive_two_level",      std::make_unique<BPCreator<BPEntryAdaptive<2>>>());
         return my_map;
     }
 
