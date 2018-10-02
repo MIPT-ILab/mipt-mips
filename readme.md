@@ -73,8 +73,8 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 
 ## About MIPT-MIPS
 
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
-[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/drec.gif?raw=true)](https://mipt.ru/drec/)
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
+[![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/drec.gif?raw=true)](https://mipt.ru/drec/)
 [![Logo](https://avatars2.githubusercontent.com/u/13999586?s=100)](https://mipt-ilab.github.io/)
 
 This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
