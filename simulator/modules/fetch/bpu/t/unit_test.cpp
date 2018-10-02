@@ -15,25 +15,36 @@ TEST_CASE( "Initialization: WrongParameters")
     CHECK_THROWS_AS( BaseBP::create_bp( "dynamic_two_bit", 100, 20), BPInvalidMode);
 }
 
-TEST_CASE( "HitAndMiss: Miss")
+TEST_CASE( "Static, all branches not taken")
 {
-    auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
 
-    // Check default cache miss behaviour
-    Addr PC = 12;
-    CHECK_FALSE(bp->is_taken(PC));
-
-    PC = 16;
-    CHECK_FALSE(bp->is_taken(PC));
-
-    PC = 20;
-    CHECK_FALSE(bp->is_taken(PC));
-
-    PC = 12;
-    CHECK_FALSE(bp->is_taken(PC));
 }
 
-TEST_CASE( "Main: PredictingBits")
+TEST_CASE( "Static, all branches taken")
+{
+
+}
+
+TEST_CASE( "One bit predictor")
+{
+
+}
+
+TEST_CASE( "Two bit predictor, basic")
+{
+    /* backward jumps */
+    auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+    
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+
+}
+
+TEST_CASE( "Two bit predictor, advanced")
 {
     auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
 
@@ -87,6 +98,28 @@ TEST_CASE( "Main: PredictingBits")
     CHECK( bp->get_target(PC) == target);
 }
 
+TEST_CASE( "Adaptive two bit prediction")
+{
+
+}
+
+TEST_CASE( "Cache Miss")
+{
+    auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
+
+    // Check default cache miss behaviour
+    Addr PC = 12;
+    CHECK_FALSE(bp->is_taken(PC));
+
+    PC = 16;
+    CHECK_FALSE(bp->is_taken(PC));
+
+    PC = 20;
+    CHECK_FALSE(bp->is_taken(PC));
+
+    PC = 12;
+    CHECK_FALSE(bp->is_taken(PC));
+}
 
 TEST_CASE( "Overload: LRU")
 {
@@ -108,18 +141,4 @@ TEST_CASE( "Overload: LRU")
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->is_taken(PCconst) );
     CHECK( bp->get_target(PCconst) == target);
-}
-
-TEST_CASE( "Static predictions")
-{
-    /* backward jumps */
-    auto bp = BaseBP::create_bp( "dynamic_two_bit", 128, 16);
-
-    Addr PC = 28;
-    Addr target = 12;
-    
-    bp->update( BPInterface( PC, true, target));
-    CHECK( bp->is_taken(PC) );
-    CHECK( bp->get_target(PC) == target);
-
 }
