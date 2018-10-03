@@ -12,7 +12,6 @@
 #include <infra/types.h>
 
 #include <array>
-#include <cassert>
 #include <iostream>
 #include <utility>
 
@@ -28,9 +27,17 @@ class MIPSRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
+    struct InvalidRegNum final : std::runtime_error
+    {
+        explicit InvalidRegNum( const uint8 num)
+                : std::runtime_error( std::string( "Invalid MIPS register num ") + std::to_string( num) + '\n')
+        { }
+    };
+
     explicit MIPSRegister( uint8 id) : MIPSRegister( static_cast<RegNum>( id))
     {
-        assert( id < 32u);
+        if( id >= 32u)
+            throw InvalidRegNum( id);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
@@ -41,12 +48,14 @@ public:
     bool is_zero()       const { return value == MIPS_REG_zero; }
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }
     bool is_mips_lo()    const { return value == MIPS_REG_lo; }
+    bool is_pc()         const { return value == MIPS_REG_pc; }
     size_t to_size_t()   const { return value; }
 
     static const MIPSRegister mips_hi;
     static const MIPSRegister mips_lo;
     static const MIPSRegister zero;
     static const MIPSRegister return_address;
+    static const MIPSRegister pc;
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const MIPSRegister& rhs) const { return !operator==(rhs); }

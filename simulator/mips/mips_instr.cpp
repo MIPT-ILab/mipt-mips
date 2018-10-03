@@ -6,6 +6,7 @@
 
 #include "mips_instr.h"
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>

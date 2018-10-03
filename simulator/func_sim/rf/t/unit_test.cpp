@@ -1,6 +1,6 @@
 /**
  * Unit tests for rf
- * @author Alexander Misevich
+ * @author Alexander Misevich, Vyacheslav Kompan
  * Copyright 2018 MIPT-MIPS
  */
 
@@ -101,6 +101,14 @@ TEST_CASE( "RF: read_write_rf")
     rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), +1 /* add */);
     CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
     CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
+
+    // Check for PC
+    rf->write( MIPSRegister::pc, 0x4000F0u);
+    CHECK( rf->read( MIPSRegister::pc) == 0x4000F0u);
+
+    // read_value()
+    rf->write( MIPSRegister(1), 0x55AAu);
+    CHECK( rf->read_value( MIPSRegister(1)) == rf->read( MIPSRegister(1)));
 }
 
 TEST_CASE( "RF: read_sources_write_dst_rf")

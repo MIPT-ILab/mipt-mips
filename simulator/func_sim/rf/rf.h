@@ -64,6 +64,10 @@ public:
 
     RF() = default;
 
+    auto read_value( Register num) const {
+        return get_value( num);
+    }
+
     inline void read_source( FuncInstr* instr, uint8 index) const
     {
         instr->set_v_src( read( instr->get_src_num( index)), index);

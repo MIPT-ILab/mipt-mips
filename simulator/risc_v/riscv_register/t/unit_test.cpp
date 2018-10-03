@@ -1,6 +1,6 @@
 /**
  * Unit tests for RISCV register
- * @author Alexander Misevich
+ * @author Alexander Misevich, Vyacheslav Kompan
  * Copyright 2018 MIPT-MIPS
  */
 
@@ -14,9 +14,18 @@
 // MIPT-MIPS modules
 #include "../riscv_register.h"
 
-static_assert(RISCVRegister::MAX_REG == 32);
+static_assert(RISCVRegister::MAX_REG >= 32);
 
 // Testing methods of the class
+TEST_CASE( "RISCV_registers: Constructor")
+{
+    for ( size_t i = 0; i < 32; ++i)
+    {
+        CHECK_NOTHROW( RISCVRegister(i));
+    }
+    CHECK_THROWS_AS( RISCVRegister(32), RISCVRegister::InvalidRegNum);
+}
+
 TEST_CASE( "RISCV_registers: Size_t_converters")
 {
     for ( size_t i = 0; i < 32; ++i)

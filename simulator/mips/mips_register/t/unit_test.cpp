@@ -1,6 +1,6 @@
 /**
  * Unit tests for MIPS register
- * @author Alexander Misevich
+ * @author Alexander Misevich, Vyacheslav Kompan
  * Copyright 2018 MIPT-MIPS
  */
 
@@ -17,6 +17,15 @@
 static_assert(MIPSRegister::MAX_REG >= 32);
 
 // Testing methods of the class
+TEST_CASE( "MIPS_registers: Constructor")
+{
+    for ( size_t i = 0; i < 32; ++i)
+    {
+        CHECK_NOTHROW( MIPSRegister(i));
+    }
+    CHECK_THROWS_AS( MIPSRegister(32), MIPSRegister::InvalidRegNum);
+}
+
 TEST_CASE( "MIPS_registers: Size_t_converters")
 {
     for ( size_t i = 0; i < 32; ++i)

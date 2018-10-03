@@ -13,7 +13,6 @@
 #include <infra/types.h>
 
 #include <array>
-#include <cassert>
 #include <iostream>
 #include <utility>
 
@@ -29,9 +28,17 @@ class RISCVRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
+    struct InvalidRegNum final : std::runtime_error
+    {
+        explicit InvalidRegNum( const uint8 num)
+                : std::runtime_error( std::string( "Invalid RISC-V register num ") + std::to_string( num) + '\n')
+        { }
+    };
+
     explicit RISCVRegister( uint8 id) : RISCVRegister( static_cast<RegNum>( id))
     {
-        assert( id < 32u);
+        if ( id >= 32u)
+            throw InvalidRegNum( id);
     }
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
@@ -42,12 +49,14 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
+    bool is_pc()                   const { return value == RISCV_REG_pc; }
     size_t to_size_t()             const { return value; }
 
     static const RISCVRegister zero;
     static const RISCVRegister return_address;
     static const RISCVRegister mips_hi;
     static const RISCVRegister mips_lo;
+    static const RISCVRegister pc;
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
