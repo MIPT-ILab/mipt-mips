@@ -416,7 +416,9 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 template<typename RegisterUInt>
 void BaseMIPSInstr<RegisterUInt>::execute_unknown()
 {
-    throw std::runtime_error(std::string("Unknown instruction ") + std::string(Dump()) + " is an unhandled trap\n");
+    std::ostringstream oss;
+    oss << *this;
+    throw UnknownMIPSInstruction( oss.str());
 }
 
 template<typename RegisterUInt>
@@ -424,21 +426,12 @@ void BaseMIPSInstr<RegisterUInt>::execute()
 {
     (this->*function)();
     complete = true;
-
-    if ( !dst.is_zero() && !is_load() && get_mask() != 0)
-    {
-        std::ostringstream oss;
-        oss << "\t [ $" << dst << " = 0x" << std::hex << (v_dst & mask);
-        if ( !dst2.is_zero())
-            oss << ", $" << dst2 << " = 0x" << v_dst2;
-        oss << " ]";
-        disasm += oss.str();
-    }
 }
 
 template<typename RegisterUInt>
 void BaseMIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
 {
+    memory_complete = true;
     if ( operation == OUT_I_LOAD || is_partial_load())
     {
         switch ( get_mem_size())
@@ -458,29 +451,32 @@ void BaseMIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
     {
         assert( false);
     }
-
-    if ( !dst.is_zero())
-    {
-        std::ostringstream oss;
-        oss << "\t [ $" << dst
-            << " = 0x" << std::hex << v_dst;
-
-        if (has_zero(get_mask()))
-            oss << ", mask = 0x" << std::hex << mask;
-        oss << " ]";
-        disasm += oss.str();
-    }
+}
+template<typename RegisterUInt>
+std::string BaseMIPSInstr<RegisterUInt>::string_dump() const
+{
+    std::ostringstream oss;
+    dump( oss);
+    return oss.str();
 }
 
 template<typename RegisterUInt>
-void BaseMIPSInstr<RegisterUInt>::check_trap()
+std::ostream& BaseMIPSInstr<RegisterUInt>::dump( std::ostream& out) const
 {
-    if ( trap != TrapType::NO_TRAP)
+    out << "{" << sequence_id << "}\t";
+    out << disasm;
+    if ( !dst.is_zero() && (is_load() ? memory_complete : complete) && get_mask() != 0)
     {
-        std::ostringstream oss;
-        oss << "\t trap";
-        disasm += oss.str();
+        out << "\t [ $" << dst << " = 0x" << std::hex << (v_dst & mask);
+        if ( !dst2.is_zero())
+            out << ", $" << dst2 << " = 0x" << v_dst2;
+        out << " ]";
     }
+    if ( trap != TrapType::NO_TRAP)
+        out << "\t trap";
+
+    out << std::dec;
+    return out;
 }
 
 template class BaseMIPSInstr<uint32>;

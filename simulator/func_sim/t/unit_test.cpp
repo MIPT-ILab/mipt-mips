@@ -11,6 +11,8 @@
 // Module
 #include <mips/mips.h>
 
+#include <sstream>
+
 static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
@@ -30,7 +32,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
 {
     FuncSim<MIPS32> simulator;
     simulator.init( valid_elf_file);
-    CHECK( simulator.step().Dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
+    CHECK( simulator.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
 TEST_CASE( "Torture_Test: Func_Sim")

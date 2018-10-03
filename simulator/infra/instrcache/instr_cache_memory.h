@@ -6,6 +6,7 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
+#include <infra/exception.h>
 #include <infra/instrcache/LRUCache.h>
 #include <infra/memory/memory.h>
 #include <infra/types.h>
@@ -15,15 +16,12 @@
 #endif
 
 template<typename Instr>
-class InstrMemory : private FuncMemory
+class InstrMemory : public FuncMemory
 {
     private:
-        LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
+        AddressLRUCache<Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 
     public:
-        using FuncMemory::startPC;
-        using FuncMemory::load_elf_file;
-
         auto fetch( Addr pc) const { return read<uint32>( pc); }
 
         Instr fetch_instr( Addr PC)
@@ -43,8 +41,8 @@ class InstrMemory : private FuncMemory
         void store( const Instr& instr)
         {
             if (instr.get_mem_addr() == 0)
-                throw std::runtime_error("Store data to zero is an unhandled trap\n");
-            instr_cache.erase( instr.get_mem_addr());
+                throw Exception("Store data to zero is an unhandled trap");
+            instr_cache.range_erase( instr.get_mem_addr(), instr.get_mem_size());
             write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }
 
@@ -54,6 +52,13 @@ class InstrMemory : private FuncMemory
                 load(instr);
             else if (instr->is_store())
                 store(*instr);
+        }
+
+        template<typename T>
+        void write(T value, Addr addr, T mask = all_ones<T>())
+        {
+            instr_cache.range_erase( addr, bitwidth<T> / 8);
+            FuncMemory::write( value, addr, mask);
         }
 };
 

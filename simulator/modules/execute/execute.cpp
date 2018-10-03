@@ -21,13 +21,11 @@ Execute<ISA>::Execute( bool log)
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
-    if ( config::complex_alu_latency < 2)
-        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be greater than 1"
-             << std::endl << critical;
+    if (config::complex_alu_latency < 2)
+        throw Exception("Wrong argument! Latency of complex arithmetic logic unit should be greater than 1");
     
-    if ( config::complex_alu_latency > 64)
-        serr << "ERROR: Wrong argument! Latency of complex arithmetic logic unit should be less than 64"
-             << std::endl << critical;
+    if (config::complex_alu_latency > 64)
+        throw Exception("Wrong argument! Latency of complex arithmetic logic unit should be less than 64");
 
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
@@ -38,21 +36,21 @@ Execute<ISA>::Execute( bool log)
     rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
 
-    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    wp_complex_arithmetic_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
+    wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_complex_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
                                                                PORT_BW, SRC_REGISTERS_NUM);
 
-    rps_bypass[0].data_ports[0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[0] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_bypass[0].data_ports[1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[1] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_bypass[0].data_ports[2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[2] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
 
-    rps_bypass[0].data_ports[3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[3] = make_read_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
 template <typename ISA>
@@ -81,7 +79,7 @@ void Execute<ISA>::clock( Cycle cycle)
 
         if ( has_flush_expired())
         {
-            wp_complex_arithmetic_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
+            wp_complex_arithmetic_bypass->write( instr.get_dst_v(), cycle);
             wp_writeback_datapath->write( instr, cycle);
         }
     }
@@ -112,23 +110,23 @@ void Execute<ISA>::clock( Cycle cycle)
     /* perform execution */
     instr.execute();
 
+    /* log */
+    sout << instr << std::endl;
+
     if ( instr.is_complex_arithmetic()) 
     {
-        wp_long_latency_execution_unit->write( instr, cycle);
+        wp_long_latency_execution_unit->write( std::move( instr), cycle);
     }
     else
     {
         /* bypass data */
-        wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
-        
-        if ( instr.is_mem_stage_required())
-            wp_mem_datapath->write( instr, cycle);
-        else
-            wp_writeback_datapath->write( instr, cycle);
-    }
+        wp_bypass->write( instr.get_dst_v(), cycle);
 
-    /* log */
-    sout << instr << std::endl;
+        if ( instr.is_mem_stage_required())
+            wp_mem_datapath->write( std::move( instr), cycle);
+        else
+            wp_writeback_datapath->write( std::move( instr), cycle);
+    }
 }
 
 

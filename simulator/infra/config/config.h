@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <infra/exception.h>
 #include <infra/types.h>
 
 #include <popl.hpp>
@@ -18,7 +19,7 @@ namespace config {
 
 class BaseValue
 {
-    friend void handleArgs( int argc, const char* argv[]);
+    friend void handleArgs( int argc, const char* const argv[]);
 protected:
     static popl::OptionParser& options() {
         static popl::OptionParser instance( "Allowed options");
@@ -43,7 +44,7 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
         if constexpr (std::is_same_v<T, bool>)
-            return out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(misc-suspicious-semicolon)
+            return out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(bugprone-suspicious-semicolon)
 
         return out << std::dec << rhs.value;
     }
@@ -52,7 +53,7 @@ public:
 template<typename T>
 struct AliasedRequiredValue : BaseTValue<T>
 {
-    AliasedRequiredValue<T>( const std::string& alias, const std::string& name, const std::string& desc) noexcept
+    AliasedRequiredValue<T>( const std::string& alias, const std::string& name, const std::string& desc)
         : BaseTValue<T>( )
     {
         this->options().template add<popl::Value<T>, popl::Attribute::required>(alias, name, desc, T(), &this->value);
@@ -62,7 +63,7 @@ struct AliasedRequiredValue : BaseTValue<T>
 template<typename T>
 struct AliasedValue : BaseTValue<T>
 {
-    AliasedValue<T>( const std::string& alias, const std::string& name, const T& val, const std::string& desc) noexcept
+    AliasedValue<T>( const std::string& alias, const std::string& name, const T& val, const std::string& desc)
         : BaseTValue<T>( val)
     {
         this->options().template add<popl::Value<T>>(alias, name, desc, val, &this->value);
@@ -71,7 +72,7 @@ struct AliasedValue : BaseTValue<T>
 
 struct AliasedSwitch : BaseTValue<bool>
 {
-    AliasedSwitch( const std::string& alias, const std::string& name, const std::string& desc) noexcept
+    AliasedSwitch( const std::string& alias, const std::string& name, const std::string& desc)
         : BaseTValue<bool>( false)
     {
         options().add<popl::Switch>(alias, name, desc, &this->value);
@@ -81,7 +82,7 @@ struct AliasedSwitch : BaseTValue<bool>
 template<typename T>
 struct Value : AliasedValue<T>
 {
-    Value( const std::string& name, const T& val, const std::string& desc) noexcept
+    Value( const std::string& name, const T& val, const std::string& desc)
         : AliasedValue<T>( "", name, val, desc)
     { }
 };
@@ -89,24 +90,24 @@ struct Value : AliasedValue<T>
 template<typename T>
 struct RequiredValue : AliasedRequiredValue<T>
 {
-    RequiredValue( const std::string& name, const std::string& desc) noexcept
+    RequiredValue( const std::string& name, const std::string& desc)
         : AliasedRequiredValue<T>( "", name, desc)
     { }
 };
 
 struct Switch : AliasedSwitch
 {
-    Switch( const std::string& name, const std::string& desc) noexcept
+    Switch( const std::string& name, const std::string& desc)
         : AliasedSwitch( "", name, desc)
     { }
 };
 
-struct HelpOption : std::runtime_error {
-    explicit HelpOption( const std::string& msg) : std::runtime_error( msg) {}
+struct HelpOption : Exception {
+    explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
 };
 
 /* methods */
-void handleArgs( int argc, const char* argv[]);
+void handleArgs( int argc, const char* const argv[]);
 
 } // namespace config
 

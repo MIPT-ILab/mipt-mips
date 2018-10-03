@@ -17,6 +17,7 @@ class Execute : public Log
     using Register = typename ISA::Register;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename ISA::RegisterUInt;
+    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:   
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
@@ -29,7 +30,7 @@ class Execute : public Log
 
         struct BypassPorts {
             std::unique_ptr<ReadPort<BypassCommand<Register>>> command_port;
-            std::array<std::unique_ptr<ReadPort<std::pair<RegisterUInt, RegisterUInt>>>, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
+            std::array<std::unique_ptr<ReadPort<InstructionOutput>>, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
         };
         std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;
 
@@ -37,18 +38,18 @@ class Execute : public Log
         std::unique_ptr<WritePort<Instr>> wp_mem_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_writeback_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_long_latency_execution_unit = nullptr;
-        std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
-        std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_complex_arithmetic_bypass = nullptr;
+        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
+        std::unique_ptr<WritePort<InstructionOutput>> wp_complex_arithmetic_bypass = nullptr;
 
-        Latency flush_expiration_latency = 0_Lt;
+        Latency flush_expiration_latency = 0_lt;
 
         void save_flush() { flush_expiration_latency = last_execution_stage_latency; }
         void clock_saved_flush()
         {
-            if ( flush_expiration_latency != 0_Lt)
-                flush_expiration_latency = flush_expiration_latency - 1_Lt;
+            if ( flush_expiration_latency != 0_lt)
+                flush_expiration_latency = flush_expiration_latency - 1_lt;
         }
-        auto has_flush_expired() const { return flush_expiration_latency == 0_Lt; }
+        auto has_flush_expired() const { return flush_expiration_latency == 0_lt; }
 
 
     public:

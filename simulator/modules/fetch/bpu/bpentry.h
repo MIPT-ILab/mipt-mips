@@ -20,11 +20,11 @@
 
 class BPEntry
 {
-protected:
+    protected:
     Addr _target = NO_VAL32;
 
 public:
-    Addr getTarget() const { return _target; }
+    Addr getTarget() const { return _target;}
     void reset() { _target = NO_VAL32; }
     void update_target(Addr target) { _target = target; }
 };
@@ -38,11 +38,15 @@ public:
     void update( bool is_taken, Addr target) {if (is_taken) _target = target; }
 };
 
-class BPEntryAlwaysTaken final : public BPEntryStatic
+template<bool DIRECTION>
+class BPEntryAlwaysOneDirection final : public BPEntryStatic
 {
 public:
-    bool is_taken( Addr /* unused */) const { return true; }
+    bool is_taken( Addr /* unused */) const { return DIRECTION; }
 };
+
+using BPEntryAlwaysTaken = BPEntryAlwaysOneDirection<true>;
+using BPEntryAlwaysNotTaken = BPEntryAlwaysOneDirection<false>;
 
 class BPEntryBackwardJumps final : public BPEntryStatic
 {
@@ -50,7 +54,6 @@ public:
     /* prediction */
     bool is_taken( Addr PC) const { return _target < PC ; }
 };
-
 
 /* dynamic predictors */
 
@@ -198,7 +201,7 @@ class BPEntryAdaptive final : public BPEntry
         void update( bool is_taken)
         {
             /* updating pattern, simulating shift register */
-            value <<= 1;
+            value <<= 1u;
             value += static_cast<uint32>( is_taken);
             value &= pattern_mask;
         }

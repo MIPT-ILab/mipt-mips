@@ -10,7 +10,7 @@
 
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
-    Simulator( log),
+    CycleAccurateSimulator( log),
     memory( new Memory),
     fetch( log),
     decode( log),
@@ -18,7 +18,7 @@ PerfSim<ISA>::PerfSim(bool log) :
     mem( log),
     writeback( log)
 {
-    wp_core_2_fetch_target = make_write_port<Addr>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     fetch.set_memory( memory.get());
@@ -30,36 +30,47 @@ PerfSim<ISA>::PerfSim(bool log) :
 }
 
 template <typename ISA>
-void PerfSim<ISA>::set_PC( Addr value)
+void PerfSim<ISA>::set_target( const Target& target)
 {
-    wp_core_2_fetch_target->write( value, curr_cycle);
-    writeback.set_PC( value);
+    wp_core_2_fetch_target->write( target, curr_cycle);
+    writeback.set_target( target);
 }
 
 template<typename ISA>
 void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
+    force_halt = false;
     memory->load_elf_file( tr);
 
     writeback.init_checker( tr);
     writeback.set_instrs_to_run( instrs_to_run);
 
-    set_PC( memory->startPC());
+    set_target( Target( memory->startPC(), 0));
 
     start_time = std::chrono::high_resolution_clock::now();
 
-    while (!rp_halt->is_ready( curr_cycle))
-    {
-        clean_up_ports( curr_cycle);
-        clock( curr_cycle);
-        curr_cycle.inc();
-    }
+    while (!is_halt())
+        clock();
 
     dump_statistics();
 }
 
 template<typename ISA>
-void PerfSim<ISA>::clock( Cycle cycle)
+bool PerfSim<ISA>::is_halt() const
+{
+    return rp_halt->is_ready( curr_cycle) || force_halt;
+}
+
+template<typename ISA>
+void PerfSim<ISA>::clock()
+{
+    clean_up_ports( curr_cycle);
+    clock_tree( curr_cycle);
+    curr_cycle.inc();
+}
+
+template<typename ISA>
+void PerfSim<ISA>::clock_tree( Cycle cycle)
 {
     writeback.clock( cycle);
     fetch.clock( cycle);

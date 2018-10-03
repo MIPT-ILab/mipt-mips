@@ -4,7 +4,7 @@ notifications:
 language: cpp
 sudo: true
 
-osx_image: xcode9.1
+osx_image: xcode9.4
 
 branches:
   only:
@@ -29,13 +29,11 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-6.0
+    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - lcov
     - g++-7
-    - clang-tidy-6.0
     - libboost-program-options1.54-dev
 
 install:
@@ -59,20 +57,21 @@ before_script:
   - cmake .. -DCMAKE_BUILD_TYPE=Release
 
 script:
-  - make
+  - make all unit-tests
   - ctest --verbose
 
 after_success:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        run-clang-tidy-6.0.py -header-filter='.*'
+        sudo apt-get install clang-tidy-7 --allow-unauthenticated
+        run-clang-tidy-7.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $TRAVIS_BUILD_DIR/simulator
         mkdir debug && cd debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
-        make && ctest
+        make unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
     fi

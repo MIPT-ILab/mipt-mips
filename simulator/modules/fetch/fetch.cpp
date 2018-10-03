@@ -20,20 +20,20 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
     wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
-    rp_flush_target = make_read_port<Addr>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
+    rp_flush_target = make_read_port<Target>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
 
-    wp_target = make_write_port<Addr>("TARGET", PORT_BW, PORT_FANOUT);
-    rp_target = make_read_port<Addr>("TARGET", PORT_LATENCY);
+    wp_target = make_write_port<Target>("TARGET", PORT_BW, PORT_FANOUT);
+    rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
 
-    wp_hold_pc = make_write_port<Addr>("HOLD_PC", PORT_BW, PORT_FANOUT);
-    rp_hold_pc = make_read_port<Addr>("HOLD_PC", PORT_LATENCY);
+    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW, PORT_FANOUT);
+    rp_hold_pc = make_read_port<Target>("HOLD_PC", PORT_LATENCY);
 
-    rp_external_target = make_read_port<Addr>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+    rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
 
     rp_bp_update = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
 
-    wp_long_latency_pc_holder = make_write_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
-    rp_long_latency_pc_holder = make_read_port<Addr>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
+    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
+    rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
 
     wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
     rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
@@ -45,31 +45,31 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 }
 
 template <typename ISA>
-Addr Fetch<ISA>::get_PC( Cycle cycle)
+Target Fetch<ISA>::get_target( Cycle cycle)
 {
     /* receive flush and stall signals */
     const bool is_stall = rp_stall->is_ready( cycle) && rp_stall->read( cycle);
 
     /* Receive all possible PC */
-    const Addr external_PC = rp_external_target->is_ready( cycle) ? rp_external_target->read( cycle) : 0;
-    const Addr hold_PC     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : 0;
-    const Addr flushed_PC  = rp_flush_target->is_ready( cycle) ? rp_flush_target->read( cycle) : 0;
-    const Addr target_PC   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : 0;
+    const Target external_target = rp_external_target->is_ready( cycle) ? rp_external_target->read( cycle) : Target();
+    const Target hold_target     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : Target();
+    const Target flushed_target  = rp_flush_target->is_ready( cycle) ? rp_flush_target->read( cycle) : Target();
+    const Target branch_target   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : Target();
 
     /* Multiplexing */
-    if ( external_PC != 0)
-        return external_PC;
+    if ( external_target.valid)
+        return external_target;
 
-    if( flushed_PC != 0)
-        return flushed_PC;
+    if( flushed_target.valid)
+        return flushed_target;
 
-    if ( !is_stall && target_PC != 0)
-        return target_PC;
+    if ( !is_stall && branch_target.valid)
+        return branch_target;
 
-    if ( hold_PC != 0)
-        return hold_PC;
+    if ( hold_target.valid)
+        return hold_target;
 
-    return 0;
+    return Target();
 }
 
 template <typename ISA>
@@ -86,13 +86,13 @@ void Fetch<ISA>::clock_instr_cache( Cycle cycle)
     if( rp_long_latency_pc_holder->is_ready( cycle))
     {
         /* get PC from long-latency port if it's possible */
-        auto PC = rp_long_latency_pc_holder->read( cycle);
+        auto target = rp_long_latency_pc_holder->read( cycle);
 
         /* write new PC to tags array */
-        tags->write( PC);
+        tags->write( target.address);
 
         /* save PC to the next stage */
-        wp_hold_pc->write( PC, cycle);
+        wp_hold_pc->write( target, cycle);
         return;
     }
     wp_hit_or_miss->write( false, cycle);
@@ -109,36 +109,35 @@ void Fetch<ISA>::save_flush( Cycle cycle)
 }
 
 template <typename ISA>
-Addr Fetch<ISA>::get_cached_PC( Cycle cycle)
+Target Fetch<ISA>::get_cached_target( Cycle cycle)
 {
     /* simulate request to the memory in the case of cache miss */
-    if( rp_hit_or_miss->is_ready( cycle))
+    if ( rp_hit_or_miss->is_ready( cycle))
     {
         save_flush( cycle);
         clock_instr_cache( cycle);
-        return 0;
+        return Target();
     }
 
     /* getting PC */
-    auto PC = get_PC( cycle);
+    auto target = get_target( cycle);
 
     /* push bubble */
-    if( PC == 0)
-        return 0;
+    if ( !target.valid)
+        return Target();
 
     /* hit or miss */
-    auto is_hit = tags->lookup( PC);
+    auto is_hit = tags->lookup( target.address);
 
-    if( !is_hit)
-    {
-        /* send miss to the next cycle */
-        wp_hit_or_miss->write( is_hit, cycle);
+    if ( is_hit)
+        return target;
 
-        /* send PC to cache*/
-        wp_long_latency_pc_holder->write( PC, cycle);
-        return 0;
-    }
-    return PC;
+    /* send miss to the next cycle */
+    wp_hit_or_miss->write( is_hit, cycle);
+
+    /* send PC to cache*/
+    wp_long_latency_pc_holder->write( target, cycle);
+    return Target();
 }
 
 
@@ -148,27 +147,26 @@ void Fetch<ISA>::clock( Cycle cycle)
     clock_bp( cycle);
 
     /* getting PC */
-    auto PC = get_cached_PC( cycle);
+    auto target = get_cached_target( cycle);
 
     /* push bubble */
-    if( PC == 0)
+    if ( !target.valid)
         return;
 
     /* hold PC for the stall case */
-    wp_hold_pc->write( PC, cycle);
+    wp_hold_pc->write( target, cycle);
 
-    Instr instr( memory->fetch_instr( PC), bp->get_bp_info( PC));
+    Instr instr( memory->fetch_instr( target.address), bp->get_bp_info( target.address));
+    instr.set_sequence_id( target.sequence_id);
 
-    /* updating PC according to prediction */
+    /* set next target according to prediction */
     wp_target->write( instr.get_predicted_target(), cycle);
 
-    /* sending to decode */
-    wp_datapath->write( instr, cycle);
-
     /* log */
-    sout << "fetch   cycle " << std::dec << cycle << ": 0x"
-         << std::hex << PC << ": 0x" << instr << std::endl;
+    sout << "fetch   cycle " << std::dec << cycle << ": " << instr << std::endl;
 
+    /* sending to decode */
+    wp_datapath->write( std::move( instr), cycle);
 }
 
 #include <mips/mips.h>

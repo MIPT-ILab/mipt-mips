@@ -17,7 +17,7 @@
 #include <vector>
 
 namespace config {
-    static Value<std::string> bp_mode = { "bp-mode", "dynamic_two_bit", "branch prediction mode"};
+    static Value<std::string> bp_mode = { "bp-mode", "saturating_two_bits", "branch prediction mode"};
     static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
@@ -85,16 +85,9 @@ public:
     }
 };
 
-/*
- *******************************************************************************
- *                                FACTORY CLASS                                *
- *******************************************************************************
- */
 class BPFactory {
-    class BaseBPCreator {
-    public:
-        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries,
-                                               uint32 ways,
+    struct BaseBPCreator {
+        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries, uint32 ways,
                                                uint32 branch_ip_size_in_bits) const = 0;
         BaseBPCreator() = default;
         virtual ~BaseBPCreator() = default;
@@ -105,10 +98,8 @@ class BPFactory {
     };
 
     template<typename T>
-    class BPCreator : public BaseBPCreator {
-    public:
-        std::unique_ptr<BaseBP> create(uint32 size_in_entries,
-                                       uint32 ways,
+    struct BPCreator : BaseBPCreator {
+        std::unique_ptr<BaseBP> create(uint32 size_in_entries, uint32 ways,
                                        uint32 branch_ip_size_in_bits) const final
         {
             return std::make_unique<BP<T>>( size_in_entries,
@@ -124,38 +115,39 @@ class BPFactory {
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static Map generate_map() {
         Map my_map;
-        my_map.emplace("static_always_taken",   std::make_unique<BPCreator<BPEntryAlwaysTaken>>());
-        my_map.emplace("static_backward_jumps", std::make_unique<BPCreator<BPEntryBackwardJumps>>());
-        my_map.emplace("dynamic_one_bit",       std::make_unique<BPCreator<BPEntryOneBit>>());
-        my_map.emplace("dynamic_two_bit",       std::make_unique<BPCreator<BPEntryTwoBit>>());
-        my_map.emplace("adaptive_two_level",    std::make_unique<BPCreator<BPEntryAdaptive<2>>>());
+        my_map.emplace("always_taken", std::make_unique<BPCreator<BPEntryAlwaysTaken>>());
+        my_map.emplace("always_not_taken", std::make_unique<BPCreator<BPEntryAlwaysNotTaken>>());
+        my_map.emplace("backward_jumps", std::make_unique<BPCreator<BPEntryBackwardJumps>>());
+        my_map.emplace("saturating_one_bit", std::make_unique<BPCreator<BPEntryOneBit>>());
+        my_map.emplace("saturating_two_bits", std::make_unique<BPCreator<BPEntryTwoBit>>());
+        my_map.emplace("adaptive_two_levels", std::make_unique<BPCreator<BPEntryAdaptive<2>>>());
         return my_map;
+    }
+
+    void print_map( std::ostream& out) const {
+        out << "Supported branch prediction modes:" << std::endl;
+        for ( const auto& map_name : map)
+            out << "\t" << map_name.first << std::endl;
     }
 
 public:
     BPFactory() : map( generate_map()) { }
 
     auto create( const std::string& name,
-                 uint32 size_in_entries,
-                 uint32 ways,
+                 uint32 size_in_entries, uint32 ways,
                  uint32 branch_ip_size_in_bits = 32) const
     {
         auto it = map.find( name);
-        if ( it == map.end())
-        {
-            std::cout << "Supported branch prediction modes:" << std::endl;
-            for ( const auto& map_name : map)
-                 std::cerr << "\t" << map_name.first << std::endl;
+        if ( it != map.end())
+            return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);
 
-            throw BPInvalidMode( name);
-        }
-
-        return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);
+        print_map(std::cerr);
+        throw BPInvalidMode( name);
     }
 };
 
 std::unique_ptr<BaseBP> BaseBP::create_bp( const std::string& name, uint32 size_in_entries,
-                                                  uint32 ways, uint32 branch_ip_size_in_bits)
+                                           uint32 ways, uint32 branch_ip_size_in_bits)
 {
     static const BPFactory factory;
     return factory.create(name, size_in_entries, ways, branch_ip_size_in_bits);

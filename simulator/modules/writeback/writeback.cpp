@@ -21,7 +21,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     if ( !rp_mem_datapath->is_ready( cycle) && !rp_execute_datapath->is_ready( cycle))
     {
         sout << "bubble\n";
-        if ( cycle >= last_writeback_cycle + 100_Lt)
+        if ( cycle >= last_writeback_cycle + 100_lt)
             throw Deadlock( "");
 
         return;
@@ -64,12 +64,12 @@ void Writeback<ISA>::check( const FuncInstr& instr)
 {
     const auto func_dump = checker.step();
 
-    if ( func_dump.Dump() == instr.Dump())
+    if ( func_dump.is_same_checker(instr))
         return;
     
     std::ostringstream oss;
-    oss << "Checker output: " << func_dump    << std::endl
-        << "PerfSim output: " << instr.Dump() << std::endl;
+    oss << "Checker output: " << func_dump << std::endl
+        << "PerfSim output: " << instr     << std::endl;
 
     throw CheckerMismatch(oss.str());
 }
