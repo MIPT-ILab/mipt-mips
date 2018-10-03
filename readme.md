@@ -36,15 +36,26 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
 MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
-Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about.
+Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
-## Build and test procedure
+## Workflow on Linux
 
-1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory && cd /path/to/your/build/directory`
-1. Run `cmake /path/to/mipt-mips/simulator && make` to get all the binaries in your build directory
-1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
+#### Clone
+  1. Check that your environment meets all the requirements above.
+  1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
+#### Build
+  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
+  1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
+  1. Go to the build directory: `cd /path/to/your/build/directory`
+  1. Run `cmake /path/to/mipt-mips/simulator` to configure CMake
+  1. Run `make` to get the `mipt-mips` binary file
+  1. If you changed some source code files, just type `make` to rebuild project
+#### Run
+  1. Now you can run simulation: `./mipt-mips -b /path/to/mipt-mips/traces/<tracename>.out`
+  1. See more command line options in the paragraph below
+#### Test
+  1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## Command line options
 
