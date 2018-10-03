@@ -37,6 +37,10 @@ protected:
         return get_value( num);
     }
 
+public:
+
+    RF() = default;
+
     void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
     {
         if ( num.is_zero())
@@ -60,9 +64,6 @@ protected:
         get_value( num) &= ~mask;      // Clear old bits
         get_value( num) |= val & mask; // Set new bits
     }
-public:
-
-    RF() = default;
 
     auto read_value( Register num) const {
         return get_value( num);
@@ -83,6 +84,7 @@ public:
     {
         write( instr.get_dst_num(),  instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
         write( instr.get_dst2_num(), instr.get_v_dst2(), instr.get_mask(), instr.get_accumulation_type());
+        write( Register::pc, instr.get_new_PC());
     }
 };
 

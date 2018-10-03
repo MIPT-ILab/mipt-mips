@@ -46,7 +46,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     instr.check_trap();
 
     // PC update
-    PC = instr.get_new_PC();
+    PC = rf.read_value( ISA::Register::pc);
 
     // Check whether we execute nops
     update_and_check_nop_counter( instr);
@@ -56,10 +56,16 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
+void FuncSim<ISA>::set_PC( Addr value) {
+    PC = value;
+    rf.write( ISA::Register::pc, value);
+}
+
+template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
     mem->load_elf_file( tr);
-    PC = mem->startPC();
+    set_PC( mem->startPC());
     nops_in_a_row = 0;
 }
 

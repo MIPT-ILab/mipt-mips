@@ -17,7 +17,6 @@ class TestRF : public RF<MIPS32>
 {
     public:
         using RF<MIPS32>::read;
-        using RF<MIPS32>::write;
 };
 
 static_assert(MIPSRegister::MAX_REG >= 32);
@@ -199,5 +198,29 @@ TEST_CASE( "RF: read_sources_write_dst_rf")
     instr->execute();
     CHECK( instr->get_v_src2() == 1u);
     CHECK( instr->get_v_dst() != NO_VAL64);
+}
+
+TEST_CASE( "RF: PC_on_writeback")
+{
+    auto rf = std::make_unique<TestRF>();
+
+    // Check for automatic PC increment
+    Addr initPC = 0x4000f0u;
+    rf->write( MIPSRegister::pc, initPC);
+    // add $t1, $zero, $zero
+    auto instr = std::make_unique<MIPS32Instr>( 0x00004820, initPC);
+    rf->read_sources( instr.get());
+    instr->execute();
+    rf->write_dst( *instr);
+    CHECK( rf->read_value( MIPSRegister::pc) == initPC + 4);
+
+    // Check for PC set on jump
+    Addr jumpPC = 0x100034 << 2; // 0x4000d0
+    // j 0x100034
+    instr = std::make_unique<MIPS32Instr>( 0x08100034);
+    rf->read_sources( instr.get());
+    instr->execute();
+    rf->write_dst( *instr);
+    CHECK( rf->read_value( MIPSRegister::pc) == jumpPC);
 }
 
