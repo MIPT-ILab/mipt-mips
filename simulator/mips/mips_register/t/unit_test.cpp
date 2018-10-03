@@ -50,6 +50,7 @@ TEST_CASE( "MIPS_registers: Hi_Lo_impossible")
         MIPSRegister reg(i);
         CHECK_FALSE(reg.is_mips_hi());
         CHECK_FALSE(reg.is_mips_lo());
+        CHECK_FALSE(reg.is_pc());
     }
 }
 
@@ -59,6 +60,7 @@ TEST_CASE( "MIPS_registers: Zero")
     CHECK(reg.is_zero());
     CHECK_FALSE(reg.is_mips_hi());
     CHECK_FALSE(reg.is_mips_lo());
+    CHECK_FALSE(reg.is_pc());
     CHECK(reg.to_size_t() == 0);
 }
 
@@ -68,6 +70,7 @@ TEST_CASE( "MIPS_registers: Return_address")
     CHECK_FALSE(reg.is_zero());
     CHECK_FALSE(reg.is_mips_hi());
     CHECK_FALSE(reg.is_mips_lo());
+    CHECK_FALSE(reg.is_pc());
     CHECK(reg.to_size_t() == 31);
 }
 
@@ -77,6 +80,7 @@ TEST_CASE( "MIPS_registers: Hi_register")
     CHECK_FALSE(reg.is_zero());
     CHECK(reg.is_mips_hi());
     CHECK_FALSE(reg.is_mips_lo());
+    CHECK_FALSE(reg.is_pc());
     CHECK_FALSE(reg.to_size_t() < 32);
 }
 
@@ -86,6 +90,16 @@ TEST_CASE( "MIPS_registers: Lo_register")
     CHECK_FALSE(reg.is_zero());
     CHECK_FALSE(reg.is_mips_hi());
     CHECK(reg.is_mips_lo());
+    CHECK_FALSE(reg.is_pc());
     CHECK_FALSE(reg.to_size_t() < 32);
 }
 
+TEST_CASE( "MIPS_registers: PC_register")
+{
+    auto reg = MIPSRegister::pc;
+    CHECK_FALSE(reg.is_zero());
+    CHECK_FALSE(reg.is_mips_hi());
+    CHECK_FALSE(reg.is_mips_lo());
+    CHECK(reg.is_pc());
+    CHECK_FALSE(reg.to_size_t() < 32);
+}

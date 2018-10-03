@@ -66,6 +66,7 @@ TEST_CASE( "RISCV_registers: return_address")
     CHECK_FALSE( reg.is_zero());
     CHECK_FALSE( reg.is_mips_hi());
     CHECK_FALSE( reg.is_mips_lo());
+    CHECK_FALSE( reg.is_pc());
 }
 
 TEST_CASE( "RISCV_registers: Zero")
@@ -74,5 +75,14 @@ TEST_CASE( "RISCV_registers: Zero")
     CHECK( reg.is_zero());
     CHECK_FALSE( reg.is_mips_hi());
     CHECK_FALSE( reg.is_mips_lo());
+    CHECK_FALSE( reg.is_pc());
 }
 
+TEST_CASE( "RISCV_registers: PC")
+{
+    auto reg = RISCVRegister::pc;
+    CHECK_FALSE( reg.is_zero());
+    CHECK_FALSE( reg.is_mips_hi());
+    CHECK_FALSE( reg.is_mips_lo());
+    CHECK( reg.is_pc());
+}
