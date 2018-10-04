@@ -12,11 +12,11 @@
 #include "mips_version.h"
 
 // MIPT-MIPS modules
+#include <func_sim/trap_types.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <func_sim/trap_types.h>
 #include <kryucow_string.h>
 
 // Generic C++
