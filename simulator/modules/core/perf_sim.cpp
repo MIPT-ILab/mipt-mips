@@ -37,7 +37,7 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
-void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+Trap PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     force_halt = false;
     memory->load_elf_file( tr);
@@ -53,6 +53,8 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
         clock();
 
     dump_statistics();
+
+    return Trap::NO_TRAP;
 }
 
 template<typename ISA>

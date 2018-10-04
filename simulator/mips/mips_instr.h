@@ -12,6 +12,7 @@
 #include "mips_version.h"
 
 // MIPT-MIPS modules
+#include <func_sim/trap_types.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
@@ -84,12 +85,7 @@ class BaseMIPSInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
-        enum class TrapType : uint8
-        {
-            NO_TRAP,
-            EXPLICIT_TRAP,
-            UNALIGNED_ADDRESS,
-        } trap = TrapType::NO_TRAP;
+        Trap trap = Trap::NO_TRAP;
 
         // Endian specific
         const union _instr
@@ -278,19 +274,26 @@ class BaseMIPSInstr
         void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
         void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
 
+        void check_halt_trap() {
+            if (new_PC == 0)
+                trap = Trap::HALT;
+        }
+
         // Function-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
         void execute_set() { v_dst = (this->*p)(); }
 
         template<Predicate p>
-        void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_trap() { if ((this->*p)()) trap = Trap::EXPLICIT_TRAP; }
 
         template<Predicate p>
         void execute_branch()
         {
             _is_jump_taken = (this->*p)();
-            if ( _is_jump_taken)
+            if ( _is_jump_taken) {
                 new_PC += sign_extend() * 4;
+                check_halt_trap();
+            }
         }
 
         void execute_clo()  { v_dst = count_leading_ones<uint32>( v_src1); }
@@ -302,12 +305,13 @@ class BaseMIPSInstr
         {
             _is_jump_taken = true;
             new_PC = target;
+            check_halt_trap();
         }
 
         void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
         void execute_jr() {
             if (v_src1 % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
             execute_jump(align_up<2>(v_src1));
         }
 
@@ -326,11 +330,12 @@ class BaseMIPSInstr
             {
                 v_dst = new_PC;
                 new_PC += sign_extend() * 4;
+                check_halt_trap();
             }
         }
 
-        void execute_syscall(){ };
-        void execute_break()  { };
+        void execute_syscall() { trap = Trap::SYSCALL; };
+        void execute_break()   { trap = Trap::BREAKPOINT; };
 
         void execute_unknown();
         void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
@@ -344,7 +349,7 @@ class BaseMIPSInstr
         void calculate_load_addr_aligned() {
             calculate_load_addr();
             if ( mem_addr % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
         }
 
         void calculate_load_addr_right32() {
@@ -379,7 +384,7 @@ class BaseMIPSInstr
         void calculate_store_addr_aligned() {
             calculate_store_addr();
             if ( mem_addr % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
         }
 
         void calculate_store_addr_right32() {
@@ -439,7 +444,7 @@ class BaseMIPSInstr
         bool is_store() const { return operation == OUT_I_STORE; }
 
         bool is_nop() const { return instr.raw == 0x0u; }
-        bool is_halt() const { return is_jump() && new_PC == 0; }
+        bool is_halt() const { return trap_type() == Trap::HALT; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
@@ -450,7 +455,9 @@ class BaseMIPSInstr
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
-        bool has_trap() const { return trap != TrapType::NO_TRAP; }
+        bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+
+        Trap trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 
