@@ -472,7 +472,7 @@ std::ostream& BaseMIPSInstr<RegisterUInt>::dump( std::ostream& out) const
             out << ", $" << dst2 << " = 0x" << v_dst2;
         out << " ]";
     }
-    if ( trap != TrapType::NO_TRAP)
+    if ( trap != Trap::NO_TRAP)
         out << "\t trap";
 
     out << std::dec;

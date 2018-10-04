@@ -16,6 +16,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
+#include <infra/trap_types.h>
 #include <kryucow_string.h>
 
 // Generic C++
@@ -84,12 +85,7 @@ class BaseMIPSInstr
             OUT_UNKNOWN
         } operation = OUT_UNKNOWN;
 
-        enum class TrapType : uint8
-        {
-            NO_TRAP,
-            EXPLICIT_TRAP,
-            UNALIGNED_ADDRESS,
-        } trap = TrapType::NO_TRAP;
+        Trap trap = Trap::NO_TRAP;
 
         // Endian specific
         const union _instr
@@ -283,7 +279,7 @@ class BaseMIPSInstr
         void execute_set() { v_dst = (this->*p)(); }
 
         template<Predicate p>
-        void execute_trap() { if ((this->*p)()) trap = TrapType::EXPLICIT_TRAP; }
+        void execute_trap() { if ((this->*p)()) trap = Trap::EXPLICIT_TRAP; }
 
         template<Predicate p>
         void execute_branch()
@@ -307,7 +303,7 @@ class BaseMIPSInstr
         void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
         void execute_jr() {
             if (v_src1 % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
             execute_jump(align_up<2>(v_src1));
         }
 
@@ -329,8 +325,8 @@ class BaseMIPSInstr
             }
         }
 
-        void execute_syscall(){ };
-        void execute_break()  { };
+        void execute_syscall() { trap = Trap::SYSCALL; };
+        void execute_break()   { trap = Trap::BREAKPOINT; };
 
         void execute_unknown();
         void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
@@ -344,7 +340,7 @@ class BaseMIPSInstr
         void calculate_load_addr_aligned() {
             calculate_load_addr();
             if ( mem_addr % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
         }
 
         void calculate_load_addr_right32() {
@@ -379,7 +375,7 @@ class BaseMIPSInstr
         void calculate_store_addr_aligned() {
             calculate_store_addr();
             if ( mem_addr % 4 != 0)
-                trap = TrapType::UNALIGNED_ADDRESS;
+                trap = Trap::UNALIGNED_ADDRESS;
         }
 
         void calculate_store_addr_right32() {
@@ -450,7 +446,9 @@ class BaseMIPSInstr
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
-        bool has_trap() const { return trap != TrapType::NO_TRAP; }
+        bool has_trap() const { return trap != Trap::NO_TRAP; }
+
+        Trap trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
 

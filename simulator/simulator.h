@@ -9,6 +9,7 @@
 #include <infra/log.h>
 #include <infra/target.h>
 #include <infra/types.h>
+#include <infra/trap_types.h>
  
 #include <memory>
 
@@ -16,8 +17,11 @@ class Simulator : public Log {
 public:
     explicit Simulator( bool log = false) : Log( log) {}
 
-    virtual void run( const std::string& tr, uint64 instrs_to_run) = 0;
-    void run_no_limit( const std::string& tr) { run( tr, MAX_VAL64); }
+    enum class StopReason : int { Halted, TrapHit, Error };
+    using RunResult = std::pair<StopReason, Trap>;
+
+    virtual RunResult run( const std::string& tr, uint64 instrs_to_run) = 0;
+    RunResult run_no_limit( const std::string& tr) { return run( tr, MAX_VAL64); }
     virtual void set_target( const Target& target) = 0;
 
     static std::unique_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
