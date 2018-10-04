@@ -50,8 +50,6 @@ TEST_CASE( "Torture_Test: Func_Sim")
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
-    auto [stopReason, trapType] = FuncSim<MIPS32>().run_no_limit( smc_code);
-    CHECK( stopReason == Simulator::StopReason::TrapHit);
-    CHECK( trapType == Trap::SYSCALL);
+    CHECK( FuncSim<MIPS32>().run_no_limit( smc_code) == Trap::SYSCALL);
 }
 

@@ -37,7 +37,7 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
-Simulator::RunResult PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+Trap PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     force_halt = false;
     memory->load_elf_file( tr);
@@ -54,7 +54,7 @@ Simulator::RunResult PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_
 
     dump_statistics();
 
-    return std::make_pair( StopReason::Halted, Trap::NO_TRAP);
+    return Trap::NO_TRAP;
 }
 
 template<typename ISA>

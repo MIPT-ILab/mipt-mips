@@ -13,7 +13,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <infra/trap_types.h>
+#include <func_sim/trap_types.h>
 
 // Generic C++
 #include <array>

@@ -12,6 +12,7 @@
 enum class Trap : uint8
 {
     NO_TRAP,
+    HALT,
     EXPLICIT_TRAP,
     BREAKPOINT,
     SYSCALL,

@@ -41,7 +41,7 @@ class FuncSim : public Simulator
 
         void init( const std::string& tr);
         FuncInstr step();
-        RunResult run(const std::string& tr, uint64 instrs_to_run) final;
+        Trap run(const std::string& tr, uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;

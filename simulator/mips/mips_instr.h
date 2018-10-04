@@ -16,7 +16,7 @@
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <infra/trap_types.h>
+#include <func_sim/trap_types.h>
 #include <kryucow_string.h>
 
 // Generic C++
@@ -274,6 +274,11 @@ class BaseMIPSInstr
         void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
         void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
 
+        void check_halt_trap() {
+            if (new_PC == 0)
+                trap = Trap::HALT;
+        }
+
         // Function-templated method is a little-known feature of C++, but useful here
         template<Predicate p>
         void execute_set() { v_dst = (this->*p)(); }
@@ -285,8 +290,10 @@ class BaseMIPSInstr
         void execute_branch()
         {
             _is_jump_taken = (this->*p)();
-            if ( _is_jump_taken)
+            if ( _is_jump_taken) {
                 new_PC += sign_extend() * 4;
+                check_halt_trap();
+            }
         }
 
         void execute_clo()  { v_dst = count_leading_ones<uint32>( v_src1); }
@@ -298,6 +305,7 @@ class BaseMIPSInstr
         {
             _is_jump_taken = true;
             new_PC = target;
+            check_halt_trap();
         }
 
         void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
@@ -322,6 +330,7 @@ class BaseMIPSInstr
             {
                 v_dst = new_PC;
                 new_PC += sign_extend() * 4;
+                check_halt_trap();
             }
         }
 
@@ -435,7 +444,7 @@ class BaseMIPSInstr
         bool is_store() const { return operation == OUT_I_STORE; }
 
         bool is_nop() const { return instr.raw == 0x0u; }
-        bool is_halt() const { return is_jump() && new_PC == 0; }
+        bool is_halt() const { return trap_type() == Trap::HALT; }
 
         bool is_conditional_move() const { return operation == OUT_R_CONDM; }
 
@@ -446,7 +455,7 @@ class BaseMIPSInstr
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
-        bool has_trap() const { return trap != Trap::NO_TRAP; }
+        bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
 
         Trap trap_type() const { return trap; }
 
