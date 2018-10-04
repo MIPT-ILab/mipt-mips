@@ -10,10 +10,10 @@
 #include "riscv_register/riscv_register.h"
 
 // MIPT-MIPS modules
+#include <func_sim/trap_types.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <func_sim/trap_types.h>
 
 // Generic C++
 #include <array>
