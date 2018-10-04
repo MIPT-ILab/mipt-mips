@@ -64,15 +64,17 @@ void FuncSim<ISA>::init( const std::string& tr)
 }
 
 template <typename ISA>
-void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+Trap FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
-        if ( instr.is_halt())
-            break;
+
+        if ( instr.has_trap())
+            return instr.trap_type();
     }
+    return Trap::NO_TRAP;
 }
 
 #include <mips/mips.h>

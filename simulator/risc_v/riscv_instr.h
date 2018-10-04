@@ -10,6 +10,7 @@
 #include "riscv_register/riscv_register.h"
 
 // MIPT-MIPS modules
+#include <func_sim/trap_types.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
@@ -81,6 +82,8 @@ class RISCVInstr
         constexpr bool is_special() const { return false; }
 
         constexpr bool has_trap() const { return false; }
+
+        Trap trap_type() const { return Trap::NO_TRAP; }
 
         constexpr bool get_writes_dst() const { return false; }
 
