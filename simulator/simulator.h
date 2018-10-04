@@ -6,10 +6,10 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include <func_sim/trap_types.h>
 #include <infra/log.h>
 #include <infra/target.h>
 #include <infra/types.h>
-#include <func_sim/trap_types.h>
  
 #include <memory>
 
