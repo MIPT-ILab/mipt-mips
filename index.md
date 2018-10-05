@@ -12,7 +12,7 @@ Date | Event name
 :----: | ----------------------------
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
 19 Sep | **Layers of Computer Science, ISA and uArch**<br/> • [Slides](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Layers%20of%20Computer%20Science.pptx?raw=true)
-03 Oct | **Combinational Circuits and CMOS implementation**<br/> • Slides<br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
+03 Oct | **Combinational Circuits and CMOS implementation**<br/> • Slides, [YouTube](https://youtu.be/zDldV01U5MQ) <br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
 17 Oct | **Sequential Circuits**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
