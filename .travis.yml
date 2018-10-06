@@ -29,7 +29,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main
+    - llvm-toolchain-trusty-7
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
