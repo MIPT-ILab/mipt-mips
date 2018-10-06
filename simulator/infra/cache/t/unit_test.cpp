@@ -180,7 +180,7 @@ static void test( const std::vector<Addr>& values, uint32 associativity, uint32 
     CHECK( misses == golden.at({associativity, _size}).misses);
 }
 
-static std::vector<uint32> read_values()
+static std::vector<Addr> read_values()
 {
     const std::string MEM_TRACE_FILENAME = TEST_DATA_PATH "mem_trace.txt";
 
@@ -190,7 +190,7 @@ static std::vector<uint32> read_values()
     CHECK( mem_trace_file.is_open());
     
     Addr addr;
-    std::vector<uint32> values;
+    std::vector<Addr> values;
     values.reserve(100000);
     while ( mem_trace_file >> std::hex >> addr)
         values.push_back(addr);
