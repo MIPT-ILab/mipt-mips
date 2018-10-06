@@ -102,7 +102,7 @@ template<> struct doubled<int64>  { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
-using Addr = uint32;
+using Addr = uint64;
 
 // The following consts are used to initialize some variables
 // as something that has invalid value.
