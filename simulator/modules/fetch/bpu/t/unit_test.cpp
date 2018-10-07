@@ -39,7 +39,7 @@ TEST_CASE( "Static, all branches taken")
 
 TEST_CASE( "One bit predictor")
 {
-    auto bp = BaseBP::create_bp( "saturating_two_bits", 128, 16);
+    auto bp = BaseBP::create_bp( "saturating_one_bit", 128, 16);
 
     Addr PC = 28;
     Addr target = 12;
