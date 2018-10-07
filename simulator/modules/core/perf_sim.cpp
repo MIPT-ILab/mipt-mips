@@ -5,6 +5,8 @@
 
 #include "perf_sim.h"
 
+#include <infra/memory/elf/elf_loader.h>
+
 #include <chrono>
 #include <iostream>
 
@@ -40,7 +42,7 @@ template<typename ISA>
 Trap PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     force_halt = false;
-    memory->load_elf_file( tr);
+    ::load_elf_file( memory.get(), tr);
 
     writeback.init_checker( tr);
     writeback.set_instrs_to_run( instrs_to_run);
