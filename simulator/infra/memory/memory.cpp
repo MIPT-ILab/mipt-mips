@@ -7,9 +7,6 @@
 
 #include "memory.h"
 
-// ELFIO
-#include <elfio/elfio.hpp>
-
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
@@ -45,29 +42,6 @@ FuncMemory::FuncMemory( uint32 addr_bits,
         throw FuncMemoryBadMapping("Each page is too large ("s + std::to_string(page_size) + " bytes)");
 
     memory.resize(set_cnt);
-}
-
-void FuncMemory::load_elf_file( const std::string& executable_file_name)
-{
-    ELFIO::elfio reader;
-
-    if ( !reader.load( executable_file_name))
-        throw InvalidElfFile( executable_file_name);
-
-    for ( const auto& section : reader.sections)
-        load_elf_section( section);
-}
-
-void FuncMemory::load_elf_section( const ELFIO::section* section)
-{
-    if ( section->get_address() == 0)
-        return;
-
-    if ( section->get_name() == ".text")
-        startPC_addr = section->get_address();
-
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
-    memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
 }
 
 void FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)

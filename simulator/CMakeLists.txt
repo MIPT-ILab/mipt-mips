@@ -24,6 +24,7 @@ endif()
 
 set(CPPS infra/macro_test.cpp
     infra/memory/memory.cpp
+    infra/memory/elf/elf_loader.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp

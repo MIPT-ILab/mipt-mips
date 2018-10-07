@@ -14,16 +14,8 @@
 #include <infra/types.h>
 
 // Generic C++
-#include <stdexcept>
 #include <string>
 #include <vector>
-
-struct InvalidElfFile final : Exception
-{
-    explicit InvalidElfFile(const std::string& name)
-        : Exception("Invalid elf file", name)
-    { }
-};
 
 struct FuncMemoryBadMapping final : Exception
 {
@@ -31,11 +23,6 @@ struct FuncMemoryBadMapping final : Exception
         : Exception("Invalid FuncMemory mapping", msg)
     { }
 };
-
-namespace ELFIO {
-    class section;
-} // namespace ELFIO
-
 class FuncMemory
 {
     public:
@@ -49,10 +36,12 @@ class FuncMemory
         template<typename T>
         void write( T value, Addr addr, T mask = all_ones<T>());
 
-        uint64 startPC() const { return startPC_addr; }
+        Addr startPC() const { return startPC_addr; }
+        void set_startPC(Addr value) { startPC_addr = value; }
+
         std::string dump() const;
         
-        void load_elf_file(const std::string& executable_file_name);
+        void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
@@ -89,9 +78,6 @@ class FuncMemory
         void alloc( Addr addr);
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
-        void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
-        
-        void load_elf_section( const ELFIO::section* section);
 };
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

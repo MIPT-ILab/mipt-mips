@@ -9,6 +9,7 @@
 #include <catch.hpp>
 
 // Module
+#include <infra/memory/elf/elf_loader.h>    
 #include <mips/mips.h>
 #include <modules/writeback/writeback.h>
 

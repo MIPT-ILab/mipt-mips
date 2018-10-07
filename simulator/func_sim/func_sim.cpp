@@ -4,6 +4,7 @@
  */
  
 #include "func_sim.h"
+#include <infra/memory/elf/elf_loader.h>
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new Memory) { }
@@ -58,7 +59,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    mem->load_elf_file( tr);
+    ::load_elf_file( mem.get(), tr);
     PC = mem->startPC();
     nops_in_a_row = 0;
 }
