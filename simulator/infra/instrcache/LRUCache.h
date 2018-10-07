@@ -36,20 +36,18 @@ class LRUCache
             return std::pair<bool, const Value&>( result != data.end(), result->second);
         }
 
+        void touch( const Key& key)
+        {
+            auto lru_it  = lru_hash.find( key);
+            lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
+        }
+
         void update( const Key& key, const Value& value)
         {
-            auto data_it = data.find( key);
-            auto lru_it  = lru_hash.find( key);
-            assert ( ( data_it == data.end()) == ( lru_it == lru_hash.end()));
-            if ( data_it == data.end())
-            {
+            if ( data.find( key) == data.end())
                 allocate( key, value);
-            }
             else
-            {
-                assert( data_it->second.is_same( value));
-                lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
-            }
+                touch( key);
         }
 
         void erase( const Key& key)
@@ -94,18 +92,6 @@ class LRUCache
         std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
 
         std::size_t number_of_elements = 0u;
-};
-
-template <typename Value, size_t CAPACITY>
-class AddressLRUCache : public LRUCache<Addr, Value, CAPACITY>
-{
-public:
-    void range_erase( Addr start_address, size_t size)
-    {
-        Addr end_address = start_address + size;
-        for (Addr i = start_address; i < end_address; ++i)
-            this->erase( i);
-    }
 };
 
 #endif // LRUCACHE_H

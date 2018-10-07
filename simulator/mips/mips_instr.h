@@ -404,8 +404,12 @@ class BaseMIPSInstr
     public:
         BaseMIPSInstr() = delete;
 
+        bool is_same_bytes( uint32 bytes) const {
+            return instr.raw == bytes;
+        }
+
         bool is_same( const BaseMIPSInstr& rhs) const {
-            return PC == rhs.PC && instr.raw == rhs.instr.raw;
+            return PC == rhs.PC && is_same_bytes( rhs.instr.raw);
         }
         
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
