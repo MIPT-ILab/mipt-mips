@@ -23,6 +23,9 @@ TEST_CASE( "Static, all branches not taken")
     Addr target = 12;
 
     bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target));
+
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
 }
