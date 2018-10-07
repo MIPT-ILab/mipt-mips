@@ -38,8 +38,7 @@ class LRUCache
 
         void touch( const Key& key)
         {
-            auto lru_it  = lru_hash.find( key);
-            lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
+            lru_list.splice( lru_list.begin(), lru_list, lru_hash.find( key)->second);
         }
 
         void update( const Key& key, const Value& value)
@@ -70,20 +69,13 @@ class LRUCache
         void allocate( const Key& key, const Value& value)
         {
             if ( number_of_elements == CAPACITY)
-            {
-                // Delete least recently used element
-                const auto& lru_elem = lru_list.back();
-                lru_hash.erase( lru_elem);
-                data.erase( lru_elem);
-                lru_list.pop_back();
-            }
-            else {
-                 number_of_elements++;
-            }
+                erase( lru_list.back());
+
             // Add a new element
             data.emplace( key, value);
             auto ptr = lru_list.insert( lru_list.begin(), key);
             lru_hash.emplace( key, ptr);
+            number_of_elements++;
         }
 
         std::unordered_map<Key, Value> data{};
