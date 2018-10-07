@@ -26,16 +26,16 @@ TEST_CASE( "Static, all branches not taken")
     CHECK( bp->get_target(PC) == target);
 }
 
-//TEST_CASE( "Static, all branches taken")
-//{
-//    auto bp = BaseBP::create_bp( "always_taken", 128, 16);
-//
-//    Addr PC = 28;
-//    Addr target = 12;
-//    
-//    CHECK( bp->is_taken(PC) );
-//    CHECK( bp->get_target(PC) == target);
-//}
+TEST_CASE( "Static, all branches taken")
+{
+    auto bp = BaseBP::create_bp( "always_taken", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+    
+    //CHECK( bp->is_taken(PC) );
+    //CHECK( bp->get_target(PC) == target);
+}
 
 TEST_CASE( "One bit predictor")
 {
