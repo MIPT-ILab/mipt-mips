@@ -24,7 +24,7 @@ TEST_CASE( "Static, all branches not taken")
 
     bp->update( BPInterface( PC, false, target));
     CHECK_FALSE( bp->is_taken(PC) );
-    //CHECK( bp->get_target(PC) == target);
+    CHECK_FALSE( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Static, all branches taken")
