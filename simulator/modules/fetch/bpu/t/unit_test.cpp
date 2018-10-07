@@ -17,22 +17,28 @@ TEST_CASE( "Initialization: WrongParameters")
 
 TEST_CASE( "Static, all branches not taken")
 {
+    auto bp = BaseBP::create_bp( "always_not_taken", 128, 16);
 
+    Addr PC = 28;
+    Addr target = 12;
+    
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Static, all branches taken")
 {
+    auto bp = BaseBP::create_bp( "always_taken", 128, 16);
 
+    Addr PC = 28;
+    Addr target = 12;
+    
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "One bit predictor")
 {
-
-}
-
-TEST_CASE( "Two bit predictor, basic")
-{
-    /* backward jumps */
     auto bp = BaseBP::create_bp( "saturating_two_bits", 128, 16);
 
     Addr PC = 28;
@@ -41,7 +47,18 @@ TEST_CASE( "Two bit predictor, basic")
     bp->update( BPInterface( PC, true, target));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
+}
 
+TEST_CASE( "Two bit predictor, basic")
+{
+    auto bp = BaseBP::create_bp( "saturating_two_bits", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+    
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Two bit predictor, advanced")
