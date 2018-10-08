@@ -8,8 +8,8 @@
 #include <catch.hpp>
 
 // MIPT-MIPS modules
-#include "../memory.h"
 #include "../elf/elf_loader.h"
+#include "../memory.h"
 
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
