@@ -84,8 +84,10 @@ TEST_CASE( "One bit predictor in case of changed target")
 
     Addr PC = 28;
     Addr target = 12;
-    
+ 
+    //learn   
     bp->update( BPInterface( PC, true, target));
+    //change the target
     target = 16;
     bp->update( BPInterface( PC, true, target));
     CHECK( bp->get_target(PC) == target);
@@ -194,6 +196,37 @@ TEST_CASE( "Adaptive two bit prediction")
     bp->update( BPInterface( PC, false, target));
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
+}
+
+TEST_CASE( "Adaptive two bit prediction in case of changed target")
+{
+    auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
+
+    Addr PC = 12;
+    Addr target = 28;
+
+    // Learn in sequence 001001001
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    //change the target
+    target = 24;
+    //update the target
+    bp->update( BPInterface( PC, true, target));
+
+    //check if the target was updated
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Cache Miss")
