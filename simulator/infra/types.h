@@ -120,7 +120,7 @@ static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
 // Replace it with std::endian if C++20 is shipped
-enum class endian
+enum class Endian
 {
 #ifdef _WIN32
     little = 0,
