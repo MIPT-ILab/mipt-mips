@@ -42,6 +42,30 @@ TEST_CASE( "Static, all branches taken")
     CHECK( bp->get_target(PC) == target);
 }
 
+TEST_CASE( "Backward only branches taken")
+{
+    auto bp = BaseBP::create_bp( "backward_jumps", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+}
+
+TEST_CASE( "Backward only branches taken in case of forward jump")
+{
+    auto bp = BaseBP::create_bp( "backward_jumps", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 36;
+
+    bp->update( BPInterface( PC, true, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
+}
+
 TEST_CASE( "One bit predictor")
 {
     auto bp = BaseBP::create_bp( "saturating_one_bit", 128, 16);
@@ -51,6 +75,19 @@ TEST_CASE( "One bit predictor")
     
     bp->update( BPInterface( PC, true, target));
     CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+}
+
+TEST_CASE( "One bit predictor in case of changed target")
+{
+    auto bp = BaseBP::create_bp( "saturating_one_bit", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+    
+    bp->update( BPInterface( PC, true, target));
+    target = 16;
+    bp->update( BPInterface( PC, true, target));
     CHECK( bp->get_target(PC) == target);
 }
 
