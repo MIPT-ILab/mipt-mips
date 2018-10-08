@@ -54,7 +54,7 @@ TEST_CASE( "Backward only branches taken")
     CHECK( bp->get_target(PC) == target);
 }
 
-TEST_CASE( "Backward only branches taken case of forward jump")
+TEST_CASE( "Backward only branches taken in case of forward jump")
 {
     auto bp = BaseBP::create_bp( "backward_jumps", 128, 16);
 
