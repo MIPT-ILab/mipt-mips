@@ -11,34 +11,12 @@
 #include <infra/memory/memory.h>
 #include <infra/types.h>
 
-#ifndef INSTR_CACHE_CAPACITY
-#define INSTR_CACHE_CAPACITY 8192
-#endif
-
 template<typename Instr>
 class InstrMemory : public FuncMemory
 {
-    private:
-        LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
-
-    public:
+public:
         auto fetch( Addr pc) const { return read<uint32>( pc); }
-
-        Instr fetch_instr( Addr PC)
-        {
-            const auto [found, value] = instr_cache.find( PC);
-            auto true_bytes = fetch( PC);
-            if ( found && value.is_same_bytes( true_bytes)) {
-                instr_cache.touch( PC);
-                return value;
-            }
-            if ( found)
-                instr_cache.erase( PC);
-
-            Instr instr( true_bytes, PC);
-            instr_cache.update( PC, instr);
-            return instr;
-        }
+        auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 
         void load( Instr* instr) const
         {
@@ -60,6 +38,32 @@ class InstrMemory : public FuncMemory
                 load(instr);
             else if (instr->is_store())
                 store(*instr);
+        }
+};
+
+#ifndef INSTR_CACHE_CAPACITY
+#define INSTR_CACHE_CAPACITY 8192
+#endif
+
+template<typename Instr>
+class InstrMemoryCached : public InstrMemory<Instr>
+{
+        LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
+    public:
+        Instr fetch_instr( Addr PC)
+        {
+            const auto [found, value] = instr_cache.find( PC);
+            auto true_bytes = this->fetch( PC);
+            if ( found && value.is_same_bytes( true_bytes)) {
+                instr_cache.touch( PC);
+                return value;
+            }
+            if ( found)
+                instr_cache.erase( PC);
+
+            const Instr& instr = InstrMemory<Instr>::fetch_instr( PC);
+            instr_cache.update( PC, instr);
+            return instr;
         }
 };
 
