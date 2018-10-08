@@ -9,26 +9,38 @@
 #include <elfio/elfio.hpp>
 #include <infra/memory/memory.h>
 
-static void load_elf_section( FuncMemory* memory, const ELFIO::section* section)
+static void load_elf_section( FuncMemory* memory, const ELFIO::section& section)
 {
-    if ( section->get_address() == 0)
-        return;
-
-    if ( section->get_name() == ".text")
-        memory->set_startPC( section->get_address());
-
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
-    memory->memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
+    memory->memcpy_host_to_guest( section.get_address(), reinterpret_cast<const Byte*>(section.get_data()), section.get_size());
 }
 
+static void set_startPC( FuncMemory* memory, const ELFIO::elfio& reader)
+{
+    if ( reader.sections[ ".text"] != nullptr)
+        memory->set_startPC( reader.sections[ ".text"]->get_address());
+}
 
-void load_elf_file( FuncMemory* memory, const std::string& executable_file_name)
+static void load_all_elf_sections( FuncMemory* memory, const ELFIO::elfio& reader)
+{
+    for ( const auto& section : reader.sections)
+        if ( section->get_address() != 0)
+            load_elf_section( memory, *section);
+}
+
+static ELFIO::elfio get_elfio_reader( const std::string& filename)
 {
     ELFIO::elfio reader;
 
-    if ( !reader.load( executable_file_name))
-        throw InvalidElfFile( executable_file_name);
+    if ( !reader.load( filename))
+        throw InvalidElfFile( filename);
 
-    for ( const auto& section : reader.sections)
-        load_elf_section( memory, section);
+    return reader;
+}
+
+void load_elf_file( FuncMemory* memory, const std::string& filename)
+{
+    const auto& reader = get_elfio_reader( filename);
+    load_all_elf_sections( memory, reader);
+    set_startPC( memory, reader);
 }
