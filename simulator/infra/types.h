@@ -119,4 +119,18 @@ static const uint16 MAX_VAL16 = UINT16_MAX;
 static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
+// Replace it with std::endian if C++20 is shipped
+enum class Endian
+{
+#ifdef _WIN32
+    little = 0,
+    big    = 1,
+    native = little
+#else
+    little = __ORDER_LITTLE_ENDIAN__,
+    big    = __ORDER_BIG_ENDIAN__,
+    native = __BYTE_ORDER__
+#endif
+};
+
 #endif // #ifndef COMMON__TYPES_H
