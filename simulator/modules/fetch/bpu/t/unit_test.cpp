@@ -159,7 +159,41 @@ TEST_CASE( "Two bit predictor, advanced")
 
 TEST_CASE( "Adaptive two bit prediction")
 {
+    auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
 
+    Addr PC = 12;
+    Addr target = 28;
+
+    // Learn in sequence 001001001
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    //check prediction on 00 sequence
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+
+    //check prediction on 01 sequence
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
+
+    //check prediction on 10 sequence
+    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
 }
 
 TEST_CASE( "Cache Miss")
