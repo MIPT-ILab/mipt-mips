@@ -53,7 +53,7 @@ class InstrMemoryCached : public InstrMemory<Instr>
         Instr fetch_instr( Addr PC)
         {
             const auto [found, value] = instr_cache.find( PC);
-            auto true_bytes = fetch( PC);
+            auto true_bytes = this->fetch( PC);
             if ( found && value.is_same_bytes( true_bytes)) {
                 instr_cache.touch( PC);
                 return value;
