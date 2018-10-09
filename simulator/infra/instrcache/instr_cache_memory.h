@@ -65,6 +65,17 @@ class InstrMemoryCached : public InstrMemory<Instr>
             instr_cache.update( PC, instr);
             return instr;
         }
+
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+        {
+            //instr_cache.range_erase( dst, size);
+            return FuncMemory::memcpy_host_to_guest( dst, src, size);
+        }
+
+        size_t memcpy_guest_to_host( Byte *dst, Addr src, size_t size)
+        {
+            return FuncMemory::memcpy_guest_to_host( dst, src, size);
+        }
 };
 
 #endif // INSTR_CACHE_H
