@@ -17,22 +17,84 @@ TEST_CASE( "Initialization: WrongParameters")
 
 TEST_CASE( "Static, all branches not taken")
 {
+    auto bp = BaseBP::create_bp( "always_not_taken", 128, 16);
 
+    Addr PC = 28;
+    Addr target = 12;
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target));
+
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
 }
 
 TEST_CASE( "Static, all branches taken")
 {
+    auto bp = BaseBP::create_bp( "always_taken", 128, 16);
 
+    Addr PC = 28;
+    Addr target = 12;
+
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+}
+
+TEST_CASE( "Backward only branches taken")
+{
+    auto bp = BaseBP::create_bp( "backward_jumps", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+}
+
+TEST_CASE( "Backward only branches taken in case of forward jump")
+{
+    auto bp = BaseBP::create_bp( "backward_jumps", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 36;
+
+    bp->update( BPInterface( PC, true, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
 }
 
 TEST_CASE( "One bit predictor")
 {
+    auto bp = BaseBP::create_bp( "saturating_one_bit", 128, 16);
 
+    Addr PC = 28;
+    Addr target = 12;
+    
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+}
+
+TEST_CASE( "One bit predictor in case of changed target")
+{
+    auto bp = BaseBP::create_bp( "saturating_one_bit", 128, 16);
+
+    Addr PC = 28;
+    Addr target = 12;
+ 
+    //learn   
+    bp->update( BPInterface( PC, true, target));
+    //change the target
+    target = 16;
+    bp->update( BPInterface( PC, true, target));
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Two bit predictor, basic")
 {
-    /* backward jumps */
     auto bp = BaseBP::create_bp( "saturating_two_bits", 128, 16);
 
     Addr PC = 28;
@@ -41,7 +103,6 @@ TEST_CASE( "Two bit predictor, basic")
     bp->update( BPInterface( PC, true, target));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
-
 }
 
 TEST_CASE( "Two bit predictor, advanced")
@@ -100,7 +161,72 @@ TEST_CASE( "Two bit predictor, advanced")
 
 TEST_CASE( "Adaptive two bit prediction")
 {
+    auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
 
+    Addr PC = 12;
+    Addr target = 28;
+
+    // Learn in sequence 001001001
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    //check prediction on 00 sequence
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == target);
+
+    //check prediction on 01 sequence
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
+
+    //check prediction on 10 sequence
+    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK_FALSE( bp->is_taken(PC) );
+    CHECK( bp->get_target(PC) == PC + 4);
+}
+
+TEST_CASE( "Adaptive two bit prediction in case of changed target")
+{
+    auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
+
+    Addr PC = 12;
+    Addr target = 28;
+
+    // Learn in sequence 001001001
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target));
+
+    //change the target
+    target = 24;
+    //update the target
+    bp->update( BPInterface( PC, true, target));
+
+    //check if the target was updated
+    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target));
+    CHECK( bp->get_target(PC) == target);
 }
 
 TEST_CASE( "Cache Miss")

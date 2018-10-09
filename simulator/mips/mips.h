@@ -17,7 +17,7 @@ struct MIPS
     using Register = MIPSRegister;
     using RegisterUInt = MIPSRegisterUInt<version>;
     using FuncInstr = MIPSInstr<version>;
-    using Memory = InstrMemory<FuncInstr>;
+    using Memory = InstrMemoryCached<FuncInstr>;
     static const auto& get_instr( uint32 bytes, Addr PC) {
         return FuncInstr( version, bytes, PC);
     }

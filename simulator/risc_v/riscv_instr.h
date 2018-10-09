@@ -50,8 +50,12 @@ class RISCVInstr
         explicit
         RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC), new_PC( PC + 4) {};
 
+         bool is_same_bytes( uint32 bytes) const {
+            return bytes == instr;
+        }
+        
         bool is_same( const RISCVInstr& rhs) const {
-            return PC == rhs.PC && instr == rhs.instr;
+            return PC == rhs.PC && is_same_bytes( rhs.instr);
         }
 
         bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
