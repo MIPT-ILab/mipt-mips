@@ -44,12 +44,41 @@ FuncMemory::FuncMemory( uint32 addr_bits,
     memory.resize(set_cnt);
 }
 
-void FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+size_t FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    for ( size_t offset = 0; offset < size; ++offset)
+    size_t offset = 0;
+    for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
-        alloc_and_write_byte( dst + offset, *(src + offset));
-}    
+        alloc_and_write_byte( dst + offset, src[offset]);
+    return offset;
+}
+
+size_t FuncMemory::memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
+{
+    return memcpy_host_to_guest( dst, src, size);
+}
+catch (...)
+{
+    return 0;
+}
+
+size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
+{
+    size_t offset = 0;
+    for (; offset < size; ++offset)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
+        dst[offset] = check_and_read_byte( src + offset);
+    return offset;
+}
+
+size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) const noexcept try
+{
+    return memcpy_guest_to_host( dst, src, size);
+}
+catch (...)
+{
+    return 0;
+}
 
 template<typename T>
 T FuncMemory::read( Addr addr, T mask) const

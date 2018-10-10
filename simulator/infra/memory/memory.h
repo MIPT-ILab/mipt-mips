@@ -40,8 +40,12 @@ class FuncMemory
         void set_startPC(Addr value) { startPC_addr = value; }
 
         std::string dump() const;
-        
-        void memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
+
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
+        size_t memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept;
+        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const;
+        size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
+
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
