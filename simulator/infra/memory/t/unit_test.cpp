@@ -34,6 +34,8 @@ TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
     CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
 }
 
+#if 0
+
 static std::vector<Byte> get_4k_bytes()
 {
     return std::vector<Byte>(4096, Byte{0xAA});
@@ -63,6 +65,8 @@ TEST_CASE( "Func_memory_init: Copy_4G_to_guest")
     CHECK_THROWS_AS( throws_bad_alloc_because_of_memory_overflow(), std::bad_alloc);
     CHECK( 0 == returns_zero_because_of_memory_overflow());
 }
+
+#endif
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
 {
