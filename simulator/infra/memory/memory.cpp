@@ -62,7 +62,7 @@ catch (...)
     return 0;
 }
 
-size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size)
+size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
 {
     size_t offset = 0;
     for (; offset < size; ++offset)
@@ -71,7 +71,7 @@ size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size)
     return offset;
 }
 
-size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) noexcept try
+size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) const noexcept try
 {
     return memcpy_guest_to_host( dst, src, size);
 }
