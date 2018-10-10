@@ -90,14 +90,13 @@ class FuncMemory
 template<typename T>
 T FuncMemory::read( Addr addr) const
 {
-    constexpr size_t amount_of_bytes = bitwidth<T> / CHAR_BIT;
-    Byte bytes[amount_of_bytes];
+    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
 
-    memcpy_guest_to_host( bytes, addr, amount_of_bytes);
+    memcpy_guest_to_host( bytes.data(), addr, bytes.size());
 
     // Endian specific
     T value = 0;
-    for ( size_t i = 0; i < amount_of_bytes; ++i)
+    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
         value |= T( bytes[i]) << ( i * CHAR_BIT);
 
     return value;
@@ -106,14 +105,13 @@ T FuncMemory::read( Addr addr) const
 template<typename T>
 void FuncMemory::write( T value, Addr addr)
 {
-    constexpr size_t amount_of_bytes = bitwidth<T> / CHAR_BIT;
-    Byte bytes[amount_of_bytes];
+    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
     
     // Endian specific
-    for ( size_t i = 0; i < amount_of_bytes; ++i)
+    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
         bytes[i] = Byte( value >> ( i * CHAR_BIT));
 
-    memcpy_host_to_guest( addr, bytes, amount_of_bytes);
+    memcpy_host_to_guest( addr, bytes.data(), bytes.size());
 }
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
