@@ -14,6 +14,7 @@
 #include <infra/types.h>
 
 // Generic C++
+#include <array>
 #include <climits>
 #include <string>
 #include <vector>
