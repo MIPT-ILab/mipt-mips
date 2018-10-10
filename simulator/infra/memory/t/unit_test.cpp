@@ -124,6 +124,46 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
     CHECK( func_mem.read<uint16>( write_addr + 2) == right_ret);
 }
 
+TEST_CASE( "Func_memory: Host_Guest_Memcpy")
+{
+    FuncMemory func_mem;
+    ::load_elf_file( &func_mem, valid_elf_file);
+    Addr addr = 0x3FFFFE;
+
+    // Single byte
+    const Byte write_data_1 = Byte( 0xA5);
+    Byte read_data_1 = Byte( 0xFF);
+    CHECK_NOTHROW( func_mem.memcpy_host_to_guest( addr, &write_data_1, 1));
+    CHECK( func_mem.read<uint8>( addr) == static_cast<uint8>( write_data_1));
+    CHECK_NOTHROW( func_mem.memcpy_guest_to_host( &read_data_1, addr, 1));
+    CHECK( read_data_1 == write_data_1);
+
+    // 8 bytes
+    size_t size = 8;
+    const uint8 write_data_8[8] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+    uint8 read_data_8[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    CHECK_NOTHROW( func_mem.memcpy_host_to_guest( addr, reinterpret_cast<const Byte*>(write_data_8), size));
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.read<uint8>( addr + i) == write_data_8[i]);
+    CHECK_NOTHROW( func_mem.memcpy_guest_to_host( reinterpret_cast<Byte *>( read_data_8), addr, size));
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data_8[i] == write_data_8[i]);
+
+    // 1 KByte
+    size = 1024;
+    uint8 write_data_1024[1024], read_data_1024[1024];
+    for (size_t i = 0; i < size; i++) {
+        write_data_1024[i] = static_cast<uint8>( i & 0xFF);
+        read_data_1024[i] = 0xFF;
+    }
+    CHECK_NOTHROW( func_mem.memcpy_host_to_guest( addr, reinterpret_cast<const Byte*>(write_data_1024), size));
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.read<uint8>( addr + i) == write_data_1024[i]);
+    CHECK_NOTHROW( func_mem.memcpy_guest_to_host( reinterpret_cast<Byte *>( read_data_1024), addr, size));
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data_1024[i] == write_data_1024[i]);
+}
+
 TEST_CASE( "Func_memory: Dump")
 {
     FuncMemory func_mem;
