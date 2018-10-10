@@ -45,7 +45,10 @@ class FuncMemory
         template<typename T> T read( Addr addr, T mask) const { return read<T>( addr) & mask; }
 
         template<typename T> void write( T value, Addr addr);
-        template<typename T> void write( T value, Addr addr, T mask) { write( ( value & mask) | (read<T>( addr) & ~mask), addr); }
+        template<typename T> void write( T value, Addr addr, T mask)
+        {
+            write( ( value & mask) | (read<T>( addr) & ~mask), addr);
+        }
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
