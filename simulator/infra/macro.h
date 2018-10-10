@@ -11,7 +11,9 @@
 #include <infra/types.h>
 
 #include <algorithm>
+#include <array>
 #include <bitset>
+#include <climits>
 #include <limits>
 #include <type_traits>
 
@@ -42,6 +44,10 @@ constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits
 /* 128 types have no std::numeric_limits */
 template<> constexpr size_t bitwidth<uint128> = 128u;
 template<> constexpr size_t bitwidth<int128> = 128u;
+
+/* Byte width of integer type */
+template<typename T>
+constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T>
