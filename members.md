@@ -16,3 +16,4 @@ List of 2018/2019 MIPT-MIPS project members:
 15. Egor Bova
 16. Arsen Davtyan
 17. Andrey Agrachev
+18. Kirill Rogozhkin
