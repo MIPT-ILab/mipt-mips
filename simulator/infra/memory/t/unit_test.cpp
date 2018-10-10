@@ -44,7 +44,7 @@ static void throws_bad_alloc_because_of_memory_overflow()
     FuncMemory mem;
     auto bytes = get_4k_bytes();
     for ( Addr addr = 0x10; addr < 4 * 1024 * 1024 * 1024; addr += bytes.size())
-        memcpy_host_to_guest( addr, bytes.data(), bytes.size());
+        mem.memcpy_host_to_guest( addr, bytes.data(), bytes.size());
 }
 
 static int returns_zero_because_of_memory_overflow()
@@ -52,7 +52,7 @@ static int returns_zero_because_of_memory_overflow()
     FuncMemory mem;
     auto bytes = get_4k_bytes();
     for ( Addr addr = 0x10; addr < 4 * 1024 * 1024 * 1024; addr += bytes.size())
-        if ( 0 == memcpy_host_to_guest_noexcept( addr, bytes.data(), bytes.size()))
+        if ( 0 == mem.memcpy_host_to_guest_noexcept( addr, bytes.data(), bytes.size()))
             return 0;
     
     return 1;
