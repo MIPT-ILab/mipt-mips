@@ -63,25 +63,24 @@ TEST_CASE( "Func_memory: Read_Method_Test")
     ::load_elf_file( &func_mem, valid_elf_file);
 
     // read 4 bytes from the func_mem start addr
-    uint64 right_ret = 0x03020100;
-    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
+    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
+    CHECK( func_mem.read<uint32, Endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    right_ret = 0x030201;
-    CHECK( func_mem.read<uint32>( dataSectAddr + 1, 0xFFFFFFull) == right_ret);
+    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
+    CHECK( func_mem.read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
-    right_ret = 0x0302;
-    CHECK( func_mem.read<uint32>( dataSectAddr + 2, 0xFFFFull) == right_ret);
-    CHECK( func_mem.read<uint16>( dataSectAddr + 2) == right_ret);
+    CHECK( func_mem.read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
+    CHECK( func_mem.read<uint16, Endian::big>( dataSectAddr + 2) == 0x0203);
 
     // read 1 bytes from the func_mem start addr + 3
-    right_ret = 0x03;
-    CHECK( func_mem.read<uint8>( dataSectAddr + 3) == right_ret);
+    CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + 3) == 0x03);
+    CHECK( func_mem.read<uint8, Endian::big>( dataSectAddr + 3) == 0x03);
 
     // check hadling the situation when read
     // from not initialized or written data
-    CHECK( func_mem.read<uint8>( 0x300000) == NO_VAL8);
+    CHECK( func_mem.read<uint8, Endian::little>( 0x300000) == NO_VAL8);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
@@ -90,19 +89,19 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     ::load_elf_file( &func_mem, valid_elf_file);
 
     // write 1 into the byte pointed by dataSectAddr
-    func_mem.write<uint8>( 1, dataSectAddr);
+    func_mem.write<uint8, Endian::little>( 1, dataSectAddr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
-    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
+    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x7777 into the two bytes pointed by ( dataSectAddr + 1)
-    func_mem.write<uint16>( 0x7777, dataSectAddr + 1);
+    func_mem.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
     right_ret = 0x03777701; // before write it was 0x03020101
-    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
+    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x00000000 into the four bytes pointed by dataSectAddr
-    func_mem.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    func_mem.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
     right_ret = 0x00000000; // before write it was 0x03777701
-    CHECK( func_mem.read<uint32>( dataSectAddr) == right_ret);
+    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
@@ -113,15 +112,15 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
     uint64 write_addr = 0x3FFFFE;
 
     // write 0x03020100 into the four bytes pointed by write_addr
-    func_mem.write<uint32>( 0x03020100, write_addr);
+    func_mem.write<uint32, Endian::little>( 0x03020100, write_addr);
     uint64 right_ret = 0x0100;
-    CHECK( func_mem.read<uint16>( write_addr) == right_ret);
+    CHECK( func_mem.read<uint16, Endian::little>( write_addr) == right_ret);
 
     right_ret = 0x0201;
-    CHECK( func_mem.read<uint16>( write_addr + 1) == right_ret);
+    CHECK( func_mem.read<uint16, Endian::little>( write_addr + 1) == right_ret);
 
     right_ret = 0x0302;
-    CHECK( func_mem.read<uint16>( write_addr + 2) == right_ret);
+    CHECK( func_mem.read<uint16, Endian::little>( write_addr + 2) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
@@ -129,13 +128,16 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     FuncMemory func_mem;
 
     // Single byte
-    const Byte write_data_1 = Byte( 0xA5);
-    Byte read_data_1 = Byte( 0xFF);
+    const Byte write_data_1{ 0xA5};
+    Byte read_data_1{ 0xFF};
+
+    // Write
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
-    CHECK( func_mem.read<uint8>( dataSectAddr) == static_cast<uint8>( write_data_1));
+
+    // Check if read correctly
+    CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
     CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
-
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
@@ -143,15 +145,19 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     FuncMemory func_mem;
 
     // 8 bytes
-    const size_t size = 8;
-    const uint8 write_data_8[size] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
-    uint8 read_data_8[size] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_8),
-                                                   size) == size);
+    const constexpr size_t size = 8;
+    const std::array<Byte, size> write_data_8 = {{Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}}};
+    std::array<Byte, size> read_data_8;
+    read_data_8.fill(Byte{ 0xFF});
+
+    // Write
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_8.data(), size) == size);
+
+    // Check if read correctlly
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_8[i]);
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_8), dataSectAddr,
-                                                   size) == size);
+        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8[i]));
+
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_8[i] == write_data_8[i]);
 
@@ -162,18 +168,17 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     FuncMemory func_mem;
 
     // 1 KByte
-    const size_t size = 1024;
-    uint8 write_data_1024[size], read_data_1024[size];
+    const  constexpr size_t size = 1024;
+    std::array<Byte, size> write_data_1024, read_data_1024;
     for (size_t i = 0; i < size; i++) {
-        write_data_1024[i] = static_cast<uint8>( i & 0xFF);
-        read_data_1024[i] = 0xFF;
+        write_data_1024[i] = Byte( i & 0xFF);
+        read_data_1024[i] = Byte( 0xFF);
     }
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_1024),
-                                                   size) == size);
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_1024[i]);
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_1024), dataSectAddr,
-                                                   size) == size);
+        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024[i]));
+
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_1024[i] == write_data_1024[i]);
 }
@@ -221,27 +226,27 @@ TEST_CASE( "Func_memory: Invariancy")
     
     CHECK( mem1.dump() == mem2.dump());
 
-    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
-    CHECK( mem1.read<uint32>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32>( dataSectAddr + 1, 0xFFFFFFull));
-    CHECK( mem1.read<uint32>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32>( dataSectAddr + 2, 0xFFFFull));
-    CHECK( mem1.read<uint16>( dataSectAddr + 2) == mem2.read<uint16>( dataSectAddr + 2));
-    CHECK( mem1.read<uint8>( dataSectAddr + 3) == mem2.read<uint8>( dataSectAddr + 3));
-    CHECK( mem1.read<uint8>( 0x300000) == mem2.read<uint8>( 0x300000));
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull));
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull));
+    CHECK( mem1.read<uint16, Endian::little>( dataSectAddr + 2) == mem2.read<uint16, Endian::little>( dataSectAddr + 2));
+    CHECK( mem1.read<uint8, Endian::little>( dataSectAddr + 3) == mem2.read<uint8, Endian::little>( dataSectAddr + 3));
+    CHECK( mem1.read<uint8, Endian::little>( 0x300000) == mem2.read<uint8, Endian::little>( 0x300000));
     
-    mem1.write<uint8>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32>( dataSectAddr) != mem2.read<uint32>( dataSectAddr));
+    mem1.write<uint8, Endian::little>( 1, dataSectAddr);
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
 
-    mem2.write<uint8>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
+    mem2.write<uint8, Endian::little>( 1, dataSectAddr);
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
 
-    mem1.write<uint16>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32>( dataSectAddr) != mem2.read<uint32>( dataSectAddr));
+    mem1.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
 
-    mem2.write<uint16>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32>( dataSectAddr) == mem2.read<uint32>( dataSectAddr));
+    mem2.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
 
-    mem1.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-    mem2.write<uint32>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    mem1.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    mem2.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
 
-    CHECK( mem1.read<uint32>( dataSectAddr) == mem1.read<uint32>( dataSectAddr));
+    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem1.read<uint32, Endian::little>( dataSectAddr));
 }

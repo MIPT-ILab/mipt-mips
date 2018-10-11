@@ -13,6 +13,7 @@
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
+#include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
@@ -402,6 +403,8 @@ class BaseMIPSInstr
     protected:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
     public:
+        static const constexpr Endian endian = Endian::little;
+    
         BaseMIPSInstr() = delete;
 
         bool is_same_bytes( uint32 bytes) const {

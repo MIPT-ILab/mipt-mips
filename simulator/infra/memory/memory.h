@@ -9,6 +9,7 @@
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
 // uArchSim modules
+#include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/types.h>
@@ -42,13 +43,14 @@ class FuncMemory
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const;
         size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
 
-        template<typename T> T read( Addr addr) const;
-        template<typename T> T read( Addr addr, T mask) const { return read<T>( addr) & mask; }
+        template<typename T, Endian endian> T read( Addr addr) const;
+        template<typename T, Endian endian> T read( Addr addr, T mask) const { return read<T, endian>( addr) & mask; }
 
-        template<typename T> void write( T value, Addr addr);
-        template<typename T> void write( T value, Addr addr, T mask)
+        template<typename T, Endian endian> void write( T value, Addr addr);
+        template<typename T, Endian endian> void write( T value, Addr addr, T mask)
         {
-            write( ( value & mask) | (read<T>( addr) & ~mask), addr);
+            T combined_value = (value & mask) | (read<T, endian>( addr) & ~mask);
+            write<T, endian>( combined_value, addr);
         }
     private:
         const uint32 page_bits;
@@ -88,30 +90,18 @@ class FuncMemory
         void alloc_and_write_byte( Addr addr, Byte value);
 };
 
-template<typename T>
+template<typename T, Endian endian>
 T FuncMemory::read( Addr addr) const
 {
-    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
-
+    std::array<Byte, bytewidth<T>> bytes;
     memcpy_guest_to_host( bytes.data(), addr, bytes.size());
-
-    // Endian specific
-    T value = 0;
-    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
-        value |= T( bytes[i]) << ( i * CHAR_BIT);
-
-    return value;
+    return pack_array<T, endian>( bytes);
 }
 
-template<typename T>
+template<typename T, Endian endian>
 void FuncMemory::write( T value, Addr addr)
 {
-    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
-    
-    // Endian specific
-    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
-        bytes[i] = Byte( value >> ( i * CHAR_BIT));
-
+    const auto& bytes = unpack_array<T, endian>( value);
     memcpy_host_to_guest( addr, bytes.data(), bytes.size());
 }
 

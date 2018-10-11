@@ -11,6 +11,7 @@
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
+#include <infra/endian.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
@@ -45,6 +46,7 @@ class RISCVInstr
         std::string disasm = {};
 
     public:
+        static const constexpr Endian endian = Endian::little;
         RISCVInstr() = delete;
 
         explicit
