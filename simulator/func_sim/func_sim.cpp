@@ -72,7 +72,7 @@ Trap FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
         const auto& instr = step();
         sout << instr << std::endl;
 
-        if ( instr.has_trap())
+        if ( instr.trap_type() == Trap::HALT)
             return instr.trap_type();
     }
     return Trap::NO_TRAP;

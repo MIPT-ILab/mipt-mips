@@ -124,6 +124,60 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
     CHECK( func_mem.read<uint16>( write_addr + 2) == right_ret);
 }
 
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
+{
+    FuncMemory func_mem;
+
+    // Single byte
+    const Byte write_data_1 = Byte( 0xA5);
+    Byte read_data_1 = Byte( 0xFF);
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
+    CHECK( func_mem.read<uint8>( dataSectAddr) == static_cast<uint8>( write_data_1));
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data_1, dataSectAddr, 1) == 1);
+    CHECK( read_data_1 == write_data_1);
+
+}
+
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
+{
+    FuncMemory func_mem;
+
+    // 8 bytes
+    const size_t size = 8;
+    const uint8 write_data_8[size] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+    uint8 read_data_8[size] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_8),
+                                                   size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_8[i]);
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_8), dataSectAddr,
+                                                   size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data_8[i] == write_data_8[i]);
+
+}
+
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
+{
+    FuncMemory func_mem;
+
+    // 1 KByte
+    const size_t size = 1024;
+    uint8 write_data_1024[size], read_data_1024[size];
+    for (size_t i = 0; i < size; i++) {
+        write_data_1024[i] = static_cast<uint8>( i & 0xFF);
+        read_data_1024[i] = 0xFF;
+    }
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_1024),
+                                                   size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_1024[i]);
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_1024), dataSectAddr,
+                                                   size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data_1024[i] == write_data_1024[i]);
+}
+
 TEST_CASE( "Func_memory: Dump")
 {
     FuncMemory func_mem;
