@@ -43,7 +43,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
-    CHECK( FuncSim<MIPS32>().run_no_limit( smc_code) == Trap::SYSCALL);
+    CHECK_THROWS_AS( FuncSim<MIPS32>().run_no_limit( smc_code), BearingLost);
 }
 
 TEST_CASE( "Torture_Test: Func_Sim")
