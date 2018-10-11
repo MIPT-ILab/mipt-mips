@@ -48,9 +48,9 @@ static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) n
 }
 
 template<typename T>
-static inline auto unpack_array_le( T value) noexcept
+static inline constexpr auto unpack_array_le( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array; // NOLINT(hicpp-member-init) We init it later
+    std::array<Byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         array[i] = Byte( value >> ( i * CHAR_BIT));
 
@@ -58,9 +58,9 @@ static inline auto unpack_array_le( T value) noexcept
 }
 
 template<typename T>
-static inline auto unpack_array_be( T value) noexcept
+static inline constexpr auto unpack_array_be( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array; // NOLINT(hicpp-member-init) We init it later
+    std::array<Byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         array[i] = Byte( value >> ((array.size() - i - 1) * CHAR_BIT));
 
@@ -68,7 +68,7 @@ static inline auto unpack_array_be( T value) noexcept
 }
 
 template<typename T, Endian e>
-static inline auto unpack_array( T value)
+static constexpr inline auto unpack_array( T value) noexcept
 {
     if constexpr (e == Endian::little)
         return unpack_array_le<T>( value);
@@ -77,12 +77,18 @@ static inline auto unpack_array( T value)
 }
 
 template<typename T, Endian e>
-static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array)
+static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array) noexcept
 {
     if constexpr (e == Endian::little)
         return pack_array_le<T>( array);
 
     return pack_array_be<T>( array);
-}    
-    
+}
+
+template<typename T>
+static inline constexpr T swap_endian( T value) noexcept
+{
+    return pack_array_le<T>( unpack_array_be<T>( value)); 
+}
+
 #endif // ENDIAN_H
