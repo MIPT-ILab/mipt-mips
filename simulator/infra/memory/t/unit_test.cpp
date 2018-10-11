@@ -14,6 +14,10 @@
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
+class TestFuncMemory : public FuncMemory {
+    public:
+        using FuncMemory::check_and_read_byte;
+};
 
 //
 // Check that all incorect input params of the constructor
@@ -55,6 +59,58 @@ TEST_CASE( "Func_memory: StartPC_Method_Test")
     ::load_elf_file( &func_mem, valid_elf_file);
 
     CHECK( func_mem.startPC() == 0x4000b0u /*address of the ".text" section*/);
+}
+
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
+{
+    // Single byte
+    TestFuncMemory func_mem;
+    const Byte write_data = Byte( 0xA5);
+    Byte read_data = Byte( 0xFF);
+
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data, 1) == 1);
+    CHECK( func_mem.check_and_read_byte( dataSectAddr) == write_data);
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data, dataSectAddr, 1) == 1);
+    CHECK( read_data == write_data);
+
+}
+
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
+{
+    // 8 bytes
+    TestFuncMemory func_mem;
+
+    const size_t size = 8;
+    Byte write_data[size], read_data[size];
+    for (size_t i = 0; i < size; i++) {
+        write_data[i] = Byte( i & 0xFF);
+        read_data[i] = Byte( 0xFF);
+    }
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data, size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.check_and_read_byte( dataSectAddr + i) == write_data[i]);
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data, dataSectAddr, size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data[i] == write_data[i]);
+}
+
+TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
+{
+    // 1 KByte
+    TestFuncMemory func_mem;
+
+    const size_t size = 1024;
+    Byte write_data[size], read_data[size];
+    for (size_t i = 0; i < size; i++) {
+        write_data[i] = Byte( i & 0xFF);
+        read_data[i] = Byte( 0xFF);
+    }
+    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data, size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( func_mem.check_and_read_byte( dataSectAddr + i) == write_data[i]);
+    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data, dataSectAddr, size) == size);
+    for (size_t i = 0; i < size; i++)
+        CHECK( read_data[i] == write_data[i]);
 }
 
 TEST_CASE( "Func_memory: Read_Method_Test")
@@ -122,60 +178,6 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 
     right_ret = 0x0302;
     CHECK( func_mem.read<uint16>( write_addr + 2) == right_ret);
-}
-
-TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
-{
-    FuncMemory func_mem;
-
-    // Single byte
-    const Byte write_data_1 = Byte( 0xA5);
-    Byte read_data_1 = Byte( 0xFF);
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
-    CHECK( func_mem.read<uint8>( dataSectAddr) == static_cast<uint8>( write_data_1));
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data_1, dataSectAddr, 1) == 1);
-    CHECK( read_data_1 == write_data_1);
-
-}
-
-TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
-{
-    FuncMemory func_mem;
-
-    // 8 bytes
-    const size_t size = 8;
-    const uint8 write_data_8[size] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
-    uint8 read_data_8[size] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_8),
-                                                   size) == size);
-    for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_8[i]);
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_8), dataSectAddr,
-                                                   size) == size);
-    for (size_t i = 0; i < size; i++)
-        CHECK( read_data_8[i] == write_data_8[i]);
-
-}
-
-TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
-{
-    FuncMemory func_mem;
-
-    // 1 KByte
-    const size_t size = 1024;
-    uint8 write_data_1024[size], read_data_1024[size];
-    for (size_t i = 0; i < size; i++) {
-        write_data_1024[i] = static_cast<uint8>( i & 0xFF);
-        read_data_1024[i] = 0xFF;
-    }
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, reinterpret_cast<const Byte*>(write_data_1024),
-                                                   size) == size);
-    for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8>( dataSectAddr + i) == write_data_1024[i]);
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( reinterpret_cast<Byte *>( read_data_1024), dataSectAddr,
-                                                   size) == size);
-    for (size_t i = 0; i < size; i++)
-        CHECK( read_data_1024[i] == write_data_1024[i]);
 }
 
 TEST_CASE( "Func_memory: Dump")
