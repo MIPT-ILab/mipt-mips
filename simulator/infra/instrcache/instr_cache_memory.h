@@ -23,7 +23,9 @@ public:
 
         void load( Instr* instr) const
         {
-            instr->set_v_dst(read<DstType, endian>(instr->get_mem_addr(), bitmask<DstType>(instr->get_mem_size() * CHAR_BIT)));
+            auto mask = bitmask<DstType>(instr->get_mem_size() * CHAR_BIT);
+            auto value = read<DstType, endian>(instr->get_mem_addr(), mask);
+            instr->set_v_dst( value);
         }
 
         void store( const Instr& instr)
