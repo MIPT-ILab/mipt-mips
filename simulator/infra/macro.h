@@ -11,7 +11,6 @@
 #include <infra/types.h>
 
 #include <algorithm>
-#include <array>
 #include <bitset>
 #include <climits>
 #include <limits>
