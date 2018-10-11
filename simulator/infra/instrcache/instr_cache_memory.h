@@ -33,9 +33,9 @@ public:
                 throw Exception("Store data to zero is an unhandled trap");
 
             if (~instr.get_mask() == 0)
-                write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
+                write<DstType>( instr.get_v_src2(), instr.get_mem_addr());
             else
-                write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+                write<DstType>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }
 
         void load_store(Instr* instr)
