@@ -50,7 +50,7 @@ static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) n
 template<typename T>
 static inline auto unpack_array_le( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array;
+    std::array<Byte, bytewidth<T>> array; // NOLINT(hicpp-member-init) We init it later
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         array[i] = Byte( value >> ( i * CHAR_BIT));
 
@@ -60,7 +60,7 @@ static inline auto unpack_array_le( T value) noexcept
 template<typename T>
 static inline auto unpack_array_be( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array;
+    std::array<Byte, bytewidth<T>> array; // NOLINT(hicpp-member-init) We init it later
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         array[i] = Byte( value >> ((array.size() - i - 1) * CHAR_BIT));
 
