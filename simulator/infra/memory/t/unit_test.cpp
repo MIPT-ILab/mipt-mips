@@ -1,7 +1,8 @@
 /**
  * Unit tests for module implementing the concept of
  * programer-visible memory space accesing via memory address.
- * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
+ * @author Alexander Titov <alexander.igorevich.titov@gmail.com>,
+ *         Vyacheslav Kompan  <kompan.vo@phystech.edu>
  * Copyright 2012-2018 MIPT-MIPS iLab project
  */
 // Catch2
@@ -14,10 +15,6 @@
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
-class TestFuncMemory : public FuncMemory {
-    public:
-        using FuncMemory::check_and_read_byte;
-};
 
 //
 // Check that all incorect input params of the constructor
@@ -64,12 +61,12 @@ TEST_CASE( "Func_memory: StartPC_Method_Test")
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
     // Single byte
-    TestFuncMemory func_mem;
+    FuncMemory func_mem;
     const Byte write_data = Byte( 0xA5);
     Byte read_data = Byte( 0xFF);
 
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data, 1) == 1);
-    CHECK( func_mem.check_and_read_byte( dataSectAddr) == write_data);
+    CHECK( func_mem.read<uint8>( dataSectAddr) == static_cast<uint8>( write_data));
     CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data, dataSectAddr, 1) == 1);
     CHECK( read_data == write_data);
 
@@ -78,7 +75,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
     // 8 bytes
-    TestFuncMemory func_mem;
+    FuncMemory func_mem;
 
     const size_t size = 8;
     Byte write_data[size], read_data[size];
@@ -88,7 +85,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     }
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data, size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.check_and_read_byte( dataSectAddr + i) == write_data[i]);
+        CHECK( func_mem.read<uint8>( dataSectAddr + i) == static_cast<uint8>( write_data[i]));
     CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data, dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data[i] == write_data[i]);
@@ -97,7 +94,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
     // 1 KByte
-    TestFuncMemory func_mem;
+    FuncMemory func_mem;
 
     const size_t size = 1024;
     Byte write_data[size], read_data[size];
@@ -107,7 +104,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     }
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data, size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.check_and_read_byte( dataSectAddr + i) == write_data[i]);
+        CHECK( func_mem.read<uint8>( dataSectAddr + i) == static_cast<uint8>( write_data[i]));
     CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data, dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data[i] == write_data[i]);

@@ -81,12 +81,11 @@ class FuncMemory
 
         bool check( Addr addr) const;
         Byte read_byte( Addr addr) const;
+        Byte check_and_read_byte( Addr addr) const;
 
         void alloc( Addr addr);
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
-    protected:
-        Byte check_and_read_byte( Addr addr) const;
 };
 
 template<typename T>
