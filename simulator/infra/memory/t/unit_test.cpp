@@ -146,7 +146,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
     // 8 bytes
     const constexpr size_t size = 8;
-    const std::array<Byte, size> write_data_8({Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}});
+    const std::array<Byte, size> write_data_8 = {{Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}}};
     std::array<Byte, size> read_data_8;
     read_data_8.fill(Byte{ 0xFF});
 
