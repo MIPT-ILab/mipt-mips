@@ -14,6 +14,8 @@
 #include <infra/types.h>
 
 // Generic C++
+#include <array>
+#include <climits>
 #include <string>
 #include <vector>
 
@@ -30,12 +32,6 @@ class FuncMemory
                               uint32 page_bits = 10,
                               uint32 offset_bits = 12);
 
-        template<typename T>
-        T read( Addr addr, T mask = all_ones<T>()) const;
-
-        template<typename T>
-        void write( T value, Addr addr, T mask = all_ones<T>());
-
         Addr startPC() const { return startPC_addr; }
         void set_startPC(Addr value) { startPC_addr = value; }
 
@@ -46,6 +42,14 @@ class FuncMemory
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const;
         size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
 
+        template<typename T> T read( Addr addr) const;
+        template<typename T> T read( Addr addr, T mask) const { return read<T>( addr) & mask; }
+
+        template<typename T> void write( T value, Addr addr);
+        template<typename T> void write( T value, Addr addr, T mask)
+        {
+            write( ( value & mask) | (read<T>( addr) & ~mask), addr);
+        }
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
@@ -83,5 +87,32 @@ class FuncMemory
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
 };
+
+template<typename T>
+T FuncMemory::read( Addr addr) const
+{
+    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
+
+    memcpy_guest_to_host( bytes.data(), addr, bytes.size());
+
+    // Endian specific
+    T value = 0;
+    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
+        value |= T( bytes[i]) << ( i * CHAR_BIT);
+
+    return value;
+}
+
+template<typename T>
+void FuncMemory::write( T value, Addr addr)
+{
+    std::array<Byte, bitwidth<T> / CHAR_BIT> bytes;
+    
+    // Endian specific
+    for ( size_t i = 0; i < bytes.size(); ++i) // NOLINTNEXTLINE
+        bytes[i] = Byte( value >> ( i * CHAR_BIT));
+
+    memcpy_host_to_guest( addr, bytes.data(), bytes.size());
+}
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

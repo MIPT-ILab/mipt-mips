@@ -46,6 +46,9 @@ FuncMemory::FuncMemory( uint32 addr_bits,
 
 size_t FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
+    assert( dst != 0);
+    assert( dst <= addr_mask);
+
     size_t offset = 0;
     for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
@@ -64,6 +67,8 @@ catch (...)
 
 size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
 {
+    assert( src != 0);
+
     size_t offset = 0;
     for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
@@ -80,60 +85,11 @@ catch (...)
     return 0;
 }
 
-template<typename T>
-T FuncMemory::read( Addr addr, T mask) const
-{
-    assert( addr <= addr_mask);
-
-    T value = 0;
-
-    // Endian specific
-    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if (( mask & 0xFFu) == 0xFFu)
-            value |= static_cast<T>(static_cast<T>(check_and_read_byte( addr + i)) << (i * 8));
-        if constexpr ( bitwidth<T> > 8)
-            mask >>= 8u; // NOLINT(bugprone-suspicious-semicolon)
-    }
-
-    return value;
-}
-
-
-template uint8 FuncMemory::read<uint8>( Addr addr, uint8 mask) const;
-template uint16 FuncMemory::read<uint16>( Addr addr, uint16 mask) const;
-template uint32 FuncMemory::read<uint32>( Addr addr, uint32 mask) const;
-template uint64 FuncMemory::read<uint64>( Addr addr, uint64 mask) const;
-template uint128 FuncMemory::read<uint128>( Addr addr, uint128 mask) const;
-
-template<typename T>
-void FuncMemory::write( T value, Addr addr, T mask)
-{
-    assert( addr != 0);
-    assert( addr <= addr_mask);
-    assert( mask != 0);
-
-    // Endian specific
-    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if ((mask & 0xFFu) == 0xFFu)
-            alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
-        if constexpr ( bitwidth<T> > 8) { // NOLINT(bugprone-suspicious-semicolon)
-            mask >>= 8u;
-            value >>= 8u;
-        }
-    }
-}
-
 void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
 {
     alloc( addr);
     write_byte( addr, value);
 }
-
-template void FuncMemory::write<uint8>( uint8 value, Addr addr, uint8 mask);
-template void FuncMemory::write<uint16>( uint16 value, Addr addr, uint16 mask);
-template void FuncMemory::write<uint32>( uint32 value, Addr addr, uint32 mask);
-template void FuncMemory::write<uint64>( uint64 value, Addr addr, uint64 mask);
-template void FuncMemory::write<uint128>( uint128 value, Addr addr, uint128 mask);
 
 void FuncMemory::alloc( Addr addr)
 {

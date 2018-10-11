@@ -15,13 +15,16 @@ template<typename Instr>
 class InstrMemory : public FuncMemory
 {
 public:
+        using DstType = decltype(std::declval<Instr>().get_v_dst());
+
         auto fetch( Addr pc) const { return read<uint32>( pc); }
         auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 
         void load( Instr* instr) const
         {
-            using DstType = decltype(instr->get_v_dst());
-            instr->set_v_dst(read<DstType>(instr->get_mem_addr(), bitmask<DstType>(instr->get_mem_size() * 8)));
+            auto mask = bitmask<DstType>(instr->get_mem_size() * CHAR_BIT);
+            auto value = read<DstType>(instr->get_mem_addr(), mask);
+            instr->set_v_dst( value);
         }
 
         void store( const Instr& instr)
@@ -29,7 +32,10 @@ public:
             if (instr.get_mem_addr() == 0)
                 throw Exception("Store data to zero is an unhandled trap");
 
-            write( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+            if (~instr.get_mask() == 0)
+                write<DstType>( instr.get_v_src2(), instr.get_mem_addr());
+            else
+                write<DstType>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }
 
         void load_store(Instr* instr)
