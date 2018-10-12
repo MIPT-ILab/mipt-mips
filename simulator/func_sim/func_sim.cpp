@@ -65,6 +65,14 @@ void FuncSim<ISA>::init( const std::string& tr)
 }
 
 template <typename ISA>
+void FuncSim<ISA>::init( const Memory& other_mem)
+{
+    other_mem.duplicate_to( mem.get());
+    PC = mem->startPC();
+    nops_in_a_row = 0;
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     init( tr);

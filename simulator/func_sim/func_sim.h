@@ -40,6 +40,7 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         void init( const std::string& tr);
+        void init( const Memory& other_mem);
         FuncInstr step();
         Trap run(const std::string& tr, uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
