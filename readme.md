@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.org/MIPT-ILab/mipt-mips)
+[![Build Status](https://travis-ci.com/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.com/MIPT-ILab/mipt-mips)
 [![Build status](https://ci.appveyor.com/api/projects/status/eungty6us329y8w1/branch/master?svg=true)](https://ci.appveyor.com/project/miptilab/mipt-mips/branch/master)
 [![codecov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graph/badge.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
