@@ -147,7 +147,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     // 8 bytes
     const constexpr size_t size = 8;
     const std::array<Byte, size> write_data_8 = {{Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}}};
-    std::array<Byte, size> read_data_8;
+    std::array<Byte, size> read_data_8{};
     read_data_8.fill(Byte{ 0xFF});
 
     // Write
@@ -155,11 +155,11 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
     // Check if read correctlly
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8[i]));
+        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
 
     CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( read_data_8[i] == write_data_8[i]);
+        CHECK( read_data_8.at(i) == write_data_8.at(i));
 
 }
 
@@ -169,18 +169,20 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
     // 1 KByte
     const  constexpr size_t size = 1024;
-    std::array<Byte, size> write_data_1024, read_data_1024;
-    for (size_t i = 0; i < size; i++) {
-        write_data_1024[i] = Byte( i & 0xFF);
-        read_data_1024[i] = Byte( 0xFF);
-    }
+    std::array<Byte, size> write_data_1024{};
+    for (size_t i = 0; i < size; i++)
+        write_data_1024.at(i) = Byte( i & 0xFFu);
+
+    std::array<Byte, size> read_data_1024{};
+    read_data_1024.fill(Byte( 0xFF));
+
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024[i]));
+        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
 
     CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( read_data_1024[i] == write_data_1024[i]);
+        CHECK( read_data_1024.at(i) == write_data_1024.at(i));
 }
 
 TEST_CASE( "Func_memory: Dump")

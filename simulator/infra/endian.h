@@ -70,7 +70,7 @@ static inline constexpr auto unpack_array_be( T value) noexcept
 template<typename T, Endian e>
 static constexpr inline auto unpack_array( T value) noexcept
 {
-    if constexpr (e == Endian::little)
+    if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
         return unpack_array_le<T>( value);
 
     return unpack_array_be<T>( value);
@@ -79,7 +79,7 @@ static constexpr inline auto unpack_array( T value) noexcept
 template<typename T, Endian e>
 static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array) noexcept
 {
-    if constexpr (e == Endian::little)
+    if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
         return pack_array_le<T>( array);
 
     return pack_array_be<T>( array);
