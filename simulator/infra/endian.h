@@ -32,7 +32,7 @@ static inline constexpr T pack_array_le( std::array<Byte, bytewidth<T>> array) n
 {
     T value = 0;
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        value |= unsign_t<T>( array[i]) << (i * CHAR_BIT);
+        value |= unsign_t<T>( uint8( array[i])) << (i * CHAR_BIT);
 
     return value;
 }
@@ -42,7 +42,7 @@ static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) n
 {
     T value = 0;
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        value |= unsign_t<T>( array[i]) << ((array.size() - i - 1) * CHAR_BIT);
+        value |= unsign_t<T>( uint8( array[i])) << ((array.size() - i - 1) * CHAR_BIT);
 
     return value;
 }
