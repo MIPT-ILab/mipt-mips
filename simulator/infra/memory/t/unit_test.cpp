@@ -175,7 +175,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
     std::array<Byte, size> read_data_1024{};
     read_data_1024.fill(Byte( 0xFF));
-    
+
     CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
