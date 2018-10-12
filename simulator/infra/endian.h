@@ -52,7 +52,7 @@ static inline constexpr auto unpack_array_le( T value) noexcept
 {
     std::array<Byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = Byte( value >> ( i * CHAR_BIT));
+        array[i] = Byte( uint8( value >> ( i * CHAR_BIT)));
 
     return array;
 }
@@ -62,7 +62,7 @@ static inline constexpr auto unpack_array_be( T value) noexcept
 {
     std::array<Byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = Byte( value >> ((array.size() - i - 1) * CHAR_BIT));
+        array[i] = Byte( uint8( value >> ((array.size() - i - 1) * CHAR_BIT)));
 
     return array;
 }
