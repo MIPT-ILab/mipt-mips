@@ -219,40 +219,6 @@ TEST_CASE( "Func_memory: Dump")
     );
 }
 
-TEST_CASE( "Func_memory: Invariancy")
-{
-    FuncMemory mem1;
-    FuncMemory mem2( 48, 15, 10);
-    ::load_elf_file( &mem1, valid_elf_file);
-    ::load_elf_file( &mem2, valid_elf_file);
-    
-    CHECK( mem1.dump() == mem2.dump());
-
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull));
-    CHECK( mem1.read<uint16, Endian::little>( dataSectAddr + 2) == mem2.read<uint16, Endian::little>( dataSectAddr + 2));
-    CHECK( mem1.read<uint8, Endian::little>( dataSectAddr + 3) == mem2.read<uint8, Endian::little>( dataSectAddr + 3));
-    CHECK( mem1.read<uint8, Endian::little>( 0x300000) == mem2.read<uint8, Endian::little>( 0x300000));
-    
-    mem1.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
-
-    mem2.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-
-    mem1.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
-
-    mem2.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-
-    mem1.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-    mem2.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem1.read<uint32, Endian::little>( dataSectAddr));
-}
-
 TEST_CASE( "Func_memory: Duplicate")
 {
     FuncMemory mem1;
