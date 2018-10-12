@@ -100,17 +100,20 @@ static_assert(count_leading_zeroes<uint64>(~static_cast<uint64>(0)) == 0);
 
 static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
 
-// static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
-// static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
+static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
+static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
 
 static_assert(pack_array_le<uint32>( test_array) == 0x12345678);
 static_assert(pack_array_be<uint32>( test_array) == 0x78563412);
 
-// static_assert(unpack_array<uint32, Endian::little>( 0x12345678)[0] == test_array[0]);
-// static_assert(unpack_array<uint32, Endian::big>( 0x12345678)[0] == test_array[3]);
+static_assert(unpack_array<uint32, Endian::little>( 0x12345678)[0] == test_array[0]);
+static_assert(unpack_array<uint32, Endian::big>( 0x12345678)[0] == test_array[3]);
 
 static_assert(pack_array<uint32, Endian::little>( test_array) == 0x12345678);
 static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
+
+static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
+static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);
