@@ -5,8 +5,8 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
-#include <infra/macro.h>
 #include <infra/endian.h>
+#include <infra/macro.h>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");

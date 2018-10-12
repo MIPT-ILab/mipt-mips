@@ -26,6 +26,7 @@ struct FuncMemoryBadMapping final : Exception
         : Exception("Invalid FuncMemory mapping", msg)
     { }
 };
+
 class FuncMemory
 {
     public:
@@ -93,6 +94,7 @@ class FuncMemory
 template<typename T, Endian endian>
 T FuncMemory::read( Addr addr) const
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) Initialized by memcpy
     std::array<Byte, bytewidth<T>> bytes;
     memcpy_guest_to_host( bytes.data(), addr, bytes.size());
     return pack_array<T, endian>( bytes);
