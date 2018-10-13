@@ -14,6 +14,7 @@
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
+static const uint64 dataSectAddrShifted = 0x100c0;
 
 //
 // Check that all incorect input params of the constructor
@@ -229,41 +230,63 @@ TEST_CASE( "Func_memory: Dump")
     );
 }
 
+static void test_coherency(FuncMemory* mem1, FuncMemory* mem2)
+{
+    auto address = dataSectAddr - 0x400000;
+    CHECK( mem1->dump() == mem2->dump());
+
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+    CHECK( mem1->read<uint32, Endian::little>( address + 1, 0xFFFFFFull) == mem2->read<uint32, Endian::little>( address + 1, 0xFFFFFFull));
+    CHECK( mem1->read<uint32, Endian::little>( address + 2, 0xFFFFull) == mem2->read<uint32, Endian::little>( address + 2, 0xFFFFull));
+    CHECK( mem1->read<uint16, Endian::little>( address + 2) == mem2->read<uint16, Endian::little>( address + 2));
+    CHECK( mem1->read<uint8, Endian::little>( address + 3) == mem2->read<uint8, Endian::little>( address + 3));
+    CHECK( mem1->read<uint8, Endian::little>( 0x7777) == mem2->read<uint8, Endian::little>( 0x7777));
+ 
+    mem1->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
+    mem2->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
+
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem1->read<uint32, Endian::little>( address));
+}
+
 TEST_CASE( "Func_memory: Duplicate")
 {
-    auto ptr1 = FuncMemory::create_hierarchied_memory();
-    auto ptr2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
- 
-    FuncMemory& mem1 = *ptr1;
-    FuncMemory& mem2 = *ptr2;
+    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    ::load_elf_file( &mem1, valid_elf_file);
-    mem1.duplicate_to( &mem2);
-    
-    CHECK( mem1.dump() == mem2.dump());
+    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
+}
 
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull));
-    CHECK( mem1.read<uint16, Endian::little>( dataSectAddr + 2) == mem2.read<uint16, Endian::little>( dataSectAddr + 2));
-    CHECK( mem1.read<uint8, Endian::little>( dataSectAddr + 3) == mem2.read<uint8, Endian::little>( dataSectAddr + 3));
-    CHECK( mem1.read<uint8, Endian::little>( 0x300000) == mem2.read<uint8, Endian::little>( 0x300000));
-    
-    mem1.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
+TEST_CASE( "Func_memory: Plain Memory")
+{
+    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    mem2.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
+    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
+}
 
-    mem1.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
+TEST_CASE( "Func_memory: Duplicate Plain Memory")
+{
+    auto mem1 = FuncMemory::create_plain_memory( 24);
+    auto mem2 = FuncMemory::create_hierarchied_memory();
 
-    mem2.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-
-    mem1.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-    mem2.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem1.read<uint32, Endian::little>( dataSectAddr));
+    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
 }
 

@@ -33,6 +33,8 @@ class FuncMemory
             create_hierarchied_memory( uint32 addr_bits = 32,
                                          uint32 page_bits = 10,
                                          uint32 offset_bits = 12);
+	static std::unique_ptr<FuncMemory>
+	    create_plain_memory( uint32 addr_bits = 20);
 
         Addr startPC() const { return startPC_addr; }
         void set_startPC(Addr value) { startPC_addr = value; }
