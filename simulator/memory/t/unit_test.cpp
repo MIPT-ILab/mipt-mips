@@ -21,22 +21,24 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory( )); // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory( 48, 15, 10)); // check memory initialization with custom parameters
-    CHECK_THROWS_AS( FuncMemory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
-    CHECK_THROWS_AS( FuncMemory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
-    CHECK_THROWS_AS( FuncMemory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
+    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( )); // check memory initialization with default parameters
+    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
-    FuncMemory mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& mem = *ptr;
     CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
 {
-    FuncMemory mem( 48, 15, 10);
+    auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+    FuncMemory& mem = *ptr;
     CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
 }
 
@@ -45,13 +47,15 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
     // test behavior when the file name does not exist
     const std::string wrong_file_name = "./1234567890/qwertyuiop";
     // must exit and return EXIT_FAILURE
-    FuncMemory mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& mem = *ptr;
     CHECK_THROWS_AS( load_elf_file( &mem, wrong_file_name), InvalidElfFile);
 }
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
     ::load_elf_file( &func_mem, valid_elf_file);
 
     CHECK( func_mem.startPC() == 0x4000b0u /*address of the ".text" section*/);
@@ -59,7 +63,8 @@ TEST_CASE( "Func_memory: StartPC_Method_Test")
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
     ::load_elf_file( &func_mem, valid_elf_file);
 
     // read 4 bytes from the func_mem start addr
@@ -85,7 +90,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
     ::load_elf_file( &func_mem, valid_elf_file);
 
     // write 1 into the byte pointed by dataSectAddr
@@ -106,7 +112,8 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
     ::load_elf_file( &func_mem, valid_elf_file);
 
     uint64 write_addr = 0x3FFFFE;
@@ -125,7 +132,8 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // Single byte
     const Byte write_data_1{ 0xA5};
@@ -142,7 +150,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // 8 bytes
     const constexpr size_t size = 8;
@@ -165,7 +174,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // 1 KByte
     const  constexpr size_t size = 1024;
@@ -187,7 +197,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
 TEST_CASE( "Func_memory: Dump")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
     ::load_elf_file( &func_mem, valid_elf_file);
 
     CHECK( func_mem.dump() ==
@@ -221,8 +232,12 @@ TEST_CASE( "Func_memory: Dump")
 
 TEST_CASE( "Func_memory: Duplicate")
 {
-    FuncMemory mem1;
-    FuncMemory mem2( 48, 15, 10);
+    auto ptr1 = FuncMemory::create_hierarchied_memory();
+    auto ptr2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+ 
+    FuncMemory& mem1 = *ptr1;
+    FuncMemory& mem2 = *ptr2;
+
     ::load_elf_file( &mem1, valid_elf_file);
     mem1.duplicate_to( &mem2);
     

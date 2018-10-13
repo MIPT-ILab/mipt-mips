@@ -4,10 +4,10 @@
  */
  
 #include "func_sim.h"
-#include <infra/memory/elf/elf_loader.h>
+#include <memory/elf/elf_loader.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new FuncMemory)
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( FuncMemory::create_hierarchied_memory())
 {
     imem.set_memory( mem.get());
 }
