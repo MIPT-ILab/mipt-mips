@@ -219,12 +219,12 @@ TEST_CASE( "Func_memory: Dump")
     );
 }
 
-TEST_CASE( "Func_memory: Invariancy")
+TEST_CASE( "Func_memory: Duplicate")
 {
     FuncMemory mem1;
     FuncMemory mem2( 48, 15, 10);
     ::load_elf_file( &mem1, valid_elf_file);
-    ::load_elf_file( &mem2, valid_elf_file);
+    mem1.duplicate_to( &mem2);
     
     CHECK( mem1.dump() == mem2.dump());
 

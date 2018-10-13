@@ -22,8 +22,8 @@
 
 struct FuncMemoryBadMapping final : Exception
 {
-    explicit FuncMemoryBadMapping(const std::string& msg)
-        : Exception("Invalid FuncMemory mapping", msg)
+    explicit FuncMemoryBadMapping( const std::string& msg)
+        : Exception( "Invalid FuncMemory mapping", msg)
     { }
 };
 
@@ -44,13 +44,15 @@ class FuncMemory
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const;
         size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
 
+        void duplicate_to( FuncMemory* target) const;
+
         template<typename T, Endian endian> T read( Addr addr) const;
         template<typename T, Endian endian> T read( Addr addr, T mask) const { return read<T, endian>( addr) & mask; }
 
         template<typename T, Endian endian> void write( T value, Addr addr);
         template<typename T, Endian endian> void write( T value, Addr addr, T mask)
         {
-            T combined_value = (value & mask) | (read<T, endian>( addr) & ~mask);
+            T combined_value = ( value & mask) | (read<T, endian>( addr) & ~mask);
             write<T, endian>( combined_value, addr);
         }
     private:
