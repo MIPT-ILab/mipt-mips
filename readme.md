@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.org/MIPT-ILab/mipt-mips)
+[![Build Status](https://travis-ci.com/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.com/MIPT-ILab/mipt-mips)
 [![Build status](https://ci.appveyor.com/api/projects/status/eungty6us329y8w1/branch/master?svg=true)](https://ci.appveyor.com/project/miptilab/mipt-mips/branch/master)
 [![codecov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graph/badge.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
@@ -25,7 +25,7 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 
 ## Requirements
 
-MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to use compilers of these versions or newer:
+MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
 * GCC 7
 * Clang 5.0
 * Apple LLVM 7.3.0

@@ -15,15 +15,16 @@ template<typename Instr>
 class InstrMemory : public FuncMemory
 {
 public:
+        static const constexpr Endian endian = Instr::endian;
         using DstType = decltype(std::declval<Instr>().get_v_dst());
 
-        auto fetch( Addr pc) const { return read<uint32>( pc); }
+        auto fetch( Addr pc) const { return read<uint32, endian>( pc); }
         auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 
         void load( Instr* instr) const
         {
             auto mask = bitmask<DstType>(instr->get_mem_size() * CHAR_BIT);
-            auto value = read<DstType>(instr->get_mem_addr(), mask);
+            auto value = read<DstType, endian>(instr->get_mem_addr(), mask);
             instr->set_v_dst( value);
         }
 
@@ -33,9 +34,9 @@ public:
                 throw Exception("Store data to zero is an unhandled trap");
 
             if (~instr.get_mask() == 0)
-                write<DstType>( instr.get_v_src2(), instr.get_mem_addr());
+                write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
             else
-                write<DstType>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+                write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
         }
 
         void load_store(Instr* instr)
@@ -59,8 +60,7 @@ class InstrMemoryCached : public InstrMemory<Instr>
         Instr fetch_instr( Addr PC)
         {
             const auto [found, value] = instr_cache.find( PC);
-            auto true_bytes = this->fetch( PC);
-            if ( found && value.is_same_bytes( true_bytes)) {
+            if ( found && value.is_same_bytes( this->fetch( PC))) {
                 instr_cache.touch( PC);
                 return value;
             }
