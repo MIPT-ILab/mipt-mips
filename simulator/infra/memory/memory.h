@@ -52,9 +52,11 @@ class FuncMemory
         template<typename T, Endian endian> void write( T value, Addr addr);
         template<typename T, Endian endian> void write( T value, Addr addr, T mask)
         {
-            T combined_value = ( value & mask) | (read<T, endian>( addr) & ~mask);
+            T combined_value = ( value & mask) | ( read<T, endian>( addr) & ~mask);
             write<T, endian>( combined_value, addr);
         }
+
+        template<typename Instr> void load_store( Instr* instr);
     private:
         const uint32 page_bits;
         const uint32 offset_bits;
@@ -91,6 +93,9 @@ class FuncMemory
         void alloc( Addr addr);
         void write_byte( Addr addr, Byte value);
         void alloc_and_write_byte( Addr addr, Byte value);
+
+        template<typename Instr> void load( Instr* instr) const;
+        template<typename Instr> void store( const Instr& instr);
 };
 
 template<typename T, Endian endian>
@@ -107,6 +112,39 @@ void FuncMemory::write( T value, Addr addr)
 {
     const auto& bytes = unpack_array<T, endian>( value);
     memcpy_host_to_guest( addr, bytes.data(), bytes.size());
+}
+
+template<typename Instr>
+void FuncMemory::load( Instr* instr) const
+{
+    static const constexpr Endian endian = Instr::endian;
+    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
+    auto value = read<DstType, endian>( instr->get_mem_addr(), mask);
+    instr->set_v_dst( value);
+}
+
+template<typename Instr>
+void FuncMemory::store( const Instr& instr)
+{
+    static const constexpr Endian endian = Instr::endian;
+    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    if ( instr.get_mem_addr() == 0)
+        throw Exception("Store data to zero is an unhandled trap");
+
+    if ( ~instr.get_mask() == 0)
+        write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
+    else
+        write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+}
+
+template<typename Instr>
+void FuncMemory::load_store(Instr* instr)
+{
+    if ( instr->is_load())
+        load( instr);
+    else if ( instr->is_store())
+        store( *instr);
 }
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
