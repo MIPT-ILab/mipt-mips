@@ -13,7 +13,7 @@
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     CycleAccurateSimulator( log),
-    memory( new Memory),
+    memory( new FuncMemory),
     fetch( log),
     decode( log),
     execute( log),

@@ -156,7 +156,7 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* hold PC for the stall case */
     wp_hold_pc->write( target, cycle);
 
-    Instr instr( memory->fetch_instr( target.address), bp->get_bp_info( target.address));
+    Instr instr( memory.fetch_instr( target.address), bp->get_bp_info( target.address));
     instr.set_sequence_id( target.sequence_id);
 
     /* set next target according to prediction */

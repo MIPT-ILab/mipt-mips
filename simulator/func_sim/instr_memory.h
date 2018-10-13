@@ -11,10 +11,12 @@
 #include <infra/types.h>
 
 template<typename Instr>
-class InstrMemory : public FuncMemory
+class InstrMemory
 {
+    FuncMemory* mem = nullptr;
 public:
-    auto fetch( Addr pc) const { return read<uint32, Instr::endian>( pc); }
+    void set_memory( FuncMemory* m) { mem = m; }
+    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
     auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 };
 
