@@ -101,7 +101,6 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
 
 size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    assert( dst != 0);
     assert( dst <= addr_mask);
 
     size_t offset = 0;
@@ -113,8 +112,6 @@ size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_
 
 size_t HierarchiedMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
 {
-    assert( src != 0);
-
     size_t offset = 0;
     for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
