@@ -7,6 +7,7 @@
 #ifndef FUNC_SIM_H
 #define FUNC_SIM_H
 
+#include "instr_memory.h"
 #include "rf/rf.h"
 
 #include <infra/exception.h>
@@ -25,13 +26,13 @@ template <typename ISA>
 class FuncSim : public Simulator
 {
     using FuncInstr = typename ISA::FuncInstr;
-    using Memory = typename ISA::Memory;
-    
+
     private:
         RF<ISA> rf;
         Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
-        std::unique_ptr<Memory> mem = nullptr;
+        std::unique_ptr<FuncMemory> mem = nullptr;
+        InstrMemoryCached<FuncInstr> imem;
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
@@ -40,7 +41,7 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         void init( const std::string& tr);
-        void init( const Memory& other_mem);
+        void init( const FuncMemory& other_mem);
         FuncInstr step();
         Trap run(const std::string& tr, uint64 instrs_to_run) final;
         void set_target(const Target& target) final {

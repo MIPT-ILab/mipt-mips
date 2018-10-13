@@ -8,6 +8,7 @@
 
 #include "bpu/bpu.h"
 
+#include <func_sim/instr_memory.h>
 #include <infra/cache/cache_tag_array.h>
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
@@ -17,15 +18,14 @@ class Fetch : public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using Memory = typename ISA::Memory;
 
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
-    void set_memory( Memory* mem) { memory = mem; }
+    void set_memory( FuncMemory* mem) { memory.set_memory( mem); }
 
 private:
-    Memory* memory = nullptr;
+    InstrMemoryCached<FuncInstr> memory;
     std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<CacheTagArray> tags = nullptr;
     

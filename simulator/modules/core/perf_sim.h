@@ -41,7 +41,6 @@ public:
 private:
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using Memory = typename ISA::Memory;
 
     Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
@@ -49,7 +48,7 @@ private:
 
     /* simulator units */
     RF<ISA> rf;
-    std::unique_ptr<Memory> memory = nullptr;
+    std::unique_ptr<FuncMemory> memory = nullptr;
     Fetch<ISA> fetch;
     Decode<ISA> decode;
     Execute<ISA> execute;

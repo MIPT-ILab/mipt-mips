@@ -31,7 +31,6 @@ class Writeback : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename ISA::RegisterUInt;
-    using Memory = typename ISA::Memory;
 private:
     /* Instrumentation */
     uint64 instrs_to_run = 0;
@@ -57,7 +56,7 @@ public:
     explicit Writeback( bool log);
     void clock( Cycle cycle);
     void set_RF( RF<ISA>* value) { rf = value; }
-    void init_checker( const Memory& mem);
+    void init_checker( const FuncMemory& mem);
     void set_target( const Target& value) { checker.set_target( value); }
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }

@@ -13,7 +13,7 @@ Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
 }
 
 template <typename ISA>
-void Writeback<ISA>::init_checker( const Memory& mem)
+void Writeback<ISA>::init_checker( const FuncMemory& mem)
 {
     checker.init( mem);
 }
