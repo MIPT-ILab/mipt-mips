@@ -32,41 +32,31 @@ TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& mem = *ptr;
-    CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
 {
     auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
-    FuncMemory& mem = *ptr;
-    CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
 TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 {
     // test behavior when the file name does not exist
-    const std::string wrong_file_name = "./1234567890/qwertyuiop";
-    // must exit and return EXIT_FAILURE
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& mem = *ptr;
-    CHECK_THROWS_AS( load_elf_file( &mem, wrong_file_name), InvalidElfFile);
+    CHECK_THROWS_AS( ElfLoader( "./1234567890/qwertyuiop"), InvalidElfFile);
 }
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& func_mem = *ptr;
-    ::load_elf_file( &func_mem, valid_elf_file);
-
-    CHECK( func_mem.startPC() == 0x4000b0u /*address of the ".text" section*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the ".text" section*/);
 }
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
     FuncMemory& func_mem = *ptr;
-    ::load_elf_file( &func_mem, valid_elf_file);
 
     // read 4 bytes from the func_mem start addr
     CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
@@ -92,8 +82,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
     FuncMemory& func_mem = *ptr;
-    ::load_elf_file( &func_mem, valid_elf_file);
 
     // write 1 into the byte pointed by dataSectAddr
     func_mem.write<uint8, Endian::little>( 1, dataSectAddr);
@@ -114,8 +104,8 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
     FuncMemory& func_mem = *ptr;
-    ::load_elf_file( &func_mem, valid_elf_file);
 
     uint64 write_addr = 0x3FFFFE;
 
@@ -198,8 +188,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 TEST_CASE( "Func_memory: Dump")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
     FuncMemory& func_mem = *ptr;
-    ::load_elf_file( &func_mem, valid_elf_file);
 
     CHECK( func_mem.dump() ==
         "addr 0x400095: data 0xc\n"
@@ -265,7 +255,7 @@ TEST_CASE( "Func_memory: Duplicate")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2.get());
     test_coherency( mem1.get(), mem2.get());
 }
@@ -275,7 +265,7 @@ TEST_CASE( "Func_memory: Plain Memory")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2.get());
     test_coherency( mem1.get(), mem2.get());
 }
@@ -285,8 +275,7 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     auto mem1 = FuncMemory::create_plain_memory( 24);
     auto mem2 = FuncMemory::create_hierarchied_memory();
 
-    ::load_elf_file( mem1.get(), valid_elf_file, -0x400000);
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2.get());
     test_coherency( mem1.get(), mem2.get());
 }
-
