@@ -167,7 +167,7 @@ inline Byte FuncMemory::read_byte( Addr addr) const
 
 Byte FuncMemory::check_and_read_byte( Addr addr) const
 {
-    return check( addr) ? read_byte( addr) : static_cast<Byte>( NO_VAL8);
+    return check( addr) ? read_byte( addr) : Byte{};
 }
 
 inline void FuncMemory::write_byte( Addr addr, Byte value)
