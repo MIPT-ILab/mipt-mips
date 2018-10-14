@@ -15,7 +15,7 @@ namespace config {
 
 int main( int argc, const char* argv[]) try {
     /* Analysing and handling of inserted arguments */
-    config::handleArgs( argc, argv);
+    config::handleArgs( argc, argv, 1);
     Simulator::create_configured_simulator()->run( config::binary_filename, config::num_steps);
     return 0;
 }
