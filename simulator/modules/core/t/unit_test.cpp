@@ -16,6 +16,14 @@
 static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
+TEST_CASE( "PerfSim: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    PerfSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), Deadlock);
+}
+
 // TODO: remove that class, use true FuncSim interfaces instead
 template <typename ISA>
 struct PerfSimAndMemory : PerfSim<ISA>

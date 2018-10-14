@@ -18,6 +18,20 @@
 static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
+TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
+{
+    // Just call a constructor
+    CHECK_NOTHROW( FuncSim<MIPS32>() );
+}
+
+TEST_CASE( "FuncSim: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
+
 // TODO: remove that class, use true FuncSim interfaces instead
 template <typename ISA>
 struct FuncSimAndMemory : FuncSim<ISA>
@@ -46,11 +60,17 @@ struct FuncSimAndMemory : FuncSim<ISA>
     }
 };
 
-TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
+TEST_CASE( "FuncSim: get lost without pc")
 {
-    // Just call a constructor
-    CHECK_NOTHROW( FuncSim<MIPS32>() );
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    ElfLoader( valid_elf_file).load_to( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
 
+TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
+{
     // Call constructor and init
     CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().init_trace( valid_elf_file) );
 }
