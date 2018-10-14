@@ -144,7 +144,6 @@ bool HierarchiedMemory::check( Addr addr) const
 
 void HierarchiedMemory::duplicate_to( FuncMemory* target) const
 {
-    target->set_startPC( startPC());
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
             target->memcpy_host_to_guest( get_addr( set_it, page_it, page_it->begin()),

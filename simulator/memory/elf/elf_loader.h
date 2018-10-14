@@ -10,6 +10,7 @@
 #include <infra/exception.h>
 #include <infra/types.h>
 
+#include <memory>
 #include <string>
 
 struct InvalidElfFile final : Exception
@@ -21,6 +22,27 @@ struct InvalidElfFile final : Exception
 
 class FuncMemory;
 
-void load_elf_file(FuncMemory* memory, const std::string& filename, AddrDiff offset = 0);
+namespace ELFIO {
+    class elfio;
+} // namespace ELFIO
 
+class ElfLoader
+{
+public:
+    explicit ElfLoader( const std::string& filename, AddrDiff offset = 0);
+    ~ElfLoader();
+
+    // Regardless of 'const std::unique_ptr', we delete everything explicitly
+    ElfLoader( const ElfLoader&) = delete;
+    ElfLoader( ElfLoader&&) = delete;
+    ElfLoader& operator=( const ElfLoader&) = delete;
+    ElfLoader& operator=( ElfLoader&&) = delete;
+
+    void load_to(FuncMemory* memory) const;
+    Addr get_startPC() const;
+private:
+    const std::unique_ptr<ELFIO::elfio> reader;
+    AddrDiff offset;
+};
+   
 #endif

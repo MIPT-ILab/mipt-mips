@@ -41,7 +41,6 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         void set_memory( FuncMemory* memory) final;
-        void init();
         void init_checker() final { };
         FuncInstr step();
         Trap run(uint64 instrs_to_run) final;

@@ -36,9 +36,6 @@ class FuncMemory
 	static std::unique_ptr<FuncMemory>
 	    create_plain_memory( uint32 addr_bits = 20);
 
-        Addr startPC() const { return startPC_addr; }
-        void set_startPC(Addr value) { startPC_addr = value; }
-
         virtual size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) = 0;
         virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const = 0;
         virtual void duplicate_to( FuncMemory* target) const = 0;
@@ -66,7 +63,6 @@ class FuncMemory
         FuncMemory& operator=( const FuncMemory&) = default;
         FuncMemory& operator=( FuncMemory&&) = default;
     private:
-        Addr startPC_addr = 0;
         template<typename Instr> void load( Instr* instr) const;
         template<typename Instr> void store( const Instr& instr);
 };
