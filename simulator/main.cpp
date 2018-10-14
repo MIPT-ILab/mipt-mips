@@ -6,6 +6,8 @@
 
 /* Simulator modules. */
 #include <infra/config/config.h>
+#include <memory/elf/elf_loader.h>
+#include <memory/memory.h>
 #include <simulator.h>
 
 namespace config {
@@ -14,9 +16,14 @@ namespace config {
 } // namespace config
 
 int main( int argc, const char* argv[]) try {
-    /* Analysing and handling of inserted arguments */
     config::handleArgs( argc, argv, 1);
-    Simulator::create_configured_simulator()->run( config::binary_filename, config::num_steps);
+    auto memory = FuncMemory::create_hierarchied_memory();
+    ::load_elf_file( memory.get(), config::binary_filename);
+
+    auto sim = Simulator::create_configured_simulator();
+    sim->set_memory( memory.get());
+    sim->init_checker();
+    sim->run( config::num_steps);
     return 0;
 }
 catch (const config::HelpOption& e) {

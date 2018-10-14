@@ -266,3 +266,4 @@ TEST_CASE( "Func_memory: Duplicate")
 
     CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem1.read<uint32, Endian::little>( dataSectAddr));
 }
+
