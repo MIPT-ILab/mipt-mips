@@ -8,24 +8,24 @@
 #include "execute.h"
 
 namespace config {
-    Value<uint64> complex_alu_latency = { "complex-alu-latency", 3, "Latency of complex arithmetic logic unit"};
+    Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
 } // namespace config
 
 
 template <typename ISA>
 Execute<ISA>::Execute( bool log) 
     : Log( log)
-    , last_execution_stage_latency( Latency( config::complex_alu_latency - 1))
+    , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
-    if (config::complex_alu_latency < 2)
-        throw Exception("Wrong argument! Latency of complex arithmetic logic unit should be greater than 1");
+    if (config::long_alu_latency < 2)
+        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be greater than 1");
     
-    if (config::complex_alu_latency > 64)
-        throw Exception("Wrong argument! Latency of complex arithmetic logic unit should be less than 64");
+    if (config::long_alu_latency > 64)
+        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be less than 64");
 
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
@@ -37,7 +37,7 @@ Execute<ISA>::Execute( bool log)
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
 
     wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    wp_complex_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
+    wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
                                                                PORT_BW, SRC_REGISTERS_NUM);
 
     rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
@@ -72,14 +72,14 @@ void Execute<ISA>::clock( Cycle cycle)
         return;
     }
 
-    /* get the instruction from complex ALU if it is ready */
+    /* get the instruction from long ALU if it is ready */
     if ( rp_long_latency_execution_unit->is_ready( cycle))
     {
         auto instr = rp_long_latency_execution_unit->read( cycle);
 
         if ( has_flush_expired())
         {
-            wp_complex_arithmetic_bypass->write( instr.get_dst_v(), cycle);
+            wp_long_arithmetic_bypass->write( instr.get_dst_v(), cycle);
             wp_writeback_datapath->write( instr, cycle);
         }
     }
@@ -113,7 +113,7 @@ void Execute<ISA>::clock( Cycle cycle)
     /* log */
     sout << instr << std::endl;
 
-    if ( instr.is_complex_arithmetic()) 
+    if ( instr.is_long_arithmetic()) 
     {
         wp_long_latency_execution_unit->write( std::move( instr), cycle);
     }
