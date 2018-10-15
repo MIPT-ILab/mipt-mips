@@ -211,7 +211,7 @@ TEST_CASE( "Adaptive two bit prediction in case of changed target")
     auto bp = get_trained_adaptive_two_level_predictor( PC, target);
 
     // use different target
-    Addr target = 24;
+    target = 24;
     bp->update( BPInterface( PC, true, target));
 
     //check if the target was updated
