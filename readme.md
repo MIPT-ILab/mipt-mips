@@ -81,7 +81,7 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 * `--icache-line-size` — line size of instruction cache
 
 #### Complex pipeline
-* `--complex-alu-latency` - number of execution stages required for complex arithmetic instructions to be complete
+* `--long-alu-latency` - number of execution stages required for long arithmetic instructions to be complete
 
 ## About MIPT-MIPS
 
