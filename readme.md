@@ -80,7 +80,7 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 * `--icache-ways` — # of ways in instruction cache
 * `--icache-line-size` — line size of instruction cache
 
-#### Complex pipeline
+#### Execution pipeline
 * `--long-alu-latency` - number of execution stages required for long arithmetic instructions to be complete
 
 ## About MIPT-MIPS
