@@ -20,11 +20,11 @@
 
 class BPEntry
 {
-protected:
+    protected:
     Addr _target = NO_VAL32;
 
 public:
-    Addr getTarget() const { return _target; }
+    Addr getTarget() const { return _target;}
     void reset() { _target = NO_VAL32; }
     void update_target(Addr target) { _target = target; }
 };
@@ -38,11 +38,15 @@ public:
     void update( bool is_taken, Addr target) {if (is_taken) _target = target; }
 };
 
-class BPEntryAlwaysTaken final : public BPEntryStatic
+template<bool DIRECTION>
+class BPEntryAlwaysOneDirection final : public BPEntryStatic
 {
 public:
-    bool is_taken( Addr /* unused */) const { return true; }
+    bool is_taken( Addr /* unused */) const { return DIRECTION; }
 };
+
+using BPEntryAlwaysTaken = BPEntryAlwaysOneDirection<true>;
+using BPEntryAlwaysNotTaken = BPEntryAlwaysOneDirection<false>;
 
 class BPEntryBackwardJumps final : public BPEntryStatic
 {
@@ -50,7 +54,6 @@ public:
     /* prediction */
     bool is_taken( Addr PC) const { return _target < PC ; }
 };
-
 
 /* dynamic predictors */
 
@@ -77,10 +80,9 @@ public:
             /* if the address has somehow changed, we should update it appropriately */
             reset();
             update_target(target);
-        } else
-        {
-            state = static_cast<State>( is_taken);
         }
+
+        state = static_cast<State>( is_taken);
     }
 
     void reset() { BPEntry::reset(); state = default_state; }

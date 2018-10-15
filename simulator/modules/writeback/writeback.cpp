@@ -13,6 +13,12 @@ Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
 }
 
 template <typename ISA>
+void Writeback<ISA>::init_checker( const Memory& mem)
+{
+    checker.init( mem);
+}
+
+template <typename ISA>
 void Writeback<ISA>::clock( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";

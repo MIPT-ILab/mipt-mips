@@ -40,8 +40,9 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         void init( const std::string& tr);
+        void init( const Memory& other_mem);
         FuncInstr step();
-        void run(const std::string& tr, uint64 instrs_to_run) final;
+        Trap run(const std::string& tr, uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;

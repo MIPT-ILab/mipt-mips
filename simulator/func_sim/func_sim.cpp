@@ -4,6 +4,7 @@
  */
  
 #include "func_sim.h"
+#include <infra/memory/elf/elf_loader.h>
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new Memory) { }
@@ -58,21 +59,31 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
-    mem->load_elf_file( tr);
+    ::load_elf_file( mem.get(), tr);
     PC = mem->startPC();
     nops_in_a_row = 0;
 }
 
 template <typename ISA>
-void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+void FuncSim<ISA>::init( const Memory& other_mem)
+{
+    other_mem.duplicate_to( mem.get());
+    PC = mem->startPC();
+    nops_in_a_row = 0;
+}
+
+template <typename ISA>
+Trap FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
 {
     init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
-        if ( instr.is_halt())
-            break;
+
+        if ( instr.trap_type() == Trap::HALT)
+            return instr.trap_type();
     }
+    return Trap::NO_TRAP;
 }
 
 #include <mips/mips.h>

@@ -28,7 +28,7 @@ class PerfSim : public CycleAccurateSimulator
 public:
     explicit PerfSim( bool log);
     ~PerfSim() final { destroy_ports(); }
-    void run( const std::string& tr, uint64 instrs_to_run) final;
+    Trap run( const std::string& tr, uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void clock() final;
     void halt() final { force_halt = true; }

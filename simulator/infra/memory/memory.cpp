@@ -7,9 +7,6 @@
 
 #include "memory.h"
 
-// ELFIO
-#include <elfio/elfio.hpp>
-
 // MIPT-MIPS modules
 #include <infra/macro.h>
 
@@ -47,77 +44,45 @@ FuncMemory::FuncMemory( uint32 addr_bits,
     memory.resize(set_cnt);
 }
 
-void FuncMemory::load_elf_file( const std::string& executable_file_name)
+size_t FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    ELFIO::elfio reader;
+    assert( dst != 0);
+    assert( dst <= addr_mask);
 
-    if ( !reader.load( executable_file_name))
-        throw InvalidElfFile( executable_file_name);
-
-    for ( const auto& section : reader.sections)
-        load_elf_section( section);
-}
-
-void FuncMemory::load_elf_section( const ELFIO::section* section)
-{
-    if ( section->get_address() == 0)
-        return;
-
-    if ( section->get_name() == ".text")
-        startPC_addr = section->get_address();
-
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
-    memcpy_host_to_guest( section->get_address(), reinterpret_cast<const Byte*>(section->get_data()), section->get_size());
-}
-
-void FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
-{
-    for ( size_t offset = 0; offset < size; ++offset)
+    size_t offset = 0;
+    for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
-        alloc_and_write_byte( dst + offset, *(src + offset));
-}    
-
-template<typename T>
-T FuncMemory::read( Addr addr, T mask) const
-{
-    assert( addr <= addr_mask);
-
-    T value = 0;
-
-    // Endian specific
-    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if (( mask & 0xFFu) == 0xFFu)
-            value |= static_cast<T>(static_cast<T>(check_and_read_byte( addr + i)) << (i * 8));
-        if constexpr ( bitwidth<T> > 8)
-            mask >>= 8u; // NOLINT(bugprone-suspicious-semicolon)
-    }
-
-    return value;
+        alloc_and_write_byte( dst + offset, src[offset]);
+    return offset;
 }
 
-
-template uint8 FuncMemory::read<uint8>( Addr addr, uint8 mask) const;
-template uint16 FuncMemory::read<uint16>( Addr addr, uint16 mask) const;
-template uint32 FuncMemory::read<uint32>( Addr addr, uint32 mask) const;
-template uint64 FuncMemory::read<uint64>( Addr addr, uint64 mask) const;
-template uint128 FuncMemory::read<uint128>( Addr addr, uint128 mask) const;
-
-template<typename T>
-void FuncMemory::write( T value, Addr addr, T mask)
+size_t FuncMemory::memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
 {
-    assert( addr != 0);
-    assert( addr <= addr_mask);
-    assert( mask != 0);
+    return memcpy_host_to_guest( dst, src, size);
+}
+catch (...)
+{
+    return 0;
+}
 
-    // Endian specific
-    for ( size_t i = 0; i < bitwidth<T> / 8; ++i) {
-        if ((mask & 0xFFu) == 0xFFu)
-            alloc_and_write_byte( addr + i, static_cast<Byte>( static_cast<uint8>( value & 0xFFu)));
-        if constexpr ( bitwidth<T> > 8) { // NOLINT(bugprone-suspicious-semicolon)
-            mask >>= 8u;
-            value >>= 8u;
-        }
-    }
+size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
+{
+    assert( src != 0);
+
+    size_t offset = 0;
+    for (; offset < size; ++offset)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
+        dst[offset] = check_and_read_byte( src + offset);
+    return offset;
+}
+
+size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) const noexcept try
+{
+    return memcpy_guest_to_host( dst, src, size);
+}
+catch (...)
+{
+    return 0;
 }
 
 void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
@@ -125,12 +90,6 @@ void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
     alloc( addr);
     write_byte( addr, value);
 }
-
-template void FuncMemory::write<uint8>( uint8 value, Addr addr, uint8 mask);
-template void FuncMemory::write<uint16>( uint16 value, Addr addr, uint16 mask);
-template void FuncMemory::write<uint32>( uint32 value, Addr addr, uint32 mask);
-template void FuncMemory::write<uint64>( uint64 value, Addr addr, uint64 mask);
-template void FuncMemory::write<uint128>( uint128 value, Addr addr, uint128 mask);
 
 void FuncMemory::alloc( Addr addr)
 {
@@ -147,6 +106,16 @@ bool FuncMemory::check( Addr addr) const
 {
     const auto& set = memory[get_set(addr)];
     return !set.empty() && !set[get_page(addr)].empty();
+}
+
+void FuncMemory::duplicate_to( FuncMemory* target) const
+{
+    target->set_startPC( startPC());
+    for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
+        for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
+            target->memcpy_host_to_guest( get_addr( set_it, page_it, page_it->begin()),
+                                          page_it->data(),
+                                          page_it->size());
 }
 
 std::string FuncMemory::dump() const

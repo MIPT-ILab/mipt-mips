@@ -17,7 +17,7 @@ struct RISCV
 {
     using FuncInstr = RISCVInstr<T>;
     using Register = RISCVRegister;
-    using Memory = InstrMemory<RISCVInstr<T>>;
+    using Memory = InstrMemoryCached<RISCVInstr<T>>;
     using RegisterUInt = T;
 };
 

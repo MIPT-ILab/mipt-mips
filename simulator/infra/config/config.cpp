@@ -13,9 +13,9 @@ namespace config {
 static AliasedSwitch help_option = { "h", "help", "print help"};
 
 /* basic method */
-void handleArgs( int argc, const char* const argv[])
+void handleArgs( int argc, const char* const argv[], int start_index)
 {
-    BaseValue::options().parse( argc, argv);
+    BaseValue::options().parse( argc, argv, start_index);
 
     if ( help_option)
         throw HelpOption( BaseValue::options().help());
