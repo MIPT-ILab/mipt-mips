@@ -159,12 +159,9 @@ TEST_CASE( "Two bit predictor, advanced")
     CHECK( bp->get_target(PC) == target);
 }
 
-TEST_CASE( "Adaptive two bit prediction")
+static auto get_trained_adaptive_two_level_predictor()
 {
     auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
-
-    Addr PC = 12;
-    Addr target = 28;
 
     // Learn in sequence 001001001
     bp->update( BPInterface( PC, false, target));
@@ -178,6 +175,15 @@ TEST_CASE( "Adaptive two bit prediction")
     bp->update( BPInterface( PC, false, target));
     bp->update( BPInterface( PC, false, target));
     bp->update( BPInterface( PC, true, target));
+
+    return bp;
+}
+
+TEST_CASE( "Adaptive two bit prediction")
+{
+    auto bp = get_trained_adaptive_two_level_predictor();
+    Addr PC = 12;
+    Addr target = 28;
 
     //check prediction on 00 sequence
     bp->update( BPInterface( PC, false, target));
@@ -200,26 +206,10 @@ TEST_CASE( "Adaptive two bit prediction")
 
 TEST_CASE( "Adaptive two bit prediction in case of changed target")
 {
-    auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
+    auto bp = get_trained_adaptive_two_level_predictor();
 
     Addr PC = 12;
-    Addr target = 28;
-
-    // Learn in sequence 001001001
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
-
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
-
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
-
-    //change the target
-    target = 24;
+    Addr target = 24; // use different target
     //update the target
     bp->update( BPInterface( PC, true, target));
 
