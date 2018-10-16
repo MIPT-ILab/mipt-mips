@@ -58,6 +58,10 @@ class FuncMemory
         template<typename Instr> void load_store( Instr* instr);
 
         virtual ~FuncMemory() = default;
+        FuncMemory( const FuncMemory&) = default;
+        FuncMemory( FuncMemory&&) = default;
+        FuncMemory& operator=( const FuncMemory&) = default;
+        FuncMemory& operator=( FuncMemory&&) = default;
     private:
         Addr startPC_addr = 0;
         template<typename Instr> void load( Instr* instr) const;
