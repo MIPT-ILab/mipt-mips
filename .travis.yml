@@ -34,7 +34,7 @@ addons:
     update: true
     packages:
     - g++-7
-    - libboost-program-options1.54-dev
+    - libboost-dev
     - clang-tidy-7
 
 install:
