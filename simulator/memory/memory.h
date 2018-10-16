@@ -57,6 +57,7 @@ class FuncMemory
 
         template<typename Instr> void load_store( Instr* instr);
 
+        FuncMemory() = default;
         virtual ~FuncMemory() = default;
         FuncMemory( const FuncMemory&) = default;
         FuncMemory( FuncMemory&&) = default;
