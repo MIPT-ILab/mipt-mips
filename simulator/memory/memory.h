@@ -57,7 +57,7 @@ class FuncMemory
 
         template<typename Instr> void load_store( Instr* instr);
 
-        virtual ~FuncMemory() {}
+        virtual ~FuncMemory() = default;
     private:
         Addr startPC_addr = 0;
         template<typename Instr> void load( Instr* instr) const;
