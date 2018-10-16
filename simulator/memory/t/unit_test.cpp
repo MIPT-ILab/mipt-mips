@@ -169,7 +169,6 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_8.at(i) == write_data_8.at(i));
-
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
