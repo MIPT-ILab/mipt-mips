@@ -80,7 +80,7 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
     // check hadling the situation when read
     // from not initialized or written data
-    CHECK( func_mem.read<uint8, Endian::little>( 0x300000) == NO_VAL8);
+    CHECK( func_mem.read<uint8, Endian::little>( 0x300000) == 0);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
