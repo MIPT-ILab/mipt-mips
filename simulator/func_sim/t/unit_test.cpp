@@ -64,6 +64,14 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     CHECK( simulator.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
+TEST_CASE( "FuncSim: make a step with checker")
+{
+    FuncSimAndMemory<MIPS32> simulator;
+    simulator.init( valid_elf_file);
+    simulator.init_checker();
+    CHECK( simulator.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
+}
+
 TEST_CASE( "Run one instruction: Func_Sim")
 {
     CHECK( FuncSimAndMemory<MIPS32>().run_trace( smc_code, 1) == Trap::NO_TRAP);
