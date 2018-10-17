@@ -21,6 +21,6 @@ struct InvalidElfFile final : Exception
 
 class FuncMemory;
 
-void load_elf_file(FuncMemory* memory, const std::string& filename, AddrDiff offset = 0)
+void load_elf_file(FuncMemory* memory, const std::string& filename, AddrDiff offset = 0);
 
 #endif
