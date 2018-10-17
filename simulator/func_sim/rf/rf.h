@@ -22,8 +22,8 @@ class RF
 
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
-    auto& get_value( Register num) { return array.at( num.to_size_t()); }
-    const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
+    auto& get_value( Register num) { return array.at( num.to_rf_index()); }
+    const auto& get_value( Register num) const { return array.at( num.to_rf_index()); }
 
     static uint32 get_carry( uint32 x, uint32 y, int8 accumulation)
     {
@@ -36,11 +36,6 @@ public:
     const auto& read( Register num) const
     {
         return get_value( num);
-    }
-
-    const auto& read( size_t regno) const
-    {
-        return array.at( regno);
     }
 
     void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
@@ -65,10 +60,6 @@ public:
 
         get_value( num) &= ~mask;      // Clear old bits
         get_value( num) |= val & mask; // Set new bits
-    }
-
-    void write( size_t regno, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0) {
-        write( Register( regno), val, mask, accumulation);
     }
 
     inline void read_source( FuncInstr* instr, uint8 index) const
