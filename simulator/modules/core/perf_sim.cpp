@@ -4,8 +4,7 @@
  */
 
 #include "perf_sim.h"
-
-#include <infra/memory/elf/elf_loader.h>
+#include <memory/elf/elf_loader.h>
 
 #include <chrono>
 #include <iostream>
@@ -13,7 +12,7 @@
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     CycleAccurateSimulator( log),
-    memory( new FuncMemory),
+    memory( FuncMemory::create_hierarchied_memory()),
     fetch( log),
     decode( log),
     execute( log),

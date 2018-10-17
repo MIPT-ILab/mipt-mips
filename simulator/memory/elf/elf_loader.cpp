@@ -7,7 +7,7 @@
 #include "elf_loader.h"
 
 #include <elfio/elfio.hpp>
-#include <infra/memory/memory.h>
+#include <memory/memory.h>
 
 static void load_elf_section( FuncMemory* memory, const ELFIO::section& section)
 {

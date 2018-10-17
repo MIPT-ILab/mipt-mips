@@ -23,11 +23,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/memory/memory.cpp
-    infra/memory/elf/elf_loader.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
+    memory/hierarchied_memory.cpp
+    memory/elf/elf_loader.cpp
     modules/fetch/fetch.cpp
     modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp

@@ -11,7 +11,7 @@
 #include "rf/rf.h"
 
 #include <infra/exception.h>
-
+#include <memory/memory.h>
 #include <simulator.h>
 
 #include <memory>
