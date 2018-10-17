@@ -30,11 +30,17 @@ class RF
         return (accumulation == +1 && MAX_VAL32 - x < y) || (accumulation == -1 && x < y) ? 1 : 0;
     }
 
-protected:
+public:
+    RF() = default;
 
     const auto& read( Register num) const
     {
         return get_value( num);
+    }
+
+    const auto& read( size_t regno) const
+    {
+        return array.at( regno);
     }
 
     void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
@@ -60,9 +66,10 @@ protected:
         get_value( num) &= ~mask;      // Clear old bits
         get_value( num) |= val & mask; // Set new bits
     }
-public:
 
-    RF() = default;
+    void write( size_t regno, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0) {
+        write( Register( regno), val, mask, accumulation);
+    }
 
     inline void read_source( FuncInstr* instr, uint8 index) const
     {

@@ -13,12 +13,7 @@
 #include <mips/mips.h>
 
 
-class TestRF : public RF<MIPS32>
-{
-    public:
-        using RF<MIPS32>::read;
-        using RF<MIPS32>::write;
-};
+class TestRF : public RF<MIPS32> {};
 
 static_assert(MIPSRegister::MAX_REG >= 32);
 
@@ -101,6 +96,21 @@ TEST_CASE( "RF: read_write_rf")
     rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), +1 /* add */);
     CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
     CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
+}
+
+TEST_CASE( "RF: rw_by_regno")
+{
+    auto rf = std::make_unique<TestRF>();
+
+    // Zero
+    rf->write( 0, 0x1337u);
+    CHECK( rf->read( 0) == 0u);
+
+    // GPR
+    for( size_t i = 1; i < 32; ++i) {
+        rf->write( i, 0x1337u);
+        CHECK( rf->read( i) == 0x1337u);
+    }
 }
 
 TEST_CASE( "RF: read_sources_write_dst_rf")
