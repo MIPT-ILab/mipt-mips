@@ -34,7 +34,7 @@ addons:
     update: true
     packages:
     - g++-7
-    - libboost-program-options1.54-dev
+    - libboost-dev
     - clang-tidy-7
 
 install:
@@ -52,7 +52,7 @@ install:
     fi
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/traces && make
+  - cd $TRAVIS_BUILD_DIR/traces && make tt
   - cd $TRAVIS_BUILD_DIR/simulator
   - mkdir release && cd release
   - cmake .. -DCMAKE_BUILD_TYPE=Release
