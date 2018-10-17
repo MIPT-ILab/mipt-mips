@@ -71,7 +71,16 @@ TEST_CASE( "Torture_Test: Perf_Sim")
     CHECK_NOTHROW( PerfSimAndMemory<MIPS64>( false).run_trace_no_limit( TEST_PATH "/tt.core64.le.out") );
 }
 
-TEST_CASE( "Perf_Sim: Run_SMC_Trace")
+TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
+{
+    PerfSim<MIPS32> sim( false);
+    auto mem = FuncMemory::create_hierarchied_memory();
+    ::load_elf_file( mem.get(), smc_code);
+    sim.set_memory( mem.get());
+    CHECK( sim.run_no_limit( ) == Trap::NO_TRAP);
+}
+
+TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 {
     CHECK_THROWS_AS( PerfSimAndMemory<MIPS32>( false).run_trace_no_limit( smc_code), CheckerMismatch);
 }
