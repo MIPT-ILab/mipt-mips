@@ -34,7 +34,7 @@ before_build:
 - 7z x mips-linux-gnu.zip
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make"
+- bash -lc "cd /c/projects/mipt-mips/traces/; make tt"
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
