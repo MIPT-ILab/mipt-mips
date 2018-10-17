@@ -31,7 +31,7 @@ before_build:
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
 - appveyor DownloadFile %GNU_BINUTILS%
-- 7z x mips-linux-gnu.7z
+- 7z x mips-linux-gnu.zip
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
