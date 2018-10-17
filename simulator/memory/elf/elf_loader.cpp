@@ -9,23 +9,23 @@
 #include <elfio/elfio.hpp>
 #include <memory/memory.h>
 
-static void load_elf_section( FuncMemory* memory, const ELFIO::section& section)
+static void load_elf_section( FuncMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
-    memory->memcpy_host_to_guest( section.get_address(), reinterpret_cast<const Byte*>(section.get_data()), section.get_size());
+    memory->memcpy_host_to_guest( section.get_address() + offset, reinterpret_cast<const Byte*>(section.get_data()), section.get_size());
 }
 
-static void set_startPC( FuncMemory* memory, const ELFIO::elfio& reader)
+static void set_startPC( FuncMemory* memory, const ELFIO::elfio& reader, AddrDiff offset)
 {
     if ( reader.sections[ ".text"] != nullptr)
-        memory->set_startPC( reader.sections[ ".text"]->get_address());
+        memory->set_startPC( reader.sections[ ".text"]->get_address() + offset);
 }
 
-static void load_all_elf_sections( FuncMemory* memory, const ELFIO::elfio& reader)
+static void load_all_elf_sections( FuncMemory* memory, const ELFIO::elfio& reader, AddrDiff offset)
 {
     for ( const auto& section : reader.sections)
         if ( section->get_address() != 0)
-            load_elf_section( memory, *section);
+            load_elf_section( memory, *section, offset);
 }
 
 static ELFIO::elfio get_elfio_reader( const std::string& filename)
@@ -38,9 +38,9 @@ static ELFIO::elfio get_elfio_reader( const std::string& filename)
     return reader;
 }
 
-void load_elf_file( FuncMemory* memory, const std::string& filename)
+void load_elf_file( FuncMemory* memory, const std::string& filename, AddrDiff offset)
 {
     const auto& reader = get_elfio_reader( filename);
-    load_all_elf_sections( memory, reader);
-    set_startPC( memory, reader);
+    load_all_elf_sections( memory, reader, offset);
+    set_startPC( memory, reader, offset);
 }

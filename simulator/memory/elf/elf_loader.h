@@ -8,6 +8,7 @@
 #define ELF_LOADER_H
 
 #include <infra/exception.h>
+#include <infra/types.h>
 
 #include <string>
 
@@ -20,6 +21,6 @@ struct InvalidElfFile final : Exception
 
 class FuncMemory;
 
-void load_elf_file(FuncMemory* memory, const std::string& filename);
+void load_elf_file(FuncMemory* memory, const std::string& filename, AddrDiff offset = 0);
 
 #endif
