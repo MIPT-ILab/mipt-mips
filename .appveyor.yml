@@ -27,10 +27,11 @@ before_build:
 - git submodule update --init
 - if "%platform%"=="x86" set MSYSTEM=mingw32
 - if "%platform%"=="x64" set MSYSTEM=mingw64
-- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;%PATH%
+- set PATH=C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;C:\Projects\mipt-mips\mips-linux-gnu\bin;%PATH%
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
-- bash -lc "/c/projects/mipt-mips/traces/.get-binutils.sh /c/msys64/usr"
+- appveyor DownloadFile %GNU_BINUTILS%
+- 7z x mips-linux-gnu.zip
 
 build_script:
 - bash -lc "cd /c/projects/mipt-mips/traces/; make"
