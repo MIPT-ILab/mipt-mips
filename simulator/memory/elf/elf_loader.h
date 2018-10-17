@@ -8,6 +8,7 @@
 #define ELF_LOADER_H
 
 #include <infra/exception.h>
+#include <infra/types.h>
 
 #include <string>
 
