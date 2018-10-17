@@ -114,12 +114,12 @@ class DataBypass
 
         RegisterInfo& get_entry( Register num)
         {
-            return scoreboard.at( num.to_size_t());
+            return scoreboard.at( num.to_rf_index());
         }
 
         const RegisterInfo& get_entry( Register num) const
         {
-            return scoreboard.at( num.to_size_t());
+            return scoreboard.at( num.to_rf_index());
         }
 
         // returns a latency of an instruction
