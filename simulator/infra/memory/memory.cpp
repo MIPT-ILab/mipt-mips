@@ -108,6 +108,16 @@ bool FuncMemory::check( Addr addr) const
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
+void FuncMemory::duplicate_to( FuncMemory* target) const
+{
+    target->set_startPC( startPC());
+    for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
+        for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
+            target->memcpy_host_to_guest( get_addr( set_it, page_it, page_it->begin()),
+                                          page_it->data(),
+                                          page_it->size());
+}
+
 std::string FuncMemory::dump() const
 {
     std::ostringstream oss;
@@ -157,7 +167,7 @@ inline Byte FuncMemory::read_byte( Addr addr) const
 
 Byte FuncMemory::check_and_read_byte( Addr addr) const
 {
-    return check( addr) ? read_byte( addr) : static_cast<Byte>( NO_VAL8);
+    return check( addr) ? read_byte( addr) : Byte{};
 }
 
 inline void FuncMemory::write_byte( Addr addr, Byte value)

@@ -13,7 +13,7 @@
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     CycleAccurateSimulator( log),
-    memory( new Memory),
+    memory( new FuncMemory),
     fetch( log),
     decode( log),
     execute( log),
@@ -44,7 +44,7 @@ Trap PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
     force_halt = false;
     ::load_elf_file( memory.get(), tr);
 
-    writeback.init_checker( tr);
+    writeback.init_checker( *memory);
     writeback.set_instrs_to_run( instrs_to_run);
 
     set_target( Target( memory->startPC(), 0));

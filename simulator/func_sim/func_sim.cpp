@@ -7,7 +7,10 @@
 #include <infra/memory/elf/elf_loader.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new Memory) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new FuncMemory)
+{
+    imem.set_memory( mem.get());
+}
 
 template <typename ISA>
 void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
@@ -25,7 +28,7 @@ template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
-    FuncInstr instr = mem->fetch_instr( PC);
+    FuncInstr instr = imem.fetch_instr( PC);
 
     // set sequence_id
     instr.set_sequence_id(sequence_id);
@@ -60,6 +63,14 @@ template <typename ISA>
 void FuncSim<ISA>::init( const std::string& tr)
 {
     ::load_elf_file( mem.get(), tr);
+    PC = mem->startPC();
+    nops_in_a_row = 0;
+}
+
+template <typename ISA>
+void FuncSim<ISA>::init( const FuncMemory& other_mem)
+{
+    other_mem.duplicate_to( mem.get());
     PC = mem->startPC();
     nops_in_a_row = 0;
 }

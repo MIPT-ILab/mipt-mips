@@ -32,7 +32,7 @@ void handleArgs( const char* (& array)[N])
 {
     // Let it decay
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
-    config::handleArgs( N, array);
+    config::handleArgs( N, array, 1);
 }
 
 //

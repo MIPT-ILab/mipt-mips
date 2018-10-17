@@ -22,8 +22,8 @@ class DataBypass
     using Instr     = PerfInstr<FuncInstr>;
 
     public:
-        explicit DataBypass( uint64 complex_alu_latency)
-            : last_execution_stage_value( static_cast<uint8>(complex_alu_latency - 1))
+        explicit DataBypass( uint64 long_alu_latency)
+            : last_execution_stage_value( static_cast<uint8>(long_alu_latency - 1))
         { }
 
         // checks whether a source register of an instruction is in the RF  
@@ -82,7 +82,7 @@ class DataBypass
 
             void set_next_stage_after_first_execution_stage( const Instr& instr)
             {
-                if ( instr.is_complex_arithmetic())
+                if ( instr.is_long_arithmetic())
                 {
                     next_stage_after_first_execution_stage.set_to_first_execution_stage();
                     next_stage_after_first_execution_stage.inc();
@@ -129,7 +129,7 @@ class DataBypass
             if ( instr.is_mem_stage_required())
                 return 2_lt;
             
-            if ( instr.is_complex_arithmetic())
+            if ( instr.is_long_arithmetic())
                 return Latency( last_execution_stage_value + 1);
             
             return 1_lt;
@@ -152,7 +152,7 @@ void DataBypass<ISA>::trace_new_dst_register( const Instr& instr, Register num)
     entry.set_next_stage_after_first_execution_stage( instr);
 
 
-    if ( instr.is_complex_arithmetic())
+    if ( instr.is_long_arithmetic())
     {
         entry.ready_stage.set_to_last_execution_stage( last_execution_stage_value);
     }

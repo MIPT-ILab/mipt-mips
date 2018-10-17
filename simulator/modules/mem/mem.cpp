@@ -3,8 +3,9 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-
 #include "mem.h"
+
+#include <infra/memory/memory.h>
 
 static constexpr const uint32 FLUSHED_STAGES_NUM = 3;
 
@@ -25,7 +26,6 @@ Mem<ISA>::Mem( bool log) : Log( log)
     wp_bypassing_unit_flush_notify = make_write_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                             PORT_BW, PORT_FANOUT);
 }
-
 
 template <typename ISA>
 void Mem<ISA>::clock( Cycle cycle)

@@ -9,7 +9,6 @@
 
 #include "riscv_instr.h"
 
-#include <infra/instrcache/instr_cache_memory.h>
 #include <infra/types.h>
 
 template <typename T>
@@ -17,7 +16,6 @@ struct RISCV
 {
     using FuncInstr = RISCVInstr<T>;
     using Register = RISCVRegister;
-    using Memory = InstrMemoryCached<RISCVInstr<T>>;
     using RegisterUInt = T;
 };
 
