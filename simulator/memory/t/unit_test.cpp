@@ -52,6 +52,26 @@ TEST_CASE( "Func_memory: StartPC_Method_Test")
     CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the ".text" section*/);
 }
 
+TEST_CASE( "Plain memory: out of range")
+{
+    std::array<Byte, 16> arr{};
+    auto ptr = FuncMemory::create_plain_memory( 10);
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x0, arr.data(), 2048), FuncMemoryOutOfRange );
+
+    CHECK( ptr->memcpy_host_to_guest_noexcept( 0x0, arr.data(), 2048) == 0 );
+}
+
+TEST_CASE( "Hierarchied memory: out of range")
+{
+    std::array<Byte, 16> arr{};
+    auto ptr = FuncMemory::create_hierarchied_memory( 10, 3, 4);
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x0, arr.data(), 2048), FuncMemoryOutOfRange );
+}
+
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
@@ -135,7 +155,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 
     // Check if read correctly
     CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data_1, dataSectAddr, 1) == 1);
+    CHECK( func_mem.memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
 
@@ -157,7 +177,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     for (size_t i = 0; i < size; i++)
         CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
 
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_8.data(), dataSectAddr, size) == size);
+    CHECK( func_mem.memcpy_guest_to_host( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_8.at(i) == write_data_8.at(i));
 }
@@ -180,7 +200,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     for (size_t i = 0; i < size; i++)
         CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
 
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_1024.data(), dataSectAddr, size) == size);
+    CHECK( func_mem.memcpy_guest_to_host( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_1024.at(i) == write_data_1024.at(i));
 }

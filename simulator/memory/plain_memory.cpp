@@ -20,13 +20,13 @@ class PlainMemory : public FuncMemory
 
         std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
-        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const final;
+        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
         void duplicate_to( FuncMemory* target) const final;
     private:
         std::size_t arena_size;
         std::unique_ptr<Byte[]> arena;
-        Byte* guest_to_host(Addr addr);
-        const Byte* guest_to_host(Addr addr) const;
+        Byte* guest_to_host(Addr addr) noexcept;
+        const Byte* guest_to_host(Addr addr) const noexcept;
 };
 
 std::unique_ptr<FuncMemory>
@@ -52,27 +52,33 @@ void PlainMemory::duplicate_to( FuncMemory* target) const
 
 size_t PlainMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    assert( dst <= arena_size);
-    assert( dst + size <= arena_size);
+    if (size > arena_size)
+        throw FuncMemoryOutOfRange( dst + size, arena_size);
+
+    if (dst > arena_size)
+        throw FuncMemoryOutOfRange( dst, arena_size);
+
+    if (dst > arena_size - size)
+        throw FuncMemoryOutOfRange( dst + size, arena_size);
+
     std::memcpy( guest_to_host( dst), src, size);
     return size;
 }
 
-size_t PlainMemory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const
+size_t PlainMemory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept
 {
-    assert( src <= arena_size);
-    assert( src + size <= arena_size);
-    std::memcpy( dst, guest_to_host( src), size);
-    return size;
+    size_t valid_size = std::min<size_t>( size, arena_size - src);
+    std::memcpy( dst, guest_to_host( src), valid_size);
+    return valid_size;
 }
 
-Byte* PlainMemory::guest_to_host(Addr addr)
+Byte* PlainMemory::guest_to_host(Addr addr) noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low level access
     return arena.get() + addr;
 }
 
-const Byte* PlainMemory::guest_to_host(Addr addr) const
+const Byte* PlainMemory::guest_to_host(Addr addr) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low level access
     return arena.get() + addr;
