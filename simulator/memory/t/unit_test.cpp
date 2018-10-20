@@ -14,6 +14,7 @@
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
+static const uint64 dataSectAddrShifted = 0x100c0;
 
 //
 // Check that all incorect input params of the constructor
@@ -21,46 +22,61 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory( )); // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory( 48, 15, 10)); // check memory initialization with custom parameters
-    CHECK_THROWS_AS( FuncMemory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
-    CHECK_THROWS_AS( FuncMemory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
-    CHECK_THROWS_AS( FuncMemory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
+    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( )); // check memory initialization with default parameters
+    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
+    CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
-    FuncMemory mem;
-    CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
 {
-    FuncMemory mem( 48, 15, 10);
-    CHECK_NOTHROW( ::load_elf_file( &mem, valid_elf_file));
+    auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
 TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 {
     // test behavior when the file name does not exist
-    const std::string wrong_file_name = "./1234567890/qwertyuiop";
-    // must exit and return EXIT_FAILURE
-    FuncMemory mem;
-    CHECK_THROWS_AS( load_elf_file( &mem, wrong_file_name), InvalidElfFile);
+    CHECK_THROWS_AS( ElfLoader( "./1234567890/qwertyuiop"), InvalidElfFile);
 }
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    FuncMemory func_mem;
-    ::load_elf_file( &func_mem, valid_elf_file);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the ".text" section*/);
+}
 
-    CHECK( func_mem.startPC() == 0x4000b0u /*address of the ".text" section*/);
+TEST_CASE( "Plain memory: out of range")
+{
+    std::array<Byte, 16> arr{};
+    auto ptr = FuncMemory::create_plain_memory( 10);
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x0, arr.data(), 2048), FuncMemoryOutOfRange );
+
+    CHECK( ptr->memcpy_host_to_guest_noexcept( 0x0, arr.data(), 2048) == 0 );
+}
+
+TEST_CASE( "Hierarchied memory: out of range")
+{
+    std::array<Byte, 16> arr{};
+    auto ptr = FuncMemory::create_hierarchied_memory( 10, 3, 4);
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
+    CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x0, arr.data(), 2048), FuncMemoryOutOfRange );
 }
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    FuncMemory func_mem;
-    ::load_elf_file( &func_mem, valid_elf_file);
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
+    FuncMemory& func_mem = *ptr;
 
     // read 4 bytes from the func_mem start addr
     CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
@@ -85,8 +101,9 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    FuncMemory func_mem;
-    ::load_elf_file( &func_mem, valid_elf_file);
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
+    FuncMemory& func_mem = *ptr;
 
     // write 1 into the byte pointed by dataSectAddr
     func_mem.write<uint8, Endian::little>( 1, dataSectAddr);
@@ -106,8 +123,9 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    FuncMemory func_mem;
-    ::load_elf_file( &func_mem, valid_elf_file);
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
+    FuncMemory& func_mem = *ptr;
 
     uint64 write_addr = 0x3FFFFE;
 
@@ -125,7 +143,8 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // Single byte
     const Byte write_data_1{ 0xA5};
@@ -136,13 +155,14 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 
     // Check if read correctly
     CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( &read_data_1, dataSectAddr, 1) == 1);
+    CHECK( func_mem.memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // 8 bytes
     const constexpr size_t size = 8;
@@ -157,15 +177,15 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     for (size_t i = 0; i < size; i++)
         CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
 
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_8.data(), dataSectAddr, size) == size);
+    CHECK( func_mem.memcpy_guest_to_host( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_8.at(i) == write_data_8.at(i));
-
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
-    FuncMemory func_mem;
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    FuncMemory& func_mem = *ptr;
 
     // 1 KByte
     const  constexpr size_t size = 1024;
@@ -180,15 +200,16 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     for (size_t i = 0; i < size; i++)
         CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
 
-    CHECK( func_mem.memcpy_guest_to_host_noexcept( read_data_1024.data(), dataSectAddr, size) == size);
+    CHECK( func_mem.memcpy_guest_to_host( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_1024.at(i) == write_data_1024.at(i));
 }
 
 TEST_CASE( "Func_memory: Dump")
 {
-    FuncMemory func_mem;
-    ::load_elf_file( &func_mem, valid_elf_file);
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( ptr.get());
+    FuncMemory& func_mem = *ptr;
 
     CHECK( func_mem.dump() ==
         "addr 0x400095: data 0xc\n"
@@ -219,36 +240,62 @@ TEST_CASE( "Func_memory: Dump")
     );
 }
 
+static void test_coherency(FuncMemory* mem1, FuncMemory* mem2)
+{
+    auto address = dataSectAddr - 0x400000;
+    CHECK( mem1->dump() == mem2->dump());
+
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+    CHECK( mem1->read<uint32, Endian::little>( address + 1, 0xFFFFFFull) == mem2->read<uint32, Endian::little>( address + 1, 0xFFFFFFull));
+    CHECK( mem1->read<uint32, Endian::little>( address + 2, 0xFFFFull) == mem2->read<uint32, Endian::little>( address + 2, 0xFFFFull));
+    CHECK( mem1->read<uint16, Endian::little>( address + 2) == mem2->read<uint16, Endian::little>( address + 2));
+    CHECK( mem1->read<uint8, Endian::little>( address + 3) == mem2->read<uint8, Endian::little>( address + 3));
+    CHECK( mem1->read<uint8, Endian::little>( 0x7777) == mem2->read<uint8, Endian::little>( 0x7777));
+ 
+    mem1->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
+    mem2->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
+
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem1->read<uint32, Endian::little>( address));
+}
+
 TEST_CASE( "Func_memory: Duplicate")
 {
-    FuncMemory mem1;
-    FuncMemory mem2( 48, 15, 10);
-    ::load_elf_file( &mem1, valid_elf_file);
-    mem1.duplicate_to( &mem2);
-    
-    CHECK( mem1.dump() == mem2.dump());
+    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull));
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull) == mem2.read<uint32, Endian::little>( dataSectAddr + 2, 0xFFFFull));
-    CHECK( mem1.read<uint16, Endian::little>( dataSectAddr + 2) == mem2.read<uint16, Endian::little>( dataSectAddr + 2));
-    CHECK( mem1.read<uint8, Endian::little>( dataSectAddr + 3) == mem2.read<uint8, Endian::little>( dataSectAddr + 3));
-    CHECK( mem1.read<uint8, Endian::little>( 0x300000) == mem2.read<uint8, Endian::little>( 0x300000));
-    
-    mem1.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
+}
 
-    mem2.write<uint8, Endian::little>( 1, dataSectAddr);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
+TEST_CASE( "Func_memory: Plain Memory")
+{
+    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    mem1.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) != mem2.read<uint32, Endian::little>( dataSectAddr));
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
+}
 
-    mem2.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem2.read<uint32, Endian::little>( dataSectAddr));
+TEST_CASE( "Func_memory: Duplicate Plain Memory")
+{
+    auto mem1 = FuncMemory::create_plain_memory( 24);
+    auto mem2 = FuncMemory::create_hierarchied_memory();
 
-    mem1.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-    mem2.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
-
-    CHECK( mem1.read<uint32, Endian::little>( dataSectAddr) == mem1.read<uint32, Endian::little>( dataSectAddr));
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    mem1->duplicate_to( mem2.get());
+    test_coherency( mem1.get(), mem2.get());
 }

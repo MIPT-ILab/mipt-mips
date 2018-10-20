@@ -27,11 +27,13 @@ class PerfSim : public CycleAccurateSimulator
 {
 public:
     explicit PerfSim( bool log);
-    ~PerfSim() final { destroy_ports(); }
-    Trap run( const std::string& tr, uint64 instrs_to_run) final;
+    ~PerfSim() override { destroy_ports(); }
+    Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
+    void set_memory( FuncMemory* memory) final;
     void clock() final;
     void halt() final { force_halt = true; }
+    void init_checker() final { writeback.init_checker( *memory); }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -48,7 +50,8 @@ private:
 
     /* simulator units */
     RF<ISA> rf;
-    std::unique_ptr<FuncMemory> memory = nullptr;
+    FuncMemory* memory = nullptr;
+
     Fetch<ISA> fetch;
     Decode<ISA> decode;
     Execute<ISA> execute;

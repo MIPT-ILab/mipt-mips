@@ -16,9 +16,8 @@
 
 // Generic C++
 #include <array>
-#include <climits>
+#include <memory>
 #include <string>
-#include <vector>
 
 struct FuncMemoryBadMapping final : Exception
 {
@@ -27,24 +26,30 @@ struct FuncMemoryBadMapping final : Exception
     { }
 };
 
+struct FuncMemoryOutOfRange final : Exception
+{
+    explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
+        : Exception( "Out of memory range",
+            std::string( "address: ") + std::to_string(addr) + "; max address: " + std::to_string(mask))
+    { }
+};
+
 class FuncMemory
 {
     public:
-        explicit FuncMemory ( uint32 addr_bits = 32,
-                              uint32 page_bits = 10,
-                              uint32 offset_bits = 12);
+        static std::unique_ptr<FuncMemory>
+            create_hierarchied_memory( uint32 addr_bits = 32,
+                                         uint32 page_bits = 10,
+                                         uint32 offset_bits = 12);
+	static std::unique_ptr<FuncMemory>
+	    create_plain_memory( uint32 addr_bits = 20);
 
-        Addr startPC() const { return startPC_addr; }
-        void set_startPC(Addr value) { startPC_addr = value; }
+        virtual size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) = 0;
+        virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
+        virtual void duplicate_to( FuncMemory* target) const = 0;
+        virtual std::string dump() const = 0;
 
-        std::string dump() const;
-
-        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size);
         size_t memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept;
-        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const;
-        size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
-
-        void duplicate_to( FuncMemory* target) const;
 
         template<typename T, Endian endian> T read( Addr addr) const;
         template<typename T, Endian endian> T read( Addr addr, T mask) const { return read<T, endian>( addr) & mask; }
@@ -57,46 +62,26 @@ class FuncMemory
         }
 
         template<typename Instr> void load_store( Instr* instr);
+
+        FuncMemory() = default;
+        virtual ~FuncMemory() = default;
+        FuncMemory( const FuncMemory&) = default;
+        FuncMemory( FuncMemory&&) = default;
+        FuncMemory& operator=( const FuncMemory&) = default;
+        FuncMemory& operator=( FuncMemory&&) = default;
     private:
-        const uint32 page_bits;
-        const uint32 offset_bits;
-        const uint32 set_bits;
-
-        const Addr addr_mask;
-        const Addr offset_mask;
-        const Addr page_mask;
-        const Addr set_mask;
-
-        const size_t page_cnt;
-        const size_t set_cnt;
-        const size_t page_size;
-
-        using Page = std::vector<Byte>;
-        using Set  = std::vector<Page>;
-        using Mem  = std::vector<Set>;
-        Mem memory = {};
-        Addr startPC_addr = NO_VAL32;
-
-        size_t get_set( Addr addr) const;
-        size_t get_page( Addr addr) const;
-        size_t get_offset( Addr addr) const;
-
-        Addr get_addr( Addr set, Addr page, Addr offset) const;
-        Addr get_addr(const Mem::const_iterator& set_it,
-                      const Set::const_iterator& page_it,
-                      const Page::const_iterator& byte_it) const;
-
-        bool check( Addr addr) const;
-        Byte read_byte( Addr addr) const;
-        Byte check_and_read_byte( Addr addr) const;
-
-        void alloc( Addr addr);
-        void write_byte( Addr addr, Byte value);
-        void alloc_and_write_byte( Addr addr, Byte value);
-
         template<typename Instr> void load( Instr* instr) const;
         template<typename Instr> void store( const Instr& instr);
 };
+
+inline size_t FuncMemory::memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
+{
+    return memcpy_host_to_guest( dst, src, size);
+}
+catch (...)
+{
+    return 0;
+}
 
 template<typename T, Endian endian>
 T FuncMemory::read( Addr addr) const

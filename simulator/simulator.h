@@ -13,13 +13,19 @@
  
 #include <memory>
 
+class FuncMemory;
+
 class Simulator : public Log {
 public:
     explicit Simulator( bool log = false) : Log( log) {}
 
-    virtual Trap run( const std::string& tr, uint64 instrs_to_run) = 0;
-    Trap run_no_limit( const std::string& tr) { return run( tr, MAX_VAL64); }
+    virtual Trap run( uint64 instrs_to_run) = 0;
     virtual void set_target( const Target& target) = 0;
+    virtual void set_memory( FuncMemory* m) = 0;
+    virtual void init_checker() = 0;
+
+    Trap run_no_limit() { return run( MAX_VAL64); }
+    void set_pc( Addr pc) { set_target( Target( pc, 0)); }
 
     static std::unique_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::unique_ptr<Simulator> create_configured_simulator();

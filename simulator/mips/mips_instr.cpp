@@ -303,9 +303,9 @@ MIPSRegister BaseMIPSInstr<RegisterUInt>::get_register( RegType type) const
     case RegType::HI_LO: return MIPSRegister::mips_lo;
     case RegType::ZERO:  return MIPSRegister::zero;
     case RegType::RA:    return MIPSRegister::return_address;
-    case RegType::RS:    return MIPSRegister( instr.asR.rs);
-    case RegType::RT:    return MIPSRegister( instr.asR.rt);
-    case RegType::RD:    return MIPSRegister( instr.asR.rd);
+    case RegType::RS:    return MIPSRegister::from_cpu_index( instr.asR.rs);
+    case RegType::RT:    return MIPSRegister::from_cpu_index( instr.asR.rt);
+    case RegType::RD:    return MIPSRegister::from_cpu_index( instr.asR.rd);
     default: assert(0);  return MIPSRegister::zero;
     }
 }

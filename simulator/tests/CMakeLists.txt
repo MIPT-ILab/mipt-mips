@@ -6,10 +6,10 @@
 
 set(TESTS_CPPS
     infra/cache/t/unit_test.cpp
-    infra/memory/t/unit_test.cpp
     infra/config/t/unit_test.cpp
     infra/instrcache/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
+    memory/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
     mips/t/unit_test.cpp
     func_sim/rf/t/unit_test.cpp

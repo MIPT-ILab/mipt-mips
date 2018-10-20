@@ -7,8 +7,9 @@
 #define INSTR_CACHE_H
 
 #include <infra/instrcache/LRUCache.h>
-#include <infra/memory/memory.h>
 #include <infra/types.h>
+
+#include <memory/memory.h>
 
 template<typename Instr>
 class InstrMemory

@@ -4,8 +4,7 @@
  */
 
 #include "perf_sim.h"
-
-#include <infra/memory/elf/elf_loader.h>
+#include <memory/elf/elf_loader.h>
 
 #include <chrono>
 #include <iostream>
@@ -13,7 +12,6 @@
 template <typename ISA>
 PerfSim<ISA>::PerfSim(bool log) : 
     CycleAccurateSimulator( log),
-    memory( new FuncMemory),
     fetch( log),
     decode( log),
     execute( log),
@@ -23,12 +21,18 @@ PerfSim<ISA>::PerfSim(bool log) :
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
-    fetch.set_memory( memory.get());
     decode.set_RF( &rf);
-    mem.set_memory( memory.get());
     writeback.set_RF( &rf);
 
     init_ports();
+}
+
+template <typename ISA>
+void PerfSim<ISA>::set_memory( FuncMemory* m)
+{
+    memory = m;
+    fetch.set_memory( m);
+    mem.set_memory( m);
 }
 
 template <typename ISA>
@@ -39,15 +43,11 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
-Trap PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 {
     force_halt = false;
-    ::load_elf_file( memory.get(), tr);
 
-    writeback.init_checker( *memory);
     writeback.set_instrs_to_run( instrs_to_run);
-
-    set_target( Target( memory->startPC(), 0));
 
     start_time = std::chrono::high_resolution_clock::now();
 

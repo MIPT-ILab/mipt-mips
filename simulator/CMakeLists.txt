@@ -23,11 +23,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS infra/macro_test.cpp
-    infra/memory/memory.cpp
-    infra/memory/elf/elf_loader.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
+    memory/hierarchied_memory.cpp
+    memory/plain_memory.cpp
+    memory/elf/elf_loader.cpp
     modules/fetch/fetch.cpp
     modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp
@@ -89,6 +90,9 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # Targets
 add_library(mipt-mips-src STATIC ${CPPS})
+add_library(mipt-mips-cen64 STATIC interface/cen64/cen64_intf.cpp interface/cen64/cen64_memory.cpp)
+
+target_link_libraries(mipt-mips-cen64 mipt-mips-src stdc++)
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} mipt-mips-src)

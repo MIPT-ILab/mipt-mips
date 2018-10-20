@@ -4,8 +4,7 @@
  */
 
 #include "mem.h"
-
-#include <infra/memory/memory.h>
+#include <memory/memory.h>
 
 static constexpr const uint32 FLUSHED_STAGES_NUM = 3;
 

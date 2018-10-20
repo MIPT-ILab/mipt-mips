@@ -4,12 +4,15 @@
  */
  
 #include "func_sim.h"
-#include <infra/memory/elf/elf_loader.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new FuncMemory)
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+
+template <typename ISA>
+void FuncSim<ISA>::set_memory( FuncMemory* m)
 {
-    imem.set_memory( mem.get());
+    mem = m;
+    imem.set_memory( m);
 }
 
 template <typename ISA>
@@ -60,25 +63,9 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::init( const std::string& tr)
+Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
-    ::load_elf_file( mem.get(), tr);
-    PC = mem->startPC();
     nops_in_a_row = 0;
-}
-
-template <typename ISA>
-void FuncSim<ISA>::init( const FuncMemory& other_mem)
-{
-    other_mem.duplicate_to( mem.get());
-    PC = mem->startPC();
-    nops_in_a_row = 0;
-}
-
-template <typename ISA>
-Trap FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
-{
-    init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;

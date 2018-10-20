@@ -1,5 +1,5 @@
 /**
- * memory.cpp - the module implementing the concept of
+ * hierarchied_memory.cpp - the module implementing the concept of
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * Copyright 2012-2018 uArchSim iLab project
@@ -9,6 +9,7 @@
 
 // MIPT-MIPS modules
 #include <infra/macro.h>
+#include <infra/types.h>
 
 // Generic C++
 #include <cassert>
@@ -16,8 +17,62 @@
 #include <iostream>
 #include <sstream>
 #include <utility>
+#include <vector>
 
-FuncMemory::FuncMemory( uint32 addr_bits,
+class HierarchiedMemory : public FuncMemory
+{
+    public:
+        HierarchiedMemory ( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
+
+        std::string dump() const final;
+        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
+        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
+        void duplicate_to( FuncMemory* target) const final;
+
+    private:
+        const uint32 page_bits;
+        const uint32 offset_bits;
+        const uint32 set_bits;
+
+        const Addr addr_mask;
+        const Addr offset_mask;
+        const Addr page_mask;
+        const Addr set_mask;
+
+        const size_t page_cnt;
+        const size_t set_cnt;
+        const size_t page_size;
+
+        using Page = std::vector<Byte>;
+        using Set  = std::vector<Page>;
+        using Mem  = std::vector<Set>;
+        Mem memory = {};
+
+        size_t get_set( Addr addr) const noexcept;
+        size_t get_page( Addr addr) const noexcept;
+        size_t get_offset( Addr addr) const noexcept;
+
+        Addr get_addr( Addr set, Addr page, Addr offset) const noexcept;
+        Addr get_addr(const Mem::const_iterator& set_it,
+                      const Set::const_iterator& page_it,
+                      const Page::const_iterator& byte_it) const noexcept;
+
+        bool check( Addr addr) const noexcept;
+        Byte read_byte( Addr addr) const noexcept;
+        Byte check_and_read_byte( Addr addr) const noexcept;
+
+        void alloc( Addr addr);
+        void write_byte( Addr addr, Byte value);
+        void alloc_and_write_byte( Addr addr, Byte value);
+};
+
+std::unique_ptr<FuncMemory>
+FuncMemory::create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint32 offset_bits)
+{
+    return std::make_unique<HierarchiedMemory>( addr_bits, page_bits, offset_bits);
+}
+
+HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
     page_bits( page_bits),
@@ -44,10 +99,16 @@ FuncMemory::FuncMemory( uint32 addr_bits,
     memory.resize(set_cnt);
 }
 
-size_t FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    assert( dst != 0);
-    assert( dst <= addr_mask);
+    if (size > addr_mask)
+        throw FuncMemoryOutOfRange( dst + size, addr_mask);
+    
+    if (dst > addr_mask)
+        throw FuncMemoryOutOfRange( dst, addr_mask);
+
+    if (dst > addr_mask - size)
+        throw FuncMemoryOutOfRange( dst, addr_mask);
 
     size_t offset = 0;
     for (; offset < size; ++offset)
@@ -56,19 +117,8 @@ size_t FuncMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
     return offset;
 }
 
-size_t FuncMemory::memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
+size_t HierarchiedMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const noexcept
 {
-    return memcpy_host_to_guest( dst, src, size);
-}
-catch (...)
-{
-    return 0;
-}
-
-size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
-{
-    assert( src != 0);
-
     size_t offset = 0;
     for (; offset < size; ++offset)
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) Low level access
@@ -76,22 +126,13 @@ size_t FuncMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const
     return offset;
 }
 
-size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) const noexcept try
-{
-    return memcpy_guest_to_host( dst, src, size);
-}
-catch (...)
-{
-    return 0;
-}
-
-void FuncMemory::alloc_and_write_byte( Addr addr, Byte value)
+void HierarchiedMemory::alloc_and_write_byte( Addr addr, Byte value)
 {
     alloc( addr);
     write_byte( addr, value);
 }
 
-void FuncMemory::alloc( Addr addr)
+void HierarchiedMemory::alloc( Addr addr)
 {
     auto& set = memory[get_set(addr)];
     if ( set.empty())
@@ -102,15 +143,14 @@ void FuncMemory::alloc( Addr addr)
         page.resize(page_size, Byte());
 }
 
-bool FuncMemory::check( Addr addr) const
+bool HierarchiedMemory::check( Addr addr) const noexcept
 {
     const auto& set = memory[get_set(addr)];
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-void FuncMemory::duplicate_to( FuncMemory* target) const
+void HierarchiedMemory::duplicate_to( FuncMemory* target) const
 {
-    target->set_startPC( startPC());
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
             target->memcpy_host_to_guest( get_addr( set_it, page_it, page_it->begin()),
@@ -118,7 +158,7 @@ void FuncMemory::duplicate_to( FuncMemory* target) const
                                           page_it->size());
 }
 
-std::string FuncMemory::dump() const
+std::string HierarchiedMemory::dump() const
 {
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;
@@ -133,44 +173,44 @@ std::string FuncMemory::dump() const
     return oss.str();
 }
 
-Addr FuncMemory::get_addr(const Mem::const_iterator& set_it, const Set::const_iterator& page_it, const Page::const_iterator& byte_it) const
+Addr HierarchiedMemory::get_addr(const Mem::const_iterator& set_it, const Set::const_iterator& page_it, const Page::const_iterator& byte_it) const noexcept
 {
     return get_addr( std::distance( memory.begin(), set_it),
                      std::distance( set_it->begin(), page_it),
                      std::distance( page_it->begin(), byte_it));
 }
 
-inline size_t FuncMemory::get_set( Addr addr) const
+inline size_t HierarchiedMemory::get_set( Addr addr) const noexcept
 {
     return ( addr & set_mask) >> ( page_bits + offset_bits);
 }
 
-inline size_t FuncMemory::get_page( Addr addr) const
+inline size_t HierarchiedMemory::get_page( Addr addr) const noexcept
 {
     return ( addr & page_mask) >> offset_bits;
 }
 
-inline size_t FuncMemory::get_offset( Addr addr) const
+inline size_t HierarchiedMemory::get_offset( Addr addr) const noexcept
 {
     return ( addr & offset_mask);
 }
 
-inline Addr FuncMemory::get_addr( Addr set, Addr page, Addr offset) const
+inline Addr HierarchiedMemory::get_addr( Addr set, Addr page, Addr offset) const noexcept
 {
     return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
 }
 
-inline Byte FuncMemory::read_byte( Addr addr) const
+inline Byte HierarchiedMemory::read_byte( Addr addr) const noexcept
 {
     return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
 }
 
-Byte FuncMemory::check_and_read_byte( Addr addr) const
+Byte HierarchiedMemory::check_and_read_byte( Addr addr) const noexcept
 {
     return check( addr) ? read_byte( addr) : Byte{};
 }
 
-inline void FuncMemory::write_byte( Addr addr, Byte value)
+inline void HierarchiedMemory::write_byte( Addr addr, Byte value)
 {
     memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
 }

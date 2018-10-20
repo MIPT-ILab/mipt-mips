@@ -11,7 +11,7 @@
 #include "rf/rf.h"
 
 #include <infra/exception.h>
-
+#include <memory/memory.h>
 #include <simulator.h>
 
 #include <memory>
@@ -31,7 +31,7 @@ class FuncSim : public Simulator
         RF<ISA> rf;
         Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
-        std::unique_ptr<FuncMemory> mem = nullptr;
+        FuncMemory* mem = nullptr;
         InstrMemoryCached<FuncInstr> imem;
 
         uint64 nops_in_a_row = 0;
@@ -40,10 +40,10 @@ class FuncSim : public Simulator
     public:
         explicit FuncSim( bool log = false);
 
-        void init( const std::string& tr);
-        void init( const FuncMemory& other_mem);
+        void set_memory( FuncMemory* memory) final;
+        void init_checker() final { };
         FuncInstr step();
-        Trap run(const std::string& tr, uint64 instrs_to_run) final;
+        Trap run(uint64 instrs_to_run) final;
         void set_target(const Target& target) final {
             PC = target.address;
             sequence_id = target.sequence_id;
