@@ -1,11 +1,11 @@
 /*
- * mars_syscalls.h - implementation of MARS syscalls
+ * mars_calls.h - implementation of MARS syscalls
  * @author Vyacheslav Kompan kompan.vo@phystech.edu
  * Copyright 2018 MIPT-MIPS
  */
 
-#ifndef MIPS_SYSCALL_H
-#define MIPS_SYSCALL_H
+#ifndef MARS_CALLS_H
+#define MARS_CALLS_H
 
 /* Simulator modules */
 #include "func_sim/rf/rf.h"
@@ -61,4 +61,4 @@ public:
     void execute() final;
 };
 
-#endif //MIPS_SYSCALL_H
+#endif //MARS_CALLS_H

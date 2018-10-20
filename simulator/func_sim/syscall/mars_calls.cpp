@@ -1,5 +1,5 @@
 /*
- * mars_syscalls.cpp - implementation of MARS syscalls
+ * mars_calls.cpp - implementation of MARS syscalls
  * @author Vyacheslav Kompan kompan.vo@phystech.edu
  * Copyright 2018 MIPT-MIPS
  */
