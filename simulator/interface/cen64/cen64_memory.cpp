@@ -41,7 +41,7 @@ private:
     }
 
     size_t memcpy_host_to_guest_word( Addr dst, const Byte* src, size_t size = 4) const {
-        std::array<Byte, 4> tmp;
+        std::array<Byte, 4> tmp{};
         for (size_t i = 0; i < size; ++i)
             tmp[i] = src[i];
 
