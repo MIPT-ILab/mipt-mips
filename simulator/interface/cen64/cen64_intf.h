@@ -58,7 +58,7 @@ void vr4300_cp1_init(struct vr4300 *vr4300);
 void vr4300_cycle(struct vr4300 *vr4300);
 void vr4300_cycle_extra(struct vr4300 *vr4300, struct vr4300_stats *stats);
 
-uint64 vr4300_get_register(struct vr4300 *vr4300, std::size_t i);
+uint64 vr4300_get_register(struct vr4300 *vr4300, size_t i);
 uint64 vr4300_get_pc(struct vr4300 *vr4300);
 
 int read_mi_regs(void *opaque, uint32 address, uint32 *word);
