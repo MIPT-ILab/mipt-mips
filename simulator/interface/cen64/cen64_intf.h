@@ -49,10 +49,10 @@ struct vr4300_stats;
 extern "C" {
 
 struct vr4300* vr4300_alloc();
-void vr4300_free(struct vr4300*);
+void vr4300_free(struct vr4300* ptr);
 
 struct vr4300_stats* vr4300_stats_alloc();
-void vr4300_stats_free(struct vr4300_stats*);
+void vr4300_stats_free(struct vr4300_stats* ptr);
 
 int vr4300_init(struct vr4300 *vr4300, struct bus_controller *bus);
 void vr4300_cp1_init(struct vr4300 *vr4300);

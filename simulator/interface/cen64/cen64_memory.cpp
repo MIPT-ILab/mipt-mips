@@ -27,7 +27,7 @@ public:
     size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
     size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
     std::string dump() const final { assert(0); return {}; }
-    void duplicate_to( FuncMemory*) const final { assert(0); }
+    void duplicate_to( FuncMemory* /* target */) const final { assert(0); }
 private:
     bus_controller* bus = nullptr;
 
@@ -35,39 +35,38 @@ private:
         uint32 val;
         size_t result = bus_read_word( bus, src, &val);
         auto tmp = unpack_array<uint32, Endian::big>( val);
-        for (size_t i = 0; i < size; ++i)
-            dst[i] = tmp[i];
+        std::copy( tmp.begin(), tmp.begin() + size, dst);
         return result;
     }
 
     size_t memcpy_host_to_guest_word( Addr dst, const Byte* src, size_t size = 4) const {
         std::array<Byte, 4> tmp{};
-        for (size_t i = 0; i < size; ++i)
-            tmp[i] = src[i];
-
+        std::copy(src, src + size, tmp.begin()); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return bus_write_word( bus, dst, pack_array<uint32, Endian::big>( tmp), bitmask<uint32>(size * CHAR_BIT));
     }
 };
 
-size_t CEN64Memory::memcpy_guest_to_host( Byte* dst, Addr src, size_t length) const noexcept
+size_t CEN64Memory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept
 {
     size_t result = 0;
-    for (size_t i = 0; i < length; i += 4)
+    for (size_t i = 0; i < size; i += 4) // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         result += memcpy_guest_to_host_word(dst + i, src + i);
 
-    size_t remainder = length % 4;
-    result += memcpy_guest_to_host_word(dst + length - remainder, src + length - remainder, remainder);
+    size_t remainder = size % 4;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    result += memcpy_guest_to_host_word(dst + size - remainder, src + size - remainder, remainder);
     return result;
 }
 
-size_t CEN64Memory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t length)
+size_t CEN64Memory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
     size_t result = 0;
-    for (size_t i = 0; i < length; i += 4)
+    for (size_t i = 0; i < size; i += 4) // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         result += memcpy_host_to_guest_word(dst + i, src + i);
 
-    size_t remainder = length % 4;
-    result += memcpy_host_to_guest_word(dst + length - remainder, src + length - remainder, remainder);
+    size_t remainder = size % 4;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    result += memcpy_host_to_guest_word(dst + size - remainder, src + size - remainder, remainder);
     return result;
 }
 
