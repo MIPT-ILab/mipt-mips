@@ -70,16 +70,9 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::init()
-{
-    PC = mem->startPC();
-    nops_in_a_row = 0;
-}
-
-template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
-    init();
+    nops_in_a_row = 0;
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;

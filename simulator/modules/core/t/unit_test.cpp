@@ -16,6 +16,14 @@
 static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
+TEST_CASE( "PerfSim: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    PerfSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), Deadlock);
+}
+
 // TODO: remove that class, use true FuncSim interfaces instead
 template <typename ISA>
 struct PerfSimAndMemory : PerfSim<ISA>
@@ -27,15 +35,20 @@ struct PerfSimAndMemory : PerfSim<ISA>
        this->set_memory( mem.get());
     }
 
-    auto run_trace( const std::string& tr, uint64 steps) {
-        ::load_elf_file( mem.get(), tr);
+    void init_trace( const std::string& tr) {
+        ElfLoader elf( tr);
+        elf.load_to( mem.get());
         this->init_checker();
+        this->set_pc( elf.get_startPC());
+    }
+
+    auto run_trace( const std::string& tr, uint64 steps) {
+        init_trace( tr);
         return PerfSim<ISA>::run( steps);
     }
 
     auto run_trace_no_limit( const std::string& tr) {
-        ::load_elf_file( mem.get(), tr);
-        this->init_checker();
+        init_trace( tr);
         return PerfSim<ISA>::run_no_limit();
     }
 };
@@ -75,8 +88,10 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
 {
     PerfSim<MIPS32> sim( false);
     auto mem = FuncMemory::create_hierarchied_memory();
-    ::load_elf_file( mem.get(), smc_code);
     sim.set_memory( mem.get());
+    ElfLoader elf( smc_code);
+    elf.load_to( mem.get());
+    sim.set_pc( elf.get_startPC());
     CHECK( sim.run_no_limit( ) == Trap::NO_TRAP);
 }
 

@@ -17,12 +17,14 @@ namespace config {
 
 int main( int argc, const char* argv[]) try {
     config::handleArgs( argc, argv, 1);
+    ElfLoader elf( config::binary_filename);
     auto memory = FuncMemory::create_hierarchied_memory();
-    ::load_elf_file( memory.get(), config::binary_filename);
+    elf.load_to( memory.get());
 
     auto sim = Simulator::create_configured_simulator();
     sim->set_memory( memory.get());
     sim->init_checker();
+    sim->set_pc( elf.get_startPC());
     sim->run( config::num_steps);
     return 0;
 }

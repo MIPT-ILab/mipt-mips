@@ -49,8 +49,6 @@ Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 
     writeback.set_instrs_to_run( instrs_to_run);
 
-    set_target( Target( memory->startPC(), 0));
-
     start_time = std::chrono::high_resolution_clock::now();
 
     while (!is_halt())

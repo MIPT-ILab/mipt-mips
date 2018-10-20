@@ -23,6 +23,7 @@ public:
     virtual void init_checker() = 0;
 
     Trap run_no_limit() { return run( MAX_VAL64); }
+    void set_pc( Addr pc) { set_target( Target( pc, 0)); }
 
     static std::unique_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::unique_ptr<Simulator> create_configured_simulator();

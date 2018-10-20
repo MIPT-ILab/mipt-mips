@@ -18,6 +18,20 @@
 static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
+TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
+{
+    // Just call a constructor
+    CHECK_NOTHROW( FuncSim<MIPS32>() );
+}
+
+TEST_CASE( "FuncSim: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
+
 // TODO: remove that class, use true FuncSim interfaces instead
 template <typename ISA>
 struct FuncSimAndMemory : FuncSim<ISA>
@@ -29,45 +43,49 @@ struct FuncSimAndMemory : FuncSim<ISA>
        this->set_memory( mem.get());
     }
 
-    void init( const std::string& tr) {
-        ::load_elf_file( mem.get(), tr);
-        FuncSim<ISA>::init();
+    void init_trace( const std::string& tr) {
+        ElfLoader elf( tr);
+        elf.load_to( mem.get());
+        this->set_pc( elf.get_startPC());
     }
 
     auto run_trace( const std::string& tr, uint64 steps) {
-        ::load_elf_file( mem.get(), tr);
+        init_trace( tr);
         return FuncSim<ISA>::run( steps);
     }
 
     auto run_trace_no_limit( const std::string& tr) {
-        ::load_elf_file( mem.get(), tr);
+        init_trace( tr);
         return FuncSim<ISA>::run_no_limit();
     }
 };
 
-TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
+TEST_CASE( "FuncSim: get lost without pc")
 {
-    // Just call a constructor
-    CHECK_NOTHROW( FuncSimAndMemory<MIPS32>() );
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<MIPS32> sim( false);
+    sim.set_memory( m.get());
+    ElfLoader( valid_elf_file).load_to( m.get());
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
 
+TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
+{
     // Call constructor and init
-    CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().init( valid_elf_file) );
-
-    // Do bad init
-    CHECK_THROWS_AS( FuncSimAndMemory<MIPS32>().init( "./1234567890/qwertyuop"), InvalidElfFile);
+    CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().init_trace( valid_elf_file) );
 }
 
 TEST_CASE( "Make_A_Step: Func_Sim")
 {
     FuncSimAndMemory<MIPS32> simulator;
-    simulator.init( valid_elf_file);
+    simulator.init_trace( valid_elf_file);
     CHECK( simulator.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }
 
 TEST_CASE( "FuncSim: make a step with checker")
 {
     FuncSimAndMemory<MIPS32> simulator;
-    simulator.init( valid_elf_file);
+    simulator.init_trace( valid_elf_file);
     simulator.init_checker();
     CHECK( simulator.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
 }

@@ -26,6 +26,14 @@ struct FuncMemoryBadMapping final : Exception
     { }
 };
 
+struct FuncMemoryOutOfRange final : Exception
+{
+    explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
+        : Exception( "Out of memory range",
+            std::string( "address: ") + std::to_string(addr) + "; max address: " + std::to_string(mask))
+    { }
+};
+
 class FuncMemory
 {
     public:
@@ -36,16 +44,12 @@ class FuncMemory
 	static std::unique_ptr<FuncMemory>
 	    create_plain_memory( uint32 addr_bits = 20);
 
-        Addr startPC() const { return startPC_addr; }
-        void set_startPC(Addr value) { startPC_addr = value; }
-
         virtual size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) = 0;
-        virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const = 0;
+        virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
         virtual void duplicate_to( FuncMemory* target) const = 0;
         virtual std::string dump() const = 0;
 
         size_t memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept;
-        size_t memcpy_guest_to_host_noexcept( Byte* dst, Addr src, size_t size) const noexcept;
 
         template<typename T, Endian endian> T read( Addr addr) const;
         template<typename T, Endian endian> T read( Addr addr, T mask) const { return read<T, endian>( addr) & mask; }
@@ -66,7 +70,6 @@ class FuncMemory
         FuncMemory& operator=( const FuncMemory&) = default;
         FuncMemory& operator=( FuncMemory&&) = default;
     private:
-        Addr startPC_addr = 0;
         template<typename Instr> void load( Instr* instr) const;
         template<typename Instr> void store( const Instr& instr);
 };
@@ -74,15 +77,6 @@ class FuncMemory
 inline size_t FuncMemory::memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
 {
     return memcpy_host_to_guest( dst, src, size);
-}
-catch (...)
-{
-    return 0;
-}
-
-inline size_t FuncMemory::memcpy_guest_to_host_noexcept( Byte *dst, Addr src, size_t size) const noexcept try
-{
-    return memcpy_guest_to_host( dst, src, size);
 }
 catch (...)
 {
