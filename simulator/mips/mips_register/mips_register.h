@@ -49,7 +49,7 @@ public:
     {
         if (id < 32u)
             return from_cpu_index( id);
-        else switch (id) {
+        switch (id) {
             case 32: return from_cp0_index( 12); // SR
             case 33: return MIPSRegister::mips_lo;
             case 34: return MIPSRegister::mips_hi;
