@@ -9,6 +9,7 @@
 
 #include "instr_memory.h"
 #include "rf/rf.h"
+#include "func_sim/syscall/mars_calls.h"
 
 #include <infra/exception.h>
 #include <memory/memory.h>
@@ -33,6 +34,7 @@ class FuncSim : public Simulator
         uint64 sequence_id = 0;
         FuncMemory* mem = nullptr;
         InstrMemoryCached<FuncInstr> imem;
+        std::unique_ptr<Syscall<ISA>> syscall_handler;
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);

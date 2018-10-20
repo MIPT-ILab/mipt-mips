@@ -79,7 +79,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
-    CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().run_trace_no_limit( smc_code));
+    CHECK_THROWS_AS( FuncSimAndMemory<MIPS32>().run_trace_no_limit( smc_code), TerminatedByExit);
 }
 
 TEST_CASE( "Torture_Test: Func_Sim")

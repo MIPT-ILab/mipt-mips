@@ -2,11 +2,18 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
+
+#include <infra/config/config.h>
 #include "func_sim.h"
 
+namespace config {
+    static Switch ignore_syscalls = { "no-syscalls", "ignore all syscalls (functional only)" };
+}
+
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log) {
+    syscall_handler = Syscall<ISA>::get_handler( config::ignore_syscalls, &rf);
+}
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( FuncMemory* m)
@@ -77,8 +84,13 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         const auto& instr = step();
         sout << instr << std::endl;
 
-        if ( instr.trap_type() == Trap::HALT)
-            return instr.trap_type();
+        switch ( instr.trap_type()) {
+            case Trap::SYSCALL:
+                syscall_handler->execute ();
+                break;
+            case Trap::HALT: return Trap::HALT;
+            default: break;
+        }
     }
     return Trap::NO_TRAP;
 }

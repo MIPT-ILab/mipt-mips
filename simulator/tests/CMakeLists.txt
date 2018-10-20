@@ -16,6 +16,7 @@ set(TESTS_CPPS
     risc_v/riscv_register/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
+    func_sim/syscall/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     )
 

@@ -37,6 +37,7 @@ set(CPPS infra/macro_test.cpp
     modules/core/perf_sim.cpp
     modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
+    func_sim/syscall/mars_calls.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
