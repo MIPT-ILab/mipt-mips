@@ -52,9 +52,10 @@ size_t PlainMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size
     if ( dst > arena.size())
         throw FuncMemoryOutOfRange( dst, arena.size());
 
-    if ( dst > arena_size - size)
+    if ( dst > arena.size() - size)
         throw FuncMemoryOutOfRange( dst + size, arena.size());
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low-level access
     std::copy( src, src + size, arena.begin() + dst);
     return size;
 }
