@@ -13,6 +13,8 @@
  
 #include <memory>
 
+class FuncMemory;
+
 class Simulator : public Log {
 public:
     explicit Simulator( bool log = false) : Log( log) {}
