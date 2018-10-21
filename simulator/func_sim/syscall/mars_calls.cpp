@@ -5,10 +5,27 @@
  */
 
 #include "mars_calls.h"
+/* ISA */
 #include <mips/mips.h>
+/* Generic C & C++ */
+#include <cassert>
+#include <utility>
 
 static const MIPSRegister v0 = MIPSRegister::from_cpu_index( 2);
 static const MIPSRegister a0 = MIPSRegister::from_cpu_index( 4);
+
+std::pair<bool, long long> strToInt( const std::string &str) {
+    char *end;
+    long long value = std::strtoll( str.c_str(), &end, 0);
+    bool isInt = !(*end);
+    return std::make_pair( isInt, value);
+}
+
+std::pair<bool, char> strToChar( const std::string &str) {
+    bool isChar = (str.length() == 1);
+    char value = isChar ? str[0] : ' ';
+    return std::make_pair( isChar, value);
+}
 
 template <typename ISA>
 void MARSCalls<ISA>::execute() {
@@ -34,8 +51,11 @@ void MARSCalls<ISA>::print_integer() {
 
 template <typename ISA>
 void MARSCalls<ISA>::read_integer() {
-    RegisterInt value = 0;
-    instream >> value;
+    std::string input;
+    instream >> input;
+    auto[isInt, value] = strToInt( input);
+    if (!isInt)
+        throw BadInputValue();
     rf->write( v0, value);
 }
 
@@ -47,8 +67,11 @@ void MARSCalls<ISA>::print_character() {
 
 template <typename ISA>
 void MARSCalls<ISA>::read_character() {
-    char value = 0;
-    instream >> value;
+    std::string input;
+    instream >> input;
+    auto[isChar, value] = strToChar( input);
+    if (!isChar)
+        throw BadInputValue();
     rf->write( v0, value);
 }
 

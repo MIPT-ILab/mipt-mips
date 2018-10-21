@@ -18,6 +18,10 @@ struct TerminatedByExit final : Exception {
     TerminatedByExit() : Exception( "Terminated", "exit called") {}
 };
 
+struct BadInputValue final : Exception {
+    BadInputValue() : Exception( "Runtime syscall error", "bad input value") {}
+};
+
 template <typename ISA>
 struct Syscall {
     static std::unique_ptr<Syscall<ISA>> get_handler( bool ignore, RF<ISA> *rf, std::istream& instream = std::cin,
