@@ -43,6 +43,7 @@ set(CPPS infra/macro_test.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp
     simulator.cpp
+    syscall/syscall.cpp
     )
 
 # Compilation flags

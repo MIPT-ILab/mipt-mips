@@ -5,23 +5,14 @@
  */
 
 #include "mars_calls.h"
+#include <mips/mips.h>
 
-enum Regno : uint8 {
-    v0 = 2,
-    a0 = 4
-};
-
-template <typename ISA>
-std::unique_ptr<Syscall<ISA>>
-Syscall<ISA>::get_handler( bool ignore, RF<ISA> *rf, std::istream& cin, std::ostream& cout) {
-    if (ignore)
-        return std::make_unique<Syscall<ISA>>();
-    return std::make_unique<MARSCalls<ISA>>( rf, cin, cout);
-}
+static const MIPSRegister v0 = MIPSRegister::from_cpu_index( 2);
+static const MIPSRegister a0 = MIPSRegister::from_cpu_index( 4);
 
 template <typename ISA>
 void MARSCalls<ISA>::execute() {
-    RegisterUInt syscall_code = rf->read( Register::from_cpu_index( Regno::v0));
+    RegisterUInt syscall_code = rf->read( v0);
     switch (syscall_code) {
         case 1:  print_integer(); break;
         case 5:  read_integer(); break;
@@ -37,7 +28,7 @@ void MARSCalls<ISA>::execute() {
 
 template <typename ISA>
 void MARSCalls<ISA>::print_integer() {
-    RegisterInt value = rf->read( Register::from_cpu_index( Regno::a0));
+    RegisterInt value = rf->read( a0);
     outstream << value;
 }
 
@@ -45,12 +36,12 @@ template <typename ISA>
 void MARSCalls<ISA>::read_integer() {
     RegisterInt value = 0;
     instream >> value;
-    rf->write( Register::from_cpu_index( Regno::v0), value);
+    rf->write( v0, value);
 }
 
 template <typename ISA>
 void MARSCalls<ISA>::print_character() {
-    char value = rf->read( Register::from_cpu_index( Regno::a0));
+    char value = rf->read( a0);
     outstream << value;
 }
 
@@ -58,24 +49,18 @@ template <typename ISA>
 void MARSCalls<ISA>::read_character() {
     char value = 0;
     instream >> value;
-    rf->write( Register::from_cpu_index( Regno::v0), value);
+    rf->write( v0, value);
 }
 
 
-#include <mips/mips.h>
-#include <risc_v/risc_v.h>
-
-template struct Syscall<MIPSI>;
-template struct Syscall<MIPSII>;
-template struct Syscall<MIPSIII>;
-template struct Syscall<MIPSIV>;
-template struct Syscall<MIPS32>;
-template struct Syscall<MIPS64>;
-template struct Syscall<RISCV32>;
-template struct Syscall<RISCV64>;
-template struct Syscall<RISCV128>;
-
+template class MARSCalls<MIPSI>;
+template class MARSCalls<MIPSII>;
+template class MARSCalls<MIPSIII>;
+template class MARSCalls<MIPSIV>;
+template class MARSCalls<MIPS32>;
+template class MARSCalls<MIPS64>;
 /* Disable MARS syscalls for RISC-V */
+#include <risc_v/risc_v.h>
 template <> void MARSCalls<RISCV32>::execute() {}
 template <> void MARSCalls<RISCV64>::execute() {}
 template <> void MARSCalls<RISCV128>::execute() {}

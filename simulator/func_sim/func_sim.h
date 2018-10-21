@@ -9,11 +9,11 @@
 
 #include "instr_memory.h"
 #include "rf/rf.h"
-#include "func_sim/syscall/mars_calls.h"
 
 #include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
+#include <syscall/syscall.h>
 
 #include <memory>
 #include <string>
