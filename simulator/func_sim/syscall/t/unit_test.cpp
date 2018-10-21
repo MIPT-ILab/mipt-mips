@@ -42,8 +42,17 @@ TEST_CASE( "MARSCalls: read_integer") {
     auto syscall_handler = Syscall<MIPS32>::get_handler( false, &rf, input);
 
     rf.write( v0, 5u); // read_integer
-    syscall_handler->execute();
+    CHECK_NOTHROW( syscall_handler->execute());
     CHECK( rf.read( v0) == 1337 );
+}
+
+TEST_CASE( "MARSCalls: read_integer_bad") {
+    RF<MIPS32> rf;
+    std::istringstream input( "1337q\n");
+    auto syscall_handler = Syscall<MIPS32>::get_handler( false, &rf, input);
+
+    rf.write( v0, 5u); // read_integer
+    CHECK_THROWS_AS( syscall_handler->execute(), BadInputValue);
 }
 
 TEST_CASE( "MARSCalls: exit") {
@@ -71,6 +80,15 @@ TEST_CASE( "MARSCalls: read_character") {
     auto syscall_handler = Syscall<MIPS32>::get_handler( false, &rf, input);
 
     rf.write( v0, 12u); // read_character
-    syscall_handler->execute();
+    CHECK_NOTHROW( syscall_handler->execute());
     CHECK( rf.read( v0) == 'z');
+}
+
+TEST_CASE( "MARSCalls: read_character_bad") {
+    RF<MIPS32> rf;
+    std::istringstream input( "zz\n");
+    auto syscall_handler = Syscall<MIPS32>::get_handler( false, &rf, input);
+
+    rf.write( v0, 12u); // read_character
+    CHECK_THROWS_AS( syscall_handler->execute(), BadInputValue);
 }
