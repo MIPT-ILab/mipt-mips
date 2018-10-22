@@ -15,8 +15,8 @@ namespace config {
     AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
     AliasedRequiredValue<uint64> uint64_config = { "n", "uint64_config_name", "uint64 config description"};
 
-    AliasedSwitch bool_config_1 = { "d", "bool_config_1", "first bool config description"};
-    AliasedSwitch bool_config_2 = { "f", "bool_config_2", "second bool config description"};
+    Switch bool_config_1 = { "bool_config_1", "first bool config description"};
+    Switch bool_config_2 = { "bool_config_2", "second bool config description"};
 } // namespace config
 
 template<typename T>
@@ -49,7 +49,7 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
         "mipt-mips",
         "-b", "file.elf",
         "-n", "145",
-        "-f"
+        "--bool_config_2"
     };
 
     CHECK_NOTHROW( handleArgs( argv));
@@ -79,7 +79,7 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "-d"
+        "--bool_config_1"
     };
 
     CHECK_NOTHROW( handleArgs( argv));
@@ -193,10 +193,8 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
     const char* argv[] =
     {
         "mipt-mips",
-        "-b", "run_test.elf",
+        "-b", "run_test",
         "-n",
-        "-f",
-        "-d"
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -209,7 +207,6 @@ TEST_CASE( "config_parse: Pass help option alias")
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "-d",
         "-h"
     };
 
@@ -223,7 +220,6 @@ TEST_CASE( "config_parse: Pass help option")
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "-d",
         "--help"
     };
 
