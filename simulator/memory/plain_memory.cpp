@@ -7,8 +7,6 @@
 
 #include "memory.h"
 
-#include <cassert>
-#include <cstring>
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -23,10 +21,7 @@ class PlainMemory : public FuncMemory
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
         void duplicate_to( FuncMemory* target) const final;
     private:
-        std::size_t arena_size;
-        std::unique_ptr<Byte[]> arena;
-        Byte* guest_to_host(Addr addr) noexcept;
-        const Byte* guest_to_host(Addr addr) const noexcept;
+        std::vector<Byte> arena;
 };
 
 std::unique_ptr<FuncMemory>
@@ -36,8 +31,7 @@ FuncMemory::create_plain_memory( uint32 addr_bits)
 }
 
 PlainMemory::PlainMemory( uint32 addr_bits) try
-    : arena_size( 1ull << addr_bits)
-    , arena( std::make_unique<Byte[]>( arena_size))
+    : arena( 1ull << addr_bits)
 {
 }
 catch (const std::bad_alloc&)
@@ -47,41 +41,30 @@ catch (const std::bad_alloc&)
 
 void PlainMemory::duplicate_to( FuncMemory* target) const
 {
-    target->memcpy_host_to_guest( 0, arena.get(), arena_size);
+    target->memcpy_host_to_guest( 0, arena.data(), arena.size());
 }
 
 size_t PlainMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    if (size > arena_size)
-        throw FuncMemoryOutOfRange( dst + size, arena_size);
+    if ( size > arena.size())
+        throw FuncMemoryOutOfRange( dst + size, arena.size());
 
-    if (dst > arena_size)
-        throw FuncMemoryOutOfRange( dst, arena_size);
+    if ( dst > arena.size())
+        throw FuncMemoryOutOfRange( dst, arena.size());
 
-    if (dst > arena_size - size)
-        throw FuncMemoryOutOfRange( dst + size, arena_size);
+    if ( dst > arena.size() - size)
+        throw FuncMemoryOutOfRange( dst + size, arena.size());
 
-    std::memcpy( guest_to_host( dst), src, size);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low-level access
+    std::copy( src, src + size, arena.begin() + dst);
     return size;
 }
 
 size_t PlainMemory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept
 {
-    size_t valid_size = std::min<size_t>( size, arena_size - src);
-    std::memcpy( dst, guest_to_host( src), valid_size);
+    size_t valid_size = std::min<size_t>( size, arena.size() - src);
+    std::copy( arena.begin() + src, arena.begin() + src + valid_size, dst);
     return valid_size;
-}
-
-Byte* PlainMemory::guest_to_host(Addr addr) noexcept
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low level access
-    return arena.get() + addr;
-}
-
-const Byte* PlainMemory::guest_to_host(Addr addr) const noexcept
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) low level access
-    return arena.get() + addr;
 }
 
 std::string PlainMemory::dump() const
@@ -89,10 +72,10 @@ std::string PlainMemory::dump() const
     std::ostringstream oss;
     oss << std::setfill( '0') << std::hex;
 
-    for ( Addr i = 0; i < arena_size; ++i)
-        if ( uint32( arena[i]) != 0)
-            oss << "addr 0x" << i
-                << ": data 0x" << uint32( arena[i]) << std::endl;
+    for ( auto it = arena.begin(); it != arena.end(); ++it)
+        if ( uint32( *it) != 0)
+            oss << "addr 0x" << std::distance(arena.begin(), it)
+                << ": data 0x" << uint32( *it) << std::endl;
 
     return oss.str();
 }
