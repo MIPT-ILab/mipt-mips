@@ -71,6 +71,24 @@ TEST_CASE( "Perf_Sim_init: Process_Wrong_Args")
     CHECK_THROWS_AS( PerfSimAndMemory<MIPS32>( false).run_trace( "./1234567890/qwertyuop", 1), InvalidElfFile);
 }
 
+TEST_CASE( "Perf_Sim: Register R/W")
+{
+    PerfSim<MIPS32> sim( false);
+
+    /* Signed */
+    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
+    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    /* Unsigned */
+    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
+}
+
+TEST_CASE( "Perf_Sim: Register size")
+{
+    CHECK( PerfSim<MIPS32>( false).sizeof_register() == bytewidth<uint32>);
+    CHECK( PerfSim<MIPS64>( false).sizeof_register() == bytewidth<uint64>);
+}
+
 TEST_CASE( "Torture_Test: Perf_Sim")
 {
     // MIPS 32 Little-Endian

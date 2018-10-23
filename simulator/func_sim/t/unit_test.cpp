@@ -109,11 +109,8 @@ TEST_CASE( "FuncSim: Register R/W")
 
 TEST_CASE( "FuncSim: Register size")
 {
-    FuncSim<MIPS32> simMIPS32;
-    FuncSim<MIPS64> simMIPS64;
-
-    CHECK( simMIPS32.sizeof_register() == bytewidth<uint32>);
-    CHECK( simMIPS64.sizeof_register() == bytewidth<uint64>);
+    CHECK( FuncSim<MIPS32>().sizeof_register() == bytewidth<uint32>);
+    CHECK( FuncSim<MIPS64>().sizeof_register() == bytewidth<uint64>);
 }
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")
