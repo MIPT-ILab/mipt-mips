@@ -40,8 +40,8 @@ void vr4300_cp1_init(struct vr4300* /* vr4300 */ ) {}
 void vr4300_cycle(struct vr4300 * vr4300) { vr4300->sim->clock(); }
 void vr4300_cycle_extra(struct vr4300* /* vr4300 */, struct vr4300_stats* /* stats */) { }
 
-uint64_t vr4300_get_register(struct vr4300* /* vr4300 */, size_t /* index */) { return 0; }
-uint64_t vr4300_get_pc(struct vr4300* /* vr4300 */) { return 0; }
+uint64 vr4300_get_register(struct vr4300* vr4300, size_t i) { return vr4300->sim->read_cpu_register( i); }
+uint64 vr4300_get_pc(struct vr4300* /* vr4300 */) { return 0; }
 
 int read_mi_regs(void * /* opaque */, uint32_t /* address */, uint32_t * /* word */) { return 0; }
 int write_mi_regs(void * /* opaque */, uint32_t /* address */, uint32_t /* word */, uint32_t /* dqm */) { return 0; }
