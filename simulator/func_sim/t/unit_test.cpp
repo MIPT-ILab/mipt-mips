@@ -97,13 +97,23 @@ TEST_CASE( "Run one instruction: Func_Sim")
 
 TEST_CASE( "FuncSim: Register R/W")
 {
-    auto simMIPS32 = Simulator::create_simulator( "mips32", true, false);
-    simMIPS32->write_cpu_register<int32>( 1, -1337);
-    CHECK( simMIPS32->read_cpu_register<int32>( 1) == -1337 );
+    FuncSim<MIPS32> sim;
 
-    auto simRISCV128 = Simulator::create_simulator( "riscv128", true, false);
-    simRISCV128->write_cpu_register<int128>( 1, -1337);
-    CHECK( simRISCV128->read_cpu_register<int128>( 1) == -1337 );
+    /* Signed */
+    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
+    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    /* Unsigned */
+    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
+}
+
+TEST_CASE( "FuncSim: Register size")
+{
+    FuncSim<MIPS32> simMIPS32;
+    FuncSim<MIPS64> simMIPS64;
+
+    CHECK( simMIPS32.sizeof_register() == bytewidth<uint32>);
+    CHECK( simMIPS64.sizeof_register() == bytewidth<uint64>);
 }
 
 TEST_CASE( "Run_SMC_trace: Func_Sim")

@@ -31,18 +31,8 @@ public:
     static std::unique_ptr<Simulator> create_configured_simulator();
 
     virtual size_t sizeof_register() const = 0;
-    template <typename T>
-    T read_cpu_register( uint8 regno) {
-        return static_cast<T>( this->read_cpu_register_internal( regno));
-    }
-    template <typename T>
-    void write_cpu_register( uint8 regno, T value) {
-        this->write_cpu_register_internal( regno, static_cast<int_largest>( value));
-    }
-
-private:
-    virtual int_largest read_cpu_register_internal( uint8 regno) const = 0;
-    virtual void write_cpu_register_internal( uint8 regno, int_largest value) = 0;
+    virtual uint64 read_cpu_register( uint8 regno) const = 0;
+    virtual void write_cpu_register( uint8 regno, uint64 value) = 0;
 };
 
 class CycleAccurateSimulator : public Simulator {

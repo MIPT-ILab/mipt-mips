@@ -39,13 +39,6 @@ class FuncSim : public Simulator
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
 
-        int_largest read_cpu_register_internal( uint8 regno) const final {
-            return static_cast<int_largest>( rf.read( Register::from_cpu_index( regno)));
-        }
-        void write_cpu_register_internal( uint8 regno, int_largest value) final {
-            rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
-        }
-
     public:
         explicit FuncSim( bool log = false);
 
@@ -58,7 +51,15 @@ class FuncSim : public Simulator
             sequence_id = target.sequence_id;
         }
 
-        size_t sizeof_register() const final { return sizeof(RegisterUInt); }
+        size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+
+        uint64 read_cpu_register( uint8 regno) const final {
+            return static_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
+        }
+
+        void write_cpu_register( uint8 regno, uint64 value) final {
+            rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+        }
 };
 
 #endif
