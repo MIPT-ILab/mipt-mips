@@ -29,6 +29,10 @@ public:
 
     static std::unique_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::unique_ptr<Simulator> create_configured_simulator();
+
+    virtual size_t sizeof_register() const = 0;
+    virtual uint64 read_cpu_register( uint8 regno) const = 0;
+    virtual void write_cpu_register( uint8 regno, uint64 value) = 0;
 };
 
 class CycleAccurateSimulator : public Simulator {

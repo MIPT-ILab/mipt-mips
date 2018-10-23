@@ -42,7 +42,11 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    size_t to_rf_index()             const { return value; }
+    static RISCVRegister from_cpu_index( uint8 id) {
+        assert( id < 32u);
+        return RISCVRegister( static_cast<RegNum>( id));
+    }
+    size_t to_rf_index()           const { return value; }
 
     static const RISCVRegister zero;
     static const RISCVRegister return_address;
