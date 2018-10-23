@@ -95,6 +95,17 @@ TEST_CASE( "Run one instruction: Func_Sim")
     CHECK( FuncSimAndMemory<MIPS32>().run_trace( smc_code, 1) == Trap::NO_TRAP);
 }
 
+TEST_CASE( "FuncSim: Register R/W")
+{
+    auto simMIPS32 = Simulator::create_simulator( "mips32", true, false);
+    simMIPS32->write_cpu_register<int32>( 1, -1337);
+    CHECK( simMIPS32->read_cpu_register<int32>( 1) == -1337 );
+
+    auto simRISCV128 = Simulator::create_simulator( "riscv128", true, false);
+    simRISCV128->write_cpu_register<int128>( 1, -1337);
+    CHECK( simRISCV128->read_cpu_register<int128>( 1) == -1337 );
+}
+
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
     CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().run_trace_no_limit( smc_code));

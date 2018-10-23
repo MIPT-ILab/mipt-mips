@@ -26,6 +26,8 @@ template <typename ISA>
 class FuncSim : public Simulator
 {
     using FuncInstr = typename ISA::FuncInstr;
+    using Register = typename ISA::Register;
+    using RegisterUInt = typename ISA::RegisterUInt;
 
     private:
         RF<ISA> rf;
@@ -36,6 +38,13 @@ class FuncSim : public Simulator
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
+
+        int_largest read_cpu_register_internal( uint8 regno) const final {
+            return static_cast<int_largest>( rf.read( Register::from_cpu_index( regno)));
+        }
+        void write_cpu_register_internal( uint8 regno, int_largest value) final {
+            rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+        }
 
     public:
         explicit FuncSim( bool log = false);
@@ -48,6 +57,8 @@ class FuncSim : public Simulator
             PC = target.address;
             sequence_id = target.sequence_id;
         }
+
+        size_t sizeof_register() const final { return sizeof(RegisterUInt); }
 };
 
 #endif

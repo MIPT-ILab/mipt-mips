@@ -35,6 +35,8 @@ public:
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
 
+    size_t sizeof_register() const final { return sizeof(typename ISA::RegisterUInt); }
+
     // Rule of five
     PerfSim( const PerfSim&) = delete;
     PerfSim( PerfSim&&) = delete;
@@ -65,6 +67,9 @@ private:
     void clock_tree( Cycle cycle);
     void dump_statistics() const;
     bool is_halt() const;
+
+    int_largest read_cpu_register_internal( uint8) const final { return 0; }
+    void write_cpu_register_internal( uint8, int_largest) final {}
 };
 
 #endif

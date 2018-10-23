@@ -63,6 +63,10 @@ using int128 = boost::multiprecision::int128_t;
 
 #endif // __SIZEOF_INT128__
 
+/* Largest used types */
+using int_largest = int128;
+using uint_largest = uint128;
+
 /* Convert signed type to unsigned type */
 template<typename> struct unsign;
 template<> struct unsign<int8>    { using type = uint8; };
