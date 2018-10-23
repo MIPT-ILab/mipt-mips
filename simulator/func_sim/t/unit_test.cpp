@@ -95,6 +95,24 @@ TEST_CASE( "Run one instruction: Func_Sim")
     CHECK( FuncSimAndMemory<MIPS32>().run_trace( smc_code, 1) == Trap::NO_TRAP);
 }
 
+TEST_CASE( "FuncSim: Register R/W")
+{
+    FuncSim<MIPS32> sim;
+
+    /* Signed */
+    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
+    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    /* Unsigned */
+    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
+}
+
+TEST_CASE( "FuncSim: Register size")
+{
+    CHECK( FuncSim<MIPS32>().sizeof_register() == bytewidth<uint32>);
+    CHECK( FuncSim<MIPS64>().sizeof_register() == bytewidth<uint64>);
+}
+
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
     CHECK_NOTHROW( FuncSimAndMemory<MIPS32>().run_trace_no_limit( smc_code));
