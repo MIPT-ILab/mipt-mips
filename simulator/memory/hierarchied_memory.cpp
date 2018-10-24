@@ -27,7 +27,7 @@ class HierarchiedMemory : public FuncMemory
         std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
-        void duplicate_to( FuncMemory* target) const final;
+        void duplicate_to( std::shared_ptr<FuncMemory> target) const final;
 
     private:
         const uint32 page_bits;
@@ -66,10 +66,10 @@ class HierarchiedMemory : public FuncMemory
         void alloc_and_write_byte( Addr addr, Byte value);
 };
 
-std::unique_ptr<FuncMemory>
+std::shared_ptr<FuncMemory>
 FuncMemory::create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint32 offset_bits)
 {
-    return std::make_unique<HierarchiedMemory>( addr_bits, page_bits, offset_bits);
+    return std::make_shared<HierarchiedMemory>( addr_bits, page_bits, offset_bits);
 }
 
 HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
@@ -149,7 +149,7 @@ bool HierarchiedMemory::check( Addr addr) const noexcept
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-void HierarchiedMemory::duplicate_to( FuncMemory* target) const
+void HierarchiedMemory::duplicate_to( std::shared_ptr<FuncMemory> target) const
 {
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)

@@ -15,10 +15,10 @@ Writeback<ISA>::Writeback(bool log) : Log( log)
 template <typename ISA>
 void Writeback<ISA>::Checker::init( const FuncMemory& outer_mem)
 {
-    sim = std::make_unique<FuncSim<ISA>>();
+    sim = std::make_shared<FuncSim<ISA>>();
     memory = FuncMemory::create_hierarchied_memory();
-    outer_mem.duplicate_to( memory.get());
-    sim->set_memory( memory.get());
+    outer_mem.duplicate_to( memory);
+    sim->set_memory( memory);
     active = true;
 }
 

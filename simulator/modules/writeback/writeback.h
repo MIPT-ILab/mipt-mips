@@ -38,8 +38,8 @@ private:
     Cycle last_writeback_cycle = 0_cl;
 
     class Checker {
-        std::unique_ptr<FuncSim<ISA>> sim;
-        std::unique_ptr<FuncMemory> memory;
+        std::shared_ptr<FuncSim<ISA>> sim;
+        std::shared_ptr<FuncMemory> memory;
         bool active = false;
     public:
         void check( const FuncInstr& instr);

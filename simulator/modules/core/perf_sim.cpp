@@ -28,7 +28,7 @@ PerfSim<ISA>::PerfSim(bool log) :
 }
 
 template <typename ISA>
-void PerfSim<ISA>::set_memory( FuncMemory* m)
+void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
     fetch.set_memory( m);

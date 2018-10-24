@@ -32,13 +32,13 @@ TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr));
 }
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
 {
     auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
-    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
+    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr));
 }
 
 TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
@@ -75,7 +75,7 @@ TEST_CASE( "Hierarchied memory: out of range")
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
+    ElfLoader( valid_elf_file).load_to( ptr);
     FuncMemory& func_mem = *ptr;
 
     // read 4 bytes from the func_mem start addr
@@ -102,7 +102,7 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
+    ElfLoader( valid_elf_file).load_to( ptr);
     FuncMemory& func_mem = *ptr;
 
     // write 1 into the byte pointed by dataSectAddr
@@ -124,7 +124,7 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
+    ElfLoader( valid_elf_file).load_to( ptr);
     FuncMemory& func_mem = *ptr;
 
     uint64 write_addr = 0x3FFFFE;
@@ -208,7 +208,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 TEST_CASE( "Func_memory: Dump")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
+    ElfLoader( valid_elf_file).load_to( ptr);
     FuncMemory& func_mem = *ptr;
 
     CHECK( func_mem.dump() ==
@@ -275,8 +275,8 @@ TEST_CASE( "Func_memory: Duplicate")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1);
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }
 
@@ -285,8 +285,8 @@ TEST_CASE( "Func_memory: Plain Memory")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1);
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }
 
@@ -295,7 +295,7 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     auto mem1 = FuncMemory::create_plain_memory( 24);
     auto mem2 = FuncMemory::create_hierarchied_memory();
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    ElfLoader( valid_elf_file, -0x400000).load_to( mem1);
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }

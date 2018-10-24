@@ -33,10 +33,10 @@ public:
     ~PerfSim() override { destroy_ports(); }
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
-    void set_memory( FuncMemory* memory) final;
+    void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void clock() final;
     void halt() final { force_halt = true; }
-    void init_checker() final { writeback.init_checker( *memory); }
+    void init_checker() final { writeback.init_checker( *memory.lock()); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
@@ -63,7 +63,7 @@ private:
 
     /* simulator units */
     RF<ISA> rf;
-    FuncMemory* memory = nullptr;
+    std::weak_ptr<FuncMemory> memory;
 
     Fetch<ISA> fetch;
     Decode<ISA> decode;

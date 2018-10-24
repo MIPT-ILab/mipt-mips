@@ -70,7 +70,7 @@ void Mem<ISA>::clock( Cycle cycle)
     }
 
     /* perform required loads and stores */
-    memory->load_store( &instr);
+    memory.lock()->load_store( &instr);
 
     /* log */
     sout << instr << std::endl;

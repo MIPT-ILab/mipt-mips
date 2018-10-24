@@ -27,7 +27,7 @@ public:
     size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
     size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
     std::string dump() const final { assert(0); return {}; }
-    void duplicate_to( FuncMemory* /* target */) const final { assert(0); }
+    void duplicate_to( std::shared_ptr<FuncMemory> /* target */) const final { assert(0); }
 private:
     bus_controller* bus = nullptr;
 

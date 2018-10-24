@@ -28,7 +28,7 @@ TEST_CASE( "FuncSim: create empty memory and get lost")
 {
     auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<MIPS32> sim( false);
-    sim.set_memory( m.get());
+    sim.set_memory( m);
     CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
 }
 
@@ -36,16 +36,16 @@ TEST_CASE( "FuncSim: create empty memory and get lost")
 template <typename ISA>
 struct FuncSimAndMemory : FuncSim<ISA>
 {
-    std::unique_ptr<FuncMemory> mem;
+    std::shared_ptr<FuncMemory> mem;
 
     FuncSimAndMemory() : FuncSim<ISA>(), mem( FuncMemory::create_hierarchied_memory())
     {
-       this->set_memory( mem.get());
+       this->set_memory( mem);
     }
 
     void init_trace( const std::string& tr) {
         ElfLoader elf( tr);
-        elf.load_to( mem.get());
+        elf.load_to( mem);
         this->set_pc( elf.get_startPC());
     }
 
@@ -64,8 +64,8 @@ TEST_CASE( "FuncSim: get lost without pc")
 {
     auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<MIPS32> sim( false);
-    sim.set_memory( m.get());
-    ElfLoader( valid_elf_file).load_to( m.get());
+    sim.set_memory( m);
+    ElfLoader( valid_elf_file).load_to( m);
     CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
 }
 

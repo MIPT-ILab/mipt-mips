@@ -33,7 +33,7 @@ class FuncSim : public Simulator
         RF<ISA> rf;
         Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
-        FuncMemory* mem = nullptr;
+        std::weak_ptr<FuncMemory> mem;
         InstrMemoryCached<FuncInstr> imem;
 
         uint64 nops_in_a_row = 0;
@@ -42,7 +42,7 @@ class FuncSim : public Simulator
     public:
         explicit FuncSim( bool log = false);
 
-        void set_memory( FuncMemory* memory) final;
+        void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void init_checker() final { };
         FuncInstr step();
         Trap run(uint64 instrs_to_run) final;

@@ -9,7 +9,7 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
 
 template <typename ISA>
-void FuncSim<ISA>::set_memory( FuncMemory* m)
+void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     mem = m;
     imem.set_memory( m);
@@ -44,7 +44,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     instr.execute();
 
     // load/store
-    mem->load_store( &instr);
+    mem.lock()->load_store( &instr);
 
     // writeback
     rf.write_dst( instr);

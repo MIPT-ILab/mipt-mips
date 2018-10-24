@@ -37,16 +37,16 @@ struct FuncMemoryOutOfRange final : Exception
 class FuncMemory
 {
     public:
-        static std::unique_ptr<FuncMemory>
+        static std::shared_ptr<FuncMemory>
             create_hierarchied_memory( uint32 addr_bits = 32,
                                          uint32 page_bits = 10,
                                          uint32 offset_bits = 12);
-	static std::unique_ptr<FuncMemory>
+	static std::shared_ptr<FuncMemory>
 	    create_plain_memory( uint32 addr_bits = 20);
 
         virtual size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) = 0;
         virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
-        virtual void duplicate_to( FuncMemory* target) const = 0;
+        virtual void duplicate_to( std::shared_ptr<FuncMemory> target) const = 0;
         virtual std::string dump() const = 0;
 
         size_t memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept;
