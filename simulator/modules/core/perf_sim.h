@@ -26,6 +26,9 @@ template <typename ISA>
 class PerfSim : public CycleAccurateSimulator
 {
 public:
+    using Register = typename ISA::Register;
+    using RegisterUInt = typename ISA::RegisterUInt;
+
     explicit PerfSim( bool log);
     ~PerfSim() override { destroy_ports(); }
     Trap run( uint64 instrs_to_run) final;
@@ -34,6 +37,16 @@ public:
     void clock() final;
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
+
+    size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+
+    uint64 read_cpu_register( uint8 regno) const final {
+        return static_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
+    }
+
+    void write_cpu_register( uint8 regno, uint64 value) final {
+        rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+    }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
