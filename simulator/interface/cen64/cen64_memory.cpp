@@ -70,7 +70,7 @@ size_t CEN64Memory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size
     return result;
 }
 
-std::unique_ptr<FuncMemory> generate_cen64_memory( bus_controller * bus_ptr)
+std::shared_ptr<FuncMemory> generate_cen64_memory( bus_controller * bus_ptr)
 {
-    return std::make_unique<CEN64Memory>( bus_ptr);
+    return std::make_shared<CEN64Memory>( bus_ptr);
 }

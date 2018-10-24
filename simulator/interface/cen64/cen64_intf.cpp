@@ -8,18 +8,18 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
-extern std::unique_ptr<FuncMemory> generate_cen64_memory( bus_controller * bus_ptr);
+extern std::shared_ptr<FuncMemory> generate_cen64_memory( bus_controller * bus_ptr);
 
 struct vr4300
 {
-    std::unique_ptr<CycleAccurateSimulator> sim;
-    std::unique_ptr<FuncMemory> bus;
+    std::shared_ptr<CycleAccurateSimulator> sim;
+    std::shared_ptr<FuncMemory> bus;
 
     int init( struct bus_controller * bus_ptr)
     {
         sim = CycleAccurateSimulator::create_simulator("mips64", true);
         bus = generate_cen64_memory( bus_ptr);
-        sim->set_memory( bus.get());
+        sim->set_memory( bus);
         sim->set_pc(0x1fc00000ull);
         return 0;
     }
