@@ -3,7 +3,6 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
 
@@ -55,12 +54,12 @@ public:
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
+
 private:
     RegNum value = RISCV_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit RISCVRegister( RegNum id) : value( id) {}
-
 };
 
 #endif

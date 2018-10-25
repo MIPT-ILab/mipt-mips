@@ -67,6 +67,7 @@ public:
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const MIPSRegister& rhs) const { return !operator==(rhs); }
+
 private:
     RegNum value = MIPS_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
