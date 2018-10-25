@@ -37,7 +37,7 @@ struct PerfSimAndMemory : PerfSim<ISA>
 
     void init_trace( const std::string& tr) {
         ElfLoader elf( tr);
-        elf.load_to( mem);
+        elf.load_to( mem.get());
         this->init_checker();
         this->set_pc( elf.get_startPC());
     }
@@ -108,7 +108,7 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
     auto mem = FuncMemory::create_hierarchied_memory();
     sim.set_memory( mem);
     ElfLoader elf( smc_code);
-    elf.load_to( mem);
+    elf.load_to( mem.get());
     sim.set_pc( elf.get_startPC());
     CHECK( sim.run_no_limit( ) == Trap::NO_TRAP);
 }

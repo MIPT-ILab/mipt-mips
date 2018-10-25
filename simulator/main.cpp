@@ -19,7 +19,7 @@ int main( int argc, const char* argv[]) try {
     config::handleArgs( argc, argv, 1);
     ElfLoader elf( config::binary_filename);
     auto memory = FuncMemory::create_hierarchied_memory();
-    elf.load_to( memory);
+    elf.load_to( memory.get());
 
     auto sim = Simulator::create_configured_simulator();
     sim->set_memory( memory);
