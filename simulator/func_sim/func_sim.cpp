@@ -44,7 +44,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     instr.execute();
 
     // load/store
-    mem.lock()->load_store( &instr);
+    mem->load_store( &instr);
 
     // writeback
     rf.write_dst( instr);

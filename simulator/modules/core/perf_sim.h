@@ -36,7 +36,7 @@ public:
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void clock() final;
     void halt() final { force_halt = true; }
-    void init_checker() final { writeback.init_checker( *memory.lock()); }
+    void init_checker() final { writeback.init_checker( *memory); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
@@ -63,7 +63,7 @@ private:
 
     /* simulator units */
     RF<ISA> rf;
-    std::weak_ptr<FuncMemory> memory;
+    std::shared_ptr<FuncMemory> memory;
 
     Fetch<ISA> fetch;
     Decode<ISA> decode;
