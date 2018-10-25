@@ -276,7 +276,7 @@ TEST_CASE( "Func_memory: Duplicate")
     auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }
 
@@ -286,7 +286,7 @@ TEST_CASE( "Func_memory: Plain Memory")
     auto mem2 = FuncMemory::create_plain_memory( 24);
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }
 
@@ -296,6 +296,6 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     auto mem2 = FuncMemory::create_hierarchied_memory();
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
-    mem1->duplicate_to( mem2.get());
+    mem1->duplicate_to( mem2);
     test_coherency( mem1.get(), mem2.get());
 }
