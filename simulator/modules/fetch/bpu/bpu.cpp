@@ -39,7 +39,6 @@ public:
             4,
             branch_ip_size_in_bits)
     {
-
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
         throw BPInvalidMode(e.what());
