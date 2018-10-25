@@ -41,7 +41,7 @@ class Mem : public Log
     public:
         explicit Mem( bool log);
         void clock( Cycle cycle);
-        void set_memory( std::shared_ptr<FuncMemory> mem) { memory = mem; }
+        void set_memory( std::shared_ptr<FuncMemory> mem) { memory = std::move( mem); }
 };
 
 
