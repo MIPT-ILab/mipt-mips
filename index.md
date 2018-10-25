@@ -13,7 +13,8 @@ Date | Event name
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
 19 Sep | **Layers of Computer Science, ISA and uArch**<br/> • Slides: [L1](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Layers%20of%20Computer%20Science.pptx?raw=true)
 03 Oct | **CMOS and Combinational Circuits**<br/> • Slides: [L2 - CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Integrated%20Circuits%20Basics.pptx?raw=true), [L3 - Combinational Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Combinational%20Circuits.pptx?raw=true)  <br/> • [YouTube](https://youtu.be/zDldV01U5MQ) <br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
-17 Oct | **Sequential Circuits**
+17 Oct | **Sequential Circuits**<br/> • Slides: [L4 - Sequential Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Sequential%20Circuits.pptx?raw=true) <br/> • [YouTube](https://youtu.be/SlFY1iJ-63Q) <br/> • Homework: Study implementation of [SR-latch](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/rs.circ), [T-latch counter](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/counter.circ) and [Mem array](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/array2x4.circ) with [Logisim](http://www.cburch.com/logisim/index.html). Refresh scheme of [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and look inside [Flip-flop ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu-filp-flop.circ).
+31 Oct | **Single-cycle implementation of MIPS/RISC-V CPU**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
@@ -25,7 +26,8 @@ Date | Event name
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
 26 Sep | **Version control system**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Introduction.%20Version%20Control%20System.pptx?raw=true)<br/> • [YouTube](https://www.youtube.com/watch?v=HOeMi9dRD58)<br/> • Homework: read our [our cheat sheet](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet) and contribute to members.md<br/> • Further reading: *Pro Git* ([Rus](https://git-scm.com/book/ru/v2), [Eng](https://git-scm.com/book/en/v2)), *Git Flight Rules* ([Rus](https://github.com/k88hudson/git-flight-rules/blob/master/README_ru.md), [Eng](https://github.com/k88hudson/git-flight-rules))
 10 Oct | **Build, Makefiles, and CMake**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Build,%20Makefiles,%20CMake.pptx?raw=true)<br/> • [YouTube](https://youtu.be/2t_qkJ67nAE)<br/> • Homework: use Make or CMake to build your project, build MIPT-MIPS.
-24 Oct | **Continuous Integration**
+24 Oct | **Continuous Integration**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Continious%20Integration.pptx?raw=true)<br/> • Homework: install Travis CI for your project to run your Make or CMake builds.
+07 Nov | **Code form** |
 
 In addition, repository contains a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
