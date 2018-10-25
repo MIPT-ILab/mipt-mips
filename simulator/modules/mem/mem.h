@@ -21,7 +21,7 @@ class Mem : public Log
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
-        std::weak_ptr<FuncMemory> memory;
+        std::shared_ptr<FuncMemory> memory;
 
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;

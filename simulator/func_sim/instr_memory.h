@@ -14,10 +14,10 @@
 template<typename Instr>
 class InstrMemory
 {
-    std::weak_ptr<FuncMemory> mem;
+    std::shared_ptr<FuncMemory> mem;
 public:
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = m; }
-    auto fetch( Addr pc) const { return mem.lock()->template read<uint32, Instr::endian>( pc); }
+    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
     auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 };
 
