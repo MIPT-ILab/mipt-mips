@@ -16,7 +16,7 @@ class InstrMemory
 {
     std::shared_ptr<FuncMemory> mem;
 public:
-    void set_memory( std::shared_ptr<FuncMemory> m) { mem = m; }
+    void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
     auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
     auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
 };
