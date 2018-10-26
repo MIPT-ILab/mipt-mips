@@ -79,7 +79,6 @@ class LRUCache
 
         std::list<Key> lru_list{};
         std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
-
 };
 
 #endif // LRUCACHE_H
