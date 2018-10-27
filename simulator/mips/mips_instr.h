@@ -161,6 +161,7 @@ class BaseMIPSInstr
         static const MapType isaMapRI;
         static const MapType isaMapIJ;
         static const MapType isaMapMIPS32;
+        typename MapType::iterator find_entry( MapType isaMap, std::string_view name);
 
         MIPSRegister src1 = MIPSRegister::zero;
         MIPSRegister src2 = MIPSRegister::zero;
@@ -402,6 +403,7 @@ class BaseMIPSInstr
         Execute function = &BaseMIPSInstr::execute_unknown;
     protected:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
+        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
     public:
         static const constexpr Endian endian = Endian::little;
     
@@ -511,6 +513,8 @@ class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
 public:
     explicit MIPSInstr( uint32 bytes, Addr PC = 0)
         : Base( V, bytes, PC) { }
+    explicit MIPSInstr( std::string_view str_opcode, Addr PC = 0)
+        : Base( V, str_opcode, PC) { }
 };
 
 

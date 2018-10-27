@@ -295,6 +295,44 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, A
 }
 
 template<typename RegisterUInt>
+BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC) :
+    new_PC( PC + 4),
+    PC( PC)
+{
+    auto it = find_entry( isaMapR,      str_opcode);
+    if ( it == isaMapR.end())
+        it =  find_entry( isaMapRI,     str_opcode);
+    if ( it == isaMapRI.end())
+        it =  find_entry( isaMapMIPS32, str_opcode);
+    if ( it == isaMapMIPS32.end())
+        it =  find_entry( isaMapIJ,     str_opcode);
+    if ( it == isaMapIJ.end())
+    {
+        std::ostringstream oss;
+        if ( PC != 0)
+            oss << std::hex << "0x" << PC << ": ";
+        oss << str_opcode << '\t' << "Unknown";
+        disasm = oss.str();
+    }
+    else {
+        init( it->second, version);
+    } 
+}
+
+template<typename RegisterUInt>
+typename BaseMIPSInstr<RegisterUInt>::MapType::iterator 
+BaseMIPSInstr<RegisterUInt>::find_entry( BaseMIPSInstr<RegisterUInt>::MapType map, std::string_view name)
+{
+    auto it = map.begin();
+    for ( ; it != map.end(); it++)
+    {
+        if ( it->second.name == name)
+            return it;
+    }
+    return it;
+}
+
+template<typename RegisterUInt>
 MIPSRegister BaseMIPSInstr<RegisterUInt>::get_register( RegType type) const
 {
     switch ( type) {

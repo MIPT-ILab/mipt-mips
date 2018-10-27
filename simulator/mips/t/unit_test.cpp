@@ -9,6 +9,15 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
     CHECK_NOTHROW( MIPS32Instr(0x0).execute());
 }
 
+TEST_CASE( "sllv")
+{
+    MIPS32Instr instr("sllv");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+
 TEST_CASE( "MIPS32_instr: Divmult")
 {
     CHECK(MIPS32Instr(0x02290018).is_divmult());
@@ -19,6 +28,14 @@ TEST_CASE( "MIPS32_instr: Divmult")
     CHECK(MIPS32Instr(0x72290001).is_divmult());
     CHECK(MIPS32Instr(0x72290004).is_divmult());
     CHECK(MIPS32Instr(0x72290005).is_divmult());
+    CHECK(MIPS32Instr("mult").is_divmult());
+    CHECK(MIPS32Instr("multu").is_divmult());
+    CHECK(MIPS32Instr("div").is_divmult());
+    CHECK(MIPS32Instr("divu").is_divmult());
+    CHECK(MIPS32Instr("dmult").is_divmult());
+    CHECK(MIPS32Instr("dmultu").is_divmult());
+    CHECK(MIPS32Instr("ddiv").is_divmult());
+    CHECK(MIPS32Instr("ddivu").is_divmult());
 }
     
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
