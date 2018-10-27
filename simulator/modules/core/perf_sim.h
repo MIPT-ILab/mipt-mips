@@ -48,6 +48,14 @@ public:
         rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
     }
 
+    uint64 read_cause_register() const {
+        return static_cast<uint64>( rf.read( Register::cause));
+    }
+
+    void write_cause_register( uint64 value) {
+        rf.write( Register::cause, static_cast<RegisterUInt>( value));
+    }
+
     // Rule of five
     PerfSim( const PerfSim&) = delete;
     PerfSim( PerfSim&&) = delete;

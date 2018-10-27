@@ -9,6 +9,7 @@ const RISCVRegister RISCVRegister::zero = RISCVRegister( RISCV_REG_zero);
 const RISCVRegister RISCVRegister::return_address = RISCVRegister( RISCV_REG_rs);
 const RISCVRegister RISCVRegister::mips_hi = RISCVRegister( MAX_VAL_RegNum);
 const RISCVRegister RISCVRegister::mips_lo = RISCVRegister( MAX_VAL_RegNum);
+const RISCVRegister RISCVRegister::cause = RISCVRegister( MAX_VAL_RegNum);
 
 std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
 {{
