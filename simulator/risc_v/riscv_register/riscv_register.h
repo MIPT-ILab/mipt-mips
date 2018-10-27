@@ -43,6 +43,7 @@ public:
     static const RISCVRegister return_address;
     static const RISCVRegister mips_hi;
     static const RISCVRegister mips_lo;
+    static const RISCVRegister cause;
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
