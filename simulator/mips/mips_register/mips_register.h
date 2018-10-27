@@ -54,7 +54,7 @@ public:
             case 33: return MIPSRegister::mips_lo;
             case 34: return MIPSRegister::mips_hi;
             case 35: return from_cp0_index( 8);  // Bad
-            case 36: return from_cp0_index( 13); // Cause
+            case 36: return MIPSRegister::cause;
             default: return MIPSRegister::zero;  // CP1 registers etc.
         }
     }
@@ -64,9 +64,11 @@ public:
     static const MIPSRegister mips_lo;
     static const MIPSRegister zero;
     static const MIPSRegister return_address;
+    static const MIPSRegister cause;
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const MIPSRegister& rhs) const { return !operator==(rhs); }
+
 private:
     RegNum value = MIPS_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;

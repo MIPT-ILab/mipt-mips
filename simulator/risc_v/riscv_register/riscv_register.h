@@ -3,7 +3,6 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
 
@@ -29,11 +28,6 @@ class RISCVRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
-    explicit RISCVRegister( uint8 id) : RISCVRegister( static_cast<RegNum>( id))
-    {
-        assert( id < 32u);
-    }
-
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
         return out << regTable.at( rhs.value);
@@ -42,25 +36,23 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static RISCVRegister from_cpu_index( uint8 id) {
-        assert( id < 32u);
-        return RISCVRegister( static_cast<RegNum>( id));
-    }
+    static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( static_cast<RegNum>( id)); }
     size_t to_rf_index()           const { return value; }
 
     static const RISCVRegister zero;
     static const RISCVRegister return_address;
     static const RISCVRegister mips_hi;
     static const RISCVRegister mips_lo;
+    static const RISCVRegister cause;
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
+
 private:
     RegNum value = RISCV_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit RISCVRegister( RegNum id) : value( id) {}
-
 };
 
 #endif

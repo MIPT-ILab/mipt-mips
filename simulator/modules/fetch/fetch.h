@@ -22,7 +22,7 @@ class Fetch : public Log
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
-    void set_memory( FuncMemory* mem) { memory.set_memory( mem); }
+    void set_memory( std::shared_ptr<FuncMemory> mem) { memory.set_memory( std::move( mem)); }
 
 private:
     InstrMemoryCached<FuncInstr> memory;

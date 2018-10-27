@@ -38,7 +38,7 @@ public:
     ElfLoader& operator=( const ElfLoader&) = delete;
     ElfLoader& operator=( ElfLoader&&) = delete;
 
-    void load_to(FuncMemory* memory) const;
+    void load_to( FuncMemory *memory) const;
     Addr get_startPC() const;
 private:
     const std::unique_ptr<ELFIO::elfio> reader;

@@ -25,7 +25,7 @@ class LRUCache
 
         static auto get_capacity() { return CAPACITY; }
 
-        auto size() const { return number_of_elements; }
+        auto size() const { return lru_hash.size(); }
         bool empty() const { return size() == 0; }
 
         // First return value is true if and only if the value was found
@@ -60,30 +60,25 @@ class LRUCache
                 data.erase( data_it);
                 lru_list.erase( lru_it->second);
                 lru_hash.erase( lru_it);
-
-                number_of_elements--;
             }
         }
 
     private:
         void allocate( const Key& key, const Value& value)
         {
-            if ( number_of_elements == CAPACITY)
+            if ( lru_hash.size() == CAPACITY)
                 erase( lru_list.back());
 
             // Add a new element
             data.emplace( key, value);
             auto ptr = lru_list.insert( lru_list.begin(), key);
             lru_hash.emplace( key, ptr);
-            number_of_elements++;
         }
 
         std::unordered_map<Key, Value> data{};
 
         std::list<Key> lru_list{};
         std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
-
-        std::size_t number_of_elements = 0u;
 };
 
 #endif // LRUCACHE_H

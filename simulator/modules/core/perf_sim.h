@@ -33,7 +33,7 @@ public:
     ~PerfSim() override { destroy_ports(); }
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
-    void set_memory( FuncMemory* memory) final;
+    void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void clock() final;
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
@@ -46,6 +46,14 @@ public:
 
     void write_cpu_register( uint8 regno, uint64 value) final {
         rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+    }
+
+    uint64 read_cause_register() const {
+        return static_cast<uint64>( rf.read( Register::cause));
+    }
+
+    void write_cause_register( uint64 value) {
+        rf.write( Register::cause, static_cast<RegisterUInt>( value));
     }
 
     // Rule of five
@@ -63,7 +71,7 @@ private:
 
     /* simulator units */
     RF<ISA> rf;
-    FuncMemory* memory = nullptr;
+    std::shared_ptr<FuncMemory> memory;
 
     Fetch<ISA> fetch;
     Decode<ISA> decode;
