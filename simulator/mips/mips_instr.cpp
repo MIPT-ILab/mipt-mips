@@ -306,7 +306,13 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_vie
         it =  find_entry( isaMapMIPS32, str_opcode);
     if ( it == isaMapMIPS32.end())
         it =  find_entry( isaMapIJ,     str_opcode);
-    if ( it == isaMapIJ.end())
+    
+    if ( str_opcode == "nop")
+    {
+        init (isaMapR.find( 0)->second, version);
+        disasm = "nop ";
+    }
+    else if ( it == isaMapIJ.end())
     {
         std::ostringstream oss;
         if ( PC != 0)
@@ -320,8 +326,8 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_vie
 }
 
 template<typename RegisterUInt>
-typename BaseMIPSInstr<RegisterUInt>::MapType::iterator 
-BaseMIPSInstr<RegisterUInt>::find_entry( BaseMIPSInstr<RegisterUInt>::MapType map, std::string_view name)
+typename BaseMIPSInstr<RegisterUInt>::MapType::const_iterator 
+BaseMIPSInstr<RegisterUInt>::find_entry( const BaseMIPSInstr<RegisterUInt>::MapType& map, std::string_view name) const
 {
     auto it = map.begin();
     for ( ; it != map.end(); it++)
@@ -329,7 +335,7 @@ BaseMIPSInstr<RegisterUInt>::find_entry( BaseMIPSInstr<RegisterUInt>::MapType ma
         if ( it->second.name == name)
             return it;
     }
-    return it;
+    return map.end();
 }
 
 template<typename RegisterUInt>

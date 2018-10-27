@@ -9,14 +9,58 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
     CHECK_NOTHROW( MIPS32Instr(0x0).execute());
 }
 
-TEST_CASE( "sllv")
+TEST_CASE( "MIPS32_instr: invalid instruction in ctor form string")
 {
-    MIPS32Instr instr("sllv");
+    MIPS32Instr instr( "invalid_instruction");
+    bool isvalid = true;
+    try
+    {
+        instr.execute();
+    }
+    catch ( UnknownMIPSInstruction& exc)
+    {
+        isvalid = false;
+    }
+    CHECK( isvalid == false);   
+}
+
+TEST_CASE( "MIPS32_instr: sllv")
+{
+    MIPS32Instr instr( "sllv");
     instr.set_v_src( 1, 0);
     instr.set_v_src( 0, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 1);
+    CHECK( instr.get_v_dst() == 1);
 }
+
+TEST_CASE( "MIPS32_instr: mul")
+{
+    MIPS32Instr instr( "mul");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 20, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 200);
+}
+
+TEST_CASE( "MIPS32_instr: addi")
+{
+    MIPS32Instr instr( "addi");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 0, 1);
+    instr.set_v_imm( 20);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 30);
+}
+
+TEST_CASE( "MIPS32_instr: teqi")
+{
+    MIPS32Instr instr( "teqi");
+    instr.set_v_src( 0, 0);
+    instr.set_v_imm( 0);
+    instr.execute();
+    CHECK( instr.has_trap());
+}
+
 
 TEST_CASE( "MIPS32_instr: Divmult")
 {
@@ -96,6 +140,7 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
     CHECK(MIPS32Instr(0x02290036).get_disasm() == "tne $s1, $t1");
     CHECK(MIPS32Instr(0x01208809).get_disasm() == "jalr $s1, $t1");
     CHECK(MIPS32Instr(0x00000000).get_disasm() == "nop ");
+    CHECK(MIPS32Instr     ("nop").get_disasm() == "nop ");
 }
 
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
