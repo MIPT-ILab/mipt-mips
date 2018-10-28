@@ -9,19 +9,10 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
     CHECK_NOTHROW( MIPS32Instr(0x0).execute());
 }
 
-TEST_CASE( "MIPS32_instr: invalid instruction in ctor form string")
+TEST_CASE( "MIPS32_instr: invalid instruction in ctor from string")
 {
     MIPS32Instr instr( "invalid_instruction");
-    bool isvalid = true;
-    try
-    {
-        instr.execute();
-    }
-    catch ( UnknownMIPSInstruction& exc)
-    {
-        isvalid = false;
-    }
-    CHECK( isvalid == false);   
+    CHECK_THROWS_AS( instr.execute(), UnknownMIPSInstruction);
 }
 
 TEST_CASE( "MIPS32_instr: sllv")
@@ -60,7 +51,6 @@ TEST_CASE( "MIPS32_instr: teqi")
     instr.execute();
     CHECK( instr.has_trap());
 }
-
 
 TEST_CASE( "MIPS32_instr: Divmult")
 {
