@@ -9,6 +9,49 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
     CHECK_NOTHROW( MIPS32Instr(0x0).execute());
 }
 
+TEST_CASE( "MIPS32_instr: invalid instruction in ctor from string")
+{
+    MIPS32Instr instr( "invalid_instruction");
+    CHECK_THROWS_AS( instr.execute(), UnknownMIPSInstruction);
+}
+
+TEST_CASE( "MIPS32_instr: sllv")
+{
+    MIPS32Instr instr( "sllv");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: mul")
+{
+    MIPS32Instr instr( "mul");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 20, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 200);
+}
+
+TEST_CASE( "MIPS32_instr: addi")
+{
+    MIPS32Instr instr( "addi");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 0, 1);
+    instr.set_v_imm( 20);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 30);
+}
+
+TEST_CASE( "MIPS32_instr: teqi")
+{
+    MIPS32Instr instr( "teqi");
+    instr.set_v_src( 0, 0);
+    instr.set_v_imm( 0);
+    instr.execute();
+    CHECK( instr.has_trap());
+}
+
 TEST_CASE( "MIPS32_instr: Divmult")
 {
     CHECK(MIPS32Instr(0x02290018).is_divmult());
@@ -19,6 +62,14 @@ TEST_CASE( "MIPS32_instr: Divmult")
     CHECK(MIPS32Instr(0x72290001).is_divmult());
     CHECK(MIPS32Instr(0x72290004).is_divmult());
     CHECK(MIPS32Instr(0x72290005).is_divmult());
+    CHECK(MIPS32Instr("mult").is_divmult());
+    CHECK(MIPS32Instr("multu").is_divmult());
+    CHECK(MIPS32Instr("div").is_divmult());
+    CHECK(MIPS32Instr("divu").is_divmult());
+    CHECK(MIPS32Instr("dmult").is_divmult());
+    CHECK(MIPS32Instr("dmultu").is_divmult());
+    CHECK(MIPS32Instr("ddiv").is_divmult());
+    CHECK(MIPS32Instr("ddivu").is_divmult());
 }
     
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
@@ -79,6 +130,7 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
     CHECK(MIPS32Instr(0x02290036).get_disasm() == "tne $s1, $t1");
     CHECK(MIPS32Instr(0x01208809).get_disasm() == "jalr $s1, $t1");
     CHECK(MIPS32Instr(0x00000000).get_disasm() == "nop ");
+    CHECK(MIPS32Instr     ("nop").get_disasm() == "nop ");
 }
 
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
