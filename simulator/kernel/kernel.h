@@ -21,8 +21,8 @@ public:
         return std::make_shared<Kernel>();
     }
 
-    void set_simulator( std::shared_ptr<Simulator> sim) { this->sim = sim; }
-    void set_memory( std::shared_ptr<FuncMemory> mem) { this->mem = std::move( mem); }
+    void set_simulator( std::shared_ptr<Simulator> s) { sim = s; }
+    void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
     /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
     virtual bool execute() { return true; }
 
