@@ -23,6 +23,7 @@ public:
 
     void set_simulator( std::shared_ptr<Simulator> sim) { this->sim = sim; }
     void set_memory( std::shared_ptr<FuncMemory> mem) { this->mem = std::move( mem); }
+    /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
     virtual bool execute() { return true; }
 
     Kernel() = default;
