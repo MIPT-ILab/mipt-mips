@@ -35,6 +35,7 @@ class FuncSim : public Simulator
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<FuncInstr> imem;
+        std::shared_ptr<Kernel> kernel;
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
@@ -43,6 +44,7 @@ class FuncSim : public Simulator
         explicit FuncSim( bool log = false);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
+        void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void init_checker() final { };
         FuncInstr step();
         Trap run(uint64 instrs_to_run) final;
