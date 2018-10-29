@@ -85,16 +85,16 @@ uint64 vr4300_get_pc(struct vr4300* /* vr4300 */) { return 0; }
 
 int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
 {
-    // NOLINTNEXTLINE(ppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
     auto cpu = reinterpret_cast<const vr4300*>( opaque);
     auto reg = static_cast<MiRegister>( ( address - MI_REGS_BASE_ADDRESS) / 4);
-    *word = cpu->mi_regs[reg];
+    *word = cpu->mi_regs.at( reg);
     return 0;
 }
 
 int write_mi_regs( void* opaque, uint32 address, uint32 word, uint32 dqm)
 {
-    // NOLINTNEXTLINE(ppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
     auto vr4300 = reinterpret_cast<struct vr4300*>( opaque);
     auto reg = static_cast<MiRegister>( ( address - MI_REGS_BASE_ADDRESS) / 4);
 
@@ -129,24 +129,24 @@ void vr4300::write_mi_init_mode_reg( uint32 word)
     static const constexpr uint64 MI_RDRAM_REG_MODE = 0x0200;
     uint32 result = word & 0x3FFu;
 
-    if ((word & 0x0080) != 0)
+    if ((word & 0x0080u) != 0)
         result &= ~MI_INIT_MODE;
-    else if ((word & 0x0100) != 0)
+    else if ((word & 0x0100u) != 0)
         result |= MI_INIT_MODE;
 
-    if ((word & 0x0200) != 0)
+    if ((word & 0x0200u) != 0)
         result &= ~MI_EBUS_TEST_MODE;
-    else if ((word & 0x0400) != 0)
+    else if ((word & 0x0400u) != 0)
         result |= MI_EBUS_TEST_MODE;
 
-    if ((word & 0x0800) != 0) {
+    if ((word & 0x0800u) != 0) {
         mi_regs[MI_INTR_REG] &= ~MI_INTR_DP;
         check_for_interrupts();
     }
 
-    if ((word & 0x1000) != 0)
+    if ((word & 0x1000u) != 0)
         result &= ~MI_RDRAM_REG_MODE;
-    else if ((word & 0x2000) != 0)
+    else if ((word & 0x2000u) != 0)
         result |= MI_RDRAM_REG_MODE;
 
     mi_regs[MI_INIT_MODE_REG] = result; 
@@ -154,34 +154,34 @@ void vr4300::write_mi_init_mode_reg( uint32 word)
 
 void vr4300::write_mi_intr_mask_reg( uint32 word)
 {
-    if ((word & 0x0001) != 0)
+    if ((word & 0x0001u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_SP;
-    else if ((word & 0x0002) != 0)
+    else if ((word & 0x0002u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_SP;
 
-    if ((word & 0x0004) != 0)
+    if ((word & 0x0004u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_SI;
-    else if ((word & 0x0008) != 0)
+    else if ((word & 0x0008u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_SI;
 
-    if ((word & 0x0010) != 0)
+    if ((word & 0x0010u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_AI;
-    else if ((word & 0x0020) != 0)
+    else if ((word & 0x0020u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_AI;
 
-    if ((word & 0x0040) != 0)
+    if ((word & 0x0040u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_VI;
-    else if ((word & 0x0080) != 0)
+    else if ((word & 0x0080u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_VI;
 
-    if ((word & 0x0100) != 0)
+    if ((word & 0x0100u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_PI;
-    else if ((word & 0x0200) != 0)
+    else if ((word & 0x0200u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_PI;
 
-    if ((word & 0x0400) != 0)
+    if ((word & 0x0400u) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_DP;
-    else if ((word & 0x0800) != 0)
+    else if ((word & 0x0800u) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_DP;
 
     check_for_interrupts();
