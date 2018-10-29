@@ -1,7 +1,7 @@
 /*
  * kernel.h - base kernel class
  * @author Vyacheslav Kompan kompan.vo@phystech.edu
- * Copyright 2015 MIPT-MIPS
+ * Copyright 2018 MIPT-MIPS
  */
 
 #ifndef KERNEL_H
