@@ -88,7 +88,7 @@ int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
     // NOLINTNEXTLINE(ppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
     auto cpu = reinterpret_cast<const vr4300*>( opaque);
     auto reg = static_cast<MiRegister>( ( address - MI_REGS_BASE_ADDRESS) / 4);
-    *word = ->mi_regs[reg];
+    *word = cpu->mi_regs[reg];
     return 0;
 }
 
