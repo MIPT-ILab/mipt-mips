@@ -14,6 +14,7 @@ set(TESTS_CPPS
     mips/mips_register/t/unit_test.cpp
     mips/t/unit_test.cpp
     func_sim/rf/t/unit_test.cpp
+    func_sim/mars/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp

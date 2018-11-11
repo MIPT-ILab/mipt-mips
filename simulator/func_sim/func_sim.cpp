@@ -4,6 +4,7 @@
  */
  
 #include "func_sim.h"
+#include <kernel/kernel.h>
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
@@ -72,6 +73,9 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 
         if ( instr.trap_type() == Trap::HALT)
             return instr.trap_type();
+        if ( instr.trap_type() == Trap::SYSCALL)
+            if ( kernel.get() && !kernel->execute())
+                break;
     }
     return Trap::NO_TRAP;
 }

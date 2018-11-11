@@ -8,18 +8,25 @@
 #define KERNEL_H
 
 /* Simulator modules */
+#include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
 /* Generic C++ */
+#include <iostream>
 #include <memory>
 
+struct BadInputValue final : Exception {
+    BadInputValue() : Exception( "Bad input value") {}
+};
+
 class Kernel {
+protected:
     std::weak_ptr<Simulator> sim;
     std::shared_ptr<FuncMemory> mem;
 public:
-    static std::shared_ptr<Kernel> create_kernel() {
-        return std::make_shared<Kernel>();
-    }
+    static std::shared_ptr<Kernel> create_kernel( bool use_mars = false, std::istream& instream = std::cin,
+                                                  std::ostream& outstream = std::cout);
+    static std::shared_ptr<Kernel> create_configured_kernel();
 
     void set_simulator( std::shared_ptr<Simulator> s) { sim = s; }
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }

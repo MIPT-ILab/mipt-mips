@@ -26,6 +26,7 @@ set(CPPS infra/macro_test.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
+    kernel/kernel.cpp
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
@@ -37,6 +38,7 @@ set(CPPS infra/macro_test.cpp
     modules/core/perf_sim.cpp
     modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
+    func_sim/mars/mars_kernel.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp

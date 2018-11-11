@@ -26,12 +26,13 @@ int main( int argc, const char* argv[]) try {
     sim->set_memory( memory);
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
-    sim->run( config::num_steps);
 
-    auto kernel = Kernel::create_kernel();
+    auto kernel = Kernel::create_configured_kernel();
     kernel->set_memory( memory);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
+
+    sim->run( config::num_steps);
     return 0;
 }
 catch (const config::HelpOption& e) {
