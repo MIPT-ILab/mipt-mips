@@ -28,12 +28,13 @@ public:
                                                   std::ostream& outstream = std::cout);
     static std::shared_ptr<Kernel> create_configured_kernel();
 
-    void set_simulator( std::shared_ptr<Simulator> s) { sim = s; }
+    void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
     /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
     virtual bool execute() { return true; }
 
     Kernel() = default;
+    virtual ~Kernel() = default;
     Kernel( const Kernel&) = delete;
     Kernel( Kernel&&) = delete;
     Kernel operator=( const Kernel&) = delete;
