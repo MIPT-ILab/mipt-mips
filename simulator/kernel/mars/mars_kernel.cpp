@@ -35,7 +35,8 @@ void MARSKernel::print_integer() {
 void MARSKernel::read_integer() {
     std::string input;
     instream >> input;
-    uint64 value, pos;
+    uint64 value = 0;
+    size_t pos = 0;
     try {
         value = static_cast<uint64>( std::stoll( input, &pos, 0));
     }

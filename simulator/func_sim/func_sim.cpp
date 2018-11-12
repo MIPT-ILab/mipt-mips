@@ -71,11 +71,15 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         const auto& instr = step();
         sout << instr << std::endl;
 
-        if ( instr.trap_type() == Trap::HALT)
-            return instr.trap_type();
-        if ( instr.trap_type() == Trap::SYSCALL)
-            if ( kernel.get() && !kernel->execute())
+        switch ( instr.trap_type()) {
+            case Trap::HALT:
+                return Trap::HALT;
+            case Trap::SYSCALL:
+                if ( kernel.get() && !kernel->execute())
+                    return Trap::SYSCALL;
                 break;
+            default: break;
+        }
     }
     return Trap::NO_TRAP;
 }

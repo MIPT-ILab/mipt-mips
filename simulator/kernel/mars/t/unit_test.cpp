@@ -4,7 +4,7 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "../mars_kernel.h"
+#include "kernel/mars/mars_kernel.h"
 #include <simulator.h>
 /* Catch2 */
 #include <catch.hpp>

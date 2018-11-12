@@ -5,7 +5,7 @@
  */
 
 #include "kernel.h"
-#include <func_sim/mars/mars_kernel.h>
+#include "mars/mars_kernel.h"
 /* Simulator modules. */
 #include <infra/config/config.h>
 

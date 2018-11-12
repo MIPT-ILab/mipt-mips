@@ -10,11 +10,11 @@ set(TESTS_CPPS
     infra/instrcache/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     kernel/t/unit_test.cpp
+    kernel/mars/t/unit_test.cpp
     memory/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
     mips/t/unit_test.cpp
     func_sim/rf/t/unit_test.cpp
-    func_sim/mars/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
