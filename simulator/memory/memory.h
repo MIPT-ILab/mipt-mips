@@ -139,7 +139,7 @@ class ZeroMemory : public FuncMemory
         size_t memcpy_guest_to_host( Byte* dst, Addr, size_t size) const noexcept final
         {
             std::fill_n( dst, size, Byte{});
-	    return size;
+            return size;
         }
 
         void duplicate_to( std::shared_ptr<FuncMemory>) const final { }
