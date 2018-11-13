@@ -135,14 +135,15 @@ void FuncMemory::load_store(Instr* instr)
 class ZeroMemory : public FuncMemory
 {
     public:
-        size_t memcpy_host_to_guest( Addr, const Byte*, size_t) final { }
+        size_t memcpy_host_to_guest( Addr, const Byte*, size_t) final { return 0; }
         size_t memcpy_guest_to_host( Byte* dst, Addr, size_t size) const noexcept final
         {
             std::fill_n( dst, size, Byte{});
+	    return size;
         }
 
-        void duplicate_to( std::shared_ptr<FuncMemory> target) const final { }
+        void duplicate_to( std::shared_ptr<FuncMemory>) const final { }
         std::string dump() const final { return std::string( "empty memory\n"); }
-}
+};
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
