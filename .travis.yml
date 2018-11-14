@@ -2,8 +2,6 @@ notifications:
   email: false
 
 language: cpp
-sudo: true
-
 dist: xenial
 osx_image: xcode10.1
 
