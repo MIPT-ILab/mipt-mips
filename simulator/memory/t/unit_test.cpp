@@ -74,9 +74,8 @@ TEST_CASE( "Hierarchied memory: out of range")
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // read 4 bytes from the func_mem start addr
     CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
@@ -101,9 +100,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // write 1 into the byte pointed by dataSectAddr
     func_mem->write<uint8, Endian::little>( 1, dataSectAddr);
@@ -123,9 +121,8 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     uint64 write_addr = 0x3FFFFE;
 
@@ -143,8 +140,7 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // Single byte
     const Byte write_data_1{ 0xA5};
@@ -161,8 +157,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // 8 bytes
     const constexpr size_t size = 8;
@@ -184,8 +179,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // 1 KByte
     const  constexpr size_t size = 1024;
@@ -207,9 +201,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
 TEST_CASE( "Func_memory: Dump")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    std::shared_ptr<FuncMemory> func_mem = ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     CHECK( func_mem->dump() ==
         "addr 0x400095: data 0xc\n"
