@@ -10,6 +10,7 @@
 
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
+#include "_instr.h"
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
@@ -23,38 +24,6 @@
 // Generic C++
 #include <array>
 #include <unordered_map>
-
-enum instr_masks {
-    //32bits         01234567012345670123456701234567
-    FUNCT_MASK    = 0b00000000000000000000000000111111,
-    SHAMT_MASK    = 0b00000000000000000000011111000000,
-    RD_MASK       = 0b00000000000000001111100000000000,
-    RT_MASK       = 0b00000000000111110000000000000000,
-    RS_MASK       = 0b00000011111000000000000000000000,
-    OPCODE_MASK   = 0b11111100000000000000000000000000,
-    ASI_IMM_MASK  = 0b00000000000000001111111111111111,
-    ASJ_IMM_MASK  = 0b00000011111111111111111111111111,
-};
-
-enum instr_size_and_shifts {
-    FUNCT_SIZE    = 6,
-    SHAMT_SIZE    = 5,
-    RD_SIZE       = 5,
-    RT_SIZE       = 5,
-    RS_SIZE       = 5,
-    OPCODE_SIZE   = 6,
-    ASI_IMM_SIZE  = 16,
-    ASJ_IMM_SIZE  = 26,
-
-    FUNCT_SHIFT   = 0,
-    SHAMT_SHIFT   = FUNCT_SHIFT + FUNCT_SIZE,
-    RD_SHIFT      = SHAMT_SHIFT + SHAMT_SIZE,
-    RT_SHIFT      = RD_SHIFT    + RD_SIZE,
-    RS_SHIFT      = RT_SHIFT    + RT_SIZE,
-    OPCODE_SHIFT  = RS_SHIFT    + RS_SIZE,
-    ASI_IMM_SHIFT = 0,
-    ASJ_IMM_SHIFT = 0,
-};
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
@@ -120,61 +89,7 @@ class BaseMIPSInstr
 
         Trap trap = Trap::NO_TRAP;
 
-        // Endian specific
-        const struct _instr
-        {
-            struct AsR
-            {
-                int funct;
-                int shamt;
-                int rd;
-                int rt;
-                int rs;
-                int opcode;
-            };
-            struct AsI
-            {
-                int imm;
-                int rt;
-                int rs;
-                int opcode;
-            };
-            struct AsJ
-            {
-                int imm;
-                int opcode;
-            };
-
-            AsR get_as_r() const {
-                AsR result = {};
-                result.funct  = (raw & FUNCT_MASK)   >> FUNCT_SHIFT;
-                result.shamt  = (raw & SHAMT_MASK)   >> SHAMT_SHIFT;
-                result.rd     = (raw & RD_MASK)      >> RD_SHIFT;
-                result.rt     = (raw & RT_MASK)      >> RT_SHIFT;
-                result.rs     = (raw & RS_MASK)      >> RS_SHIFT;
-                result.opcode = (raw & OPCODE_MASK)  >> OPCODE_SHIFT;
-                return result;
-            };
-             AsI get_as_i() const {
-                AsI result = {};
-                result.imm    = (raw & ASI_IMM_MASK) >> ASI_IMM_SHIFT;
-                result.rt     = (raw & RT_MASK)      >> RT_SHIFT;
-                result.rs     = (raw & RS_MASK)      >> RS_SHIFT;
-                result.opcode = (raw & OPCODE_MASK)  >> OPCODE_SHIFT;
-                return result;
-            };
-             AsJ get_as_j() const {
-                AsJ result = {};
-                result.imm    = (raw & ASJ_IMM_MASK) >> ASJ_IMM_SHIFT;
-                result.opcode = (raw & OPCODE_MASK)  >> OPCODE_SHIFT;
-                return result;
-            };
-
-            const uint32 raw;
-
-            _instr() : raw(NO_VAL32) { };
-            explicit _instr(uint32 bytes) : raw( bytes) { }
-        } instr;
+        _instr instr;
 
         using Execute = void (BaseMIPSInstr::*)();
         using Predicate = bool (BaseMIPSInstr::*)() const;
