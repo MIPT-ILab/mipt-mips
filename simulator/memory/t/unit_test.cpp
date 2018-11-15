@@ -74,95 +74,90 @@ TEST_CASE( "Hierarchied memory: out of range")
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // read 4 bytes from the func_mem start addr
-    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
-    CHECK( func_mem.read<uint32, Endian::big>( dataSectAddr) == 0x010203);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
+    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
-    CHECK( func_mem.read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
+    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
-    CHECK( func_mem.read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
-    CHECK( func_mem.read<uint16, Endian::big>( dataSectAddr + 2) == 0x0203);
+    CHECK( func_mem->read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
+    CHECK( func_mem->read<uint16, Endian::big>( dataSectAddr + 2) == 0x0203);
 
     // read 1 bytes from the func_mem start addr + 3
-    CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + 3) == 0x03);
-    CHECK( func_mem.read<uint8, Endian::big>( dataSectAddr + 3) == 0x03);
+    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + 3) == 0x03);
+    CHECK( func_mem->read<uint8, Endian::big>( dataSectAddr + 3) == 0x03);
 
     // check hadling the situation when read
     // from not initialized or written data
-    CHECK( func_mem.read<uint8, Endian::little>( 0x300000) == 0);
+    CHECK( func_mem->read<uint8, Endian::little>( 0x300000) == 0);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // write 1 into the byte pointed by dataSectAddr
-    func_mem.write<uint8, Endian::little>( 1, dataSectAddr);
+    func_mem->write<uint8, Endian::little>( 1, dataSectAddr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
-    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x7777 into the two bytes pointed by ( dataSectAddr + 1)
-    func_mem.write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
+    func_mem->write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
     right_ret = 0x03777701; // before write it was 0x03020101
-    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x00000000 into the four bytes pointed by dataSectAddr
-    func_mem.write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
     right_ret = 0x00000000; // before write it was 0x03777701
-    CHECK( func_mem.read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     uint64 write_addr = 0x3FFFFE;
 
     // write 0x03020100 into the four bytes pointed by write_addr
-    func_mem.write<uint32, Endian::little>( 0x03020100, write_addr);
+    func_mem->write<uint32, Endian::little>( 0x03020100, write_addr);
     uint64 right_ret = 0x0100;
-    CHECK( func_mem.read<uint16, Endian::little>( write_addr) == right_ret);
+    CHECK( func_mem->read<uint16, Endian::little>( write_addr) == right_ret);
 
     right_ret = 0x0201;
-    CHECK( func_mem.read<uint16, Endian::little>( write_addr + 1) == right_ret);
+    CHECK( func_mem->read<uint16, Endian::little>( write_addr + 1) == right_ret);
 
     right_ret = 0x0302;
-    CHECK( func_mem.read<uint16, Endian::little>( write_addr + 2) == right_ret);
+    CHECK( func_mem->read<uint16, Endian::little>( write_addr + 2) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // Single byte
     const Byte write_data_1{ 0xA5};
     Byte read_data_1{ 0xFF};
 
     // Write
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
+    CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
 
     // Check if read correctly
-    CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
-    CHECK( func_mem.memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
+    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
+    CHECK( func_mem->memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // 8 bytes
     const constexpr size_t size = 8;
@@ -171,21 +166,20 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
     read_data_8.fill(Byte{ 0xFF});
 
     // Write
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_8.data(), size) == size);
+    CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_8.data(), size) == size);
 
     // Check if read correctlly
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
+        CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
 
-    CHECK( func_mem.memcpy_guest_to_host( read_data_8.data(), dataSectAddr, size) == size);
+    CHECK( func_mem->memcpy_guest_to_host( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_8.at(i) == write_data_8.at(i));
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
 
     // 1 KByte
     const  constexpr size_t size = 1024;
@@ -196,22 +190,21 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     std::array<Byte, size> read_data_1024{};
     read_data_1024.fill(Byte( 0xFF));
 
-    CHECK( func_mem.memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
+    CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem.read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
+        CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
 
-    CHECK( func_mem.memcpy_guest_to_host( read_data_1024.data(), dataSectAddr, size) == size);
+    CHECK( func_mem->memcpy_guest_to_host( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
         CHECK( read_data_1024.at(i) == write_data_1024.at(i));
 }
 
 TEST_CASE( "Func_memory: Dump")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
-    ElfLoader( valid_elf_file).load_to( ptr.get());
-    FuncMemory& func_mem = *ptr;
+    auto func_mem = FuncMemory::create_hierarchied_memory();
+    ElfLoader( valid_elf_file).load_to( func_mem.get());
 
-    CHECK( func_mem.dump() ==
+    CHECK( func_mem->dump() ==
         "addr 0x400095: data 0xc\n"
         "addr 0x4000a8: data 0x70\n"
         "addr 0x4000a9: data 0x81\n"
@@ -251,7 +244,7 @@ static void test_coherency(FuncMemory* mem1, FuncMemory* mem2)
     CHECK( mem1->read<uint16, Endian::little>( address + 2) == mem2->read<uint16, Endian::little>( address + 2));
     CHECK( mem1->read<uint8, Endian::little>( address + 3) == mem2->read<uint8, Endian::little>( address + 3));
     CHECK( mem1->read<uint8, Endian::little>( 0x7777) == mem2->read<uint8, Endian::little>( 0x7777));
- 
+
     mem1->write<uint8, Endian::little>( 1, address);
     CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
 

@@ -34,7 +34,7 @@
 
 #include <cstddef>
 
-enum rcp_interrupt_mask {
+enum rcp_interrupt_mask : uint64 {
   MI_INTR_SP = 0x01,
   MI_INTR_SI = 0x02,
   MI_INTR_AI = 0x04,
