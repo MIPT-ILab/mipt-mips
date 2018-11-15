@@ -6,6 +6,7 @@
 
 /* Simulator modules. */
 #include <infra/config/config.h>
+#include <kernel/kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
@@ -22,9 +23,15 @@ int main( int argc, const char* argv[]) try {
     elf.load_to( memory.get());
 
     auto sim = Simulator::create_configured_simulator();
-    sim->set_memory( std::move( memory));
+    sim->set_memory( memory);
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
+
+    auto kernel = Kernel::create_configured_kernel();
+    kernel->set_memory( memory);
+    kernel->set_simulator( sim);
+    sim->set_kernel( kernel);
+
     sim->run( config::num_steps);
     return 0;
 }
