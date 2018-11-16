@@ -61,7 +61,7 @@ constexpr auto popcount( T x) noexcept
     static_assert( std::is_integral<T>::value, "popcount works only for integral types");
     static_assert( std::numeric_limits<T>::radix == 2, "popcount works only for binary types");
     static_assert( bitwidth<T> <= bitwidth<uint64>, "popcount works only for uint64 and narrower types");
-    return std::bitset<bitwidth<T>>( static_cast<typename std::make_unsigned<T>::type>( x)).count();
+    return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
 }
 
 /*
@@ -72,7 +72,7 @@ constexpr auto popcount( T x) noexcept
 template <typename T>
 static constexpr T all_ones()
 {
-    return static_cast<T>(~T(0));
+    return narrow_cast<T>(~T(0));
 }
 
 /* Returns a bitmask with desired amount of LSB set to '1'
@@ -83,7 +83,7 @@ static constexpr T all_ones()
 template <typename T>
 static constexpr T bitmask(unsigned int const onecount)
 {
-    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : static_cast<T>(0);
+    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
 }
 
 /*
@@ -93,7 +93,7 @@ static constexpr T bitmask(unsigned int const onecount)
 template <typename T>
 static constexpr T msb_set()
 {
-    return static_cast<T>(1u) << (bitwidth<T> - 1);
+    return T{ 1u} << (bitwidth<T> - 1);
 }
 
 template <typename T>
@@ -121,7 +121,7 @@ static constexpr inline size_t count_leading_ones(const T& value) noexcept
     return count_leading_zeroes<T>( ~value);
 }
 
-/* 
+/*
  * Templated no-value (non-trivial data of given size)
  */
 template<typename T> constexpr T NO_VAL = all_ones<T>();
@@ -143,11 +143,11 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    if constexpr ((static_cast<ST>(-2) >> 1u) == static_cast<ST>(-1))
+    if constexpr ((ST{ -2} >> 1u) == ST{ -1})
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise, bugprone-suspicious-semicolon)
-        return static_cast<ST>(value) >> shamt;
+        return narrow_cast<ST>(value) >> shamt;
 
     return (value & msb_set<T>()) == 0 // check MSB
              ? value >> shamt          // just shift if MSB is zero

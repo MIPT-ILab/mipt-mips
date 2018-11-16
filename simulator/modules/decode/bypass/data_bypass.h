@@ -1,6 +1,6 @@
 /**
  * data_bypass.h - Implementation of bypassing unit
- * 
+ *
  * @author Denis Los
  * Copyright 2018 MIPT-MIPS Project
  */
@@ -23,10 +23,10 @@ class DataBypass
 
     public:
         explicit DataBypass( uint64 long_alu_latency)
-            : last_execution_stage_value( static_cast<uint8>(long_alu_latency - 1))
+            : last_execution_stage_value( narrow_cast<uint8>(long_alu_latency - 1))
         { }
 
-        // checks whether a source register of an instruction is in the RF  
+        // checks whether a source register of an instruction is in the RF
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
@@ -44,7 +44,7 @@ class DataBypass
         auto is_stall( const Instr& instr) const
         {
             const auto instruction_latency = get_instruction_latency( instr);
-    
+
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
                     ( instruction_latency < writeback_stage_info.operation_latency));
@@ -66,7 +66,7 @@ class DataBypass
 
         // handles a flush of the pipeline
         void handle_flush();
-    
+
     private:
         const uint8 last_execution_stage_value;
 
@@ -128,10 +128,10 @@ class DataBypass
         {
             if ( instr.is_mem_stage_required())
                 return 2_lt;
-            
+
             if ( instr.is_long_arithmetic())
                 return Latency( last_execution_stage_value + 1);
-            
+
             return 1_lt;
         }
 
@@ -191,15 +191,15 @@ void DataBypass<ISA>::trace_new_dst2_register( const Instr& instr, Register num)
 
 template <typename ISA>
 void DataBypass<ISA>::trace_new_instr( const Instr& instr)
-{    
+{
     const auto& dst  = instr.get_dst_num();
     const auto& dst2 = instr.get_dst2_num();
 
     writeback_stage_info.operation_latency = get_instruction_latency( instr);
-    
+
     if ( !dst.is_zero())
         trace_new_dst_register( instr, dst);
-    
+
     if ( !dst2.is_zero())
         trace_new_dst2_register( instr, dst2);
 }
@@ -228,7 +228,7 @@ void DataBypass<ISA>::update()
                 }
                 else
                     entry.current_stage.inc();
-                
+
 
                 if ( entry.current_stage == entry.ready_stage)
                     entry.is_bypassible = true;

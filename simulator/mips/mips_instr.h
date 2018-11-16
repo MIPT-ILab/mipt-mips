@@ -32,7 +32,7 @@ auto mips_multiplication(T x, T y) {
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
     using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    auto value = static_cast<UT2>(static_cast<T2>(x) * static_cast<T2>(y));
+    auto value = narrow_cast<UT2>(narrow_cast<T2>(x) * narrow_cast<T2>(y));
     return ReturnType(value, value >> bitwidth<T>);
 }
 
@@ -43,7 +43,7 @@ auto mips_division(T x, T y) {
         return ReturnType();
 
     if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-        if ( y == -1 && x == static_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
+        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
             return ReturnType();
 
     return ReturnType(x / y, x % y);
@@ -169,8 +169,8 @@ class BaseMIPSInstr
         MIPSRegister dst2 = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
-        auto sign_extend() const { return static_cast<RegisterSInt>( static_cast<int16>(v_imm)); }
-        auto zero_extend() const { return static_cast<RegisterUInt>( static_cast<uint16>(v_imm)); }
+        auto sign_extend() const { return RegisterSInt{ narrow_cast<int16>(v_imm)}; }
+        auto zero_extend() const { return RegisterUInt{ narrow_cast<uint16>(v_imm)}; }
 
         RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
         RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
@@ -198,37 +198,37 @@ class BaseMIPSInstr
         void init( const ISAEntry& entry, MIPSVersion version);
 
         // Predicate helpers - unary
-        bool lez() const { return static_cast<RegisterSInt>( v_src1) <= 0; }
-        bool gez() const { return static_cast<RegisterSInt>( v_src1) >= 0; }
-        bool ltz() const { return static_cast<RegisterSInt>( v_src1) < 0; }
-        bool gtz() const { return static_cast<RegisterSInt>( v_src1) > 0; }
+        bool lez() const { return narrow_cast<RegisterSInt>( v_src1) <= 0; }
+        bool gez() const { return narrow_cast<RegisterSInt>( v_src1) >= 0; }
+        bool ltz() const { return narrow_cast<RegisterSInt>( v_src1) < 0; }
+        bool gtz() const { return narrow_cast<RegisterSInt>( v_src1) > 0; }
 
         // Predicate helpers - binary
         bool eq()  const { return v_src1 == v_src2; }
         bool ne()  const { return v_src1 != v_src2; }
         bool geu() const { return v_src1 >= v_src2; }
         bool ltu() const { return v_src1 <  v_src2; }
-        bool ge()  const { return static_cast<RegisterSInt>( v_src1) >= static_cast<RegisterSInt>( v_src2); }
-        bool lt()  const { return static_cast<RegisterSInt>( v_src1) <  static_cast<RegisterSInt>( v_src2); }
+        bool ge()  const { return narrow_cast<RegisterSInt>( v_src1) >= narrow_cast<RegisterSInt>( v_src2); }
+        bool lt()  const { return narrow_cast<RegisterSInt>( v_src1) <  narrow_cast<RegisterSInt>( v_src2); }
 
         // Predicate helpers - immediate
-        bool eqi() const { return static_cast<RegisterSInt>( v_src1) == sign_extend(); }
-        bool nei() const { return static_cast<RegisterSInt>( v_src1) != sign_extend(); }
-        bool lti() const { return static_cast<RegisterSInt>( v_src1) <  sign_extend(); }
-        bool gei() const { return static_cast<RegisterSInt>( v_src1) >= sign_extend(); }
+        bool eqi() const { return narrow_cast<RegisterSInt>( v_src1) == sign_extend(); }
+        bool nei() const { return narrow_cast<RegisterSInt>( v_src1) != sign_extend(); }
+        bool lti() const { return narrow_cast<RegisterSInt>( v_src1) <  sign_extend(); }
+        bool gei() const { return narrow_cast<RegisterSInt>( v_src1) >= sign_extend(); }
 
         // Predicate helpers - immediate unsigned
-        bool ltiu() const { return v_src1 <  static_cast<RegisterUInt>(sign_extend()); }
-        bool geiu() const { return v_src1 >= static_cast<RegisterUInt>(sign_extend()); }
+        bool ltiu() const { return v_src1 <  narrow_cast<RegisterUInt>(sign_extend()); }
+        bool geiu() const { return v_src1 >= narrow_cast<RegisterUInt>(sign_extend()); }
 
         template <typename T>
-        void execute_addition()     { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) + static_cast<T>( v_src2)); }
+        void execute_addition()     { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) + narrow_cast<T>( v_src2)); }
 
         template <typename T>
-        void execute_subtraction()  { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) - static_cast<T>( v_src2)); }
+        void execute_subtraction()  { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) - narrow_cast<T>( v_src2)); }
 
         template <typename T>
-        void execute_addition_imm() { v_dst = static_cast<unsign_t<T>>( static_cast<T>( v_src1) + static_cast<T>( sign_extend())); }
+        void execute_addition_imm() { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) + narrow_cast<T>( sign_extend())); }
 
         template <typename T>
         void execute_multiplication() { std::tie(v_dst, v_dst2) = mips_multiplication<T>(v_src1, v_src2); }
@@ -239,30 +239,30 @@ class BaseMIPSInstr
         void execute_move()   { v_dst = v_src1; }
 
         template <typename T>
-        void execute_sll()   { v_dst = static_cast<T>( v_src1) << shamt; }
+        void execute_sll()   { v_dst = narrow_cast<T>( v_src1) << shamt; }
         void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
 
         template <typename T>
         void execute_srl()
         {
             // On 64-bit CPUs the result word is sign-extended
-            v_dst = static_cast<RegisterUInt>(static_cast<RegisterSInt>(static_cast<unsign_t<T>>(static_cast<T>(v_src1) >> shamt)));
+            v_dst = narrow_cast<RegisterUInt>(narrow_cast<RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(v_src1) >> shamt)));
         }
         void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
 
         template <typename T>
-        void execute_sra()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), shamt); }
+        void execute_sra()   { v_dst = arithmetic_rs( narrow_cast<T>( v_src1), shamt); }
         void execute_dsra32() { v_dst = arithmetic_rs( v_src1, shamt + 32); }
 
         template <typename T>
-        void execute_sllv()   { v_dst = static_cast<T>( v_src1) << v_src2; }
+        void execute_sllv()   { v_dst = narrow_cast<T>( v_src1) << v_src2; }
 
         template <typename T>
-        void execute_srlv()   { v_dst = static_cast<T>( v_src1) >> v_src2; }
+        void execute_srlv()   { v_dst = narrow_cast<T>( v_src1) >> v_src2; }
 
         template <typename T>
-        void execute_srav()   { v_dst = arithmetic_rs( static_cast<T>( v_src1), v_src2); }
-        void execute_lui()    { v_dst = static_cast<RegisterUInt>( sign_extend()) << 0x10u; }
+        void execute_srav()   { v_dst = arithmetic_rs( narrow_cast<T>( v_src1), v_src2); }
+        void execute_lui()    { v_dst = narrow_cast<RegisterUInt>( sign_extend()) << 0x10u; }
 
         void execute_and()   { v_dst = v_src1 & v_src2; }
         void execute_or()    { v_dst = v_src1 | v_src2; }
@@ -406,7 +406,7 @@ class BaseMIPSInstr
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
     public:
         static const constexpr Endian endian = Endian::little;
-    
+
         BaseMIPSInstr() = delete;
 
         bool is_same_bytes( uint32 bytes) const {
@@ -416,7 +416,7 @@ class BaseMIPSInstr
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && is_same_bytes( rhs.instr.raw);
         }
-        
+
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
                 && sequence_id == rhs.sequence_id
@@ -469,7 +469,7 @@ class BaseMIPSInstr
         Trap trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
-        
+
         void set_v_imm( uint32 value) { v_imm = value; }
         auto get_v_imm() { return v_imm; }
 
@@ -498,7 +498,7 @@ class BaseMIPSInstr
 
         void set_sequence_id( uint64 id) { sequence_id = id; }
         auto get_sequence_id() const { return sequence_id; }
-        
+
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
 };

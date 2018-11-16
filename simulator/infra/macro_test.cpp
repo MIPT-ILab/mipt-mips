@@ -81,7 +81,7 @@ static_assert(popcount(MAX_VAL8) == 8);
 static_assert(popcount(MAX_VAL16) == 16);
 static_assert(popcount(MAX_VAL32) == 32);
 static_assert(popcount(~MAX_VAL32) == 0);
-static_assert(popcount(~static_cast<uint64>(MAX_VAL32)) == 0);
+static_assert(popcount(~narrow_cast<uint64>(MAX_VAL32)) == 0);
 */
 
 static_assert(bitmask<uint32>(1) == 1);
@@ -94,9 +94,9 @@ static_assert(count_leading_zeroes<uint64>(0xFF) == 56);
 static_assert(count_leading_zeroes<uint8>(0x0) == 8);
 static_assert(count_leading_zeroes<uint32>(0x0) == 32);
 static_assert(count_leading_zeroes<uint64>(0x0) == 64);
-static_assert(count_leading_zeroes<uint8>(static_cast<uint8>(0xFF)) == 0);
-static_assert(count_leading_zeroes<uint32>(~static_cast<uint32>(0)) == 0);
-static_assert(count_leading_zeroes<uint64>(~static_cast<uint64>(0)) == 0);
+static_assert(count_leading_zeroes<uint8>(uint8{ 0xFF}) == 0);
+static_assert(count_leading_zeroes<uint32>(~uint32{ 0}) == 0);
+static_assert(count_leading_zeroes<uint64>(~uint64{ 0}) == 0);
 
 static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
 
