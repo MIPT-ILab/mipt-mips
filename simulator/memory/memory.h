@@ -126,15 +126,16 @@ public:
     static std::shared_ptr<FuncMemory>
         create_plain_memory( uint32 addr_bits = 20);
 
-    template<typename T, Endian endian> void write( T value, Addr addr, T mask)
+    template<typename T, Endian endian> void masked_write( T value, Addr addr, T mask)
     {
         T combined_value = ( value & mask) | ( this->read<T, endian>( addr) & ~mask);
         write<T, endian>( combined_value, addr);
     }
 
+protected:
+    template<typename Instr> void load_store( Instr* instr);
 private:
     template<typename Instr> void store( const Instr& instr);
-    template<typename Instr> void load_store( Instr* instr);
 };
 
 template<typename Instr>
@@ -148,7 +149,7 @@ void FuncMemory::store( const Instr& instr)
     if ( ~instr.get_mask() == 0)
         write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
     else
-        write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
 }
 
 template<typename Instr>
