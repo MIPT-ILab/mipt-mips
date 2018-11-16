@@ -89,7 +89,7 @@ public:
         return size;
     }
 
-    void duplicate_to( std::shared_ptr<FuncMemory> /* target */) const final { }
+    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
     std::string dump() const final { return std::string( "empty memory\n"); }
 };
 
