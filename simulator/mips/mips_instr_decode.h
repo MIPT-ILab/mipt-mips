@@ -36,7 +36,7 @@ static const constexpr uint32 OPCODE_MASK   = 0b11111100'00000000'00000000'00000
 static const constexpr uint32 ASI_IMM_MASK  = 0b00000000'00000000'11111111'11111111;
 static const constexpr uint32 ASJ_IMM_MASK  = 0b00000011'11111111'11111111'11111111;
 
-struct _MIPSInstrDecode
+struct mipsInstrDecode
         {
             struct AsR
             {
