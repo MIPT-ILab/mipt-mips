@@ -10,7 +10,7 @@
 
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
-#include "_instr.h"
+#include "mips_instr_decode.h"
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
@@ -89,7 +89,7 @@ class BaseMIPSInstr
 
         Trap trap = Trap::NO_TRAP;
 
-        _instr instr;
+        _MIPSInstrDecode instr;
 
         using Execute = void (BaseMIPSInstr::*)();
         using Predicate = bool (BaseMIPSInstr::*)() const;
@@ -436,7 +436,7 @@ class BaseMIPSInstr
         Trap trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
-        
+
         void set_v_imm( uint32 value) { v_imm = value; }
         auto get_v_imm() { return v_imm; }
 
