@@ -87,8 +87,8 @@ struct mipsInstrDecode
 
             const uint32 raw;
 
-            _MIPSInstrDecode() : raw(NO_VAL32) { };
-            explicit _MIPSInstrDecode(uint32 bytes) : raw( bytes) { }
+            mipsInstrDecode() : raw(NO_VAL32) { };
+            explicit mipsInstrDecode(uint32 bytes) : raw( bytes) { }
         };
 
 #endif //MIPS_INSTR_DECODE_H
