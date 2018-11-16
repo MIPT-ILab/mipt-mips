@@ -56,11 +56,11 @@ class FuncSim : public Simulator
         size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
         uint64 read_cpu_register( uint8 regno) const final {
-            return static_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
+            return narrow_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
         }
 
         void write_cpu_register( uint8 regno, uint64 value) final {
-            rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+            rf.write( Register::from_cpu_index( regno), narrow_cast<RegisterUInt>( value));
         }
 };
 

@@ -8,6 +8,7 @@
 #ifndef INFRA_TIMING_H
 #define INFRA_TIMING_H
 
+#include <infra/macro.h>
 #include <infra/types.h>
 
 #include <boost/operators.hpp>
@@ -27,7 +28,7 @@ class Cycle : public boost::totally_ordered<Cycle>
         constexpr auto operator<( const Cycle& rhs) const { return value < rhs.value; }
 
         constexpr void inc() { ++value; }
-        constexpr explicit operator double() const { return static_cast<double>( value); }
+        constexpr explicit operator double() const { return narrow_cast<double>( value); }
 
         constexpr uint64 operator%( uint64 number) const { return value % number; }
 
@@ -52,7 +53,7 @@ class Cycle : public boost::totally_ordered<Cycle>
 // NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
 constexpr inline auto operator""_cl( unsigned long long int number)
 {
-    return Cycle( static_cast<uint64>( number));
+    return Cycle( uint64{ number});
 }
 
 class Latency : public boost::totally_ordered<Latency>
@@ -87,7 +88,7 @@ class Latency : public boost::totally_ordered<Latency>
 // NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
 constexpr inline auto operator""_lt( unsigned long long int number)
 {
-    return Latency( static_cast<int64>( number));
+    return Latency( narrow_cast<int64>( number));
 }
 
 constexpr inline auto operator*( int64 number, const Latency& latency) { return latency * number; }
@@ -97,4 +98,3 @@ constexpr Cycle   Cycle::operator-( const Latency& latency) const { return Cycle
 constexpr Latency Cycle::operator-( const Cycle& cycle) const { return Latency( value - cycle.value); }
 
 #endif // INFRA_TIMING_H
-

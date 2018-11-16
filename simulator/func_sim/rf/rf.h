@@ -48,14 +48,14 @@ public:
             const auto old_val = get_value( num);
             // Handle carry to HI register
             if ( num.is_mips_lo()) {
-                auto carry = get_carry( static_cast<uint32>( old_val), static_cast<uint32>( val), accumulation);
+                auto carry = get_carry( narrow_cast<uint32>( old_val), narrow_cast<uint32>( val), accumulation);
                 write( Register::mips_hi, carry, mask, accumulation);
             }
 
             if (accumulation == 1)
-                val = static_cast<uint32>(old_val) + static_cast<uint32>(val);
+                val = narrow_cast<uint32>(old_val) + narrow_cast<uint32>(val);
             else
-                val = static_cast<uint32>(old_val) - static_cast<uint32>(val);
+                val = narrow_cast<uint32>(old_val) - narrow_cast<uint32>(val);
         }
 
         get_value( num) &= ~mask;      // Clear old bits

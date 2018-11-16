@@ -11,7 +11,7 @@
 
 namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
-}
+} // namespace config
 
 std::shared_ptr<Kernel> Kernel::create_kernel( bool use_mars, std::istream& instream, std::ostream& outstream) {
     if (use_mars)

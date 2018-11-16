@@ -95,10 +95,10 @@ TEST_CASE( "FuncSim: Register R/W")
     FuncSim<MIPS32> sim;
 
     /* Signed */
-    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
-    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    sim.write_cpu_register( 1, narrow_cast<uint64>( -1337));
+    CHECK( narrow_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
     /* Unsigned */
-    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    sim.write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
 }
 
