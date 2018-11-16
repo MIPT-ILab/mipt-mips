@@ -147,10 +147,10 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     Byte read_data_1{ 0xFF};
 
     // Write
-    CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 0x1);
+    CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
 
     // Check if read correctly
-    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == narrow_cast<uint8>( write_data_1));
+    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == uint8{ 0xA5});
     CHECK( func_mem->memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
