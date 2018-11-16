@@ -132,7 +132,6 @@ public:
         write<T, endian>( combined_value, addr);
     }
 
-protected:
     template<typename Instr> void load_store( Instr* instr);
 private:
     template<typename Instr> void store( const Instr& instr);
