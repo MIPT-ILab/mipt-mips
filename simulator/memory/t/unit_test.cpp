@@ -114,7 +114,7 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x00000000 into the four bytes pointed by dataSectAddr
-    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr);
     right_ret = 0x00000000; // before write it was 0x03777701
     CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 }
@@ -257,8 +257,8 @@ static void test_coherency(FuncMemory* mem1, FuncMemory* mem2)
     mem2->write<uint16, Endian::little>( 0x7777, address + 1);
     CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
 
-    mem1->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
-    mem2->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
+    mem1->write<uint32, Endian::little>( 0x00000000, address)
+    mem2->write<uint32, Endian::little>( 0x00000000, address);
 
     CHECK( mem1->read<uint32, Endian::little>( address) == mem1->read<uint32, Endian::little>( address));
 }
