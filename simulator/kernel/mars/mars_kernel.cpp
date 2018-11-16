@@ -28,7 +28,7 @@ bool MARSKernel::execute () {
 }
 
 void MARSKernel::print_integer() {
-    auto value = static_cast<int64>( sim.lock()->read_cpu_register( a0));
+    auto value = narrow_cast<int64>( sim.lock()->read_cpu_register( a0));
     outstream << value;
 }
 
@@ -38,7 +38,7 @@ void MARSKernel::read_integer() {
     uint64 value = 0;
     size_t pos = 0;
     try {
-        value = static_cast<uint64>( std::stoll( input, &pos, 0));
+        value = narrow_cast<uint64>( std::stoll( input, &pos, 0));
     }
     catch (...) {
         throw BadInputValue();
@@ -58,5 +58,5 @@ void MARSKernel::read_character() {
     instream >> input;
     if (input.length() != 1)
         throw BadInputValue();
-    sim.lock()->write_cpu_register( v0, static_cast<uint64>( input.at(0)));
+    sim.lock()->write_cpu_register( v0, narrow_cast<uint64>( input.at(0)));
 }

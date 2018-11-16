@@ -39,7 +39,7 @@ public:
 
     static MIPSRegister from_cpu_index( uint8 id) {
         assert( id < 32u);
-        return MIPSRegister( static_cast<RegNum>( id));
+        return MIPSRegister( RegNum{ id});
     }
     static MIPSRegister from_cp0_index( uint8 id) {
         /* To be implemented */

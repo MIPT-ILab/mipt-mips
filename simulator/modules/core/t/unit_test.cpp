@@ -50,10 +50,10 @@ TEST_CASE( "Perf_Sim: Register R/W")
     PerfSim<MIPS32> sim( false);
 
     /* Signed */
-    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
-    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    sim.write_cpu_register( 1, narrow_cast<uint64>( -1337));
+    CHECK( narrow_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
     /* Unsigned */
-    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    sim.write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
 }
 

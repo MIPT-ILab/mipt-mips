@@ -306,7 +306,7 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_vie
         it =  find_entry( isaMapMIPS32, str_opcode);
     if ( it == isaMapMIPS32.end())
         it =  find_entry( isaMapIJ,     str_opcode);
-    
+
     if ( str_opcode == "nop")
     {
         init (isaMapR.find( 0)->second, version);
@@ -322,11 +322,11 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_vie
     }
     else {
         init( it->second, version);
-    } 
+    }
 }
 
 template<typename RegisterUInt>
-typename BaseMIPSInstr<RegisterUInt>::MapType::const_iterator 
+typename BaseMIPSInstr<RegisterUInt>::MapType::const_iterator
 BaseMIPSInstr<RegisterUInt>::find_entry( const BaseMIPSInstr<RegisterUInt>::MapType& map, std::string_view name) const
 {
     return std::find_if( map.begin(), map.end(), [name]( const auto& e) {
@@ -395,17 +395,17 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
 
             oss << " $" << src1 << ", $"
                 << src2 << ", "
-                << std::dec << static_cast<int16>(v_imm);
+                << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_BRANCH_0:
             v_imm = instr.get_as_i().imm;
             oss << " $" << src1 << ", "
-                << std::dec << static_cast<int16>(v_imm);
+                << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_TRAP:
             v_imm = instr.get_as_i().imm;
             oss << " $" << src1 << ", 0x"
-                << std::hex << static_cast<int16>(v_imm) << std::dec;
+                << std::hex << narrow_cast<int16>(v_imm) << std::dec;
             break;
         case OUT_I_CONST:
             v_imm = instr.get_as_i().imm;
@@ -476,9 +476,9 @@ void BaseMIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = static_cast<int8>( value); break;
-            case 2: v_dst = static_cast<int16>( value); break;
-            case 4: v_dst = static_cast<int32>( value); break;
+            case 1: v_dst = narrow_cast<int8>( value); break;
+            case 2: v_dst = narrow_cast<int16>( value); break;
+            case 4: v_dst = narrow_cast<int32>( value); break;
             case 8: v_dst = value; break;
             default: assert( false);
         }
