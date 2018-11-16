@@ -257,25 +257,25 @@ BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, A
     bool valid = false;
     auto it = isaMapRI.cbegin();
 
-    switch ( instr.asR.opcode)
+    switch ( instr.get_as_r().opcode)
     {
         case 0x0: // R instruction
-            it = isaMapR.find( instr.asR.funct);
+            it = isaMapR.find( instr.get_as_r().funct);
             valid = ( it != isaMapR.end());
             break;
 
         case 0x1: // RegIMM instruction
-            it = isaMapRI.find( instr.asI.rt);
+            it = isaMapRI.find( instr.get_as_i().rt);
             valid = ( it != isaMapRI.end());
             break;
 
         case 0x1C: // MIPS32 instruction
-            it = isaMapMIPS32.find( instr.asR.funct);
+            it = isaMapMIPS32.find( instr.get_as_r().funct);
             valid = ( it != isaMapMIPS32.end());
             break;
 
         default: // I and J instructions
-            it = isaMapIJ.find( instr.asR.opcode);
+            it = isaMapIJ.find( instr.get_as_r().opcode);
             valid = ( it != isaMapIJ.end());
             break;
     }
@@ -347,9 +347,9 @@ MIPSRegister BaseMIPSInstr<RegisterUInt>::get_register( RegType type) const
     case RegType::HI_LO: return MIPSRegister::mips_lo;
     case RegType::ZERO:  return MIPSRegister::zero;
     case RegType::RA:    return MIPSRegister::return_address;
-    case RegType::RS:    return MIPSRegister::from_cpu_index( instr.asR.rs);
-    case RegType::RT:    return MIPSRegister::from_cpu_index( instr.asR.rt);
-    case RegType::RD:    return MIPSRegister::from_cpu_index( instr.asR.rd);
+    case RegType::RS:    return MIPSRegister::from_cpu_index( instr.get_as_r().rs);
+    case RegType::RT:    return MIPSRegister::from_cpu_index( instr.get_as_r().rt);
+    case RegType::RD:    return MIPSRegister::from_cpu_index( instr.get_as_r().rd);
     default: assert(0);  return MIPSRegister::zero;
     }
 }
@@ -363,7 +363,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
         ? entry.function
         : &BaseMIPSInstr<RegisterUInt>::execute_unknown;
 
-    shamt = instr.asR.shamt;
+    shamt = instr.get_as_r().shamt;
 
     src1 = get_register( entry.src1);
     src2 = get_register( entry.src2);
@@ -388,31 +388,31 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
                 <<  ", " << std::dec << shamt;
             break;
         case OUT_I_ARITHM:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
 
             oss << " $" << dst << ", $"
                 << src1 << ", "
                 << std::hex << "0x" << v_imm << std::dec;
             break;
         case OUT_I_BRANCH:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
 
             oss << " $" << src1 << ", $"
                 << src2 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_RI_BRANCH_0:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
             oss << " $" << src1 << ", "
                 << std::dec << static_cast<int16>(v_imm);
             break;
         case OUT_RI_TRAP:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
             oss << " $" << src1 << ", 0x"
                 << std::hex << static_cast<int16>(v_imm) << std::dec;
             break;
         case OUT_I_CONST:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
 
             oss << " $" << dst << std::hex
                 << ", 0x" << v_imm << std::dec;
@@ -421,7 +421,7 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
         case OUT_I_LOAD:
         case OUT_I_LOADU:
         case OUT_I_PARTIAL_LOAD:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
 
             oss << " $" << dst << ", 0x"
                 << std::hex << v_imm
@@ -429,14 +429,14 @@ void BaseMIPSInstr<RegisterUInt>::init( const BaseMIPSInstr<RegisterUInt>::ISAEn
             break;
 
         case OUT_I_STORE:
-            v_imm = instr.asI.imm;
+            v_imm = instr.get_as_i().imm;
 
             oss << " $" << src2 << ", 0x"
                 << std::hex << v_imm
                 << "($" << src1 << ")" << std::dec;
             break;
         case OUT_J_JUMP:
-            v_imm = instr.asJ.imm;
+            v_imm = instr.get_as_j().imm;
             oss << " 0x" << std::hex << v_imm << std::dec;
             break;
         default:

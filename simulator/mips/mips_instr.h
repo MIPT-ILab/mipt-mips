@@ -10,6 +10,7 @@
 
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
+#include "mips_instr_decode.h"
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
@@ -88,41 +89,7 @@ class BaseMIPSInstr
 
         Trap trap = Trap::NO_TRAP;
 
-        // Endian specific
-        const union _instr
-        {
-            const struct AsR
-            {
-                uint32 funct  :6;
-                uint32 shamt  :5;
-                uint32 rd     :5;
-                uint32 rt     :5;
-                uint32 rs     :5;
-                uint32 opcode :6;
-            } asR;
-            const struct AsI
-            {
-                uint32 imm    :16;
-                uint32 rt     :5;
-                uint32 rs     :5;
-                uint32 opcode :6;
-            } asI;
-            const struct AsJ
-            {
-                uint32 imm    :26;
-                uint32 opcode :6;
-            } asJ;
-
-            const uint32 raw;
-
-            _instr() : raw(NO_VAL32) { };
-            explicit _instr(uint32 bytes) : raw( bytes) { }
-
-            static_assert( sizeof( AsR) == sizeof( uint32));
-            static_assert( sizeof( AsI) == sizeof( uint32));
-            static_assert( sizeof( AsJ) == sizeof( uint32));
-            static_assert( sizeof( uint32) == 4);
-        } instr;
+        mipsInstrDecode instr;
 
         using Execute = void (BaseMIPSInstr::*)();
         using Predicate = bool (BaseMIPSInstr::*)() const;
@@ -406,7 +373,7 @@ class BaseMIPSInstr
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
     public:
         static const constexpr Endian endian = Endian::little;
-    
+
         BaseMIPSInstr() = delete;
 
         bool is_same_bytes( uint32 bytes) const {
@@ -416,7 +383,7 @@ class BaseMIPSInstr
         bool is_same( const BaseMIPSInstr& rhs) const {
             return PC == rhs.PC && is_same_bytes( rhs.instr.raw);
         }
-        
+
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
                 && sequence_id == rhs.sequence_id
@@ -469,7 +436,7 @@ class BaseMIPSInstr
         Trap trap_type() const { return trap; }
 
         bool is_bubble() const { return is_nop() && PC == 0; }
-        
+
         void set_v_imm( uint32 value) { v_imm = value; }
         auto get_v_imm() { return v_imm; }
 
@@ -498,7 +465,7 @@ class BaseMIPSInstr
 
         void set_sequence_id( uint64 id) { sequence_id = id; }
         auto get_sequence_id() const { return sequence_id; }
-        
+
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
 };

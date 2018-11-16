@@ -16,6 +16,12 @@
 #include <limits>
 #include <type_traits>
 
+template <typename To, typename From>
+static constexpr To narrow_cast(const From& value)
+{
+    return static_cast<To>( value);
+}
+
 /* Returns size of a static array */
 template<typename T, size_t N>
 constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
