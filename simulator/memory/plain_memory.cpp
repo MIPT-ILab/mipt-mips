@@ -19,7 +19,7 @@ class PlainMemory : public FuncMemory
         std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
-        void duplicate_to( std::shared_ptr<FuncMemory> target) const final;
+        void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
     private:
         std::vector<Byte> arena;
 };
@@ -39,7 +39,7 @@ catch (const std::bad_alloc&)
     throw FuncMemoryBadMapping("Too many address guest address bits");
 }
 
-void PlainMemory::duplicate_to( std::shared_ptr<FuncMemory> target) const
+void PlainMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
     target->memcpy_host_to_guest( 0, arena.data(), arena.size());
 }

@@ -149,7 +149,7 @@ bool HierarchiedMemory::check( Addr addr) const noexcept
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-void HierarchiedMemory::duplicate_to( std::shared_ptr<FuncMemory> target) const
+void HierarchiedMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)
