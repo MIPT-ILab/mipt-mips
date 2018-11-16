@@ -329,13 +329,9 @@ template<typename RegisterUInt>
 typename BaseMIPSInstr<RegisterUInt>::MapType::const_iterator
 BaseMIPSInstr<RegisterUInt>::find_entry( const BaseMIPSInstr<RegisterUInt>::MapType& map, std::string_view name) const
 {
-    auto it = map.begin();
-    for ( ; it != map.end(); it++)
-    {
-        if ( it->second.name == name)
-            return it;
-    }
-    return map.end();
+    return std::find_if( map.begin(), map.end(), [name]( const auto& e) {
+        return e.second.name == name;
+    });
 }
 
 template<typename RegisterUInt>
