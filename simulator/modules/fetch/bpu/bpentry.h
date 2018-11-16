@@ -202,7 +202,7 @@ class BPEntryAdaptive final : public BPEntry
             value <<= 1u;
             value &= pattern_mask;
             if ( is_taken)
-                value |= 1;
+                value |= 1u;
         }
 
         void reset() { value = default_pattern; }
