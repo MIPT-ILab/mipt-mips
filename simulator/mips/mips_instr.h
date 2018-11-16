@@ -10,6 +10,7 @@
 
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
+#include "mips_instr_decode.h"
 
 // MIPT-MIPS modules
 #include <func_sim/trap_types.h>
@@ -88,41 +89,7 @@ class BaseMIPSInstr
 
         Trap trap = Trap::NO_TRAP;
 
-        // Endian specific
-        const union _instr
-        {
-            const struct AsR
-            {
-                uint32 funct  :6;
-                uint32 shamt  :5;
-                uint32 rd     :5;
-                uint32 rt     :5;
-                uint32 rs     :5;
-                uint32 opcode :6;
-            } asR;
-            const struct AsI
-            {
-                uint32 imm    :16;
-                uint32 rt     :5;
-                uint32 rs     :5;
-                uint32 opcode :6;
-            } asI;
-            const struct AsJ
-            {
-                uint32 imm    :26;
-                uint32 opcode :6;
-            } asJ;
-
-            const uint32 raw;
-
-            _instr() : raw(NO_VAL32) { };
-            explicit _instr(uint32 bytes) : raw( bytes) { }
-
-            static_assert( sizeof( AsR) == sizeof( uint32));
-            static_assert( sizeof( AsI) == sizeof( uint32));
-            static_assert( sizeof( AsJ) == sizeof( uint32));
-            static_assert( sizeof( uint32) == 4);
-        } instr;
+        mipsInstrDecode instr;
 
         using Execute = void (BaseMIPSInstr::*)();
         using Predicate = bool (BaseMIPSInstr::*)() const;
