@@ -16,6 +16,12 @@
 #include <limits>
 #include <type_traits>
 
+template <typename To, typename From>
+static constexpr To narrow_cast(const From& value)
+{
+    return static_cast<To>( value);
+}
+
 /* Returns size of a static array */
 template<typename T, size_t N>
 constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
@@ -146,12 +152,6 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     return (value & msb_set<T>()) == 0 // check MSB
              ? value >> shamt          // just shift if MSB is zero
              : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
-}
-
-template <typename To, typename From>
-static constexpr To narrow_cast(const From& value)
-{
-    return static_cast<To>( value);
 }
 
 #endif
