@@ -1,4 +1,4 @@
-/* riscv_register.h - RISCV register info class 
+/* riscv_register.h - RISCV register info class
  * @author Alexandr Misevich
  * Copyright 2018 MIPT-MIPS
  */
@@ -36,7 +36,7 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( static_cast<RegNum>( id)); }
+    static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
     size_t to_rf_index()           const { return value; }
 
     static const RISCVRegister zero;

@@ -25,7 +25,7 @@ TEST_CASE( "MARS: print integer") {
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 1u); // print integer
-    sim->write_cpu_register( a0, static_cast<uint64>( -1337));
+    sim->write_cpu_register( a0, narrow_cast<uint64>( -1337));
     CHECK_NOTHROW( mars_kernel->execute());
     CHECK( output.str() == "-1337");
 }
@@ -67,7 +67,7 @@ TEST_CASE( "MARS: print character") {
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 11u); // print character
-    sim->write_cpu_register( a0, static_cast<uint64>( 'x'));
+    sim->write_cpu_register( a0, uint64{ 'x'});
     CHECK_NOTHROW( mars_kernel->execute());
     CHECK( output.str() == "x");
 }

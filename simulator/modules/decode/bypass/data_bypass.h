@@ -1,6 +1,6 @@
 /**
  * data_bypass.h - Implementation of bypassing unit
- * 
+ *
  * @author Denis Los
  * Copyright 2018 MIPT-MIPS Project
  */
@@ -26,7 +26,7 @@ class DataBypass
             : long_alu_latency( long_alu_latency)
         { }
 
-        // checks whether a source register of an instruction is in the RF  
+        // checks whether a source register of an instruction is in the RF
         auto is_in_RF( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
@@ -44,7 +44,7 @@ class DataBypass
         auto is_stall( const Instr& instr) const
         {
             const auto instruction_latency = get_instruction_latency( instr);
-    
+
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
                     ( instruction_latency < writeback_stage_info.operation_latency));
@@ -66,7 +66,7 @@ class DataBypass
 
         // handles a flush of the pipeline
         void handle_flush();
-    
+
     private:
         const Latency long_alu_latency;
 
@@ -128,10 +128,10 @@ class DataBypass
         {
             if ( instr.is_mem_stage_required())
                 return 2_lt;
-            
+
             if ( instr.is_long_arithmetic())
                 return long_alu_latency;
-            
+
             return 1_lt;
         }
 
@@ -191,15 +191,15 @@ void DataBypass<ISA>::trace_new_dst2_register( const Instr& instr, Register num)
 
 template <typename ISA>
 void DataBypass<ISA>::trace_new_instr( const Instr& instr)
-{    
+{
     const auto& dst  = instr.get_dst_num();
     const auto& dst2 = instr.get_dst2_num();
 
     writeback_stage_info.operation_latency = get_instruction_latency( instr);
-    
+
     if ( !dst.is_zero())
         trace_new_dst_register( instr, dst);
-    
+
     if ( !dst2.is_zero())
         trace_new_dst2_register( instr, dst2);
 }
