@@ -121,6 +121,16 @@ static constexpr inline size_t count_leading_ones(const T& value) noexcept
     return count_leading_zeroes<T>( ~value);
 }
 
+template <typename T>
+static constexpr inline size_t find_first_set(const T& value) noexcept
+{
+    if ( value == 0)
+        return bitwidth<T>;
+    using UT = typename std::make_unsigned<T>::type;
+    UT uvalue{ value};
+    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1))) - 1;
+}
+
 /*
  * Templated no-value (non-trivial data of given size)
  */
