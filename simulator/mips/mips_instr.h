@@ -33,7 +33,7 @@ auto mips_multiplication(T x, T y) {
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
     using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    auto value = narrow_cast<UT2>(narrow_cast<T2>(x) * narrow_cast<T2>(y));
+    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
     return ReturnType(value, value >> bitwidth<T>);
 }
 
