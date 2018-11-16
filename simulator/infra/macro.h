@@ -148,4 +148,10 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
              : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
 
+template <typename To, typename From>
+static constexpr To narrow_cast(const From& value)
+{
+    return static_cast<To>( value);
+}
+
 #endif
