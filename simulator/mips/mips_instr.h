@@ -89,7 +89,7 @@ class BaseMIPSInstr
 
         Trap trap = Trap::NO_TRAP;
 
-        _MIPSInstrDecode instr;
+        mipsInstrDecode instr;
 
         using Execute = void (BaseMIPSInstr::*)();
         using Predicate = bool (BaseMIPSInstr::*)() const;
