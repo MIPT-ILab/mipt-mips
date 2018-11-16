@@ -71,7 +71,7 @@ T ReadableMemory::read( Addr addr) const noexcept
 }
 
 template<typename Instr>
-vid ReadableMemory::load( Instr* instr) const
+void ReadableMemory::load( Instr* instr) const
 {
     static const constexpr Endian endian = Instr::endian;
     using DstType = decltype( std::declval<Instr>().get_v_dst());
