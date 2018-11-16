@@ -98,6 +98,17 @@ static_assert(count_leading_zeroes<uint8>(uint8{ 0xFF}) == 0);
 static_assert(count_leading_zeroes<uint32>(~uint32{ 0}) == 0);
 static_assert(count_leading_zeroes<uint64>(~uint64{ 0}) == 0);
 
+static_assert(find_first_set<uint64>(0) == 64);
+static_assert(find_first_set<uint32>(0) == 32);
+static_assert(find_first_set<uint8>(0) == 8);
+static_assert(find_first_set<uint64>(1) == 0);
+static_assert(find_first_set<uint32>(1) == 0);
+static_assert(find_first_set<uint64>(all_ones<uint64>()) == 0);
+static_assert(find_first_set<uint64>(2) == 1);
+static_assert(find_first_set<uint64>(3) == 0);
+static_assert(find_first_set<uint64>(0xFFFF000) == 12);
+static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
+
 static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
 
 static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
