@@ -23,7 +23,7 @@ class DataBypass
 
     public:
         explicit DataBypass( uint64 long_alu_latency)
-            : last_execution_stage_value( narrow_cast<uint8>(long_alu_latency - 1))
+            : long_alu_latency( long_alu_latency)
         { }
 
         // checks whether a source register of an instruction is in the RF
@@ -55,7 +55,7 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, uint8 src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
-            return BypassCommand<Register>( get_entry( reg_num).current_stage, last_execution_stage_value);
+            return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
         }
 
         // garners the information about a new instruction
@@ -68,7 +68,7 @@ class DataBypass
         void handle_flush();
 
     private:
-        const uint8 last_execution_stage_value;
+        const Latency long_alu_latency;
 
         struct RegisterInfo
         {
@@ -130,7 +130,7 @@ class DataBypass
                 return 2_lt;
 
             if ( instr.is_long_arithmetic())
-                return Latency( last_execution_stage_value + 1);
+                return long_alu_latency;
 
             return 1_lt;
         }
@@ -154,7 +154,7 @@ void DataBypass<ISA>::trace_new_dst_register( const Instr& instr, Register num)
 
     if ( instr.is_long_arithmetic())
     {
-        entry.ready_stage.set_to_last_execution_stage( last_execution_stage_value);
+        entry.ready_stage.set_to_stage( long_alu_latency - 1_lt);
     }
     else if ( instr.is_load())
     {
@@ -210,30 +210,24 @@ void DataBypass<ISA>::update()
 {
     for ( auto& entry:scoreboard)
     {
-        if ( entry.is_traced)
+        if ( !entry.is_traced)
+            continue;
+
+        if ( entry.current_stage.is_writeback())
         {
-            if ( entry.current_stage.is_writeback())
-            {
-                entry.reset();
-            }
-            else
-            {
-                if ( entry.current_stage.is_first_execution_stage())
-                {
-                    entry.current_stage = entry.next_stage_after_first_execution_stage;
-                }
-                else if ( entry.current_stage.is_last_execution_stage( last_execution_stage_value))
-                {
-                    entry.current_stage.set_to_writeback();
-                }
-                else
-                    entry.current_stage.inc();
-
-
-                if ( entry.current_stage == entry.ready_stage)
-                    entry.is_bypassible = true;
-            }
+            entry.reset();
+            continue;
         }
+
+        if ( entry.current_stage.is_first_execution_stage())
+            entry.current_stage = entry.next_stage_after_first_execution_stage;
+        else if ( entry.current_stage.is_same_stage( long_alu_latency - 1_lt))
+            entry.current_stage.set_to_writeback();
+        else
+            entry.current_stage.inc();
+        
+        if ( entry.current_stage == entry.ready_stage)
+            entry.is_bypassible = true;
     }
 
     writeback_stage_info.update();
@@ -244,10 +238,8 @@ template <typename ISA>
 void DataBypass<ISA>::handle_flush()
 {
     for ( auto& entry:scoreboard)
-    {
         if ( entry.is_traced)
             entry.reset();
-    }
 
     writeback_stage_info.operation_latency = 0_lt;
 }
