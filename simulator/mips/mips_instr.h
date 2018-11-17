@@ -19,8 +19,6 @@
 #include <infra/types.h>
 #include <kryucow_string.h>
 
-struct MIPSInstrDecoder;
-
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
@@ -78,9 +76,6 @@ enum OperationType : uint8
 };
 
 template<typename RegisterUInt>
-struct MIPSTableEntry;
-
-template<typename RegisterUInt>
 class BaseMIPSInstr
 {
     private:
@@ -125,7 +120,7 @@ class BaseMIPSInstr
 
         KryuCowString disasm = {};
 
-        void init( const MIPSTableEntry<RegisterUInt>& entry, const MIPSInstrDecoder& instr, MIPSVersion version);
+        void init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version);
 
         void check_halt_trap() {
             if (new_PC == 0)

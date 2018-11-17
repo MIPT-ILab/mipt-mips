@@ -20,6 +20,7 @@ struct MIPSInstrDecoder
     const uint32 opcode;
     const uint32 imm;
     const uint32 jump;
+    const uint32 bytes;
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
     {
@@ -35,6 +36,7 @@ struct MIPSInstrDecoder
         , opcode ( apply_mask( raw, 0b11111100'00000000'00000000'00000000))
         , imm    ( apply_mask( raw, 0b00000000'00000000'11111111'11111111))
         , jump   ( apply_mask( raw, 0b00000011'11111111'11111111'11111111))
+        , bytes  ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
     { }
 };
 
