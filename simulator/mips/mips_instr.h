@@ -14,42 +14,11 @@
 #include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
-#include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
 #include <kryucow_string.h>
 
-template<size_t N, typename T>
-T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
-
-template<typename T>
-auto mips_multiplication(T x, T y) {
-    using T2 = doubled_t<T>;
-    using UT2 = unsign_t<T2>;
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    return ReturnType(value, value >> bitwidth<T>);
-}
-
-template<typename T>
-auto mips_division(T x, T y) {
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    if ( y == 0)
-        return ReturnType();
-
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
-            return ReturnType();
-
-    return ReturnType(x / y, x % y);
-}
-
-struct UnknownMIPSInstruction final : Exception
-{
-    explicit UnknownMIPSInstruction(const std::string& msg)
-        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
-    { }
-};
+#include <sstream>
 
 enum OperationType : uint8
 {
@@ -75,13 +44,30 @@ enum OperationType : uint8
     OUT_UNKNOWN
 };
 
-template<typename RegisterUInt>
+template<typename R>
 struct MIPSTableEntry;
 
-template<typename RegisterUInt>
+struct UnknownMIPSInstruction final : Exception
+{
+    explicit UnknownMIPSInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
+
+template<typename I>
+void unknown_mips_instruction( I* instr)
+{
+    std::ostringstream oss;
+    oss << *instr;
+    throw UnknownMIPSInstruction( oss.str());
+}
+
+template<typename R>
 class BaseMIPSInstr
 {
     private:
+        friend class ALU;
+        using RegisterUInt = R;
         using RegisterSInt = sign_t<RegisterUInt>;
 
         OperationType operation = OUT_UNKNOWN;
@@ -89,16 +75,12 @@ class BaseMIPSInstr
 
         const uint32 raw;
 
-        using Predicate = bool (BaseMIPSInstr::*)() const;
-
         MIPSRegister src1 = MIPSRegister::zero;
         MIPSRegister src2 = MIPSRegister::zero;
         MIPSRegister dst  = MIPSRegister::zero;
         MIPSRegister dst2 = MIPSRegister::zero;
 
         uint32 v_imm = NO_VAL32;
-        auto sign_extend() const { return RegisterSInt{ narrow_cast<int16>(v_imm)}; }
-        auto zero_extend() const { return RegisterUInt{ narrow_cast<uint16>(v_imm)}; }
 
         RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
         RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
@@ -125,214 +107,8 @@ class BaseMIPSInstr
 
         void init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version);
 
-        void check_halt_trap() {
-            if (new_PC == 0)
-                trap = Trap::HALT;
-        }
-
-    public:
-        using Execute = void (BaseMIPSInstr::*)();
-
-        void calculate_load_addr()  { calculate_addr(); }
-        void calculate_store_addr() {
-            calculate_addr();
-            mask = bitmask<RegisterUInt>(mem_size * 8);
-        }
-
-        void calculate_load_addr_aligned() {
-            calculate_load_addr();
-            if ( mem_addr % 4 != 0)
-                trap = Trap::UNALIGNED_ADDRESS;
-        }
-
-        void calculate_load_addr_right32() {
-            // Endian specific
-            calculate_load_addr();
-            /* switch (mem_addr % 4) {
-               case 0: return 0xFFFF'FFFF;
-               case 1: return 0x00FF'FFFF;
-               case 2: return 0x0000'FFFF;
-               case 3: return 0x0000'00FF;
-               }
-             */
-            mask = bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
-        }
-
-        void calculate_load_addr_left32() {
-            // Endian specific
-            calculate_load_addr();
-            /* switch (mem_addr % 4) {
-               case 0: return 0xFF00'0000;
-               case 1: return 0xFFFF'0000;
-               case 2: return 0xFFFF'FF00;
-               case 3: return 0xFFFF'FFFF;
-               }
-             */
-            mask = bitmask<RegisterUInt>( ( 1 + mem_addr % 4) * 8) << ( ( 3 - mem_addr % 4) * 8);
-            // Actually we read a word LEFT to effective address
-            mem_addr -= 3;
-        }
-
-        // store functions done by analogy with loads
-        void calculate_store_addr_aligned() {
-            calculate_store_addr();
-            if ( mem_addr % 4 != 0)
-                trap = Trap::UNALIGNED_ADDRESS;
-        }
-
-        void calculate_store_addr_right32() {
-            calculate_store_addr();
-            mask = bitmask<uint32>( ( 4 - mem_addr % 4) * 8);
-        }
-
-        void calculate_store_addr_left32() {
-            calculate_store_addr();
-            mask = bitmask<RegisterUInt>( ( 1 + mem_addr % 4) * 8) << ( ( 3 - mem_addr % 4) * 8);
-            mem_addr -= 3;
-        }
-
-        void calculate_addr() { mem_addr = v_src1 + sign_extend(); }
-
-        // Predicate helpers - unary
-        bool lez() const { return narrow_cast<RegisterSInt>( v_src1) <= 0; }
-        bool gez() const { return narrow_cast<RegisterSInt>( v_src1) >= 0; }
-        bool ltz() const { return narrow_cast<RegisterSInt>( v_src1) < 0; }
-        bool gtz() const { return narrow_cast<RegisterSInt>( v_src1) > 0; }
-
-        // Predicate helpers - binary
-        bool eq()  const { return v_src1 == v_src2; }
-        bool ne()  const { return v_src1 != v_src2; }
-        bool geu() const { return v_src1 >= v_src2; }
-        bool ltu() const { return v_src1 <  v_src2; }
-        bool ge()  const { return narrow_cast<RegisterSInt>( v_src1) >= narrow_cast<RegisterSInt>( v_src2); }
-        bool lt()  const { return narrow_cast<RegisterSInt>( v_src1) <  narrow_cast<RegisterSInt>( v_src2); }
-
-        // Predicate helpers - immediate
-        bool eqi() const { return narrow_cast<RegisterSInt>( v_src1) == sign_extend(); }
-        bool nei() const { return narrow_cast<RegisterSInt>( v_src1) != sign_extend(); }
-        bool lti() const { return narrow_cast<RegisterSInt>( v_src1) <  sign_extend(); }
-        bool gei() const { return narrow_cast<RegisterSInt>( v_src1) >= sign_extend(); }
-
-        // Predicate helpers - immediate unsigned
-        bool ltiu() const { return v_src1 <  narrow_cast<RegisterUInt>(sign_extend()); }
-        bool geiu() const { return v_src1 >= narrow_cast<RegisterUInt>(sign_extend()); }
-
-        template <typename T>
-        void execute_addition()     { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) + narrow_cast<T>( v_src2)); }
-
-        template <typename T>
-        void execute_subtraction()  { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) - narrow_cast<T>( v_src2)); }
-
-        template <typename T>
-        void execute_addition_imm() { v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( v_src1) + narrow_cast<T>( sign_extend())); }
-
-        template <typename T>
-        void execute_multiplication() { std::tie(v_dst, v_dst2) = mips_multiplication<T>(v_src1, v_src2); }
-
-        template <typename T>
-        void execute_division() { std::tie(v_dst, v_dst2) = mips_division<T>(v_src1, v_src2); }
-
-        void execute_move()   { v_dst = v_src1; }
-
-        template <typename T>
-        void execute_sll()   { v_dst = narrow_cast<T>( v_src1) << shamt; }
-        void execute_dsll32() { v_dst = v_src1 << (shamt + 32u); }
-
-        template <typename T>
-        void execute_srl()
-        {
-            // On 64-bit CPUs the result word is sign-extended
-            v_dst = narrow_cast<RegisterUInt>(narrow_cast<RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(v_src1) >> shamt)));
-        }
-        void execute_dsrl32() { v_dst = v_src1 >> (shamt + 32u); }
-
-        template <typename T>
-        void execute_sra()   { v_dst = arithmetic_rs( narrow_cast<T>( v_src1), shamt); }
-        void execute_dsra32() { v_dst = arithmetic_rs( v_src1, shamt + 32); }
-
-        template <typename T>
-        void execute_sllv()   { v_dst = narrow_cast<T>( v_src1) << v_src2; }
-
-        template <typename T>
-        void execute_srlv()   { v_dst = narrow_cast<T>( v_src1) >> v_src2; }
-
-        template <typename T>
-        void execute_srav()   { v_dst = arithmetic_rs( narrow_cast<T>( v_src1), v_src2); }
-        void execute_lui()    { v_dst = narrow_cast<RegisterUInt>( sign_extend()) << 0x10u; }
-
-        void execute_and()   { v_dst = v_src1 & v_src2; }
-        void execute_or()    { v_dst = v_src1 | v_src2; }
-        void execute_xor()   { v_dst = v_src1 ^ v_src2; }
-        void execute_nor()   { v_dst = ~(v_src1 | v_src2); }
-
-        void execute_andi()  { v_dst = v_src1 & zero_extend(); }
-        void execute_ori()   { v_dst = v_src1 | zero_extend(); }
-        void execute_xori()  { v_dst = v_src1 ^ zero_extend(); }
-
-        void execute_movn()  { execute_move(); if (v_src2 == 0) mask = 0; }
-        void execute_movz()  { execute_move(); if (v_src2 != 0) mask = 0; }
-
-        // Function-templated method is a little-known feature of C++, but useful here
-        template<Predicate p>
-        void execute_set() { v_dst = (this->*p)(); }
-
-        template<Predicate p>
-        void execute_trap() { if ((this->*p)()) trap = Trap::EXPLICIT_TRAP; }
-
-        template<Predicate p>
-        void execute_branch()
-        {
-            _is_jump_taken = (this->*p)();
-            if ( _is_jump_taken) {
-                new_PC += sign_extend() * 4;
-                check_halt_trap();
-            }
-        }
-
-        void execute_clo()  { v_dst = count_leading_ones<uint32>( v_src1); }
-        void execute_dclo() { v_dst = count_leading_ones<uint64>( v_src1); }
-        void execute_clz()  { v_dst = count_leading_zeroes<uint32>(  v_src1); }
-        void execute_dclz() { v_dst = count_leading_zeroes<uint64>(  v_src1); }
-
-        void execute_jump( Addr target)
-        {
-            _is_jump_taken = true;
-            new_PC = target;
-            check_halt_trap();
-        }
-
-        void execute_j()  { execute_jump((PC & 0xf0000000) | (v_imm << 2u)); }
-        void execute_jr() {
-            if (v_src1 % 4 != 0)
-                trap = Trap::UNALIGNED_ADDRESS;
-            execute_jump(align_up<2>(v_src1));
-        }
-
-        template<Execute j>
-        void execute_jump_and_link()
-        {
-            v_dst = new_PC; // link
-            (this->*j)();   // jump
-        }
-
-        template<Predicate p>
-        void execute_branch_and_link()
-        {
-            _is_jump_taken = (this->*p)();
-            if ( _is_jump_taken)
-            {
-                v_dst = new_PC;
-                new_PC += sign_extend() * 4;
-                check_halt_trap();
-            }
-        }
-
-        void execute_syscall() { trap = Trap::SYSCALL; };
-        void execute_break()   { trap = Trap::BREAKPOINT; };
-
-        void execute_unknown();
-
-        Execute function = &BaseMIPSInstr::execute_unknown;
+        using Execute = void (*)(BaseMIPSInstr*);
+        Execute execute_function = unknown_mips_instruction;
     protected:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
