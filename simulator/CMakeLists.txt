@@ -40,7 +40,7 @@ set(CPPS infra/macro_test.cpp
     modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
-    mips/mips_instr_decode.cpp
+    mips/mips_isa.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp
