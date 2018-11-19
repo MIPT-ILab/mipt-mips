@@ -66,7 +66,7 @@ template<typename R>
 class BaseMIPSInstr
 {
     private:
-        friend class ALU;
+        friend struct ALU;
         using RegisterUInt = R;
         using RegisterSInt = sign_t<RegisterUInt>;
 
