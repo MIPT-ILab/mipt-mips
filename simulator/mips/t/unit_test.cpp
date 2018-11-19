@@ -129,8 +129,8 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
     CHECK(MIPS32Instr(0x02290034).get_disasm() == "teq $s1, $t1");
     CHECK(MIPS32Instr(0x02290036).get_disasm() == "tne $s1, $t1");
     CHECK(MIPS32Instr(0x01208809).get_disasm() == "jalr $s1, $t1");
-    CHECK(MIPS32Instr(0x00000000).get_disasm() == "nop ");
-    CHECK(MIPS32Instr     ("nop").get_disasm() == "nop ");
+    CHECK(MIPS32Instr(0x00000000).get_disasm() == "nop");
+    CHECK(MIPS32Instr     ("nop").get_disasm() == "nop");
 }
 
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
