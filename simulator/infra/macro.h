@@ -65,6 +65,16 @@ constexpr auto popcount( T x) noexcept
 }
 
 /*
+ * Returns value of T type with only the most significant bit set
+ * Examples: msb_set<uint8>() -> 0x80
+ */
+template <typename T>
+static constexpr T msb_set()
+{
+    return T{ 1u} << (bitwidth<T> - 1);
+}
+
+/*
  * Returns a value full on one bits.
  * all_ones<uint8>()  -> 0xFF
  * all_ones<uint32>() -> 0xFFFF'FFFF
@@ -72,7 +82,7 @@ constexpr auto popcount( T x) noexcept
 template <typename T>
 static constexpr T all_ones()
 {
-    return narrow_cast<T>(~T(0));
+    return (msb_set<T>() - 1u) | msb_set<T>();
 }
 
 /* Returns a bitmask with desired amount of LSB set to '1'
@@ -84,16 +94,6 @@ template <typename T>
 static constexpr T bitmask(unsigned int const onecount)
 {
     return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
-}
-
-/*
- * Returns value of T type with only the most significant bit set
- * Examples: msb_set<uint8>() -> 0x80
- */
-template <typename T>
-static constexpr T msb_set()
-{
-    return T{ 1u} << (bitwidth<T> - 1);
 }
 
 template <typename T>
