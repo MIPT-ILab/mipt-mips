@@ -416,9 +416,13 @@ class BaseMIPSInstr
         {
             if ( index == 0)
                 v_src1 = value;
-            else
+            else if ( index == 1)
                 v_src2 = value;
+            else
+                assert( false);
         }
+        
+        void set_new_PC( Addr value) { new_PC = value; }
 
         auto get_v_dst()  const { return v_dst; }
         auto get_v_dst2() const { return v_dst2; }

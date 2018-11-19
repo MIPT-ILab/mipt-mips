@@ -15,43 +15,6 @@ TEST_CASE( "MIPS32_instr: invalid instruction in ctor from string")
     CHECK_THROWS_AS( instr.execute(), UnknownMIPSInstruction);
 }
 
-TEST_CASE( "MIPS32_instr: sllv")
-{
-    MIPS32Instr instr( "sllv");
-    instr.set_v_src( 1, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 1);
-}
-
-TEST_CASE( "MIPS32_instr: mul")
-{
-    MIPS32Instr instr( "mul");
-    instr.set_v_src( 10, 0);
-    instr.set_v_src( 20, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 200);
-}
-
-TEST_CASE( "MIPS32_instr: addi")
-{
-    MIPS32Instr instr( "addi");
-    instr.set_v_src( 10, 0);
-    instr.set_v_src( 0, 1);
-    instr.set_v_imm( 20);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 30);
-}
-
-TEST_CASE( "MIPS32_instr: teqi")
-{
-    MIPS32Instr instr( "teqi");
-    instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
-    instr.execute();
-    CHECK( instr.has_trap());
-}
-
 TEST_CASE( "MIPS32_instr: Divmult")
 {
     CHECK(MIPS32Instr(0x02290018).is_divmult());
@@ -243,3 +206,78 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
     CHECK(MIPS32Instr(0x0c0004d2).get_disasm() == "jal 0x4d2");
 }
 
+
+TEST_CASE( "MIPS32_instr: beq")
+{
+    MIPS32Instr instr( "beq");
+    
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.set_v_imm( 1);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    
+    instr.set_new_PC(instr.get_PC() + 4);
+    instr.set_v_src( -1, 0);
+    instr.set_v_src( -1, 1);
+    instr.set_v_imm( 1);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    
+    instr.set_new_PC(instr.get_PC() + 4);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    
+    instr.set_new_PC(instr.get_PC() + 4);
+    instr.set_v_src( -1, 0);
+    instr.set_v_src( -1, 1);
+    instr.set_v_imm( 1024);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    
+    instr.set_new_PC(instr.get_PC() + 4);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.set_v_imm( -1024);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: sllv")
+{
+    MIPS32Instr instr( "sllv");
+    instr.set_v_src( 0, 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: mul")
+{
+    MIPS32Instr instr( "mul");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 20, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 200);
+}
+
+TEST_CASE( "MIPS32_instr: addi")
+{
+    MIPS32Instr instr( "addi");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 0, 1);
+    instr.set_v_imm( 20);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 30);
+}
+
+TEST_CASE( "MIPS32_instr: teqi")
+{
+    MIPS32Instr instr( "teqi");
+    instr.set_v_src( 0, 0);
+    instr.set_v_imm( 0);
+    instr.execute();
+    CHECK( instr.has_trap());
+}
