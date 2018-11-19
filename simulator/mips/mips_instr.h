@@ -76,6 +76,9 @@ enum OperationType : uint8
 };
 
 template<typename RegisterUInt>
+struct MIPSTableEntry;
+
+template<typename RegisterUInt>
 class BaseMIPSInstr
 {
     private:
