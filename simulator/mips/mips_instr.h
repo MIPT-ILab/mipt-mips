@@ -11,7 +11,6 @@
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
 
-// MIPT-MIPS modules
 #include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
@@ -19,12 +18,6 @@
 #include <infra/string_view.h>
 #include <infra/types.h>
 #include <kryucow_string.h>
-
-// Generic C++
-#include <array>
-#include <unordered_map>
-
-struct MIPSInstrDecoder;
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
@@ -130,7 +123,7 @@ class BaseMIPSInstr
 
         KryuCowString disasm = {};
 
-        void init( const MIPSTableEntry<RegisterUInt>& entry, const MIPSInstrDecoder& instr, MIPSVersion version);
+        void init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version);
 
         void check_halt_trap() {
             if (new_PC == 0)
