@@ -204,7 +204,7 @@ static const Table<RegisterUInt> isaMapIJ =
     // ********************* I and J INSTRUCTIONS *************************
     // Direct jumps
     //key     name    operation  memsize    source1      source2      destination      pointer                          mips version
-    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::template execute_j,     MIPS_I_Instr } },
+    {0x2, { "j",   OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_j,     MIPS_I_Instr } },
     {0x3, { "jal", OUT_J_JUMP, 0, RegType::ZERO, RegType::ZERO, RegType::RA,
                                 &BaseMIPSInstr<RegisterUInt>::template execute_jump_and_link<&BaseMIPSInstr<RegisterUInt>::execute_j>,   MIPS_I_Instr } },
 
