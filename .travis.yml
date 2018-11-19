@@ -16,12 +16,6 @@ os:
   - linux
   - osx
 
-git:
-  submodules: true
-
-python:
-  - "3.6"
-
 matrix:
   exclude:
     - os: osx
@@ -40,6 +34,7 @@ addons:
     - clang-tidy-7
 
 install:
+  - pip install --user future
   - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
 # Download and build binutils on OS X
   - |
