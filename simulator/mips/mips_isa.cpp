@@ -13,7 +13,7 @@
 #include <unordered_map>
 
 #include "mips_instr.h"
-#include "mips_instr_decoder.h"
+#include "mips_instr_decode.h"
 
 enum class RegType : uint8
 {
