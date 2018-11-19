@@ -15,7 +15,10 @@ Date | Event name
 03 Oct | **CMOS and Combinational Circuits**<br/> • Slides: [L2 - CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Integrated%20Circuits%20Basics.pptx?raw=true), [L3 - Combinational Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Combinational%20Circuits.pptx?raw=true)  <br/> • [YouTube](https://youtu.be/zDldV01U5MQ) <br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
 17 Oct | **Sequential Circuits**<br/> • Slides: [L4 - Sequential Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Sequential%20Circuits.pptx?raw=true) <br/> • [YouTube](https://youtu.be/SlFY1iJ-63Q) <br/> • Homework: Study implementation of [SR-latch](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/rs.circ), [T-latch counter](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/counter.circ) and [Mem array](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/array2x4.circ) with [Logisim](http://www.cburch.com/logisim/index.html). Refresh scheme of [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and look inside [Flip-flop ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu-filp-flop.circ).
 31 Oct | **Single-cycle implementation of MIPS/RISC-V CPU**<br/> • Slides: [L5 - Single-cycle MIPS/RISC-V](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%205%20-%20Single-cycle%20implementation%20of%20MIPS%20CPU.pptx?raw=true) <br/> • [YouTube](https://youtu.be/_okzQg7OxP0) <br/> • Homework: Read wiki's [MIPS section](https://github.com/MIPT-ILab/mipt-mips/wiki#mips). Recap single-cycle data path (foils 20-26). Get familiar with single-cycle model: [simulator](https://github.com/MIPT-ILab/mipt-mips/tree/master/simulator) & [wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Functional-Simulator). Study RISC-V [opened issues](https://github.com/MIPT-ILab/mipt-mips/issues?q=is:issue+is:open+sort:updated-asc+label:%22S1+%E2%80%94+ISA%22+no:assignee).
-14 Nov | **Pipeline**
+14 Nov | **Pipeline**<br/> • Slides: [L6 - Pipelining](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%206%20-%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/QHj2fBxSpUU) <br/> • Homework: Walk through documentation on [performance simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator) and [ports concepts](https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports). Read original paper on [ASIM Perf Model Framework](http://www.ckluk.org/ck/papers/asim_ieeecomputer.pdf).
+28 Nov | **Branch prediction**
+12 Dec | **Advanced pipelining**
+19 Dec | **Final Test**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
@@ -29,7 +32,8 @@ Date | Event name
 10 Oct | **Build, Makefiles, and CMake**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Build,%20Makefiles,%20CMake.pptx?raw=true)<br/> • [YouTube](https://youtu.be/2t_qkJ67nAE)<br/> • Homework: use Make or CMake to build your project, build MIPT-MIPS.
 24 Oct | **Continuous Integration**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Continious%20Integration.pptx?raw=true)<br/> • Homework: install Travis CI for your project to run your Make or CMake builds.
 07 Nov | **Code form**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Code%20Form.pptx?raw=true)
-21 Nov | **Unit tests**
+21 Nov | **Unit testing**
+05 Dec | **Test-driven development**
 
 In addition, repository contains a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
