@@ -59,7 +59,7 @@ MIPSRegister get_register( const MIPSInstrDecoder& instr, RegType type)
 }
 
 template<typename RegisterUInt>
-using Table = std::unordered_map<uint8, MIPSTableEntry<RegisterUInt>>;
+using Table = std::unordered_map<uint32, MIPSTableEntry<RegisterUInt>>;
 
 //unordered map for R-instructions
 template<typename RegisterUInt>
@@ -300,49 +300,34 @@ static const Table<RegisterUInt> isaMapMIPS32 =
 };
 
 template<typename RegisterUInt>
-BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
-    raw( bytes),
-    new_PC( PC + 4),
-    PC( PC)
+MIPSTableEntry<RegisterUInt> unknown_instruction =
+{ "Unknown instruction", OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::execute_unknown, MIPS_I_Instr};
+
+template<typename RegisterUInt>
+MIPSTableEntry<RegisterUInt> nop =
+{ "nop" , OUT_R_SPECIAL, 0, RegType::ZERO, RegType::ZERO, RegType::ZERO, &BaseMIPSInstr<RegisterUInt>::template execute_sll<uint32>, MIPS_I_Instr};
+
+template<typename RegisterUInt>
+const MIPSTableEntry<RegisterUInt>& get_table_entry( const Table<RegisterUInt>& table, uint32 key)
 {
-    bool valid = false;
-    auto it = isaMapRI<RegisterUInt>.cbegin();
-    MIPSInstrDecoder instr( raw);
+    auto it = table.find( key);
+    return it == table.end() ? unknown_instruction<RegisterUInt> : it->second;
+}
+
+template<typename RegisterUInt>
+const MIPSTableEntry<RegisterUInt>& get_table_entry( uint32 bytes)
+{
+    MIPSInstrDecoder instr( bytes);
+
+    if ( instr.bytes == 0)
+        return nop<RegisterUInt>;
 
     switch ( instr.opcode)
     {
-        case 0x0: // R instruction
-            it = isaMapR<RegisterUInt>.find( instr.funct);
-            valid = ( it != isaMapR<RegisterUInt>.end());
-            break;
-
-        case 0x1: // RegIMM instruction
-            it = isaMapRI<RegisterUInt>.find( instr.rt);
-            valid = ( it != isaMapRI<RegisterUInt>.end());
-            break;
-
-        case 0x1C: // MIPS32 instruction
-            it = isaMapMIPS32<RegisterUInt>.find( instr.funct);
-            valid = ( it != isaMapMIPS32<RegisterUInt>.end());
-            break;
-
-        default: // I and J instructions
-            it = isaMapIJ<RegisterUInt>.find( instr.opcode);
-            valid = ( it != isaMapIJ<RegisterUInt>.end());
-            break;
-    }
-
-    if ( valid)
-    {
-        init( it->second, instr, version);
-    }
-    else {
-        std::ostringstream oss;
-        if ( PC != 0)
-            oss << std::hex << "0x" << PC << ": ";
-        oss << std::hex << std::setfill( '0')
-            << "0x" << std::setw( 8) << raw << '\t' << "Unknown";
-        disasm = oss.str();
+        case 0x0:  return get_table_entry( isaMapR<RegisterUInt>,      instr.funct);  // R instruction
+        case 0x1:  return get_table_entry( isaMapRI<RegisterUInt>,     instr.rt);     // RegIMM instruction
+        case 0x1C: return get_table_entry( isaMapMIPS32<RegisterUInt>, instr.funct);  // MIPS32 instruction
+        default:   return get_table_entry( isaMapIJ<RegisterUInt>,     instr.opcode); // I and J instructions
     }
 }
 
@@ -355,42 +340,44 @@ auto find_entry( const M& map, std::string_view name)
 }
 
 template<typename RegisterUInt>
+const MIPSTableEntry<RegisterUInt>& get_table_entry( std::string_view str_opcode)
+{
+    if ( str_opcode == "nop")
+        return nop<RegisterUInt>;
+
+    for ( const auto& map : { isaMapR<RegisterUInt>, isaMapRI<RegisterUInt>, isaMapMIPS32<RegisterUInt>, isaMapIJ<RegisterUInt> })
+    {
+        auto res = find_entry( map, str_opcode);
+        if ( res != map.end())
+            return res->second;
+    }
+
+    return unknown_instruction<RegisterUInt>;
+}
+
+template<typename RegisterUInt>
+BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
+    raw( bytes),
+    new_PC( PC + 4),
+    PC( PC)
+{
+    init( get_table_entry<RegisterUInt>( raw), version);
+}
+
+template<typename RegisterUInt>
 BaseMIPSInstr<RegisterUInt>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
     : raw( 0)
     , new_PC( PC + 4)
     , PC( PC)
 {
-    auto it = find_entry( isaMapR<RegisterUInt>,      str_opcode);
-    if ( it == isaMapR<RegisterUInt>.end())
-        it =  find_entry( isaMapRI<RegisterUInt>,     str_opcode);
-    if ( it == isaMapRI<RegisterUInt>.end())
-        it =  find_entry( isaMapMIPS32<RegisterUInt>, str_opcode);
-    if ( it == isaMapMIPS32<RegisterUInt>.end())
-        it =  find_entry( isaMapIJ<RegisterUInt>,     str_opcode);
-
-    if ( str_opcode == "nop")
-    {
-        init (isaMapR<RegisterUInt>.find( 0)->second, MIPSInstrDecoder( 0), version);
-        disasm = "nop ";
-    }
-    else if ( it == isaMapIJ<RegisterUInt>.end())
-    {
-        std::ostringstream oss;
-        if ( PC != 0)
-            oss << std::hex << "0x" << PC << ": ";
-        oss << str_opcode << '\t' << "Unknown";
-        disasm = oss.str();
-    }
-    else {
-        init( it->second, MIPSInstrDecoder( 0), version);
-    }
+    init( get_table_entry<RegisterUInt>( str_opcode), version);
 }
 
 template<typename RegisterUInt>
-void BaseMIPSInstr<RegisterUInt>::init( const MIPSTableEntry<RegisterUInt>& entry,
-                                        const MIPSInstrDecoder& instr,
-                                        MIPSVersion version)
+void BaseMIPSInstr<RegisterUInt>::init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version)
 {
+    MIPSInstrDecoder instr( raw);
+
     operation = entry.operation;
     mem_size  = entry.mem_size;
     function  = entry.versions.is_supported(version)
@@ -485,10 +472,8 @@ void BaseMIPSInstr<RegisterUInt>::init( const MIPSTableEntry<RegisterUInt>& entr
                 oss << ", $" << src2;
             break;
     }
-    if ( raw == 0x0ul)
-        disasm = "nop ";
-    else
-        disasm = oss.str();
+
+    disasm = oss.str();
 }
 
 template class BaseMIPSInstr<uint32>;
