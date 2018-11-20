@@ -10,23 +10,15 @@
 #include <iostream>
 #include <sstream>
 
-template<typename RegisterUInt>
-void BaseMIPSInstr<RegisterUInt>::execute_unknown()
+template<typename R>
+void BaseMIPSInstr<R>::execute()
 {
-    std::ostringstream oss;
-    oss << *this;
-    throw UnknownMIPSInstruction( oss.str());
-}
-
-template<typename RegisterUInt>
-void BaseMIPSInstr<RegisterUInt>::execute()
-{
-    (this->*function)();
+    execute_function(this);
     complete = true;
 }
 
-template<typename RegisterUInt>
-void BaseMIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
+template<typename R>
+void BaseMIPSInstr<R>::set_v_dst( R value)
 {
     memory_complete = true;
     if ( operation == OUT_I_LOAD || is_partial_load())
@@ -49,16 +41,16 @@ void BaseMIPSInstr<RegisterUInt>::set_v_dst( RegisterUInt value)
         assert( false);
     }
 }
-template<typename RegisterUInt>
-std::string BaseMIPSInstr<RegisterUInt>::string_dump() const
+template<typename R>
+std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
     dump( oss);
     return oss.str();
 }
 
-template<typename RegisterUInt>
-std::ostream& BaseMIPSInstr<RegisterUInt>::dump( std::ostream& out) const
+template<typename R>
+std::ostream& BaseMIPSInstr<R>::dump( std::ostream& out) const
 {
     out << "{" << sequence_id << "}\t";
     out << disasm;
