@@ -65,10 +65,8 @@ static uint32 get_immediate( const MIPSInstrDecoder& instr, OperationType operat
     switch ( operation)
     {
     case OUT_I_ARITHM:
-    case OUT_I_BRANCH:
-    case OUT_RI_BRANCH_0:
+    case OUT_I_BRANCH
     case OUT_RI_TRAP:
-    case OUT_I_CONST:
     case OUT_I_LOAD:
     case OUT_I_LOADU:
     case OUT_I_PARTIAL_LOAD:
@@ -288,10 +286,10 @@ static const Table<R> isaMapRI =
 {
     // key     name    pointer        operation   memsize    source1        source2      destination  mips version
     // Branches
-    {0x0,  { "bltz",  mips_bltz<R>,  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
-    {0x1,  { "bgez",  mips_bgez<R>,  OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
-    {0x2,  { "bltzl", mips_bltzl<R>, OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
-    {0x3,  { "bgezl", mips_bgezl<R>, OUT_RI_BRANCH_0,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
+    {0x0,  { "bltz",  mips_bltz<R>,  OUT_I_BRANCH,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
+    {0x1,  { "bgez",  mips_bgez<R>,  OUT_I_BRANCH,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
+    {0x2,  { "bltzl", mips_bltzl<R>, OUT_I_BRANCH,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
+    {0x3,  { "bgezl", mips_bgezl<R>, OUT_I_BRANCH,  0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
     // Conditional traps
     {0x8,  { "tgei",  mips_tgei<R>,  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
     {0x9,  { "tgeiu", mips_tgeiu<R>, OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
@@ -300,10 +298,10 @@ static const Table<R> isaMapRI =
     {0xC,  { "teqi",  mips_teqi<R>,  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
     {0xE,  { "tnei",  mips_tnei<R>,  OUT_RI_TRAP, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_II_Instr} },
     // Linking branches
-    {0x10, { "bltzal",  mips_bltzal<R>,  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_I_Instr} },
-    {0x11, { "bgezal",  mips_bgezal<R>,  OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_I_Instr} },
-    {0x12, { "bltzall", mips_bltzall<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_II_Instr} },
-    {0x13, { "bgezall", mips_bgezall<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_II_Instr} }
+    {0x10, { "bltzal",  mips_bltzal<R>,  OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_I_Instr} },
+    {0x11, { "bgezal",  mips_bgezal<R>,  OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_I_Instr} },
+    {0x12, { "bltzall", mips_bltzall<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_II_Instr} },
+    {0x13, { "bgezall", mips_bgezall<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::RA, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -317,8 +315,8 @@ static const Table<R> isaMapIJ =
     // Branches
     {0x4, { "beq",  mips_beq<R>,  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_I_Instr} },
     {0x5, { "bne",  mips_bne<R>,  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_I_Instr} },
-    {0x6, { "blez", mips_blez<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
-    {0x7, { "bgtz", mips_bgtz<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
+    {0x6, { "blez", mips_blez<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
+    {0x7, { "bgtz", mips_bgtz<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::ZERO, RegType::ZERO, MIPS_I_Instr} },
     // Addition/Subtraction
     {0x8, { "addi",  mips_addi<R>,  OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, MIPS_I_Instr} },
     {0x9, { "addiu", mips_addiu<R>, OUT_I_ARITHM, 0, RegType::RS, RegType::ZERO, RegType::RT, MIPS_I_Instr} },
@@ -328,13 +326,13 @@ static const Table<R> isaMapIJ =
     {0xC, { "andi",  mips_andi<R>,  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, MIPS_I_Instr} },
     {0xD, { "ori",   mips_ori<R>,   OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, MIPS_I_Instr} },
     {0xE, { "xori",  mips_xori<R>,  OUT_I_ARITHM, 0, RegType::RS,   RegType::ZERO, RegType::RT, MIPS_I_Instr} },
-    {0xF, { "lui",   mips_lui<R>,   OUT_I_CONST,  0, RegType::ZERO, RegType::ZERO, RegType::RT, MIPS_I_Instr} },
+    {0xF, { "lui",   mips_lui<R>,   OUT_I_ARITHM, 0, RegType::ZERO, RegType::ZERO, RegType::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
-    {0x14, { "beql",  mips_beql<R>,  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
-    {0x15, { "bnel",  mips_bnel<R>,  OUT_I_BRANCH,    0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
-    {0x16, { "blezl", mips_blezl<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
-    {0x17, { "bgtzl", mips_bgtzl<R>, OUT_RI_BRANCH_0, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
+    {0x14, { "beql",  mips_beql<R>,  OUT_I_BRANCH, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
+    {0x15, { "bnel",  mips_bnel<R>,  OUT_I_BRANCH, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
+    {0x16, { "blezl", mips_blezl<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
+    {0x17, { "bgtzl", mips_bgtzl<R>, OUT_I_BRANCH, 0, RegType::RS, RegType::RT,   RegType::ZERO, MIPS_II_Instr} },
     // Doubleword unaligned loads
     {0x1A, { "ldl", mips_ldl<R>,  OUT_I_LOAD, 8, RegType::RS, RegType::ZERO, RegType::RT, MIPS_III_Instr} },
     {0x1B, { "ldr", mips_ldr<R>,  OUT_I_LOAD, 8, RegType::RS, RegType::ZERO, RegType::RT, MIPS_III_Instr} },
@@ -501,28 +499,21 @@ void BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<R>& entry)
                 <<  ", " << std::dec << shamt;
             break;
         case OUT_I_ARITHM:
-            oss << " $" << dst << ", $"
-                << src1 << ", "
-                << std::hex << "0x" << v_imm << std::dec;
+            oss << " $" << dst;
+            if ( print_src1)
+               oss  << ", $" << src1;
+            oss << ", 0x" << std::hex << v_imm << std::dec;
             break;
         case OUT_I_BRANCH:
-            oss << " $" << src1 << ", $"
-                << src2 << ", "
-                << std::dec << narrow_cast<int16>(v_imm);
-            break;
-        case OUT_RI_BRANCH_0:
-            oss << " $" << src1 << ", "
-                << std::dec << narrow_cast<int16>(v_imm);
+            oss << " $" << src1;
+            if ( print_src2)
+                out << ", $" << src2;
+            out << ", " << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_TRAP:
             oss << " $" << src1 << ", 0x"
                 << std::hex << narrow_cast<int16>(v_imm) << std::dec;
             break;
-        case OUT_I_CONST:
-            oss << " $" << dst << std::hex
-                << ", 0x" << v_imm << std::dec;
-            break;
-
         case OUT_I_LOAD:
         case OUT_I_LOADU:
         case OUT_I_PARTIAL_LOAD:
