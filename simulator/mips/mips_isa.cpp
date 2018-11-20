@@ -487,7 +487,7 @@ void BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<R>& entry)
     const bool print_dst  = is_explicit_register( entry.dst);
     const bool print_src1 = is_explicit_register( entry.src1);
     const bool print_src2 = is_explicit_register( entry.src2);
-    
+
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
