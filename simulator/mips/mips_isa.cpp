@@ -476,7 +476,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<R>& entry, MIPSVersion version
     if ( entry.dst == RegType::HI_LO)
         dst2 = MIPSRegister::mips_hi;
 
-    imm = get_immediate( instr, operation);
+    v_imm = get_immediate( instr, operation);
 
     generate_disasm( entry);
 }
