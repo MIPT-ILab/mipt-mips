@@ -43,6 +43,8 @@ MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
+To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
+
 ## Workflow example
 
 #### Clone

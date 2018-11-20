@@ -24,6 +24,7 @@ environment:
 #    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
+- pip install future
 - git submodule update --init
 - if "%platform%"=="x86" set MSYSTEM=mingw32
 - if "%platform%"=="x64" set MSYSTEM=mingw64
