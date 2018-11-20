@@ -106,6 +106,7 @@ class BaseMIPSInstr
         KryuCowString disasm = {};
 
         void init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version);
+        void generate_disasm( const MIPSTableEntry<RegisterUInt>& entry);
 
         using Execute = void (*)(BaseMIPSInstr*);
         Execute execute_function = unknown_mips_instruction;

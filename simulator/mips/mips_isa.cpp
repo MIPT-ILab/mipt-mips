@@ -59,6 +59,28 @@ MIPSRegister get_register( const MIPSInstrDecoder& instr, RegType type)
     }
 }
 
+
+static uint32 get_immediate( const MIPSInstrDecoder& instr, OperationType operation)
+{
+    switch ( operation)
+    {
+    case OUT_I_ARITHM:
+    case OUT_I_BRANCH:
+    case OUT_RI_BRANCH_0:
+    case OUT_RI_TRAP:
+    case OUT_I_CONST:
+    case OUT_I_LOAD:
+    case OUT_I_LOADU:
+    case OUT_I_PARTIAL_LOAD:
+    case OUT_I_STORE:
+        return instr.imm;
+    case OUT_J_JUMP:
+        return instr.jump;
+    default:
+        return 0;
+    }    
+}
+
 template<typename R> auto mips_add     = ALU::addition<BaseMIPSInstr<R>, int32>;
 template<typename R> auto mips_addi    = ALU::addition_imm<BaseMIPSInstr<R>, int32>;
 template<typename R> auto mips_addiu   = ALU::addition_imm<BaseMIPSInstr<R>, uint32>;
@@ -454,10 +476,18 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<R>& entry, MIPSVersion version
     if ( entry.dst == RegType::HI_LO)
         dst2 = MIPSRegister::mips_hi;
 
+    imm = get_immediate( instr, operation);
+
+    generate_disasm( entry);
+}
+
+template<typename R>
+void BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<R>& entry)
+{
     const bool print_dst  = is_explicit_register( entry.dst);
     const bool print_src1 = is_explicit_register( entry.src1);
     const bool print_src2 = is_explicit_register( entry.src2);
-
+    
     std::ostringstream oss;
     if ( PC != 0)
         oss << std::hex << "0x" << PC << ": ";
@@ -471,32 +501,24 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<R>& entry, MIPSVersion version
                 <<  ", " << std::dec << shamt;
             break;
         case OUT_I_ARITHM:
-            v_imm = instr.imm;
-
             oss << " $" << dst << ", $"
                 << src1 << ", "
                 << std::hex << "0x" << v_imm << std::dec;
             break;
         case OUT_I_BRANCH:
-            v_imm = instr.imm;
-
             oss << " $" << src1 << ", $"
                 << src2 << ", "
                 << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_BRANCH_0:
-            v_imm = instr.imm;
             oss << " $" << src1 << ", "
                 << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_TRAP:
-            v_imm = instr.imm;
             oss << " $" << src1 << ", 0x"
                 << std::hex << narrow_cast<int16>(v_imm) << std::dec;
             break;
         case OUT_I_CONST:
-            v_imm = instr.imm;
-
             oss << " $" << dst << std::hex
                 << ", 0x" << v_imm << std::dec;
             break;
@@ -504,22 +526,17 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<R>& entry, MIPSVersion version
         case OUT_I_LOAD:
         case OUT_I_LOADU:
         case OUT_I_PARTIAL_LOAD:
-            v_imm = instr.imm;
-
             oss << " $" << dst << ", 0x"
                 << std::hex << v_imm
                 << "($" << src1 << ")" << std::dec;
             break;
 
         case OUT_I_STORE:
-            v_imm = instr.imm;
-
             oss << " $" << src2 << ", 0x"
                 << std::hex << v_imm
                 << "($" << src1 << ")" << std::dec;
             break;
         case OUT_J_JUMP:
-            v_imm = instr.jump;
             oss << " 0x" << std::hex << v_imm << std::dec;
             break;
         default:
