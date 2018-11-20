@@ -44,6 +44,7 @@ Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get 
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
 To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
+If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
 
 ## Workflow example
 
