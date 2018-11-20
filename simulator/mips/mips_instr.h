@@ -185,10 +185,8 @@ class BaseMIPSInstr
         {
             if ( index == 0)
                 v_src1 = value;
-            else if ( index == 1)
-                v_src2 = value;
             else
-                assert( false);
+                v_src2 = value;
         }
 
         void set_new_PC( Addr value) { new_PC = value; }
