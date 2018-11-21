@@ -507,8 +507,8 @@ void BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<R>& entry)
         case OUT_I_BRANCH:
             oss << " $" << src1;
             if ( print_src2)
-                out << ", $" << src2;
-            out << ", " << std::dec << narrow_cast<int16>(v_imm);
+                oss << ", $" << src2;
+            oss << ", " << std::dec << narrow_cast<int16>(v_imm);
             break;
         case OUT_RI_TRAP:
             oss << " $" << src1 << ", 0x"
