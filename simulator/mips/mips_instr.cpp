@@ -13,7 +13,7 @@
 template<typename R>
 void BaseMIPSInstr<R>::execute()
 {
-    execute_function(this);
+    executor(this);
     complete = true;
 }
 
@@ -21,7 +21,7 @@ template<typename R>
 void BaseMIPSInstr<R>::set_v_dst( R value)
 {
     memory_complete = true;
-    if ( operation == OUT_I_LOAD || is_partial_load())
+    if ( operation == OUT_LOAD || is_partial_load())
     {
         switch ( get_mem_size())
         {
@@ -32,7 +32,7 @@ void BaseMIPSInstr<R>::set_v_dst( R value)
             default: assert( false);
         }
     }
-    else if ( operation == OUT_I_LOADU)
+    else if ( operation == OUT_LOADU)
     {
         v_dst = value;
     }

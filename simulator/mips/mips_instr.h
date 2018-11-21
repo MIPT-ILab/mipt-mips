@@ -22,29 +22,24 @@
 
 enum OperationType : uint8
 {
-    OUT_R_ARITHM,
+    OUT_ARITHM,
     OUT_R_ACCUM,
     OUT_R_CONDM,
-    OUT_R_SHAMT,
     OUT_R_JUMP,
     OUT_R_SPECIAL,
     OUT_R_SUBTR,
-    OUT_R_TRAP,
-    OUT_I_ARITHM,
-    OUT_I_BRANCH,
-    OUT_RI_BRANCH_0,
-    OUT_RI_TRAP,
-    OUT_I_LOAD,
-    OUT_I_LOADU,
-    OUT_I_PARTIAL_LOAD,
-    OUT_I_CONST,
-    OUT_I_STORE,
+    OUT_BRANCH,
+    OUT_TRAP,
+    OUT_LOAD,
+    OUT_LOADU,
+    OUT_PARTIAL_LOAD,
+    OUT_STORE,
     OUT_J_JUMP,
     OUT_J_SPECIAL,
     OUT_UNKNOWN
 };
 
-template<typename R>
+template<typename I>
 struct MIPSTableEntry;
 
 struct UnknownMIPSInstruction final : Exception
@@ -88,7 +83,6 @@ class BaseMIPSInstr
         RegisterUInt v_dst2 = NO_VAL<RegisterUInt>;
         RegisterUInt mask   = all_ones<RegisterUInt>();
 
-        uint16 shamt = NO_VAL16;
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
 
@@ -105,11 +99,11 @@ class BaseMIPSInstr
 
         KryuCowString disasm = {};
 
-        void init( const MIPSTableEntry<RegisterUInt>& entry, MIPSVersion version);
-        void generate_disasm( const MIPSTableEntry<RegisterUInt>& entry);
+        void init( const MIPSTableEntry<BaseMIPSInstr>& entry, MIPSVersion version);
+        std::string generate_disasm( const MIPSTableEntry<BaseMIPSInstr>& entry) const;
 
         using Execute = void (*)(BaseMIPSInstr*);
-        Execute execute_function = unknown_mips_instruction;
+        Execute executor = unknown_mips_instruction;
     protected:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
@@ -140,18 +134,17 @@ class BaseMIPSInstr
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_RI_BRANCH_0 ||
                                       operation == OUT_R_JUMP      ||
-                                      operation == OUT_I_BRANCH;}
+                                      operation == OUT_BRANCH;}
         bool is_jump_taken() const { return  _is_jump_taken; }
 
         bool is_partial_load() const
         {
-            return operation == OUT_I_PARTIAL_LOAD;
+            return operation == OUT_PARTIAL_LOAD;
         }
 
-        bool is_load() const { return operation == OUT_I_LOAD ||
-                                       operation == OUT_I_LOADU ||
+        bool is_load() const { return operation == OUT_LOAD ||
+                                       operation == OUT_LOADU ||
                                        is_partial_load(); }
 
         int8 get_accumulation_type() const
@@ -159,7 +152,7 @@ class BaseMIPSInstr
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
 
-        bool is_store() const { return operation == OUT_I_STORE; }
+        bool is_store() const { return operation == OUT_STORE; }
 
         bool is_nop() const { return raw == 0x0u; }
         bool is_halt() const { return trap_type() == Trap::HALT; }
@@ -168,8 +161,7 @@ class BaseMIPSInstr
 
         bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
 
-        bool is_explicit_trap() const { return operation == OUT_R_TRAP ||
-                                               operation == OUT_RI_TRAP; }
+        bool is_explicit_trap() const { return operation == OUT_TRAP; }
 
         bool is_special() const { return operation == OUT_R_SPECIAL; }
 
