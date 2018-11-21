@@ -65,7 +65,7 @@ static uint32 get_immediate( const MIPSInstrDecoder& instr, OperationType operat
     switch ( operation)
     {
     case OUT_I_ARITHM:
-    case OUT_I_BRANCH
+    case OUT_I_BRANCH:
     case OUT_RI_TRAP:
     case OUT_I_LOAD:
     case OUT_I_LOADU:
