@@ -32,12 +32,10 @@ enum OperationType : uint8
     OUT_R_TRAP,
     OUT_I_ARITHM,
     OUT_I_BRANCH,
-    OUT_RI_BRANCH_0,
     OUT_RI_TRAP,
     OUT_I_LOAD,
     OUT_I_LOADU,
     OUT_I_PARTIAL_LOAD,
-    OUT_I_CONST,
     OUT_I_STORE,
     OUT_J_JUMP,
     OUT_J_SPECIAL,
@@ -140,7 +138,6 @@ class BaseMIPSInstr
 
         /* Checks if instruction can change PC in unusual way. */
         bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_RI_BRANCH_0 ||
                                       operation == OUT_R_JUMP      ||
                                       operation == OUT_I_BRANCH;}
         bool is_jump_taken() const { return  _is_jump_taken; }
