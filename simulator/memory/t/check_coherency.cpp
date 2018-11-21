@@ -1,11 +1,11 @@
 /**
  * Simple test to check whether two memory instances are equal
  * @author Pavel I. Kryukov kryukov@frtk.ru
- * Copyright 2012-2018 MIPT-MIPS iLab project
+ * Copyright 2018 MIPT-MIPS iLab project
  */
- 
-#include <catch.hpp>
+
 #include "../memory.h"
+#include <catch.hpp>
 
 void check_coherency(FuncMemory* mem1, FuncMemory* mem2, Addr address)
 {
