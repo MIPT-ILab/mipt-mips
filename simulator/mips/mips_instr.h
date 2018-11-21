@@ -189,8 +189,6 @@ class BaseMIPSInstr
                 v_src2 = value;
         }
 
-        void set_new_PC( Addr value) { new_PC = value; }
-
         void set_shamt(uint16 val) { shamt = val; }
 
         auto get_v_dst()  const { return v_dst; }
