@@ -7,8 +7,9 @@
 #ifndef CHECK_COHERENCY_H
 #define CHECK_COHERENCY_H
  
-class FuncMemory;
+#include <infra/types.h>
 
+class FuncMemory;
 void check_coherency(FuncMemory* mem1, FuncMemory* mem2, Addr address);
 
 #endif // CHECK_COHERENCY_H
