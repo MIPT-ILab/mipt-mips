@@ -203,26 +203,26 @@ struct ALU
     void move( I* instr)   { instr->v_dst = instr->v_src1; }
 
     template<typename I, typename T> static
-    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->shamt; }
+    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_imm; }
 
     template<typename I> static
-    void dsll32( I* instr) { instr->v_dst = instr->v_src1 << (instr->shamt + 32u); }
+    void dsll32( I* instr) { instr->v_dst = instr->v_src1 << (instr->v_imm + 32u); }
 
     template<typename I, typename T> static
     void srl( I* instr)
     {
         // On 64-bit CPUs the result word is sign-extended
-        instr->v_dst = narrow_cast<typename I::RegisterUInt>(narrow_cast<typename I::RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> instr->shamt)));
+        instr->v_dst = narrow_cast<typename I::RegisterUInt>(narrow_cast<typename I::RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> instr->v_imm)));
     }
 
     template<typename I> static
-    void dsrl32( I* instr) { instr->v_dst = instr->v_src1 >> (instr->shamt + 32u); }
+    void dsrl32( I* instr) { instr->v_dst = instr->v_src1 >> (instr->v_imm + 32u); }
 
     template<typename I, typename T> static
-    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->shamt); }
+    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_imm); }
 
     template<typename I> static
-    void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->shamt + 32); }
+    void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->v_imm + 32); }
 
     template<typename I, typename T> static
     void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_src2; }
