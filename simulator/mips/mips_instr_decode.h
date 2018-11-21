@@ -10,6 +10,33 @@
 #include <infra/types.h>
 #include <infra/macro.h>
 
+#include "mips_register/mips_register.h"
+
+enum class Imm : uint8
+{
+    NO, SHIFT,                // R type
+    LOGIC, ARITH, TRAP, ADDR, // I type
+    JUMP                      // J type
+};
+
+enum class Reg : uint8
+{
+    RS, RT, RD,
+    ZERO, RA,
+    HI, LO, HI_LO
+};
+
+using Src1 = Reg;
+using Src2 = Reg;
+using Dst = Reg;
+
+static inline bool is_explicit_register( Reg type)
+{
+    return type == Reg::RS
+        || type == Reg::RT
+        || type == Reg::RD;
+}
+
 struct MIPSInstrDecoder
 {
     const uint32 funct;
@@ -25,6 +52,32 @@ struct MIPSInstrDecoder
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
     {
         return ( bytes & mask) >> find_first_set( mask);
+    }
+
+    uint32 get_immediate( Imm type) const
+    {
+        switch ( type)
+        {
+        case Imm::NO:    return 0;
+        case Imm::SHIFT: return shamt;
+        case Imm::JUMP:  return jump;
+        default:         return imm;
+        }    
+    }
+
+    MIPSRegister get_register( Reg type) const
+    {
+        switch ( type) {
+        case Reg::HI:    return MIPSRegister::mips_hi;
+        case Reg::LO:    return MIPSRegister::mips_lo;
+        case Reg::HI_LO: return MIPSRegister::mips_lo;
+        case Reg::ZERO:  return MIPSRegister::zero;
+        case Reg::RA:    return MIPSRegister::return_address;
+        case Reg::RS:    return MIPSRegister::from_cpu_index( rs);
+        case Reg::RT:    return MIPSRegister::from_cpu_index( rt);
+        case Reg::RD:    return MIPSRegister::from_cpu_index( rd);
+        default: assert(0);  return MIPSRegister::zero;
+        }
     }
 
     explicit constexpr MIPSInstrDecoder(uint32 raw) noexcept
