@@ -32,10 +32,9 @@ extern "C"
     }
 }
 
-TEST_CASE( "CEN64Memory: nullptr and dump" )
+TEST_CASE( "CEN64Memory: nullptr" )
 {
     auto cen64_memory = create_cen64_memory( nullptr);
-    CHECK (cen64_memory->dump() == "");
 }
 
 /*
