@@ -5,12 +5,12 @@
  
 #include <catch.hpp>
 
-#include "../cen64_memory.h"
 #include "../../t/check_coherency.h"
+#include "../cen64_memory.h"
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 
-// The idea is mock CEN64 using our casual FuncMemory implementation
+// Mock CEN64 with our casual FuncMemory implementation
 struct bus_controller
 {
     bus_controller() : memory( FuncMemory::create_hierarchied_memory()) {}
@@ -34,7 +34,7 @@ extern "C"
 
 TEST_CASE( "CEN64Memory: nullptr" )
 {
-    auto cen64_memory = create_cen64_memory( nullptr);
+    CHECK_NOTHROW( create_cen64_memory( nullptr) );
 }
 
 /*
