@@ -5,11 +5,9 @@
  */
 
 #include "cen64_intf.h"
-#include <memory/memory.h>
+#include <memory/cen64/cen64_memory.h>
 #include <mips/mips.h>
 #include <modules/core/perf_sim.h>
-
-extern std::shared_ptr<FuncMemory> generate_cen64_memory( bus_controller* bus_ptr);
 
 static const constexpr uint64 MI_REGS_BASE_ADDRESS = 0x04300000;
 
@@ -33,7 +31,7 @@ struct vr4300 : private PerfSim<MIPS64>
 
     int init( struct bus_controller* bus_ptr)
     {
-        set_memory( generate_cen64_memory( bus_ptr));
+        set_memory( create_cen64_memory( bus_ptr));
         set_pc( 0x1fc00000ull);
         mi_regs[MI_VERSION_REG] = 0x01010101u;
         mi_regs[MI_INIT_MODE_REG] = 0x80u;
