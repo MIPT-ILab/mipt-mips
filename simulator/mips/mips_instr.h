@@ -182,8 +182,6 @@ class BaseMIPSInstr
                 v_src2 = value;
         }
 
-        void set_shamt(uint16 val) { shamt = val; }
-
         auto get_v_dst()  const { return v_dst; }
         auto get_v_dst2() const { return v_dst2; }
         auto get_mask()  const { return mask;  }
