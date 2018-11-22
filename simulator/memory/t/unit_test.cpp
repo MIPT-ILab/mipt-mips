@@ -253,6 +253,8 @@ TEST_CASE( "Func_memory: Plain Memory")
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2);
+
+    CHECK( mem1->dump() == mem2->dump());
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
 
@@ -263,5 +265,7 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2);
+
+    CHECK( mem1->dump() == mem2->dump());
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
