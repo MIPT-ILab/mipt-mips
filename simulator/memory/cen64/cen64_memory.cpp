@@ -22,16 +22,26 @@ int bus_write_word(bus_controller *bus, uint32_t address, uint32_t word, uint32_
 class CEN64Memory : public FuncMemory
 {
 public:
-    explicit CEN64Memory(bus_controller* value) { bus = value; }
+    explicit CEN64Memory(bus_controller* value) : bus( value) { }
 
-    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
-    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
+    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final
+    {
+        return copy_by_words( dst, src, size);
+    }
+
+    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
+    {
+        return copy_by_words( dst, src, size);
+    }
+
     std::string dump() const final { assert(0); return {}; }
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { assert(0); }
-private:
-    bus_controller* bus = nullptr;
 
-    size_t memcpy_guest_to_host_word( Byte* dst, Addr src, size_t size = 4) const noexcept {
+private:
+    bus_controller* const bus = nullptr;
+
+    size_t copy_word( Byte* dst, Addr src, size_t size) const noexcept
+    {
         uint32 val;
         size_t result = bus_read_word( bus, src, &val);
         auto tmp = unpack_array<uint32, Endian::big>( val);
@@ -39,36 +49,30 @@ private:
         return result;
     }
 
-    size_t memcpy_host_to_guest_word( Addr dst, const Byte* src, size_t size = 4) const {
+    size_t copy_word( Addr dst, const Byte* src, size_t size) const noexcept
+    {
         std::array<Byte, 4> tmp{};
         std::copy(src, src + size, tmp.begin()); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        return bus_write_word( bus, dst, pack_array<uint32, Endian::big>( tmp), bitmask<uint32>(size * CHAR_BIT));
+        uint32 dqm = swap_endian( bitmask<uint32>( size * CHAR_BIT));
+        return bus_write_word( bus, dst, pack_array<uint32, Endian::big>( tmp), dqm);
+    }
+
+    template<typename D, typename S>
+    size_t copy_by_words(D dst, S src, size_t size) const noexcept
+    {
+        static const constexpr size_t word_size = bytewidth<uint32>;
+        size_t result = 0;
+        size_t remainder = size % word_size;
+
+        if ( remainder != 0)
+            result += copy_word(dst, src, remainder); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+        for ( size_t i = remainder; i < size; i += word_size)
+            result += copy_word(dst + i, src + i, word_size); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+        return result;
     }
 };
-
-size_t CEN64Memory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept
-{
-    size_t result = 0;
-    for (size_t i = 0; i < size; i += 4) // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        result += memcpy_guest_to_host_word(dst + i, src + i);
-
-    size_t remainder = size % 4;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    result += memcpy_guest_to_host_word(dst + size - remainder, src + size - remainder, remainder);
-    return result;
-}
-
-size_t CEN64Memory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
-{
-    size_t result = 0;
-    for (size_t i = 0; i < size; i += 4) // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        result += memcpy_host_to_guest_word(dst + i, src + i);
-
-    size_t remainder = size % 4;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    result += memcpy_host_to_guest_word(dst + size - remainder, src + size - remainder, remainder);
-    return result;
-}
 
 std::shared_ptr<FuncMemory> create_cen64_memory( bus_controller * bus_ptr)
 {
