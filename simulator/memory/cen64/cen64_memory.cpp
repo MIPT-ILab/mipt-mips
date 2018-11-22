@@ -10,7 +10,7 @@
 #include <cassert>
 #include <memory>
 
-struct bus_controller;
+#include "cen64_memory.h"
  
 extern "C" {
     
@@ -70,7 +70,7 @@ size_t CEN64Memory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size
     return result;
 }
 
-std::shared_ptr<FuncMemory> generate_cen64_memory( bus_controller * bus_ptr)
+std::shared_ptr<FuncMemory> create_cen64_memory( bus_controller * bus_ptr)
 {
     return std::make_shared<CEN64Memory>( bus_ptr);
 }
