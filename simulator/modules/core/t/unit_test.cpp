@@ -66,13 +66,13 @@ TEST_CASE( "Perf_Sim: Register size")
 template<typename ISA>
 auto get_simulator_with_test(std::string test)
 {
-    auto sim = std::make_shared<PerfSim<ISA>>();
+    auto sim = std::make_shared<PerfSim<ISA>>( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
 
     ElfLoader elf( test);
     elf.load_to( mem.get());
-    sim->init_checker()
+    sim->init_checker();
     sim->set_pc( elf.get_startPC());
     return sim;
 }
