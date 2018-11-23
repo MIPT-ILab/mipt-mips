@@ -130,7 +130,7 @@ auto get_simulator_with_test(std::string test)
 
     ElfLoader elf( test);
     elf.load_to( mem.get());
-    sim->set_pc( elfCoreUniversal.get_startPC());
+    sim->set_pc( elf.get_startPC());
     return sim;
 }
 
