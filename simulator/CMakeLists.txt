@@ -75,7 +75,7 @@ if (ENABLE_COVERAGE)
     if (NOT CMAKE_COMPILER_IS_GNUCXX)
         message(FATAL_ERROR "CodeCov is supported only for GCC builds")
     endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -DNDEBUG")
 endif()
 
 if (ENABLE_PROFILE)
