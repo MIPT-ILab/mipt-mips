@@ -63,72 +63,12 @@ TEST_CASE( "Perf_Sim: Register size")
     CHECK( PerfSim<MIPS64>( false).sizeof_register() == bytewidth<uint64>);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 32, Core Universal")
-{
-    PerfSim<MIPS32> sim( false);
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim.set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core.universal.out");
-    elf.load_to( mem.get());
-    sim.init_checker();
-    sim.set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim.run_no_limit() );
-}
-
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 32, Core 32")
-{
-    PerfSim<MIPS32> sim( false);
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim.set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core32.out");
-    elf.load_to( mem.get());
-    sim.init_checker();
-    sim.set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim.run_no_limit() );
-}
-
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 32, Core 32 LE")
-{
-    PerfSim<MIPS32> sim( false);
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim.set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core32.le.out");
-    elf.load_to( mem.get());
-    sim.init_checker();
-    sim.set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim.run_no_limit() );
-}
-
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core Universal")
-{
-    PerfSim<MIPS64> sim( false);
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim.set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core.universal.out");
-    elf.load_to( mem.get());
-    sim.init_checker();
-    sim.set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim.run_no_limit() );
-}
-
 TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64")
 {
     PerfSim<MIPS64> sim( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim.set_memory( mem);
     ElfLoader elf( TEST_PATH "/tt.core64.out");
-    elf.load_to( mem.get());
-    sim.init_checker();
-    sim.set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim.run_no_limit() );
-}
-
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64 LE")
-{
-    PerfSim<MIPS64> sim( false);
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim.set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core64.le.out");
     elf.load_to( mem.get());
     sim.init_checker();
     sim.set_pc( elf.get_startPC());
