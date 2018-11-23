@@ -54,6 +54,7 @@ MIPT | Name | Score | Comments
 **718** | **Andrey Agrachev** | **3** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465)** |
 **714** | **Yauheni Sharamed** | **3** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599)**
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
+**717** | **Ivan Startsev** | **2** | **[#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)** |
 **717** | **Arsen Davtyan** | **2** | **[#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)** |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 **717** | **Vsevolod Pukhov** | **1** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)** |
