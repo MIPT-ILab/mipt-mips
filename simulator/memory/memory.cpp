@@ -10,7 +10,18 @@
 
 std::string ReadableMemory::read_string( Addr addr) const
 {
-    std::vector<char> tmp( strlen( addr));
+    return read_string_by_size( addr, strlen( addr));
+}
+
+std::string ReadableMemory::read_string_limited( Addr addr, size_t size) const
+{
+    auto length = std::min<size_t>( size, strlen( addr));
+    return read_string_by_size( addr, length);
+}
+
+std::string ReadableMemory::read_string_by_size( Addr addr, size_t size) const
+{
+    std::vector<char> tmp( size);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Cast from characters
     memcpy_guest_to_host( reinterpret_cast<Byte*>( tmp.data()), addr, tmp.size());
     return std::string( tmp.begin(), tmp.end());

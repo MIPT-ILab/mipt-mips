@@ -56,11 +56,14 @@ public:
     virtual std::string dump() const = 0;
     virtual size_t strlen( Addr addr) const = 0;
     std::string read_string( Addr addr) const;
+    std::string read_string_limited( Addr addr, size_t size) const;
 
     template<typename T, Endian endian> T read( Addr addr) const noexcept;
     template<typename T, Endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
+private:
+    std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
 template<typename T, Endian endian>

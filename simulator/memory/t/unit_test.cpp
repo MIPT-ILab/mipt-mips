@@ -299,6 +299,8 @@ TEST_CASE( "Func_memory: String length")
     CHECK( mem->strlen( 0x12) == 10);
     CHECK( mem->read_string( 0x10) == "Hello World!");
     CHECK( mem->read_string( 0x12) == "llo World!");
+    CHECK( mem->read_string_limited( 0x10, 50) == "Hello World!");
+    CHECK( mem->read_string_limited( 0x10, 5) == "Hello");
 }
 
 TEST_CASE( "Func_memory: String length, plain memory")
