@@ -5,11 +5,35 @@
  */
 
 #include "mars_kernel.h"
-/* Generic C++ */
+
+#include <fstream>
 #include <string>
 
-static const uint8 v0 = 2;
-static const uint8 a0 = 4;
+class MARSKernel : public Kernel {
+    void print_integer();
+    void read_integer();
+    void print_character();
+    void read_character();
+
+    std::istream& instream;
+    std::ostream& outstream;
+    std::ostream& errstream;
+
+public:
+    bool execute() final;
+
+    MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
+      : instream( instream), outstream( outstream), errstream( errstream) {}
+};
+
+std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream) {
+    return std::make_shared<MARSKernel>( instream, outstream, errstream);
+}
+
+static const constexpr uint8 v0 = 2;
+static const constexpr uint8 a0 = 4;
+static const constexpr uint8 a1 = 5;
+static const constexpr uint8 a2 = 6;
 
 bool MARSKernel::execute () {
     uint64 syscall_code = sim.lock()->read_cpu_register( v0);

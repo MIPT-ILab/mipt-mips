@@ -6,19 +6,23 @@
 
 #include "kernel.h"
 #include "mars/mars_kernel.h"
-/* Simulator modules. */
+
 #include <infra/config/config.h>
 
 namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
 } // namespace config
 
-std::shared_ptr<Kernel> Kernel::create_kernel( bool use_mars, std::istream& instream, std::ostream& outstream) {
-    if (use_mars)
-        return std::make_shared<MARSKernel>( instream, outstream);
-    return std::make_shared<Kernel>();
+class DummyKernel : public Kernel
+{
+public:
+    bool execute() final { return true; }
+};
+
+std::shared_ptr<Kernel> Kernel::create_dummy_kernel() {
+    return std::make_shared<DummyKernel>();
 }
 
 std::shared_ptr<Kernel> Kernel::create_configured_kernel() {
-    return create_kernel( config::use_mars);
+    return config::use_mars ? create_mars_kernel() : Kernel::create_dummy_kernel();
 }
