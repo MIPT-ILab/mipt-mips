@@ -9,7 +9,7 @@
 #include <elfio/elfio.hpp>
 #include <memory/memory.h>
 
-static void load_elf_section( FuncMemory* memory, const ELFIO::section& section, AddrDiff offset)
+static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
     auto src = reinterpret_cast<const Byte*>( section.get_data ());
@@ -24,7 +24,7 @@ ElfLoader::ElfLoader( const std::string& filename, AddrDiff offset)
         throw InvalidElfFile( filename);
 }
 
-void ElfLoader::load_to( FuncMemory *memory) const
+void ElfLoader::load_to( WriteableMemory *memory) const
 {
     for ( const auto& section : reader->sections)
         if ( section->get_address() != 0)

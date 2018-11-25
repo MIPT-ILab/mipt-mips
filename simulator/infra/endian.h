@@ -30,7 +30,7 @@ enum class Endian
 template<typename T>
 static inline constexpr T pack_array_le( std::array<Byte, bytewidth<T>> array) noexcept
 {
-    T value = 0;
+    T value{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         value |= unsign_t<T>( uint8( array[i])) << (i * CHAR_BIT);
 
@@ -40,7 +40,7 @@ static inline constexpr T pack_array_le( std::array<Byte, bytewidth<T>> array) n
 template<typename T>
 static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) noexcept
 {
-    T value = 0;
+    T value{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         value |= unsign_t<T>( uint8( array[i])) << ((array.size() - i - 1) * CHAR_BIT);
 

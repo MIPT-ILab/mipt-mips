@@ -20,7 +20,7 @@ struct InvalidElfFile final : Exception
     { }
 };
 
-class FuncMemory;
+class WriteableMemory;
 
 namespace ELFIO {
     class elfio;
@@ -38,7 +38,7 @@ public:
     ElfLoader& operator=( const ElfLoader&) = delete;
     ElfLoader& operator=( ElfLoader&&) = delete;
 
-    void load_to( FuncMemory *memory) const;
+    void load_to( WriteableMemory *memory) const;
     Addr get_startPC() const;
 private:
     const std::unique_ptr<ELFIO::elfio> reader;

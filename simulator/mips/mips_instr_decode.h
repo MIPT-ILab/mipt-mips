@@ -7,8 +7,8 @@
 #ifndef MIPS_INSTR_DECODE_H
 #define MIPS_INSTR_DECODE_H
 
-#include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/types.h>
 
 #include "mips_register/mips_register.h"
 
