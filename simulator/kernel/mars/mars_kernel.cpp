@@ -15,6 +15,7 @@ class MARSKernel : public Kernel {
     void print_character();
     void read_character();
     void print_string();
+    void read_string();
 
     std::istream& instream;
     std::ostream& outstream;
@@ -33,6 +34,7 @@ std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream, std::ostream
 
 static const constexpr uint8 v0 = 2;
 static const constexpr uint8 a0 = 4;
+static const constexpr uint8 a1 = 5;
 
 bool MARSKernel::execute () {
     (void)errstream; // w/a for Clang warning
@@ -41,6 +43,7 @@ bool MARSKernel::execute () {
         case 1: print_integer(); break;
         case 4: print_string (); break;
         case 5: read_integer (); break;
+        case 8: read_string(); break;
         case 10: return false; // exit
         case 11: print_character(); break;
         case 12: read_character(); break;
@@ -89,3 +92,15 @@ void MARSKernel::read_character() {
 void MARSKernel::print_string() {
     outstream << mem->read_string( sim.lock()->read_cpu_register( a0));
 }
+
+void MARSKernel::read_string() {
+    auto cpu = sim.lock();
+    uint64 buffer_ptr = cpu->read_cpu_register( a0);
+    uint64 chars_to_read = cpu->read_cpu_register( a1);
+
+    std::string input;
+    instream >> input;
+
+    mem->write_string_limited( input, buffer_ptr, chars_to_read);
+}
+

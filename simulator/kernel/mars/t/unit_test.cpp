@@ -13,6 +13,7 @@
 
 static const uint8 v0 = 2;
 static const uint8 a0 = 4;
+static const uint8 a1 = 5;
 
 TEST_CASE( "MARS: construct kernel") {
     CHECK_NOTHROW( create_mars_kernel());
@@ -66,6 +67,23 @@ TEST_CASE( "MARS: read bad integer") {
 
     sim->write_cpu_register( v0, 5u); // read integer
     CHECK_THROWS_AS( mars_kernel->execute(), BadInputValue);
+}
+
+TEST_CASE( "MARS: read string")
+{
+    std::istringstream input( "Hello World\n");
+    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto mars_kernel = create_mars_kernel( input);
+    mars_kernel->set_simulator( sim);
+    auto mem = FuncMemory::create_plain_memory( 24);
+    sim->set_memory( mem);
+    mars_kernel->set_memory( mem);
+
+    sim->write_cpu_register( v0, 8u); // read string
+    sim->write_cpu_register( a0, 0x1000u);
+    sim->write_cpu_register( a1, 0x5);
+    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mem->read_string(0x1000u) == "Hello");
 }
 
 TEST_CASE( "MARS: exit") {

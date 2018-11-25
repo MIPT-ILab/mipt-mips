@@ -116,6 +116,9 @@ public:
     }
 
     void write_string( const std::string& value, Addr addr);
+    void write_string_limited( const std::string& value, Addr addr, size_t size);
+private:
+    void write_string_by_size( const std::string& value, Addr addr, size_t size);
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually

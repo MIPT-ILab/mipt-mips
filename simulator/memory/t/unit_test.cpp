@@ -313,10 +313,16 @@ TEST_CASE( "Func_memory: String length, plain memory")
     CHECK( mem->strlen( 0x10) == 12);
 }
 
-
 TEST_CASE( "Func_memory: Write string")
 {
     auto mem = FuncMemory::create_plain_memory();
     mem->write_string( "MIPT-MIPS is cool", 0x20); 
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS is cool");
+}
+
+TEST_CASE( "Func_memory: Write string limited")
+{
+    auto mem = FuncMemory::create_plain_memory();
+    mem->write_string_limited( "MIPT-MIPS is cool", 0x20, 9);
+    CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
 }
