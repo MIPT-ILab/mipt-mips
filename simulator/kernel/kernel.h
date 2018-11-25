@@ -19,6 +19,16 @@ struct BadInputValue final : Exception {
     BadInputValue() : Exception( "Bad input value") {}
 };
 
+struct SyscallResult {
+    enum {
+        HALT,
+        UNSUPPORTED,
+        SUCCESS,
+        IGNORED,
+    } type;
+    uint64 code;
+};
+
 class Kernel {
 protected:
     std::weak_ptr<Simulator> sim;
@@ -29,8 +39,8 @@ public:
 
     void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
-    /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
-    virtual bool execute() = 0;
+
+    virtual SyscallResult execute() = 0;
 
     Kernel() = default;
     virtual ~Kernel() = default;

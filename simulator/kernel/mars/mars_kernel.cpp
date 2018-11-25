@@ -22,7 +22,7 @@ class MARSKernel : public Kernel {
     std::ostream& errstream;
 
 public:
-    bool execute() final;
+    SyscallResult execute() final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
       : instream( instream), outstream( outstream), errstream( errstream) {}
@@ -36,23 +36,21 @@ static const constexpr uint8 v0 = 2;
 static const constexpr uint8 a0 = 4;
 static const constexpr uint8 a1 = 5;
 
-bool MARSKernel::execute () {
-    (void)errstream; // w/a for Clang warning
+SyscallResult MARSKernel::execute () {
+    auto cpu = sim.lock();
     uint64 syscall_code = sim.lock()->read_cpu_register( v0);
     switch (syscall_code) {
         case 1: print_integer(); break;
         case 4: print_string (); break;
         case 5: read_integer (); break;
         case 8: read_string(); break;
-        case 10: return false; // exit
+        case 10: return { SyscallResult::HALT, 0};
         case 11: print_character(); break;
         case 12: read_character(); break;
-        default: break;
-#if 0 // Temporarily, as some traces have unimplemented syscalls
-            throw Exception( "Syscall " + std::to_string( syscall_code) + " not implemented yet");
-#endif
+        case 17: return { SyscallResult::HALT, cpu->read_cpu_register( a0)};
+        default: return { SyscallResult::UNSUPPORTED, 0};
     }
-    return true;
+    return { SyscallResult::SUCCESS, 0};
 }
 
 void MARSKernel::print_integer() {

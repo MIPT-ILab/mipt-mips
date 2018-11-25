@@ -10,7 +10,7 @@
 
 TEST_CASE( "Kernel: Execute nothing")
 {
-    CHECK( Kernel::create_dummy_kernel()->execute());
+    CHECK( Kernel::create_dummy_kernel()->execute().type == SyscallResult::SUCCESS);
 }
 
 TEST_CASE( "Kernel: Default kernel is empty")

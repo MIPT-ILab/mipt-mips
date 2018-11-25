@@ -39,6 +39,7 @@ class FuncSim : public Simulator
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
+        Trap handle_syscall();
 
     public:
         explicit FuncSim( bool log = false);

@@ -7,7 +7,7 @@
 #include <kernel/kernel.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), kernel( Kernel::create_dummy_kernel()) { }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -64,22 +64,32 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
+Trap FuncSim<ISA>::handle_syscall()
+{
+    auto result = kernel->execute();
+    switch ( result.type) {
+    case SyscallResult::HALT:        exit_code = result.code; return Trap::HALT;
+    case SyscallResult::IGNORED:     return Trap::SYSCALL;
+    case SyscallResult::SUCCESS:     return Trap::NO_TRAP;
+    case SyscallResult::UNSUPPORTED: return Trap::UNSUPPORTED_SYSCALL;
+    default: assert( 0);
+    }
+    return Trap::NO_TRAP;
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
-
-        switch ( instr.trap_type()) {
-            case Trap::HALT:
-                return Trap::HALT;
-            case Trap::SYSCALL:
-                if ( kernel.get() && !kernel->execute())
-                    return Trap::SYSCALL;
-                break;
-            default: break;
-        }
+        auto trap = instr.trap_type();
+        if ( instr.is_syscall())
+            trap = handle_syscall();
+        
+        if ( trap == Trap::HALT)
+            return Trap::HALT;
     }
     return Trap::NO_TRAP;
 }
