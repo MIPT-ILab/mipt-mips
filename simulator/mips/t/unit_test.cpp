@@ -1511,11 +1511,11 @@ TEST_CASE( "MIPS32_instr: sllv 1 by 1")
 
 // Bug-test (#709)
 /* ***********************************
-TEST_CASE( "MIPS32_instr: sllv 1 by 64 + 8 (shift-variable overflow)")
+TEST_CASE( "MIPS32_instr: sllv 1 by 32 + 8 (shift-variable overflow)")
 {
     MIPS32Instr instr( "sllv");
     instr.set_v_src( 1, 0);
-    instr.set_v_src( 64 + 8, 1);
+    instr.set_v_src( 32 + 8, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x100);
 }
@@ -1842,11 +1842,11 @@ TEST_CASE( "MIPS64_instr: srav 0xff000000 by 4")
 
 // Bug-test (#709)
 /* ***********************************
-TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 64 (shift-variable overflow)")
+TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 32 (shift-variable overflow)")
 {
     MIPS64Instr instr( "srav");
     instr.set_v_src( 0xffff0000, 0);
-    instr.set_v_src( 64, 1);
+    instr.set_v_src( 32, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff0000);
 }
@@ -1932,11 +1932,11 @@ TEST_CASE( "MIPS32_instr: srlv 0xaaa00000 by 4")
 
 // Bug-test (#709)
 /* ***********************************
-TEST_CASE( "MIPS32_instr: srlv 1 by 64 (shift-variable overflow)")
+TEST_CASE( "MIPS32_instr: srlv 1 by 32 (shift-variable overflow)")
 {
     MIPS32Instr instr( "srlv");
     instr.set_v_src( 1, 0);
-    instr.set_v_src( 64, 1);
+    instr.set_v_src( 32, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
