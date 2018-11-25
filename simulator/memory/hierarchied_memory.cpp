@@ -101,13 +101,13 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
 
 size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    if (size > addr_mask)
+    if (size > addr_mask + 1)
         throw FuncMemoryOutOfRange( dst + size, addr_mask);
     
-    if (dst > addr_mask)
+    if (dst > addr_mask + 1)
         throw FuncMemoryOutOfRange( dst, addr_mask);
 
-    if (dst > addr_mask - size)
+    if (dst > addr_mask + 1 - size)
         throw FuncMemoryOutOfRange( dst, addr_mask);
 
     size_t offset = 0;

@@ -121,7 +121,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
 }
 
 template<typename ISA>
-auto get_simulator_with_test(std::string test)
+auto get_simulator_with_test( const std::string& test)
 {
     // MIPS 32 Little-endian
     auto sim = std::make_shared<FuncSim<ISA>>();
