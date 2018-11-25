@@ -64,14 +64,19 @@ void MARSKernel::read_integer() {
     instream >> input;
     uint64 value = 0;
     size_t pos = 0;
+
     try {
         value = narrow_cast<uint64>( std::stoll( input, &pos, 0));
     }
-    catch (...) {
-        throw BadInputValue();
+    catch ( const std::invalid_argument& e) {
+        throw BadInputValue( std::string("No conversion could be performed: ") + e.what());
     }
-    if (pos != input.length())
-        throw BadInputValue();
+    catch ( const std::out_of_range& e) {
+        throw BadInputValue( std::string( "Out of range value: ") + e.what());
+    }
+
+    if ( pos != input.length())
+        throw BadInputValue( "Unknown error.");
     sim.lock()->write_cpu_register( v0, value);
 }
 
@@ -84,7 +89,7 @@ void MARSKernel::read_character() {
     std::string input;
     instream >> input;
     if (input.length() != 1)
-        throw BadInputValue();
+        throw BadInputValue( "More than one character is entered");
     sim.lock()->write_cpu_register( v0, narrow_cast<uint64>( input.at(0)));
 }
 
