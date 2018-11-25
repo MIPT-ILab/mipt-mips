@@ -16,7 +16,7 @@
 #include <memory>
 
 struct BadInputValue final : Exception {
-    BadInputValue() : Exception( "Bad input value") {}
+    explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
 };
 
 struct SyscallResult {

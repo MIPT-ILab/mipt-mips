@@ -63,10 +63,22 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     return instr;
 }
 
+static SyscallResult execute_syscall( Kernel* kernel)
+{
+    do try {
+        return kernel->execute();
+    }
+    catch (const BadInputValue& e) {
+        std::cerr << e.what();
+    } while (true);
+
+    return {SyscallResult::UNSUPPORTED, 0};
+}
+
 template <typename ISA>
 Trap FuncSim<ISA>::handle_syscall()
 {
-    auto result = kernel->execute();
+    auto result = execute_syscall( kernel.get());
     switch ( result.type) {
     case SyscallResult::HALT:        exit_code = result.code; return Trap::HALT;
     case SyscallResult::IGNORED:     return Trap::SYSCALL;
