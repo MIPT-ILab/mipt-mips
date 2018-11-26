@@ -16,7 +16,7 @@ struct bus_controller;
 struct CEN64MemoryUnsupportedInterface : Exception
 {
     explicit CEN64MemoryUnsupportedInterface( const std::string& msg)
-        : Exception( "CEN64 interface is not supported")
+        : Exception( "CEN64 interface is not supported", msg)
     { }
 };
 
