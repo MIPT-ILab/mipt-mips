@@ -44,7 +44,7 @@ public:
         throw CEN64MemoryUnsupportedInterface("duplication");
     }
 
-    size_t strlen( Addr addr) const final
+    size_t strlen( Addr /* addr */) const final
     {
         throw CEN64MemoryUnsupportedInterface("string output");
     }
