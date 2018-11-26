@@ -34,8 +34,15 @@ public:
         return copy_by_words( dst, src, size);
     }
 
-    std::string dump() const final { assert(0); return {}; }
-    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { assert(0); }
+    std::string dump() const final
+    {
+        throw CEN64MemoryUnsupportedInterface("dump");
+    }
+
+    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final
+    {
+        throw CEN64MemoryUnsupportedInterface("duplication");
+    }
 
 private:
     bus_controller* const bus = nullptr;

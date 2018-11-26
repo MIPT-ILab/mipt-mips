@@ -9,8 +9,17 @@
  
 #include "../memory.h"
 
+#include <infra/exception.h>
+
 struct bus_controller;
- 
+
+struct CEN64MemoryUnsupportedInterface : Exception
+{
+    explicit CEN64MemoryUnsupportedInterface( const std::string& msg)
+        : Exception( "CEN64 interface is not supported")
+    { }
+};
+
 std::shared_ptr<FuncMemory> create_cen64_memory( bus_controller * bus_ptr);
 
 #endif
