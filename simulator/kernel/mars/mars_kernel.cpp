@@ -15,6 +15,7 @@ bool MARSKernel::execute () {
     uint64 syscall_code = sim.lock()->read_cpu_register( v0);
     switch (syscall_code) {
         case 1: print_integer(); break;
+        case 4: print_string (); break;
         case 5: read_integer (); break;
         case 10: return false; // exit
         case 11: print_character(); break;
@@ -59,4 +60,8 @@ void MARSKernel::read_character() {
     if (input.length() != 1)
         throw BadInputValue();
     sim.lock()->write_cpu_register( v0, narrow_cast<uint64>( input.at(0)));
+}
+
+void MARSKernel::print_string() {
+    outstream << mem->read_string( sim.lock()->read_cpu_register( a0));
 }

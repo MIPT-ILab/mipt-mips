@@ -14,6 +14,7 @@ class MARSKernel : public Kernel {
     void read_integer();
     void print_character();
     void read_character();
+    void print_string();
 
     std::istream& instream;
     std::ostream& outstream;
