@@ -157,7 +157,7 @@ void Fetch<ISA>::clock( Cycle cycle)
     wp_hold_pc->write( target, cycle);
 
     Instr instr( memory.fetch_instr( target.address), bp->get_bp_info( target.address));
-    instr.set_sequence_id( target.sequence_id);
+    instr.sequence_id = target.sequence_id;
 
     /* set next target according to prediction */
     wp_target->write( instr.get_predicted_target(), cycle);

@@ -35,8 +35,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     FuncInstr instr = imem.fetch_instr( PC);
 
     // set sequence_id
-    instr.set_sequence_id(sequence_id);
-    sequence_id++;
+    instr.sequence_id = sequence_id++;
 
     // read sources
     rf.read_sources( &instr);
@@ -54,7 +53,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     instr.check_trap();
 
     // PC update
-    PC = instr.get_new_PC();
+    PC = instr.new_PC;
 
     // Check whether we execute nops
     update_and_check_nop_counter( instr);

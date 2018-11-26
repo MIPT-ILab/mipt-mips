@@ -386,19 +386,17 @@ const MIPSTableEntry<I>& get_table_entry( std::string_view str_opcode)
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
-    raw( bytes),
-    new_PC( PC + 4),
-    PC( PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC)
+    : Instr<MIPSRegister, R>( PC)
+    , raw( bytes)
 {
     init( get_table_entry<BaseMIPSInstr<R>>( raw), version);
 }
 
 template<typename R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
-    : raw( 0)
-    , new_PC( PC + 4)
-    , PC( PC)
+    : Instr<MIPSRegister, R>( PC)
+    , raw( 0)
 {
     init( get_table_entry<BaseMIPSInstr<R>>( str_opcode), version);
 }
@@ -407,15 +405,16 @@ template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPSVersion version)
 {
     MIPSInstrDecoder instr( raw);
-    operation = entry.operation;
-    mem_size  = entry.mem_size;
-    executor  = entry.versions.is_supported(version) ? entry.function : unknown_mips_instruction<BaseMIPSInstr<R>>;
-    v_imm     = instr.get_immediate( entry.immediate_type);
-    src1      = instr.get_register( entry.src1);
-    src2      = instr.get_register( entry.src2);
-    dst       = instr.get_register( entry.dst);
-    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi : MIPSRegister::zero;
-    disasm    = generate_disasm( entry);
+    this->new_PC    = PC + 4;
+    this->operation = entry.operation;
+    this->mem_size  = entry.mem_size;
+    this->executor  = entry.versions.is_supported(version) ? entry.function : unknown_mips_instruction<BaseMIPSInstr<R>>;
+    this->v_imm     = instr.get_immediate( entry.immediate_type);
+    this->src1      = instr.get_register( entry.src1);
+    this->src2      = instr.get_register( entry.src2);
+    this->dst       = instr.get_register( entry.dst);
+    this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi : MIPSRegister::zero;
+    this->disasm    = generate_disasm( entry);
 }
 
 static std::string print_immediate( Imm type, uint32 value)
