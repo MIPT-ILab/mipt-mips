@@ -4,12 +4,29 @@
 #include <sstream>
 
 template <typename ISA>
-Writeback<ISA>::Writeback(bool log) : Log( log), checker( false)
+Writeback<ISA>::Writeback(bool log) : Log( log)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
     wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW, PORT_FANOUT);
+}
+
+template <typename ISA>
+void Writeback<ISA>::Checker::init( const FuncMemory& outer_mem)
+{
+    auto memory = FuncMemory::create_hierarchied_memory();
+    sim = std::make_shared<FuncSim<ISA>>();
+    outer_mem.duplicate_to( memory);
+    sim->set_memory( std::move( memory));
+    active = true;
+}
+
+template <typename ISA>
+void Writeback<ISA>::Checker::set_target( const Target& value)
+{
+    if (active)
+        sim->set_target( value);
 }
 
 template <typename ISA>
@@ -47,7 +64,7 @@ void Writeback<ISA>::clock( Cycle cycle)
     sout << instr << std::endl;
 
     /* perform checks */
-    check( instr);
+    checker.check( instr);
 
     /* update simulator cycles info */
     ++executed_instrs;
@@ -60,9 +77,12 @@ void Writeback<ISA>::clock( Cycle cycle)
 }
 
 template <typename ISA>
-void Writeback<ISA>::check( const FuncInstr& instr)
+void Writeback<ISA>::Checker::check( const FuncInstr& instr)
 {
-    const auto func_dump = checker.step();
+    if (!active)
+        return;
+
+    const auto func_dump = sim->step();
 
     if ( func_dump.is_same_checker(instr))
         return;

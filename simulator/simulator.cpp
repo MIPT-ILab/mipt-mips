@@ -101,7 +101,7 @@ public:
     }
 };
     
-std::unique_ptr<Simulator>
+std::shared_ptr<Simulator>
 Simulator::create_simulator( const std::string& isa, bool functional_only, bool log)
 {
     if ( functional_only)
@@ -110,13 +110,13 @@ Simulator::create_simulator( const std::string& isa, bool functional_only, bool 
     return CycleAccurateSimulator::create_simulator( isa, log);
 }
 
-std::unique_ptr<Simulator>
+std::shared_ptr<Simulator>
 Simulator::create_configured_simulator()
 {
     return create_simulator( config::isa, config::functional_only, config::disassembly_on);
 }
 
-std::unique_ptr<CycleAccurateSimulator>
+std::shared_ptr<CycleAccurateSimulator>
 CycleAccurateSimulator::create_simulator( const std::string& isa, bool log)
 {
     return SimulatorFactory::get_instance().get_perfsim( isa, log);

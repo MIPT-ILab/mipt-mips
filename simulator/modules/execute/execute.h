@@ -39,7 +39,7 @@ class Execute : public Log
         std::unique_ptr<WritePort<Instr>> wp_writeback_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_long_latency_execution_unit = nullptr;
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
-        std::unique_ptr<WritePort<InstructionOutput>> wp_complex_arithmetic_bypass = nullptr;
+        std::unique_ptr<WritePort<InstructionOutput>> wp_long_arithmetic_bypass = nullptr;
 
         Latency flush_expiration_latency = 0_lt;
 

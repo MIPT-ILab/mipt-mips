@@ -26,12 +26,36 @@ template <typename ISA>
 class PerfSim : public CycleAccurateSimulator
 {
 public:
+    using Register = typename ISA::Register;
+    using RegisterUInt = typename ISA::RegisterUInt;
+
     explicit PerfSim( bool log);
-    ~PerfSim() final { destroy_ports(); }
-    void run( const std::string& tr, uint64 instrs_to_run) final;
+    ~PerfSim() override { destroy_ports(); }
+    Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
+    void set_memory( std::shared_ptr<FuncMemory> memory) final;
+    void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
     void clock() final;
     void halt() final { force_halt = true; }
+    void init_checker() final { writeback.init_checker( *memory); }
+
+    size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+
+    uint64 read_cpu_register( uint8 regno) const final {
+        return narrow_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
+    }
+
+    void write_cpu_register( uint8 regno, uint64 value) final {
+        rf.write( Register::from_cpu_index( regno), narrow_cast<RegisterUInt>( value));
+    }
+
+    uint64 read_cause_register() const {
+        return narrow_cast<uint64>( rf.read( Register::cause));
+    }
+
+    void write_cause_register( uint64 value) {
+        rf.write( Register::cause, narrow_cast<RegisterUInt>( value));
+    }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -41,15 +65,16 @@ public:
 private:
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using Memory = typename ISA::Memory;
 
     Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
-    bool force_halt = false;    
+    bool force_halt = false;
 
     /* simulator units */
     RF<ISA> rf;
-    std::unique_ptr<Memory> memory = nullptr;
+    std::shared_ptr<FuncMemory> memory;
+    std::shared_ptr<Kernel> kernel;
+
     Fetch<ISA> fetch;
     Decode<ISA> decode;
     Execute<ISA> execute;

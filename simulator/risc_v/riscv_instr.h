@@ -10,6 +10,8 @@
 #include "riscv_register/riscv_register.h"
 
 // MIPT-MIPS modules
+#include <func_sim/trap_types.h>
+#include <infra/endian.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
@@ -44,13 +46,18 @@ class RISCVInstr
         std::string disasm = {};
 
     public:
+        static const constexpr Endian endian = Endian::little;
         RISCVInstr() = delete;
 
         explicit
         RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC), new_PC( PC + 4) {};
 
+         bool is_same_bytes( uint32 bytes) const {
+            return bytes == instr;
+        }
+        
         bool is_same( const RISCVInstr& rhs) const {
-            return PC == rhs.PC && instr == rhs.instr;
+            return PC == rhs.PC && is_same_bytes( rhs.instr);
         }
 
         bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
@@ -81,6 +88,8 @@ class RISCVInstr
         constexpr bool is_special() const { return false; }
 
         constexpr bool has_trap() const { return false; }
+
+        Trap trap_type() const { return Trap::NO_TRAP; }
 
         constexpr bool get_writes_dst() const { return false; }
 

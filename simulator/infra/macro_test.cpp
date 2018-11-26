@@ -5,10 +5,14 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <infra/endian.h>
 #include <infra/macro.h>
 
-static char array[] = "Hello World!";
-static_assert(countof(array) == sizeof(array) / sizeof(char));
+static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
+static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
+
+static char hello_world[] = "Hello World!";
+static_assert(countof(hello_world) == sizeof(hello_world) / sizeof(char));
 
 static_assert(is_power_of_two(1u));
 static_assert(is_power_of_two(2u));
@@ -77,7 +81,7 @@ static_assert(popcount(MAX_VAL8) == 8);
 static_assert(popcount(MAX_VAL16) == 16);
 static_assert(popcount(MAX_VAL32) == 32);
 static_assert(popcount(~MAX_VAL32) == 0);
-static_assert(popcount(~static_cast<uint64>(MAX_VAL32)) == 0);
+static_assert(popcount(~narrow_cast<uint64>(MAX_VAL32)) == 0);
 */
 
 static_assert(bitmask<uint32>(1) == 1);
@@ -90,9 +94,37 @@ static_assert(count_leading_zeroes<uint64>(0xFF) == 56);
 static_assert(count_leading_zeroes<uint8>(0x0) == 8);
 static_assert(count_leading_zeroes<uint32>(0x0) == 32);
 static_assert(count_leading_zeroes<uint64>(0x0) == 64);
-static_assert(count_leading_zeroes<uint8>(static_cast<uint8>(0xFF)) == 0);
-static_assert(count_leading_zeroes<uint32>(~static_cast<uint32>(0)) == 0);
-static_assert(count_leading_zeroes<uint64>(~static_cast<uint64>(0)) == 0);
+static_assert(count_leading_zeroes<uint8>(uint8{ 0xFF}) == 0);
+static_assert(count_leading_zeroes<uint32>(~uint32{ 0}) == 0);
+static_assert(count_leading_zeroes<uint64>(~uint64{ 0}) == 0);
+
+static_assert(find_first_set<uint64>(0) == 64);
+static_assert(find_first_set<uint32>(0) == 32);
+static_assert(find_first_set<uint8>(0) == 8);
+static_assert(find_first_set<uint64>(1) == 0);
+static_assert(find_first_set<uint32>(1) == 0);
+static_assert(find_first_set<uint64>(all_ones<uint64>()) == 0);
+static_assert(find_first_set<uint64>(2) == 1);
+static_assert(find_first_set<uint64>(3) == 0);
+static_assert(find_first_set<uint64>(0xFFFF000) == 12);
+static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
+
+static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
+
+static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
+static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
+
+static_assert(pack_array_le<uint32>( test_array) == 0x12345678);
+static_assert(pack_array_be<uint32>( test_array) == 0x78563412);
+
+static_assert(unpack_array<uint32, Endian::little>( 0x12345678)[0] == test_array[0]);
+static_assert(unpack_array<uint32, Endian::big>( 0x12345678)[0] == test_array[3]);
+
+static_assert(pack_array<uint32, Endian::little>( test_array) == 0x12345678);
+static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
+
+static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
+static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);

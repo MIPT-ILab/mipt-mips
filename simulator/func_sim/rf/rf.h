@@ -22,15 +22,16 @@ class RF
 
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
-    auto& get_value( Register num) { return array.at( num.to_size_t()); }
-    const auto& get_value( Register num) const { return array.at( num.to_size_t()); }
+    auto& get_value( Register num) { return array.at( num.to_rf_index()); }
+    const auto& get_value( Register num) const { return array.at( num.to_rf_index()); }
 
     static uint32 get_carry( uint32 x, uint32 y, int8 accumulation)
     {
         return (accumulation == +1 && MAX_VAL32 - x < y) || (accumulation == -1 && x < y) ? 1 : 0;
     }
 
-protected:
+public:
+    RF() = default;
 
     const auto& read( Register num) const
     {
@@ -47,22 +48,19 @@ protected:
             const auto old_val = get_value( num);
             // Handle carry to HI register
             if ( num.is_mips_lo()) {
-                auto carry = get_carry( static_cast<uint32>( old_val), static_cast<uint32>( val), accumulation);
+                auto carry = get_carry( narrow_cast<uint32>( old_val), narrow_cast<uint32>( val), accumulation);
                 write( Register::mips_hi, carry, mask, accumulation);
             }
 
             if (accumulation == 1)
-                val = static_cast<uint32>(old_val) + static_cast<uint32>(val);
+                val = narrow_cast<uint32>(old_val) + narrow_cast<uint32>(val);
             else
-                val = static_cast<uint32>(old_val) - static_cast<uint32>(val);
+                val = narrow_cast<uint32>(old_val) - narrow_cast<uint32>(val);
         }
 
         get_value( num) &= ~mask;      // Clear old bits
         get_value( num) |= val & mask; // Set new bits
     }
-public:
-
-    RF() = default;
 
     inline void read_source( FuncInstr* instr, uint8 index) const
     {

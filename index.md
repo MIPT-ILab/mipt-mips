@@ -11,8 +11,14 @@ Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT buildin
 Date | Event name
 :----: | ----------------------------
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
-19 Sep | **Layers of Computer Science, ISA and uArch**<br/> • [Slides](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Layers%20of%20Computer%20Science.pptx?raw=true)
-02 Oct | **Combinational Circuits and CMOS implementation**<br/> • Slides<br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
+19 Sep | **Layers of Computer Science, ISA and uArch**<br/> • Slides: [L1](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Layers%20of%20Computer%20Science.pptx?raw=true)
+03 Oct | **CMOS and Combinational Circuits**<br/> • Slides: [L2 - CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Integrated%20Circuits%20Basics.pptx?raw=true), [L3 - Combinational Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Combinational%20Circuits.pptx?raw=true)  <br/> • [YouTube](https://youtu.be/zDldV01U5MQ) <br/> • Homework: Install [Logisim](http://www.cburch.com/logisim/index.html) and look inside [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and [CMOS](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/cmos.circ) examples.
+17 Oct | **Sequential Circuits**<br/> • Slides: [L4 - Sequential Circuits](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Sequential%20Circuits.pptx?raw=true) <br/> • [YouTube](https://youtu.be/SlFY1iJ-63Q) <br/> • Homework: Study implementation of [SR-latch](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/rs.circ), [T-latch counter](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/counter.circ) and [Mem array](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/array2x4.circ) with [Logisim](http://www.cburch.com/logisim/index.html). Refresh scheme of [ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu.circ) and look inside [Flip-flop ALU](https://github.com/MIPT-ILab/ca-lectures/blob/master/logisim/alu-filp-flop.circ).
+31 Oct | **Single-cycle implementation of MIPS/RISC-V CPU**<br/> • Slides: [L5 - Single-cycle MIPS/RISC-V](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%205%20-%20Single-cycle%20implementation%20of%20MIPS%20CPU.pptx?raw=true) <br/> • [YouTube](https://youtu.be/_okzQg7OxP0) <br/> • Homework: Read wiki's [MIPS section](https://github.com/MIPT-ILab/mipt-mips/wiki#mips). Recap single-cycle data path (foils 20-26). Get familiar with single-cycle model: [simulator](https://github.com/MIPT-ILab/mipt-mips/tree/master/simulator) & [wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Functional-Simulator). Study RISC-V [opened issues](https://github.com/MIPT-ILab/mipt-mips/issues?q=is:issue+is:open+sort:updated-asc+label:%22S1+%E2%80%94+ISA%22+no:assignee).
+14 Nov | **Pipeline**<br/> • Slides: [L6 - Pipelining](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%206%20-%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/QHj2fBxSpUU) <br/> • Homework: Walk through documentation on [performance simulator](https://github.com/MIPT-ILab/mipt-mips/wiki/Performance-simulator) and [ports concepts](https://github.com/MIPT-ILab/mipt-mips/wiki/Communication-between-modules-through-ports). Read original paper on [ASIM Perf Model Framework](http://www.ckluk.org/ck/papers/asim_ieeecomputer.pdf).
+28 Nov | **Branch prediction**
+12 Dec | **Advanced pipelining**
+19 Dec | **Final Test**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
@@ -22,33 +28,44 @@ You may find lectures of previous year [in our archive](https://github.com/MIPT-
 Date | Event name
 :----: | ----------------------------
 13 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Promotion.pptx?raw=true)
-26 Sep | **Version control system**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Introduction.%20Version%20Control%20System.pptx?raw=true), video<br/> • Homework: read our [our cheat sheet](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet) and contribute to members.md<br/> • Further reading: *Pro Git* ([Rus](https://git-scm.com/book/ru/v2), [Eng](https://git-scm.com/book/en/v2)), *Git Flight Rules* ([Rus](https://github.com/k88hudson/git-flight-rules/blob/master/README_ru.md), [Eng](https://github.com/k88hudson/git-flight-rules))
+26 Sep | **Version control system**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%201%20-%20Introduction.%20Version%20Control%20System.pptx?raw=true)<br/> • [YouTube](https://www.youtube.com/watch?v=HOeMi9dRD58)<br/> • Homework: read our [our cheat sheet](https://github.com/MIPT-ILab/mipt-mips/wiki/Git-&-GitHub-cheat-sheet) and contribute to members.md<br/> • Further reading: *Pro Git* ([Rus](https://git-scm.com/book/ru/v2), [Eng](https://git-scm.com/book/en/v2)), *Git Flight Rules* ([Rus](https://github.com/k88hudson/git-flight-rules/blob/master/README_ru.md), [Eng](https://github.com/k88hudson/git-flight-rules))
+10 Oct | **Build, Makefiles, and CMake**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%202%20-%20Build,%20Makefiles,%20CMake.pptx?raw=true)<br/> • [YouTube](https://youtu.be/2t_qkJ67nAE)<br/> • Homework: use Make or CMake to build your project, build MIPT-MIPS.
+24 Oct | **Continuous Integration**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Continious%20Integration.pptx?raw=true)<br/> • Homework: install Travis CI for your project to run your Make or CMake builds.
+07 Nov | **Code form**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Code%20Form.pptx?raw=true)
+21 Nov | **Unit testing**
+05 Dec | **Test-driven development**
 
 In addition, repository contains a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
 ## Students Contribution Score
 
 MIPT | Name | Score | Comments
-:----: |:----: | ------------------------------ | ------------------------------
+:----: |:---- | ------------------------------ | ------------------------------
 611 | Denis Los | 19 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31), [#20](https://github.com/MIPT-ILab/mipt-mips/issues/20) |
 618 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
 512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
+**711** | **Vyacheslav Kompan** | **9** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/662)**  |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
+**71x** | **Yan Logovskiy** | **4** | **[#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)**, **[#506](https://github.com/MIPT-ILab/mipt-mips/issues/506)** |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
-**71x** | **Yan Logovskiy** | **3** | **[#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)** |
+**718** | **Andrey Agrachev** | **3** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465)** |
+**714** | **Yauheni Sharamed** | **3** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599)**
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
-**711** | **Vyacheslav Kompan** | **2** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354)** |
+**717** | **Ivan Startsev** | **2** | **[#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)** |
+**717** | **Arsen Davtyan** | **2** | **[#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)** |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
+**717** | **Vsevolod Pukhov** | **1** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)** |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
 
 List of [Upcoming contributuions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
 ## About us
 
-The project is mentored by [Igor Smirnov](https://github.com/igorsmir-ilab), [Kirill Korolev](https://github.com/kkorolev), and [Oleg Ladin](https://github.com/olegladin) under the supervising of [Pavel Kryukov](https://github.com/pavelkryukov). For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [MIPT ILab site](https://mipt.ru/drec/about/ilab/)
+The project is mentored by [Igor Smirnov](https://github.com/igorsmir-ilab), [Kirill Korolev](https://github.com/kkorolev), and [Oleg Ladin](https://github.com/olegladin) under [Pavel Kryukov](https://github.com/pavelkryukov)'s supervising. For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [MIPT ILab site](https://mipt.ru/drec/about/ilab/)
 
 Additional repositories:
 * [MIPS traces](https://github.com/MIPT-ILab/mips-traces)

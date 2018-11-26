@@ -4,14 +4,14 @@
  */
 
 #include "perf_sim.h"
+#include <memory/elf/elf_loader.h>
 
 #include <chrono>
 #include <iostream>
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) : 
+PerfSim<ISA>::PerfSim(bool log) :
     CycleAccurateSimulator( log),
-    memory( new Memory),
     fetch( log),
     decode( log),
     execute( log),
@@ -21,12 +21,18 @@ PerfSim<ISA>::PerfSim(bool log) :
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
-    fetch.set_memory( memory.get());
     decode.set_RF( &rf);
-    mem.set_memory( memory.get());
     writeback.set_RF( &rf);
 
     init_ports();
+}
+
+template <typename ISA>
+void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
+{
+    memory = m;
+    fetch.set_memory( m);
+    mem.set_memory( m);
 }
 
 template <typename ISA>
@@ -37,15 +43,11 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
-void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
+Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 {
     force_halt = false;
-    memory->load_elf_file( tr);
 
-    writeback.init_checker( tr);
     writeback.set_instrs_to_run( instrs_to_run);
-
-    set_target( Target( memory->startPC(), 0));
 
     start_time = std::chrono::high_resolution_clock::now();
 
@@ -53,6 +55,8 @@ void PerfSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
         clock();
 
     dump_statistics();
+
+    return Trap::NO_TRAP;
 }
 
 template<typename ISA>
@@ -85,8 +89,8 @@ void PerfSim<ISA>::dump_statistics() const
     auto executed_instrs = writeback.get_executed_instrs();
     auto now_time = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration<double, std::milli>(now_time - start_time).count();
-    auto frequency = static_cast<double>( curr_cycle) / time; // cycles per millisecond = kHz
-    auto ipc = 1.0 * executed_instrs / static_cast<double>( curr_cycle);
+    auto frequency = double{ curr_cycle} / time; // cycles per millisecond = kHz
+    auto ipc = 1.0 * executed_instrs / double{ curr_cycle};
     auto simips = executed_instrs / time;
 
     std::cout << std::endl << "****************************"

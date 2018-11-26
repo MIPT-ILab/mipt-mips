@@ -10,17 +10,18 @@
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
+class FuncMemory;
+
 template <typename ISA>
 class Mem : public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using Memory = typename ISA::Memory;
     using RegisterUInt = typename ISA::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
-        Memory* memory = nullptr;
+        std::shared_ptr<FuncMemory> memory;
 
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
@@ -40,7 +41,7 @@ class Mem : public Log
     public:
         explicit Mem( bool log);
         void clock( Cycle cycle);
-        void set_memory( Memory* mem) { memory = mem; }
+        void set_memory( std::shared_ptr<FuncMemory> mem) { memory = std::move( mem); }
 };
 
 

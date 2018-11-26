@@ -4,9 +4,17 @@
  */
  
 #include "func_sim.h"
+#include <kernel/kernel.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), mem( new Memory) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+
+template <typename ISA>
+void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
+{
+    mem = std::move( m);
+    imem.set_memory( mem);
+}
 
 template <typename ISA>
 void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
@@ -24,7 +32,7 @@ template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
     // fetch instruction
-    FuncInstr instr = mem->fetch_instr( PC);
+    FuncInstr instr = imem.fetch_instr( PC);
 
     // set sequence_id
     instr.set_sequence_id(sequence_id);
@@ -56,23 +64,24 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 }
 
 template <typename ISA>
-void FuncSim<ISA>::init( const std::string& tr)
+Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
-    mem->load_elf_file( tr);
-    PC = mem->startPC();
     nops_in_a_row = 0;
-}
-
-template <typename ISA>
-void FuncSim<ISA>::run( const std::string& tr, uint64 instrs_to_run)
-{
-    init( tr);
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
         const auto& instr = step();
         sout << instr << std::endl;
-        if ( instr.is_halt())
-            break;
+
+        switch ( instr.trap_type()) {
+            case Trap::HALT:
+                return Trap::HALT;
+            case Trap::SYSCALL:
+                if ( kernel.get() && !kernel->execute())
+                    return Trap::SYSCALL;
+                break;
+            default: break;
+        }
     }
+    return Trap::NO_TRAP;
 }
 
 #include <mips/mips.h>

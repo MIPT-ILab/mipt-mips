@@ -26,7 +26,7 @@ public:
 
 TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")
 {
-    AddressLRUCache<Dummy, 8192> cache{};
+    LRUCache<Addr, Dummy, 8192> cache{};
 
     const Addr PC = 0x401c04;
     const Dummy test_number( 0x103abf9);
@@ -40,11 +40,11 @@ TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")
 
 TEST_CASE( "check_method_size: Check_Method_Size")
 {
-    AddressLRUCache<MIPS32Instr, 8192> instr_cache{};
+    LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
     uint32 instr_bytes = 0x2484ae10;
     Addr PC = 0x30ae17;
-    const std::size_t SIZE = AddressLRUCache<MIPS32Instr, 8192>::get_capacity() / 12;
+    const std::size_t SIZE = LRUCache<Addr, MIPS32Instr, 8192>::get_capacity() / 12;
 
     for ( std::size_t i = 0; i < SIZE; ++i)
     {
@@ -59,7 +59,7 @@ TEST_CASE( "check_method_size: Check_Method_Size")
 
 TEST_CASE( "update_and_find: Update_Find_And_Check")
 {
-    AddressLRUCache<MIPS32Instr, 8192> instr_cache{};
+    LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x3c010400;
     const Addr PC = 0x401c04;
@@ -71,7 +71,7 @@ TEST_CASE( "update_and_find: Update_Find_And_Check")
 
 TEST_CASE( "check_method_erase: Check_Method_Erase")
 {
-    AddressLRUCache<MIPS32Instr, 8192> instr_cache{};
+    LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x3c010400;
     const Addr PC = 0x401c04;
@@ -83,31 +83,9 @@ TEST_CASE( "check_method_erase: Check_Method_Erase")
     CHECK( !instr_cache.find( PC).first);
 }
 
-TEST_CASE( "check_method_erase: Check_Method_Range_Erase")
-{
-    AddressLRUCache<MIPS32Instr, 8192> instr_cache{};
-
-    const uint32 instr_bytes = 0x3c010400;
-    const Addr PC = 0x401c04;
-    const MIPS32Instr instr( instr_bytes, PC);
-    const std::size_t SIZE = AddressLRUCache<MIPS32Instr, 8192>::get_capacity() / 12;
-
-    for ( std::size_t i = 0; i < SIZE; ++i)
-    {
-        instr_cache.update( PC + i, instr);
-    }
-    CHECK( SIZE == instr_cache.size());
-    instr_cache.range_erase( PC, 200);
-
-    CHECK( SIZE == instr_cache.size() + 200);
-    CHECK( !instr_cache.find( PC).first);
-    CHECK( !instr_cache.find( PC + 100).first);
-    CHECK( instr_cache.find( PC + 200).first);
-}
-
 TEST_CASE( "check_method_empty: Check_Method_Empty")
 {
-    AddressLRUCache<MIPS32Instr, 8192> instr_cache{};
+    LRUCache<Addr, MIPS32Instr, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x2484ae10;
     const Addr PC = 0x400d05;

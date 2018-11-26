@@ -1,0 +1,35 @@
+/**
+ * Simple test to check whether two memory instances are equal
+ * @author Pavel I. Kryukov kryukov@frtk.ru
+ * Copyright 2018 MIPT-MIPS iLab project
+ */
+
+#include "../memory.h"
+#include <catch.hpp>
+
+void check_coherency(FuncMemory* mem1, FuncMemory* mem2, Addr address)
+{
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+    CHECK( mem1->read<uint32, Endian::little>( address + 1, 0xFFFFFFull) == mem2->read<uint32, Endian::little>( address + 1, 0xFFFFFFull));
+    CHECK( mem1->read<uint32, Endian::little>( address + 2, 0xFFFFull) == mem2->read<uint32, Endian::little>( address + 2, 0xFFFFull));
+    CHECK( mem1->read<uint16, Endian::little>( address + 2) == mem2->read<uint16, Endian::little>( address + 2));
+    CHECK( mem1->read<uint8, Endian::little>( address + 3) == mem2->read<uint8, Endian::little>( address + 3));
+    CHECK( mem1->read<uint8, Endian::little>( 0x7777) == mem2->read<uint8, Endian::little>( 0x7777));
+
+    mem1->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint8, Endian::little>( 1, address);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
+
+    mem2->write<uint16, Endian::little>( 0x7777, address + 1);
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
+
+    mem1->write<uint32, Endian::little>( 0x00000000, address);
+    mem2->write<uint32, Endian::little>( 0x00000000, address);
+
+    CHECK( mem1->read<uint32, Endian::little>( address) == mem1->read<uint32, Endian::little>( address));
+}
