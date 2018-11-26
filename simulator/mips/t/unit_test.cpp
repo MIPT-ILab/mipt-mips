@@ -115,7 +115,6 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
     CHECK(MIPS32Instr(0x00098cfe).get_disasm() == "dsrl32 $s1, $t1, 19");
     CHECK(MIPS32Instr(0x03298806).get_disasm() == "srlv $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x03298816).get_disasm() == "dsrlv $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x01398822).get_disasm() == "sub $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x0139882e).get_disasm() == "dsub $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x01398823).get_disasm() == "subu $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x0139882f).get_disasm() == "dsubu $s1, $t1, $t9");
@@ -243,3 +242,26 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
     CHECK(MIPS32Instr(0x0c0004d2).get_disasm() == "jal 0x4d2");
 }
 
+TEST_CASE( "MIPS32_instr: sub")
+{
+	CHECK(MIPS32Instr(0x01398822).get_disasm() == "sub $s1, $t1, $t9");
+	MIPS32Instr instr( "sub");
+	instr.set_v_src( 1, 0);
+	instr.set_v_src( 1, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 0);
+	
+	instr.set_v_src( 10, 0);
+	instr.set_v_src( 1, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 9);
+	
+	/*  Overflow exception is not implemented
+	instr.get_v_dst( 0xfee1dead);
+	instr.set_v_src( 0x80000000, 0);
+	instr.set_v_src( 0xffffffff, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 0xfee1dead);
+	CHECK(instr.trap_type() != Trap::NO_TRAP);
+	*/
+}
