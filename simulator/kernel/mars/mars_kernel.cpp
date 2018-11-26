@@ -32,10 +32,9 @@ std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream, std::ostream
 
 static const constexpr uint8 v0 = 2;
 static const constexpr uint8 a0 = 4;
-static const constexpr uint8 a1 = 5;
-static const constexpr uint8 a2 = 6;
 
 bool MARSKernel::execute () {
+    (void)errstream; // w/a for Clang warning
     uint64 syscall_code = sim.lock()->read_cpu_register( v0);
     switch (syscall_code) {
         case 1: print_integer(); break;
