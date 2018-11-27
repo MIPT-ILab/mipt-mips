@@ -144,7 +144,7 @@ void FuncMemory::store( const Instr& instr)
     if ( ~instr.get_mask() == 0)
         write<Instr::RegisterUInt, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr());
     else
-        masked_writeInstr::RegisterUInt, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<Instr::RegisterUInt, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
 }
 
 template<typename Instr>
