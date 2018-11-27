@@ -116,7 +116,6 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
     CHECK(MIPS32Instr(0x03298806).get_disasm() == "srlv $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x03298816).get_disasm() == "dsrlv $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x0139882e).get_disasm() == "dsub $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x01398823).get_disasm() == "subu $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x0139882f).get_disasm() == "dsubu $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x01398826).get_disasm() == "xor $s1, $t1, $t9");
     CHECK(MIPS32Instr(0x0139882a).get_disasm() == "slt $s1, $t1, $t9");
@@ -256,7 +255,7 @@ TEST_CASE( "MIPS32_instr: sub")
 	instr.execute();
 	CHECK(instr.get_v_dst == 9);
 	
-	/*  Overflow exception is not implemented
+	/*  Overflow exception is not implemented (#130)
 	instr.get_v_dst( 0xfee1dead);
 	instr.set_v_src( 0x80000000, 0);
 	instr.set_v_src( 0xffffffff, 1);
@@ -264,4 +263,23 @@ TEST_CASE( "MIPS32_instr: sub")
 	CHECK(instr.get_v_dst == 0xfee1dead);
 	CHECK(instr.trap_type() != Trap::NO_TRAP);
 	*/
+}
+TEST_CASE( "MIPS32_instr: subu")
+{
+    CHECK(MIPS32Instr(0x01398823).get_disasm() == "subu $s1, $t1, $t9");
+	MIPS32Instr instr( "subu");
+	instr.set_v_src( 1, 0);
+	instr.set_v_src( 1, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 0);
+	
+	instr.set_v_src( 10, 0);
+	instr.set_v_src( 1, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 9);
+	
+	instr.set_v_src( 1, 0);
+	instr.set_v_src( 0, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 1);
 }
