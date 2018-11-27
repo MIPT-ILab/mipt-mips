@@ -255,6 +255,11 @@ TEST_CASE( "MIPS32_instr: sub")
 	instr.execute();
 	CHECK(instr.get_v_dst == 9);
 	
+	instr.set_v_src( 1, 0);
+	instr.set_v_src( 0, 1);
+	instr.execute();
+	CHECK(instr.get_v_dst == 1);
+	
 	/*  Overflow exception is not implemented (#130)
 	instr.get_v_dst( 0xfee1dead);
 	instr.set_v_src( 0x80000000, 0);
