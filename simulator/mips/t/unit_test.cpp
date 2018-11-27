@@ -147,7 +147,6 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
     CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, 0xfb2e");
     CHECK(MIPS32Instr(0x313104d2).get_disasm() == "andi $s1, $t1, 0x4d2");
     CHECK(MIPS32Instr(0x353104d2).get_disasm() == "ori $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x393104d2).get_disasm() == "xori $s1, $t1, 0x4d2");
     CHECK(MIPS32Instr(0x3c1104d2).get_disasm() == "lui $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062c04d2).get_disasm() == "teqi $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062cfb2e).get_disasm() == "teqi $s1, 0xfb2e");
@@ -248,24 +247,24 @@ TEST_CASE( "MIPS32_instr: sub")
 	instr.set_v_src( 1, 0);
 	instr.set_v_src( 1, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 0);
+	CHECK(instr.get_v_dst() == 0);
 	
 	instr.set_v_src( 10, 0);
 	instr.set_v_src( 1, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 9);
+	CHECK(instr.get_v_dst() == 9);
 	
 	instr.set_v_src( 1, 0);
 	instr.set_v_src( 0, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 1);
+	CHECK(instr.get_v_dst() == 1);
 	
 	/*  Overflow exception is not implemented (#130)
 	instr.get_v_dst( 0xfee1dead);
 	instr.set_v_src( 0x80000000, 0);
 	instr.set_v_src( 0xffffffff, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 0xfee1dead);
+	CHECK(instr.get_v_dst() == 0xfee1dead);
 	CHECK(instr.trap_type() != Trap::NO_TRAP);
 	*/
 }
@@ -276,15 +275,40 @@ TEST_CASE( "MIPS32_instr: subu")
 	instr.set_v_src( 1, 0);
 	instr.set_v_src( 1, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 0);
+	CHECK(instr.get_v_dst() == 0);
 	
 	instr.set_v_src( 10, 0);
 	instr.set_v_src( 1, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 9);
+	CHECK(instr.get_v_dst() == 9);
 	
 	instr.set_v_src( 1, 0);
 	instr.set_v_src( 0, 1);
 	instr.execute();
-	CHECK(instr.get_v_dst == 1);
+	CHECK(instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: xori")
+{
+    CHECK(MIPS32Instr(0x393104d2).get_disasm() == "xori $s1, $t1, 0x4d2");
+	MIPS32Instr instr( "xori");
+	instr.set_v_src( 0, 0);
+	instr.set_v_imm( 0);
+	instr.execute();
+	CHECK(instr.get_v_dst() == 0);
+	
+	instr.set_v_src( 0, 0);
+	instr.set_v_imm( 1);
+	instr.execute();
+	CHECK(instr.get_v_dst() == 1);
+	
+	instr.set_v_src( 1, 0);
+	instr.set_v_imm( 0);
+	instr.execute();
+	CHECK(instr.get_v_dst() == 1);
+	
+	instr.set_v_src( 0xa, 0);
+	instr.set_v_imm( 0x6);
+	instr.execute();
+	CHECK(instr.get_v_dst() == 0xf);
 }
