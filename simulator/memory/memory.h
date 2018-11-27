@@ -73,8 +73,9 @@ T ReadableMemory::read( Addr addr) const noexcept
 template<typename Instr>
 void ReadableMemory::load( Instr* instr) const
 {
-    auto mask = bitmask<Instr::RegisterUInt>( instr->get_mem_size() * CHAR_BIT);
-    auto value = read<Instr::RegisterUInt, Instr::endian>( instr->get_mem_addr(), mask);
+    using R = typename Instr::RegisterUInt;
+    auto mask = bitmask<R>( instr->get_mem_size() * CHAR_BIT);
+    auto value = read<R, Instr::endian>( instr->get_mem_addr(), mask);
     instr->set_v_dst( value);
 }
 
@@ -138,13 +139,14 @@ private:
 template<typename Instr>
 void FuncMemory::store( const Instr& instr)
 {
+    using R = typename Instr::RegisterUInt;
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is an unhandled trap");
 
     if ( ~instr.get_mask() == 0)
-        write<Instr::RegisterUInt, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr());
+        write<R, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr());
     else
-        masked_write<Instr::RegisterUInt, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<R, Instr::endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
 }
 
 template<typename Instr>
