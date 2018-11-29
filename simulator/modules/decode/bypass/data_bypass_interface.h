@@ -15,30 +15,26 @@
 class RegisterStage
 {
 public:
-    auto operator==(const RegisterStage& rhs) const { return value == rhs.value; }
+    bool operator==(const RegisterStage& rhs) const { return is_same_stage( rhs.value); }
 
-    void inc() { ++value; }
+    void inc() { value = value + 1_lt; }
 
     static constexpr const uint8 BYPASSING_STAGES_NUMBER = 4;
 
-    void set_to_first_execution_stage() { value = 0; }
-    void set_to_mem_stage() { value = IN_RF_STAGE_VALUE - 2; }
-    void set_to_writeback() { value = IN_RF_STAGE_VALUE - 1; }
-    void set_to_in_RF() { value = IN_RF_STAGE_VALUE; }
+    void set_to_stage( Latency v) { value = v; }
+    void set_to_first_execution_stage() { set_to_stage( 0_lt); }
+    void set_to_mem_stage() { set_to_stage( MEM_STAGE); }
+    void set_to_writeback() { set_to_stage( WB_STAGE); }
+    void set_to_in_RF()     { set_to_stage( IN_RF_STAGE); }
 
-    auto is_first_execution_stage() const { return value == 0; }
-    auto is_mem_stage() const { return value == IN_RF_STAGE_VALUE - 2; }
-    auto is_writeback() const { return value == IN_RF_STAGE_VALUE - 1; }
-    auto is_in_RF() const { return value == IN_RF_STAGE_VALUE; }
-
-    void set_to_last_execution_stage( uint8 last_execution_stage_value) { value = last_execution_stage_value; }
-    auto is_last_execution_stage( uint8 last_execution_stage_value) const 
-    { 
-        return value == last_execution_stage_value; 
-    }
+    bool is_same_stage( Latency v) const  { return value == v; }
+    bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
+    bool is_mem_stage() const { return is_same_stage( MEM_STAGE); }
+    bool is_writeback() const { return is_same_stage( WB_STAGE); }
+    bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
 private:
-    uint8 value = IN_RF_STAGE_VALUE;
+    Latency value = IN_RF_STAGE;
 
     // EXECUTE_0  - 0                              | Bypassing stage
     //  .......
@@ -47,7 +43,9 @@ private:
     // WRITEBACK  - MAX_VAL8 - 1                   | Bypassing stage
     // IN_RF      - MAX_VAL8
 
-    static constexpr const uint8 IN_RF_STAGE_VALUE = MAX_VAL8;
+    static constexpr const Latency IN_RF_STAGE = Latency( MAX_VAL8);
+    static constexpr const Latency MEM_STAGE   = IN_RF_STAGE - 2_lt;
+    static constexpr const Latency WB_STAGE    = IN_RF_STAGE - 1_lt;
 };
 
 
@@ -55,9 +53,9 @@ template<typename Register>
 class BypassCommand
 {
 public:
-    BypassCommand(RegisterStage bypassing_stage, uint8 last_execution_stage_value)
+    BypassCommand(RegisterStage bypassing_stage, Latency last_execution_stage)
         : bypassing_stage(bypassing_stage)
-        , last_execution_stage_value(last_execution_stage_value)
+        , last_execution_stage(last_execution_stage)
     { }
 
     // returns an index of the port where bypassed data should be get from
@@ -68,7 +66,7 @@ public:
         if ( bypassing_stage.is_first_execution_stage())
             bypass_direction = 0;
 
-        if ( bypassing_stage.is_last_execution_stage( last_execution_stage_value))
+        if ( bypassing_stage.is_same_stage( last_execution_stage))
             bypass_direction = 1;
 
         if ( bypassing_stage.is_mem_stage())
@@ -82,7 +80,7 @@ public:
 
 private:
     const RegisterStage bypassing_stage;
-    const uint8 last_execution_stage_value;
+    const Latency last_execution_stage;
 };
 
 #endif // DATA_BYPASS_INTERFACE_H

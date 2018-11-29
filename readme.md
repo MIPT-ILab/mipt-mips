@@ -17,7 +17,10 @@ MIPT-MIPS can be used for different purposes:
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
 * **Education**: simulator is a nice experimental frog to study CPU internals
 
-Features modeled:
+Key system-level features:
+* Compatibility with [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls convention
+
+Key microarchitecture features:
 * Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
 * Configurable instruction cache with true-LRU policy
 * Interstage data bypassing
@@ -39,6 +42,9 @@ To work with MIPS traces, you need to install MIPS binutils. Please follow [our 
 MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
+
+To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
+If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
 
 ## Workflow example
 
@@ -62,11 +68,15 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 
 ### Basic options
 
-* `-I` — modeled ISA, default option is "mips32"
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
-* `-f` — enables functional simulation only
 * `-d` — enables detailed output of each cycle
+
+### ISA and system-level options:
+
+* `-f` — enables functional simulation only
+* `-I` — modeled ISA, default option is "mips32"
+* `--mars` — enables MARS-compatible mode
 
 ### Performance mode options
 

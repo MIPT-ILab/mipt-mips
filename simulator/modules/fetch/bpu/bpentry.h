@@ -199,10 +199,10 @@ class BPEntryAdaptive final : public BPEntry
 
         void update( bool is_taken)
         {
-            /* updating pattern, simulating shift register */
             value <<= 1u;
-            value += static_cast<uint32>( is_taken);
             value &= pattern_mask;
+            if ( is_taken)
+                value |= 1u;
         }
 
         void reset() { value = default_pattern; }

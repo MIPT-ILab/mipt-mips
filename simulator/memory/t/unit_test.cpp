@@ -10,6 +10,7 @@
 // MIPT-MIPS modules
 #include "../elf/elf_loader.h"
 #include "../memory.h"
+#include "check_coherency.h"
 
 static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
 // the address of the ".data" section
@@ -114,7 +115,7 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 
     // write 0x00000000 into the four bytes pointed by dataSectAddr
-    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr, 0xFFFFFFFFull);
+    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr);
     right_ret = 0x00000000; // before write it was 0x03777701
     CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
 }
@@ -150,7 +151,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
 
     // Check if read correctly
-    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == static_cast<uint8>( write_data_1));
+    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == uint8{ 0xA5});
     CHECK( func_mem->memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
@@ -233,36 +234,6 @@ TEST_CASE( "Func_memory: Dump")
     );
 }
 
-static void test_coherency(FuncMemory* mem1, FuncMemory* mem2)
-{
-    auto address = dataSectAddr - 0x400000;
-    CHECK( mem1->dump() == mem2->dump());
-
-    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
-    CHECK( mem1->read<uint32, Endian::little>( address + 1, 0xFFFFFFull) == mem2->read<uint32, Endian::little>( address + 1, 0xFFFFFFull));
-    CHECK( mem1->read<uint32, Endian::little>( address + 2, 0xFFFFull) == mem2->read<uint32, Endian::little>( address + 2, 0xFFFFull));
-    CHECK( mem1->read<uint16, Endian::little>( address + 2) == mem2->read<uint16, Endian::little>( address + 2));
-    CHECK( mem1->read<uint8, Endian::little>( address + 3) == mem2->read<uint8, Endian::little>( address + 3));
-    CHECK( mem1->read<uint8, Endian::little>( 0x7777) == mem2->read<uint8, Endian::little>( 0x7777));
-
-    mem1->write<uint8, Endian::little>( 1, address);
-    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
-
-    mem2->write<uint8, Endian::little>( 1, address);
-    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
-
-    mem1->write<uint16, Endian::little>( 0x7777, address + 1);
-    CHECK( mem1->read<uint32, Endian::little>( address) != mem2->read<uint32, Endian::little>( address));
-
-    mem2->write<uint16, Endian::little>( 0x7777, address + 1);
-    CHECK( mem1->read<uint32, Endian::little>( address) == mem2->read<uint32, Endian::little>( address));
-
-    mem1->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
-    mem2->write<uint32, Endian::little>( 0x00000000, address, 0xFFFFFFFFull);
-
-    CHECK( mem1->read<uint32, Endian::little>( address) == mem1->read<uint32, Endian::little>( address));
-}
-
 TEST_CASE( "Func_memory: Duplicate")
 {
     auto mem1 = FuncMemory::create_hierarchied_memory();
@@ -270,7 +241,9 @@ TEST_CASE( "Func_memory: Duplicate")
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2);
-    test_coherency( mem1.get(), mem2.get());
+
+    CHECK( mem1->dump() == mem2->dump());
+    check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
 
 TEST_CASE( "Func_memory: Plain Memory")
@@ -280,7 +253,9 @@ TEST_CASE( "Func_memory: Plain Memory")
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2);
-    test_coherency( mem1.get(), mem2.get());
+
+    CHECK( mem1->dump() == mem2->dump());
+    check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
 
 TEST_CASE( "Func_memory: Duplicate Plain Memory")
@@ -290,5 +265,7 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
 
     ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
     mem1->duplicate_to( mem2);
-    test_coherency( mem1.get(), mem2.get());
+
+    CHECK( mem1->dump() == mem2->dump());
+    check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }

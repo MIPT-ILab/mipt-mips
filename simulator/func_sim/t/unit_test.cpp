@@ -95,10 +95,10 @@ TEST_CASE( "FuncSim: Register R/W")
     FuncSim<MIPS32> sim;
 
     /* Signed */
-    sim.write_cpu_register( 1, static_cast<uint64>( -1337));
-    CHECK( static_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
+    sim.write_cpu_register( 1, narrow_cast<uint64>( -1337));
+    CHECK( narrow_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
     /* Unsigned */
-    sim.write_cpu_register( 1, static_cast<uint64>( MAX_VAL32));
+    sim.write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
 }
 
@@ -120,43 +120,23 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     CHECK_NOTHROW( sim.run_no_limit() );
 }
 
-TEST_CASE( "Torture_Test: Func_Sim")
+template<typename ISA>
+auto get_simulator_with_test( const std::string& test)
 {
     // MIPS 32 Little-endian
-    FuncSim<MIPS32> simMIPS32;
+    auto sim = std::make_shared<FuncSim<ISA>>();
     auto mem = FuncMemory::create_hierarchied_memory();
-    simMIPS32.set_memory( mem);
+    sim->set_memory( mem);
 
-    ElfLoader elfCoreUniversal( TEST_PATH "/tt.core.universal.out");
-    elfCoreUniversal.load_to( mem.get());
-    simMIPS32.set_pc( elfCoreUniversal.get_startPC());
-    CHECK_NOTHROW( simMIPS32.run_no_limit() );
+    ElfLoader elf( test);
+    elf.load_to( mem.get());
+    sim->set_pc( elf.get_startPC());
+    return sim;
+}
 
-    ElfLoader elfCore32( TEST_PATH "/tt.core32.out");
-    elfCore32.load_to( mem.get());
-    simMIPS32.set_pc( elfCore32.get_startPC());
-    CHECK_NOTHROW( simMIPS32.run_no_limit() );
-
-    ElfLoader elfCore32le( TEST_PATH "/tt.core32.le.out");
-    elfCore32le.load_to( mem.get());
-    simMIPS32.set_pc( elfCore32le.get_startPC());
-    CHECK_NOTHROW( simMIPS32.run_no_limit() );
-
-    // MIPS 64 Little-Endian
-    FuncSim<MIPS64> simMIPS64;
-    simMIPS64.set_memory( mem);
-
-    elfCoreUniversal.load_to( mem.get());
-    simMIPS64.set_pc( elfCoreUniversal.get_startPC());
-    CHECK_NOTHROW( simMIPS64.run_no_limit() );
-
-    ElfLoader elfCore64( TEST_PATH "/tt.core64.out");
-    elfCore64.load_to( mem.get());
-    simMIPS64.set_pc( elfCore64.get_startPC());
-    CHECK_NOTHROW( simMIPS64.run_no_limit() );
-
-    ElfLoader elfCore64le( TEST_PATH "/tt.core64.le.out");
-    elfCore64le.load_to( mem.get());
-    simMIPS64.set_pc( elfCore64le.get_startPC());
-    CHECK_NOTHROW( simMIPS64.run_no_limit() );
+TEST_CASE( "Torture_Test: Func_Sim")
+{
+    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_no_limit() );
+    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le.out")->run_no_limit() );
+    CHECK_NOTHROW( get_simulator_with_test<MIPS64>( TEST_PATH "/tt.core64.le.out")->run_no_limit() );
 }

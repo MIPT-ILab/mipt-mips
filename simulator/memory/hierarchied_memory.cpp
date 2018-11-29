@@ -27,7 +27,7 @@ class HierarchiedMemory : public FuncMemory
         std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
-        void duplicate_to( std::shared_ptr<FuncMemory> target) const final;
+        void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
 
     private:
         const uint32 page_bits;
@@ -101,14 +101,14 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
 
 size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
 {
-    if (size > addr_mask)
-        throw FuncMemoryOutOfRange( dst + size, addr_mask);
-    
-    if (dst > addr_mask)
-        throw FuncMemoryOutOfRange( dst, addr_mask);
+    if (size > addr_mask + 1)
+        throw FuncMemoryOutOfRange( dst + size, addr_mask + 1);
 
-    if (dst > addr_mask - size)
-        throw FuncMemoryOutOfRange( dst, addr_mask);
+    if (dst > addr_mask + 1)
+        throw FuncMemoryOutOfRange( dst, addr_mask + 1);
+
+    if (dst > addr_mask + 1 - size)
+        throw FuncMemoryOutOfRange( dst, addr_mask + 1);
 
     size_t offset = 0;
     for (; offset < size; ++offset)
@@ -149,7 +149,7 @@ bool HierarchiedMemory::check( Addr addr) const noexcept
     return !set.empty() && !set[get_page(addr)].empty();
 }
 
-void HierarchiedMemory::duplicate_to( std::shared_ptr<FuncMemory> target) const
+void HierarchiedMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
     for ( auto set_it = memory.begin(); set_it != memory.end(); ++set_it)
         for ( auto page_it = set_it->begin(); page_it != set_it->end(); ++page_it)

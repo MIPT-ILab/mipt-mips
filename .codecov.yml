@@ -1,7 +1,8 @@
 ignore:
   - "external/.*"
   - "simulator/interface/.*"
-  - "*/unit_test.cpp"
+  - "*/t/*.h"
+  - "*/t/*.cpp"
 
 codecov:
   ci:

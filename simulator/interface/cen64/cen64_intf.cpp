@@ -4,12 +4,10 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "cen64_intf.h" 
-#include <memory/memory.h>
+#include "cen64_intf.h"
+#include <memory/cen64/cen64_memory.h>
 #include <mips/mips.h>
 #include <modules/core/perf_sim.h>
-
-extern std::shared_ptr<FuncMemory> generate_cen64_memory( bus_controller* bus_ptr);
 
 static const constexpr uint64 MI_REGS_BASE_ADDRESS = 0x04300000;
 
@@ -33,7 +31,7 @@ struct vr4300 : private PerfSim<MIPS64>
 
     int init( struct bus_controller* bus_ptr)
     {
-        set_memory( generate_cen64_memory( bus_ptr));
+        set_memory( create_cen64_memory( bus_ptr));
         set_pc( 0x1fc00000ull);
         mi_regs[MI_VERSION_REG] = 0x01010101u;
         mi_regs[MI_INIT_MODE_REG] = 0x80u;
@@ -60,7 +58,7 @@ struct vr4300 : private PerfSim<MIPS64>
         else
             reset_mask_to_cause( 0x400);
     }
-    
+
     void write_mi_init_mode_reg( uint32 word);
     void write_mi_intr_mask_reg( uint32 word);
 };
@@ -87,7 +85,7 @@ int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
     auto cpu = reinterpret_cast<const vr4300*>( opaque);
-    auto reg = static_cast<MiRegister>( ( address - MI_REGS_BASE_ADDRESS) / 4);
+    auto reg = MiRegister{ ( address - MI_REGS_BASE_ADDRESS) / 4};
     *word = cpu->mi_regs.at( reg);
     return 0;
 }
@@ -96,7 +94,7 @@ int write_mi_regs( void* opaque, uint32 address, uint32 word, uint32 dqm)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
     auto vr4300 = reinterpret_cast<struct vr4300*>( opaque);
-    auto reg = static_cast<MiRegister>( ( address - MI_REGS_BASE_ADDRESS) / 4);
+    auto reg = MiRegister{ ( address - MI_REGS_BASE_ADDRESS) / 4};
 
     switch (reg) {
     case MI_INIT_MODE_REG: vr4300->write_mi_init_mode_reg( word); break;
@@ -149,7 +147,7 @@ void vr4300::write_mi_init_mode_reg( uint32 word)
     else if ((word & 0x2000u) != 0)
         result |= MI_RDRAM_REG_MODE;
 
-    mi_regs[MI_INIT_MODE_REG] = result; 
+    mi_regs[MI_INIT_MODE_REG] = result;
 }
 
 void vr4300::write_mi_intr_mask_reg( uint32 word)

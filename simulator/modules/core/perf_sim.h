@@ -42,19 +42,19 @@ public:
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
     uint64 read_cpu_register( uint8 regno) const final {
-        return static_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
+        return narrow_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
     }
 
     void write_cpu_register( uint8 regno, uint64 value) final {
-        rf.write( Register::from_cpu_index( regno), static_cast<RegisterUInt>( value));
+        rf.write( Register::from_cpu_index( regno), narrow_cast<RegisterUInt>( value));
     }
 
     uint64 read_cause_register() const {
-        return static_cast<uint64>( rf.read( Register::cause));
+        return narrow_cast<uint64>( rf.read( Register::cause));
     }
 
     void write_cause_register( uint64 value) {
-        rf.write( Register::cause, static_cast<RegisterUInt>( value));
+        rf.write( Register::cause, narrow_cast<RegisterUInt>( value));
     }
 
     // Rule of five
@@ -68,7 +68,7 @@ private:
 
     Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
-    bool force_halt = false;    
+    bool force_halt = false;
 
     /* simulator units */
     RF<ISA> rf;
