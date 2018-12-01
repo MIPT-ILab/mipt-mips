@@ -2,12 +2,12 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
+
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), freezed_instruction_ptr( nullptr), enabled_delayed_slots( 0), freezed_jump_instruction( false) { }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -31,8 +31,9 @@ void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::Fu
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
+
     // fetch instruction
-    FuncInstr instr = imem.fetch_instr( PC);
+    FuncInstr instr = fetch_instruction();
 
     // set sequence_id
     instr.set_sequence_id(sequence_id);
@@ -82,6 +83,15 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         }
     }
     return Trap::NO_TRAP;
+}
+
+template <typename ISA>
+typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::fetch_instruction()
+{
+    if (freezed_jump_instruction)
+        return *freezed_instruction_ptr;
+    else
+        return imem.fetch_instr( PC);
 }
 
 #include <mips/mips.h>

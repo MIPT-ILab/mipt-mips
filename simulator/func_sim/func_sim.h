@@ -36,6 +36,11 @@ class FuncSim : public Simulator
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<FuncInstr> imem;
         std::shared_ptr<Kernel> kernel;
+        FuncInstr fetch_instruction();
+
+        FuncInstr* freezed_instruction_ptr;
+        int enabled_delayed_slots;
+        bool freezed_jump_instruction;
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
