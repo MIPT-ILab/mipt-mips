@@ -25,11 +25,11 @@ TEST_CASE( "RF: read_write_rf")
         rf->write( MIPSRegister::from_cpu_index(i), i);
 
         // Try to write something in zero register
-        rf->write( MIPSRegister::zero, i);
+        rf->write( MIPSRegister::zero(), i);
 
         // Checks
         CHECK( rf->read( MIPSRegister::from_cpu_index(i)) == i);
-        CHECK( rf->read( MIPSRegister::zero) == 0u);
+        CHECK( rf->read( MIPSRegister::zero()) == 0u);
     }
 
     for( size_t i = 1; i < 32; ++i)
@@ -77,23 +77,23 @@ TEST_CASE( "RF: read_write_rf")
 
     // Additional checks for mips_hi_lo
     // Write 1 to HI and 0 to LO
-    rf->write( MIPSRegister::mips_hi, 1u);
-    rf->write( MIPSRegister::mips_lo, 0u);
+    rf->write( MIPSRegister::mips_hi(), 1u);
+    rf->write( MIPSRegister::mips_lo(), 0u);
 
-    CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
-
-    // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi, 0u, all_ones<uint32>(), -1 /* subtract */);
-    rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), -1 /* subtract */);
-    CHECK( rf->read( MIPSRegister::mips_hi) == 0u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == MAX_VAL32);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 1u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == 0u);
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi, 0u, all_ones<uint32>(), +1 /* add */);
-    rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), +1 /* add */);
-    CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
+    rf->write( MIPSRegister::mips_hi(), 0u, all_ones<uint32>(), -1 /* subtract */);
+    rf->write( MIPSRegister::mips_lo(), 1u, all_ones<uint32>(), -1 /* subtract */);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 0u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == MAX_VAL32);
+
+    // Check accumulating writes
+    rf->write( MIPSRegister::mips_hi(), 0u, all_ones<uint32>(), +1 /* add */);
+    rf->write( MIPSRegister::mips_lo(), 1u, all_ones<uint32>(), +1 /* add */);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 1u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == 0u);
 }
 
 TEST_CASE( "RF: read_sources_write_dst_rf")

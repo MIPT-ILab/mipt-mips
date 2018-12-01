@@ -68,15 +68,15 @@ struct MIPSInstrDecoder
     MIPSRegister get_register( Reg type) const
     {
         switch ( type) {
-        case Reg::HI:    return MIPSRegister::mips_hi;
-        case Reg::LO:    return MIPSRegister::mips_lo;
-        case Reg::HI_LO: return MIPSRegister::mips_lo;
-        case Reg::ZERO:  return MIPSRegister::zero;
-        case Reg::RA:    return MIPSRegister::return_address;
+        case Reg::HI:    return MIPSRegister::mips_hi();
+        case Reg::LO:    return MIPSRegister::mips_lo();
+        case Reg::HI_LO: return MIPSRegister::mips_lo();
+        case Reg::ZERO:  return MIPSRegister::zero();
+        case Reg::RA:    return MIPSRegister::return_address();
         case Reg::RS:    return MIPSRegister::from_cpu_index( rs);
         case Reg::RT:    return MIPSRegister::from_cpu_index( rt);
         case Reg::RD:    return MIPSRegister::from_cpu_index( rd);
-        default: assert(0);  return MIPSRegister::zero;
+        default: assert(0);  return MIPSRegister::zero();
         }
     }
 

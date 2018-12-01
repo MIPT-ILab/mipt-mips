@@ -49,7 +49,7 @@ public:
             // Handle carry to HI register
             if ( num.is_mips_lo()) {
                 auto carry = get_carry( narrow_cast<uint32>( old_val), narrow_cast<uint32>( val), accumulation);
-                write( Register::mips_hi, carry, mask, accumulation);
+                write( Register::mips_hi(), carry, mask, accumulation);
             }
 
             if (accumulation == 1)
