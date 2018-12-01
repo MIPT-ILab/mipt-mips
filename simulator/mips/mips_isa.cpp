@@ -414,7 +414,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src1      = instr.get_register( entry.src1);
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
-    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi : MIPSRegister::zero;
+    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
     disasm    = generate_disasm( entry);
 }
 

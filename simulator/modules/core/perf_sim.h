@@ -50,11 +50,11 @@ public:
     }
 
     uint64 read_cause_register() const {
-        return narrow_cast<uint64>( rf.read( Register::cause));
+        return narrow_cast<uint64>( rf.read( Register::cause()));
     }
 
     void write_cause_register( uint64 value) {
-        rf.write( Register::cause, narrow_cast<RegisterUInt>( value));
+        rf.write( Register::cause(), narrow_cast<RegisterUInt>( value));
     }
 
     // Rule of five
