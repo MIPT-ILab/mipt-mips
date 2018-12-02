@@ -21,6 +21,12 @@ TEST_CASE( "MIPS_registers: ID_converters")
 {
     for ( size_t i = 0; i < 32; ++i)
         CHECK( MIPSRegister::from_cpu_index(i).to_rf_index() == i);
+
+    for ( size_t i = 0; i < 32; ++i) {
+        CHECK( MIPSRegister::from_cp0_index(i).to_rf_index() > 32);
+        CHECK( !MIPSRegister::from_cp0_index(i).is_mips_lo());
+        CHECK( !MIPSRegister::from_cp0_index(i).is_mips_hi());
+    }
 }
 
 TEST_CASE( "MIPS_registers: GDB_ID_converter")
@@ -30,8 +36,8 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
     CHECK( MIPSRegister::from_gdb_index(32) == MIPSRegister::from_cp0_index(12));  // SR
     CHECK( MIPSRegister::from_gdb_index(33) == MIPSRegister::mips_lo());
     CHECK( MIPSRegister::from_gdb_index(34) == MIPSRegister::mips_hi());
-    CHECK( MIPSRegister::from_gdb_index(35) == MIPSRegister::from_cp0_index( 8));  // Bad
-    CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::from_cp0_index( 13)); // Cause
+    CHECK( MIPSRegister::from_gdb_index(35) == MIPSRegister::from_cp0_index( 8));  // BadVAddr
+    CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::cause());
 }
 
 TEST_CASE( "MIPS_registers: Equal")
