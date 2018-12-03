@@ -26,6 +26,12 @@ Branch<ISA>::Branch( bool log) : Log( log)
 template <typename ISA>
 void Branch<ISA>::clock( Cycle cycle)
 {
+    /* check if there is something to process */
+    if ( !rp_datapath->is_ready( cycle))
+    {
+        return;
+    }
+
     /* receieve flush signal */
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
 
@@ -34,13 +40,6 @@ void Branch<ISA>::clock( Cycle cycle)
     {
         return;
     }
-
-    /* check if there is something to process */
-    if ( !rp_datapath->is_ready( cycle))
-    {
-        return;
-    }
-
 
     auto instr = rp_datapath->read( cycle);
 
