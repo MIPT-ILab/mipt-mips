@@ -19,7 +19,6 @@ Prediction<ISA>::Prediction( bool log) : Log( log)
     rp_datapath = make_read_port<Instr>("EXECUTE_2_PREDICTION", PORT_LATENCY);
 
     wp_bypassing_unit_flush_notify = make_write_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_BW, PORT_FANOUT);
-
 }
 
 template <typename ISA>
