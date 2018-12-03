@@ -13,6 +13,7 @@
 #include <modules/execute/execute.h>
 #include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
+#include <modules/prediction/prediction.h>
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
@@ -79,6 +80,7 @@ private:
     Decode<ISA> decode;
     Execute<ISA> execute;
     Mem<ISA> mem;
+    Prediction<ISA> prediction;
     Writeback<ISA> writeback;
 
     /* ports */

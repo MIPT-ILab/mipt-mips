@@ -16,6 +16,7 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode( log),
     execute( log),
     mem( log),
+    prediction( log),
     writeback( log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
@@ -81,6 +82,7 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     decode.clock( cycle);
     execute.clock( cycle);
     mem.clock( cycle);
+    prediction.clock( cycle);
 }
 
 template<typename ISA>

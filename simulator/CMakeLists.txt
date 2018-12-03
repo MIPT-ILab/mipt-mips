@@ -35,6 +35,7 @@ set(CPPS infra/macro_test.cpp
     modules/decode/decode.cpp
     modules/execute/execute.cpp
     modules/mem/mem.cpp
+    modules/prediction/prediction.cpp
     modules/core/perf_sim.cpp
     modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
