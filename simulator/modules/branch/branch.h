@@ -22,16 +22,16 @@ class Branch : public Log
     
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
-	
-	std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
+
+        std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
 
         std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
         std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
 
-	std::unique_ptr<ReadPort<Instr>> rp_recive_datapath_from_mem = nullptr;
+        std::unique_ptr<ReadPort<Instr>> rp_recive_datapath_from_mem = nullptr;
 
-	std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;	
+        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;	
     
     public:
         explicit Branch( bool log);

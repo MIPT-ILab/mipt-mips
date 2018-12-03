@@ -10,15 +10,16 @@ static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 template <typename ISA>
 Branch<ISA>::Branch( bool log) : Log( log)
 {
-    wp_flush_all = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
-    rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
-    wp_flush_target = make_write_port<Target>("MEMORY_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    wp_bp_update = make_write_port<BPInterface>("MEMORY_2_FETCH", PORT_BW, PORT_FANOUT);
+    wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW, PORT_FANOUT);
 
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_PREDICTION", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", PORT_LATENCY);
 
-    wp_bypassing_unit_flush_notify = make_write_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_BW, PORT_FANOUT);
+    wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
+                                                                PORT_BW, PORT_FANOUT);
 }
 
 template <typename ISA>

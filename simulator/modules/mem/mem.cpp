@@ -12,7 +12,7 @@ Mem<ISA>::Mem( bool log) : Log( log)
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
 
-    rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY); //Write_Port is in prediction module
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
     wp_bypass = make_write_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 }

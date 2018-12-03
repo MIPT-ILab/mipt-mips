@@ -19,7 +19,7 @@ Execute<ISA>::Execute( bool log)
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    wp_prediction_datapath = make_write_port<Instr>("EXECUTE_2_PREDICTION", PORT_BW, PORT_FANOUT);
+    wp_prediction_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
     if (config::long_alu_latency < 2)
@@ -32,7 +32,7 @@ Execute<ISA>::Execute( bool log)
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
                                                            last_execution_stage_latency);
 
-    rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
     rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
@@ -124,10 +124,10 @@ void Execute<ISA>::clock( Cycle cycle)
         wp_bypass->write( instr.get_dst_v(), cycle);
 
         if ( instr.is_mem_stage_required())
-	{
+        {
             wp_mem_datapath->write( std::move( instr), cycle);
-	    wp_prediction_datapath->write( std::move( instr) ,cycle);
-	}
+            wp_prediction_datapath->write( std::move( instr) ,cycle);
+        }
         else
             wp_writeback_datapath->write( std::move( instr), cycle);
     }
