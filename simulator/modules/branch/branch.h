@@ -32,7 +32,7 @@ class Branch : public Log
 
         std::unique_ptr<ReadPort<Instr>> rp_recive_datapath_from_mem = nullptr;
 
-        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;	
+        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
     
     public:
         explicit Branch( bool log);

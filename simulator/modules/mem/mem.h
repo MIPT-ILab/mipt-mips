@@ -31,7 +31,7 @@ class Mem : public Log
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
 
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
-    
+
     public:
         explicit Mem( bool log);
         void clock( Cycle cycle);
