@@ -8,7 +8,7 @@
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
 template <typename ISA>
-Prediction<ISA>::Prediction( bool log) : Log( log)
+Branch<ISA>::Branch( bool log) : Log( log)
 {
     wp_flush_all = make_write_port<bool>("MEMORY_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
     rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
@@ -22,7 +22,7 @@ Prediction<ISA>::Prediction( bool log) : Log( log)
 }
 
 template <typename ISA>
-void Prediction<ISA>::clock( Cycle cycle)
+void Branch<ISA>::clock( Cycle cycle)
 {
     /* receieve flush signal */
     const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
@@ -71,13 +71,13 @@ void Prediction<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Prediction<MIPSI>;
-template class Prediction<MIPSII>;
-template class Prediction<MIPSIII>;
-template class Prediction<MIPSIV>;
-template class Prediction<MIPS32>;
-template class Prediction<MIPS64>;
-template class Prediction<RISCV32>;
-template class Prediction<RISCV64>;
-template class Prediction<RISCV128>;
+template class Branch<MIPSI>;
+template class Branch<MIPSII>;
+template class Branch<MIPSIII>;
+template class Branch<MIPSIV>;
+template class Branch<MIPS32>;
+template class Branch<MIPS64>;
+template class Branch<RISCV32>;
+template class Branch<RISCV64>;
+template class Branch<RISCV128>;
 

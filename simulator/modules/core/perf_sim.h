@@ -80,7 +80,7 @@ private:
     Decode<ISA> decode;
     Execute<ISA> execute;
     Mem<ISA> mem;
-    Prediction<ISA> prediction;
+    Branch<ISA> branch;
     Writeback<ISA> writeback;
 
     /* ports */

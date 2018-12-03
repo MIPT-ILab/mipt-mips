@@ -13,7 +13,7 @@
 class FuncMemory;
 
 template <typename ISA>
-class Prediction : public Log
+class Branch : public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
@@ -34,7 +34,7 @@ class Prediction : public Log
 	std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;	
     
     public:
-        explicit Prediction( bool log);
+        explicit Branch( bool log);
         void clock( Cycle cycle);
 };
 
