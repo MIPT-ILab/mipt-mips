@@ -1,5 +1,6 @@
 /**
- * rediction.cpp - Simulation of Branch Mispredict Detection stage
+ * Yauheni Sharamed SHaramed.EI@phystech.edu
+ * branch.cpp - Simulation of Branch Mispredict Detection stage
  * Copyright 2015-2018 MIPT-MIPS
  */
 

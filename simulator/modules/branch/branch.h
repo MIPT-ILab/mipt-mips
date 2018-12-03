@@ -1,5 +1,6 @@
 /**
- * prediction.h - Simulation of branch mispredict detection stage
+ * Yauheni Sharamed SHaramed.EI@phystech.edu
+ * branch.h - Simulation of branch mispredict detection stage
  * Copyright 2015-2018 MIPT-MIPS
  */
 
