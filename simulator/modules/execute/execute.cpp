@@ -123,13 +123,18 @@ void Execute<ISA>::clock( Cycle cycle)
         /* bypass data */
         wp_bypass->write( instr.get_dst_v(), cycle);
 
+        if( instr.is_jump())
+        {
+            wp_branch_datapath->write( std::move( instr) ,cycle);
+        }
         if ( instr.is_mem_stage_required())
         {
             wp_mem_datapath->write( std::move( instr), cycle);
-            wp_branch_datapath->write( std::move( instr) ,cycle);
         }
         else
+        {
             wp_writeback_datapath->write( std::move( instr), cycle);
+        }
     }
 }
 
