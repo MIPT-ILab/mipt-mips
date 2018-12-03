@@ -4,8 +4,8 @@
  */
 
 
-#ifndef PREDICTION_H
-#define PREDICTION_H
+#ifndef BRANCH_H
+#define BRANCH_H
 
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
@@ -39,4 +39,4 @@ class Prediction : public Log
 };
 
 
-#endif // PREDICTION_H
+#endif // BRANCH_H

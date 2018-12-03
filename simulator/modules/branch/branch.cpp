@@ -3,7 +3,7 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-#include "prediction.h"
+#include "branch.h"
 
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
