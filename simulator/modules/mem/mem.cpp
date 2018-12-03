@@ -6,8 +6,6 @@
 #include "mem.h"
 #include <memory/memory.h>
 
-static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
-
 template <typename ISA>
 Mem<ISA>::Mem( bool log) : Log( log)
 {
