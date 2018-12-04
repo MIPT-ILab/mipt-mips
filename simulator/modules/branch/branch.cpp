@@ -68,7 +68,6 @@ void Branch<ISA>::clock( Cycle cycle)
 
     /* data path */
     wp_datapath->write( std::move( instr), cycle);
-
 }
 
 
