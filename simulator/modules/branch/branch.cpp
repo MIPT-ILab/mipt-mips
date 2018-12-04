@@ -17,7 +17,8 @@ Branch<ISA>::Branch( bool log) : Log( log)
     wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW, PORT_FANOUT);
 
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY_AND_BRANCH", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", PORT_LATENCY);
+    wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , PORT_BW , PORT_FANOUT);    
 
     wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                                 PORT_BW, PORT_FANOUT);
@@ -64,6 +65,9 @@ void Branch<ISA>::clock( Cycle cycle)
 
     /* log */
     sout << instr << std::endl;
+
+    /* data path */
+    wp_datapath->write( std::move( instr), cycle);
 }
 
 

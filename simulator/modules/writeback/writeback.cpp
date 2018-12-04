@@ -8,6 +8,8 @@ Writeback<ISA>::Writeback(bool log) : Log( log)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
+    rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", PORT_LATENCY);
+
     wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
     wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW, PORT_FANOUT);
 }
@@ -35,7 +37,8 @@ void Writeback<ISA>::clock( Cycle cycle)
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
     /* check if there is something to process */
-    if ( !rp_mem_datapath->is_ready( cycle) && !rp_execute_datapath->is_ready( cycle))
+    if ( !rp_mem_datapath->is_ready( cycle) && !rp_execute_datapath->is_ready( cycle)
+                                            && !rp_branch_datapath->is_ready( cycle))
     {
         sout << "bubble\n";
         if ( cycle >= last_writeback_cycle + 100_lt)
@@ -44,9 +47,11 @@ void Writeback<ISA>::clock( Cycle cycle)
         return;
     }
 
-    auto instr = ( rp_mem_datapath->is_ready( cycle))
-        ? rp_mem_datapath->read( cycle)
-        : rp_execute_datapath->read( cycle);
+    auto instr = ( rp_branch_datapath->is_ready( cycle))
+        ? rp_branch_datapath->read( cycle)
+        : (rp_mem_datapath->is_ready( cycle)
+            ? rp_mem_datapath->read( cycle)
+            : rp_execute_datapath->read( cycle));
 
     /* no bubble instructions */
     assert( !instr.is_bubble());

@@ -11,16 +11,14 @@ namespace config {
     Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
 } // namespace config
 
-static constexpr const uint32 DATAPATH_2_MEM_AND_BARNCH = 2;
 
 template <typename ISA>
 Execute<ISA>::Execute( bool log) 
     : Log( log)
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
-    wp_mem_and_branch_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY_AND_BRANCH" , 
-                                                        PORT_BW , DATAPATH_2_MEM_AND_BARNCH);
-
+    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW , PORT_FANOUT);
+    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW , PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
@@ -125,9 +123,13 @@ void Execute<ISA>::clock( Cycle cycle)
         /* bypass data */
         wp_bypass->write( instr.get_dst_v(), cycle);
 
-        if ( instr.is_mem_stage_required()) // jumps are also required
+        if( instr.is_jump())
         {
-            wp_mem_and_branch_datapath->write( std::move( instr) ,cycle);
+            wp_branch_datapath->write( std::move( instr) ,cycle);
+        }
+        else if( instr.is_mem_stage_required())
+        {
+            wp_mem_datapath->write( std::move( instr) ,cycle);
         }
         else
         {

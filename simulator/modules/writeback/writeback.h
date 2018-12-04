@@ -54,6 +54,7 @@ private:
     /* Input */
     std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
 
     /* Output */
     std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;

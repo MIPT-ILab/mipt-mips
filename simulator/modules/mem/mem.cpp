@@ -10,7 +10,7 @@ template <typename ISA>
 Mem<ISA>::Mem( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY_AND_BRANCH", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
@@ -40,13 +40,13 @@ void Mem<ISA>::clock( Cycle cycle)
     }
 
     auto instr = rp_datapath->read( cycle);
-
+    
     /* perform required loads and stores */
     memory->load_store( &instr);
     
     /* bypass data */
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
-
+    
     /* data path */
     wp_datapath->write( std::move( instr), cycle);
 }
