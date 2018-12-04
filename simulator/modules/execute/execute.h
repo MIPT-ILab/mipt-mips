@@ -35,8 +35,7 @@ class Execute : public Log
         std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;
 
         /* Outputs */
-        std::unique_ptr<WritePort<Instr>> wp_mem_datapath = nullptr;
-        std::unique_ptr<WritePort<Instr>> wp_branch_datapath = nullptr;
+        std::unique_ptr<WritePort<Instr>> wp_mem_and_branch_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_writeback_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_long_latency_execution_unit = nullptr;
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;

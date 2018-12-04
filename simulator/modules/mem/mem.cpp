@@ -10,7 +10,7 @@ template <typename ISA>
 Mem<ISA>::Mem( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
+    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY_AND_BRANCH", PORT_LATENCY);
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
