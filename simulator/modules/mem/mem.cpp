@@ -40,7 +40,7 @@ void Mem<ISA>::clock( Cycle cycle)
     }
 
     auto instr = rp_datapath->read( cycle);
-    
+
     /* perform required loads and stores */
     memory->load_store( &instr);
     
