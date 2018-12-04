@@ -13,6 +13,7 @@
 #include <modules/execute/execute.h>
 #include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
+#include <modules/branch/branch.h>
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
@@ -50,11 +51,11 @@ public:
     }
 
     uint64 read_cause_register() const {
-        return narrow_cast<uint64>( rf.read( Register::cause));
+        return narrow_cast<uint64>( rf.read( Register::cause()));
     }
 
     void write_cause_register( uint64 value) {
-        rf.write( Register::cause, narrow_cast<RegisterUInt>( value));
+        rf.write( Register::cause(), narrow_cast<RegisterUInt>( value));
     }
 
     // Rule of five
@@ -79,6 +80,7 @@ private:
     Decode<ISA> decode;
     Execute<ISA> execute;
     Mem<ISA> mem;
+    Branch<ISA> branch;
     Writeback<ISA> writeback;
 
     /* ports */

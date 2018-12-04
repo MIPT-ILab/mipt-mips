@@ -70,10 +70,10 @@ class BaseMIPSInstr
 
         const uint32 raw;
 
-        MIPSRegister src1 = MIPSRegister::zero;
-        MIPSRegister src2 = MIPSRegister::zero;
-        MIPSRegister dst  = MIPSRegister::zero;
-        MIPSRegister dst2 = MIPSRegister::zero;
+        MIPSRegister src1 = MIPSRegister::zero();
+        MIPSRegister src2 = MIPSRegister::zero();
+        MIPSRegister dst  = MIPSRegister::zero();
+        MIPSRegister dst2 = MIPSRegister::zero();
 
         uint32 v_imm = NO_VAL32;
 

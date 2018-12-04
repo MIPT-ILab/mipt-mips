@@ -22,19 +22,22 @@ enum class Imm : uint8
 enum class Reg : uint8
 {
     RS, RT, RD,
+    CP0_RT, CP0_RD,
     ZERO, RA,
     HI, LO, HI_LO
 };
 
 using Src1 = Reg;
 using Src2 = Reg;
-using Dst = Reg;
+using Dst  = Reg;
 
 static inline bool is_explicit_register( Reg type)
 {
     return type == Reg::RS
         || type == Reg::RT
-        || type == Reg::RD;
+        || type == Reg::RD
+        || type == Reg::CP0_RT
+        || type == Reg::CP0_RD;
 }
 
 struct MIPSInstrDecoder
@@ -68,15 +71,17 @@ struct MIPSInstrDecoder
     MIPSRegister get_register( Reg type) const
     {
         switch ( type) {
-        case Reg::HI:    return MIPSRegister::mips_hi;
-        case Reg::LO:    return MIPSRegister::mips_lo;
-        case Reg::HI_LO: return MIPSRegister::mips_lo;
-        case Reg::ZERO:  return MIPSRegister::zero;
-        case Reg::RA:    return MIPSRegister::return_address;
-        case Reg::RS:    return MIPSRegister::from_cpu_index( rs);
-        case Reg::RT:    return MIPSRegister::from_cpu_index( rt);
-        case Reg::RD:    return MIPSRegister::from_cpu_index( rd);
-        default: assert(0);  return MIPSRegister::zero;
+        case Reg::HI:     return MIPSRegister::mips_hi();
+        case Reg::LO:     return MIPSRegister::mips_lo();
+        case Reg::HI_LO:  return MIPSRegister::mips_lo();
+        case Reg::ZERO:   return MIPSRegister::zero();
+        case Reg::RA:     return MIPSRegister::return_address();
+        case Reg::RS:     return MIPSRegister::from_cpu_index( rs);
+        case Reg::RT:     return MIPSRegister::from_cpu_index( rt);
+        case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
+        case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
+        case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
+        default: assert(0);  return MIPSRegister::zero();
         }
     }
 
