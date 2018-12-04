@@ -22,7 +22,7 @@ Decode<ISA>::Decode( bool log) : Log( log)
 
     wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
 
-    rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
     wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
                                                                             PORT_BW, PORT_FANOUT);
@@ -32,7 +32,7 @@ Decode<ISA>::Decode( bool log) : Log( log)
     wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
     
-    rp_bypassing_unit_flush_notify = make_read_port<bool>("MEMORY_2_BYPASSING_UNIT_FLUSH_NOTIFY",
+    rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY",
                                                            PORT_LATENCY);
 
     bypassing_unit = std::make_unique<BypassingUnit>( config::long_alu_latency);
