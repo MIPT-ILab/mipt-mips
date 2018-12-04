@@ -18,9 +18,7 @@ class Branch : public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
-    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
-    
+
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
 
@@ -38,6 +36,5 @@ class Branch : public Log
         explicit Branch( bool log);
         void clock( Cycle cycle);
 };
-
 
 #endif // BRANCH_H
