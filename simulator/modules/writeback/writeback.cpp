@@ -37,7 +37,7 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
     std::vector<Instr> result;
     for ( auto& port : { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get()})
         if ( port->is_ready( cycle))
-            result.emplace_back( port->read());
+            result.emplace_back( port->read( cycle));
 
     return result;
 }
@@ -47,7 +47,7 @@ void Writeback<ISA>::clock( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
-    auto instrs = read_instructions( cycle)
+    auto instrs = read_instructions( cycle);
 
     if ( instrs.empty())
         writeback_bubble( cycle);
@@ -67,7 +67,6 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
-    instr.check_trap();
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
     sout << instr << std::endl;
