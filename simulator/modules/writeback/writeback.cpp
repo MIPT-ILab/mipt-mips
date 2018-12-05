@@ -32,7 +32,7 @@ void Writeback<ISA>::Checker::set_target( const Target& value)
 }
 
 template <typename ISA>
-std::vector<Instr> Writeback<ISA>::read_instructions( Cycle cycle)
+std::vector<Writeback<ISA>::Instr> Writeback<ISA>::read_instructions( Cycle cycle)
 {
     std::vector<Instr> result;
     for ( auto& port : { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath})
@@ -62,7 +62,7 @@ void Writeback<ISA>::clock( Cycle cycle)
 }
 
 template <typename ISA>
-void Writeback<ISA>::writeback( const Instr& instr, Cycle cycle)
+void Writeback<ISA>::writeback( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
     instr.check_trap();
