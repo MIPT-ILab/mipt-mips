@@ -44,23 +44,21 @@ void Branch<ISA>::clock( Cycle cycle)
 
     auto instr = rp_datapath->read( cycle);
 
-    if ( instr.is_jump()) {
-        /* acquiring real information for BPU */
-        wp_bp_update->write( instr.get_bp_upd(), cycle);
-        
-        /* handle misprediction */
-        if ( instr.is_misprediction())
-        {
-            /* flushing the pipeline */
-            wp_flush_all->write( true, cycle);
-            
-            /* notify bypassing unit about misprediction */
-            wp_bypassing_unit_flush_notify->write( true, cycle);
+    /* acquiring real information for BPU */
+    wp_bp_update->write( instr.get_bp_upd(), cycle);
+     
+    /* handle misprediction */
+    if ( instr.is_misprediction())
+    {
+        /* flushing the pipeline */
+        wp_flush_all->write( true, cycle);
+          
+        /* notify bypassing unit about misprediction */
+        wp_bypassing_unit_flush_notify->write( true, cycle);
 
-            /* sending valid PC to fetch stage */
-            wp_flush_target->write( instr.get_actual_target(), cycle);
-            sout << "misprediction on ";
-        }
+        /* sending valid PC to fetch stage */
+        wp_flush_target->write( instr.get_actual_target(), cycle);
+        sout << "misprediction on ";
     }
 
     /* log */
