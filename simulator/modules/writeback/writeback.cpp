@@ -27,7 +27,7 @@ void Writeback<ISA>::Checker::init( const FuncMemory& outer_mem)
 template <typename ISA>
 void Writeback<ISA>::Checker::set_target( const Target& value)
 {
-    if (active)
+    if ( active)
         sim->set_target( value);
 }
 
@@ -35,11 +35,11 @@ template <typename ISA>
 auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
     std::vector<Instr> result;
-    for ( auto& port : { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath})
+    for ( auto& port : { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get()})
         if ( port->is_ready( cycle))
             result.emplace_back( port->read());
 
-    return {};
+    return result;
 }
 
 template <typename ISA>
@@ -50,15 +50,17 @@ void Writeback<ISA>::clock( Cycle cycle)
     auto instrs = read_instructions( cycle)
 
     if ( instrs.empty())
-    {
-        sout << "bubble\n";
-        if ( cycle >= last_writeback_cycle + 100_lt)
-            throw Deadlock( "");
+        writeback_bubble( cycle);
+    else
+        writeback_instruction( instrs.front(), cycle);
+}
 
-        return;
-    }
-
-    writeback_instruction( instr.front(), cycle);
+template <typename ISA>
+void Writeback<ISA>::writeback_bubble( Cycle cycle)
+{
+    sout << "bubble\n";
+    if ( cycle >= last_writeback_cycle + 100_lt)
+        throw Deadlock( "");
 }
 
 template <typename ISA>
@@ -75,7 +77,7 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     last_writeback_cycle = cycle;
     if ( executed_instrs >= instrs_to_run || instr.is_halt())
         wp_halt->write( true, cycle);
-    
+
     sout << "Executed instructions: " << executed_instrs
          << std::endl << std::endl;
 }
