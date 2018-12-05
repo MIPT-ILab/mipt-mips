@@ -53,6 +53,7 @@ private:
 
     auto read_instructions( Cycle cycle);
     void writeback_instruction( const Instr& instr, Cycle cycle);
+    void writeback_bubble( Cycle cycle);
 
     /* Input */
     std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
