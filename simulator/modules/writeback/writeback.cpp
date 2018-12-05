@@ -32,13 +32,24 @@ void Writeback<ISA>::Checker::set_target( const Target& value)
 }
 
 template <typename ISA>
+std::vector<Instr> Writeback<ISA>::read_instructions( Cycle cycle)
+{
+    std::vector<Instr> result;
+    for ( auto& port : { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath})
+        if ( port->is_ready( cycle))
+            result.emplace_back( port->read());
+
+    return {};
+}
+
+template <typename ISA>
 void Writeback<ISA>::clock( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
 
-    /* check if there is something to process */
-    if ( !rp_mem_datapath->is_ready( cycle) && !rp_execute_datapath->is_ready( cycle)
-                                            && !rp_branch_datapath->is_ready( cycle))
+    auto instrs = read_instructions( cycle)
+
+    if ( instrs.empty())
     {
         sout << "bubble\n";
         if ( cycle >= last_writeback_cycle + 100_lt)
@@ -47,31 +58,19 @@ void Writeback<ISA>::clock( Cycle cycle)
         return;
     }
 
-    auto instr = ( rp_branch_datapath->is_ready( cycle))
-        ? rp_branch_datapath->read( cycle)
-        : (rp_mem_datapath->is_ready( cycle)
-            ? rp_mem_datapath->read( cycle)
-            : rp_execute_datapath->read( cycle));
+    writeback( instr.front(), cycle);
+}
 
-    /* no bubble instructions */
-    assert( !instr.is_bubble());
-
-    /* perform writeback */
+template <typename ISA>
+void Writeback<ISA>::writeback( const Instr& instr, Cycle cycle)
+{
     rf->write_dst( instr);
-
-    /* check for traps */
     instr.check_trap();
-
-    /* bypass data */
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
-    /* log */
     sout << instr << std::endl;
 
-    /* perform checks */
     checker.check( instr);
-
-    /* update simulator cycles info */
     ++executed_instrs;
     last_writeback_cycle = cycle;
     if ( executed_instrs >= instrs_to_run || instr.is_halt())
