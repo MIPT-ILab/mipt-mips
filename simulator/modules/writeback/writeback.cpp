@@ -58,11 +58,11 @@ void Writeback<ISA>::clock( Cycle cycle)
         return;
     }
 
-    writeback( instr.front(), cycle);
+    writeback_instruction( instr.front(), cycle);
 }
 
 template <typename ISA>
-void Writeback<ISA>::writeback( const Writeback<ISA>::Instr& instr, Cycle cycle)
+void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
     instr.check_trap();
