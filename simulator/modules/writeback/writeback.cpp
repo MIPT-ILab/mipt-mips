@@ -32,7 +32,7 @@ void Writeback<ISA>::Checker::set_target( const Target& value)
 }
 
 template <typename ISA>
-std::vector<Writeback<ISA>::Instr> Writeback<ISA>::read_instructions( Cycle cycle)
+auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
     std::vector<Instr> result;
     for ( auto& port : { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath})
