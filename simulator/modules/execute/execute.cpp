@@ -11,8 +11,6 @@ namespace config {
     Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
 } // namespace config
 
-static constexpr const uint32 DATAPATH_2_MEM_AND_BARNCH = 2;
-
 template <typename ISA>
 Execute<ISA>::Execute( bool log) 
     : Log( log)
