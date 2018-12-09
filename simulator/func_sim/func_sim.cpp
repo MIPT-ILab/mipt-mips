@@ -7,7 +7,14 @@
 #include <kernel/kernel.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), freezed_instruction_ptr( nullptr), enabled_delayed_slots( 0), freezed_jump_instruction( false) { }
+FuncSim<ISA>::FuncSim( unsigned int delayed_slots_to_enable, bool log):
+    Simulator( log),
+    freezed_instruction_ptr( nullptr),
+    enabled_delayed_slots( delayed_slots_to_enable),
+    instr_to_execute_before_freezed( 0),
+    freezed_jump_instruction( false),
+    garbage_freezed_instruction( false)
+{ }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -33,6 +40,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
 
     // fetch instruction
+
     FuncInstr instr = fetch_instruction();
 
     // set sequence_id
@@ -60,6 +68,10 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     // Check whether we execute nops
     update_and_check_nop_counter( instr);
 
+    // Check if there undeleted instruction
+    if (garbage_freezed_instruction)
+        delete freezed_instruction_ptr;
+
     // dump
     return instr;
 }
@@ -73,13 +85,14 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         sout << instr << std::endl;
 
         switch ( instr.trap_type()) {
-            case Trap::HALT:
-                return Trap::HALT;
-            case Trap::SYSCALL:
-                if ( kernel.get() && !kernel->execute())
-                    return Trap::SYSCALL;
-                break;
-            default: break;
+        case Trap::HALT:
+            return Trap::HALT;
+        case Trap::SYSCALL:
+            if ( kernel.get() && !kernel->execute())
+                return Trap::SYSCALL;
+            break;
+        default:
+            break;
         }
     }
     return Trap::NO_TRAP;
@@ -88,10 +101,25 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::fetch_instruction()
 {
-    if (freezed_jump_instruction)
-        return *freezed_instruction_ptr;
-    else
+    if (enabled_delayed_slots == 0)
         return imem.fetch_instr( PC);
+
+    if (freezed_jump_instruction && instr_to_execute_before_freezed == 0) {
+        freezed_jump_instruction = false;
+        return *freezed_instruction_ptr;
+    } else if (freezed_jump_instruction && instr_to_execute_before_freezed > 0) {
+        instr_to_execute_before_freezed--;
+        return imem.fetch_instr( PC);
+    } else { //(freezed_jump_instruction == false)
+        FuncInstr fetched_instr = imem.fetch_instr( PC);
+        if (fetched_instr.is_jump()) {
+            freezed_instruction_ptr = new FuncInstr( fetched_instr);
+            freezed_jump_instruction = true;
+            instr_to_execute_before_freezed = enabled_delayed_slots - 1;
+            return imem.fetch_instr( PC);
+        }
+        return fetched_instr;
+    }
 }
 
 #include <mips/mips.h>

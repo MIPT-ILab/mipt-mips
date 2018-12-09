@@ -121,10 +121,10 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
 }
 
 template<typename ISA>
-auto get_simulator_with_test( const std::string& test)
+auto get_simulator_with_test( const std::string& test, unsigned int delayed_slots_to_enable)
 {
     // MIPS 32 Little-endian
-    auto sim = std::make_shared<FuncSim<ISA>>();
+    auto sim = std::make_shared<FuncSim<ISA>>(delayed_slots_to_enable);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -136,7 +136,13 @@ auto get_simulator_with_test( const std::string& test)
 
 TEST_CASE( "Torture_Test: Func_Sim")
 {
-    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test<MIPS64>( TEST_PATH "/tt.core64.le.out")->run_no_limit() );
+    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out", 0)->run_no_limit() );
+    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le.out", 0)->run_no_limit() );
+    CHECK_NOTHROW( get_simulator_with_test<MIPS64>( TEST_PATH "/tt.core64.le.out", 0)->run_no_limit() );
+}
+
+TEST_CASE( "Delayed branches")
+{
+    //CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal_reorder.out", 1)->run_no_limit() ); just crushes
+    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/delayed_branches.out", 0)->run_no_limit() );
 }

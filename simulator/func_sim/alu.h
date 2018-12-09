@@ -259,7 +259,7 @@ struct ALU
 
     template<typename I> static
     void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
-   
+
     template<typename I> static
     void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
 

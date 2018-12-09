@@ -39,14 +39,16 @@ class FuncSim : public Simulator
         FuncInstr fetch_instruction();
 
         FuncInstr* freezed_instruction_ptr;
-        int enabled_delayed_slots;
+        unsigned int enabled_delayed_slots;
+        unsigned int instr_to_execute_before_freezed;
         bool freezed_jump_instruction;
+        bool garbage_freezed_instruction;
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
 
     public:
-        explicit FuncSim( bool log = false);
+        explicit FuncSim( unsigned int delayed_slots_to_enable = 0, bool log = false);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
