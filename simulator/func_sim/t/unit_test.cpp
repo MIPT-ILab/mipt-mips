@@ -144,6 +144,6 @@ TEST_CASE( "Torture_Test: Func_Sim")
 TEST_CASE( "Delayed branches")
 {
     //CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal_reorder.out", 1)->run_no_limit() ); just crushes
-    //CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le.out", 21)->run_no_limit() ); works ok even with irrelevant number of delayed slots enabled
+    //CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le_reorder.out", 21)->run_no_limit() ); works ok even with irrelevant number of delayed slots enabled
     CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/delayed_branches.out", 0)->run_no_limit() );
 }
