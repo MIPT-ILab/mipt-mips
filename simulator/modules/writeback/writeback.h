@@ -51,9 +51,14 @@ private:
 
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
+    auto read_instructions( Cycle cycle);
+    void writeback_instruction( const Instr& instr, Cycle cycle);
+    void writeback_bubble( Cycle cycle);
+
     /* Input */
     std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
 
     /* Output */
     std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
