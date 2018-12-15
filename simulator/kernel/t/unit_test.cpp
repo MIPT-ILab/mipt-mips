@@ -10,10 +10,10 @@
 
 TEST_CASE( "Kernel: Execute nothing")
 {
-    CHECK( Kernel::create_dummy_kernel()->execute().type == SyscallResult::SUCCESS);
+    CHECK( Kernel::create_dummy_kernel()->execute().type == SyscallResult::IGNORED);
 }
 
 TEST_CASE( "Kernel: Default kernel is empty")
 {
-    CHECK( Kernel::create_configured_kernel()->execute().type == SyscallResult::SUCCESS);
+    CHECK( Kernel::create_configured_kernel()->execute().type == SyscallResult::IGNORED);
 }
