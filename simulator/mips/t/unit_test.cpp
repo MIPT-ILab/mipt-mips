@@ -191,7 +191,6 @@ TEST_CASE ( "MIPS32_instr: add 1 and -1")
 TEST_CASE ( "MIPS32_instr: add overflow")
 {
     MIPS32Instr instr( "add");
-    instr.set_v_dst( 0xfee1dead);
     instr.set_v_src( 0x7fffffff, 0);
     instr.set_v_src( 0x7fffffff, 1);
     instr.execute();
@@ -234,7 +233,6 @@ TEST_CASE( "MIPS32_instr: addi 1 and -1")
 TEST_CASE( "MIPS32_instr: addi overflow")
 {
     MIPS32Instr instr( "addi");
-    instr.set_v_dst( 0xfee1dead);
     instr.set_v_src( 0x7fffffff, 0);
     instr.set_v_imm( 1);
     instr.execute();
@@ -885,7 +883,6 @@ TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
     CHECK(MIPS32Instr(0x408d2000).get_disasm() == "mfc0 $a0, $Cause");
 
     MIPS32Instr instr( "mfc0");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0x12345678, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x12345678);
@@ -898,7 +895,6 @@ TEST_CASE( "MIPS32_instr: mfhi 0xdeadbeef")
     CHECK(MIPS32Instr(0x00008810).get_disasm() == "mfhi $s1");
     
     MIPS32Instr instr( "mfhi");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0xdeadbeef, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xdeadbeef);
@@ -910,7 +906,6 @@ TEST_CASE( "MIPS32_instr: mflo 0xfee1dead")
     CHECK(MIPS32Instr(0x00008812).get_disasm() == "mflo $s1");
     
     MIPS32Instr instr( "mflo");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0xfee1dead, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xfee1dead);
@@ -924,7 +919,6 @@ TEST_CASE( "MIPS32_instr: movn 3 if 0 isn't equal to 0")
     MIPS32Instr instr( "movn");
     instr.set_v_src( 3, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_mask() == 0);
 }
@@ -934,7 +928,6 @@ TEST_CASE( "MIPS32_instr: movn 0 if 0 isn't equal to 0")
     MIPS32Instr instr( "movn");
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_mask() == 0);
 }
@@ -944,7 +937,6 @@ TEST_CASE( "MIPS32_instr: movn 1 if 1 isn't equal to 1")
     MIPS32Instr instr( "movn");
     instr.set_v_src( 1, 0);
     instr.set_v_src( 1, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
     CHECK( instr.get_mask() == all_ones<uint32>());
@@ -955,7 +947,6 @@ TEST_CASE( "MIPS32_instr: movn 3 if 2 isn't equal to 0")
     MIPS32Instr instr( "movn");
     instr.set_v_src( 3, 0);
     instr.set_v_src( 2, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 3);
     CHECK( instr.get_mask() == all_ones<uint32>());
@@ -969,7 +960,6 @@ TEST_CASE( "MIPS32_instr: movz 3 if 2 is equal to 0")
     MIPS32Instr instr( "movz");
     instr.set_v_src( 3, 0);
     instr.set_v_src( 2, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_mask() == 0);
 }
@@ -979,7 +969,6 @@ TEST_CASE( "MIPS32_instr: movz 1 if 1 is equal to 1")
     MIPS32Instr instr( "movz");
     instr.set_v_src( 1, 0);
     instr.set_v_src( 1, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_mask() == 0);
 }
@@ -989,7 +978,6 @@ TEST_CASE( "MIPS32_instr: movz 0 if 0 is equal to 0")
     MIPS32Instr instr( "movz");
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
     CHECK( instr.get_mask() == all_ones<uint32>());
@@ -1000,7 +988,6 @@ TEST_CASE( "MIPS32_instr: movz 3 if 0 is equal to 0")
     MIPS32Instr instr( "movz");
     instr.set_v_src( 3, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_dst( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 3);
     CHECK( instr.get_mask() == all_ones<uint32>());
@@ -1012,7 +999,6 @@ TEST_CASE( "MIPS32_instr: mtc0 0x12345678")
     CHECK(MIPS32Instr(0x40046800).get_disasm() == "mtc0 $Cause, $a0");
 
     MIPS32Instr instr( "mtc0");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0x12345678, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x12345678);
@@ -1025,7 +1011,6 @@ TEST_CASE( "MIPS32_instr: mthi 0x12345678")
     CHECK(MIPS32Instr(0x02200011).get_disasm() == "mthi $s1");
     
     MIPS32Instr instr( "mthi");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0x12345678, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x12345678);
@@ -1037,7 +1022,6 @@ TEST_CASE( "MIPS32_instr: mtlo 0xfeedc0de")
     CHECK(MIPS32Instr(0x02200013).get_disasm() == "mtlo $s1");
     
     MIPS32Instr instr( "mtlo");
-    instr.set_v_dst( 0);
     instr.set_v_src( 0xfeedc0de, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xfeedc0de);
