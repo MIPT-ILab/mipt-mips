@@ -30,6 +30,23 @@ TEST_CASE( "MARS: print integer") {
     CHECK( output.str() == "-1337");
 }
 
+TEST_CASE( "MARS: print string")
+{
+    std::ostringstream output;
+    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto mars_kernel = create_mars_kernel( std::cin, output);
+    mars_kernel->set_simulator( sim);
+    auto mem = FuncMemory::create_plain_memory( 24);
+    sim->set_memory( mem);
+    mars_kernel->set_memory( mem);
+    mem->write_string( "Hello World!", 0x1000);
+
+    sim->write_cpu_register( v0, 4u); // print character
+    sim->write_cpu_register( a0, 0x1000u);
+    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( output.str() == "Hello World!");
+}
+
 TEST_CASE( "MARS: read integer") {
     std::istringstream input( "1337\n");
     auto sim = Simulator::create_simulator( "mips64", true, false);

@@ -20,6 +20,7 @@ class PlainMemory : public FuncMemory
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
+        size_t strlen( Addr addr) const final;
     private:
         std::vector<Byte> arena;
 };
@@ -78,4 +79,9 @@ std::string PlainMemory::dump() const
                 << ": data 0x" << uint32( *it) << std::endl;
 
     return oss.str();
+}
+
+size_t PlainMemory::strlen( Addr addr) const
+{
+    return std::distance( arena.begin() + addr, std::find( arena.begin() + addr, arena.end(), Byte{}));
 }

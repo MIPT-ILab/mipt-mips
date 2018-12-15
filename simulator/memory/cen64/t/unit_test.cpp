@@ -54,6 +54,7 @@ TEST_CASE( "CEN64Memory: unsupported" )
     auto cen64_memory = create_cen64_memory(&bus);
     CHECK_THROWS_AS( cen64_memory->dump(), CEN64MemoryUnsupportedInterface);
     CHECK_THROWS_AS( cen64_memory->duplicate_to( FuncMemory::create_plain_memory()), CEN64MemoryUnsupportedInterface);
+    CHECK_THROWS_AS( cen64_memory->strlen( 0x0), CEN64MemoryUnsupportedInterface);
 }
 
 TEST_CASE( "CEN64Memory: write word" )

@@ -44,6 +44,11 @@ public:
         throw CEN64MemoryUnsupportedInterface("duplication");
     }
 
+    size_t strlen( Addr /* addr */) const final
+    {
+        throw CEN64MemoryUnsupportedInterface("string output");
+    }
+
 private:
     bus_controller* const bus = nullptr;
 
