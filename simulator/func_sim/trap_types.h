@@ -16,6 +16,7 @@ enum class Trap : uint8
     EXPLICIT_TRAP,
     BREAKPOINT,
     SYSCALL,
+    UNSUPPORTED_SYSCALL,
     UNALIGNED_ADDRESS,
 };
 

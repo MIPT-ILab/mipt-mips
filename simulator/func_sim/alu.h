@@ -330,9 +330,6 @@ struct ALU
     }
 
     template<typename I> static
-    void syscall( I* instr) { instr->trap = Trap::SYSCALL; }
-
-    template<typename I> static
     void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
 };
 

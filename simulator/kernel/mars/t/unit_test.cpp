@@ -27,7 +27,7 @@ TEST_CASE( "MARS: print integer") {
 
     sim->write_cpu_register( v0, 1u); // print integer
     sim->write_cpu_register( a0, narrow_cast<uint64>( -1337));
-    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( output.str() == "-1337");
 }
 
@@ -44,7 +44,7 @@ TEST_CASE( "MARS: print string")
 
     sim->write_cpu_register( v0, 4u); // print character
     sim->write_cpu_register( a0, 0x1000u);
-    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( output.str() == "Hello World!");
 }
 
@@ -55,7 +55,7 @@ TEST_CASE( "MARS: read integer") {
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 5u); // read integer
-    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( sim->read_cpu_register( v0) == 1337);
 }
 
@@ -92,7 +92,8 @@ TEST_CASE( "MARS: exit") {
     mars_kernel->set_simulator (sim);
 
     sim->write_cpu_register( v0, 10u); // exit
-    CHECK_FALSE( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::HALT);
+    CHECK( mars_kernel->execute().code == 0);
 }
 
 TEST_CASE( "MARS: print character") {
@@ -103,7 +104,7 @@ TEST_CASE( "MARS: print character") {
 
     sim->write_cpu_register( v0, 11u); // print character
     sim->write_cpu_register( a0, uint64{ 'x'});
-    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( output.str() == "x");
 }
 
@@ -114,7 +115,7 @@ TEST_CASE( "MARS: read character") {
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 12u); // read character
-    CHECK_NOTHROW( mars_kernel->execute());
+    CHECK( mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( sim->read_cpu_register( v0) == 'z');
 }
 
@@ -125,5 +126,16 @@ TEST_CASE( "MARS: read bad character") {
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 12u); // read character
-    CHECK_THROWS( mars_kernel->execute());
+    CHECK_THROWS_AS( mars_kernel->execute(), BadInputValue);
+}
+
+TEST_CASE( "MARS: exit with code") {
+    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto mars_kernel = create_mars_kernel( );
+    mars_kernel->set_simulator(sim);
+
+    sim->write_cpu_register( v0, 17u); // exit
+    sim->write_cpu_register( a0, 21u); // exit code
+    CHECK( mars_kernel->execute().type == SyscallResult::HALT);
+    CHECK( mars_kernel->execute().code == 21u);
 }
