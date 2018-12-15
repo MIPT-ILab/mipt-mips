@@ -24,21 +24,20 @@ protected:
     std::weak_ptr<Simulator> sim;
     std::shared_ptr<FuncMemory> mem;
 public:
-    static std::shared_ptr<Kernel> create_kernel( bool use_mars = false, std::istream& instream = std::cin,
-                                                  std::ostream& outstream = std::cout);
     static std::shared_ptr<Kernel> create_configured_kernel();
+    static std::shared_ptr<Kernel> create_dummy_kernel();
 
     void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
     /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
-    virtual bool execute() { return true; }
+    virtual bool execute() = 0;
 
     Kernel() = default;
     virtual ~Kernel() = default;
     Kernel( const Kernel&) = delete;
     Kernel( Kernel&&) = delete;
-    Kernel operator=( const Kernel&) = delete;
-    Kernel operator=( Kernel&&) = delete;
+    Kernel& operator=( const Kernel&) = delete;
+    Kernel& operator=( Kernel&&) = delete;
 };
 
 #endif //KERNEL_H
