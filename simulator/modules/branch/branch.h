@@ -23,6 +23,7 @@ class Branch : public Log
     
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
+        std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
 
         std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
