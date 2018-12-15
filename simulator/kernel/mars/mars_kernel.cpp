@@ -37,6 +37,7 @@ static const constexpr uint8 a0 = 4;
 static const constexpr uint8 a1 = 5;
 
 SyscallResult MARSKernel::execute () {
+    (void)errstream; // w/a for Clang warning
     auto cpu = sim.lock();
     uint64 syscall_code = sim.lock()->read_cpu_register( v0);
     switch (syscall_code) {
