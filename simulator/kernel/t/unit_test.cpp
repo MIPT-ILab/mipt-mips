@@ -10,5 +10,10 @@
 
 TEST_CASE( "Kernel: Execute nothing")
 {
-    CHECK( Kernel::create_kernel()->execute());
+    CHECK( Kernel::create_dummy_kernel()->execute());
+}
+
+TEST_CASE( "Kernel: Default kernel is empty")
+{
+    CHECK( Kernel::create_configured_kernel()->execute());
 }

@@ -15,13 +15,13 @@ static const uint8 v0 = 2;
 static const uint8 a0 = 4;
 
 TEST_CASE( "MARS: construct kernel") {
-    CHECK_NOTHROW( Kernel::create_kernel( true));
+    CHECK_NOTHROW( create_mars_kernel());
 }
 
 TEST_CASE( "MARS: print integer") {
     std::ostringstream output;
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, std::cin, output);
+    auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 1u); // print integer
@@ -50,7 +50,7 @@ TEST_CASE( "MARS: print string")
 TEST_CASE( "MARS: read integer") {
     std::istringstream input( "1337\n");
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, input);
+    auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 5u); // read integer
@@ -61,7 +61,7 @@ TEST_CASE( "MARS: read integer") {
 TEST_CASE( "MARS: read bad integer") {
     std::istringstream input( "133q\n");
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, input);
+    auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 5u); // read integer
@@ -70,7 +70,7 @@ TEST_CASE( "MARS: read bad integer") {
 
 TEST_CASE( "MARS: exit") {
     auto sim = Simulator::create_simulator ("mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel (true);
+    auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator (sim);
 
     sim->write_cpu_register( v0, 10u); // exit
@@ -80,7 +80,7 @@ TEST_CASE( "MARS: exit") {
 TEST_CASE( "MARS: print character") {
     std::ostringstream output;
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, std::cin, output);
+    auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 11u); // print character
@@ -92,7 +92,7 @@ TEST_CASE( "MARS: print character") {
 TEST_CASE( "MARS: read character") {
     std::istringstream input( "z\n");
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, input);
+    auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 12u); // read character
@@ -103,7 +103,7 @@ TEST_CASE( "MARS: read character") {
 TEST_CASE( "MARS: read bad character") {
     std::istringstream input( "zz\n");
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, input);
+    auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 12u); // read character

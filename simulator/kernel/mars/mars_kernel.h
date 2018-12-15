@@ -9,21 +9,6 @@
 
 #include <kernel/kernel.h>
 
-class MARSKernel : public Kernel {
-    void print_integer();
-    void read_integer();
-    void print_character();
-    void read_character();
-    void print_string();
-
-    std::istream& instream;
-    std::ostream& outstream;
-
-public:
-    bool execute() final;
-
-    MARSKernel( std::istream& instream, std::ostream& outstream)
-      : instream( instream), outstream( outstream) {}
-};
+std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream = std::cin, std::ostream& outstream = std::cout, std::ostream& errstream = std::cerr);
 
 #endif //MARS_KERNEL_H
