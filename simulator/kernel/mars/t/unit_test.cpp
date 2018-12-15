@@ -34,7 +34,7 @@ TEST_CASE( "MARS: print string")
 {
     std::ostringstream output;
     auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = Kernel::create_kernel( true, std::cin, output);
+    auto mars_kernel = create_mars_kernel( true, std::cin, output);
     mars_kernel->set_simulator( sim);
     auto mem = FuncMemory::create_plain_memory( 24);
     sim->set_memory( mem);
