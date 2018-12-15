@@ -44,7 +44,7 @@ MIPT | Name | Score | Comments
 611 | Denis Los | 19 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31), [#20](https://github.com/MIPT-ILab/mipt-mips/issues/20) |
 618 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
 512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
-**711** | **Vyacheslav Kompan** | **9** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/662)**  |
+**711** | **Vyacheslav Kompan** | **11** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)**  |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 **714** | **Yauheni Sharamed** | **6** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724)**
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
@@ -60,8 +60,7 @@ MIPT | Name | Score | Comments
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
-
-List of [Upcoming contributuions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
+List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
 ## About us
 
