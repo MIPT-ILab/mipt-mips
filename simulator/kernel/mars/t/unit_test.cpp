@@ -228,7 +228,7 @@ TEST_CASE( "MARS: open non existing file")
 
 TEST_CASE( "MARS: open, write, read and close a file")
 {
-    std::string filename = std::tmpnam(nullptr);
+    std::string filename("tempfile");
     std::ostringstream output;
     System sys( std::cin, output);
     sys.mem->write_string( filename, 0x1000);
