@@ -105,7 +105,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 add_library(mipt-mips-src STATIC ${CPPS})
 target_link_libraries(mipt-mips-src riscv-isa)
 
-add_library(mipt-mips-cen64-intf STATIC interface/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src stdc++)
 
 add_executable(${PROJECT_NAME} main.cpp)
@@ -115,4 +115,4 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
 
 # GDB libsim.a
-include(interface/gdb/mips-sim-gdb.cmake)
+include(export/gdb/mips-sim-gdb.cmake)

@@ -1,6 +1,5 @@
 ignore:
   - "external/.*"
-  - "simulator/interface/.*"
   - "*/t/*.h"
   - "*/t/*.cpp"
 
