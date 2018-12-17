@@ -33,7 +33,7 @@ Date | Event name
 24 Oct | **Continuous Integration**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%203%20-%20Continious%20Integration.pptx?raw=true)<br/> • Homework: install Travis CI for your project to run your Make or CMake builds.
 07 Nov | **Code form**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%204%20-%20Code%20Form.pptx?raw=true)
 21 Nov | **Unit testing**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%205%20-%20Unit%20Tests.pptx?raw=true)
-05 Dec | **Test-driven development**
+05 Dec | **Test-driven development**<br/> • [Slides](https://github.com/MIPT-ILab/sd-lectures/blob/master/mipt-mips/2018/Lecture%206%20-%20Test%20Driven%20Development.pptx?raw=true)
 
 In addition, repository contains a lot of useful [Wiki manuals](https://github.com/MIPT-ILab/mipt-mips/wiki) about Git, MIPS, C++, Make utilites and so on.
 
