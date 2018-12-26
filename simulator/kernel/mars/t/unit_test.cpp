@@ -40,7 +40,7 @@ struct System
     std::shared_ptr<FuncMemory> mem = nullptr;
     
     template<typename ... KernelArgs>
-    System( KernelArgs&&... args)
+    explicit System( KernelArgs&&... args)
         : sim( Simulator::create_simulator( "mips64", true, false))
         , mars_kernel( create_mars_kernel(std::forward<KernelArgs>(args)...))
         , mem( FuncMemory::create_plain_memory( 24))
@@ -162,7 +162,7 @@ TEST_CASE( "MARS: read from stdout")
     sys.sim->write_cpu_register( a2, 5);
     CHECK( sys.mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
-    CHECK( sys.mem->read_string(0x1000u) == "");
+    CHECK( sys.mem->read_string(0x1000u).empty());
 }
 
 TEST_CASE( "MARS: read from stderr")
@@ -176,7 +176,7 @@ TEST_CASE( "MARS: read from stderr")
     sys.sim->write_cpu_register( a2, 5);
     CHECK( sys.mars_kernel->execute().type == SyscallResult::SUCCESS);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
-    CHECK( sys.mem->read_string(0x1000u) == "");
+    CHECK( sys.mem->read_string(0x1000u).empty());
 }
 
 static void write_to_descriptor(System* sys, int desc)
