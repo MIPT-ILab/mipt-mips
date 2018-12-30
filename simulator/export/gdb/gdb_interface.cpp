@@ -4,9 +4,8 @@
  * Copyright 2018 MIPT-MIPS
  */
 
+#include "sim-main.h"
 
-/* BFD config (must be included first) */
-#include <bfd/config.h>
 /* GDB Interface */
 #include <gdb/remote-sim.h>
 #include <gdb/callback.h>
@@ -16,7 +15,6 @@
 #include <sim-inline.h>
 #include <sim-arange.h>
 #include <sim-base.h>
-#include "sim-main.h"
 /* MIPT-MIPS simulator interfaces */
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>

@@ -4,9 +4,10 @@
  * Copyright 2018 MIPT-MIPS
  */
 
+#define WITH_PROFILE 0
 
 /* BFD config */
-#include "bfd/config.h"
+#include <bfd/config.h>
 
 /* GDB simulator utilities */
 #include "sim-basics.h"
