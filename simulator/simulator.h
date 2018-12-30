@@ -27,6 +27,7 @@ public:
 
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual Trap run_single_step() = 0;
+    virtual Trap run_until_trap( uint64 instrs_to_run) = 0;
     virtual void set_target( const Target& target) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
@@ -43,6 +44,7 @@ public:
     virtual void write_cpu_register( uint8 regno, uint64 value) = 0;
 
     int get_exit_code() const { return exit_code; }
+
 protected:
     int exit_code = 0;
 };
