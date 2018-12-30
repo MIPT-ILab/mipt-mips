@@ -20,6 +20,8 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
 
     #target_link_libraries(mipt-mips-gdb mipt-mips-src)
 
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_CONFIG_H")
+    
     # Output: libsim.a stored in "simulator/gdb"
     set_target_properties(mipt-mips-gdb PROPERTIES
             PREFIX ""
@@ -28,6 +30,7 @@ if (EXISTS ${GDB_SIM_COMMON_PATH})
             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin/")
 
     target_include_directories(mipt-mips-gdb SYSTEM PUBLIC
+            ${CMAKE_CURRENT_LIST_DIR}
             ${CMAKE_CURRENT_LIST_DIR}/../../../..
             ${CMAKE_CURRENT_LIST_DIR}/../../../../bfd
             ${CMAKE_CURRENT_LIST_DIR}/../../../../include
