@@ -34,6 +34,7 @@ public:
     ~PerfSim() override { destroy_ports(); }
     Trap run( uint64 instrs_to_run) final;
     Trap run_single_step() final { return Trap::HALT; }
+    Trap run_until_trap( uint64 /* instrs_to_run */) final { return Trap::HALT; }
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }

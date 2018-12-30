@@ -114,6 +114,18 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 }
 
 template <typename ISA>
+Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
+{
+    nops_in_a_row = 0;
+    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+        auto trap = step_system();
+        if ( trap != Trap::NO_TRAP)
+            return trap;
+    }
+    return Trap::NO_TRAP;
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run_single_step()
 {
     auto trap = step_system();

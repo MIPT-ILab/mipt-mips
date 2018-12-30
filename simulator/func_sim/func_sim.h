@@ -45,8 +45,9 @@ class FuncSim : public Simulator
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void init_checker() final { };
         FuncInstr step();
-        Trap run(uint64 instrs_to_run) final;
+        Trap run( uint64 instrs_to_run) final;
         Trap run_single_step() final;
+        Trap run_until_trap( uint64 instrs_to_run) final;
 
         void set_target(const Target& target) final {
             PC = target.address;
