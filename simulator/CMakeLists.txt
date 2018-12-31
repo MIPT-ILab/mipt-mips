@@ -85,6 +85,30 @@ if (ENABLE_PROFILE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
+set(GDB_SIM_COMMON_PATH ${CMAKE_CURRENT_LIST_DIR}/../../sim/common)
+
+# Add mipt-mips-gdb target iff we are building under GDB
+if (EXISTS ${GDB_SIM_COMMON_PATH})
+    set(GDB_SIM_SRCS
+            ${GDB_SIM_COMMON_PATH}/sim-utils.c
+            ${GDB_SIM_COMMON_PATH}/callback.c
+            ${GDB_SIM_COMMON_PATH}/sim-io.c
+            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp
+            )
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_CONFIG_H")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast -Wno-variadic-macros")
+
+    include_directories(
+            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/
+            ${GDB_SIM_COMMON_PATH}/../../bfd
+            ${GDB_SIM_COMMON_PATH}/../../
+            ${GDB_SIM_COMMON_PATH}/../../include
+            ${GDB_SIM_COMMON_PATH})
+else ()
+    set(GDB_SIM_SRCS)
+endif ()
+
 #include(CheckIPOSupported)
 #check_ipo_supported(RESULT result)
 #if(result)
@@ -102,7 +126,7 @@ find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # Targets
-add_library(mipt-mips-src STATIC ${CPPS})
+add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS})
 target_link_libraries(mipt-mips-src riscv-isa)
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
@@ -114,5 +138,11 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 # Tests
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
 
-# GDB libsim.a
-include(export/gdb/mips-sim-gdb.cmake)
+if (EXISTS ${GDB_SIM_COMMON_PATH})
+    # Output: libsim.a stored in "simulator/gdb"
+    set_target_properties(mipt-mips-src PROPERTIES
+            PREFIX ""
+            SUFFIX ""
+            OUTPUT_NAME "libsim.a"
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/")
+endif (EXISTS ${GDB_SIM_COMMON_PATH})
