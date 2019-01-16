@@ -49,7 +49,7 @@ install:
     fi
 
 before_script:
-  - git clone --depth=1 https://sourceware.org/git/binutils-gdb.git
+  - git clone --depth=1 https://github.com/bminor/binutils-gdb.git
   - cd $TRAVIS_BUILD_DIR/traces && make tt
   - cd $TRAVIS_BUILD_DIR/simulator
   - mkdir gdb-build debug release
