@@ -49,14 +49,26 @@ install:
     fi
 
 before_script:
+  - git clone --depth=1 http://sourceware.org/git/binutils-gdb.git
   - cd $TRAVIS_BUILD_DIR/traces && make tt
   - cd $TRAVIS_BUILD_DIR/simulator
-  - mkdir release && cd release
+  - mkdir gdb-build
+  - mkdir debug
+  - mkdir release
+  - cd release
   - cmake .. -DCMAKE_BUILD_TYPE=Release
 
 script:
   - make all unit-tests
   - ctest --verbose
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb
+  - ./configure --target=mips
+  - make
+  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
+  - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
+  - make
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb
+  - make
 
 after_success:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
@@ -66,8 +78,7 @@ after_success:
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator
-        mkdir debug && cd debug
+        cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
         make unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
