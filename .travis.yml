@@ -65,7 +65,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
   - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
   - make
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
   - make MAKEINFO=true
 
 after_success:
