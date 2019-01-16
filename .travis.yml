@@ -49,12 +49,10 @@ install:
     fi
 
 before_script:
-  - git clone --depth=1 http://sourceware.org/git/binutils-gdb.git
+  - git clone --depth=1 https://sourceware.org/git/binutils-gdb.git
   - cd $TRAVIS_BUILD_DIR/traces && make tt
   - cd $TRAVIS_BUILD_DIR/simulator
-  - mkdir gdb-build
-  - mkdir debug
-  - mkdir release
+  - mkdir gdb-build debug release
   - cd release
   - cmake .. -DCMAKE_BUILD_TYPE=Release
 
@@ -62,8 +60,8 @@ script:
   - make all unit-tests
   - ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb
-  - ./configure --target=mips
-  - make
+  - ./configure --target=mips > /dev/null
+  - make > /dev/null
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
   - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
   - make
@@ -71,6 +69,7 @@ script:
   - make
 
 after_success:
+  - cd $TRAVIS_BUILD_DIR/simulator/release
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
