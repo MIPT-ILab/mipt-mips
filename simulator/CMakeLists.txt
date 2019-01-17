@@ -85,26 +85,26 @@ if (ENABLE_PROFILE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
-set(GDB_SIM_COMMON_PATH ${CMAKE_CURRENT_LIST_DIR}/../../sim/common)
+set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 # Add mipt-mips-gdb target iff we are building under GDB
-if (EXISTS ${GDB_SIM_COMMON_PATH})
+if (GDB_SOURCE_PATH)
     set(GDB_SIM_SRCS
-            ${GDB_SIM_COMMON_PATH}/sim-utils.c
-            ${GDB_SIM_COMMON_PATH}/callback.c
-            ${GDB_SIM_COMMON_PATH}/sim-io.c
+            ${GDB_SOURCE_PATH}/sim/common/sim-utils.c
+            ${GDB_SOURCE_PATH}/sim/common/callback.c
+            ${GDB_SOURCE_PATH}/sim/common/sim-io.c
             ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp
             )
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_CONFIG_H")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast -Wno-variadic-macros")
 
-    include_directories(
-            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/
-            ${GDB_SIM_COMMON_PATH}/../../bfd
-            ${GDB_SIM_COMMON_PATH}/../../
-            ${GDB_SIM_COMMON_PATH}/../../include
-            ${GDB_SIM_COMMON_PATH})
+    include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
+    include_directories(SYSTEM
+            ${GDB_SOURCE_PATH}/
+            ${GDB_SOURCE_PATH}/bfd
+            ${GDB_SOURCE_PATH}/include
+            ${GDB_SOURCE_PATH}/sim/common)
 else ()
     set(GDB_SIM_SRCS)
 endif ()
@@ -138,11 +138,11 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 # Tests
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
 
-if (EXISTS ${GDB_SIM_COMMON_PATH})
+if (GDB_SOURCE_PATH)
     # Output: libsim.a stored in "simulator/gdb"
     set_target_properties(mipt-mips-src PROPERTIES
             PREFIX ""
             SUFFIX ""
             OUTPUT_NAME "libsim.a"
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/")
-endif (EXISTS ${GDB_SIM_COMMON_PATH})
+            ARCHIVE_OUTPUT_DIRECTORY "${GDB_SOURCE_PATH}/sim/mips")
+endif (GDB_SOURCE_PATH)
