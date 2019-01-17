@@ -40,8 +40,8 @@ install:
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         ./traces/.get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
-        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
         brew install readline
+        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin:/usr/local/opt/readline/include
     fi
 # Download binutils on Linux
   - |
@@ -65,6 +65,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release && make mipt-mips-src mipt-mips unit-tests
   - cd $TRAVIS_BUILD_DIR/simulator/release && ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && make gdb MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && ./gdb -q $TRAVIS_BUILD_DIR/traces/tt.core.universal.out -ex 'target sim' -ex 'load' -ex 'r' -ex 'q'
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/release
