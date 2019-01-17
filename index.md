@@ -71,7 +71,6 @@ The project is mentored by [Igor Smirnov](https://github.com/igorsmir-ilab), [Ki
 Additional repositories:
 * [MIPS traces](https://github.com/MIPT-ILab/mips-traces)
 * [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
-* [MIPSim GDB](https://github.com/MIPT-ILab/mipt-sim-gdb)
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
 * _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
 * _[MSVC-compatible LibELF](https://github.com/MIPT-ILab/libelf)_
