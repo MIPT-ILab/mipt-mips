@@ -62,8 +62,8 @@ script:
   - make all unit-tests
   - ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb
-  - ./configure --target=mips --with-system-zlib > /dev/null
-  - make MAKEINFO=true > /dev/null
+  - ./configure --target=mips --with-system-zlib > /dev/null 2>&1
+  - make MAKEINFO=true > /dev/null 2>&1
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
   - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
   - make
