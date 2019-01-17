@@ -61,7 +61,7 @@ script:
   - ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb
   - ./configure --target=mips > /dev/null
-  - make MAKEINFO=true > /dev/null
+  - make all-gdb MAKEINFO=true > /dev/null
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
   - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
   - make
