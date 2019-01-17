@@ -57,7 +57,6 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
-  - cd $TRAVIS_BUILD_DIR/simulator/debug     && cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
@@ -76,6 +75,8 @@ after_success:
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        cd $TRAVIS_BUILD_DIR/simulator/debug
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
         make unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
     fi
