@@ -19,6 +19,7 @@ MIPT-MIPS can be used for different purposes:
 
 Key system-level features:
 * Compatibility with [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls convention
+* Interactive simulation with [GDB](https://github.com/MIPT-ILab/mipt-mips/wiki/Interactive-simulation-with-GDB)
 
 Key microarchitecture features:
 * Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
