@@ -62,9 +62,9 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - make all unit-tests
   - ctest --verbose
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && make MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && make configure-gdb MAKEINFO=true > /dev/null
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && make mipt-mips-src
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb    && make MAKEINFO=true
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb    && make gdb MAKEINFO=true
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/release
