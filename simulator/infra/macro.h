@@ -36,11 +36,11 @@ void ignored( const T& /* unused */) noexcept { }
 
 /* Find minimal sizeof */
 template<typename ... Args>
-constexpr size_t min_sizeof() noexcept { return std::min({sizeof(Args)...}); }
+constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
 
 /* Find maximal sizeof */
 template<typename ... Args>
-constexpr size_t max_sizeof() noexcept { return std::max({sizeof(Args)...}); }
+constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
 
 /* Bit width of integer type */
 template<typename T>
