@@ -50,13 +50,12 @@ install:
 
 before_script:
   - git clone --depth=1 https://github.com/bminor/binutils-gdb.git
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb
-  - rm -rf binutils gas gold ld gprof
-  - ./configure --target=mips --with-system-zlib
   - cd $TRAVIS_BUILD_DIR/traces              && make tt
   - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && ./configure --target=mips --with-system-zlib
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
