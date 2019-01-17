@@ -62,7 +62,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure               && make libdecnumber.a
 
 script:
-  - cd $TRAVIS_BUILD_DIR/simulator/release && make mipt-mips-src unit-tests
+  - cd $TRAVIS_BUILD_DIR/simulator/release && make mipt-mips-src mipt-mips unit-tests
   - cd $TRAVIS_BUILD_DIR/simulator/release && ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && make gdb MAKEINFO=true > /dev/null
 
