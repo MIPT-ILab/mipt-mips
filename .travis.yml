@@ -41,7 +41,7 @@ install:
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         ./traces/.get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
         export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
-        export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/opt/readline/include
+        export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/Cellar/readline/7.0.5/include
     fi
 # Download binutils on Linux
   - |
