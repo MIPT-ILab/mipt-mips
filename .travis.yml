@@ -52,7 +52,7 @@ before_script:
   - git clone --depth=1 https://github.com/bminor/binutils-gdb.git
   - cd $TRAVIS_BUILD_DIR/binutils-gdb
   - rm -rf binutils gas gold ld gprof
-  - ./configure --target=mips --with-system-zlib > /dev/null 2>&1
+  - ./configure --target=mips --with-system-zlib
   - cd $TRAVIS_BUILD_DIR/traces              && make tt
   - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -63,8 +63,8 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - make all unit-tests
   - ctest --verbose
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && make MAKEINFO=true > /dev/null 2>&1
-  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && make
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && make MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && make mipt-mips-src
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb    && make MAKEINFO=true
 
 after_success:
