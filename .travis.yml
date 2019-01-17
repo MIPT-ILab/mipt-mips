@@ -51,10 +51,9 @@ install:
   - git clone --depth=1 https://github.com/bminor/binutils-gdb.git
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/traces              && make tt
-  - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
-  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
+  - cd $TRAVIS_BUILD_DIR/traces            && make tt
+  - cd $TRAVIS_BUILD_DIR/simulator         && mkdir gdb-build debug release
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
 # Prepare for GDB build
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mips --with-system-zlib --with-system-readline --with-python=no
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mips && make libopcodes.a
@@ -62,9 +61,8 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb MAKEINFO=true > /dev/null
 
 script:
-  - cd $TRAVIS_BUILD_DIR/simulator/release   && make all unit-tests
+  - cd $TRAVIS_BUILD_DIR/simulator/release   && make mipt-mips-src unit-tests
   - cd $TRAVIS_BUILD_DIR/simulator/release   && ctest --verbose
-  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && make mipt-mips-src
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb    && make gdb MAKEINFO=true
 
 after_success:
