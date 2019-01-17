@@ -52,23 +52,20 @@ before_script:
   - git clone --depth=1 https://github.com/bminor/binutils-gdb.git
   - cd $TRAVIS_BUILD_DIR/binutils-gdb
   - rm -rf binutils gas gold ld gprof
-  - cd $TRAVIS_BUILD_DIR/traces && make tt
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - mkdir gdb-build debug release
-  - cd release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - ./configure --target=mips --with-system-zlib > /dev/null 2>&1
+  - cd $TRAVIS_BUILD_DIR/traces              && make tt
+  - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
+  - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
+  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
+  - cd $TRAVIS_BUILD_DIR/simulator/debug     && cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
 
 script:
+  - cd $TRAVIS_BUILD_DIR/simulator/release
   - make all unit-tests
   - ctest --verbose
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb
-  - ./configure --target=mips --with-system-zlib > /dev/null 2>&1
-  - make MAKEINFO=true > /dev/null 2>&1
-  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build
-  - cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
-  - make
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
-  - make MAKEINFO=true
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && make MAKEINFO=true > /dev/null 2>&1
+  - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && make
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb    && make MAKEINFO=true
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/release
@@ -79,8 +76,6 @@ after_success:
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
         make unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
     fi
