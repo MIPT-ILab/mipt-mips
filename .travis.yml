@@ -54,7 +54,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/simulator           && mkdir gdb-build debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release   && cmake .. -DCMAKE_BUILD_TYPE=Release
   - cd $TRAVIS_BUILD_DIR/simulator/gdb-build && cmake .. -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && ./configure --target=mips --with-system-zlib
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb        && ./configure --target=mips --with-system-zlib --with-system-readline
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure
 
 script:
