@@ -56,9 +56,9 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb
 # Prepare for GDB build
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mips --with-system-zlib --with-system-readline --with-python=no
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb MAKEINFO=true
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mips && make libopcodes.a
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure && make libdecnumber.a
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb MAKEINFO=true > /dev/null
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release   && make mipt-mips-src unit-tests
