@@ -6,23 +6,25 @@
 
 #include "sim-main.h"
 
-/* GDB Interface */
 #include <gdb/remote-sim.h>
 #include <gdb/callback.h>
-/* GDB Simulator utilities */
+
 #include <sim-config.h>
 #include <sim-types.h>
 #include <sim-inline.h>
 #include <sim-arange.h>
 #include <sim-base.h>
-/* MIPT-MIPS simulator interfaces */
+
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
 #include <infra/config/config.h>
-/* Generic C++ */
-#include <vector>
+#include <infra/endian.h>
 
+#include <array>
+#include <memory>
+#include <string>
+#include <vector>
 
 struct SimulatorInstance {
     std::shared_ptr<Simulator> cpu = nullptr;
@@ -31,6 +33,8 @@ struct SimulatorInstance {
     size_t id = 0;
     Trap trap = Trap::NO_TRAP;
 };
+
+static const constexpr Endian gdb_endian = Endian::little;
 
 static std::vector<SimulatorInstance> simInstances;
 
@@ -115,40 +119,65 @@ SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *,
     return SIM_RC_OK;
 }
 
+static inline Byte* byte_cast(unsigned char* b) { return reinterpret_cast<Byte*>( b); }
+static inline const Byte* byte_cast(const unsigned char* b) { return reinterpret_cast<const Byte*>( b); }
 
 int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_guest_to_host( reinterpret_cast<Byte*>( buf), mem, static_cast<size_t> (length));
+    return simInstances.at( sd->instanceId).memory->memcpy_guest_to_host( byte_cast( buf), mem, static_cast<size_t> (length));
 }
 
 
 int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_host_to_guest( mem, reinterpret_cast<const Byte*>( buf), static_cast<size_t> (length));
+    return simInstances.at( sd->instanceId).memory->memcpy_host_to_guest( mem, byte_cast( buf), static_cast<size_t> (length));
 }
 
+template<typename T, Endian e>
+static inline void put_value_to_pointer( Byte* buf, T value) {
+    auto res = unpack_array<T, e>(value);
+    std::copy(res.begin(), res.end(), buf);
+}
+
+template<typename T, Endian e>
+static inline T get_value_from_pointer( const Byte* buf) {
+    std::array<Byte, bytewidth<T>> res;
+    std::copy(buf, buf + res.size(), res.begin());
+    return pack_array<T, e>( res);
+}
 
 int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
-    (void) sd;
-    (void) regno;
-    (void) buf;
-    (void) length;
+    auto sim = simInstances.at( sd->instanceId).cpu;
+    if ( length == 8) {
+        put_value_to_pointer<uint64, gdb_endian>( byte_cast( buf), sim->read_gdb_register( regno));
+        return 8;
+    }
+
+    if ( length == 4) {
+        put_value_to_pointer<uint32, gdb_endian>( byte_cast( buf), sim->read_gdb_register( regno));
+        return 4;
+    }
+
     return 0;
 }
-
 
 int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
-    (void) sd;
-    (void) regno;   
-    (void) buf;
-    (void) length;
+    auto sim = simInstances.at( sd->instanceId).cpu;
+    if ( length == 8) {
+        sim->write_gdb_register( regno, get_value_from_pointer<uint64, gdb_endian>( byte_cast( buf)));
+        return 8;
+    }
+
+    if ( length == 4) {
+        sim->write_gdb_register( regno, get_value_from_pointer<uint32, gdb_endian>( byte_cast( buf)));
+        return 4;
+    }
+
     return 0;
 }
-
 
 void sim_info (SIM_DESC sd, int verbose) {
     (void) sd;
     (void) verbose;
 }
-
 
 void sim_resume (SIM_DESC sd, int step, int) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
