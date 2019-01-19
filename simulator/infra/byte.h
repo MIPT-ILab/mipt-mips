@@ -13,25 +13,25 @@
 // Do not use std::byte as Apple Xcode does not have it
 enum class Byte : uint8 { };
 
-static inline constexpr Byte* byte_cast( char* b)
+static inline Byte* byte_cast( char* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
     return reinterpret_cast<Byte*>( b);
 }
 
-static inline constexpr const Byte* byte_cast( const char* b)
+static inline const Byte* byte_cast( const char* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
     return reinterpret_cast<const Byte*>( b);
 }
 
-static inline constexpr Byte* byte_cast( uint8* b)
+static inline Byte* byte_cast( uint8* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
     return reinterpret_cast<Byte*>( b);
 }
 
-static inline constexpr const Byte* byte_cast( const uint8* b)
+static inline const Byte* byte_cast( const uint8* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
     return reinterpret_cast<const Byte*>( b);
