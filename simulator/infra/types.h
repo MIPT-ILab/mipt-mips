@@ -13,9 +13,6 @@
 // C++11 fixed width integer types
 #include <cstdint>
 
-// Do not use std::byte as Apple Xcode does not have it
-enum class Byte : uint8_t { };
-
 /* Signed 8-bit integer type */
 using int8 = int8_t;
 /* Signed 16-bit integer type */

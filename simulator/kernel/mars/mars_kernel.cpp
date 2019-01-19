@@ -234,5 +234,5 @@ void MARSKernel::read_from_file() {
 
     auto chars_read = file->tellg() - current_pos;
     cpu->write_cpu_register( v0, chars_read);
-    mem->memcpy_host_to_guest( buffer_ptr, reinterpret_cast<const Byte*>( buffer.data()), chars_to_read);
+    mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
 }
