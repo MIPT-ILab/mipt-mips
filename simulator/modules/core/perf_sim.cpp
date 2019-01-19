@@ -44,6 +44,12 @@ void PerfSim<ISA>::set_target( const Target& target)
 }
 
 template<typename ISA>
+Addr PerfSim<ISA>::get_pc() const
+{
+    return writeback.get_next_PC();
+}
+
+template<typename ISA>
 Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 {
     force_halt = false;
@@ -104,6 +110,24 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
+}
+
+template <typename ISA>
+uint64 PerfSim<ISA>::read_gdb_register( uint8 regno) const
+{
+    if ( regno == Register::get_gdb_pc_index())
+        return get_pc();
+
+    return read_register( Register::from_gdb_index( regno));
+}
+
+template <typename ISA>
+void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+{
+    if ( regno == Register::get_gdb_pc_index())
+        set_pc( value);
+    else
+        write_register( Register::from_gdb_index( regno), value);
 }
 
 #include <mips/mips.h>

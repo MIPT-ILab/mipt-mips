@@ -132,6 +132,24 @@ Trap FuncSim<ISA>::run_single_step()
     return trap == Trap::NO_TRAP ? Trap::BREAKPOINT : trap;
 }
 
+template <typename ISA>
+uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
+{
+    if ( regno == Register::get_gdb_pc_index())
+        return get_pc();
+
+    return read_register( Register::from_gdb_index( regno));
+}
+
+template <typename ISA>
+void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+{
+    if ( regno == Register::get_gdb_pc_index())
+        set_pc( value);
+    else
+        write_register( Register::from_gdb_index( regno), value);
+}
+
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 

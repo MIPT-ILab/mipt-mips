@@ -38,6 +38,7 @@ public:
     constexpr bool is_mips_lo()    const { return false; }
     static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
     static RISCVRegister from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
     static constexpr RISCVRegister mips_hi() noexcept;
