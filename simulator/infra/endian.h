@@ -10,6 +10,8 @@
 #define ENDIAN_H
 
 #include "macro.h"
+#include "byte.h"
+
 #include <array>
 #include <climits>
 

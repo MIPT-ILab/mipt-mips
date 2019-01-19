@@ -11,8 +11,7 @@
 
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Connecting ELFIO to our guidelines
-    auto src = reinterpret_cast<const Byte*>( section.get_data ());
+    auto src = byte_cast( section.get_data ());
     memory->memcpy_host_to_guest( section.get_address() + offset, src, section.get_size());
 }
 

@@ -117,12 +117,12 @@ SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *,
 
 
 int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_guest_to_host( reinterpret_cast<Byte*>( buf), mem, static_cast<size_t> (length));
+    return simInstances.at( sd->instanceId).memory->memcpy_guest_to_host( byte_cast( buf), mem, static_cast<size_t> (length));
 }
 
 
 int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_host_to_guest( mem, reinterpret_cast<const Byte*>( buf), static_cast<size_t> (length));
+    return simInstances.at( sd->instanceId).memory->memcpy_host_to_guest( mem, byte_cast( buf), static_cast<size_t> (length));
 }
 
 
