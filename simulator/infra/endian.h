@@ -91,4 +91,20 @@ static inline constexpr T swap_endian( T value) noexcept
     return pack_array_le<T>( unpack_array_be<T>( value)); 
 }
 
+template<typename T, Endian e>
+static inline void constexpr put_value_to_pointer( Byte* buf, T value) {
+    const auto& array = unpack_array<T, e>(value);
+    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
+        *(buf + i) = array[i];
+}
+
+template<typename T, Endian e>
+static inline constexpr T get_value_from_pointer( const Byte* buf) {
+    std::array<Byte, bytewidth<T>> array{};
+    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
+        array[i] = *( buf + i);
+
+    return pack_array<T, e>( array);
+}
+
 #endif // ENDIAN_H
