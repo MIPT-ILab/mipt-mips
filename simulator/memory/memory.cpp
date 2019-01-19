@@ -22,8 +22,7 @@ std::string ReadableMemory::read_string_limited( Addr addr, size_t size) const
 std::string ReadableMemory::read_string_by_size( Addr addr, size_t size) const
 {
     std::vector<char> tmp( size);
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Cast from characters
-    memcpy_guest_to_host( reinterpret_cast<Byte*>( tmp.data()), addr, tmp.size());
+    memcpy_guest_to_host( byte_cast( tmp.data()), addr, tmp.size());
     return std::string( tmp.begin(), tmp.end());
 }
 
@@ -40,8 +39,7 @@ void WriteableMemory::write_string_limited( const std::string& value, Addr addr,
 
 void WriteableMemory::write_string_by_size( const std::string& value, Addr addr, size_t size)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Cast from characters
-    memcpy_host_to_guest( addr, reinterpret_cast<const Byte*>( value.c_str()), size);
+    memcpy_host_to_guest( addr, byte_cast( value.c_str()), size);
 }
 
 size_t ZeroMemory::memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept
