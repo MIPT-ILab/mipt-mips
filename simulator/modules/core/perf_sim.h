@@ -44,21 +44,14 @@ public:
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
-    uint64 read_cpu_register( uint8 regno) const final {
-        return narrow_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
-    }
+    uint64 read_cpu_register( uint8 regno) const final { return read_register( Register::from_cpu_index( regno)); }
+    uint64 read_gdb_register( uint8 regno) const final { return read_register( Register::from_gdb_index( regno)); }
+    uint64 read_cause_register() const { return read_register( Register::cause()); }
 
-    void write_cpu_register( uint8 regno, uint64 value) final {
-        rf.write( Register::from_cpu_index( regno), narrow_cast<RegisterUInt>( value));
-    }
-
-    uint64 read_cause_register() const {
-        return narrow_cast<uint64>( rf.read( Register::cause()));
-    }
-
-    void write_cause_register( uint64 value) {
-        rf.write( Register::cause(), narrow_cast<RegisterUInt>( value));
-    }
+    void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
+    void write_gdb_register( uint8 regno, uint64 value) final { write_register( Register::from_gdb_index( regno), value); }
+    void write_cause_register( uint64 value) { write_register( Register::cause(), value); }
+    
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -92,6 +85,9 @@ private:
     void clock_tree( Cycle cycle);
     void dump_statistics() const;
     bool is_halt() const;
+
+    uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
+    void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 };
 
 #endif

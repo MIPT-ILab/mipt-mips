@@ -114,6 +114,15 @@ TEST_CASE( "FuncSim: Register R/W")
     CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
 }
 
+TEST_CASE( "FuncSim: GDB Register R/W")
+{
+    FuncSim<MIPS32> sim;
+
+    sim.write_gdb_register( 1, uint64{ MAX_VAL32});
+    CHECK( sim.read_gdb_register( 1) == MAX_VAL32 );
+    CHECK( sim.read_gdb_register( 0) == 0 );
+}
+
 TEST_CASE( "FuncSim: Register size")
 {
     CHECK( FuncSim<MIPS32>().sizeof_register() == bytewidth<uint32>);
