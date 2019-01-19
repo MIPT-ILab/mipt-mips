@@ -31,6 +31,13 @@ void Writeback<ISA>::Checker::set_target( const Target& value)
         sim->set_target( value);
 }
 
+template<typename ISA>
+void Writeback<ISA>::set_target( const Target& value)
+{
+    checker.set_target( value);
+    next_PC = value.address;
+}
+    
 template <typename ISA>
 auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
@@ -74,6 +81,7 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     checker.check( instr);
     ++executed_instrs;
     last_writeback_cycle = cycle;
+    next_PC = instr.get_actual_target().address;
     if ( executed_instrs >= instrs_to_run || instr.is_halt())
         wp_halt->write( true, cycle);
 

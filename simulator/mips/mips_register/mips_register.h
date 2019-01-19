@@ -63,6 +63,8 @@ public:
             default: return MIPSRegister::zero();  // CP1 registers etc.
         }
     }
+    static constexpr uint8 get_gdb_pc_index() { return 37; }
+
     size_t to_rf_index() const { return value; }
 
     static constexpr MIPSRegister mips_hi() noexcept;

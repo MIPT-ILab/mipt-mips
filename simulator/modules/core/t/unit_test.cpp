@@ -28,7 +28,10 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     sim.set_memory( mem);
     sim.init_checker();
     sim.set_pc( 0x10);
+
+    CHECK_NOTHROW( sim.get_pc() == 0x10);
     CHECK_NOTHROW( sim.run( 1) );
+    CHECK_NOTHROW( sim.get_pc() == 0x14);
 }
 
 TEST_CASE( "PerfSim: create empty memory and get lost")
@@ -59,6 +62,10 @@ TEST_CASE( "Perf_Sim: GDB Register R/W")
     sim.write_gdb_register( 1, uint64{ MAX_VAL32});
     CHECK( sim.read_gdb_register( 1) == MAX_VAL32 );
     CHECK( sim.read_gdb_register( 0) == 0 );
+
+    sim.write_gdb_register( 37, 100500);
+    CHECK( sim.read_gdb_register( 37) == 100500);
+    CHECK( sim.get_pc() == 100500);
 }
 
 TEST_CASE( "Perf_Sim: Register size")

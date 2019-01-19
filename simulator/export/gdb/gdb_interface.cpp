@@ -34,8 +34,6 @@ struct SimulatorInstance {
     Trap trap = Trap::NO_TRAP;
 };
 
-static const constexpr Endian gdb_endian = Endian::little;
-
 static std::vector<SimulatorInstance> simInstances;
 
 static SimulatorInstance create_new_env(size_t id, const std::string& filename) {
@@ -129,32 +127,26 @@ int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) 
 
 int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
     auto sim = simInstances.at( sd->instanceId).cpu;
-    if ( length == 8) {
-        put_value_to_pointer<uint64, gdb_endian>( byte_cast( buf), sim->read_gdb_register( regno));
-        return 8;
-    }
+    if ( length == 8)
+        put_value_to_pointer<uint64, Endian::native>( byte_cast( buf), sim->read_gdb_register( regno));
+    else if ( length == 4)
+        put_value_to_pointer<uint32, Endian::native>( byte_cast( buf), sim->read_gdb_register( regno));
+    else
+        return 0;
 
-    if ( length == 4) {
-        put_value_to_pointer<uint32, gdb_endian>( byte_cast( buf), sim->read_gdb_register( regno));
-        return 4;
-    }
-
-    return 0;
+    return length;
 }
 
 int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
     auto sim = simInstances.at( sd->instanceId).cpu;
-    if ( length == 8) {
-        sim->write_gdb_register( regno, get_value_from_pointer<uint64, gdb_endian>( byte_cast( buf)));
-        return 8;
-    }
+    if ( length == 8)
+        sim->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( byte_cast( buf)));
+    else if ( length == 4)
+        sim->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( byte_cast( buf)));
+    else
+        return 0;
 
-    if ( length == 4) {
-        sim->write_gdb_register( regno, get_value_from_pointer<uint32, gdb_endian>( byte_cast( buf)));
-        return 4;
-    }
-
-    return 0;
+    return length;
 }
 
 void sim_info (SIM_DESC sd, int verbose) {
