@@ -29,19 +29,18 @@
 struct SimulatorInstance {
     std::shared_ptr<Simulator> cpu = nullptr;
     std::shared_ptr<FuncMemory> memory = nullptr;
-    std::string filename = {};
     size_t id = 0;
     Trap trap = Trap::NO_TRAP;
 };
 
 static std::vector<SimulatorInstance> simInstances;
 
-static SimulatorInstance create_new_env(size_t id, const std::string& filename) {
+static SimulatorInstance create_new_env(size_t id) {
     //TODO: add simulator arguments
     SimulatorInstance i;
     i.cpu = Simulator::create_simulator("mips32", true, true);
     i.memory = FuncMemory::create_hierarchied_memory();
-    i.filename = filename;
+    i.cpu->set_memory( i.memory);
     i.id = id;
     return i;
 }
@@ -68,7 +67,7 @@ SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
     try {
         config::handleArgs (argc, static_cast<const char* const*> (argv), 2);
         sd->instanceId = simInstances.size();
-        simInstances.emplace_back(create_new_env(sd->instanceId, abfd->filename));
+        simInstances.emplace_back(create_new_env(sd->instanceId));
     }
     catch (const config::HelpOption &e) {
         std::cout << "Functional simulator for MIPS-based CPU (GDB)"
@@ -99,20 +98,17 @@ void sim_close (SIM_DESC sd, int) {
     sim_state_free (sd);
 }
 
-SIM_RC sim_load (SIM_DESC sd, const char *, struct bfd *, int) {
-    SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    ElfLoader elf(simInst.filename);
-    elf.load_to(simInst.memory.get());
-    simInst.cpu->set_pc( elf.get_startPC());
-    std::cout << "MIPT-MIPS: Binary file " << simInst.filename << " loaded" << std::endl;
+SIM_RC sim_load (SIM_DESC sd, const char * prog_name, struct bfd *, int) {
+    std::string filename( prog_name);
+    ElfLoader( filename).load_to( simInstances.at( sd->instanceId).memory.get());
+    std::cout << "MIPT-MIPS: Binary file " << filename << " loaded" << std::endl;
     return SIM_RC_OK;
 }
 
-
-SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *,
+SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd * abfd,
                             char *const *, char *const *) {
     SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    simInst.cpu->set_memory( simInst.memory);
+    simInst.cpu->set_pc( bfd_get_start_address( abfd));
     std::cout << "MIPT-MIPS: prepared to run" << std::endl;
     return SIM_RC_OK;
 }
