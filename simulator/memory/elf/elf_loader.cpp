@@ -12,7 +12,7 @@
 struct InvalidElfSection : Exception
 {
     explicit InvalidElfSection(const std::string& section_name) :
-        Exception("Malformed ELF section:", section_name) { }
+        Exception("Malformed ELF section", section_name) { }
 };
 
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
