@@ -27,7 +27,7 @@ add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../../traces\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/\")
 
 # Add 'tests' target
-add_executable(unit-tests EXCLUDE_FROM_ALL tests/main.cpp ${TESTS_CPPS} memory/cen64/cen64_memory.cpp)
+add_executable(unit-tests EXCLUDE_FROM_ALL tests/main.cpp ${TESTS_CPPS} memory/cen64/cen64_memory.cpp memory/cen64/cen64_stub.cpp)
 target_link_libraries(unit-tests mipt-mips-src)
 
 # Generate list for CTest
