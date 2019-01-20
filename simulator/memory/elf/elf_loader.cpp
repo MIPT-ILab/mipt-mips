@@ -9,6 +9,8 @@
 #include <elfio/elfio.hpp>
 #include <memory/memory.h>
 
+#include <string>
+
 struct InvalidElfSection : Exception
 {
     explicit InvalidElfSection(const std::string& section_name) :
@@ -17,8 +19,9 @@ struct InvalidElfSection : Exception
 
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
+    using namespace std::literals::string_literals;
     if ( section.get_address() == 0 || section.get_data() == nullptr)
-        throw InvalidElfSection( section.get_name());
+        throw InvalidElfSection( "\""s + section.get_name() + "\""s);
 
     memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
 }
