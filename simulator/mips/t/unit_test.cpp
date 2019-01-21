@@ -3,6 +3,7 @@
 
 // uArchSim modules
 #include "../mips_instr.h"
+#include <memory/memory.h>
 
 TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 {
@@ -94,8 +95,6 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Load_Store")
     CHECK(MIPS32Instr(0x8531fb2e).get_disasm() == "lh $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0x953104d2).get_disasm() == "lhu $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0x9531fb2e).get_disasm() == "lhu $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0x893104d2).get_disasm() == "lwl $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0x8931fb2e).get_disasm() == "lwl $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0x993104d2).get_disasm() == "lwr $s1, 0x4d2($t1)");
@@ -877,6 +876,23 @@ TEST_CASE( "MIPS32_instr: jr to 2nd byte (round up to 4th)")
     CHECK( instr.get_new_PC() == 4);
 }
 ////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lw")
+{
+    CHECK(MIPS32Instr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lw");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = FuncMemory::create_plain_memory(15);
+    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x1000);
+    memory->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD);
+}
 
 TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
 {
@@ -2335,3 +2351,41 @@ TEST_CASE( "MIPS32_instr: xor 1 and -1")
     CHECK( instr.get_v_dst() == 0xfffffffe);
 }
 ////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: load dump")
+{
+    MIPS32Instr instr(0x8d3104d0);
+    CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
+
+    instr.set_v_src( 0x10, 0);
+    instr.set_sequence_id( 0);
+    instr.execute();
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0 ]");
+
+    auto memory = FuncMemory::create_plain_memory(12);
+    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x4e0);
+    memory->load_store( &instr);
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0, $s1 = 0xabcd ]" );
+}
+
+TEST_CASE( "MIPS32_instr: load dump with trap")
+{
+    MIPS32Instr instr(0x8d3104d0);
+    CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
+
+    instr.set_v_src( 0x1, 0);
+    instr.set_sequence_id( 0);
+    instr.execute();
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4d1 ]\t trap");
+}
+
+TEST_CASE( "MIPS32_instr: mult dump")
+{
+    MIPS32Instr instr(0x02290018);
+
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0x80000000, 1);
+    instr.set_sequence_id( 0);
+    instr.execute();
+    CHECK( instr.string_dump() == "{0}\tmult $s1, $t1\t [ $lo = 0x0, $hi = 0x40000000 ]" );
+}

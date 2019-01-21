@@ -52,15 +52,21 @@ std::string BaseMIPSInstr<R>::string_dump() const
 template<typename R>
 std::ostream& BaseMIPSInstr<R>::dump( std::ostream& out) const
 {
-    out << "{" << sequence_id << "}\t";
-    out << disasm;
+    out << "{" << sequence_id << "}\t" << disasm << "\t [";
+    bool has_ma = ( is_load() || is_store()) && complete;
+    if ( has_ma)
+    {
+        out << " $ma = 0x" << std::hex << get_mem_addr();
+    }
     if ( !dst.is_zero() && (is_load() ? memory_complete : complete) && get_mask() != 0)
     {
-        out << "\t [ $" << dst << " = 0x" << std::hex << (v_dst & mask);
+        if ( has_ma)
+            out << ",";
+        out << " $" << dst << " = 0x" << std::hex << (v_dst & mask);
         if ( !dst2.is_zero())
             out << ", $" << dst2 << " = 0x" << v_dst2;
-        out << " ]";
     }
+    out << " ]";
     if ( trap != Trap::NO_TRAP)
         out << "\t trap";
 
