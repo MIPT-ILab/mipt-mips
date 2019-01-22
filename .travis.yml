@@ -65,7 +65,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release && make mipt-mips-src mipt-mips unit-tests
   - cd $TRAVIS_BUILD_DIR/simulator/release && ctest --verbose
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && make gdb MAKEINFO=true > /dev/null
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && ./gdb $TRAVIS_BUILD_DIR/traces/tt.core.universal.out -ex 'target sim' -ex 'load' -ex 'r' -ex 'q'
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && ./gdb $TRAVIS_BUILD_DIR/traces/tt.core.universal.out -ex 'set pagination off' -ex 'target sim' -ex 'load' -ex 'r' -ex 'q'
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/release
