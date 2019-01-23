@@ -36,9 +36,9 @@ public:
     bool create_inferior( Addr start_addr) const;
 
     // Not implemented yet
-    int  stop() { }
+    int  stop() { return 0 }
     void do_command( const std::string&) { }
-    void info( int verbose) { }
+    void info( int /* verbose */) { }
     char** sim_complete_command( const std::string&, const std::string&) { return nullptr; }
 
     int memory_read( Byte* dst, Addr src, size_t length) const;
