@@ -36,7 +36,7 @@ public:
     bool create_inferior( Addr start_addr) const;
 
     // Not implemented yet
-    int  stop() { return 0 }
+    int  stop() { return 0; }
     void do_command( const std::string&) { }
     void info( int /* verbose */) { }
     char** sim_complete_command( const std::string&, const std::string&) { return nullptr; }
