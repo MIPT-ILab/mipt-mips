@@ -6,6 +6,7 @@
  
 #include "gdb_wrapper.h"
 
+#include <infra/argv.h>
 #include <infra/config/config.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
@@ -105,17 +106,9 @@ int GDBSim::get_exit_code() const
     return cpu->get_exit_code();
 }
 
-static int count_argc (const char *const *argv)
-{
-    /* Passed arguments start at argv[2], end with NULL */
-    int argc = 0;
-    while (argv[2 + argc] != nullptr)
-        argc++;
-    return argc;
-}
-
 int GDBSimVector::allocate_new( const char* const* argv) try
 {
+    /* argv[0] has to be ignored */
     config::handleArgs( count_argc( argv), argv, 2);
     st.emplace_back( GDBSim());
     auto id = st.size() - 1;
