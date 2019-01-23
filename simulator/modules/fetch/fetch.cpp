@@ -20,7 +20,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
     wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
-    rp_flush_target = make_read_port<Target>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
+    rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", PORT_LATENCY);
 
     wp_target = make_write_port<Target>("TARGET", PORT_BW, PORT_FANOUT);
     rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
@@ -30,7 +30,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
 
-    rp_bp_update = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
+    rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
 
     wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
     rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);

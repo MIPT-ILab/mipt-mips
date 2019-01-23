@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.com/MIPT-ILab/mipt-mips)
-[![Build status](https://ci.appveyor.com/api/projects/status/eungty6us329y8w1/branch/master?svg=true)](https://ci.appveyor.com/project/miptilab/mipt-mips/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/3a8h619rhn3pcdlm?svg=true)](https://ci.appveyor.com/project/pavelkryukov/mipt-mips)
 [![codecov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graph/badge.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
@@ -19,6 +19,7 @@ MIPT-MIPS can be used for different purposes:
 
 Key system-level features:
 * Compatibility with [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls convention
+* Interactive simulation with [GDB](https://github.com/MIPT-ILab/mipt-mips/wiki/Interactive-simulation-with-GDB)
 
 Key microarchitecture features:
 * Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms

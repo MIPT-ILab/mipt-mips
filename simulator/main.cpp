@@ -33,7 +33,7 @@ int main( int argc, const char* argv[]) try {
     sim->set_kernel( kernel);
 
     sim->run( config::num_steps);
-    return 0;
+    return sim->get_exit_code();
 }
 catch (const config::HelpOption& e) {
     std::cout << "Functional and performance simulators for MIPS-based CPU."

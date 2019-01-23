@@ -27,6 +27,7 @@ class HierarchiedMemory : public FuncMemory
         std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
         size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
+        size_t strlen( Addr addr) const final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
 
     private:
@@ -213,4 +214,13 @@ Byte HierarchiedMemory::check_and_read_byte( Addr addr) const noexcept
 inline void HierarchiedMemory::write_byte( Addr addr, Byte value)
 {
     memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
+}
+
+size_t HierarchiedMemory::strlen( Addr addr) const
+{
+    for (size_t i = 0; i <= addr_mask; ++i)
+        if ( read_byte( addr + i) == Byte{})
+            return i;
+
+    return addr_mask + 1;
 }

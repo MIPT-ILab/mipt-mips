@@ -6,7 +6,7 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-project(mipt-mips CXX)
+project(mipt-mips)
 
 set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
@@ -21,28 +21,32 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-set(CPPS infra/macro_test.cpp
+set(CPPS
+    infra/macro_test.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
-    kernel/kernel.cpp
-    kernel/mars/mars_kernel.cpp
+    memory/memory.cpp
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
-    modules/fetch/fetch.cpp
-    modules/fetch/bpu/bpu.cpp
-    modules/decode/decode.cpp
-    modules/execute/execute.cpp
-    modules/mem/mem.cpp
-    modules/core/perf_sim.cpp
-    modules/writeback/writeback.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
     mips/mips_isa.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp
+    export/gdb/gdb_wrapper.cpp
+    kernel/kernel.cpp
+    kernel/mars/mars_kernel.cpp
+    modules/fetch/fetch.cpp
+    modules/fetch/bpu/bpu.cpp
+    modules/decode/decode.cpp
+    modules/execute/execute.cpp
+    modules/mem/mem.cpp
+    modules/branch/branch.cpp
+    modules/core/perf_sim.cpp
+    modules/writeback/writeback.cpp
     simulator.cpp
 )
 
@@ -83,6 +87,29 @@ if (ENABLE_PROFILE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
+set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
+
+# Add mipt-mips-gdb target iff we are building under GDB
+if (GDB_SOURCE_PATH)
+    set(GDB_SIM_SRCS
+            ${GDB_SOURCE_PATH}/sim/common/sim-utils.c
+            ${GDB_SOURCE_PATH}/sim/common/callback.c
+            ${GDB_SOURCE_PATH}/sim/common/sim-io.c
+            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp)
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_CONFIG_H")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast -Wno-variadic-macros")
+
+    include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
+    include_directories(SYSTEM
+            ${GDB_SOURCE_PATH}/
+            ${GDB_SOURCE_PATH}/bfd
+            ${GDB_SOURCE_PATH}/include
+            ${GDB_SOURCE_PATH}/sim/common)
+else ()
+    set(GDB_SIM_SRCS)
+endif ()
+
 #include(CheckIPOSupported)
 #check_ipo_supported(RESULT result)
 #if(result)
@@ -100,10 +127,10 @@ find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # Targets
-add_library(mipt-mips-src STATIC ${CPPS})
+add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS})
 target_link_libraries(mipt-mips-src riscv-isa)
 
-add_library(mipt-mips-cen64-intf STATIC interface/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src stdc++)
 
 add_executable(${PROJECT_NAME} main.cpp)
@@ -111,3 +138,12 @@ target_link_libraries(${PROJECT_NAME} mipt-mips-src)
 
 # Tests
 include(${CMAKE_CURRENT_LIST_DIR}/tests/CMakeLists.txt)
+
+if (GDB_SOURCE_PATH)
+    # Output: libsim.a stored in "simulator/gdb"
+    set_target_properties(mipt-mips-src PROPERTIES
+            PREFIX ""
+            SUFFIX ""
+            OUTPUT_NAME "libsim.a"
+            ARCHIVE_OUTPUT_DIRECTORY "${GDB_SOURCE_PATH}/sim/mips")
+endif (GDB_SOURCE_PATH)

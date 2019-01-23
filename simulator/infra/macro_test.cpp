@@ -5,6 +5,7 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
 
@@ -125,6 +126,25 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
+
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data()) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data()) == 0x7856);
+
+template<Endian e>
+static constexpr auto check_to_pointer()
+{
+    std::array<Byte, 2> res{};
+    put_value_to_pointer<uint16, e>( res.data(), 0x3456);
+    return res;
+}
+
+static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
+static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
+
+static constexpr const char* some_argv[] = {"rm", "-rf", "/", nullptr};
+static_assert(count_argc( some_argv) == 3);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);

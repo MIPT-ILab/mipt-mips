@@ -14,7 +14,7 @@ struct Exception : std::runtime_error
 {
 protected:
     Exception( const std::string_view& description, const std::string& message)
-        : std::runtime_error( std::string( description) + ":\n\t" + message + '\n')
+        : std::runtime_error( std::string( description) + ":\t" + message + '\n')
     { }
 public:
     explicit Exception( const std::string& message)

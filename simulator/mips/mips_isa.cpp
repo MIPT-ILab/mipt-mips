@@ -16,6 +16,7 @@
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
 
+template<typename I> void do_nothing(I* /* instr */) { }
 template<typename I> auto mips_add     = ALU::addition<I, int32>;
 template<typename I> auto mips_addi    = ALU::addition_imm<I, int32>;
 template<typename I> auto mips_addiu   = ALU::addition_imm<I, uint32>;
@@ -83,12 +84,14 @@ template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
 template<typename I> auto mips_lwu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_madd    = ALU::multiplication<I, int32>;
 template<typename I> auto mips_maddu   = ALU::multiplication<I, uint32>;
+template<typename I> auto mips_mfc0    = ALU::move<I>;
 template<typename I> auto mips_mfhi    = ALU::move<I>;
 template<typename I> auto mips_mflo    = ALU::move<I>;
 template<typename I> auto mips_movn    = ALU::movn<I>;
 template<typename I> auto mips_movz    = ALU::movz<I>;
 template<typename I> auto mips_msub    = ALU::multiplication<I, int32>;
 template<typename I> auto mips_msubu   = ALU::multiplication<I, uint32>;
+template<typename I> auto mips_mtc0    = ALU::move<I>;
 template<typename I> auto mips_mthi    = ALU::move<I>;
 template<typename I> auto mips_mtlo    = ALU::move<I>;
 template<typename I> auto mips_mul     = ALU::multiplication<I, int32>;
@@ -118,7 +121,7 @@ template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
 template<typename I> auto mips_swr     = ALU::store_addr_right32<I>;
-template<typename I> auto mips_syscall = ALU::syscall<I>;
+template<typename I> auto mips_syscall = do_nothing<I>;
 template<typename I> auto mips_teq     = ALU::trap<I, ALU::eq<I>>;
 template<typename I> auto mips_teqi    = ALU::trap<I, ALU::eqi<I>>;
 template<typename I> auto mips_tge     = ALU::trap<I, ALU::ge<I>>;
@@ -174,8 +177,8 @@ static const Table<I> isaMapR =
     {0xA, { "movz", mips_movz<I>, OUT_R_CONDM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
     {0xB, { "movn", mips_movn<I>, OUT_R_CONDM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
     // System calls
-    {0xC, { "syscall", mips_syscall<I>, OUT_R_SPECIAL, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0xD, { "break",   mips_break<I>,   OUT_R_SPECIAL, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0xC, { "syscall", mips_syscall<I>, OUT_SYSCALL, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0xD, { "break",   mips_break<I>,   OUT_BREAK,   0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
     // Hi/Lo manipulators
     {0x10, { "mfhi", mips_mfhi<I>, OUT_ARITHM, 0, Imm::NO, Src1::HI, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
     {0x11, { "mthi", mips_mthi<I>, OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::ZERO, Dst::HI, MIPS_I_Instr} },
@@ -330,12 +333,19 @@ static const Table<I> isaMapMIPS32 =
 };
 
 template<typename I>
+static const Table<I> isaMapCOP0 =
+{
+    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, Imm::NO, Src1::RT, Src2::ZERO, Dst::CP0_RD, MIPS_I_Instr} },
+    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, Imm::NO, Src1::CP0_RT, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
+};
+
+template<typename I>
 MIPSTableEntry<I> unknown_instruction =
-{ "Unknown instruction", unknown_mips_instruction, OUT_R_SPECIAL, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "Unknown instruction", unknown_mips_instruction, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> nop =
-{ "nop" , mips_sll<I>, OUT_R_SPECIAL, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "nop" , mips_sll<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 const MIPSTableEntry<I>& get_table_entry( const Table<I>& table, uint32 key)
@@ -354,10 +364,11 @@ const MIPSTableEntry<I>& get_table_entry( uint32 bytes)
 
     switch ( instr.opcode)
     {
-        case 0x0:  return get_table_entry( isaMapR<I>,      instr.funct);  // R instruction
-        case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);     // RegIMM instruction
-        case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);  // MIPS32 instruction
-        default:   return get_table_entry( isaMapIJ<I>,     instr.opcode); // I and J instructions
+        case 0x0:  return get_table_entry( isaMapR<I>,      instr.funct);
+        case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
+        case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
+        case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);
+        default:   return get_table_entry( isaMapIJ<I>,     instr.opcode);
     }
 }
 
@@ -375,7 +386,7 @@ const MIPSTableEntry<I>& get_table_entry( std::string_view str_opcode)
     if ( str_opcode == "nop")
         return nop<I>;
 
-    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I> })
+    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I>, isaMapCOP0<I> })
     {
         auto res = find_entry( map, str_opcode);
         if ( res != map.end())
@@ -414,7 +425,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src1      = instr.get_register( entry.src1);
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
-    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi : MIPSRegister::zero;
+    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
     disasm    = generate_disasm( entry);
 }
 

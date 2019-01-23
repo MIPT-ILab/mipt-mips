@@ -54,11 +54,16 @@ public:
     virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
     virtual std::string dump() const = 0;
+    virtual size_t strlen( Addr addr) const = 0;
+    std::string read_string( Addr addr) const;
+    std::string read_string_limited( Addr addr, size_t size) const;
 
     template<typename T, Endian endian> T read( Addr addr) const noexcept;
     template<typename T, Endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
+private:
+    std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
 template<typename T, Endian endian>
@@ -83,14 +88,10 @@ void ReadableMemory::load( Instr* instr) const
 class ZeroMemory : public ReadableMemory
 {
 public:
-    size_t memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept final
-    {
-        std::fill_n( dst, size, Byte{});
-        return size;
-    }
-
+    size_t memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
     std::string dump() const final { return std::string( "empty memory\n"); }
+    size_t strlen( Addr /* addr */) const final { return 0; }
 };
 
 class WriteableMemory : public DestructableMemory
@@ -113,8 +114,14 @@ public:
         const auto& bytes = unpack_array<T, endian>( value);
         memcpy_host_to_guest( addr, bytes.data(), bytes.size());
     }
+
+    void write_string( const std::string& value, Addr addr);
+    void write_string_limited( const std::string& value, Addr addr, size_t size);
+private:
+    void write_string_by_size( const std::string& value, Addr addr, size_t size);
 };
 
+// NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually
 class FuncMemory : public ReadableMemory, public WriteableMemory
 {
 public:

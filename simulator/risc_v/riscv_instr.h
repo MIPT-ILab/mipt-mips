@@ -27,9 +27,9 @@ class RISCVInstr
     private:
         uint32 instr = NO_VAL32;
 
-        RISCVRegister src1 = RISCVRegister::zero;
-        RISCVRegister src2 = RISCVRegister::zero;
-        RISCVRegister dst = RISCVRegister::zero;
+        RISCVRegister src1 = RISCVRegister::zero();
+        RISCVRegister src2 = RISCVRegister::zero();
+        RISCVRegister dst = RISCVRegister::zero();
 
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
@@ -85,7 +85,9 @@ class RISCVInstr
 
         constexpr bool is_explicit_trap() const { return false; }
         
-        constexpr bool is_special() const { return false; }
+        constexpr bool is_break() const { return false; }
+
+        constexpr bool is_syscall() const { return false; }
 
         constexpr bool has_trap() const { return false; }
 

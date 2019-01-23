@@ -26,7 +26,8 @@ enum OperationType : uint8
     OUT_R_ACCUM,
     OUT_R_CONDM,
     OUT_R_JUMP,
-    OUT_R_SPECIAL,
+    OUT_SYSCALL,
+    OUT_BREAK,
     OUT_R_SUBTR,
     OUT_BRANCH,
     OUT_TRAP,
@@ -70,10 +71,10 @@ class BaseMIPSInstr
 
         const uint32 raw;
 
-        MIPSRegister src1 = MIPSRegister::zero;
-        MIPSRegister src2 = MIPSRegister::zero;
-        MIPSRegister dst  = MIPSRegister::zero;
-        MIPSRegister dst2 = MIPSRegister::zero;
+        MIPSRegister src1 = MIPSRegister::zero();
+        MIPSRegister src2 = MIPSRegister::zero();
+        MIPSRegister dst  = MIPSRegister::zero();
+        MIPSRegister dst2 = MIPSRegister::zero();
 
         uint32 v_imm = NO_VAL32;
 
@@ -163,7 +164,9 @@ class BaseMIPSInstr
 
         bool is_explicit_trap() const { return operation == OUT_TRAP; }
 
-        bool is_special() const { return operation == OUT_R_SPECIAL; }
+        bool is_syscall() const { return operation == OUT_SYSCALL; }
+
+        bool is_break() const { return operation == OUT_BREAK; }
 
         bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
 

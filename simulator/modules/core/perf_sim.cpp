@@ -16,6 +16,7 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode( log),
     execute( log),
     mem( log),
+    branch( log),
     writeback( log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
@@ -40,6 +41,12 @@ void PerfSim<ISA>::set_target( const Target& target)
 {
     wp_core_2_fetch_target->write( target, curr_cycle);
     writeback.set_target( target);
+}
+
+template<typename ISA>
+Addr PerfSim<ISA>::get_pc() const
+{
+    return writeback.get_next_PC();
 }
 
 template<typename ISA>
@@ -81,6 +88,7 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     decode.clock( cycle);
     execute.clock( cycle);
     mem.clock( cycle);
+    branch.clock( cycle);
 }
 
 template<typename ISA>
@@ -102,6 +110,24 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
               << std::endl << "****************************"
               << std::endl;
+}
+
+template <typename ISA>
+uint64 PerfSim<ISA>::read_gdb_register( uint8 regno) const
+{
+    if ( regno == Register::get_gdb_pc_index())
+        return get_pc();
+
+    return read_register( Register::from_gdb_index( regno));
+}
+
+template <typename ISA>
+void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+{
+    if ( regno == Register::get_gdb_pc_index())
+        set_pc( value);
+    else
+        write_register( Register::from_gdb_index( regno), value);
 }
 
 #include <mips/mips.h>

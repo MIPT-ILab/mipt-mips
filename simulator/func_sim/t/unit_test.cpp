@@ -62,7 +62,9 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     elf.load_to( mem.get());
     sim.set_pc( elf.get_startPC());
 
+    CHECK( sim.get_pc() == elf.get_startPC());
     CHECK( sim.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
+    CHECK( sim.get_pc() == elf.get_startPC() + 4);
 }
 
 TEST_CASE( "FuncSim: make a step with checker")
@@ -76,6 +78,18 @@ TEST_CASE( "FuncSim: make a step with checker")
     sim.init_checker();
 
     CHECK( sim.step().string_dump().find("lui $at, 0x41\t [ $at = 0x410000 ]") != std::string::npos);
+}
+
+TEST_CASE( "FuncSim: make a system-level step")
+{
+    FuncSim<MIPS32> sim;
+    auto mem = FuncMemory::create_hierarchied_memory();
+    sim.set_memory( mem);
+    ElfLoader elf( valid_elf_file);
+    elf.load_to( mem.get());
+    sim.set_pc( elf.get_startPC());
+
+    CHECK( sim.run_single_step() == Trap::BREAKPOINT);
 }
 
 TEST_CASE( "Run one instruction: Func_Sim")
@@ -100,6 +114,19 @@ TEST_CASE( "FuncSim: Register R/W")
     /* Unsigned */
     sim.write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim.read_cpu_register( 1) == MAX_VAL32 );
+}
+
+TEST_CASE( "FuncSim: GDB Register R/W")
+{
+    FuncSim<MIPS32> sim;
+
+    sim.write_gdb_register( 1, uint64{ MAX_VAL32});
+    CHECK( sim.read_gdb_register( 1) == MAX_VAL32 );
+    CHECK( sim.read_gdb_register( 0) == 0 );
+
+    sim.write_gdb_register( 37, 100500);
+    CHECK( sim.read_gdb_register( 37) == 100500);
+    CHECK( sim.get_pc() == 100500);
 }
 
 TEST_CASE( "FuncSim: Register size")

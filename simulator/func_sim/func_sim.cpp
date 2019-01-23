@@ -7,7 +7,7 @@
 #include <kernel/kernel.h>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log) { }
+FuncSim<ISA>::FuncSim( bool log) : Simulator( log), kernel( Kernel::create_dummy_kernel()) { }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -63,25 +63,91 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     return instr;
 }
 
+static SyscallResult execute_syscall( Kernel* kernel)
+{
+    do try {
+        return kernel->execute();
+    }
+    catch (const BadInputValue& e) {
+        std::cerr << e.what();
+    } while (true);
+
+    return {SyscallResult::UNSUPPORTED, 0};
+}
+
+template <typename ISA>
+Trap FuncSim<ISA>::handle_syscall()
+{
+    auto result = execute_syscall( kernel.get());
+    switch ( result.type) {
+    case SyscallResult::HALT:        exit_code = result.code; return Trap::HALT;
+    case SyscallResult::IGNORED:     return Trap::SYSCALL;
+    case SyscallResult::SUCCESS:     return Trap::NO_TRAP;
+    case SyscallResult::UNSUPPORTED: return Trap::UNSUPPORTED_SYSCALL;
+    default: assert( 0);
+    }
+    return Trap::NO_TRAP;
+}
+
+template<typename ISA>
+Trap FuncSim<ISA>::step_system()
+{
+    const auto& instr = step();
+    sout << instr << std::endl;
+
+    if ( instr.is_syscall())
+        return handle_syscall();
+
+    return instr.trap_type();
+}
+
 template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint32 i = 0; i < instrs_to_run; ++i) {
-        const auto& instr = step();
-        sout << instr << std::endl;
-
-        switch ( instr.trap_type()) {
-            case Trap::HALT:
-                return Trap::HALT;
-            case Trap::SYSCALL:
-                if ( kernel.get() && !kernel->execute())
-                    return Trap::SYSCALL;
-                break;
-            default: break;
-        }
+        auto trap = step_system();
+        if ( trap == Trap::HALT)
+            return Trap::HALT;
     }
     return Trap::NO_TRAP;
+}
+
+template <typename ISA>
+Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
+{
+    nops_in_a_row = 0;
+    for ( uint32 i = 0; i < instrs_to_run; ++i) {
+        auto trap = step_system();
+        if ( trap != Trap::NO_TRAP)
+            return trap;
+    }
+    return Trap::NO_TRAP;
+}
+
+template <typename ISA>
+Trap FuncSim<ISA>::run_single_step()
+{
+    auto trap = step_system();
+    return trap == Trap::NO_TRAP ? Trap::BREAKPOINT : trap;
+}
+
+template <typename ISA>
+uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
+{
+    if ( regno == Register::get_gdb_pc_index())
+        return get_pc();
+
+    return read_register( Register::from_gdb_index( regno));
+}
+
+template <typename ISA>
+void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+{
+    if ( regno == Register::get_gdb_pc_index())
+        set_pc( value);
+    else
+        write_register( Register::from_gdb_index( regno), value);
 }
 
 #include <mips/mips.h>

@@ -36,6 +36,7 @@ private:
     uint64 instrs_to_run = 0;
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_cl;
+    Addr next_PC = 0;
 
     class Checker {
         std::shared_ptr<FuncSim<ISA>> sim;
@@ -51,9 +52,14 @@ private:
 
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
+    auto read_instructions( Cycle cycle);
+    void writeback_instruction( const Instr& instr, Cycle cycle);
+    void writeback_bubble( Cycle cycle);
+
     /* Input */
     std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
+    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
 
     /* Output */
     std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
@@ -64,9 +70,10 @@ public:
     void clock( Cycle cycle);
     void set_RF( RF<ISA>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( mem); }
-    void set_target( const Target& value) { checker.set_target( value); }
+    void set_target( const Target& value);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
+    Addr get_next_PC() const { return next_PC; }
 };
 
 #endif
