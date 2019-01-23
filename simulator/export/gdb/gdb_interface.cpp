@@ -17,6 +17,7 @@
 
 #include <infra/byte.h>
 
+#include <tuple>
 #include <unordered_map>
 
 #include "gdb_wrapper.h"
@@ -29,11 +30,7 @@
 #include <sim-base.h>
 
 /* Trap converter */
-struct GDBTrap
-{
-    enum sim_stop reason = sim_polling;
-    int sigrc = 0;
-};
+using GDBTrap = std::pair<enum sim_stop, int>;
 
 static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
 {
@@ -47,7 +44,7 @@ static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
 
     auto it = trap_converter.find( mipt_trap);
     if ( it == trap_converter.end())
-        return GDBTrap();
+        return GDBTrap{ sim_stop, 0};
     if ( it->second.reason == sim_exited)
         return GDBTrap{ sim_exited, exit_code};
     return it->second;
@@ -71,6 +68,7 @@ CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
  * Here and below are implementations of GDB functions defined in
  * '$gdb_workspace/include/gdb/remote-sim.h'
  */
+
 SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
 {
     auto idx = simInstances.allocate_new( static_cast<const char* const*>( argv));
@@ -88,56 +86,54 @@ void sim_close( SIM_DESC sd, int)
     sim_state_free( sd);
 }
 
-SIM_RC sim_load (SIM_DESC sd, const char * prog_name, struct bfd *, int)
+SIM_RC sim_load( SIM_DESC sd, const char * prog_name, struct bfd *, int)
 {
     return get_sim( sd).load( prog_name) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
-SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd * abfd, char *const *, char *const *)
+SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, char *const *, char *const *)
 {
     return get_sim( sd).create_inferior( bfd_get_start_address( abfd)) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
-int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)
+int sim_read( SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)
 {
     return get_sim( sd).memory_read( byte_cast( buf), mem, static_cast<size_t>( length));
 }
 
-int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length)
+int sim_write( SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length)
 {
     return get_sim( sd).memory_write( mem, byte_cast( buf), static_cast<size_t>( length));
 }
 
-int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length)
+int sim_fetch_register( SIM_DESC sd, int regno, unsigned char *buf, int length)
 {
     return get_sim( sd).read_register( regno, byte_cast( buf), length);
 }
 
-int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length)
+int sim_store_register( SIM_DESC sd, int regno, unsigned char *buf, int length)
 {
     return get_sim( sd).write_register( regno, byte_cast( buf), length);
 }
 
-void sim_info (SIM_DESC sd, int verbose)
+void sim_info( SIM_DESC sd, int verbose)
 {
     get_sim( sd).info( verbose);
 }
 
-void sim_resume (SIM_DESC sd, int step, int)
+void sim_resume( SIM_DESC sd, int step, int)
 {
     get_sim( sd).resume( step);
 }
 
-int sim_stop (SIM_DESC sd)
+int sim_stop( SIM_DESC sd)
 {
     return get_sim( sd).stop();
 }
 
-void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc)
+void sim_stop_reason( SIM_DESC sd, enum sim_stop *reason, int *sigrc)
 {
-    auto trap = translate_trap( get_sim( sd).get_trap());
-    *reason = trap.reason;
-    *sigrc  = trap.sigrc;
+    std::tie(*reason, *sigrc) = translate_trap( get_sim( sd).get_trap(), get_sim( sd).get_exit_code());
 }
 
 void sim_do_command (SIM_DESC sd, const char *cmd)
