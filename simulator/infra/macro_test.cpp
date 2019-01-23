@@ -5,6 +5,7 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
 
@@ -141,6 +142,9 @@ static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
 static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
+
+static constexpr const char* some_argv[] = {"rm", "-rf", "/", nullptr};
+static_assert(count_argc( some_argv) == 3);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);
