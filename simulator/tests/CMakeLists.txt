@@ -21,6 +21,7 @@ set(TESTS_CPPS
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
     modules/core/t/unit_test.cpp
+    export/gdb/t/unit_test.cpp
     )
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../../traces\")
