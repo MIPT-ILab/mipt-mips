@@ -35,7 +35,7 @@ struct GDBTrap
     int sigrc = 0;
 };
 
-static GDBTrap translate_trap( Trap mipt_trap)
+static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
 {
     static const std::unordered_map<Trap, GDBTrap> trap_converter =
     {
@@ -46,7 +46,11 @@ static GDBTrap translate_trap( Trap mipt_trap)
     };
 
     auto it = trap_converter.find( mipt_trap);
-    return it == trap_converter.end() ? GDBTrap() : it->second;
+    if ( it == trap_converter.end())
+        return GDBTrap();
+    if ( it->second.reason == sim_exited)
+        return GDBTrap{ sim_exited, exit_code};
+    return it->second;
 }
 
 /* Holder of simulation instances */
@@ -133,12 +137,12 @@ void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc)
 {
     auto trap = translate_trap( get_sim( sd).get_trap());
     *reason = trap.reason;
-    *sigrc  = trap.reason == sim_exited ? get_sim( sd).get_exit_code() : trap.sigrc;
+    *sigrc  = trap.sigrc;
 }
 
 void sim_do_command (SIM_DESC sd, const char *cmd)
 {
-    return get_sim( sd).do_command( cmd)
+    return get_sim( sd).do_command( cmd);
 }
 
 char **sim_complete_command (SIM_DESC sd, const char *text, const char *word)
