@@ -45,7 +45,7 @@ static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
     auto it = trap_converter.find( mipt_trap);
     if ( it == trap_converter.end())
         return GDBTrap( sim_polling, 0);
-    if ( it->second.reason == sim_exited)
+    if ( it->second.first == sim_exited)
         return GDBTrap( sim_exited, exit_code);
     return it->second;
 }
