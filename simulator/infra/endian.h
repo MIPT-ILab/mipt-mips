@@ -95,7 +95,7 @@ static inline constexpr T swap_endian( T value) noexcept
 
 template<typename T, Endian e>
 static inline void constexpr put_value_to_pointer( Byte* buf, T value) {
-    const auto& array = unpack_array<T, e>(value);
+    auto array = unpack_array<T, e>(value);
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
         *(buf + i) = array[i];
 }
