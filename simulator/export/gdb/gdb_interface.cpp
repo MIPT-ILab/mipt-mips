@@ -4,9 +4,18 @@
  * Copyright 2018-2019 MIPT-MIPS
  */
 
+/*
+ * This file is designed to a be a very thin adapter between
+ * GDB simulation format and MIPT-MIPS format; basically, it does
+ * only the type conversions between pointer types, Trap types etc.
+ *
+ * If you need to add new functionality for GDB interaction,
+ * please consider adding it to gdb_wrapper.cpp as much as you can
+ */
+
 #include <bfd/config.h>
 
-#include <infra/macro.h>
+#include <infra/byte.h>
 
 #include <unordered_map>
 
@@ -19,14 +28,46 @@
 #include <sim-types.h>
 #include <sim-base.h>
 
+/* Trap converter */
+struct GDBTrap
+{
+    enum sim_stop reason = sim_polling;
+    int sigrc = 0;
+};
+
+static GDBTrap translate_trap( Trap mipt_trap)
+{
+    static const std::unordered_map<Trap, GDBTrap> trap_converter =
+    {
+        { Trap::HALT,              { sim_exited, 0                } },
+        { Trap::BREAKPOINT,        { sim_stopped, GDB_SIGNAL_TRAP } },
+        { Trap::EXPLICIT_TRAP,     { sim_stopped, GDB_SIGNAL_TRAP } },
+        { Trap::UNALIGNED_ADDRESS, { sim_stopped, GDB_SIGNAL_BUS  } },
+    };
+
+    auto it = trap_converter.find( mipt_trap);
+    return it == trap_converter.end() ? GDBTrap() : it->second;
+}
+
+/* Holder of simulation instances */
 static GDBSimVector simInstances;
 static GDBSim& get_sim( SIM_DESC sd)
 {
     return simInstances.at( sd->instanceId);
 }
 
-/* struct bfd *abfd is a Binary File Descriptor for a target program */
-SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
+/* Target values stub */
+extern "C" {
+CB_TARGET_DEFS_MAP cb_init_syscall_map[1] = {};
+CB_TARGET_DEFS_MAP cb_init_errno_map[1] = {};
+CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
+}
+
+/*
+ * Here and below are implementations of GDB functions defined in
+ * '$gdb_workspace/include/gdb/remote-sim.h'
+ */
+SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
 {
     auto idx = simInstances.allocate_new( static_cast<const char* const*>( argv));
     if ( idx == -1)
@@ -45,14 +86,12 @@ void sim_close( SIM_DESC sd, int)
 
 SIM_RC sim_load (SIM_DESC sd, const char * prog_name, struct bfd *, int)
 {
-    auto success = get_sim( sd).load( prog_name);
-    return success ? SIM_RC_OK : SIM_RC_FAIL;
+    return get_sim( sd).load( prog_name) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
 SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd * abfd, char *const *, char *const *)
 {
-    auto success = get_sim( sd).create_inferior( bfd_get_start_address( abfd));
-    return success ? SIM_RC_OK : SIM_RC_FAIL;
+    return get_sim( sd).create_inferior( bfd_get_start_address( abfd)) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
 int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)
@@ -77,8 +116,7 @@ int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length)
 
 void sim_info (SIM_DESC sd, int verbose)
 {
-    (void) sd;
-    (void) verbose;
+    get_sim( sd).info( verbose);
 }
 
 void sim_resume (SIM_DESC sd, int step, int)
@@ -88,54 +126,22 @@ void sim_resume (SIM_DESC sd, int step, int)
 
 int sim_stop (SIM_DESC sd)
 {
-    (void) sd;
-    return 0;
-}
-
-struct GDBTrap
-{
-    enum sim_stop reason = sim_polling;
-    int sigrc = 0;
-};
-
-static const std::unordered_map<Trap, GDBTrap> trap_converter =
-{
-    { Trap::HALT,              { sim_exited, 0                } },
-    { Trap::BREAKPOINT,        { sim_stopped, GDB_SIGNAL_TRAP } },
-    { Trap::EXPLICIT_TRAP,     { sim_stopped, GDB_SIGNAL_TRAP } },
-    { Trap::UNALIGNED_ADDRESS, { sim_stopped, GDB_SIGNAL_BUS  } },
-};
-
-static GDBTrap get_gdb_trap( Trap mipt_trap)
-{
-    auto it = trap_converter.find( mipt_trap);
-    return it == trap_converter.end() ? GDBTrap() : it->second;
+    return get_sim( sd).stop();
 }
 
 void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc)
 {
-    auto trap = get_gdb_trap( get_sim( sd).get_trap());
+    auto trap = translate_trap( get_sim( sd).get_trap());
     *reason = trap.reason;
     *sigrc  = trap.reason == sim_exited ? get_sim( sd).get_exit_code() : trap.sigrc;
 }
 
 void sim_do_command (SIM_DESC sd, const char *cmd)
 {
-    (void) sd;
-    (void) cmd;
+    return get_sim( sd).do_command( cmd)
 }
 
 char **sim_complete_command (SIM_DESC sd, const char *text, const char *word)
 {
-    (void) sd;
-    (void) text;
-    (void) word;
-    return nullptr;
-}
-
-/* Target values stub */
-extern "C" {
-CB_TARGET_DEFS_MAP cb_init_syscall_map[1] = {};
-CB_TARGET_DEFS_MAP cb_init_errno_map[1] = {};
-CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
+    return get_sim( sd).sim_complete_command( text, word);
 }
