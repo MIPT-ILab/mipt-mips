@@ -1,217 +1,60 @@
 /**
- * gdb_interface.c - Functional simulator interfaces for GDB
+ * gdb_interface.cpp - Functional simulator interfaces for GDB
  * @author Vyacheslav Kompan
- * Copyright 2018 MIPT-MIPS
+ * Copyright 2018-2019 MIPT-MIPS
  */
 
+/*
+ * This file is designed to a be a very thin adapter between
+ * GDB simulation format and MIPT-MIPS format; basically, it does
+ * only the type conversions between pointer types, Trap types etc.
+ *
+ * If you need to add new functionality for GDB interaction,
+ * please consider adding it to gdb_wrapper.cpp as much as you can
+ */
+
+#include <bfd/config.h>
+
+#include <infra/byte.h>
+
+#include <tuple>
+#include <unordered_map>
+
+#include "gdb_wrapper.h"
 #include "sim-main.h"
 
 #include <gdb/remote-sim.h>
-#include <gdb/callback.h>
 
 #include <sim-config.h>
 #include <sim-types.h>
-#include <sim-inline.h>
-#include <sim-arange.h>
 #include <sim-base.h>
 
-#include <memory/elf/elf_loader.h>
-#include <memory/memory.h>
-#include <simulator.h>
-#include <infra/config/config.h>
-#include <infra/endian.h>
+/* Trap converter */
+using GDBTrap = std::pair<enum sim_stop, int>;
 
-#include <array>
-#include <memory>
-#include <string>
-#include <vector>
+static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
+{
+    static const std::unordered_map<Trap, GDBTrap> trap_converter =
+    {
+        { Trap::HALT,              { sim_exited, 0                } },
+        { Trap::BREAKPOINT,        { sim_stopped, GDB_SIGNAL_TRAP } },
+        { Trap::EXPLICIT_TRAP,     { sim_stopped, GDB_SIGNAL_TRAP } },
+        { Trap::UNALIGNED_ADDRESS, { sim_stopped, GDB_SIGNAL_BUS  } },
+    };
 
-struct SimulatorInstance {
-    std::shared_ptr<Simulator> cpu = nullptr;
-    std::shared_ptr<FuncMemory> memory = nullptr;
-    size_t id = 0;
-    Trap trap = Trap::NO_TRAP;
-};
-
-static std::vector<SimulatorInstance> simInstances;
-
-static SimulatorInstance create_new_env(size_t id) {
-    //TODO: add simulator arguments
-    SimulatorInstance i;
-    i.cpu = Simulator::create_simulator("mips32", true, true);
-    i.memory = FuncMemory::create_hierarchied_memory();
-    i.cpu->set_memory( i.memory);
-    i.id = id;
-    return i;
+    auto it = trap_converter.find( mipt_trap);
+    if ( it == trap_converter.end())
+        return GDBTrap( sim_polling, 0);
+    if ( it->second.first == sim_exited)
+        return GDBTrap( sim_exited, exit_code);
+    return it->second;
 }
 
-int count_argc (char *const *argv) {
-    /* Passed arguments start at argv[2], end with NULL */
-    int argc = 0;
-    while (argv[2 + argc] != nullptr)
-        argc++;
-    return argc;
-}
-
-/* struct bfd *abfd is a Binary File Descriptor for a target program */
-SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback,
-                   struct bfd *abfd, char *const *argv) {
-    if (!abfd) {
-        std::cerr << "Input file not set; please re-run GDB with input file" << std::endl;
-        return nullptr;
-    }
-
-    int argc = count_argc (argv);
-    SIM_DESC sd = sim_state_alloc (kind, callback);
-
-    try {
-        config::handleArgs (argc, static_cast<const char* const*> (argv), 2);
-        sd->instanceId = simInstances.size();
-        simInstances.emplace_back(create_new_env(sd->instanceId));
-    }
-    catch (const config::HelpOption &e) {
-        std::cout << "Functional simulator for MIPS-based CPU (GDB)"
-                  << std::endl << std::endl << e.what () << std::endl;
-        sim_state_free (sd);
-        return nullptr;
-    }
-    catch (const std::exception &e) {
-        std::cerr << e.what () << std::endl;
-        sim_state_free (sd);
-        return nullptr;
-    }
-    catch (...) {
-        std::cerr << "Unknown exception\n";
-        sim_state_free (sd);
-        return nullptr;
-    }
-
-    std::cout << "MIPT-MIPS simulator instance created, id " << sd->instanceId << std::endl;
-
-    return sd;
-}
-
-
-void sim_close (SIM_DESC sd, int) {
-    simInstances.at (sd->instanceId).cpu.reset();
-    simInstances.at (sd->instanceId).memory.reset();
-    sim_state_free (sd);
-}
-
-SIM_RC sim_load (SIM_DESC sd, const char * prog_name, struct bfd *, int) {
-    std::string filename( prog_name);
-    ElfLoader( filename).load_to( simInstances.at( sd->instanceId).memory.get());
-    std::cout << "MIPT-MIPS: Binary file " << filename << " loaded" << std::endl;
-    return SIM_RC_OK;
-}
-
-SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd * abfd,
-                            char *const *, char *const *) {
-    SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-    simInst.cpu->set_pc( bfd_get_start_address( abfd));
-    std::cout << "MIPT-MIPS: prepared to run" << std::endl;
-    return SIM_RC_OK;
-}
-
-int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_guest_to_host( byte_cast( buf), mem, static_cast<size_t> (length));
-}
-
-int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length) {
-    return simInstances.at( sd->instanceId).memory->memcpy_host_to_guest( mem, byte_cast( buf), static_cast<size_t> (length));
-}
-
-int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
-    auto sim = simInstances.at( sd->instanceId).cpu;
-    if ( length == 8)
-        put_value_to_pointer<uint64, Endian::native>( byte_cast( buf), sim->read_gdb_register( regno));
-    else if ( length == 4)
-        put_value_to_pointer<uint32, Endian::native>( byte_cast( buf), sim->read_gdb_register( regno));
-    else
-        return 0;
-
-    return length;
-}
-
-int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length) {
-    auto sim = simInstances.at( sd->instanceId).cpu;
-    if ( length == 8)
-        sim->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( byte_cast( buf)));
-    else if ( length == 4)
-        sim->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( byte_cast( buf)));
-    else
-        return 0;
-
-    return length;
-}
-
-void sim_info (SIM_DESC sd, int verbose) {
-    (void) sd;
-    (void) verbose;
-}
-
-void sim_resume (SIM_DESC sd, int step, int) {
-    SimulatorInstance &simInst = simInstances.at (sd->instanceId);
-
-    std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
-    uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
-    try {
-        if (instrs_to_run == 1)
-            simInst.trap = simInst.cpu->run_single_step ();
-        else
-            simInst.trap = simInst.cpu->run_until_trap( instrs_to_run);
-    }
-    catch (const BearingLost &e) {
-        simInst.trap = Trap::HALT;
-        std::cout << "MIPS-MIPS: execution finished: 10 nops in a row" << std::endl;
-    }
-    catch (const std::exception &e) {
-        std::cerr << e.what () << std::endl;
-    }
-    catch (...) {
-        std::cerr << "Unknown exception\n";
-    }
-}
-
-
-int sim_stop (SIM_DESC sd) {
-    (void) sd;
-    return 0;
-}
-
-
-void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc) {
-    switch (simInstances.at(sd->instanceId).trap) {
-    case Trap::HALT:
-        *reason = sim_exited;
-        return;
-    case Trap::BREAKPOINT:
-    case Trap::EXPLICIT_TRAP:
-        *reason = sim_stopped;
-        *sigrc = GDB_SIGNAL_TRAP;
-        return;
-    case Trap::UNALIGNED_ADDRESS:
-        *reason = sim_stopped;
-        *sigrc = GDB_SIGNAL_BUS;
-        return;
-    default:
-        *reason = sim_polling;
-        std::cerr << "Wrong or unhandled trap" << std::endl;
-    }
-}
-
-
-void sim_do_command (SIM_DESC sd, const char *cmd) {
-    (void) sd;
-    (void) cmd;
-}
-
-
-char **sim_complete_command (SIM_DESC sd, const char *text, const char *word) {
-    (void) sd;
-    (void) text;
-    (void) word;
-    return nullptr;
+/* Holder of simulation instances */
+static GDBSimVector simInstances;
+static GDBSim& get_sim( SIM_DESC sd)
+{
+    return simInstances.at( sd->instanceId);
 }
 
 /* Target values stub */
@@ -219,4 +62,86 @@ extern "C" {
 CB_TARGET_DEFS_MAP cb_init_syscall_map[1] = {};
 CB_TARGET_DEFS_MAP cb_init_errno_map[1] = {};
 CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
+}
+
+/*
+ * Here and below are implementations of GDB functions defined in
+ * '$gdb_workspace/include/gdb/remote-sim.h'
+ */
+
+SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
+{
+    auto idx = simInstances.allocate_new( static_cast<const char* const*>( argv));
+    if ( idx == -1)
+        return nullptr;
+
+    auto sd = sim_state_alloc( kind, callback);
+    sd->instanceId = idx;
+    return sd;
+}
+
+void sim_close( SIM_DESC sd, int)
+{
+    get_sim( sd).shutdown();
+    sim_state_free( sd);
+}
+
+SIM_RC sim_load( SIM_DESC sd, const char * prog_name, struct bfd *, int)
+{
+    return get_sim( sd).load( prog_name) ? SIM_RC_OK : SIM_RC_FAIL;
+}
+
+SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, char *const *, char *const *)
+{
+    return get_sim( sd).create_inferior( bfd_get_start_address( abfd)) ? SIM_RC_OK : SIM_RC_FAIL;
+}
+
+int sim_read( SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)
+{
+    return get_sim( sd).memory_read( byte_cast( buf), mem, static_cast<size_t>( length));
+}
+
+int sim_write( SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length)
+{
+    return get_sim( sd).memory_write( mem, byte_cast( buf), static_cast<size_t>( length));
+}
+
+int sim_fetch_register( SIM_DESC sd, int regno, unsigned char *buf, int length)
+{
+    return get_sim( sd).read_register( regno, byte_cast( buf), length);
+}
+
+int sim_store_register( SIM_DESC sd, int regno, unsigned char *buf, int length)
+{
+    return get_sim( sd).write_register( regno, byte_cast( buf), length);
+}
+
+void sim_info( SIM_DESC sd, int verbose)
+{
+    get_sim( sd).info( verbose);
+}
+
+void sim_resume( SIM_DESC sd, int step, int)
+{
+    get_sim( sd).resume( step);
+}
+
+int sim_stop( SIM_DESC sd)
+{
+    return get_sim( sd).stop();
+}
+
+void sim_stop_reason( SIM_DESC sd, enum sim_stop *reason, int *sigrc)
+{
+    std::tie(*reason, *sigrc) = translate_trap( get_sim( sd).get_trap(), get_sim( sd).get_exit_code());
+}
+
+void sim_do_command (SIM_DESC sd, const char *cmd)
+{
+    return get_sim( sd).do_command( cmd);
+}
+
+char **sim_complete_command (SIM_DESC sd, const char *text, const char *word)
+{
+    return get_sim( sd).sim_complete_command( text, word);
 }
