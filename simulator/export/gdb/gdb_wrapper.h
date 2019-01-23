@@ -4,6 +4,14 @@
  * Copyright 2018-2019 MIPT-MIPS
  */
 
+/*
+ * gdb_wrapper.h and gdb_wrapper.cpp contain all the code for
+ * GDB intergration without having the GDB headers included, so
+ * it can be compiled by default builds and tested with Catch
+ * even if no GDB code exists in the environment.
+ * Please do not include any GDB headers here
+ */
+
 #ifndef GDB_WRAPPER_H
 #define GDB_WRAPPER_H
 
@@ -26,6 +34,12 @@ public:
     void shutdown();
     void resume( uint64 step);
     bool create_inferior( Addr start_addr) const;
+
+    // Not implemented yet
+    int  stop() { }
+    void do_command( const std::string&) { }
+    void info( int verbose) { }
+    char** sim_complete_command( const std::string&, const std::string&) { return nullptr; }
 
     int memory_read( Byte* dst, Addr src, size_t length) const;
     int memory_write( Addr dst, const Byte* src, size_t length) const;
