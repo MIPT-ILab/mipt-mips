@@ -37,9 +37,9 @@ public:
 
     // Not implemented yet
     int  stop() { return 0; }
-    void do_command( const std::string&) { }
+    void do_command( const std::string& /*command*/ ) { }
     void info( int /* verbose */) { }
-    char** sim_complete_command( const std::string&, const std::string&) { return nullptr; }
+    char** sim_complete_command( const std::string& /*text*/, const std::string& /*word*/) { return nullptr; }
 
     int memory_read( Byte* dst, Addr src, size_t length) const;
     int memory_write( Addr dst, const Byte* src, size_t length) const;

@@ -15,6 +15,7 @@
 
 #include <bfd/config.h>
 
+#include <infra/argv.h>
 #include <infra/byte.h>
 
 #include <tuple>
@@ -71,7 +72,7 @@ CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
 
 SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
 {
-    auto idx = simInstances.allocate_new( static_cast<const char* const*>( argv));
+    auto idx = simInstances.allocate_new( argv_cast( argv));
     if ( idx == -1)
         return nullptr;
 
