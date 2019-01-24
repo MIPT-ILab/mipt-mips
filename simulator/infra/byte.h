@@ -9,9 +9,25 @@
 #define INFRA_BYTE_H
  
 #include "types.h"
+
+#include <cstddef>
  
 // Do not use std::byte as Apple Xcode does not have it
 enum class Byte : uint8 { };
+
+template<std::size_t N>
+Byte* byte_cast( Byte (& array)[N])
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
+    return array;
+}
+
+template<std::size_t N>
+const Byte* byte_cast( const Byte (& array)[N])
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
+    return array;
+}
 
 static inline Byte* byte_cast( char* b)
 {

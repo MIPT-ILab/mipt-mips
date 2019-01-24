@@ -56,17 +56,15 @@ private:
     {
         uint32 val;
         size_t result = bus_read_word( bus, src, &val);
-        auto tmp = unpack_array<uint32, Endian::big>( val);
-        std::copy( tmp.begin(), tmp.begin() + size, dst);
+        put_value_to_pointer<uint32, Endian::big>( dst, val, size);
         return result;
     }
 
     size_t copy_word( Addr dst, const Byte* src, size_t size) const noexcept
     {
-        std::array<Byte, 4> tmp{};
-        std::copy(src, src + size, tmp.begin()); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        uint32 val = get_value_from_pointer<uint32, Endian::big>( src, size);
         uint32 dqm = swap_endian( bitmask<uint32>( size * CHAR_BIT));
-        return bus_write_word( bus, dst, pack_array<uint32, Endian::big>( tmp), dqm);
+        return bus_write_word( bus, dst, val, dqm);
     }
 
     template<typename D, typename S>
