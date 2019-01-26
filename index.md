@@ -4,7 +4,7 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 The project is being developed by a group of students under the guidance of Intel employees.
 Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
-Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT building.
+Lectures and seminars are delivered each **Friday 18:30, room 108 of RT building**.
 
 ## Computer Architecture
 
@@ -19,7 +19,7 @@ Date | Event name
 28 Nov | **Branch prediction**<br/> • Slides: [L7 - Branch prediction](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%207%20-%20Branch%20prediction.pptx?raw=true) <br/> • [YouTube](https://youtu.be/XzfcQ8VgnU8)
 12 Dec | **Advanced pipelining**<br/> • Slides: [L8 - Advanced Pipelining](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%208%20-%20Advanced%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/pUw2sU9RZSY)
 19 Dec | **First Test**
-04-09 Feb | **Superscalar CPU and multicore systems**
+08 Feb | **Superscalar CPU and multicore systems**
 
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
