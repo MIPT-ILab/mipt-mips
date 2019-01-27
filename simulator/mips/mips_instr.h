@@ -51,7 +51,7 @@ struct UnknownMIPSInstruction final : Exception
 };
 
 template<typename I>
-void unknown_mips_instruction( I* instr)
+void unknown_mips_instruction( I* i)
 {
     throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
