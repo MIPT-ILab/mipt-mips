@@ -8,18 +8,23 @@
 
 #include <infra/argv.h>
 #include <infra/config/config.h>
+#include <kernel/kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
- 
-GDBSim::GDBSim()
+
+GDBSim::GDBSim( const std::string& isa)
 {
-    cpu = Simulator::create_simulator("mips32", true, true);
+    cpu = Simulator::create_configured_isa_simulator( isa);
     memory = FuncMemory::create_hierarchied_memory();
+    auto kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);
+    cpu->set_kernel( kernel);
+    kernel->set_simulator( cpu);
+    kernel->set_memory( memory);
 }
 
-bool GDBSim::load(const std::string& filename) const try
+bool GDBSim::load( const std::string& filename) const try
 {
     ElfLoader( filename).load_to( memory.get());
     std::cout << "MIPT-MIPS: Binary file " << filename << " loaded" << std::endl;
@@ -106,11 +111,11 @@ int GDBSim::get_exit_code() const
     return cpu->get_exit_code();
 }
 
-int GDBSimVector::allocate_new( const char* const* argv) try
+int GDBSimVector::allocate_new( const std::string& isa, const char* const* argv) try
 {
     /* argv[0] has to be ignored */
     config::handleArgs( count_argc( argv), argv, 2);
-    st.emplace_back( GDBSim());
+    st.emplace_back( GDBSim( isa));
     auto id = st.size() - 1;
     std::cout << "MIPT-MIPS: simulator instance created, id " << id << std::endl;
     return id;

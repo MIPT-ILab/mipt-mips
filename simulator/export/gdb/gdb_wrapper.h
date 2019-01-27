@@ -28,7 +28,7 @@ class GDBSim
     std::shared_ptr<class FuncMemory> memory = nullptr;
     Trap trap = Trap::NO_TRAP;
 public:
-    GDBSim();
+    explicit GDBSim( const std::string& isa);
 
     bool load( const std::string& filename) const;
     void shutdown();
@@ -54,7 +54,7 @@ class GDBSimVector
 {
     std::vector<GDBSim> st;
 public:
-    int allocate_new( const char* const* argv);
+    int allocate_new( const std::string& isa, const char* const* argv);
     GDBSim& at(size_t i);
 };
 
