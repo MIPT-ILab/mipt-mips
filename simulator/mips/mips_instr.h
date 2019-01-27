@@ -54,7 +54,7 @@ template<typename I>
 void unknown_mips_instruction( I* instr)
 {
     std::ostringstream oss;
-    auto bytes = unpack_array<uint32, I::endian>( instr->bytes);
+    auto bytes = unpack_array<uint32, I::endian>( instr->raw);
     oss << *instr << std::hex;
     for (const auto& b : bytes)
         oss << " 0x" << uint32{ b};
