@@ -53,13 +53,7 @@ struct UnknownMIPSInstruction final : Exception
 template<typename I>
 void unknown_mips_instruction( I* instr)
 {
-    std::ostringstream oss;
-    auto bytes = unpack_array<uint32, I::endian>( instr->raw);
-    oss << *instr << std::hex;
-    for (const auto& b : bytes)
-        oss << " 0x" << static_cast<uint16>( b);
-
-    throw UnknownMIPSInstruction( oss.str());
+    throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
 
 template<typename R>
@@ -209,6 +203,15 @@ class BaseMIPSInstr
 
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
+ 
+        std::string bytes_dump() const
+        {
+             std::ostringstream oss;
+             oss << "Bytes:" << std::hex;
+             for (const auto& b : unpack_array<uint32, endian>( raw))
+                 oss << " 0x" << static_cast<uint16>( b);
+             return oss.str();
+        }
 };
 
 template<typename RegisterUInt>
