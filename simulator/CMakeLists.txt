@@ -155,7 +155,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS})
 target_link_libraries(mipt-mips-src riscv-isa)
 
-add_library(mipt-mips-cen64-intf EXCLUDE_FROM_ALL STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
 
 add_executable(mipt-mips export/standalone/main.cpp)
