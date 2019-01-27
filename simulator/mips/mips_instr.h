@@ -57,7 +57,7 @@ void unknown_mips_instruction( I* instr)
     auto bytes = unpack_array<uint32, I::endian>( instr->raw);
     oss << *instr << std::hex;
     for (const auto& b : bytes)
-        oss << " 0x" << uint32{ b};
+        oss << " 0x" << static_cast<uint16>( b);
 
     throw UnknownMIPSInstruction( oss.str());
 }
