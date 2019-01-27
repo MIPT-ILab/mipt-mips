@@ -4,4 +4,4 @@ handle SIGBUS nostop noprint noignore
 target sim --mars -f
 load
 run
-q
+quit
