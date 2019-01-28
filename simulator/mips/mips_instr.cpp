@@ -54,9 +54,9 @@ template<typename R>
 std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
-     oss << "Bytes:" << std::hex << std::setfill( '0') << std::setw( 2);
+     oss << "Bytes:" << std::hex;
      for ( const auto& b : unpack_array<uint32, endian>( raw))
-         oss << " 0x" << static_cast<uint16>( b);
+         oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return oss.str();
 }
 
