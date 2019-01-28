@@ -207,7 +207,7 @@ class BaseMIPSInstr
         std::string bytes_dump() const
         {
              std::ostringstream oss;
-             oss << "Bytes:" << std::hex;
+             oss << "Bytes:" << std::hex << std::setfill('0') << std::setw(2);
              for (const auto& b : unpack_array<uint32, endian>( raw))
                  oss << " 0x" << static_cast<uint16>( b);
              return oss.str();
