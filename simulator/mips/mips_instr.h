@@ -51,11 +51,9 @@ struct UnknownMIPSInstruction final : Exception
 };
 
 template<typename I>
-void unknown_mips_instruction( I* instr)
+void unknown_mips_instruction( I* i)
 {
-    std::ostringstream oss;
-    oss << *instr;
-    throw UnknownMIPSInstruction( oss.str());
+    throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
 
 template<typename R>
@@ -205,6 +203,7 @@ class BaseMIPSInstr
 
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
+        std::string bytes_dump() const;
 };
 
 template<typename RegisterUInt>
