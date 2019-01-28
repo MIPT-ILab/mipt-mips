@@ -62,16 +62,18 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/readline     && ./configure && make libreadline.a
 
 script:
-  - cd $TRAVIS_BUILD_DIR/simulator/release && make mipt-mips-src mipt-mips unit-tests
-  - cd $TRAVIS_BUILD_DIR/simulator/release && ctest --verbose
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && make gdb MAKEINFO=true > /dev/null
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb  && ./gdb $TRAVIS_BUILD_DIR/traces/tt.core.universal.out -ex 'set pagination off' -ex 'target sim' -ex 'load' -ex 'r' -ex 'q'
+  - cd $TRAVIS_BUILD_DIR/simulator/release
+  - make mipt-mips unit-tests
+  - ctest --verbose
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
+  - make gdb MAKEINFO=true > /dev/null
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/traces/tt.core.universal.out
 
 after_success:
-  - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        cd $TRAVIS_BUILD_DIR/simulator/release
         run-clang-tidy-7.py -header-filter='.*'
     fi
   - |
