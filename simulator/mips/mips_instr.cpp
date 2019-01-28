@@ -41,12 +41,23 @@ void BaseMIPSInstr<R>::set_v_dst( R value)
         assert( false);
     }
 }
+
 template<typename R>
 std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
     dump( oss);
     return oss.str();
+}
+
+template<typename R>
+std::string BaseMIPSInstr<R>::bytes_dump() const
+{
+     std::ostringstream oss;
+     oss << "Bytes:" << std::hex << std::setfill( '0') << std::setw( 2);
+     for ( const auto& b : unpack_array<uint32, endian>( raw))
+         oss << " 0x" << static_cast<uint16>( b);
+     return oss.str();
 }
 
 template<typename R>
