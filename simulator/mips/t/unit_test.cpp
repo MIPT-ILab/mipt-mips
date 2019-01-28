@@ -2356,6 +2356,7 @@ TEST_CASE( "MIPS32_instr: load dump")
 {
     MIPS32Instr instr(0x8d3104d0);
     CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
+    CHECK( instr.bytes_dump() == "Bytes: 0xd0 0x04 0x31 0x8d");
 
     instr.set_v_src( 0x10, 0);
     instr.set_sequence_id( 0);
