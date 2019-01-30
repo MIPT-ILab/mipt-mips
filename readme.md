@@ -53,31 +53,31 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
-  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
   1. Run `cmake /path/to/mipt-mips/simulator` to configure CMake
   1. Run `make` to get the `mipt-mips` binary file
   1. If you changed some source code files, just type `make` to rebuild project
 #### Run
-  1. Now you can run simulation: `./mipt-mips -b /path/to/mipt-mips/traces/<tracename>.out`
+  1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
   1. See more command line options in the paragraph below
 #### Test
+  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
   1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## Command line options
 
-### Basic options
+### Standalone run options
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
-* `-d` — enables detailed output of each cycle
+* `-I` — modeled ISA, default option is "mips32"
 
 ### ISA and system-level options:
 
 * `-f` — enables functional simulation only
-* `-I` — modeled ISA, default option is "mips32"
 * `--mars` — enables MARS-compatible mode
+* `-d` — enables detailed output of each cycle
 
 ### Performance mode options
 
