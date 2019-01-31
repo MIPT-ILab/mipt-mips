@@ -75,11 +75,12 @@ after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $TRAVIS_BUILD_DIR/simulator/release
-        iwyu_tool.py -p .
         run-clang-tidy-7.py -header-filter='.*'    
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        cd $TRAVIS_BUILD_DIR/simulator/release
+        iwyu_tool.py -p .
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
         make unit-tests && ctest
