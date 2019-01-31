@@ -132,11 +132,7 @@ class BaseMIPSInstr
         std::string_view get_disasm() const { return static_cast<std::string_view>( disasm); }
 
 	/* Checks if instruction can change PC in unusual way. */	
-
-	bool is_jump() const { return operation == OUT_J_JUMP ||
-				      operation == OUT_R_JUMP ||
-				      operation == OUT_BRANCH; }
-
+	
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
@@ -145,6 +141,11 @@ class BaseMIPSInstr
 
 	// target is known only at EXE stage
 	bool is_indirect_branch() const { return operation == OUT_R_JUMP; }
+
+	bool is_jump() const { return this->is_direct_jump()     ||
+				      this->is_direct_branch()   ||
+				      this->is_indirect_branch(); }
+
 
         bool is_jump_taken() const { return  _is_jump_taken; }
 
