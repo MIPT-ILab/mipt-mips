@@ -517,6 +517,10 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     instr.set_v_imm( 1024);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    
+    CHECK( instr.is_direct_branch() );
+    CHECK( !instr.is_direct_jump() );
+    CHECK( !instr.is_indirect_branch() );
 }
     
 TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
@@ -2356,6 +2360,7 @@ TEST_CASE( "MIPS32_instr: load dump")
 {
     MIPS32Instr instr(0x8d3104d0);
     CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
+    CHECK( instr.bytes_dump() == "Bytes: 0xd0 0x04 0x31 0x8d");
 
     instr.set_v_src( 0x10, 0);
     instr.set_sequence_id( 0);

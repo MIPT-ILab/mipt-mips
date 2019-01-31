@@ -51,11 +51,9 @@ struct UnknownMIPSInstruction final : Exception
 };
 
 template<typename I>
-void unknown_mips_instruction( I* instr)
+void unknown_mips_instruction( I* i)
 {
-    std::ostringstream oss;
-    oss << *instr;
-    throw UnknownMIPSInstruction( oss.str());
+    throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
 
 template<typename R>
@@ -133,10 +131,22 @@ class BaseMIPSInstr
         MIPSRegister get_dst2_num() const { return dst2; }
         std::string_view get_disasm() const { return static_cast<std::string_view>( disasm); }
 
-        /* Checks if instruction can change PC in unusual way. */
-        bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_R_JUMP      ||
-                                      operation == OUT_BRANCH;}
+	/* Checks if instruction can change PC in unusual way. */	
+	
+	//target is known at ID stage and always taken
+	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
+
+	//target is known at ID stage but if branch is taken or not is known only at EXE stage
+	bool is_direct_branch() const { return operation == OUT_BRANCH; }
+
+	// target is known only at EXE stage
+	bool is_indirect_branch() const { return operation == OUT_R_JUMP; }
+
+	bool is_jump() const { return this->is_direct_jump()     ||
+				      this->is_direct_branch()   ||
+				      this->is_indirect_branch(); }
+
+
         bool is_jump_taken() const { return  _is_jump_taken; }
 
         bool is_partial_load() const
@@ -205,6 +215,7 @@ class BaseMIPSInstr
 
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
+        std::string bytes_dump() const;
 };
 
 template<typename RegisterUInt>
