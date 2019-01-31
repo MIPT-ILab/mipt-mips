@@ -5,12 +5,11 @@
 
 #include <catch.hpp>
 
-// Testing module
 #include "../config.h"
-
-// Utils
 #include "infra/macro.h"
 #include "infra/argv.h"
+
+#include <sstream>
 
 namespace config {
     AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
