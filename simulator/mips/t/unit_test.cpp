@@ -517,6 +517,10 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     instr.set_v_imm( 1024);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    
+    CHECK( instr.is_direct_branch() );
+    CHECK( !instr.is_direct_jump() );
+    CHECK( !instr.is_indirect_branch() );
 }
     
 TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
