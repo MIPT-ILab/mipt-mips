@@ -15,7 +15,7 @@
 
 namespace popl {
     class OptionParser;
-}
+} // namespace popl
 
 namespace config {
 
