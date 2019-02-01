@@ -69,6 +69,12 @@ class RISCVInstr
         /* Checks if instruction can change PC in unusual way. */
         constexpr bool is_jump() const { return false; }
 
+	constexpr bool is_direct_jump() const { return false; }
+
+	constexpr bool is_direct_branch() const { return false; }
+
+	constexpr bool is_indirect_branch() const { return false; }
+
         constexpr bool is_jump_taken() const { return false; }
 
         constexpr bool is_load()  const { return false; }
