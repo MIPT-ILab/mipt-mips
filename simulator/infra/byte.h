@@ -43,13 +43,6 @@ const Byte* byte_cast( const char (& array)[N])
     return reinterpret_cast<Byte*>( array);
 }
 
-template<std::size_t N>
-const Byte* byte_cast( const Byte (& array)[N])
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
-    return array;
-}
-
 static inline Byte* byte_cast( char* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
