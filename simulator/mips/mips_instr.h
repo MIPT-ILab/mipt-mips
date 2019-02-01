@@ -103,10 +103,10 @@ class BaseMIPSInstr
 
         using Execute = void (*)(BaseMIPSInstr*);
         Execute executor = unknown_mips_instruction;
-    protected:
+    public:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
-    public:
+
         static const constexpr Endian endian = Endian::little;
 
         BaseMIPSInstr() = delete;
@@ -224,19 +224,18 @@ std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& 
     return instr.dump( out);
 }
 
-template<MIPSVersion V>
-class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
+class MIPS32Instr : BaseMIPSInstr<uint32>
 {
-    using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
 public:
-    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
-        : Base( V, bytes, PC) { }
-    explicit MIPSInstr( std::string_view str_opcode, Addr PC = 0)
-        : Base( V, str_opcode, PC) { }
+    MIPS32Instr( uint32 bytes, Addr pc) : BaseMIPSInstr<uint32>( MIPSVersion::v32, bytes, pc) { }
+    MIPS32Instr( std::string_view str_opcode, Addr pc) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, pc) { }
 };
 
-
-using MIPS32Instr = MIPSInstr<MIPSVersion::v32>;
-using MIPS64Instr = MIPSInstr<MIPSVersion::v64>;
+class MIPS64Instr : BaseMIPSInstr<uint64>
+{
+public:
+    MIPS64Instr( uint32 bytes, Addr pc) : BaseMIPSInstr<uint64>( MIPSVersion::v64, bytes, pc) { }
+    MIPS64Instr( std::string_view str_opcode, Addr pc) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, pc) { }
+};
 
 #endif //MIPS_INSTR_H

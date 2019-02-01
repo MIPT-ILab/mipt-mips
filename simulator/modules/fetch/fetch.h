@@ -25,7 +25,7 @@ public:
     void set_memory( std::shared_ptr<FuncMemory> mem) { memory.set_memory( std::move( mem)); }
 
 private:
-    InstrMemoryCached<FuncInstr> memory;
+    InstrMemoryCached<ISA> memory;
     std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<CacheTagArray> tags = nullptr;
     

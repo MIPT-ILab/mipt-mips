@@ -11,26 +11,26 @@
 
 #include <memory/memory.h>
 
-template<typename Instr>
+template<typename ISA>
 class InstrMemory
 {
     std::shared_ptr<ReadableMemory> mem;
 public:
     void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
-    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
-    auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
+    auto fetch( Addr pc) const { return mem->read<uint32, ISA::FuncInstr::endian>( pc); }
+    auto fetch_instr( Addr PC) { return ISA::create_instr( fetch( PC), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 
-template<typename Instr>
-class InstrMemoryCached : public InstrMemory<Instr>
+template<typename ISA>
+class InstrMemoryCached : public InstrMemory<ISA>
 {
-    LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
+    LRUCache<Addr, typename ISA::FuncInstr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
-    Instr fetch_instr( Addr PC)
+    auto fetch_instr( Addr PC)
     {
         const auto [found, value] = instr_cache.find( PC);
         if ( found && value.is_same_bytes( this->fetch( PC))) {
@@ -40,7 +40,7 @@ public:
         if ( found)
             instr_cache.erase( PC);
 
-        const Instr& instr = InstrMemory<Instr>::fetch_instr( PC);
+        auto instr = InstrMemory<ISA>::fetch_instr( PC);
         instr_cache.update( PC, instr);
         return instr;
     }
