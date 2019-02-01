@@ -407,16 +407,16 @@ template<class T> void Port<T>::Map::clean_up( Cycle cycle)
 }
 
 // External methods
-template<typename T, typename... Args>
-decltype(auto) make_write_port(Args... args)
+template<typename T>
+decltype(auto) make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
 {
-    return std::make_unique<WritePort<T>>(args...);
+    return std::make_unique<WritePort<T>>( std::move(key), bandwidth, fanout);
 }
 
-template<typename T, typename... Args>
-decltype(auto) make_read_port(Args... args)
+template<typename T>
+auto make_read_port( std::string key, Latency latency)
 {
-    return std::make_unique<ReadPort<T>>(args...);
+    return std::make_unique<ReadPort<T>>( std::move(key), latency);
 }
 
 static constexpr const Latency PORT_LATENCY = 1_lt;
