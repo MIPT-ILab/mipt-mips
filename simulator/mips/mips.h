@@ -31,6 +31,6 @@ using MIPSIV  = MIPS<MIPSVersion::IV>;
 using MIPS64  = MIPS<MIPSVersion::v64>;
 
 static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
-static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
+static_assert( std::is_base_of_v<MIPS64::FuncInstr, MIPS64Instr>);
 
 #endif // MIPS_H_
