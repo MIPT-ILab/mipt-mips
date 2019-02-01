@@ -8,11 +8,7 @@
 #ifndef COMMON__MACRO_H
 #define COMMON__MACRO_H
 
-#include <infra/types.h>
-
-#include <algorithm>
 #include <bitset>
-#include <climits>
 #include <limits>
 #include <type_traits>
 
