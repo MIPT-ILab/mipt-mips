@@ -29,7 +29,7 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - libstdc++7-dev # To fix a bug with std::hash<enum E>
+    - libstdc++6-dev # To fix a bug with std::hash<enum E>
     - libboost-dev
 
 install:
