@@ -75,7 +75,7 @@ after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $TRAVIS_BUILD_DIR/simulator/release
-        run-clang-tidy-7.py -header-filter='.*'    
+        run-clang-tidy-7.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
