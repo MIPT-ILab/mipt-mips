@@ -9,8 +9,6 @@
 #include <infra/exception.h>
 #include <infra/types.h>
 
-#include <iostream>
-#include <map>
 #include <string>
 
 namespace popl {
@@ -86,7 +84,7 @@ struct Switch : AliasedSwitch
 
 struct HelpOption : Exception
 {
-    explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
+    explicit HelpOption( const std::string& msg) : Exception( "Help", msg) { }
 };
 
 /* methods */
