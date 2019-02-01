@@ -122,7 +122,7 @@ void Execute<ISA>::clock( Cycle cycle)
         /* bypass data */
         wp_bypass->write( instr.get_dst_v(), cycle);
 
-        if( instr.is_jump())
+        if( instr.is_jump() )
         {
             wp_branch_datapath->write( std::move( instr) ,cycle);
         }

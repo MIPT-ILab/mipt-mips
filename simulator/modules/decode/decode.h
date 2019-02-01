@@ -33,8 +33,15 @@ class Decode : public Log
 
         std::unique_ptr<WritePort<bool>> wp_stall = nullptr;
 
+        std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        
+
+        std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
+        std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
+
+        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
+
+
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
         std::array<std::unique_ptr<WritePort<BypassCommand<Register>>>, SRC_REGISTERS_NUM> wps_command;
@@ -43,7 +50,7 @@ class Decode : public Log
         std::unique_ptr<ReadPort<Instr>> rp_bypassing_unit_notify = nullptr;
 
         std::unique_ptr<ReadPort<bool>> rp_bypassing_unit_flush_notify = nullptr;
-        
+
         Instr read_instr( Cycle cycle);
 
     public:

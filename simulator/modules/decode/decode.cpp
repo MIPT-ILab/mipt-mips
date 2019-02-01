@@ -11,9 +11,18 @@ namespace config {
     extern Value<uint64> long_alu_latency;
 } // namespace config
 
+static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
+
 template <typename ISA>
 Decode<ISA>::Decode( bool log) : Log( log)
 {
+    wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
+                                                                PORT_BW, PORT_FANOUT);
+
+    wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW, PORT_FANOUT);
+
     wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
 
@@ -86,6 +95,30 @@ void Decode<ISA>::clock( Cycle cycle)
     }
 
     auto instr = read_instr( cycle);
+
+    /* acquiring real information for BPU */
+    wp_bp_update->write( instr.get_bp_upd(), cycle);
+
+    bool is_misprediction = false;
+
+    if ( instr.is_direct_jump() || instr.is_indirect_jump() )
+        is_misprediction = (instr.get_bp_data()).is_taken != instr.is_jump_taken();
+    if ( instr.is_direct_jump() || instr.is_direct_branch() )
+        is_misprediction = (instr.get_bp_data()).target != instr.get_new_PC();
+
+    /* handle misprediction */
+    if ( is_misprediction)
+    {
+        /* flushing the pipeline */
+        wp_flush_all->write( true, cycle);
+
+        /* notify bypassing unit about misprediction */
+        wp_bypassing_unit_flush_notify->write( true, cycle);
+
+        /* sending valid PC to fetch stage */
+        wp_flush_target->write( instr.get_actual_target(), cycle);
+        sout << "misprediction on ";
+    }
 
     if ( bypassing_unit->is_stall( instr))
     {

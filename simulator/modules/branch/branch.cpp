@@ -46,13 +46,20 @@ void Branch<ISA>::clock( Cycle cycle)
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
-     
+
+    bool is_misprediction = false;
+
+    if ( instr.is_indirect_jump() )
+        is_misprediction = (instr.get_bp_data()).target != instr.get_new_PC();
+    if ( instr.is_direct_branch() )
+        is_misprediction = (instr.get_bp_data()).is_taken != instr.is_jump_taken();
+
     /* handle misprediction */
-    if ( instr.is_misprediction())
+    if ( is_misprediction)
     {
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
-          
+
         /* notify bypassing unit about misprediction */
         wp_bypassing_unit_flush_notify->write( true, cycle);
 

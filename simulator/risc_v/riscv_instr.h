@@ -73,7 +73,7 @@ class RISCVInstr
 
 	constexpr bool is_direct_branch() const { return false; }
 
-	constexpr bool is_indirect_branch() const { return false; }
+	constexpr bool is_indirect_jump() const { return false; }
 
         constexpr bool is_jump_taken() const { return false; }
 

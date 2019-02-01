@@ -22,9 +22,9 @@ public:
     PerfInstr( const FuncInstr& instr, const BPInterface& bp_info) : FuncInstr( instr), bp_data( bp_info) { }
 
     auto get_dst_v() const { return std::make_pair( this->get_v_dst(), this->get_v_dst2()); }
-    
-    bool is_misprediction() const { return bp_data.is_taken != this->is_jump_taken() || bp_data.target != this->get_new_PC(); }
 
+    const auto& get_bp_data() const { return bp_data; }
+    
     // Get targets for the next instruction, predicted and actual
     Target get_predicted_target() const {
         return Target( bp_data.target, this->get_sequence_id() + 1);
