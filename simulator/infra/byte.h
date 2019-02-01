@@ -40,7 +40,7 @@ template<std::size_t N>
 const Byte* byte_cast( const char (& array)[N])
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay, cppcoreguidelines-pro-type-reinterpret-cast)
-    return reinterpret_cast<Byte*>( array);
+    return reinterpret_cast<const Byte*>( array);
 }
 
 static inline Byte* byte_cast( char* b)
