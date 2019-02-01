@@ -227,15 +227,15 @@ std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& 
 class MIPS32Instr : BaseMIPSInstr<uint32>
 {
 public:
-    MIPS32Instr( uint32 bytes, Addr pc) : BaseMIPSInstr<uint32>( MIPSVersion::v32, bytes, pc) { }
-    MIPS32Instr( std::string_view str_opcode, Addr pc) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, pc) { }
+    explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, bytes, pc) { }
+    explicit MIPS32Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, pc) { }
 };
 
 class MIPS64Instr : BaseMIPSInstr<uint64>
 {
 public:
-    MIPS64Instr( uint32 bytes, Addr pc) : BaseMIPSInstr<uint64>( MIPSVersion::v64, bytes, pc) { }
-    MIPS64Instr( std::string_view str_opcode, Addr pc) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, pc) { }
+    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, bytes, pc) { }
+    explicit MIPS64Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, pc) { }
 };
 
 #endif //MIPS_INSTR_H
