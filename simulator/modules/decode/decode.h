@@ -19,7 +19,7 @@ class Decode : public Log
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
     using Instr = PerfInstr<FuncInstr>;
-    using BypassingUnit = DataBypass<ISA>;
+    using BypassingUnit = DataBypass<FuncInstr>;
 
     private:
         RF<FuncInstr>* rf = nullptr;
