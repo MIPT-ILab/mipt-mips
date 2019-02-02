@@ -59,10 +59,12 @@ void unknown_mips_instruction( I* i)
 template<typename R>
 class BaseMIPSInstr
 {
-    private:
-        friend struct ALU;
+    public:
+        using Register = MIPSRegister;
         using RegisterUInt = R;
         using RegisterSInt = sign_t<RegisterUInt>;
+    private:
+        friend struct ALU;
 
         OperationType operation = OUT_UNKNOWN;
         Trap trap = Trap::NO_TRAP;

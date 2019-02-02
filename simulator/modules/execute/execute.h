@@ -10,13 +10,12 @@
 #include <modules/ports_instance.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
 
-template <typename ISA>
+template <typename FuncInstr>
 class Execute : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register = typename ISA::Register;
+    using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:   

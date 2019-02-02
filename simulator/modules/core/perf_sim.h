@@ -67,14 +67,14 @@ private:
     bool force_halt = false;
 
     /* simulator units */
-    RF<ISA> rf;
+    RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
 
     Fetch<ISA> fetch;
-    Decode<ISA> decode;
-    Execute<ISA> execute;
-    Mem<ISA> mem;
+    Decode<FuncInstr> decode;
+    Execute<FuncInstr> execute;
+    Mem<FuncInstr> mem;
     Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
 
