@@ -12,6 +12,7 @@
 #include "../types.h"
 #include "timing.h"
 
+#include <list>
 #include <memory>
 #include <queue>
 #include <string>
@@ -193,7 +194,7 @@ template<class T> class ReadPort: public Port<T>
         const Latency _latency;
 
         // Queue of data that should be released
-        std::queue<std::pair<T, Cycle>> _dataQueue;
+        std::queue<std::pair<T, Cycle>, std::list<std::pair<T, Cycle>>> _dataQueue;
 
         // Pushes data from WritePort
         template<typename U>
