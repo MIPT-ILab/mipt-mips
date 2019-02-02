@@ -8,7 +8,7 @@
 
 #include <func_sim/func_sim.h>
 #include <infra/exception.h>
-#include <modules/ports_instance.h>
+#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
 struct CheckerMismatch final : Exception
