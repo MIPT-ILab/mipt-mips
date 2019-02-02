@@ -10,11 +10,11 @@
 #include "../exception.h"
 #include "../log.h"
 #include "../types.h"
+#include "port_queue/port_queue.h"
 #include "timing.h"
 
-#include <list>
+#include <cassert>
 #include <memory>
-#include <queue>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -194,12 +194,13 @@ template<class T> class ReadPort: public Port<T>
         const Latency _latency;
 
         // Queue of data that should be released
-        std::queue<std::pair<T, Cycle>, std::list<std::pair<T, Cycle>>> _dataQueue;
+        PortQueue<std::pair<T, Cycle>> _dataQueue;
 
         // Pushes data from WritePort
         template<typename U>
         void emplaceData( U&& what, Cycle cycle)
         {
+            assert( !_dataQueue.full());
             _dataQueue.emplace( std::forward<U>( what), cycle + _latency);
         }
  
@@ -288,8 +289,11 @@ template<class T> void WritePort<T>::init( std::vector<ReadPort<T>*> readers)
 
     // Initializing ports with setting their init flags.
     uint32 readersCounter = _destinations.size();
-    for ( const auto reader : _destinations)
+    for ( const auto reader : _destinations) {
         reader->_init = true;
+        // +1 to handle reads-after-writes
+        reader->_dataQueue.resize( ( reader->_latency.to_size_t() + 1) * this->_bandwidth);
+    }
 
     if ( readersCounter == 0)
         throw PortError( this->_key + " has no ReadPorts");
