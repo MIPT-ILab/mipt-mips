@@ -73,7 +73,7 @@ private:
 
     Fetch<ISA> fetch;
     Decode<ISA> decode;
-    Execute<ISA> execute;
+    Execute<FuncInstr> execute;
     Mem<ISA> mem;
     Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
