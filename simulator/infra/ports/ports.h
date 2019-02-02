@@ -12,7 +12,7 @@
 #include "../types.h"
 #include "timing.h"
 
-#include <list>
+#include <deque>
 #include <memory>
 #include <queue>
 #include <string>
@@ -189,18 +189,19 @@ template<class T> class ReadPort: public Port<T>
     private:
         using Log::sout;
         using Log::serr;
+        using QType = std::queue<std::pair<T, Cycle>>;
 
         // Latency is the number of cycles after which we may take data from port.
         const Latency _latency;
 
         // Queue of data that should be released
-        std::queue<std::pair<T, Cycle>, std::list<std::pair<T, Cycle>>> _dataQueue;
+        std::unique_ptr<QType> _dataQueue;
 
         // Pushes data from WritePort
         template<typename U>
         void emplaceData( U&& what, Cycle cycle)
         {
-            _dataQueue.emplace( std::forward<U>( what), cycle + _latency);
+            _dataQueue->emplace( std::forward<U>( what), cycle + _latency);
         }
  
         // Tests if there is any ungot data
@@ -215,7 +216,7 @@ template<class T> class ReadPort: public Port<T>
          * Adds port to needed Map.
         */
         ReadPort<T>( std::string key, Latency latency) :
-            Port<T>::Port( std::move( key)), _latency( latency), _dataQueue()
+            Port<T>::Port( std::move( key)), _latency( latency), _dataQueue( std::make_unique<QType>())
         {
             this->portMap[ this->_key].readers.push_back( this);
         }
@@ -330,7 +331,7 @@ template<class T> void WritePort<T>::destroy()
 template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
 {
     // there are some entries and they are ready to be read
-    return !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) == cycle;
+    return !_dataQueue->empty() && std::get<Cycle>(_dataQueue.front()) == cycle;
 }
 
 /*
@@ -356,11 +357,11 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
 */
 template<class T> void ReadPort<T>::clean_up( Cycle cycle)
 {
-    while ( !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) < cycle) {
+    while ( !_dataQueue->empty() && std::get<Cycle>(_dataQueue->front()) < cycle) {
         sout << "In " << this->_key << " port data was added at "
-             << (std::get<Cycle>(_dataQueue.front()) - _latency)
+             << (std::get<Cycle>(_dataQueue->front()) - _latency)
              << " clock and was not readed\n";
-        _dataQueue.pop();
+        _dataQueue->pop();
     }
 }
 
