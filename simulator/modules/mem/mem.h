@@ -7,7 +7,7 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include <modules/ports_instance.h>
+#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
 class FuncMemory;
