@@ -72,7 +72,7 @@ private:
     std::shared_ptr<Kernel> kernel;
 
     Fetch<ISA> fetch;
-    Decode<ISA> decode;
+    Decode<FuncInstr> decode;
     Execute<FuncInstr> execute;
     Mem<ISA> mem;
     Branch<FuncInstr> branch;
