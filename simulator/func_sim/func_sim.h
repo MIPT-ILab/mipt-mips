@@ -26,7 +26,7 @@ class FuncSim : public Simulator
     using RegisterUInt = typename ISA::RegisterUInt;
 
     private:
-        RF<ISA> rf;
+        RF<FuncInstr> rf;
         Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
