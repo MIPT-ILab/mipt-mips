@@ -331,7 +331,7 @@ template<class T> void WritePort<T>::destroy()
 template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
 {
     // there are some entries and they are ready to be read
-    return !_dataQueue->empty() && std::get<Cycle>(_dataQueue.front()) == cycle;
+    return !_dataQueue->empty() && std::get<Cycle>(_dataQueue->front()) == cycle;
 }
 
 /*
@@ -347,8 +347,8 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
         throw PortError( this->_key + " ReadPort was not ready for read at cycle=" + cycle.to_string());
 
     // data is successfully read
-    T tmp( std::move( std::get<T>(_dataQueue.front())));
-    _dataQueue.pop();
+    T tmp( std::move( std::get<T>(_dataQueue->front())));
+    _dataQueue->pop();
     return tmp;
 }
 
