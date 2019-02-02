@@ -75,7 +75,7 @@ private:
     Decode<ISA> decode;
     Execute<ISA> execute;
     Mem<ISA> mem;
-    Branch<ISA> branch;
+    Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
 
     /* ports */
