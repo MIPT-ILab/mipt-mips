@@ -40,6 +40,7 @@ set(CPPS
     export/gdb/gdb_wrapper.cpp
     kernel/kernel.cpp
     kernel/mars/mars_kernel.cpp
+    modules/ports_instance.cpp
     modules/fetch/fetch.cpp
     modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp

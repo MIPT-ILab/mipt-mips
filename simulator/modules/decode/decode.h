@@ -10,8 +10,8 @@
 #include "bypass/data_bypass.h"
 
 #include <func_sim/rf/rf.h>
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 template <typename ISA>
 class Decode : public Log
