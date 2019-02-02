@@ -12,7 +12,7 @@
 #include <infra/ports/ports.h>
 
 struct BPInterface;
-struct Target;
+class Target;
 template<typename T> class BaseMIPSInstr;
 template<typename T> class RISCVInstr;
 template<typename T> class PerfInstr;
