@@ -6,8 +6,8 @@
 #include "mem.h"
 #include <memory/memory.h>
 
-template <typename ISA>
-Mem<ISA>::Mem( bool log) : Log( log)
+template <typename FuncInstr>
+Mem<FuncInstr>::Mem( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
@@ -17,8 +17,8 @@ Mem<ISA>::Mem( bool log) : Log( log)
     wp_bypass = make_write_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 }
 
-template <typename ISA>
-void Mem<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Mem<FuncInstr>::clock( Cycle cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
@@ -55,13 +55,8 @@ void Mem<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Mem<MIPSI>;
-template class Mem<MIPSII>;
-template class Mem<MIPSIII>;
-template class Mem<MIPSIV>;
-template class Mem<MIPS32>;
-template class Mem<MIPS64>;
-template class Mem<RISCV32>;
-template class Mem<RISCV64>;
-template class Mem<RISCV128>;
-
+template class Mem<BaseMIPSInstr<uint32>>;
+template class Mem<BaseMIPSInstr<uint64>>;
+template class Mem<RISCVInstr<uint32>>;
+template class Mem<RISCVInstr<uint64>>;
+template class Mem<RISCVInstr<uint128>>;

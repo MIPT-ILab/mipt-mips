@@ -12,12 +12,11 @@
 
 class FuncMemory;
 
-template <typename ISA>
+template <typename FuncInstr>
 class Mem : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
