@@ -74,7 +74,7 @@ private:
     Fetch<ISA> fetch;
     Decode<FuncInstr> decode;
     Execute<FuncInstr> execute;
-    Mem<ISA> mem;
+    Mem<FuncInstr> mem;
     Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
 
