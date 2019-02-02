@@ -8,7 +8,7 @@
 #ifndef BRANCH_H
 #define BRANCH_H
 
-#include <infra/ports/ports.h>
+#include <modules/ports_instance.h>
 #include <modules/core/perf_instr.h>
 
 class FuncMemory;
