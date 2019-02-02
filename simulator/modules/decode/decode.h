@@ -13,11 +13,10 @@
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
-template <typename ISA>
+template <typename FuncInstr>
 class Decode : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register = typename ISA::Register;
+    using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
     using BypassingUnit = DataBypass<FuncInstr>;
 

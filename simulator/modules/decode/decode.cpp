@@ -11,8 +11,8 @@ namespace config {
     extern Value<uint64> long_alu_latency;
 } // namespace config
 
-template <typename ISA>
-Decode<ISA>::Decode( bool log) : Log( log)
+template <typename FuncInstr>
+Decode<FuncInstr>::Decode( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
@@ -39,8 +39,8 @@ Decode<ISA>::Decode( bool log) : Log( log)
 }
 
 
-template <typename ISA>
-typename Decode<ISA>::Instr Decode<ISA>::read_instr( Cycle cycle)
+template <typename FuncInstr>
+typename Decode<FuncInstr>::Instr Decode<FuncInstr>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
         return rp_stall_datapath->read( cycle);
@@ -49,8 +49,8 @@ typename Decode<ISA>::Instr Decode<ISA>::read_instr( Cycle cycle)
 }
 
 
-template <typename ISA>
-void Decode<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Decode<FuncInstr>::clock( Cycle cycle)
 {
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
@@ -122,13 +122,9 @@ void Decode<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Decode<MIPSI>;
-template class Decode<MIPSII>;
-template class Decode<MIPSIII>;
-template class Decode<MIPSIV>;
-template class Decode<MIPS32>;
-template class Decode<MIPS64>;
-template class Decode<RISCV32>;
-template class Decode<RISCV64>;
-template class Decode<RISCV128>;
+template class Decode<BaseMIPSInstr<uint32>>;
+template class Decode<BaseMIPSInstr<uint64>>;
+template class Decode<RISCVInstr<uint32>>;
+template class Decode<RISCVInstr<uint64>>;
+template class Decode<RISCVInstr<uint128>>;
 
