@@ -122,6 +122,7 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
 
     // connect all the ports
     init_ports();;
+    CHECK( init.get_fanout() == 1);
 
     // init object A by value 0
     init.write( 0, 0_cl);;
