@@ -22,7 +22,7 @@ class Decode : public Log
     using BypassingUnit = DataBypass<ISA>;
 
     private:
-        RF<ISA>* rf = nullptr;
+        RF<FuncInstr>* rf = nullptr;
         std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
 
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -49,7 +49,7 @@ class Decode : public Log
     public:
         explicit Decode( bool log);
         void clock( Cycle cycle);
-        void set_RF( RF<ISA>* value) { rf = value;}
+        void set_RF( RF<FuncInstr>* value) { rf = value;}
 };
 
 
