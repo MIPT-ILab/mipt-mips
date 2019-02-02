@@ -11,8 +11,8 @@ namespace config {
     Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
 } // namespace config
 
-template <typename ISA>
-Execute<ISA>::Execute( bool log) 
+template <typename FuncInstr>
+Execute<FuncInstr>::Execute( bool log) 
     : Log( log)
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
@@ -53,8 +53,8 @@ Execute<ISA>::Execute( bool log)
     rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
-template <typename ISA>
-void Execute<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Execute<FuncInstr>::clock( Cycle cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
@@ -141,13 +141,10 @@ void Execute<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Execute<MIPSI>;
-template class Execute<MIPSII>;
-template class Execute<MIPSIII>;
-template class Execute<MIPSIV>;
-template class Execute<MIPS32>;
-template class Execute<MIPS64>;
-template class Execute<RISCV32>;
-template class Execute<RISCV64>;
-template class Execute<RISCV128>;
+template class Execute<BaseMIPSInstr<uint32>>;
+template class Execute<BaseMIPSInstr<uint64>>;
+template class Execute<RISCVInstr<uint32>>;
+template class Execute<RISCVInstr<uint64>>;
+template class Execute<RISCVInstr<uint128>>;
+
 

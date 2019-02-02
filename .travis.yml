@@ -29,13 +29,16 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - g++-7
+    - libstdc++-7-dev # To fix a bug with std::hash<enum E>
     - libboost-dev
-    - clang-tidy-7
 
 install:
   - pip install --user future
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
+  - |
+    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install g++-7
+        CXX=g++-7
+    fi
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -73,6 +76,7 @@ script:
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install clang-tidy-7
         cd $TRAVIS_BUILD_DIR/simulator/release
         run-clang-tidy-7.py -header-filter='.*'
     fi

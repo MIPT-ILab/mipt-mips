@@ -23,7 +23,9 @@
 template <typename T>
 class RISCVInstr
 {
-    using RegisterUInt = T;
+    public:
+        using Register = RISCVRegister;
+        using RegisterUInt = T;
     private:
         uint32 instr = NO_VAL32;
 
@@ -68,6 +70,12 @@ class RISCVInstr
 
         /* Checks if instruction can change PC in unusual way. */
         constexpr bool is_jump() const { return false; }
+
+        constexpr bool is_direct_jump() const { return false; }
+
+        constexpr bool is_direct_branch() const { return false; }
+
+        constexpr bool is_indirect_branch() const { return false; }
 
         constexpr bool is_jump_taken() const { return false; }
 

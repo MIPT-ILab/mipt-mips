@@ -13,16 +13,15 @@
 #include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
 
-template <typename ISA>
+template <typename FuncInstr>
 class Decode : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register = typename ISA::Register;
+    using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
-    using BypassingUnit = DataBypass<ISA>;
+    using BypassingUnit = DataBypass<FuncInstr>;
 
     private:
-        RF<ISA>* rf = nullptr;
+        RF<FuncInstr>* rf = nullptr;
         std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
 
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -49,7 +48,7 @@ class Decode : public Log
     public:
         explicit Decode( bool log);
         void clock( Cycle cycle);
-        void set_RF( RF<ISA>* value) { rf = value;}
+        void set_RF( RF<FuncInstr>* value) { rf = value;}
 };
 
 

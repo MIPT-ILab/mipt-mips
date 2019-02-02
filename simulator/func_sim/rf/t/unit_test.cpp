@@ -17,7 +17,7 @@ static_assert(MIPSRegister::MAX_REG >= 32);
 
 TEST_CASE( "RF: read_write_rf")
 {
-    auto rf = std::make_unique<RF<MIPS32>>();
+    auto rf = std::make_unique<RF<MIPS32Instr>>();
 
     // Fill array using write() and check correctness using read()
     for( size_t i = 0; i < 32; ++i)
@@ -98,19 +98,15 @@ TEST_CASE( "RF: read_write_rf")
 
 TEST_CASE( "RF: read_sources_write_dst_rf")
 {
-    auto rf = std::make_unique<RF<MIPS32>>();
+    RF<MIPS32Instr> rf;
 
     // Fill Reg 25(it's src2) with some value
-    rf->write( MIPSRegister::from_cpu_index(25), 1);
+    rf.write( MIPSRegister::from_cpu_index(25), 1);
 
-    // Create the instr( for example, "add")
-    auto instr = std::make_unique<MIPS32Instr>( 0x01398820);
-    // Use read_sources( "add") method( initialize src1 and src2)
-    rf->read_sources( instr.get());
-    // Execute instruction( to change v_dst field)
-    instr->execute();
-    // Check
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
+    MIPS32Instr instr( 0x01398820); // add
+    rf.read_sources( &instr);
+    instr.execute();
+    CHECK( instr.get_v_src2() == 1u);
+    CHECK( instr.get_v_dst() != NO_VAL64);
 }
 

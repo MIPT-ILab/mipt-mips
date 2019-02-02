@@ -13,14 +13,10 @@
 
 class FuncMemory;
 
-template <typename ISA>
+template <typename FuncInstr>
 class Branch : public Log
-{
-    using FuncInstr = typename ISA::FuncInstr;
-    using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
-    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
-    
+{    
+        using Instr = PerfInstr<FuncInstr>;
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
