@@ -1,6 +1,10 @@
+#define COMMA ,
 PORT_TOKEN(bool)
 PORT_TOKEN(BPInterface)
 PORT_TOKEN(Target)
+PORT_TOKEN(std::pair<uint32 COMMA uint32>)
+PORT_TOKEN(std::pair<uint64 COMMA uint64>)
+PORT_TOKEN(std::pair<uint128 COMMA uint128>)
 PORT_TOKEN(PerfInstr<BaseMIPSInstr<uint32>>)
 PORT_TOKEN(PerfInstr<BaseMIPSInstr<uint64>>)
 PORT_TOKEN(PerfInstr<RISCVInstr<uint32>>)
@@ -8,3 +12,4 @@ PORT_TOKEN(PerfInstr<RISCVInstr<uint64>>)
 PORT_TOKEN(PerfInstr<RISCVInstr<uint128>>)
 PORT_TOKEN(BypassCommand<MIPSRegister>)
 PORT_TOKEN(BypassCommand<RISCVRegister>)
+#undef COMMA
