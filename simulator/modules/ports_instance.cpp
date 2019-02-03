@@ -16,6 +16,7 @@
 #include <risc_v/risc_v.h>
 
 #define PORT_TOKEN(x) \
+    template class PortQueue<std::pair<x, Cycle>>; \
     template class ReadPort<x>; \
     template class WritePort<x>;
 #include "ports_instance.def"
