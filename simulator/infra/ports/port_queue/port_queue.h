@@ -17,6 +17,7 @@ class PortQueue
 {
     struct Deleter
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         void operator()(T *p) { std::free(p); }
     };
 
@@ -58,8 +59,8 @@ public:
     void resize( size_t size)
     {
         clear();
-        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
-        arena = std::unique_ptr<T, Deleter>(reinterpret_cast<T*>(std::malloc(sizeof(T) * size)));
+        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
+        arena = std::unique_ptr<T, Deleter>(static_cast<T*>(std::malloc(sizeof(T) * size)));
         arena_end = arena.get() + size;
         p_front = p_back = arena.get();
         wrap = false;
