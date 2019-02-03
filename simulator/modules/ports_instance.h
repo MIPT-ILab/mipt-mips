@@ -21,6 +21,7 @@ class RISCVRegister;
 template<typename T> class BypassCommand;
 
 #define PORT_TOKEN(x) \
+    extern template class PortQueue<std::pair<x, Cycle>>; \
     extern template class ReadPort<x>; \
     extern template class WritePort<x>;
 #include "ports_instance.def"
