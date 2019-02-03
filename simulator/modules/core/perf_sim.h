@@ -31,7 +31,7 @@ public:
     using RegisterUInt = typename ISA::RegisterUInt;
 
     explicit PerfSim( bool log);
-    ~PerfSim() override { destroy_ports(); }
+    ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
     Trap run_single_step() final { return Trap::HALT; }
     Trap run_until_trap( uint64 /* instrs_to_run */) final { return Trap::HALT; }
