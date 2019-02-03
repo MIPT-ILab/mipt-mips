@@ -25,7 +25,13 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
 
-    init_ports();
+    PortMap::get_instance().init();
+}
+
+template <typename ISA>
+PerfSim<ISA>::~PerfSim()
+{
+    PortMap::get_instance().destroy();
 }
 
 template <typename ISA>
@@ -75,7 +81,7 @@ bool PerfSim<ISA>::is_halt() const
 template<typename ISA>
 void PerfSim<ISA>::clock()
 {
-    clean_up_ports( curr_cycle);
+    PortMap::get_instance().clean_up( curr_cycle);
     clock_tree( curr_cycle);
     curr_cycle.inc();
 }

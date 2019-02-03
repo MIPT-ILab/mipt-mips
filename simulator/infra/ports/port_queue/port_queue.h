@@ -10,36 +10,44 @@
 #ifndef PORT_QUEUE_H
 #define PORT_QUEUE_H
 
+#include <memory>
+
 template<typename T>
 class PortQueue
 {
-    T* arena = nullptr;
-    size_t arena_size = 0;
-    size_t p_front = 0;
-    size_t p_back = 0;
+    struct Deleter
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        void operator()(T *p) { std::free(p); }
+    };
+
+    std::unique_ptr<T, Deleter> arena = nullptr;
+    const T* arena_end = nullptr;
+    T* p_front = nullptr;
+    T* p_back = nullptr;
     bool wrap = false;
 
-    void advance_ptr(size_t& p) noexcept
+    void advance_ptr( T** p) noexcept
     {
-        ++p;
-        if ( p == arena_size) {
-            p = 0;
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        ++*p;
+        if ( *p == arena_end) {
+            *p = arena.get();
             wrap = !wrap;
         }
     }
 
-    void destroy()
+    void clear()
     {
         while ( !empty())
             pop();
-        std::free( arena); 
     }
 
 public:
     PortQueue() = default;
     ~PortQueue()
     {
-        destroy();
+        clear();
     }
 
     // These are not trivial, and I'm lazy to implement
@@ -50,26 +58,29 @@ public:
 
     void resize( size_t size)
     {
-        destroy();
-        arena = reinterpret_cast<T*>(std::malloc(sizeof(T) * size));
-        arena_size = size;
+        clear();
+        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
+        arena = std::unique_ptr<T, Deleter>(static_cast<T*>(std::malloc(sizeof(T) * size)));
+        arena_end = arena.get() + size;
+        p_front = p_back = arena.get();
+        wrap = false;
     }
 
     template<typename... Args> void emplace( Args ... args) noexcept
     {
-        new (&arena[p_back]) T( std::forward<Args>( args)...);
-        advance_ptr( p_back);
+        new (p_back) T( std::forward<Args>( args)...);
+        advance_ptr( &p_back);
     }
 
     bool full() const noexcept
     {
-        return p_front == p_back && (wrap || arena_size == 0);
+        return (p_front == p_back && wrap) || arena == nullptr;
     }
 
     void pop() noexcept
     {
-        arena[p_front].~T();
-        advance_ptr( p_front);
+        p_front->~T();
+        advance_ptr( &p_front);
     }
 
     bool empty() const noexcept
@@ -79,7 +90,7 @@ public:
 
     const T& front() const noexcept
     {
-        return arena[ p_front];
+        return *p_front;
     }
 };
 
