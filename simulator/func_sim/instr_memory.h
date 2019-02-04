@@ -11,14 +11,23 @@
 
 #include <memory/memory.h>
 
-template<typename ISA>
-class InstrMemory
+template<typename FuncInstr>
+class InstrMemoryIface
 {
+protected:
     std::shared_ptr<ReadableMemory> mem;
 public:
     void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
-    auto fetch( Addr pc) const { return mem->read<uint32, ISA::FuncInstr::endian>( pc); }
-    auto fetch_instr( Addr PC) { return ISA::create_instr( fetch( PC), PC); }
+    virtual FuncInstr fetch_instr( Addr PC) = 0;
+};
+
+template<typename ISA>
+class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
+{
+public:
+    using Instr = typename ISA::FuncInstr;
+    auto fetch( Addr pc) const { return this->mem->template read<uint32, Instr::endian>( pc); }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( fetch( PC), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
@@ -28,9 +37,10 @@ public:
 template<typename ISA>
 class InstrMemoryCached : public InstrMemory<ISA>
 {
-    LRUCache<Addr, typename ISA::FuncInstr, INSTR_CACHE_CAPACITY> instr_cache{};
+    using Instr = typename ISA::FuncInstr;
+    LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
-    auto fetch_instr( Addr PC)
+    Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);
         if ( found && value.is_same_bytes( this->fetch( PC))) {
