@@ -17,7 +17,7 @@ class PortQueue
 {
     struct Deleter
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc, hicpp-no-malloc)
         void operator()(T *p) { std::free(p); }
     };
 
