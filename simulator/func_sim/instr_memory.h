@@ -15,8 +15,10 @@ template<typename FuncInstr>
 class InstrMemoryIface
 {
 protected:
-    std::shared_ptr<ReadableMemory> mem;
+    std::shared_ptr<ReadableMemory> mem = nullptr;
 public:
+    InstrMemoryIface() = default;
+    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
     void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
 
@@ -32,8 +34,7 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 {
 public:
     using Instr = typename ISA::FuncInstr;
-    auto fetch( Addr pc) const { return this->mem->template read<uint32, Instr::endian>( pc); }
-    Instr fetch_instr( Addr PC) override { return ISA::create_instr( fetch( PC), PC); }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
