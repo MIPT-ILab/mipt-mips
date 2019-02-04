@@ -61,7 +61,7 @@ BasicWritePort::BasicWritePort( std::string key, uint32 bandwidth, uint32 fanout
 
 void BasicWritePort::check_init( const std::vector<Port*>& readers) const
 {
-    if ( readers.size() == 0)
+    if ( readers.empty())
         throw PortError( _key + " has no ReadPorts");
     if ( readers.size() > _fanout)
         throw PortError( _key + " WritePort is overloaded by fanout");

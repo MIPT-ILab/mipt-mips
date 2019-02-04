@@ -53,11 +53,12 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
+To build MIPT-MIPS faster, we recommend to install Ninja.
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
-  1. Run `cmake /path/to/mipt-mips/simulator` to configure CMake
-  1. Run `make` to get the `mipt-mips` binary file
-  1. If you changed some source code files, just type `make` to rebuild project
+  1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
+  1. Run `ninja` to get the `mipt-mips` binary file
+  1. If you changed some source code files, just type `ninja` to rebuild project
 #### Run
   1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
   1. See more command line options in the paragraph below
