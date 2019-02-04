@@ -4,23 +4,18 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-
 #ifndef BRANCH_H
 #define BRANCH_H
 
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 class FuncMemory;
 
-template <typename ISA>
+template <typename FuncInstr>
 class Branch : public Log
-{
-    using FuncInstr = typename ISA::FuncInstr;
-    using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
-    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
-    
+{    
+        using Instr = PerfInstr<FuncInstr>;
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -39,6 +34,5 @@ class Branch : public Log
         explicit Branch( bool log);
         void clock( Cycle cycle);
 };
-
 
 #endif // BRANCH_H

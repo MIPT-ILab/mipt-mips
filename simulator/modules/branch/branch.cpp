@@ -8,8 +8,8 @@
 
 static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
 
-template <typename ISA>
-Branch<ISA>::Branch( bool log) : Log( log)
+template <typename FuncInstr>
+Branch<FuncInstr>::Branch( bool log) : Log( log)
 {
     wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
@@ -24,8 +24,8 @@ Branch<ISA>::Branch( bool log) : Log( log)
                                                                 PORT_BW, PORT_FANOUT);
 }
 
-template <typename ISA>
-void Branch<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Branch<FuncInstr>::clock( Cycle cycle)
 {
     /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
@@ -72,13 +72,9 @@ void Branch<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Branch<MIPSI>;
-template class Branch<MIPSII>;
-template class Branch<MIPSIII>;
-template class Branch<MIPSIV>;
-template class Branch<MIPS32>;
-template class Branch<MIPS64>;
-template class Branch<RISCV32>;
-template class Branch<RISCV64>;
-template class Branch<RISCV128>;
+template class Branch<BaseMIPSInstr<uint32>>;
+template class Branch<BaseMIPSInstr<uint64>>;
+template class Branch<RISCVInstr<uint32>>;
+template class Branch<RISCVInstr<uint64>>;
+template class Branch<RISCVInstr<uint128>>;
 

@@ -121,7 +121,8 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
     ReadPort<bool> stop( "stop", ports::testing::PORT_LATENCY);;
 
     // connect all the ports
-    init_ports();;
+    PortMap::get_instance().init();
+    CHECK( init.get_fanout() == 1);
 
     // init object A by value 0
     init.write( 0, 0_cl);;
@@ -143,10 +144,10 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
         a.clock( cycle);
         b.clock( cycle);
 
-        clean_up_ports( cycle);;
+        PortMap::get_instance().clean_up( cycle);;
     }
 
-    destroy_ports();;
+    PortMap::get_instance().destroy();
 }
 
 

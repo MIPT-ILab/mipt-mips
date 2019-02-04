@@ -8,8 +8,8 @@
 
 #include <func_sim/func_sim.h>
 #include <infra/exception.h>
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 struct CheckerMismatch final : Exception
 {
@@ -48,7 +48,7 @@ private:
     } checker;
 
     /* Simulator internals */
-    RF<ISA>* rf = nullptr;
+    RF<FuncInstr>* rf = nullptr;
 
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
@@ -68,7 +68,7 @@ private:
 public:
     explicit Writeback( bool log);
     void clock( Cycle cycle);
-    void set_RF( RF<ISA>* value) { rf = value; }
+    void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( mem); }
     void set_target( const Target& value);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }

@@ -13,12 +13,11 @@
 #include <array>
 #include <cassert>
 
-template<typename ISA>
+template<typename FuncInstr>
 class RF
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register = typename ISA::Register;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using Register = typename FuncInstr::Register;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
 
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 

@@ -4,6 +4,7 @@
  */
 
 #include "perf_sim.h"
+#include <func_sim/instr_memory.h>
 #include <memory/elf/elf_loader.h>
 
 #include <chrono>
@@ -25,14 +26,22 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
 
-    init_ports();
+    PortMap::get_instance().init();
+}
+
+template <typename ISA>
+PerfSim<ISA>::~PerfSim()
+{
+    PortMap::get_instance().destroy();
 }
 
 template <typename ISA>
 void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    fetch.set_memory( m);
+    auto imemory = std::make_unique<InstrMemoryCached<ISA>>();
+    imemory->set_memory( m);
+    fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
 }
 
@@ -75,7 +84,7 @@ bool PerfSim<ISA>::is_halt() const
 template<typename ISA>
 void PerfSim<ISA>::clock()
 {
-    clean_up_ports( curr_cycle);
+    PortMap::get_instance().clean_up( curr_cycle);
     clock_tree( curr_cycle);
     curr_cycle.inc();
 }

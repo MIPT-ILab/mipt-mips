@@ -36,10 +36,11 @@ set(CPPS
     mips/mips_isa.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
-    risc_v/riscv_register/riscv_register.cpp
+    risc_v/riscv_register/riscv_register.cpp 
     export/gdb/gdb_wrapper.cpp
     kernel/kernel.cpp
     kernel/mars/mars_kernel.cpp
+    modules/ports_instance.cpp
     modules/fetch/fetch.cpp
     modules/fetch/bpu/bpu.cpp
     modules/decode/decode.cpp
@@ -56,6 +57,7 @@ set(TESTS_CPPS
     infra/config/t/unit_test.cpp
     infra/instrcache/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
+    infra/ports/port_queue/t/unit_test.cpp
     kernel/t/unit_test.cpp
     kernel/mars/t/unit_test.cpp
     memory/cen64/t/unit_test.cpp
@@ -85,9 +87,9 @@ add_library(riscv-isa risc_v/riscv_isa.cpp risc_v/opcode.gen.h)
 
 # Compilation flags
 if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /wd4661 /GR-")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4505 /wd4244 /wd4996 /wd4267 /wd4702 /wd4661")
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror -fno-rtti")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()

@@ -7,17 +7,16 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 class FuncMemory;
 
-template <typename ISA>
+template <typename FuncInstr>
 class Mem : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
