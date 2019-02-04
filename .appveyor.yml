@@ -30,8 +30,7 @@ before_build:
 - if "%platform%"=="x86" set platform=Win32 # oh dear
 - appveyor DownloadFile %GNU_BINUTILS%
 - 7z x mips-linux-gnu.zip
-- set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip"
-- appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+- appveyor DownloadFile "https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip" -FileName ninja.zip
 - 7z x ninja.zip -oC:\projects\deps\ninja > nul
 
 build_script:
@@ -40,7 +39,7 @@ build_script:
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
+- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
 
 test_script:
 - if not "%build%"=="msvc" .\mipt-mips -b ..\traces\fib.out -n 1000000
