@@ -37,9 +37,9 @@ int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus)
     return vr4300->init( create_cen64_memory( bus));
 }
 
-void vr4300_cp1_init(struct vr4300* /* vr4300 */ )
+void vr4300_cp1_init(struct vr4300* vr4300)
 {
-    
+    void(vr4300);
 }
 
 void vr4300_cycle(struct vr4300 * vr4300)
@@ -47,9 +47,9 @@ void vr4300_cycle(struct vr4300 * vr4300)
     vr4300->clock();
 }
 
-void vr4300_cycle_extra(struct vr4300* /* vr4300 */, struct vr4300_stats* /* stats */)
+void vr4300_cycle_extra(struct vr4300* vr4300, struct vr4300_stats* /* stats */)
 {
-
+    void(vr4300);
 }
 
 uint64 vr4300_get_register(struct vr4300* vr4300, size_t i)
