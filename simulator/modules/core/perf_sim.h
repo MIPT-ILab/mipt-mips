@@ -71,7 +71,7 @@ private:
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
 
-    Fetch<ISA> fetch;
+    Fetch<FuncInstr> fetch;
     Decode<FuncInstr> decode;
     Execute<FuncInstr> execute;
     Mem<FuncInstr> mem;
