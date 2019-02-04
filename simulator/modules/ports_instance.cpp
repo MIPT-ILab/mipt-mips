@@ -9,10 +9,10 @@
 #include "ports_instance.h"
 
 #include <infra/target.h>
+#include <mips/mips.h>
 #include <modules/core/perf_instr.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
 #include <modules/fetch/bpu/bp_interface.h>
-#include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
 #define PORT_TOKEN(x) \
