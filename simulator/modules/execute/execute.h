@@ -6,9 +6,9 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
-#include <modules/ports_instance.h>
 #include <modules/core/perf_instr.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
+#include <modules/ports_instance.h>
 
 template <typename FuncInstr>
 class Execute : public Log
