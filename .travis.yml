@@ -29,8 +29,9 @@ addons:
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - libstdc++-7-dev # To fix a bug with std::hash<enum E>
+    - libstdc++-7-dev # To fix lack of std::hash<enum E> in C++11
     - libboost-dev
+    - ninja
 
 install:
   - pip install --user future
