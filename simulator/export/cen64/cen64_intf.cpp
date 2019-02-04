@@ -17,19 +17,48 @@ struct vr4300* vr4300_alloc()
 void vr4300_free(struct vr4300* ptr)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
-    delete ptr; }
+    delete ptr;
+}
 
-struct vr4300_stats* vr4300_stats_alloc() { return nullptr; }
-void vr4300_stats_free(struct vr4300_stats* /* ptr */) {}
+struct vr4300_stats* vr4300_stats_alloc()
+{
+    return nullptr;
+}
 
-int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus) { return vr4300->init( create_cen64_memory( bus)); }
-void vr4300_cp1_init(struct vr4300* /* vr4300 */ ) {}
+void vr4300_stats_free(struct vr4300_stats* ptr)
+{
+    delete ptr;
+}
 
-void vr4300_cycle(struct vr4300 * vr4300) { vr4300->clock(); }
-void vr4300_cycle_extra(struct vr4300* /* vr4300 */, struct vr4300_stats* /* stats */) { }
+int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus)
+{
+    return vr4300->init( create_cen64_memory( bus));
+}
 
-uint64 vr4300_get_register(struct vr4300* vr4300, size_t i) { return vr4300->read_cpu_register( i); }
-uint64 vr4300_get_pc(struct vr4300* vr4300) { return vr4300->get_pc(); }
+void vr4300_cp1_init(struct vr4300* /* vr4300 */ )
+{
+    
+}
+
+void vr4300_cycle(struct vr4300 * vr4300)
+{
+    vr4300->clock();
+}
+
+void vr4300_cycle_extra(struct vr4300* /* vr4300 */, struct vr4300_stats* /* stats */)
+{
+
+}
+
+uint64 vr4300_get_register(struct vr4300* vr4300, size_t i)
+{
+    return vr4300->read_cpu_register( i);
+}
+
+uint64 vr4300_get_pc(struct vr4300* vr4300)
+{
+    return vr4300->get_pc();
+}
 
 int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
 {
@@ -43,8 +72,22 @@ int write_mi_regs( void* opaque, uint32 address, uint32 word, uint32 dqm)
     return reinterpret_cast<struct vr4300*>( opaque)->write_mi_regs( address, word, dqm);
 }
 
-void clear_rcp_interrupt(struct vr4300* vr4300, enum rcp_interrupt_mask mask)  { vr4300->clear_rcp_interrupt( mask); }
-void signal_rcp_interrupt(struct vr4300* vr4300, enum rcp_interrupt_mask mask) { vr4300->signal_rcp_interrupt( mask); }
+void clear_rcp_interrupt(struct vr4300* vr4300, enum rcp_interrupt_mask mask)
+{
+    vr4300->clear_rcp_interrupt( mask);
+}
 
-void clear_dd_interrupt(struct vr4300* vr4300)  { vr4300->reset_mask_to_cause( 0x800); }
-void signal_dd_interrupt(struct vr4300* vr4300) { vr4300->apply_mask_to_cause( 0x800); }
+void signal_rcp_interrupt(struct vr4300* vr4300, enum rcp_interrupt_mask mask)
+{
+    vr4300->signal_rcp_interrupt( mask);
+}
+
+void clear_dd_interrupt(struct vr4300* vr4300)
+{
+    vr4300->reset_mask_to_cause( 0x800);
+}
+
+void signal_dd_interrupt(struct vr4300* vr4300)
+{
+    vr4300->apply_mask_to_cause( 0x800);
+}
