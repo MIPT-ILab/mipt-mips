@@ -18,7 +18,7 @@ protected:
     std::shared_ptr<ReadableMemory> mem = nullptr;
 public:
     InstrMemoryIface() = default;
-    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
+    auto fetch( Addr pc) const { return mem->read<uint32, FuncInstr::endian>( pc); }
     void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
 
