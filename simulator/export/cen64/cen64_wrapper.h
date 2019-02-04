@@ -40,4 +40,5 @@ public:
 
     using PerfSim<MIPS64>::clock;
     using PerfSim<MIPS64>::read_cpu_register;
+    using PerfSim<MIPS64>::get_pc;
 };

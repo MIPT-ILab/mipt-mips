@@ -8,11 +8,16 @@
 #include "cen64_wrapper.h"
 #include <memory/cen64/cen64_memory.h>
 
-// NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
-struct vr4300* vr4300_alloc() { return new vr4300( true); }
+struct vr4300* vr4300_alloc()
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
+    return new vr4300( true);
+}
 
-// NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
-void vr4300_free(struct vr4300* ptr) { delete ptr; }
+void vr4300_free(struct vr4300* ptr)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
+    delete ptr; }
 
 struct vr4300_stats* vr4300_stats_alloc() { return nullptr; }
 void vr4300_stats_free(struct vr4300_stats* /* ptr */) {}
@@ -24,7 +29,7 @@ void vr4300_cycle(struct vr4300 * vr4300) { vr4300->clock(); }
 void vr4300_cycle_extra(struct vr4300* /* vr4300 */, struct vr4300_stats* /* stats */) { }
 
 uint64 vr4300_get_register(struct vr4300* vr4300, size_t i) { return vr4300->read_cpu_register( i); }
-uint64 vr4300_get_pc(struct vr4300* /* vr4300 */) { return 0; }
+uint64 vr4300_get_pc(struct vr4300* vr4300) { return vr4300->get_pc(); }
 
 int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
 {
