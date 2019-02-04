@@ -19,9 +19,6 @@ environment:
   - build: g++
     platform: x64
     CMAKEFILE: "Ninja"
-#  - build: clang++
-#    platform: x64
-#    CMAKEFILE: "MSYS Makefiles"
 
 before_build:
 - pip install future
@@ -46,5 +43,5 @@ build_script:
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform%
 
 test_script:
-- .\mipt-mips -b ..\traces\fib.out -n 1000000
+- if not "%build%"=="msvc" .\mipt-mips -b ..\traces\fib.out -n 1000000
 - ctest -C Release --verbose
