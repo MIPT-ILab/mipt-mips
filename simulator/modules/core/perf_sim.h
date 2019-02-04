@@ -8,12 +8,12 @@
 
 #include "perf_instr.h"
 
-#include <infra/ports/ports.h>
 #include <modules/branch/branch.h>
 #include <modules/decode/decode.h>
 #include <modules/execute/execute.h>
 #include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
+#include <modules/ports_instance.h>
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
@@ -71,7 +71,7 @@ private:
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
 
-    Fetch<ISA> fetch;
+    Fetch<FuncInstr> fetch;
     Decode<FuncInstr> decode;
     Execute<FuncInstr> execute;
     Mem<FuncInstr> mem;

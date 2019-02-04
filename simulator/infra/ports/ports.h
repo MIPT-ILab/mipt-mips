@@ -88,6 +88,7 @@ template<class T> class WritePort : public BasicWritePort
     void init( const std::vector<Port*>& readers) final;
     void clean_up( Cycle cycle) final;
     void destroy() final;
+    ReadPort<T>* port_cast( Port* p) const;
 public:
     WritePort<T>( std::string key, uint32 bandwidth, uint32 fanout) : BasicWritePort( std::move( key), bandwidth, fanout) { }
     void write( T&& what, Cycle cycle);
@@ -145,14 +146,24 @@ void WritePort<T>::write( const T& what, Cycle cycle)
     write( std::move( T( what)), cycle);
 }
 
-template<class T> void WritePort<T>::init( const std::vector<Port*>& readers)
+template<class T>
+ReadPort<T>* WritePort<T>::port_cast( Port* p) const try
+{
+    return dynamic_cast<ReadPort<T>*>( p);
+}
+catch ( const std::bad_cast&)
+{
+    throw PortError(_key + " has type mismatch between write and read ports");
+}
+
+template<class T>
+void WritePort<T>::init( const std::vector<Port*>& readers)
 {
     check_init( readers);
 
-    // TODO: use RTTI here
     _destinations.reserve( readers.size());
     for (const auto& r : readers)
-        _destinations.emplace_back( static_cast<ReadPort<T>*>( r));
+        _destinations.emplace_back( port_cast( r));
 
     _init = true;
     for ( const auto& reader : _destinations)

@@ -3,11 +3,11 @@
  * @author Denis Los
  */
 
-#include <catch.hpp>
-
 #include "../config.h"
-#include "infra/macro.h"
 #include "infra/argv.h"
+#include "infra/macro.h"
+
+#include <catch.hpp>
 
 #include <sstream>
 

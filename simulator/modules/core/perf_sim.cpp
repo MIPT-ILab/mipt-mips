@@ -4,6 +4,7 @@
  */
 
 #include "perf_sim.h"
+#include <func_sim/instr_memory.h>
 #include <memory/elf/elf_loader.h>
 
 #include <chrono>
@@ -38,7 +39,9 @@ template <typename ISA>
 void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    fetch.set_memory( m);
+    auto imemory = std::make_unique<InstrMemoryCached<ISA>>();
+    imemory->set_memory( m);
+    fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
 }
 

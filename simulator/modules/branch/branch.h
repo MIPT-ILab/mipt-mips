@@ -4,12 +4,11 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-
 #ifndef BRANCH_H
 #define BRANCH_H
 
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 class FuncMemory;
 
@@ -35,6 +34,5 @@ class Branch : public Log
         explicit Branch( bool log);
         void clock( Cycle cycle);
 };
-
 
 #endif // BRANCH_H
