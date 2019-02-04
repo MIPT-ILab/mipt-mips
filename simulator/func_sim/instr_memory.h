@@ -19,6 +19,12 @@ protected:
 public:
     void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
+
+    virtual ~InstrMemoryIface() = default;
+    InstrMemoryIface( const InstrMemoryIface&) = delete;
+    InstrMemoryIface( InstrMemoryIface&&) = default;
+    InstrMemoryIface& operator=( const InstrMemoryIface&) = delete;
+    InstrMemoryIface& operator=( InstrMemoryIface&&) = default;
 };
 
 template<typename ISA>
