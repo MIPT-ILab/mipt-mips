@@ -32,8 +32,8 @@ addons:
     - libstdc++-7-dev # To fix lack of std::hash<enum E> in C++11
     - libboost-dev
     - ninja-build
-  brew:
-    install:
+  homebrew:
+    packages:
     - ninja
 
 install:
