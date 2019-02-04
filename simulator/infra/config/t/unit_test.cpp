@@ -30,7 +30,8 @@ std::string wrap_shift_operator(const T& value)
 template<size_t N>
 void handleArgs( const char* (& array)[N])
 {
-    config::handleArgs( count_argc( argv_cast( array)), argv_cast( array), 1);
+    CHECK( count_argc( argv_cast<N>( array)) == N - 1);
+    config::handleArgs( N - 1, argv_cast<N>( array), 1);
 }
 
 //
