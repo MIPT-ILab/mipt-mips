@@ -4,6 +4,9 @@
  * Copyright 2019 MIPT-MIPS
  */
 
+#ifndef CEN64_WRAPPER
+#define CEN64_WRAPPER
+ 
 #include <mips/mips.h>
 #include <modules/core/perf_sim.h>
 
@@ -42,3 +45,5 @@ public:
     using PerfSim<MIPS64>::read_cpu_register;
     using PerfSim<MIPS64>::get_pc;
 };
+
+#endif

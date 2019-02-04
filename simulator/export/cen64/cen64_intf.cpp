@@ -27,11 +27,13 @@ struct vr4300_stats* vr4300_stats_alloc()
 
 void vr4300_stats_free(struct vr4300_stats* ptr)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
     delete ptr;
 }
 
 int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus)
 {
+    // Here we bind our CEN64 interfaces
     return vr4300->init( create_cen64_memory( bus));
 }
 
