@@ -10,7 +10,7 @@
 
 #include <func_sim/instr_memory.h>
 #include <infra/cache/cache_tag_array.h>
-#include <infra/ports/ports.h>
+#include <modules/ports_instance.h>
 #include <modules/core/perf_instr.h>
  
 template <typename ISA>
