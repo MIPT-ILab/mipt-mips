@@ -31,7 +31,7 @@ addons:
     packages:
     - libstdc++-7-dev # To fix lack of std::hash<enum E> in C++11
     - libboost-dev
-    - ninja
+    - ninja-build
 
 install:
   - pip install --user future
