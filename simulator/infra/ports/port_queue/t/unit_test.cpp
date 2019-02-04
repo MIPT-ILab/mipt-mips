@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS team
  */
 
-#include <catch.hpp>
 #include "../port_queue.h"
+#include <catch.hpp>
 
 TEST_CASE("PortQueue: empty queue")
 {

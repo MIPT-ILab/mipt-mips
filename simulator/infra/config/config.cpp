@@ -3,10 +3,9 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
- 
+#include "config.h"
 #include <popl.hpp>
 #include <sstream>
-#include "config.h"
 
 namespace config {
 

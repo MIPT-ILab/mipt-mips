@@ -6,8 +6,8 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
-#include <modules/ports_instance.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
 
 template <typename FuncInstr>

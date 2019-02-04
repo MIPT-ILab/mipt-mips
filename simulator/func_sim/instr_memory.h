@@ -24,9 +24,9 @@ public:
 
     virtual ~InstrMemoryIface() = default;
     InstrMemoryIface( const InstrMemoryIface&) = delete;
-    InstrMemoryIface( InstrMemoryIface&&) = default;
+    InstrMemoryIface( InstrMemoryIface&&) noexcept = default;
     InstrMemoryIface& operator=( const InstrMemoryIface&) = delete;
-    InstrMemoryIface& operator=( InstrMemoryIface&&) = default;
+    InstrMemoryIface& operator=( InstrMemoryIface&&) noexcept = default;
 };
 
 template<typename ISA>
