@@ -38,6 +38,7 @@ set(CPPS
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp 
     export/gdb/gdb_wrapper.cpp
+    export/cen64/cen64_wrapper.cpp
     kernel/kernel.cpp
     kernel/mars/mars_kernel.cpp
     modules/ports_instance.cpp
