@@ -17,8 +17,7 @@ TEST_CASE( "Latency to string")
     CHECK( (2_lt).to_string() == "2");
 }
 
-namespace ports {
-    namespace testing {
+namespace ports::testing {
 
         static const Latency PORT_LATENCY = 1_lt;
         static const uint32 PORT_FANOUT = 1;
@@ -107,8 +106,7 @@ namespace ports {
         };
 
         static Logic logic{};
-    } // namespace testing
-} // namespace ports
+} // namespace ports::testing
 
 using ports::testing::Logic;
 
@@ -151,8 +149,7 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
 }
 
 
-namespace ports {
-    namespace testing {
+namespace ports::testing {
 
         bool Logic::check_readiness( Cycle cycle, CheckCode code, bool is_ready)
         {
@@ -325,7 +322,5 @@ namespace ports {
                 process_data( data, cycle);;
             }
         }
-
-    } // namespace testing
-} // namespace ports
+} // namespace ports::testing
 

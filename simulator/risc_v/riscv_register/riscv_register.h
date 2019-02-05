@@ -19,6 +19,7 @@
 class RISCVRegister {
     enum RegNum : uint8
     {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) RISCV_REG_ ## X
 #include "riscv_register.def"
 #undef REGISTER

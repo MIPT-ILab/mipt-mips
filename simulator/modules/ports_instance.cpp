@@ -15,6 +15,7 @@
 #include <modules/fetch/bpu/bp_interface.h>
 #include <risc_v/risc_v.h>
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define PORT_TOKEN(x) \
     template class PortQueue<std::pair<x, Cycle>>; \
     template class ReadPort<x>; \

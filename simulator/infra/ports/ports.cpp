@@ -49,8 +49,8 @@ void PortMap::clean_up( Cycle cycle)
         cluster.second.writer->clean_up( cycle);
 }
 
-BasicWritePort::BasicWritePort( std::string key, uint32 bandwidth, uint32 fanout) :
-    Port( std::move( key)), _bandwidth(bandwidth), _fanout(fanout)
+BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
+    Port( key), _bandwidth(bandwidth), _fanout(fanout)
 {
     if ( portMap[ _key].writer != nullptr)
         serr << "Reusing of " << key

@@ -21,6 +21,7 @@ namespace config {
 
 class BaseValue
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     friend void handleArgs( int argc, const char* const argv[], int start_index);
 protected:
     static popl::OptionParser& options();
@@ -89,7 +90,7 @@ struct HelpOption : Exception
     explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
 };
 
-/* methods */
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 void handleArgs( int argc, const char* const argv[], int start_index = 1);
 
 } // namespace config
