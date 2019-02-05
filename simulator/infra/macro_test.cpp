@@ -145,7 +145,7 @@ static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
 
 static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
-static_assert( count_argc( some_argv.data()) == some_argv.size() - 1);
+static_assert( count_argc( some_argv.data()) == 3);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);
