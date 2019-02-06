@@ -31,7 +31,7 @@ auto mips_division(T x, T y) {
     if ( y == 0)
         return ReturnType{};
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type
         if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
             return ReturnType{};
 
