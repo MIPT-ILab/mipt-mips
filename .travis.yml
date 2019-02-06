@@ -82,7 +82,7 @@ after_success:
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install clang-tidy-8 --allow-unauthenticated
         cd $TRAVIS_BUILD_DIR/simulator/release
-        run-clang-tidy-8.py -header-filter='.*'
+        run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
