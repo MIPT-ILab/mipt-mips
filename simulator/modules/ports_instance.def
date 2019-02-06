@@ -1,3 +1,4 @@
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage) https://bugs.llvm.org/show_bug.cgi?id=40599
 #define COMMA ,
 PORT_TOKEN(bool)
 PORT_TOKEN(BPInterface)

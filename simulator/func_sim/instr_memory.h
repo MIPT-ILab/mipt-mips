@@ -19,7 +19,7 @@ protected:
 public:
     InstrMemoryIface() = default;
     auto fetch( Addr pc) const { return mem->read<uint32, FuncInstr::endian>( pc); }
-    void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
+    void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
 
     virtual ~InstrMemoryIface() = default;
@@ -38,6 +38,7 @@ public:
 };
 
 #ifndef INSTR_CACHE_CAPACITY
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage) We keep it as a macro to easily it from makefile
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 

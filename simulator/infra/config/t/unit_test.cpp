@@ -27,7 +27,7 @@ std::string wrap_shift_operator(const T& value)
     return oss.str();
 }
 
-template<size_t N>
+template<size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 void handleArgs( const char* (& array)[N])
 {
     CHECK( count_argc( argv_cast<N>( array)) == N - 1);
@@ -43,6 +43,8 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
     const uint64 mandatory_int_value = 145;
     const std::string mandatory_string_value{ "file.elf"};
 
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -74,6 +76,8 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
     const uint64 mandatory_int_value = 356;
     const std::string mandatory_string_value{ "run_test.elf"};
 
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -101,6 +105,8 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
 //
 TEST_CASE( "config_parse: Pass_No_Args")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips", nullptr
@@ -114,6 +120,8 @@ TEST_CASE( "config_parse: Pass_No_Args")
 //
 TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -129,6 +137,8 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
 //
 TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -144,6 +154,8 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
 //
 TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -162,6 +174,8 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
 //
 TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -180,6 +194,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
 //
 TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -196,6 +212,8 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
 //
 TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -209,6 +227,8 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
 
 TEST_CASE( "config_parse: Pass help option alias")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -223,6 +243,8 @@ TEST_CASE( "config_parse: Pass help option alias")
 
 TEST_CASE( "config_parse: Pass help option")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",
@@ -242,6 +264,8 @@ TEST_CASE( "config_parse: Pass help option")
 //
 TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twice")
 {
+    // Replace with std::make_array in C++20
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     const char* argv[] =
     {
         "mipt-mips",

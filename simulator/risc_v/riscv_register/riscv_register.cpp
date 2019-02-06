@@ -7,6 +7,7 @@
 
 std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
 {{
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) # X
 #include "riscv_register.def"
 #undef REGISTER

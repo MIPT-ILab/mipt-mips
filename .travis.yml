@@ -25,7 +25,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-7
+    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-8 main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
@@ -63,7 +63,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
 # Prepare for GDB build
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure && make libdecnumber.a
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/readline     && ./configure && make libreadline.a
@@ -74,15 +74,15 @@ script:
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
-  - make gdb MAKEINFO=true > /dev/null
+  - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/traces/tt.core.universal.out
 
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-7
+        sudo apt-get install clang-tidy-8 --allow-unauthenticated
         cd $TRAVIS_BUILD_DIR/simulator/release
-        run-clang-tidy-7.py -header-filter='.*'
+        run-clang-tidy-8.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
