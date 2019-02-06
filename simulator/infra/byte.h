@@ -15,34 +15,6 @@
 // Do not use std::byte as Apple Xcode does not have it
 enum class Byte : uint8 { };
 
-template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-Byte* byte_cast( Byte (& array)[N])
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
-    return array;
-}
-
-template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-const Byte* byte_cast( const Byte (& array)[N])
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
-    return array;
-}
-
-template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-Byte* byte_cast( char (& array)[N])
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay, cppcoreguidelines-pro-type-reinterpret-cast)
-    return reinterpret_cast<Byte*>( array);
-}
-
-template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-const Byte* byte_cast( const char (& array)[N])
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay, cppcoreguidelines-pro-type-reinterpret-cast)
-    return reinterpret_cast<const Byte*>( array);
-}
-
 static inline Byte* byte_cast( char* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
