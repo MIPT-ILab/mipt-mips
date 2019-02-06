@@ -9,9 +9,9 @@
 
 static const constexpr uint64 MI_REGS_BASE_ADDRESS = 0x04300000;
 
-int vr4300::init( std::shared_ptr<FuncMemory> mem)
+int vr4300::init( std::shared_ptr<FuncMemory> m)
 {
-    set_memory( std::move( mem));
+    set_memory( std::move( m));
     set_pc( 0x1fc00000ull);
     mi_regs[MI_VERSION_REG] = 0x01010101u;
     mi_regs[MI_INIT_MODE_REG] = 0x80u;
