@@ -8,12 +8,14 @@ cmake_minimum_required(VERSION 3.9)
 
 project(mipt-mips)
 enable_testing()
+find_package(Boost REQUIRED)
 
+# Options
 set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
-
 option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
+set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -94,11 +96,11 @@ else ()
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Code coverage options
 if (ENABLE_COVERAGE)
     if (WIN32)
         message(FATAL_ERROR "CodeCov is not supported for Windows builds")
@@ -109,14 +111,13 @@ if (ENABLE_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -DNDEBUG")
 endif()
 
+# Profiling options
 if (ENABLE_PROFILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
-set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
-
-# Add mipt-mips-gdb target iff we are building under GDB
+# Add GDB stuff iff we are building under GDB
 if (GDB_SOURCE_PATH)
     message("Building GDB integration with ${GDB_SOURCE_PATH}"  )
     set(GDB_SIM_SRCS
@@ -148,11 +149,10 @@ endif ()
 
 # Headers
 include_directories(${CMAKE_CURRENT_LIST_DIR})
-include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/../external ${RISCV_DIR})
-
-# Boost
-find_package(Boost REQUIRED)
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM
+        ${CMAKE_CURRENT_LIST_DIR}/../external
+        ${RISCV_DIR}
+        ${Boost_INCLUDE_DIRS})
 
 # Targets
 add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS})
@@ -168,8 +168,8 @@ add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
 target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
 add_test(all_tests unit-tests)
 
+# GDB output placement
 if (GDB_SOURCE_PATH)
-    # Output: libsim.a stored in "simulator/gdb"
     set_target_properties(mipt-mips-src PROPERTIES
             PREFIX ""
             SUFFIX ""
