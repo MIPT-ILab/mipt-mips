@@ -127,8 +127,6 @@ if (GDB_SOURCE_PATH)
             ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp)
 
     add_definitions(-DHAVE_CONFIG_H)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast -Wno-variadic-macros")
-
     include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
     include_directories(SYSTEM
             ${GDB_SOURCE_PATH}/
