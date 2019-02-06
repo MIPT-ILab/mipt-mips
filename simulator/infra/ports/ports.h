@@ -68,7 +68,7 @@ class BasicWritePort : public Port
     Cycle _lastCycle = 0_cl;
     uint32 _writeCounter = 0;
 protected:
-    BasicWritePort( std::string key, uint32 bandwidth, uint32 fanout);
+    BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout);
     virtual void init( const std::vector<Port*>& readers) = 0;
     virtual void destroy() = 0;
     virtual void clean_up( Cycle cycle) = 0;
@@ -90,7 +90,7 @@ template<class T> class WritePort : public BasicWritePort
     void destroy() final;
     ReadPort<T>* port_cast( Port* p) const;
 public:
-    WritePort<T>( std::string key, uint32 bandwidth, uint32 fanout) : BasicWritePort( std::move( key), bandwidth, fanout) { }
+    WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout) : BasicWritePort( key, bandwidth, fanout) { }
     void write( T&& what, Cycle cycle);
     void write( const T& what, Cycle cycle);
 };
@@ -109,8 +109,8 @@ private:
     void clean_up( Cycle cycle);
     void init( uint32 bandwidth);
 public:
-    ReadPort<T>( std::string key, Latency latency) :
-        Port( std::move( key)), _latency( latency), _dataQueue()
+    ReadPort<T>( const std::string& key, Latency latency) :
+        Port( key), _latency( latency), _dataQueue()
     {
         portMap[ _key].readers.push_back( this);
     }

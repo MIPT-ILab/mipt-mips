@@ -72,7 +72,7 @@ CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
 
 SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd * /* abfd */, char *const *argv)
 {
-    // TODO: define ISA based on GDB configuration
+    // TODO(kryukov): define ISA based on GDB configuration
     auto idx = simInstances.allocate_new( "mips32", argv_cast( argv));
     if ( idx == -1)
         return nullptr;

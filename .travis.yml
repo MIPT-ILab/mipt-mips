@@ -25,7 +25,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-7
+    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-8 main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
@@ -80,9 +80,9 @@ script:
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-7
+        sudo apt-get install clang-tidy-8 --allow-unauthenticated
         cd $TRAVIS_BUILD_DIR/simulator/release
-        run-clang-tidy-7.py -header-filter='.*'
+        run-clang-tidy-8.py -header-filter='.*'
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then

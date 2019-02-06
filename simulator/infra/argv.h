@@ -20,14 +20,14 @@ static inline constexpr int count_argc( const char *const *argv)
 // 'const char* const*' shall be the only allowed signature for argv
 // For other cases, use `argv_cast'
 
-template<std::size_t N>
+template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 constexpr const char* const* argv_cast( const char* (& array)[N])
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
     return array;
 }
 
-template<std::size_t N>
+template<std::size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 constexpr const char* const* argv_cast( const char* const (& array)[N])
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)

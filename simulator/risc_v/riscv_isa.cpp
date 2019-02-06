@@ -3,4 +3,4 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "opcode.gen.h"
+#include <riscv.opcode.gen.h>
