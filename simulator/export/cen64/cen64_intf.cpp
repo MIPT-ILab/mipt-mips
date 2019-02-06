@@ -25,10 +25,10 @@ struct vr4300_stats* vr4300_stats_alloc()
     return nullptr;
 }
 
-void vr4300_stats_free(struct vr4300_stats* ptr)
+void vr4300_stats_free(struct vr4300_stats* /* ptr */)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
-    delete ptr;
+    // delete ptr;
 }
 
 int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus)
@@ -39,7 +39,7 @@ int vr4300_init(struct vr4300 *vr4300, struct bus_controller * bus)
 
 void vr4300_cp1_init(struct vr4300* vr4300)
 {
-    void(vr4300);
+    (void)vr4300;
 }
 
 void vr4300_cycle(struct vr4300 * vr4300)
@@ -49,7 +49,7 @@ void vr4300_cycle(struct vr4300 * vr4300)
 
 void vr4300_cycle_extra(struct vr4300* vr4300, struct vr4300_stats* /* stats */)
 {
-    void(vr4300);
+    (void)vr4300;
 }
 
 uint64 vr4300_get_register(struct vr4300* vr4300, size_t i)
