@@ -12,10 +12,6 @@
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-static char hello_world[] = "Hello World!";
-static_assert(countof(hello_world) == sizeof(hello_world) / sizeof(char));
-
 static_assert(is_power_of_two(1u));
 static_assert(is_power_of_two(2u));
 static_assert(is_power_of_two(4u));

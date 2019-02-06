@@ -22,10 +22,6 @@ static constexpr To narrow_cast(const From& value)
     return static_cast<To>( value);
 }
 
-/* Returns size of a static array */
-template<typename T, size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
-
 /* Checks if values is power of two */
 template<typename T>
 constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }
