@@ -30,9 +30,9 @@ class PortQueue
     inline void advance_ptr( T* PortQueue::* p) noexcept
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        ++(this->*p);
-        if ( *(this->*p) == arena_end) {
-            *(this->*p) = arena.get();
+        ++( this->*p);
+        if (this->*p == arena_end) {
+            this->*p = arena.get();
             wrap = !wrap;
         }
     }
