@@ -106,7 +106,7 @@ private:
     PortQueue<std::pair<T, Cycle>> _dataQueue;
 
     void emplaceData( T&& what, Cycle cycle);
-    void clean_up( Cycle cycle);
+    void clean_up( Cycle cycle) noexcept;
     void init( uint32 bandwidth);
 public:
     ReadPort<T>( const std::string& key, Latency latency) :
@@ -185,7 +185,6 @@ template<class T> void WritePort<T>::destroy()
 template<class T>
 void ReadPort<T>::emplaceData( T&& what, Cycle cycle)
 {
-    assert( !_dataQueue.full());
     _dataQueue.emplace( std::move( what), cycle + _latency);
 }
 
@@ -211,7 +210,7 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
     return tmp;
 }
 
-template<class T> void ReadPort<T>::clean_up( Cycle cycle)
+template<class T> void ReadPort<T>::clean_up( Cycle cycle) noexcept
 {
     while ( !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) < cycle)
         _dataQueue.pop();

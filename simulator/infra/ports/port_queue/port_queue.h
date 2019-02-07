@@ -26,16 +26,14 @@ class PortQueue
     const T* arena_end = nullptr;
     T* p_front = nullptr;
     T* p_back = nullptr;
-    bool wrap = false;
+    size_t occupied = 0;
 
     inline void advance_ptr( T* PortQueue::* p) noexcept
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         ++( this->*p);
-        if (this->*p == arena_end) {
+        if (this->*p == arena_end)
             this->*p = arena.get();
-            wrap = !wrap;
-        }
     }
 
     void clear()
@@ -64,30 +62,31 @@ public:
         arena = std::unique_ptr<T, Deleter>(static_cast<T*>(std::malloc(sizeof(T) * size)));
         arena_end = arena.get() + size;
         p_front = p_back = arena.get();
-        wrap = false;
+        occupied = 0;
     }
 
     template<typename... Args> void emplace( Args ... args) noexcept
     {
         new (p_back) T( std::forward<Args>( args)...);
         advance_ptr( &PortQueue::p_back);
+        ++occupied;
     }
 
     bool full() const noexcept
     {
-        return (p_front == p_back && wrap) || arena == nullptr;
+        return arena.get() + occupied == arena_end;
     }
 
     void pop() noexcept
     {
-        if constexpr ( !std::is_trivially_destructible<T>::value)
-            p_front->~T();
+        p_front->~T();
         advance_ptr( &PortQueue::p_front);
+        --occupied;
     }
 
     bool empty() const noexcept
     {
-        return p_front == p_back && !wrap;
+        return occupied == 0;
     }
 
     const T& front() const noexcept
