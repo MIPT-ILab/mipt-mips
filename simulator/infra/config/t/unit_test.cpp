@@ -29,7 +29,7 @@ std::string wrap_shift_operator(const T& value)
 
 static void handleArgs( const std::vector<const char*>& argv)
 {
-    config::handleArgs( count_argv( argv_cast( argv.data())), argv_cast( argv.data()), 1);
+    config::handleArgs( count_argc( argv_cast( argv.data())), argv_cast( argv.data()), 1);
 }
 
 //
