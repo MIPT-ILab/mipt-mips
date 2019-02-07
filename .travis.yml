@@ -60,7 +60,7 @@ install:
 before_script:
   - cd $TRAVIS_BUILD_DIR/traces            && make tt
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_PROFILE=1 -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
 # Prepare for GDB build
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
@@ -72,7 +72,8 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 2000000
+  - gprof ./mipt-mips gmon.out -p | head -100
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/traces/tt.core.universal.out
