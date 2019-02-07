@@ -20,6 +20,8 @@ struct InvalidElfSection : Exception
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     using namespace std::literals::string_literals;
+    if ( section.get_type() == SHT_NOBITS)
+        return;
     if ( section.get_address() == 0 || section.get_data() == nullptr)
         throw InvalidElfSection( "\""s + section.get_name() + "\""s);
 

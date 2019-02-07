@@ -22,10 +22,6 @@ static constexpr To narrow_cast(const From& value)
     return static_cast<To>( value);
 }
 
-/* Returns size of a static array */
-template<typename T, size_t N>
-constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
-
 /* Checks if values is power of two */
 template<typename T>
 constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }
@@ -128,7 +124,7 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
         return bitwidth<T>;
     using UT = typename std::make_unsigned<T>::type;
     UT uvalue{ value};
-    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1))) - 1;
+    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
 }
 
 /*
@@ -156,7 +152,7 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     if constexpr ((ST{ -2} >> 1u) == ST{ -1})
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
-        // NOLINTNEXTLINE(hicpp-signed-bitwise, bugprone-suspicious-semicolon)
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
         return narrow_cast<ST>(value) >> shamt;
 
     return (value & msb_set<T>()) == 0 // check MSB

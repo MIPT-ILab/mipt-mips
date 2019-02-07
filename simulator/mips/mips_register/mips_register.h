@@ -19,7 +19,9 @@
 class MIPSRegister {
     enum RegNum : uint8
     {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) MIPS_REG_ ## X
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
 #include "mips_register.def"
 #undef REGISTER

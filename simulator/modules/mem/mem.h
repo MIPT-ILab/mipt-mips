@@ -7,17 +7,16 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
 
 class FuncMemory;
 
-template <typename ISA>
+template <typename FuncInstr>
 class Mem : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
@@ -35,7 +34,7 @@ class Mem : public Log
     public:
         explicit Mem( bool log);
         void clock( Cycle cycle);
-        void set_memory( std::shared_ptr<FuncMemory> mem) { memory = std::move( mem); }
+        void set_memory( const std::shared_ptr<FuncMemory>& mem) { memory = mem; }
 };
 
 

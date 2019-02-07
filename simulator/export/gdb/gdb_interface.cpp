@@ -15,6 +15,7 @@
 
 #include <bfd/config.h>
 
+#include <infra/argv.h>
 #include <infra/byte.h>
 
 #include <tuple>
@@ -25,9 +26,9 @@
 
 #include <gdb/remote-sim.h>
 
+#include <sim-base.h>
 #include <sim-config.h>
 #include <sim-types.h>
-#include <sim-base.h>
 
 /* Trap converter */
 using GDBTrap = std::pair<enum sim_stop, int>;
@@ -69,9 +70,10 @@ CB_TARGET_DEFS_MAP cb_init_open_map[1] = {};
  * '$gdb_workspace/include/gdb/remote-sim.h'
  */
 
-SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *, char *const *argv)
+SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd * /* abfd */, char *const *argv)
 {
-    auto idx = simInstances.allocate_new( static_cast<const char* const*>( argv));
+    // TODO(kryukov): define ISA based on GDB configuration
+    auto idx = simInstances.allocate_new( "mips32", argv_cast( argv));
     if ( idx == -1)
         return nullptr;
 
@@ -80,18 +82,18 @@ SIM_DESC sim_open( SIM_OPEN_KIND kind, struct host_callback_struct *callback, st
     return sd;
 }
 
-void sim_close( SIM_DESC sd, int)
+void sim_close( SIM_DESC sd, int /* quitting */)
 {
     get_sim( sd).shutdown();
     sim_state_free( sd);
 }
 
-SIM_RC sim_load( SIM_DESC sd, const char * prog_name, struct bfd *, int)
+SIM_RC sim_load( SIM_DESC sd, const char * prog_name, struct bfd * /* abfd */, int /* from_tty */)
 {
     return get_sim( sd).load( prog_name) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
-SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, char *const *, char *const *)
+SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, char *const * /* argv */, char *const * /* env */)
 {
     return get_sim( sd).create_inferior( bfd_get_start_address( abfd)) ? SIM_RC_OK : SIM_RC_FAIL;
 }
@@ -121,7 +123,7 @@ void sim_info( SIM_DESC sd, int verbose)
     get_sim( sd).info( verbose);
 }
 
-void sim_resume( SIM_DESC sd, int step, int)
+void sim_resume( SIM_DESC sd, int step, int /* siggnal */)
 {
     get_sim( sd).resume( step);
 }

@@ -17,8 +17,7 @@ TEST_CASE( "Latency to string")
     CHECK( (2_lt).to_string() == "2");
 }
 
-namespace ports {
-    namespace testing {
+namespace ports::testing {
 
         static const Latency PORT_LATENCY = 1_lt;
         static const uint32 PORT_FANOUT = 1;
@@ -107,8 +106,7 @@ namespace ports {
         };
 
         static Logic logic{};
-    } // namespace testing
-} // namespace ports
+} // namespace ports::testing
 
 using ports::testing::Logic;
 
@@ -121,7 +119,8 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
     ReadPort<bool> stop( "stop", ports::testing::PORT_LATENCY);;
 
     // connect all the ports
-    init_ports();;
+    PortMap::get_instance().init();
+    CHECK( init.get_fanout() == 1);
 
     // init object A by value 0
     init.write( 0, 0_cl);;
@@ -143,15 +142,14 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
         a.clock( cycle);
         b.clock( cycle);
 
-        clean_up_ports( cycle);;
+        PortMap::get_instance().clean_up( cycle);;
     }
 
-    destroy_ports();;
+    PortMap::get_instance().destroy();
 }
 
 
-namespace ports {
-    namespace testing {
+namespace ports::testing {
 
         bool Logic::check_readiness( Cycle cycle, CheckCode code, bool is_ready)
         {
@@ -324,7 +322,5 @@ namespace ports {
                 process_data( data, cycle);;
             }
         }
-
-    } // namespace testing
-} // namespace ports
+} // namespace ports::testing
 

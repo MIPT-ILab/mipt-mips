@@ -4,7 +4,7 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 The project is being developed by a group of students under the guidance of Intel employees.
 Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
-Lectures and seminars are delivered each Wednesday 17:05, room 108 of RT building.
+Lectures and seminars are delivered each **Friday 18:30, room 108 of RT building**.
 
 ## Computer Architecture
 
@@ -19,7 +19,7 @@ Date | Event name
 28 Nov | **Branch prediction**<br/> • Slides: [L7 - Branch prediction](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%207%20-%20Branch%20prediction.pptx?raw=true) <br/> • [YouTube](https://youtu.be/XzfcQ8VgnU8)
 12 Dec | **Advanced pipelining**<br/> • Slides: [L8 - Advanced Pipelining](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%208%20-%20Advanced%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/pUw2sU9RZSY)
 19 Dec | **First Test**
-04-09 Feb | **Superscalar CPU and multicore systems**
+08 Feb | **Superscalar CPU and multicore systems**
 
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
@@ -53,7 +53,7 @@ MIPT | Name | Score | Comments
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 **718** | **Andrey Agrachev** | **4** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626)** |
 **717** | **Vsevolod Pukhov** | **4** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)**, **[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
-**71x** | **Yan Logovskiy** | **4** | **[#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)**, **[#506](https://github.com/MIPT-ILab/mipt-mips/issues/506)** |
+**711** | **Yan Logovskiy** | **4** | **[#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)**, **[#506](https://github.com/MIPT-ILab/mipt-mips/issues/506)** |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |

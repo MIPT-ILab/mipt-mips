@@ -39,6 +39,7 @@ public:
 
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::shared_ptr<Simulator> create_configured_simulator();
+    static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa);
 
     virtual size_t sizeof_register() const = 0;
 

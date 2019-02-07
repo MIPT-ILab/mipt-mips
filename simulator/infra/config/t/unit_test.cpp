@@ -3,13 +3,13 @@
  * @author Denis Los
  */
 
+#include "../config.h"
+#include "infra/argv.h"
+#include "infra/macro.h"
+
 #include <catch.hpp>
 
-// Testing module
-#include "../config.h"
-
-// Utils
-#include "infra/macro.h"
+#include <sstream>
 
 namespace config {
     AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
@@ -27,12 +27,9 @@ std::string wrap_shift_operator(const T& value)
     return oss.str();
 }
 
-template<size_t N>
-void handleArgs( const char* (& array)[N])
+static void handleArgs( const std::vector<const char*>& argv)
 {
-    // Let it decay
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
-    config::handleArgs( N, array, 1);
+    config::handleArgs( count_argc( argv_cast( argv.data())), argv_cast( argv.data()), 1);
 }
 
 //
@@ -44,15 +41,16 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
     const uint64 mandatory_int_value = 145;
     const std::string mandatory_string_value{ "file.elf"};
 
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "file.elf",
         "-n", "145",
-        "--bool_config_2"
+        "--bool_config_2",
+        nullptr
     };
 
-    CHECK_NOTHROW( handleArgs( argv));
+    CHECK_NOTHROW( handleArgs( argv) );
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
@@ -74,12 +72,13 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
     const uint64 mandatory_int_value = 356;
     const std::string mandatory_string_value{ "run_test.elf"};
 
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "--bool_config_1"
+        "--bool_config_1",
+        nullptr
     };
 
     CHECK_NOTHROW( handleArgs( argv));
@@ -100,9 +99,9 @@ TEST_CASE( "config_parse:  Pass_Valid_Args_2")
 //
 TEST_CASE( "config_parse: Pass_No_Args")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
-        "mipt-mips"
+        "mipt-mips", nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -113,10 +112,11 @@ TEST_CASE( "config_parse: Pass_No_Args")
 //
 TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "--uint64_config_name", "356",
+        nullptr
     };
     
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -127,10 +127,11 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
 //
 TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
-        "--string_config_name", "test.elf", 
+        "--string_config_name", "test.elf",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -141,12 +142,13 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
 //
 TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "--string_config_name", "test.elf",
         "-n", "356",
-        "-koption"
+        "-koption",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -158,12 +160,13 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
 //
 TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "run_test_1.elf",
         "--string_config_name", "run_test_2.elf",
         "-n", "412",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -175,11 +178,12 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
 //
 TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b",
         "-n", "412",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -190,11 +194,12 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
 //
 TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "run_test",
         "-n",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), std::exception);
@@ -202,12 +207,13 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
 
 TEST_CASE( "config_parse: Pass help option alias")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "-h"
+        "-h",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
@@ -215,12 +221,13 @@ TEST_CASE( "config_parse: Pass help option alias")
 
 TEST_CASE( "config_parse: Pass help option")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "run_test.elf",
         "-n", "356",
-        "--help"
+        "--help",
+        nullptr
     };
 
     CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
@@ -233,11 +240,12 @@ TEST_CASE( "config_parse: Pass help option")
 //
 TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twice")
 {
-    const char* argv[] =
+    std::vector<const char*> argv
     {
         "mipt-mips",
         "-b", "test.elf",
-        "-n", "100"
+        "-n", "100",
+        nullptr
     };
 
     // should not throw any exceptions

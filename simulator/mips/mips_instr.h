@@ -51,20 +51,20 @@ struct UnknownMIPSInstruction final : Exception
 };
 
 template<typename I>
-void unknown_mips_instruction( I* instr)
+void unknown_mips_instruction( I* i)
 {
-    std::ostringstream oss;
-    oss << *instr;
-    throw UnknownMIPSInstruction( oss.str());
+    throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
 
 template<typename R>
 class BaseMIPSInstr
 {
-    private:
-        friend struct ALU;
+    public:
+        using Register = MIPSRegister;
         using RegisterUInt = R;
         using RegisterSInt = sign_t<RegisterUInt>;
+    private:
+        friend struct ALU;
 
         OperationType operation = OUT_UNKNOWN;
         Trap trap = Trap::NO_TRAP;
@@ -105,10 +105,10 @@ class BaseMIPSInstr
 
         using Execute = void (*)(BaseMIPSInstr*);
         Execute executor = unknown_mips_instruction;
-    protected:
+    public:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
-    public:
+
         static const constexpr Endian endian = Endian::little;
 
         BaseMIPSInstr() = delete;
@@ -133,10 +133,22 @@ class BaseMIPSInstr
         MIPSRegister get_dst2_num() const { return dst2; }
         std::string_view get_disasm() const { return static_cast<std::string_view>( disasm); }
 
-        /* Checks if instruction can change PC in unusual way. */
-        bool is_jump() const { return operation == OUT_J_JUMP      ||
-                                      operation == OUT_R_JUMP      ||
-                                      operation == OUT_BRANCH;}
+	/* Checks if instruction can change PC in unusual way. */	
+	
+	//target is known at ID stage and always taken
+	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
+
+	//target is known at ID stage but if branch is taken or not is known only at EXE stage
+	bool is_direct_branch() const { return operation == OUT_BRANCH; }
+
+	// target is known only at EXE stage
+	bool is_indirect_branch() const { return operation == OUT_R_JUMP; }
+
+	bool is_jump() const { return this->is_direct_jump()     ||
+				      this->is_direct_branch()   ||
+				      this->is_indirect_branch(); }
+
+
         bool is_jump_taken() const { return  _is_jump_taken; }
 
         bool is_partial_load() const
@@ -205,6 +217,7 @@ class BaseMIPSInstr
 
         std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
+        std::string bytes_dump() const;
 };
 
 template<typename RegisterUInt>
@@ -213,19 +226,18 @@ std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& 
     return instr.dump( out);
 }
 
-template<MIPSVersion V>
-class MIPSInstr : public BaseMIPSInstr<MIPSRegisterUInt<V>>
+class MIPS32Instr : public BaseMIPSInstr<uint32>
 {
-    using Base = BaseMIPSInstr<MIPSRegisterUInt<V>>;
 public:
-    explicit MIPSInstr( uint32 bytes, Addr PC = 0)
-        : Base( V, bytes, PC) { }
-    explicit MIPSInstr( std::string_view str_opcode, Addr PC = 0)
-        : Base( V, str_opcode, PC) { }
+    explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, bytes, pc) { }
+    explicit MIPS32Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, pc) { }
 };
 
-
-using MIPS32Instr = MIPSInstr<MIPSVersion::v32>;
-using MIPS64Instr = MIPSInstr<MIPSVersion::v64>;
+class MIPS64Instr : public BaseMIPSInstr<uint64>
+{
+public:
+    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, bytes, pc) { }
+    explicit MIPS64Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, pc) { }
+};
 
 #endif //MIPS_INSTR_H

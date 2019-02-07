@@ -12,9 +12,6 @@
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
-static char hello_world[] = "Hello World!";
-static_assert(countof(hello_world) == sizeof(hello_world) / sizeof(char));
-
 static_assert(is_power_of_two(1u));
 static_assert(is_power_of_two(2u));
 static_assert(is_power_of_two(4u));
@@ -143,8 +140,8 @@ static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
 
-static constexpr const char* some_argv[] = {"rm", "-rf", "/", nullptr};
-static_assert(count_argc( some_argv) == 3);
+static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
+static_assert( count_argc( some_argv.data()) == 3);
 
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);

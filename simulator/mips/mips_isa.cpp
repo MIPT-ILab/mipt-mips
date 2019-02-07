@@ -5,8 +5,8 @@
  */
 
 #include <func_sim/alu.h>
-#include <infra/types.h>
 #include <infra/macro.h>
+#include <infra/types.h>
 
 #include <iomanip>
 #include <iostream>

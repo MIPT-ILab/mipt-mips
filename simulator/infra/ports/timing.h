@@ -80,6 +80,7 @@ class Latency : public boost::totally_ordered<Latency>
         friend constexpr inline Cycle Cycle::operator+( const Latency& latency) const;
         friend constexpr inline Cycle Cycle::operator-( const Latency& latency) const;
         std::string to_string() const { return std::to_string( value); }
+        size_t to_size_t() const { return value; }
 
     private:
         int64 value;

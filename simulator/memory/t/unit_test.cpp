@@ -290,10 +290,9 @@ TEST_CASE( "Func_memory: String length, no zero bytes")
 
 TEST_CASE( "Func_memory: String length")
 {
-    const char hw[] = "Hello World!";
-    static_assert( countof(hw) == 13);
+    const std::string hw("Hello World!");
     auto mem = FuncMemory::create_hierarchied_memory( 24);
-    mem->memcpy_host_to_guest( 0x10, byte_cast( hw), countof( hw));
+    mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
     CHECK( mem->strlen( 0x10) == 12);
     CHECK( mem->strlen( 0x12) == 10);
     CHECK( mem->read_string( 0x10) == "Hello World!");
@@ -304,10 +303,9 @@ TEST_CASE( "Func_memory: String length")
 
 TEST_CASE( "Func_memory: String length, plain memory")
 {
-    const char hw[] = "Hello World!";
-    static_assert( countof(hw) == 13);
+    const std::string hw("Hello World!");
     auto mem = FuncMemory::create_plain_memory();
-    mem->memcpy_host_to_guest( 0x10, byte_cast( hw), countof( hw));
+    mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
     CHECK( mem->strlen( 0x10) == 12);
 }
 

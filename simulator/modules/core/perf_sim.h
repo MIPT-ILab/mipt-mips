@@ -8,12 +8,12 @@
 
 #include "perf_instr.h"
 
-#include <infra/ports/ports.h>
 #include <modules/branch/branch.h>
 #include <modules/decode/decode.h>
 #include <modules/execute/execute.h>
 #include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
+#include <modules/ports_instance.h>
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
@@ -31,7 +31,7 @@ public:
     using RegisterUInt = typename ISA::RegisterUInt;
 
     explicit PerfSim( bool log);
-    ~PerfSim() override { destroy_ports(); }
+    ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
     Trap run_single_step() final { return Trap::HALT; }
     Trap run_until_trap( uint64 /* instrs_to_run */) final { return Trap::HALT; }
@@ -67,15 +67,15 @@ private:
     bool force_halt = false;
 
     /* simulator units */
-    RF<ISA> rf;
+    RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
 
-    Fetch<ISA> fetch;
-    Decode<ISA> decode;
-    Execute<ISA> execute;
-    Mem<ISA> mem;
-    Branch<ISA> branch;
+    Fetch<FuncInstr> fetch;
+    Decode<FuncInstr> decode;
+    Execute<FuncInstr> execute;
+    Mem<FuncInstr> mem;
+    Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
 
     /* ports */

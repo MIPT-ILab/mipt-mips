@@ -116,6 +116,12 @@ Simulator::create_configured_simulator()
     return create_simulator( config::isa, config::functional_only, config::disassembly_on);
 }
 
+std::shared_ptr<Simulator>
+Simulator::create_configured_isa_simulator( const std::string& isa)
+{
+    return create_simulator( isa, config::functional_only, config::disassembly_on);
+}
+
 std::shared_ptr<CycleAccurateSimulator>
 CycleAccurateSimulator::create_simulator( const std::string& isa, bool log)
 {
