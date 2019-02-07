@@ -124,7 +124,7 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
         return bitwidth<T>;
     using UT = typename std::make_unsigned<T>::type;
     UT uvalue{ value};
-    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1))) - 1;
+    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
 }
 
 /*
