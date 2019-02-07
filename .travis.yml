@@ -59,7 +59,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/traces            && make tt
-  - cd $TRAVIS_BUILD_DIR/simulator         && mkdir gdb-build debug release
+  - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
 # Prepare for GDB build
   - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
@@ -81,7 +81,8 @@ after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install clang-tidy-8 --allow-unauthenticated
-        cd $TRAVIS_BUILD_DIR/simulator/release
+        cd $TRAVIS_BUILD_DIR/simulator/debug
+        cmake .. -DCMAKE_BUILD_TYPE=Release
         run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
     fi
   - |
