@@ -64,7 +64,7 @@ To build MIPT-MIPS faster, we recommend to install Ninja.
   1. See more command line options in the paragraph below
 #### Test
   1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
-  1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
+  1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## Command line options
 
