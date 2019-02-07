@@ -11,6 +11,7 @@
 #define PORT_QUEUE_H
 
 #include <memory>
+#include <type_traits>
 
 template<typename T>
 class PortQueue
@@ -79,7 +80,8 @@ public:
 
     void pop() noexcept
     {
-        p_front->~T();
+        if constexpr ( !std::is_trivially_destructible<T>::value)
+            p_front->~T();
         advance_ptr( &PortQueue::p_front);
     }
 
