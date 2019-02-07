@@ -81,7 +81,8 @@ after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install clang-tidy-8 --allow-unauthenticated
-        cd $TRAVIS_BUILD_DIR/simulator/release
+        cd $TRAVIS_BUILD_DIR/simulator/debug
+        cmake .. -DCMAKE_BUILD_TYPE=Debug
         run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
     fi
   - |
