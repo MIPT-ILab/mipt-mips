@@ -28,6 +28,10 @@ class BP final: public BaseBP
     std::vector<std::vector<T>> data;
     CacheTagArray tags;
 
+    bool is_way_taken( size_t way, Addr PC) const
+    {
+        return data[ way][ tags.set(PC)].is_taken( PC);
+    }
 public:
     BP( uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
         : data( ways, std::vector<T>( size_in_entries / ways))
@@ -50,8 +54,7 @@ public:
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags.read" is used:
         const auto[ is_hit, way] = tags.read_no_touch( PC);
-
-        return is_hit && data[ way][ tags.set(PC)].is_taken( PC);
+        return is_hit && is_way_taken( way, PC);
     }
 
     Addr get_target( Addr PC) const final
@@ -61,7 +64,7 @@ public:
         const auto[ is_hit, way] = tags.read_no_touch( PC);
 
         // return saved target only in case it is predicted taken
-        if ( is_hit && is_taken( PC))
+        if ( is_hit && is_way_taken( way, PC))
             return data[ way][ tags.set(PC)].getTarget();
 
         return PC + 4;
