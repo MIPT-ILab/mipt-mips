@@ -46,7 +46,7 @@ struct ALU
     }
 
     template<typename I> static auto zero_extend( const I* instr) {
-        using T = typename I::RegisterSInt;
+        using T = typename I::RegisterUInt;
         return T{ narrow_cast<uint16>(instr->v_imm)};
     }
 
