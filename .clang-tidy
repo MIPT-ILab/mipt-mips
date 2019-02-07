@@ -1,2 +1,2 @@
 ---
-Checks: '*,-*braces-around-statements,-llvm-header-guard,-cert-err58-cpp,-fuchsia-default-arguments,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-modernize-use-nodiscard,-*non-private-member-variables-in-classes,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-*-uppercase-literal-suffix'
+Checks: '*,-*braces-around-statements,-llvm-header-guard,-cert-err58-cpp,-fuchsia-default-arguments,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-modernize-use-nodiscard,-*non-private-member-variables-in-classes,-*-uppercase-literal-suffix'
