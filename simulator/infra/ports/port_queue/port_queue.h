@@ -27,12 +27,12 @@ class PortQueue
     T* p_back = nullptr;
     bool wrap = false;
 
-    void advance_ptr( T** p) noexcept
+    inline void advance_ptr( T* PortQueue::* p) noexcept
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        ++*p;
-        if ( *p == arena_end) {
-            *p = arena.get();
+        ++( this->*p);
+        if (this->*p == arena_end) {
+            this->*p = arena.get();
             wrap = !wrap;
         }
     }
@@ -69,7 +69,7 @@ public:
     template<typename... Args> void emplace( Args ... args) noexcept
     {
         new (p_back) T( std::forward<Args>( args)...);
-        advance_ptr( &p_back);
+        advance_ptr( &PortQueue::p_back);
     }
 
     bool full() const noexcept
@@ -80,7 +80,7 @@ public:
     void pop() noexcept
     {
         p_front->~T();
-        advance_ptr( &p_front);
+        advance_ptr( &PortQueue::p_front);
     }
 
     bool empty() const noexcept
