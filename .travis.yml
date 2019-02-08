@@ -73,6 +73,7 @@ script:
   - ninja mipt-mips
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 2000000
   - gprof ./mipt-mips gmon.out -p | head -100
+  - gprof ./mipt-mips gmon.out -l | head -100
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/traces/tt.core.universal.out
