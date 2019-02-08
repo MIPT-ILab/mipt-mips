@@ -70,8 +70,7 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ninja mipt-mips unit-tests
-  - ctest --verbose
+  - ninja mipt-mips
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 2000000
   - gprof ./mipt-mips gmon.out -p | head -100
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
