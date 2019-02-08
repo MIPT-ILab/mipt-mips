@@ -85,6 +85,7 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
         const size_t line_bits;
     public:
         const uint32 sets;
+        const size_t set_bits;
         const Addr   addr_mask;
 
         // extract set from address
