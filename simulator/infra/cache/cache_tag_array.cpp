@@ -92,18 +92,19 @@ CacheTagArraySize::CacheTagArraySize(
     uint32 line_size,
     uint32 addr_size_in_bits)
     : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
+    , line_bits ( find_first_set( line_size))
     , sets( size_in_bytes / ( ways * line_size))
     , addr_mask( bitmask<Addr>( addr_size_in_bits))
 { }
 
 uint32 CacheTagArraySize::set( Addr addr) const
 {
-    return ( ( addr & addr_mask) / line_size) & (sets - 1);
+    return ( ( addr & addr_mask) >> line_bits) & (sets - 1);
 }
 
 Addr CacheTagArraySize::tag( Addr addr) const
 {
-    return ( addr & addr_mask) / line_size;
+    return ( addr & addr_mask) >> line_bits;
 }
 
 CacheTagArray::CacheTagArray(

@@ -82,7 +82,7 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 line_size,
             uint32 addr_size_in_bits
         );
-
+        const size_t line_bits;
     public:
         const uint32 sets;
         const Addr   addr_mask;
