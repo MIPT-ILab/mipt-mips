@@ -44,6 +44,7 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
     auto ports = { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get() };
     std::vector<Instr> result;
     result.reserve( ports.size());
+
     for ( auto& port : ports)
         if ( port->is_ready( cycle))
             result.emplace_back( port->read( cycle));
