@@ -10,9 +10,7 @@
 #ifndef PORT_QUEUE_H
 #define PORT_QUEUE_H
 
-// std::aligned_alloc is available only in GCC 7.4
-// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83662
-#include <stdlib.h>
+#include <boost/align/aligned_alloc.hpp>
 #include <memory>
 #include <type_traits>
 
@@ -21,14 +19,12 @@ class PortQueue
 {
     void* allocate( size_t size)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
-        return ::aligned_alloc( alignof(T), sizeof(T) * size);
+        return boost::alignment::aligned_alloc( alignof(T), sizeof(T) * size);
     }
 
     struct Deleter
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc, hicpp-no-malloc)
-        void operator()(void *p) { std::free(p); }
+        void operator()(void *p) { boost::alignment::aligned_free(p); }
     };
 
     std::unique_ptr<void, Deleter> arena = nullptr;
@@ -70,7 +66,7 @@ public:
         clear();
         arena = std::unique_ptr<void, Deleter>( allocate( size));
         arena_start = static_cast<T*>( arena.get());
-        arena_end = arena_start + size;
+        arena_end = arena_start + size; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         p_front = p_back = arena_start;
         occupied = 0;
     }
@@ -84,6 +80,7 @@ public:
 
     bool full() const noexcept
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return arena_start + occupied == arena_end;
     }
 
