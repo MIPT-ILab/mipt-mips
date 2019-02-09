@@ -65,7 +65,6 @@ class LRUCache
             assert ( ( data_it == data.end()) == ( lru_it == lru_hash.end()));
             if ( data_it != data.end())
             {
-                assert( !empty());
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
@@ -81,7 +80,6 @@ class LRUCache
                 erase( lru_list.back());
 
             // Add a new element
-            assert( !free_list.empty());
             auto index = free_list.front();
             free_list.pop_front();
             new (&storage[index]) Value( value);
