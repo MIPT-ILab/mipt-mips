@@ -66,7 +66,7 @@ public:
         clear();
         arena = std::unique_ptr<void, Deleter>( allocate( size));
         arena_start = static_cast<T*>( arena.get());
-        arena_end = arena_start + size;
+        arena_end = arena_start + size; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         p_front = p_back = arena_start;
         occupied = 0;
     }
@@ -80,6 +80,7 @@ public:
 
     bool full() const noexcept
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return arena_start + occupied == arena_end;
     }
 
