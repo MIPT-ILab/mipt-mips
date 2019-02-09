@@ -9,16 +9,11 @@
 #include "risc_v.h"
 #include "riscv_register/riscv_register.h"
 
-// MIPT-MIPS modules
 #include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-
-// Generic C++
-#include <array>
-#include <unordered_map>
 
 template <typename T>
 class RISCVInstr
