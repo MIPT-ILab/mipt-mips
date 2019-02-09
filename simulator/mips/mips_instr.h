@@ -57,7 +57,7 @@ void unknown_mips_instruction( I* i)
 }
 
 template<typename R>
-class BaseMIPSInstr
+class alignas(64) BaseMIPSInstr
 {
     public:
         using Register = MIPSRegister;
