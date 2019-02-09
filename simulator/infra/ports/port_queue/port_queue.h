@@ -66,7 +66,7 @@ public:
         clear();
         arena = std::unique_ptr<void, Deleter>( allocate( size));
         arena_start = static_cast<T*>( arena.get());
-        arena_end = arena_start + size; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic
+        arena_end = arena_start + size; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         p_front = p_back = arena_start;
         occupied = 0;
     }
