@@ -10,6 +10,9 @@
 #ifndef PORT_QUEUE_H
 #define PORT_QUEUE_H
 
+// std::aligned_alloc is available only in GCC 7.4
+// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83662
+#include <stdlib.h>
 #include <memory>
 #include <type_traits>
 
