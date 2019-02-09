@@ -30,6 +30,17 @@ class LRUCache
             storage = static_cast<Value*>( arena.get());
         }
 
+        ~LRUCache()
+        {
+            for (const auto& e : data)
+                storage[ e.second].~Value();
+        }
+
+        LRUCache(const LRUCache&) = delete;
+        LRUCache(LRUCache&&) = delete;
+        LRUCache& operator=(const LRUCache&) = delete;
+        LRUCache& operator=(LRUCache&&) = delete;
+
         static auto get_capacity() { return CAPACITY; }
 
         auto size() const { return lru_hash.size(); }
