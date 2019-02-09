@@ -16,13 +16,20 @@
 template<typename T>
 class PortQueue
 {
+    void* allocate( size_t size)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
+        return ::aligned_alloc( alignof(T), sizeof(T) * size);
+    }
+
     struct Deleter
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc, hicpp-no-malloc)
-        void operator()(T *p) { std::free(p); }
+        void operator()(void *p) { std::free(p); }
     };
 
-    std::unique_ptr<T, Deleter> arena = nullptr;
+    std::unique_ptr<void, Deleter> arena = nullptr;
+    T* arena_start = nullptr;
     const T* arena_end = nullptr;
     T* p_front = nullptr;
     T* p_back = nullptr;
@@ -33,7 +40,7 @@ class PortQueue
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         ++( this->*p);
         if (this->*p == arena_end)
-            this->*p = arena.get();
+            this->*p = arena_start;
     }
 
     void clear()
@@ -58,10 +65,10 @@ public:
     void resize( size_t size)
     {
         clear();
-        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
-        arena = std::unique_ptr<T, Deleter>(static_cast<T*>(std::malloc(sizeof(T) * size)));
-        arena_end = arena.get() + size;
-        p_front = p_back = arena.get();
+        arena = std::unique_ptr<void, Deleter>( allocate( size));
+        arena_start = static_cast<T*>( arena.get());
+        arena_end = arena_start + size;
+        p_front = p_back = arena_start;
         occupied = 0;
     }
 
@@ -74,7 +81,7 @@ public:
 
     bool full() const noexcept
     {
-        return arena.get() + occupied == arena_end;
+        return arena_start + occupied == arena_end;
     }
 
     void pop() noexcept
