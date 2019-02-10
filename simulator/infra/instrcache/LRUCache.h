@@ -101,12 +101,12 @@ class LRUCache
 
         static void* allocate_memory()
         {
-            return boost::alignment::aligned_alloc( alignof(Value), sizeof(Value) * CAPACITY);
+            return std::malloc( sizeof(Value) * CAPACITY);
         }
 
         struct Deleter
         {
-            void operator()(void *p) { boost::alignment::aligned_free(p); }
+            void operator()(void *p) { std::free(p); }
         };
 
         std::unordered_map<Key, size_t> data{};
