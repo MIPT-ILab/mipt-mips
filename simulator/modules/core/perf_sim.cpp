@@ -39,7 +39,7 @@ template <typename ISA>
 void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    auto imemory = std::make_unique<InstrMemory<ISA>>();
+    auto imemory = std::make_unique<InstrMemoryCached<ISA>>();
     imemory->set_memory( m);
     fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
