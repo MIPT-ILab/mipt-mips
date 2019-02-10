@@ -27,7 +27,9 @@ class LRUCache
             for (size_t i = 0; i < CAPACITY; ++i)
                 free_list.emplace_back(i);
             arena = std::unique_ptr<void, Deleter>( allocate_memory());
-            storage = static_cast<Value*>( arena.get());
+            void* ptr = arena.get();
+            size_t space = sizeof(Value) * (CAPACITY + 1);
+            storage = static_cast<Value*>(std::align( alignof(Value), sizeof(Value) * CAPACITY, ptr, space));
         }
 
         ~LRUCache()
@@ -101,7 +103,7 @@ class LRUCache
 
         static void* allocate_memory()
         {
-            return std::malloc( sizeof(Value) * CAPACITY);
+            return std::malloc( sizeof(Value) * (CAPACITY + 1));
         }
 
         struct Deleter
