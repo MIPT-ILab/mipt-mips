@@ -30,7 +30,7 @@ class FuncSim : public Simulator
         Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
-        InstrMemoryCached<ISA> imem;
+        InstrMemory<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
         uint64 nops_in_a_row = 0;
