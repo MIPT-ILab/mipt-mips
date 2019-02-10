@@ -348,14 +348,14 @@ MIPSTableEntry<I> nop =
 { "nop" , mips_sll<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( const Table<I>& table, uint32 key)
+MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 {
     auto it = table.find( key);
     return it == table.end() ? unknown_instruction<I> : it->second;
 }
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( uint32 bytes)
+MIPSTableEntry<I> get_table_entry( uint32 bytes)
 {
     MIPSInstrDecoder instr( bytes);
 
@@ -381,7 +381,7 @@ auto find_entry( const M& map, std::string_view name)
 }
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( std::string_view str_opcode)
+MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 {
     if ( str_opcode == "nop")
         return nop<I>;
