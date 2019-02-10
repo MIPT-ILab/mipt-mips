@@ -17,7 +17,7 @@
 template<typename T>
 class PortQueue
 {
-    void* allocate( size_t size)
+    static void* allocate( size_t size)
     {
         return boost::alignment::aligned_alloc( alignof(T), sizeof(T) * size);
     }
