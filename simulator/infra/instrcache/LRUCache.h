@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include <boost/align/aligned_alloc.hpp>
 #include <infra/types.h>
 
 template <typename Key, typename Value, size_t CAPACITY>
