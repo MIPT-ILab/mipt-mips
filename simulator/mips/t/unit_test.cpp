@@ -682,15 +682,6 @@ TEST_CASE( "MIPS64_instr: dsllv 1 by 32")
     CHECK( instr.get_v_dst() == 0x100000000);
 }
 
-/* (#709)
- * Bug: This test fails here: CHECK( 0 == 1)
- * Only in case of compilation with:
- *   build = msvc, platform = x86, CMAKEFILE = Visual Studio 15
- * Some other tests marked with sign (#709) also fail.
-*/
-
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: dsllv 1 by 64 (shift-variable overflow)")
 {
     MIPS64Instr instr( "dsllv");
@@ -699,10 +690,7 @@ TEST_CASE( "MIPS64_instr: dsllv 1 by 64 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: dsllv 1 by 128 (shift-variable overflow)")
 {
     MIPS64Instr instr( "dsllv");
@@ -711,8 +699,6 @@ TEST_CASE( "MIPS64_instr: dsllv 1 by 128 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-/ ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS64_instr: dsrav 0xfeedabcd by 0")
 {
@@ -752,8 +738,6 @@ TEST_CASE( "MIPS64_instr: dsrav 0xffab000000000000 by 4")
     CHECK( instr.get_v_dst() == 0xfffab00000000000);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: dsrav 1 by 64 (shift-variable overflow)")
 {
     MIPS64Instr instr( "dsrav");
@@ -762,8 +746,6 @@ TEST_CASE( "MIPS64_instr: dsrav 1 by 64 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS64_instr: dsrlv 0xdeadbeef by 0")
 {
@@ -803,8 +785,6 @@ TEST_CASE( "MIPS64_instr: dsrlv 0x8765432000000011 by 16")
     CHECK( instr.get_v_dst() == 0x0000876543200000);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: dsrlv 1 by 64 (shift-variable overflow)")
 {
     MIPS64Instr instr( "dsrlv");
@@ -813,8 +793,6 @@ TEST_CASE( "MIPS64_instr: dsrlv 1 by 64 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: j to 4th instr")
 {
@@ -1539,8 +1517,6 @@ TEST_CASE( "MIPS32_instr: sllv 1 by 1")
     CHECK( instr.get_v_dst() == 2);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS32_instr: sllv 1 by 32 + 8 (shift-variable overflow)")
 {
     MIPS32Instr instr( "sllv");
@@ -1549,10 +1525,7 @@ TEST_CASE( "MIPS32_instr: sllv 1 by 32 + 8 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x100);
 }
-// ***********************************/
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS32_instr: sllv 1 by 32 (shift-variable overflow)")
 {
     MIPS32Instr instr( "sllv");
@@ -1561,10 +1534,7 @@ TEST_CASE( "MIPS32_instr: sllv 1 by 32 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS32_instr: sllv by 64 (shift-variable overflow)")
 {
     MIPS32Instr instr( "sllv");
@@ -1573,10 +1543,7 @@ TEST_CASE( "MIPS32_instr: sllv by 64 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: sllv by 64 (shift-variable ovreflow)")
 {
     MIPS64Instr instr( "sllv");
@@ -1585,8 +1552,6 @@ TEST_CASE( "MIPS64_instr: sllv by 64 (shift-variable ovreflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < 0")
 {
@@ -1801,8 +1766,6 @@ TEST_CASE( "MIPS32_instr: srav 0x321 by 0")
     CHECK( instr.get_v_dst() == 0x321);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS32_instr: srav 14 by 0xffffff03 shift-variable overflow")
 {
     MIPS32Instr instr( "srav");
@@ -1811,7 +1774,6 @@ TEST_CASE( "MIPS32_instr: srav 14 by 0xffffff03 shift-variable overflow")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
 
 TEST_CASE( "MIPS32_instr: srav 0x333311 by 4")
 {
@@ -1870,8 +1832,6 @@ TEST_CASE( "MIPS64_instr: srav 0xff000000 by 4")
     CHECK( instr.get_v_dst() == 0xfff00000);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 32 (shift-variable overflow)")
 {
     MIPS64Instr instr( "srav");
@@ -1880,8 +1840,6 @@ TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 32 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff0000);
 }
-// ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE ( "MIPS32_instr: srl 0xdeadbeef by 0")
 {
@@ -1960,8 +1918,6 @@ TEST_CASE( "MIPS32_instr: srlv 0xaaa00000 by 4")
     CHECK( instr.get_v_dst() == 0x0aaa0000);
 }
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS32_instr: srlv 1 by 32 (shift-variable overflow)")
 {
     MIPS32Instr instr( "srlv");
@@ -1970,10 +1926,7 @@ TEST_CASE( "MIPS32_instr: srlv 1 by 32 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
-// ***********************************/
 
-// Bug-test (#709)
-/* ***********************************
 TEST_CASE( "MIPS64_instr: srlv 0x11 by 0x00000a00 (shift-variable overflow)")
 {
     MIPS64Instr instr( "srlv");
@@ -1982,8 +1935,6 @@ TEST_CASE( "MIPS64_instr: srlv 0x11 by 0x00000a00 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x11);
 }
-// ***********************************/
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: syscall")
 {
