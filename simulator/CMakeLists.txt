@@ -86,7 +86,6 @@ add_custom_command(
     COMMAND cat ${RISCV_DIR}/opcodes | python ${RISCV_DIR}/parse-opcodes -c > ${RISCV_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/opcodes ${RISCV_DIR}/parse-opcodes
 )
-add_library(riscv-isa risc_v/riscv_isa.cpp ${RISCV_DIR}/riscv.opcode.gen.h)
 
 # Compilation flags
 if (MSVC)
@@ -153,17 +152,17 @@ include_directories(SYSTEM
         ${Boost_INCLUDE_DIRS})
 
 # Targets
-add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS})
-target_link_libraries(mipt-mips-src riscv-isa)
-
+add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h)
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
-target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
-
 add_executable(mipt-mips export/standalone/main.cpp)
-target_link_libraries(mipt-mips mipt-mips-src)
-
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
+
+# Dependencies
+target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
+target_link_libraries(mipt-mips mipt-mips-src)
 target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
+
+# Test output
 add_test(all_tests unit-tests)
 
 # GDB output placement
