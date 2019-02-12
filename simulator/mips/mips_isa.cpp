@@ -386,7 +386,7 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
     if ( str_opcode == "nop")
         return nop<I>;
 
-    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I>, isaMapCOP0<I> })
+    for ( const auto* map : { &isaMapR<I>, &isaMapRI<I>, &isaMapMIPS32<I>, &isaMapIJ<I>, &isaMapCOP0<I> })
     {
         auto res = find_entry( map, str_opcode);
         if ( res != map.end())
