@@ -388,8 +388,8 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 
     for ( const auto* map : { &isaMapR<I>, &isaMapRI<I>, &isaMapMIPS32<I>, &isaMapIJ<I>, &isaMapCOP0<I> })
     {
-        auto res = find_entry( map, str_opcode);
-        if ( res != map.end())
+        auto res = find_entry( *map, str_opcode);
+        if ( res != map->end())
             return res->second;
     }
 
