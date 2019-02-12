@@ -20,8 +20,6 @@ struct InvalidElfSection : Exception
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     using namespace std::literals::string_literals;
-    if ( ( section.get_flags() & SHF_ALLOC) == 0)
-        return;
     if ( section.get_address() == 0 || section.get_data() == nullptr)
         throw InvalidElfSection( "\""s + section.get_name() + "\""s);
 
@@ -39,7 +37,8 @@ ElfLoader::ElfLoader( const std::string& filename, AddrDiff offset)
 void ElfLoader::load_to( WriteableMemory *memory) const
 {
     for ( const auto& section : reader->sections) try {
-        load_elf_section( memory, *section, offset);
+        if ( section.get_flags() & SHF_ALLOC)
+            load_elf_section( memory, *section, offset);
     }
     catch ( const InvalidElfSection& e) {
         std::cerr << e.what();
