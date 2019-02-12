@@ -340,7 +340,7 @@ static const Table<I> isaMapCOP0 =
 };
 
 template<typename I>
-static const std::vector<Table<I>*> all_isa_maps =
+static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
     &isaMapRI<I>,
