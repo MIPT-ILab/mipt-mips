@@ -42,5 +42,5 @@ build_script:
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
 
 test_script:
-- if not "%build%"=="msvc" .\mipt-mips -b ..\traces\fib.out -n 1000000
+- .\mipt-mips -b ..\traces\fib.out -n 1000000
 - ctest -C Release --verbose
