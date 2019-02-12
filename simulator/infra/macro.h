@@ -127,6 +127,9 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
     return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
 }
 
+template <typename T>
+constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
+
 /*
  * Templated no-value (non-trivial data of given size)
  */

@@ -225,13 +225,13 @@ struct ALU
     void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->v_imm + 32); }
 
     template<typename I, typename T> static
-    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_src2; }
+    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> instr->v_src2; }
+    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2); }
+    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I> static
     void lui( I* instr)    { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 0x10u; }
