@@ -65,6 +65,7 @@ class alignas(64) BaseMIPSInstr
         using RegisterSInt = sign_t<RegisterUInt>;
     private:
         friend struct ALU;
+	using Execute = void (*)(BaseMIPSInstr*);
 
         OperationType operation = OUT_UNKNOWN;
         Trap trap = Trap::NO_TRAP;
@@ -93,18 +94,14 @@ class alignas(64) BaseMIPSInstr
         bool memory_complete = false;
 
         Addr new_PC = NO_VAL32;
-
         const Addr PC = NO_VAL32;
-
         uint64 sequence_id = NO_VAL64;
+        Execute executor = unknown_mips_instruction;
 
-        KryuCowString disasm = {};
+	KryuCowString disasm = {};
 
         void init( const MIPSTableEntry<BaseMIPSInstr>& entry, MIPSVersion version);
         std::string generate_disasm( const MIPSTableEntry<BaseMIPSInstr>& entry) const;
-
-        using Execute = void (*)(BaseMIPSInstr*);
-        Execute executor = unknown_mips_instruction;
     public:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
