@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
