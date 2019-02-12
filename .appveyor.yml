@@ -40,6 +40,7 @@ build_script:
 - cmake ../simulator -G "%CMAKEFILE%"
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
+- if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
 
 test_script:
 - .\mipt-mips -b ..\traces\fib.out -n 1000000
