@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
@@ -340,6 +341,16 @@ static const Table<I> isaMapCOP0 =
 };
 
 template<typename I>
+static const std::vector<const Table<I>*> all_isa_maps =
+{
+    &isaMapR<I>,
+    &isaMapRI<I>,
+    &isaMapMIPS32<I>,
+    &isaMapIJ<I>,
+    &isaMapCOP0<I>
+};
+
+template<typename I>
 MIPSTableEntry<I> unknown_instruction =
 { "Unknown instruction", unknown_mips_instruction, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
@@ -386,10 +397,10 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
     if ( str_opcode == "nop")
         return nop<I>;
 
-    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I>, isaMapCOP0<I> })
+    for ( const auto& map : all_isa_maps<I>)
     {
-        auto res = find_entry( map, str_opcode);
-        if ( res != map.end())
+        auto res = find_entry( *map, str_opcode);
+        if ( res != map->end())
             return res->second;
     }
 
