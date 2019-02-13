@@ -5,6 +5,7 @@
  */
 
 #include <func_sim/alu.h>
+#include <infra/instrcache/LRUCache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -437,7 +438,10 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
     dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
-    disasm    = generate_disasm( entry);
+    if ( get_disasm_cache().find( raw).first)
+        get_disasm_cache().touch( raw);
+    else
+        get_disasm_cache().update( raw, generate_disasm( entry));
 }
 
 static std::string print_immediate( Imm type, uint32 value)
@@ -462,8 +466,6 @@ std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInst
     const bool print_dst = is_explicit_register( entry.dst);
 
     std::ostringstream oss;
-    if ( PC != 0)
-        oss << std::hex << "0x" << PC << ": ";
     oss << entry.name;
 
     if ( entry.immediate_type == Imm::ADDR)
