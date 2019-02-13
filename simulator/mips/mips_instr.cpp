@@ -6,9 +6,31 @@
 
 #include "mips_instr.h"
 
+#include <infra/instrcache/LRUCache.h>
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+
+static_assert(std::is_trivially_destructible<BaseMIPSInstr<uint32>>::value,
+              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+static_assert(std::is_trivially_destructible<BaseMIPSInstr<uint64>>::value,
+              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+// Visual Studio implements is_trivially copyable in a buggy way
+// https://developercommunity.visualstudio.com/content/problem/170883/msvc-type-traits-stdis-trivial-is-bugged.html
+#ifdef __GNUC__
+static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint32>>::value,
+              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
+              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+#endif
+
+template<typename R>
+BaseMIPSInstr<R>::DisasmCache& BaseMIPSInstr<R>::get_disasm_cache()
+{
+    static DisasmCache instance;
+    return instance;
+}
 
 template<typename R>
 void BaseMIPSInstr<R>::execute()
@@ -61,9 +83,23 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 }
 
 template<typename R>
+std::string BaseMIPSInstr<R>::get_disasm() const
+{
+    const auto [found, value] = get_disasm_cache().find( raw);
+    if ( found) {
+        get_disasm_cache().touch( raw);
+        return value;
+    }
+    return "<disassembly optimized out>";
+}
+
+template<typename R>
 std::ostream& BaseMIPSInstr<R>::dump( std::ostream& out) const
 {
-    out << "{" << sequence_id << "}\t" << disasm << "\t [";
+    if ( PC != 0)
+        out << std::hex << "0x" << PC << ": ";
+
+    out << "{" << sequence_id << "}\t" << get_disasm() << "\t [";
     bool has_ma = ( is_load() || is_store()) && complete;
     if ( has_ma)
     {
