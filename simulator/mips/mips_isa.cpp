@@ -438,13 +438,14 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
     dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
-    if ( get_disasm_cache().find( raw).first)
-        get_disasm_cache().touch( raw);
-    else
-        get_disasm_cache().update( raw, generate_disasm( entry));
+    opname    = entry.name;
+    print_dst = is_explicit_register( entry.dst);
+    print_src1 = is_explicit_register( entry.src1);
+    print_src2 = is_explicit_register( entry.src2);
+    imm_type   = entry.immediate_type;
 }
 
-static std::string print_immediate( Imm type, uint32 value)
+static std::string print_immediate( MIPSImm type, uint32 value)
 {
     std::ostringstream oss;
     switch ( type)
@@ -461,23 +462,18 @@ static std::string print_immediate( Imm type, uint32 value)
 }
 
 template<typename R>
-std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInstr<R>>& entry) const
+std::string BaseMIPSInstr<R>::generate_disasm() const
 {
-    const bool print_dst = is_explicit_register( entry.dst);
-
     std::ostringstream oss;
-    oss << entry.name;
+    oss << opname;
 
-    if ( entry.immediate_type == Imm::ADDR)
+    if ( imm_type == Imm::ADDR)
     {
         oss << " $" << (print_dst ? dst : src2)
             << print_immediate( Imm::ADDR, v_imm)
             << "($" << src1 << ")" << std::dec;
         return oss.str();
     }
-
-    const bool print_src1 = is_explicit_register( entry.src1);
-    const bool print_src2 = is_explicit_register( entry.src2);
     
     if ( print_dst)
         oss <<  " $" << dst;
@@ -486,7 +482,7 @@ std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInst
     if ( print_src2)
         oss << ", $" << src2;
 
-    oss << print_immediate( entry.immediate_type, v_imm);
+    oss << print_immediate( imm_type, v_imm);
     return oss.str();
 }
 
