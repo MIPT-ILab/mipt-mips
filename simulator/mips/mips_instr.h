@@ -19,6 +19,13 @@
 
 #include <sstream>
 
+enum class MIPSImm : uint8
+{
+    NO, SHIFT,                // R type
+    LOGIC, ARITH, TRAP, ADDR, // I type
+    JUMP                      // J type
+};
+
 enum OperationType : uint8
 {
     OUT_ARITHM,
@@ -38,9 +45,6 @@ enum OperationType : uint8
     OUT_J_SPECIAL,
     OUT_UNKNOWN
 };
-
-template<typename I>
-struct MIPSTableEntry;
 
 struct UnknownMIPSInstruction final : Exception
 {
@@ -70,6 +74,7 @@ class BaseMIPSInstr
         using Execute = void (*)(BaseMIPSInstr*);
         using DisasmCache = LRUCache<uint32, std::string, 8192>;
 
+        std::string_view opname = {};
         OperationType operation = OUT_UNKNOWN;
         Trap trap = Trap::NO_TRAP;
 
@@ -81,6 +86,7 @@ class BaseMIPSInstr
         MIPSRegister dst2 = MIPSRegister::zero();
 
         uint32 v_imm = NO_VAL32;
+        MIPSImm imm_type = MIPSImm::NO;
 
         RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
         RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
@@ -95,9 +101,11 @@ class BaseMIPSInstr
         bool complete   = false;
         bool _is_jump_taken = false; // actual result
         bool memory_complete = false;
+        bool print_dst = false;
+        bool print_src1 = false;
+        bool print_src2 = false;
 
         Addr new_PC = NO_VAL32;
-
         const Addr PC = NO_VAL32;
 
         uint64 sequence_id = NO_VAL64;
@@ -105,7 +113,7 @@ class BaseMIPSInstr
         Execute executor = unknown_mips_instruction;
 
         void init( const MIPSTableEntry<BaseMIPSInstr>& entry, MIPSVersion version);
-        std::string generate_disasm( const MIPSTableEntry<BaseMIPSInstr>& entry) const;
+        std::string generate_disasm() const;
 
         static DisasmCache& get_disasm_cache();
     public:

@@ -90,7 +90,9 @@ std::string BaseMIPSInstr<R>::get_disasm() const
         get_disasm_cache().touch( raw);
         return value;
     }
-    return "<disassembly optimized out>";
+    auto result = generate_disasm();
+    get_disasm_cache().update( raw, result);
+    return result;
 }
 
 template<typename R>
