@@ -411,6 +411,7 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 template<typename R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
     raw( bytes),
+    raw_valid( true),
     new_PC( PC + 4),
     PC( PC)
 {

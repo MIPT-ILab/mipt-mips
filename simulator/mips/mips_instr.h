@@ -104,6 +104,7 @@ class BaseMIPSInstr
         bool complete   = false;
         bool _is_jump_taken = false; // actual result
         bool memory_complete = false;
+        const bool raw_valid = false;
         bool print_dst = false;
         bool print_src1 = false;
         bool print_src2 = false;
