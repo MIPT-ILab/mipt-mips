@@ -50,7 +50,7 @@ void PortMap::clean_up( Cycle cycle)
 }
 
 BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( key), _bandwidth(bandwidth), _fanout(fanout)
+    Port( key), _fanout(fanout), installed_bandwidth(bandwidth)
 {
     if ( portMap[ _key].writer != nullptr)
         serr << "Reusing of " << key
@@ -67,21 +67,4 @@ void BasicWritePort::check_init( const std::vector<Port*>& readers) const
         throw PortError( _key + " WritePort is overloaded by fanout");
     if ( readers.size() != _fanout)
         throw PortError( _key + " WritePort is underloaded by fanout");
-}
-
-void BasicWritePort::prepare_to_write( Cycle cycle)
-{
-    if ( !_init)
-        throw PortError(_key + " WritePort was not initializated");
-
-    if ( _lastCycle != cycle)
-        _writeCounter = 0;
-
-    _lastCycle = cycle;
-
-    if ( _writeCounter >= _bandwidth)
-        throw PortError(_key + " port is overloaded by bandwidth");
-
-    // If we can add something more on that cycle, forwarding it to all ReadPorts.
-    _writeCounter++;
 }
