@@ -59,7 +59,7 @@ template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache;
 
 template<typename R>
-class alignas(64) BaseMIPSInstr
+class BaseMIPSInstr
 {
     public:
         using Register = MIPSRegister;
