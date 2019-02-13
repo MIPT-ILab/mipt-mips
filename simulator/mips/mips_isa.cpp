@@ -5,6 +5,7 @@
  */
 
 #include <func_sim/alu.h>
+#include <infra/instrcache/LRUCache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
@@ -340,6 +342,16 @@ static const Table<I> isaMapCOP0 =
 };
 
 template<typename I>
+static const std::vector<const Table<I>*> all_isa_maps =
+{
+    &isaMapR<I>,
+    &isaMapRI<I>,
+    &isaMapMIPS32<I>,
+    &isaMapIJ<I>,
+    &isaMapCOP0<I>
+};
+
+template<typename I>
 MIPSTableEntry<I> unknown_instruction =
 { "Unknown instruction", unknown_mips_instruction, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
@@ -386,10 +398,10 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
     if ( str_opcode == "nop")
         return nop<I>;
 
-    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I>, isaMapCOP0<I> })
+    for ( const auto& map : all_isa_maps<I>)
     {
-        auto res = find_entry( map, str_opcode);
-        if ( res != map.end())
+        auto res = find_entry( *map, str_opcode);
+        if ( res != map->end())
             return res->second;
     }
 
@@ -426,7 +438,10 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
     dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
-    disasm    = generate_disasm( entry);
+    if ( get_disasm_cache().find( raw).first)
+        get_disasm_cache().touch( raw);
+    else
+        get_disasm_cache().update( raw, generate_disasm( entry));
 }
 
 static std::string print_immediate( Imm type, uint32 value)
@@ -451,8 +466,6 @@ std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInst
     const bool print_dst = is_explicit_register( entry.dst);
 
     std::ostringstream oss;
-    if ( PC != 0)
-        oss << std::hex << "0x" << PC << ": ";
     oss << entry.name;
 
     if ( entry.immediate_type == Imm::ADDR)
