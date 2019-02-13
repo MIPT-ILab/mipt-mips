@@ -46,6 +46,9 @@ enum OperationType : uint8
     OUT_UNKNOWN
 };
 
+template<typename I>
+struct MIPSTableEntry;
+
 struct UnknownMIPSInstruction final : Exception
 {
     explicit UnknownMIPSInstruction(const std::string& msg)
