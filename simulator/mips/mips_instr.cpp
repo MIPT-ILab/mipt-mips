@@ -26,7 +26,7 @@ static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
 #endif
 
 template<typename R>
-BaseMIPSInstr<R>::DisasmCache& BaseMIPSInstr<R>::get_disasm_cache()
+typename BaseMIPSInstr<R>::DisasmCache& BaseMIPSInstr<R>::get_disasm_cache()
 {
     static DisasmCache instance;
     return instance;
