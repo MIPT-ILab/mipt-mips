@@ -71,7 +71,7 @@ public:
         occupied = 0;
     }
 
-    template<typename... Args> void emplace( Args ... args) noexcept
+    template<typename... Args> void emplace( Args&& ... args) noexcept
     {
         new (p_back) T( std::forward<Args>( args)...);
         advance_ptr( &PortQueue::p_back);
