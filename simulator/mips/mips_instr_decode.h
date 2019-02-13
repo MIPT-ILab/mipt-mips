@@ -12,12 +12,7 @@
 
 #include "mips_register/mips_register.h"
 
-enum class Imm : uint8
-{
-    NO, SHIFT,                // R type
-    LOGIC, ARITH, TRAP, ADDR, // I type
-    JUMP                      // J type
-};
+using Imm = MIPSImm;
 
 enum class Reg : uint8
 {

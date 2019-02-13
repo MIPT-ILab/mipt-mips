@@ -85,12 +85,17 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 template<typename R>
 std::string BaseMIPSInstr<R>::get_disasm() const
 {
+    if ( raw == 0) // Mocking instructions cannot access disassembly cache
+        return generate_disasm();
+
     const auto [found, value] = get_disasm_cache().find( raw);
     if ( found) {
         get_disasm_cache().touch( raw);
         return value;
     }
-    return "<disassembly optimized out>";
+    auto result = generate_disasm();
+    get_disasm_cache().update( raw, result);
+    return result;
 }
 
 template<typename R>
