@@ -49,4 +49,16 @@ template<typename T> class BypassCommand;
 #include "ports_instance.def"
 #undef PORT_TOKEN
 
+template<typename T>
+auto make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
+{
+    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth, fanout);
+}
+
+template<typename T>
+auto make_read_port( std::string key, Latency latency)
+{
+    return std::make_unique<ReadPort<T>>( PortMap::get_instance(), std::move(key), latency);
+}
+
 #endif

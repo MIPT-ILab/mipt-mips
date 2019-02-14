@@ -240,19 +240,6 @@ void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
         destinations.emplace_back( port_cast( r));
 }
 
-// External methods
-template<typename T>
-decltype(auto) make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
-{
-    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth, fanout);
-}
-
-template<typename T>
-auto make_read_port( std::string key, Latency latency)
-{
-    return std::make_unique<ReadPort<T>>( PortMap::get_instance(), std::move(key), latency);
-}
-
 static constexpr const Latency PORT_LATENCY = 1_lt;
 static constexpr const Latency PORT_LONG_LATENCY = 30_lt;
 static constexpr const uint32 PORT_FANOUT = 1;
