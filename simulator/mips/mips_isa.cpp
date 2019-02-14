@@ -357,7 +357,7 @@ MIPSTableEntry<I> unknown_instruction =
 
 template<typename I>
 MIPSTableEntry<I> nop =
-{ "nop" , mips_sll<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "nop" , do_nothing<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
