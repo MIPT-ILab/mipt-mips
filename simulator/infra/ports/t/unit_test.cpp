@@ -1,154 +1,128 @@
 /**
- * Unit tests for ports
- * @author Denis Los
+ * Ports unit test
+ * @author Pavel Kryukov
+ * Copyright 2019 MIPT-MIPS team
  */
 
 #include "../ports.h"
 #include <catch.hpp>
 #include <map>
-
-static const int NONE = -1;
-static const int DATA_LIMIT = 5;
-static const Cycle EXPECTED_MAX_CYCLE = 8_cl;
-static const Cycle CLOCK_LIMIT = 10_cl;
-
-enum CheckCode {  MODULE_A, MODULE_B };
-
-static bool check_data( Cycle cycle, CheckCode code, int data)
+ 
+TEST_CASE("Ports: no write port")
 {
-    static std::map<Cycle, std::pair<int, int>> script =
-    // | CYCLE |MODULE_A|MODULE_B|
-    {
-       { 0_cl, { NONE,    NONE }},
-       { 1_cl, { NONE,    NONE }},
-       { 2_cl, { 1,       NONE }},
-       { 3_cl, { NONE,    2    }},
-       { 4_cl, { 3,       NONE }},
-       { 5_cl, { NONE,    4    }},
-       { 6_cl, { 5,       NONE }},
-       { 7_cl, { NONE,    6    }},
-       { 8_cl, { NONE,    NONE }}
-    };
-
-    if ( cycle > EXPECTED_MAX_CYCLE)
-        return false;
-
-    switch ( code)
-    {
-    case MODULE_A: return script[cycle].first  == data;
-    case MODULE_B: return script[cycle].second == data;
-    default: return false;
-    };
+    auto pm = PortMap::create_port_map();
+    ReadPort<int> input( pm, "Key", PORT_LATENCY);
+    CHECK_THROWS_AS( pm->init(), PortError);
 }
 
-static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
+TEST_CASE("Ports: no read port")
 {
-    return check_data( cycle, code, NONE) != is_ready;
+    auto pm = PortMap::create_port_map();
+    WritePort<int> output( pm, "Yek", PORT_BW, PORT_FANOUT);
+    CHECK_THROWS_AS( pm->init(), PortError);
 }
 
-class A
+TEST_CASE("Ports: two write ports")
 {
-public:
-    A( std::shared_ptr<PortMap> map)
-        : to_B( map, "A_to_B", PORT_BW, PORT_FANOUT)
-        , from_B( map, "B_to_A", PORT_LATENCY)
-        , init( map, "init_A", PORT_LATENCY)
-        , stop( map, "stop", PORT_BW, PORT_FANOUT)
-    { }
-
-    void clock( Cycle cycle)
-    {
-        bool is_init_ready = init.is_ready( cycle);
-        bool is_from_B_ready = from_B.is_ready( cycle);
-
-        if ( cycle != 1_cl)
-            CHECK( !is_init_ready);
-        CHECK( check_readiness( cycle, MODULE_B, is_from_B_ready));
-
-        if ( is_init_ready)
-        {
-            auto data = init.read( cycle);
-            CHECK( cycle == 1_cl );
-            CHECK( data == 0 );
-            to_B.write( data + 1, cycle);
-        }
-        else if ( is_from_B_ready)
-        {
-            auto data = from_B.read( cycle);
-            CHECK( check_data( cycle, MODULE_B, data));
-            if ( data >= DATA_LIMIT)
-                stop.write( true, cycle);
-            else
-                to_B.write( data + 1, cycle);
-        }
-    }
-
-private:
-    WritePort<int> to_B;
-    ReadPort<int> from_B;
-    ReadPort<int> init;
-    WritePort<bool> stop;
-};
-
-class B
-{
-public:
-    B( std::shared_ptr<PortMap> map)
-        : to_A( map, "B_to_A", PORT_BW, PORT_FANOUT)
-        , from_A( map, "A_to_B", PORT_LATENCY)
-    { };
-
-    void clock( Cycle cycle)
-    {
-        bool is_from_A_ready = from_A.is_ready( cycle);
-        CHECK( check_readiness( cycle, MODULE_A, is_from_A_ready));
-        if ( is_from_A_ready)
-        {
-            auto data = from_A.read( cycle);
-            CHECK( check_data( cycle, MODULE_A, data));
-            to_A.write( data + 1, cycle);
-        }
-    }
-
-private:
-    WritePort<int> to_A;
-    ReadPort<int> from_A;
-};
-
-TEST_CASE( "Latency to string")
-{
-    CHECK( (5_cl).to_string() == "5");
-    CHECK( (2_lt).to_string() == "2");
+    auto pm = PortMap::create_port_map();
+    ReadPort<int> input( pm, "Key", PORT_LATENCY);
+    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT);
+    CHECK_THROWS_AS( WritePort<int>( pm, "Key", PORT_BW, PORT_FANOUT), PortError);
 }
 
-TEST_CASE( "test_ports: Test_Ports_A_B")
+TEST_CASE("Ports: fanout overload")
 {
-    auto map = PortMap::create_port_map();
-    A a( map);
-    B b( map);
+    auto pm = PortMap::create_port_map();
+    ReadPort<int> input( pm, "Key", PORT_LATENCY);
+    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT);
+    ReadPort<int> input2( pm, "Key", PORT_LATENCY);
+    CHECK_THROWS_AS( pm->init(), PortError);
+}
 
-    WritePort<int> init( map, "init_A", PORT_BW, PORT_FANOUT);
-    ReadPort<bool> stop( map, "stop", PORT_LATENCY);
+TEST_CASE("Ports: fanout underload")
+{
+    auto pm = PortMap::create_port_map();
+    ReadPort<int> input( pm, "Key", PORT_LATENCY);
+    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT * 2);
+    CHECK_THROWS_AS( pm->init(), PortError);
+}
 
-    map->init();
-    CHECK( init.get_fanout() == 1);
+using PairOfPorts = std::pair<std::unique_ptr<ReadPort<int>>, std::unique_ptr<WritePort<int>>>;
 
-    // init object A by value 0
-    init.write( 0, 0_cl);
+static PairOfPorts
+get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
+{
+    PairOfPorts pop;
+    pop.first = std::make_unique<ReadPort<int>>( pm, "Key", lat);
+    pop.second = std::make_unique<WritePort<int>>( pm, "Key", bw, PORT_FANOUT);
+    pm->init();
+    return pop;
+}
 
-    for ( auto cycle = 0_cl; cycle < CLOCK_LIMIT; cycle.inc())
-    {
-        if ( stop.is_ready( cycle))
-        {
-            CHECK( cycle == EXPECTED_MAX_CYCLE);
-            stop.read( cycle);
-            break;
-        }
+TEST_CASE("Ports: simple transmission")
+{
+    auto pm = PortMap::create_port_map();
+    const auto [rp, wp] = get_pair_of_ports( pm);
+    wp->write( 11, 0_cl);
+    CHECK( !rp->is_ready( 0_cl));
+    pm->clean_up( 0_cl);
+    CHECK( rp->is_ready( 1_cl));
+    CHECK( rp->read( 1_cl) == 11);
+}
 
-        CHECK( cycle < EXPECTED_MAX_CYCLE);
-        a.clock( cycle);
-        b.clock( cycle);
+TEST_CASE("Ports: throw if not ready")
+{
+    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
+    wp->write( 1, 0_cl);
+    CHECK_THROWS_AS( rp->read( 0_cl), PortError);
+}
 
-        map->clean_up( cycle);
-    }
+TEST_CASE("Ports: read once")
+{
+    auto pm = PortMap::create_port_map();
+    const auto [rp, wp] = get_pair_of_ports( pm);
+    wp->write( 11, 0_cl);
+    pm->clean_up( 0_cl);
+    rp->read( 1_cl);
+    CHECK( !rp->is_ready( 1_cl));
+}
+
+TEST_CASE("Ports: overload bandwidth")
+{
+    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
+    (void)rp;
+    wp->write( 11, 0_cl);
+    CHECK_THROWS_AS( wp->write( 12, 0_cl), PortError);
+}
+
+TEST_CASE("Ports: sequential read")
+{
+    auto pm = PortMap::create_port_map();
+    const auto [rp, wp] = get_pair_of_ports( pm);
+
+    wp->write( 10, 0_cl);
+    pm->clean_up( 0_cl);
+    
+    wp->write( 11, 1_cl);
+    CHECK( rp->is_ready( 1_cl));
+    CHECK( rp->read( 1_cl) == 10);
+    CHECK( !rp->is_ready( 1_cl));
+    pm->clean_up( 1_cl);
+
+    CHECK( rp->read( 2_cl) == 11);
+}
+
+TEST_CASE("Ports: non-regular read")
+{
+    auto pm = PortMap::create_port_map();
+    const auto [rp, wp] = get_pair_of_ports( pm);
+    wp->write( 10, 0_cl);
+    pm->clean_up( 1_cl);
+
+    wp->write( 11, 1_cl);
+    CHECK( rp->is_ready( 1_cl));
+    pm->clean_up( 2_cl);
+
+    CHECK( rp->is_ready( 2_cl));
+    CHECK( rp->read( 2_cl) == 11);
 }
