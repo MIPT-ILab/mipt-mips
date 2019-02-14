@@ -22,6 +22,14 @@ TEST_CASE("Ports: no read port")
     CHECK_THROWS_AS( pm->init(), PortError);
 }
 
+TEST_CASE("Ports: two write ports")
+{
+    auto pm = PortMap::create_port_map();
+    WritePort<int> output1( pm, "Yek", PORT_BW, PORT_FANOUT);
+    WritePort<int> output2( pm, "Yek", PORT_BW, PORT_FANOUT);
+    CHECK_NOTHROW( pm->init());
+}
+
 TEST_CASE("Ports: fanout overload")
 {
     auto pm = PortMap::create_port_map();
