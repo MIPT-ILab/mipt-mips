@@ -106,12 +106,6 @@ template<class T> class ReadPort;
     
 template<class T> class WritePort : public BasicWritePort
 {
-    std::vector<ReadPort<T>*> destinations = {};
-    void add_port( BasicReadPort* r);
-    void init( const std::vector<BasicReadPort*>& readers) final;
-    void clean_up( Cycle cycle) noexcept final;
-    ReadPort<T>* port_cast( Port* p) const;
-    void basic_write( T&& what, Cycle cycle) noexcept( std::is_nothrow_copy_constructible<T>::value);
 public:
     WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout)
         : BasicWritePort( key, bandwidth, fanout)
@@ -128,14 +122,32 @@ public:
         increment_write_counter();
         basic_write( std::move( T( what)), cycle);
     }
+    
+private:
+    void init( const std::vector<BasicReadPort*>& readers) final;
+    void add_port( BasicReadPort* r);
+    ReadPort<T>* port_cast( Port* p) const;
+    
+    void clean_up( Cycle cycle) noexcept final;
+
+    void basic_write( T&& what, Cycle cycle) noexcept( std::is_nothrow_copy_constructible<T>::value);
+
+    std::vector<ReadPort<T>*> destinations = {};
 };
 
 template<class T> class ReadPort : public BasicReadPort
 {
-    friend class WritePort<T>;
-private:
-    PortQueue<std::pair<T, Cycle>> queue;
+public:
+    ReadPort<T>( const std::string& key, Latency latency) : BasicReadPort( key, latency) { }
 
+    bool is_ready( Cycle cycle) const noexcept
+    {
+        return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
+    }
+
+    T read( Cycle cycle);
+private:
+    friend class WritePort<T>;
     void emplaceData( T&& what, Cycle cycle)
         noexcept( std::is_nothrow_copy_constructible<T>::value)
     {
@@ -150,15 +162,7 @@ private:
 
     void clean_up( Cycle cycle) noexcept;
 
-public:
-    ReadPort<T>( const std::string& key, Latency latency) : BasicReadPort( key, latency) { }
-
-    bool is_ready( Cycle cycle) const noexcept
-    {
-        return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
-    }
-
-    T read( Cycle cycle);
+    PortQueue<std::pair<T, Cycle>> queue;
 };
 
 template<class T>
