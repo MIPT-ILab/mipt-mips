@@ -55,20 +55,27 @@ class Port : public Log
 {
 public:
     const std::string& get_key() const noexcept { return _key; }
+    PortMap& get_port_map() const noexcept { return portMap; }
+
 protected:
-    PortMap& portMap = PortMap::get_instance();
     explicit Port( std::string key);
+
 private:
     const std::string _key;
+    PortMap& portMap = PortMap::get_instance();
 };
 
 class BasicReadPort : public Port
 {
 public:
     auto get_latency() const noexcept { return _latency; }
+
 protected:
     BasicReadPort( const std::string& key, Latency latency);
+
 private:
+    friend class BasicWritePort;
+    virtual void init( uint32 bandwidth) = 0;
     const Latency _latency;
 };
 
@@ -125,7 +132,6 @@ public:
     
 private:
     void init( const std::vector<BasicReadPort*>& readers) final;
-    void add_port( BasicReadPort* r);
     ReadPort<T>* port_cast( Port* p) const;
     
     void clean_up( Cycle cycle) noexcept final;
@@ -154,12 +160,7 @@ private:
         queue.emplace( std::move( what), cycle + get_latency());
     }
 
-    void init( uint32 bandwidth)
-    {
-        // +1 to handle reads-after-writes
-        queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
-    }
-
+    void init( uint32 bandwidth) final;
     void clean_up( Cycle cycle) noexcept;
 
     PortQueue<std::pair<T, Cycle>> queue;
@@ -195,14 +196,6 @@ catch ( const std::bad_cast&)
 {
     throw PortError( get_key() + " has type mismatch between write and read ports");
 }
-    
-template<class T>
-void WritePort<T>::add_port( BasicReadPort* r)
-{
-    auto reader = port_cast( r);
-    destinations.emplace_back( reader);
-    reader->init( get_bandwidth());    
-}
 
 template<class T>
 void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
@@ -210,10 +203,18 @@ void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
     base_init( readers);
     destinations.reserve( readers.size());
     for (const auto& r : readers)
-        add_port( r);
+        destinations.emplace_back( port_cast( r));
 }
 
-template<class T> T ReadPort<T>::read( Cycle cycle)
+template<class T>
+void ReadPort<T>::init( uint32 bandwidth)
+{
+    // +1 to handle reads-after-writes
+    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
+}
+
+template<class T>
+T ReadPort<T>::read( Cycle cycle)
 {
     if ( !is_ready( cycle))
         throw PortError( get_key() + " ReadPort was not ready for read at cycle=" + cycle.to_string());
@@ -223,7 +224,8 @@ template<class T> T ReadPort<T>::read( Cycle cycle)
     return tmp;
 }
 
-template<class T> void ReadPort<T>::clean_up( Cycle cycle) noexcept
+template<class T>
+void ReadPort<T>::clean_up( Cycle cycle) noexcept
 {
     while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
         queue.pop();

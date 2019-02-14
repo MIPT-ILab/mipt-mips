@@ -55,14 +55,14 @@ Port::Port( std::string key) : Log( false), _key( std::move( key)) { }
 BasicReadPort::BasicReadPort( const std::string& key, Latency latency)
     : Port( key), _latency( latency)
 {
-    portMap.add_port( this);
+    get_port_map().add_port( this);
 }
 
 
 BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
     Port( key), _fanout(fanout), installed_bandwidth(bandwidth)
 {
-    portMap.add_port( this);
+    get_port_map().add_port( this);
 }
 
 void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
@@ -75,4 +75,6 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
         throw PortError( get_key() + " WritePort is underloaded by fanout");
 
     initialized_bandwidth = installed_bandwidth;
+    for (const auto& r : readers)
+        r->init( initialized_bandwidth);
 }
