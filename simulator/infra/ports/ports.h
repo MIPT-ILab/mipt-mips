@@ -151,12 +151,11 @@ public:
         return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
     }
 
-    T read( Cycle cycle) noexcept(std::is_nothrow_copy_constructible<T>::value)
+    T read( Cycle cycle)
     {
-        assert( is_ready( cycle));
-        T tmp( std::move( std::get<T>(queue.front())));
-        queue.pop();
-        return tmp;
+        if ( !is_ready( cycle))
+            throw PortError( get_key() + " has no data to read in cycle:" + std::to_string( cycle));
+        return pop_front();
     }
 
 private:
@@ -172,6 +171,13 @@ private:
     {
         while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
            queue.pop();
+    }
+
+    T pop_front() noexcept(std::is_nothrow_copy_constructible<T>::value)
+    {
+        T tmp( std::move( std::get<T>(queue.front())));
+        queue.pop();
+        return tmp;
     }
 
     PortQueue<std::pair<T, Cycle>> queue;
