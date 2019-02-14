@@ -141,6 +141,15 @@ private:
     std::vector<ReadPort<T>*> destinations = {};
 };
 
+// Has to be out of class due to VS bug
+// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
+template<class T>
+void ReadPort<T>::init( uint32 bandwidth)
+{
+    // +1 to handle reads-after-writes
+    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
+}
+
 template<class T> class ReadPort : public BasicReadPort
 {
 public:
@@ -151,7 +160,14 @@ public:
         return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
     }
 
-    T read( Cycle cycle);
+    T read( Cycle cycle) noexcept(std::is_nothrow_copy_constructible<T>::value)
+    {
+        assert( !is_ready( cycle));
+        T tmp( std::move( std::get<T>(queue.front())));
+        queue.pop();
+        return tmp;
+    }
+
 private:
     friend class WritePort<T>;
     void emplaceData( T&& what, Cycle cycle)
@@ -161,7 +177,11 @@ private:
     }
 
     void init( uint32 bandwidth) final;
-    void clean_up( Cycle cycle) noexcept;
+    void clean_up( Cycle cycle) noexcept
+    {
+        while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
+           queue.pop();
+    }
 
     PortQueue<std::pair<T, Cycle>> queue;
 };
@@ -204,31 +224,6 @@ void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
     destinations.reserve( readers.size());
     for (const auto& r : readers)
         destinations.emplace_back( port_cast( r));
-}
-
-template<class T>
-void ReadPort<T>::init( uint32 bandwidth)
-{
-    // +1 to handle reads-after-writes
-    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
-}
-
-template<class T>
-T ReadPort<T>::read( Cycle cycle)
-{
-    if ( !is_ready( cycle))
-        throw PortError( get_key() + " ReadPort was not ready for read at cycle=" + cycle.to_string());
-
-    T tmp( std::move( std::get<T>(queue.front())));
-    queue.pop();
-    return tmp;
-}
-
-template<class T>
-void ReadPort<T>::clean_up( Cycle cycle) noexcept
-{
-    while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
-        queue.pop();
 }
 
 // External methods
