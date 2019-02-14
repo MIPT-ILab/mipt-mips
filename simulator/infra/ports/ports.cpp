@@ -49,8 +49,7 @@ void PortMap::clean_up( Cycle cycle)
 void PortMap::add_port( BasicWritePort* port)
 {
     if ( map[ port->get_key()].writer != nullptr)
-        serr << "Reusing of " << port->get_key()
-             << " key for WritePort. Last WritePort will be used." << std::endl;
+        throw PortError( get_key() + " has two WritePorts");
 
     map[ port->get_key()].writer = port;
 }
