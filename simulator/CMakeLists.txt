@@ -59,8 +59,9 @@ set(TESTS_CPPS
     infra/cache/t/unit_test.cpp
     infra/config/t/unit_test.cpp
     infra/instrcache/t/unit_test.cpp
-    infra/ports/t/unit_test.cpp
     infra/ports/port_queue/t/unit_test.cpp
+    infra/ports/t/unit_test.cpp
+    infra/ports/t/example_test.cpp
     kernel/t/unit_test.cpp
     kernel/mars/t/unit_test.cpp
     memory/cen64/t/unit_test.cpp
