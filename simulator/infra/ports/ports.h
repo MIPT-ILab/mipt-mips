@@ -162,7 +162,7 @@ public:
 
     T read( Cycle cycle) noexcept(std::is_nothrow_copy_constructible<T>::value)
     {
-        assert( !is_ready( cycle));
+        assert( is_ready( cycle));
         T tmp( std::move( std::get<T>(queue.front())));
         queue.pop();
         return tmp;
