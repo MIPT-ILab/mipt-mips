@@ -83,7 +83,7 @@ protected:
     void base_init( const std::vector<BasicReadPort*>& readers);
 
     void reset_write_counter() noexcept { write_counter = 0; }
-    void increment_write_counter() noexcept
+    void increment_write_counter()
     {
         ++write_counter;
         if ( write_counter > get_bandwidth())
