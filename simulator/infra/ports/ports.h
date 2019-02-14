@@ -1,7 +1,7 @@
 /**
  * ports.h - template for simulation of ports.
  * @author Pavel Kryukov
- * Copyright 2017-2018 MIPT-MIPS team
+ * Copyright 2017-2019 MIPT-MIPS team
  */
 
 #ifndef PORTS_H
@@ -27,123 +27,193 @@ struct PortError final : Exception {
 
 class PortMap : public Log
 {
-private:
-    struct Cluster
-    {
-        class BasicWritePort* writer = nullptr;
-        std::vector<class Port*> readers = {};
-    };
-
-    std::unordered_map<std::string, Cluster> _map = { };
-
-    PortMap() noexcept : Log( false) { }
 public:
-    decltype(auto) operator[]( const std::string& v) { return _map.operator[]( v); }
-
-    static PortMap& get_instance()
-    {
-        static PortMap instance;
-        return instance;
-    }
+    static PortMap& get_instance();
 
     void init() const;
     void clean_up( Cycle cycle);
     void destroy();
+
+private:
+    PortMap() noexcept;
+
+    friend class BasicWritePort;
+    friend class BasicReadPort;
+    void add_port( class BasicWritePort* port);
+    void add_port( class BasicReadPort* port);
+
+    struct Cluster
+    {
+        class BasicWritePort* writer = nullptr;
+        std::vector<class BasicReadPort*> readers = {};
+    };
+
+    std::unordered_map<std::string, Cluster> map = { };
 };
 
 class Port : public Log
 {
+public:
+    const std::string& get_key() const noexcept { return _key; }
+    PortMap& get_port_map() const noexcept { return portMap; }
+
 protected:
-    PortMap& portMap = PortMap::get_instance();
+    explicit Port( std::string key);
+
+private:
     const std::string _key;
-    bool _init = false;
-    explicit Port( std::string key) : Log( false), _key( std::move( key)) { }
+    PortMap& portMap = PortMap::get_instance();
+};
+
+class BasicReadPort : public Port
+{
+public:
+    auto get_latency() const noexcept { return _latency; }
+
+protected:
+    BasicReadPort( const std::string& key, Latency latency);
+
+private:
+    friend class BasicWritePort;
+    virtual void init( uint32 bandwidth) = 0;
+    const Latency _latency;
 };
 
 class BasicWritePort : public Port
 {
-    friend class PortMap;
-    const uint32 _bandwidth;
-    const uint32 _fanout;
-    Cycle _lastCycle = 0_cl;
-    uint32 _writeCounter = 0;
+public:
+    auto get_fanout() const noexcept { return _fanout; }
+    auto get_bandwidth() const noexcept { return initialized_bandwidth; }
+
 protected:
     BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout);
-    virtual void init( const std::vector<Port*>& readers) = 0;
-    virtual void destroy() = 0;
-    virtual void clean_up( Cycle cycle) = 0;
-    void check_init( const std::vector<Port*>& readers) const;
-    void prepare_to_write( Cycle cycle);
-public:
-    auto get_fanout() const { return _fanout; }
-    auto get_bandwidth() const { return _bandwidth; }
+    void base_init( const std::vector<BasicReadPort*>& readers);
+
+    void reset_write_counter() noexcept { write_counter = 0; }
+    void increment_write_counter()
+    {
+        ++write_counter;
+        if ( write_counter > get_bandwidth())
+            throw PortError( get_key() + " port is overloaded by bandwidth");
+    }
+
+private:
+    friend class PortMap;
+    virtual void init( const std::vector<BasicReadPort*>& readers) = 0;
+    virtual void clean_up( Cycle cycle) noexcept = 0;
+
+    uint32 write_counter = 0;
+    uint32 initialized_bandwidth = 0;
+
+    const uint32 _fanout = 0;
+    const uint32 installed_bandwidth = 0;
 };
 
 template<class T> class ReadPort;
     
 template<class T> class WritePort : public BasicWritePort
 {
-    using Log::serr;
-    std::vector<ReadPort<T>*> _destinations = {};
-    void init( const std::vector<Port*>& readers) final;
-    void clean_up( Cycle cycle) final;
-    void destroy() final;
-    ReadPort<T>* port_cast( Port* p) const;
 public:
-    WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout) : BasicWritePort( key, bandwidth, fanout) { }
-    void write( T&& what, Cycle cycle);
-    void write( const T& what, Cycle cycle);
-};
+    WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout)
+        : BasicWritePort( key, bandwidth, fanout)
+    { }
 
-template<class T> class ReadPort : public Port
-{
-    friend class WritePort<T>;
-private:
-    using Log::sout;
-    using Log::serr;
-
-    const Latency _latency;
-    PortQueue<std::pair<T, Cycle>> _dataQueue;
-
-    void emplaceData( T&& what, Cycle cycle);
-    void clean_up( Cycle cycle) noexcept;
-    void init( uint32 bandwidth);
-public:
-    ReadPort<T>( const std::string& key, Latency latency) :
-        Port( key), _latency( latency), _dataQueue()
+    void write( T&& what, Cycle cycle)
     {
-        portMap[ _key].readers.push_back( this);
+        increment_write_counter();
+        basic_write( std::forward<T>( what), cycle);
     }
 
-    bool is_ready( Cycle cycle) const;
-    T read( Cycle cycle);
+    void write( const T& what, Cycle cycle)
+    {
+        increment_write_counter();
+        basic_write( std::move( T( what)), cycle);
+    }
+
+private:
+    void init( const std::vector<BasicReadPort*>& readers) final;
+    ReadPort<T>* port_cast( Port* p) const;
+
+    void clean_up( Cycle cycle) noexcept final;
+
+    void basic_write( T&& what, Cycle cycle) noexcept( std::is_nothrow_copy_constructible<T>::value);
+
+    std::vector<ReadPort<T>*> destinations = {};
 };
 
-template<class T>
-void WritePort<T>::clean_up( Cycle cycle)
+template<class T> class ReadPort : public BasicReadPort
 {
-    for ( const auto& reader : _destinations)
+public:
+    ReadPort<T>( const std::string& key, Latency latency) : BasicReadPort( key, latency) { }
+
+    bool is_ready( Cycle cycle) const noexcept
+    {
+        return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
+    }
+
+    T read( Cycle cycle)
+    {
+        if ( !is_ready( cycle))
+            throw PortError( get_key() + " has no data to read in cycle:" + cycle.to_string());
+        return pop_front();
+    }
+
+private:
+    friend class WritePort<T>;
+    void emplaceData( T&& what, Cycle cycle)
+        noexcept( std::is_nothrow_copy_constructible<T>::value)
+    {
+        queue.emplace( std::move( what), cycle + get_latency());
+    }
+
+    void init( uint32 bandwidth) final;
+    void clean_up( Cycle cycle) noexcept
+    {
+        while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
+           queue.pop();
+    }
+
+    T pop_front() noexcept(std::is_nothrow_copy_constructible<T>::value)
+    {
+        T tmp( std::move( std::get<T>(queue.front())));
+        queue.pop();
+        return tmp;
+    }
+
+    PortQueue<std::pair<T, Cycle>> queue;
+};
+
+// Has to be out of class due to VS bug
+// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
+template<class T>
+void ReadPort<T>::init( uint32 bandwidth)
+{
+    // +1 to handle reads-after-writes
+    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
+}
+
+// Has to be out of class due to VS bug
+// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
+template<class T>
+void WritePort<T>::clean_up( Cycle cycle) noexcept
+{
+    reset_write_counter();
+    for ( const auto& reader : destinations)
         reader->clean_up( cycle);
 }
 
+// Methods operating with ReadPort<T> are also declared out of class
 template<class T>
-void WritePort<T>::write( T&& what, Cycle cycle)
+void WritePort<T>::basic_write( T&& what, Cycle cycle)
+    noexcept( std::is_nothrow_copy_constructible<T>::value)
 {
-    prepare_to_write( cycle);
-
     // Copy data to all ports except first one
-    auto it = std::next( _destinations.begin());
-    for ( ; it != _destinations.end(); ++it)
+    auto it = std::next( destinations.begin());
+    for ( ; it != destinations.end(); ++it)
         (*it)->emplaceData( std::move( T( what)), cycle); // Force copy ctor
 
     // Move data to the first port
-    _destinations.front()->emplaceData( std::forward<T>( what), cycle);
-}
-
-template<class T>
-void WritePort<T>::write( const T& what, Cycle cycle)
-{
-    write( std::move( T( what)), cycle);
+    destinations.front()->emplaceData( std::forward<T>( what), cycle);
 }
 
 template<class T>
@@ -153,67 +223,16 @@ ReadPort<T>* WritePort<T>::port_cast( Port* p) const try
 }
 catch ( const std::bad_cast&)
 {
-    throw PortError(_key + " has type mismatch between write and read ports");
+    throw PortError( get_key() + " has type mismatch between write and read ports");
 }
 
 template<class T>
-void WritePort<T>::init( const std::vector<Port*>& readers)
+void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
 {
-    check_init( readers);
-
-    _destinations.reserve( readers.size());
+    base_init( readers);
+    destinations.reserve( readers.size());
     for (const auto& r : readers)
-        _destinations.emplace_back( port_cast( r));
-
-    _init = true;
-    for ( const auto& reader : _destinations)
-        reader->init( get_bandwidth());
-}
-
-template<class T> void WritePort<T>::destroy()
-{
-    if ( !_init)
-        return;
-
-    for ( const auto& reader : _destinations)
-         reader->_init = false;
-
-    _destinations.clear();
-    _init = false;
-}
-
-template<class T>
-void ReadPort<T>::emplaceData( T&& what, Cycle cycle)
-{
-    _dataQueue.emplace( std::move( what), cycle + _latency);
-}
-
-template<class T> bool ReadPort<T>::is_ready( Cycle cycle) const
-{
-    return !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) == cycle;
-}
-
-template<class T> void ReadPort<T>::init( uint32 bandwidth)
-{
-    // +1 to handle reads-after-writes
-    _init = true;
-    _dataQueue.resize( ( _latency.to_size_t() + 1) * bandwidth);
-}
-
-template<class T> T ReadPort<T>::read( Cycle cycle)
-{
-    if ( !is_ready( cycle))
-        throw PortError( _key + " ReadPort was not ready for read at cycle=" + cycle.to_string());
-
-    T tmp( std::move( std::get<T>(_dataQueue.front())));
-    _dataQueue.pop();
-    return tmp;
-}
-
-template<class T> void ReadPort<T>::clean_up( Cycle cycle) noexcept
-{
-    while ( !_dataQueue.empty() && std::get<Cycle>(_dataQueue.front()) < cycle)
-        _dataQueue.pop();
+        destinations.emplace_back( port_cast( r));
 }
 
 // External methods
