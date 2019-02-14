@@ -6,10 +6,25 @@
 
 #include "ports.h"
 
-PortMap& PortMap::get_instance()
+std::shared_ptr<PortMap> PortMap::create_port_map()
 {
-    static PortMap instance;
+    struct PortMapHack : public PortMap {};
+    return std::make_shared<PortMapHack>();
+}
+
+std::shared_ptr<PortMap> PortMap::instance = nullptr;
+
+std::shared_ptr<PortMap> PortMap::get_instance()
+{
+    if ( instance == nullptr)
+        reset_instance();
+
     return instance;
+}
+
+void PortMap::reset_instance()
+{
+    instance = create_port_map();
 }
 
 PortMap::PortMap() noexcept : Log( false) { }
@@ -22,20 +37,15 @@ void PortMap::init() const
             throw PortError( cluster.first + " has no WritePort");
 
         cluster.second.writer->init( cluster.second.readers);
+        for ( const auto& r : cluster.second.readers)
+            r->init( cluster.second.writer->get_bandwidth());
     }
-}
-
-void PortMap::clean_up( Cycle cycle)
-{
-    for ( const auto& cluster : map)
-        cluster.second.writer->clean_up( cycle);
 }
 
 void PortMap::add_port( BasicWritePort* port)
 {
     if ( map[ port->get_key()].writer != nullptr)
-        serr << "Reusing of " << port->get_key()
-             << " key for WritePort. Last WritePort will be used." << std::endl;
+        throw PortError( port->get_key() + " has two WritePorts");
 
     map[ port->get_key()].writer = port;
 }
@@ -45,24 +55,20 @@ void PortMap::add_port( BasicReadPort* port)
     map[ port->get_key()].readers.push_back( port);
 }
 
-void PortMap::destroy()
+Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
+    : Log( false), pm( std::move( port_map)), k( std::move( key))
+{ }
+
+BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)
+    : Port( port_map, key), _latency( latency)
 {
-    map.clear();
+    get_port_map()->add_port( this);
 }
 
-Port::Port( std::string key) : Log( false), _key( std::move( key)) { }
-
-BasicReadPort::BasicReadPort( const std::string& key, Latency latency)
-    : Port( key), _latency( latency)
+BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout) :
+    Port( port_map, key), _fanout(fanout), installed_bandwidth(bandwidth)
 {
-    get_port_map().add_port( this);
-}
-
-
-BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( key), _fanout(fanout), installed_bandwidth(bandwidth)
-{
-    get_port_map().add_port( this);
+    get_port_map()->add_port( this);
 }
 
 void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
@@ -75,6 +81,4 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
         throw PortError( get_key() + " WritePort is underloaded by fanout");
 
     initialized_bandwidth = installed_bandwidth;
-    for (const auto& r : readers)
-        r->init( initialized_bandwidth);
 }
