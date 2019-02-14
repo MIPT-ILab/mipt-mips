@@ -36,8 +36,11 @@ public:
 
 private:
     PortMap() noexcept;
-    void add_port( friend class BasicWritePort* port);
-    void add_port( friend class BasicReadPort* port);
+
+    friend class BasicWritePort;
+    friend class BasicReadPort;
+    void add_port( class BasicWritePort* port);
+    void add_port( class BasicReadPort* port);
 
     struct Cluster
     {
@@ -88,13 +91,14 @@ protected:
     }
 
 private:
+    friend class PortMap;
     virtual void init( const std::vector<BasicReadPort*>& readers) = 0;
     virtual void clean_up( Cycle cycle) noexcept = 0;
-    friend class PortMap;
 
-    const uint32 _fanout = 0;
     uint32 write_counter = 0;
     uint32 initialized_bandwidth = 0;
+
+    const uint32 _fanout = 0;
     const uint32 installed_bandwidth = 0;
 };
 
@@ -115,13 +119,13 @@ public:
 
     void write( T&& what, Cycle cycle)
     {
-        increment_write_counter( cycle);
+        increment_write_counter();
         basic_write( std::forward<T>( what), cycle);
     }
 
     void write( const T& what, Cycle cycle)
     {
-        increment_write_counter( cycle);
+        increment_write_counter();
         basic_write( std::move( T( what)), cycle);
     }
 };
