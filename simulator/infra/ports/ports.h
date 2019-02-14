@@ -154,7 +154,7 @@ public:
     T read( Cycle cycle)
     {
         if ( !is_ready( cycle))
-            throw PortError( get_key() + " has no data to read in cycle:" + std::to_string( cycle));
+            throw PortError( get_key() + " has no data to read in cycle:" + cycle.to_string());
         return pop_front();
     }
 
