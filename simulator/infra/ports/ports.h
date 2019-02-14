@@ -222,11 +222,7 @@ void WritePort<T>::init( const std::vector<BasicReadPort*>& readers) try
     base_init( readers);
     destinations.reserve( readers.size());
     for (const auto& r : readers)
-        destinations.emplace_back( dynamic_cast<ReadPort<T>*>( r));
-}
-catch ( const std::bad_cast&)
-{
-    throw PortError( get_key() + " has type mismatch between write and read ports");
+        destinations.emplace_back( port_cast( r));
 }
 
 static constexpr const Latency PORT_LATENCY = 1_lt;

@@ -65,7 +65,6 @@ TEST_CASE("Ports: simple transmission")
     const auto [rp, wp] = get_pair_of_ports( pm);
     wp->write( 11, 0_cl);
     CHECK( !rp->is_ready( 0_cl));
-
     CHECK( rp->is_ready( 1_cl));
     CHECK( rp->read( 1_cl) == 11);
 }
@@ -82,7 +81,6 @@ TEST_CASE("Ports: read once")
     auto pm = PortMap::create_port_map();
     const auto [rp, wp] = get_pair_of_ports( pm);
     wp->write( 11, 0_cl);
-
     rp->read( 1_cl);
     CHECK( !rp->is_ready( 1_cl));
 }
@@ -115,7 +113,6 @@ TEST_CASE("Ports: non-regular read")
     wp->write( 10, 0_cl);
     wp->write( 11, 1_cl);
     CHECK( rp->is_ready( 1_cl));
-
     CHECK( rp->is_ready( 2_cl));
     CHECK( rp->read( 2_cl) == 11);
 }
