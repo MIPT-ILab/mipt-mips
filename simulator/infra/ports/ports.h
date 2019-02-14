@@ -140,6 +140,7 @@ public:
 
 private:
     void init( const std::vector<BasicReadPort*>& readers) final;
+    void add_reader( BasicReadPort* readers);
     void basic_write( T&& what, Cycle cycle) noexcept( std::is_nothrow_copy_constructible<T>::value);
 
     std::vector<ReadPort<T>*> destinations = {};
@@ -217,16 +218,22 @@ void WritePort<T>::basic_write( T&& what, Cycle cycle)
 }
 
 template<class T>
-void WritePort<T>::init( const std::vector<BasicReadPort*>& readers) try
+void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
 {
     base_init( readers);
     destinations.reserve( readers.size());
     for (const auto& r : readers)
-        destinations.emplace_back( dynamic_cast<ReadPort<T>*>( r));
+        add_reader( r);
 }
-catch ( const std::bad_cast&)
+
+template<class T>
+void WritePort<T>::add_reader( BasicReadPort* reader)
 {
-    throw PortError( get_key() + " has type mismatch between write and read ports");
+    auto r = dynamic_cast<ReadPort<T>*>( reader);
+    if ( r == nullptr)
+        throw PortError( get_key() + " has type mismatch between write and read ports");
+
+    destinations.emplace_back( r);
 }
 
 static constexpr const Latency PORT_LATENCY = 1_lt;
