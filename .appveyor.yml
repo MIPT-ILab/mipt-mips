@@ -14,34 +14,29 @@ environment:
     platform: x64
     CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
-    platform: x86
-    CMAKEFILE: "Ninja"
-  - build: g++
-    platform: x64
     CMAKEFILE: "Ninja"
 
 before_build:
 - pip install future
 - git submodule update --init
-- if "%platform%"=="x86" set MSYSTEM=mingw32
-- if "%platform%"=="x64" set MSYSTEM=mingw64
-- set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;C:\Projects\mipt-mips\mips-linux-gnu\bin;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;C:\Libraries\boost_1_67_0;C:\projects\deps\mips-linux-gnu\bin;%PATH%
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
 - appveyor DownloadFile %GNU_BINUTILS%
-- 7z x mips-linux-gnu.zip
 - appveyor DownloadFile "https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip" -FileName ninja.zip
+- 7z x mips-linux-gnu.zip -oC:\projects\deps\mips-linux-gnu > nul
 - 7z x ninja.zip -oC:\projects\deps\ninja > nul
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make tt"
-- mkdir build
-- cd build
+- cd C:\Projects\mipt-mips\traces
+- C:\MinGW\bin\mingw32-make tt
+- mkdir C:\Projects\mipt-mips\build
+- cd C:\Projects\mipt-mips\build
 - cmake ../simulator -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests"
+- if not "%build%"=="msvc" ninja mipt-mips unit-tests
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
 - if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
 
 test_script:
-- .\mipt-mips -b ..\traces\fib.out -n 1000000
 - ctest -C Release --verbose
+- .\mipt-mips -b ..\traces\fib.out -n 1000000
