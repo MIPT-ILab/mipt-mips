@@ -27,8 +27,7 @@ TEST_CASE("Ports: two write ports")
     auto pm = PortMap::create_port_map();
     ReadPort<int> input( pm, "Key", PORT_LATENCY);
     WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT);
-    WritePort<int> output2( pm, "Key", PORT_BW, PORT_FANOUT);
-    CHECK_THROWS_AS( pm->init(), PortError);
+    CHECK_THROWS_AS( WritePort<int>( pm, "Key", PORT_BW, PORT_FANOUT), PortError);
 }
 
 TEST_CASE("Ports: fanout overload")
@@ -116,6 +115,7 @@ TEST_CASE("Ports: non-regular read")
     wp->write( 10, 0_cl);
     wp->write( 11, 1_cl);
     CHECK( rp->is_ready( 1_cl));
+
     CHECK( rp->is_ready( 2_cl));
     CHECK( rp->read( 2_cl) == 11);
 }
