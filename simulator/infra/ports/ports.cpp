@@ -49,7 +49,7 @@ void PortMap::clean_up( Cycle cycle)
 void PortMap::add_port( BasicWritePort* port)
 {
     if ( map[ port->get_key()].writer != nullptr)
-        throw PortError( get_key() + " has two WritePorts");
+        throw PortError( port->get_key() + " has two WritePorts");
 
     map[ port->get_key()].writer = port;
 }
