@@ -42,7 +42,7 @@ TEST_CASE("Ports: fanout underload")
 using PairOfPorts = std::pair<std::unique_ptr<ReadPort<int>>, std::unique_ptr<WritePort<int>>>;
 
 static PairOfPorts
-get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint bw = PORT_BW, Latency lat = PORT_LATENCY)
+get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
 {
     PairOfPorts pop;
     pop.first = std::make_unique<ReadPort<int>>( pm, "Key", lat);
