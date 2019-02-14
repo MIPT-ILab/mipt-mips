@@ -129,26 +129,17 @@ public:
         increment_write_counter();
         basic_write( std::move( T( what)), cycle);
     }
-    
+
 private:
     void init( const std::vector<BasicReadPort*>& readers) final;
     ReadPort<T>* port_cast( Port* p) const;
-    
+
     void clean_up( Cycle cycle) noexcept final;
 
     void basic_write( T&& what, Cycle cycle) noexcept( std::is_nothrow_copy_constructible<T>::value);
 
     std::vector<ReadPort<T>*> destinations = {};
 };
-
-// Has to be out of class due to VS bug
-// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
-template<class T>
-void ReadPort<T>::init( uint32 bandwidth)
-{
-    // +1 to handle reads-after-writes
-    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
-}
 
 template<class T> class ReadPort : public BasicReadPort
 {
@@ -186,6 +177,17 @@ private:
     PortQueue<std::pair<T, Cycle>> queue;
 };
 
+// Has to be out of class due to VS bug
+// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
+template<class T>
+void ReadPort<T>::init( uint32 bandwidth)
+{
+    // +1 to handle reads-after-writes
+    queue.resize( ( get_latency().to_size_t() + 1) * bandwidth);
+}
+
+// Has to be out of class due to VS bug
+// https://developercommunity.visualstudio.com/content/problem/457098/extern-template-instantiation-does-not-work-for-vi.html
 template<class T>
 void WritePort<T>::clean_up( Cycle cycle) noexcept
 {
@@ -194,6 +196,7 @@ void WritePort<T>::clean_up( Cycle cycle) noexcept
         reader->clean_up( cycle);
 }
 
+// Methods operating with ReadPort<T> are also declared out of class
 template<class T>
 void WritePort<T>::basic_write( T&& what, Cycle cycle)
     noexcept( std::is_nothrow_copy_constructible<T>::value)
