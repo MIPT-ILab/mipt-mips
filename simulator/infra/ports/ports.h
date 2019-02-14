@@ -27,7 +27,17 @@ struct PortError final : Exception {
 
 class PortMap : public Log
 {
+public:
+    static PortMap& get_instance();
+
+    void init() const;
+    void clean_up( Cycle cycle);
+    void destroy();
+
 private:
+    void add_port( BasicWritePort* port);
+    void add_port( BasicReadPort* port);
+
     struct Cluster
     {
         class BasicWritePort* writer = nullptr;
@@ -36,33 +46,31 @@ private:
 
     std::unordered_map<std::string, Cluster> map = { };
     PortMap() noexcept;
-public:
-    void add_port( BasicWritePort* port);
-    void add_port( BasicReadPort* port);
 
-    static PortMap& get_instance();
+    friend class BasicWritePort;
+    friend class BasicReadPort;
 
-    void init() const;
-    void clean_up( Cycle cycle);
-    void destroy();
 };
 
 class Port : public Log
 {
-    const std::string _key;
+public:
+    const std::string& get_key() const noexcept { return _key; }
 protected:
     PortMap& portMap = PortMap::get_instance();
     explicit Port( std::string key);
-public:
-    const std::string& get_key() const { return _key; }
+private:
+    const std::string _key;
 };
 
 class BasicReadPort : public Port
 {
-    const Latency _latency;
+public:
+    auto get_latency() const noexcept { return _latency; }
 protected:
     BasicReadPort( const std::string& key, Latency latency);
-    auto get_latency() const noexcept { return _latency; }
+private:
+    const Latency _latency;
 };
 
 class BasicWritePort : public Port
