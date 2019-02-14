@@ -10,11 +10,12 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of p
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Simulation frequency gets up to 0.7 MHz on i5-7300U.
+* **Speed**. Up to 1.0 MHz simulation frequency on i5-7300U.
 
 MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
+* **Performance control** of developed or produced hardware
 * **Education**: simulator is a nice experimental frog to study CPU internals
 
 Key system-level features:
@@ -47,25 +48,6 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
 If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
 
-## Workflow example
-
-#### Clone
-  1. Check that your environment meets all the requirements above.
-  1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-#### Build
-To build MIPT-MIPS faster, we recommend to install Ninja.
-  1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
-  1. Go to the build directory: `cd /path/to/your/build/directory`
-  1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
-  1. Run `ninja` to get the `mipt-mips` binary file
-  1. If you changed some source code files, just type `ninja` to rebuild project
-#### Run
-  1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
-  1. See more command line options in the paragraph below
-#### Test
-  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
-  1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
-
 ## Command line options
 
 ### Standalone run options
@@ -94,6 +76,25 @@ To build MIPT-MIPS faster, we recommend to install Ninja.
 
 #### Execution pipeline
 * `--long-alu-latency` - number of execution stages required for long arithmetic instructions to be complete
+
+## Workflow example
+
+#### Clone
+  1. Check that your environment meets all the requirements above.
+  1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
+#### Build
+To build MIPT-MIPS faster, we recommend to install Ninja.
+  1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
+  1. Go to the build directory: `cd /path/to/your/build/directory`
+  1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
+  1. Run `ninja` to get the `mipt-mips` binary file
+  1. If you changed some source code files, just type `ninja` to rebuild project
+#### Run
+  1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
+  1. See more command line options in the paragraph below
+#### Test
+  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
+  1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## About MIPT-MIPS
 
