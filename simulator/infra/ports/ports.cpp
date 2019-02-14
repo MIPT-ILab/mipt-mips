@@ -37,13 +37,9 @@ void PortMap::init() const
             throw PortError( cluster.first + " has no WritePort");
 
         cluster.second.writer->init( cluster.second.readers);
+        for ( const auto& r : cluster.second.readers)
+            r->init( cluster.second.writer->get_bandwidth());
     }
-}
-
-void PortMap::clean_up( Cycle cycle)
-{
-    for ( const auto& cluster : map)
-        cluster.second.writer->clean_up( cycle);
 }
 
 void PortMap::add_port( BasicWritePort* port)
@@ -85,6 +81,4 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
         throw PortError( get_key() + " WritePort is underloaded by fanout");
 
     initialized_bandwidth = installed_bandwidth;
-    for (const auto& r : readers)
-        r->init( initialized_bandwidth);
 }

@@ -148,7 +148,5 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
         CHECK( cycle < EXPECTED_MAX_CYCLE);
         a.clock( cycle);
         b.clock( cycle);
-
-        map->clean_up( cycle);
     }
 }

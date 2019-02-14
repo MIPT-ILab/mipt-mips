@@ -84,7 +84,6 @@ bool PerfSim<ISA>::is_halt() const
 template<typename ISA>
 void PerfSim<ISA>::clock()
 {
-    PortMap::get_instance()->clean_up( curr_cycle);
     clock_tree( curr_cycle);
     curr_cycle.inc();
 }
