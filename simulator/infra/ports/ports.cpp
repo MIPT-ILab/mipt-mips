@@ -6,10 +6,25 @@
 
 #include "ports.h"
 
-PortMap& PortMap::get_instance()
+std::shared_ptr<PortMap> PortMap::create_port_map()
 {
-    static PortMap instance;
+    struct PortMapHack : public PortMap {};
+    return std::make_shared<PortMapHack>();
+}
+
+std::shared_ptr<PortMap> PortMap::instance = nullptr;
+
+std::shared_ptr<PortMap> PortMap::get_instance()
+{
+    if ( instance == nullptr)
+        reset_instance();
+
     return instance;
+}
+
+void PortMap::reset_instance()
+{
+    instance = create_port_map();
 }
 
 PortMap::PortMap() noexcept : Log( false) { }
@@ -45,24 +60,20 @@ void PortMap::add_port( BasicReadPort* port)
     map[ port->get_key()].readers.push_back( port);
 }
 
-void PortMap::destroy()
+Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
+    : Log( false), pm( std::move( port_map)), k( std::move( key))
+{ }
+
+BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)
+    : Port( port_map, key), _latency( latency)
 {
-    map.clear();
+    get_port_map()->add_port( this);
 }
 
-Port::Port( std::string key) : Log( false), _key( std::move( key)) { }
-
-BasicReadPort::BasicReadPort( const std::string& key, Latency latency)
-    : Port( key), _latency( latency)
+BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout) :
+    Port( port_map, key), _fanout(fanout), installed_bandwidth(bandwidth)
 {
-    get_port_map().add_port( this);
-}
-
-
-BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( key), _fanout(fanout), installed_bandwidth(bandwidth)
-{
-    get_port_map().add_port( this);
+    get_port_map()->add_port( this);
 }
 
 void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)

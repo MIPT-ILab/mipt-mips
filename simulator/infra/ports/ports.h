@@ -28,11 +28,13 @@ struct PortError final : Exception {
 class PortMap : public Log
 {
 public:
-    static PortMap& get_instance();
+    static std::shared_ptr<PortMap> create_port_map();
+
+    static std::shared_ptr<PortMap> get_instance();
+    static void reset_instance();
 
     void init() const;
     void clean_up( Cycle cycle);
-    void destroy();
 
 private:
     PortMap() noexcept;
@@ -49,20 +51,21 @@ private:
     };
 
     std::unordered_map<std::string, Cluster> map = { };
+    static std::shared_ptr<PortMap> instance;
 };
 
 class Port : public Log
 {
 public:
-    const std::string& get_key() const noexcept { return _key; }
-    PortMap& get_port_map() const noexcept { return portMap; }
+    const std::string& get_key() const noexcept { return k; }
+    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
 
 protected:
-    explicit Port( std::string key);
+    Port( std::shared_ptr<PortMap> port_map, std::string key);
 
 private:
-    const std::string _key;
-    PortMap& portMap = PortMap::get_instance();
+    const std::shared_ptr<PortMap> pm;
+    const std::string k;
 };
 
 class BasicReadPort : public Port
@@ -71,7 +74,7 @@ public:
     auto get_latency() const noexcept { return _latency; }
 
 protected:
-    BasicReadPort( const std::string& key, Latency latency);
+    BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency);
 
 private:
     friend class BasicWritePort;
@@ -86,7 +89,7 @@ public:
     auto get_bandwidth() const noexcept { return initialized_bandwidth; }
 
 protected:
-    BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout);
+    BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout);
     void base_init( const std::vector<BasicReadPort*>& readers);
 
     void reset_write_counter() noexcept { write_counter = 0; }
@@ -110,12 +113,12 @@ private:
 };
 
 template<class T> class ReadPort;
-    
+
 template<class T> class WritePort : public BasicWritePort
 {
 public:
-    WritePort<T>( const std::string& key, uint32 bandwidth, uint32 fanout)
-        : BasicWritePort( key, bandwidth, fanout)
+    WritePort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout)
+        : BasicWritePort( port_map, key, bandwidth, fanout)
     { }
 
     void write( T&& what, Cycle cycle)
@@ -144,7 +147,9 @@ private:
 template<class T> class ReadPort : public BasicReadPort
 {
 public:
-    ReadPort<T>( const std::string& key, Latency latency) : BasicReadPort( key, latency) { }
+    ReadPort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)
+        : BasicReadPort( port_map, key, latency)
+    { }
 
     bool is_ready( Cycle cycle) const noexcept
     {
@@ -239,13 +244,13 @@ void WritePort<T>::init( const std::vector<BasicReadPort*>& readers)
 template<typename T>
 decltype(auto) make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
 {
-    return std::make_unique<WritePort<T>>( std::move(key), bandwidth, fanout);
+    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth, fanout);
 }
 
 template<typename T>
 auto make_read_port( std::string key, Latency latency)
 {
-    return std::make_unique<ReadPort<T>>( std::move(key), latency);
+    return std::make_unique<ReadPort<T>>( PortMap::get_instance(), std::move(key), latency);
 }
 
 static constexpr const Latency PORT_LATENCY = 1_lt;
