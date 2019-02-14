@@ -96,6 +96,7 @@ protected:
     
 private:
     virtual void init( const std::vector<BasicReadPort*>& readers) = 0;
+    virtual void clean_up( Cycle cycle) noexcept = 0;
 
     // Friendship to get a list of read ports
     friend class PortMap;
