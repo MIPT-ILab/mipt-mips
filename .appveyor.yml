@@ -26,11 +26,11 @@ before_build:
 - appveyor DownloadFile "https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip" -FileName ninja.zip
 - 7z x mips-linux-gnu.zip -oC:\projects\deps\mips-linux-gnu > nul
 - 7z x ninja.zip -oC:\projects\deps\ninja > nul
+- cd C:\Projects\mipt-mips\traces
+- mingw32-make tt
+- mkdir C:\Projects\mipt-mips\build
 
 build_script:
-- cd C:\Projects\mipt-mips\traces
-- C:\MinGW\bin\mingw32-make tt
-- mkdir C:\Projects\mipt-mips\build
 - cd C:\Projects\mipt-mips\build
 - cmake ../simulator -G "%CMAKEFILE%"
 - if not "%build%"=="msvc" ninja mipt-mips unit-tests
