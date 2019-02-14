@@ -89,7 +89,7 @@ protected:
             throw PortError( get_key() + " port is overloaded by bandwidth");
     }
 
-    virtual void clean_up( Cycle /* cycle */) noexcept
+    void reset_counter() noexcept
     {
         write_counter = 0;
     }
@@ -164,7 +164,7 @@ private:
 
     void clean_up( Cycle cycle) noexcept final
     {
-        BasicWritePort::clean_up( cycle);
+        reset_counter();
         for ( const auto& reader : destinations)
             reader->clean_up( cycle);
     }
