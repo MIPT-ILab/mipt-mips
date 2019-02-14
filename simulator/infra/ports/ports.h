@@ -35,8 +35,9 @@ public:
     void destroy();
 
 private:
-    void add_port( BasicWritePort* port);
-    void add_port( BasicReadPort* port);
+    PortMap() noexcept;
+    void add_port( friend class BasicWritePort* port);
+    void add_port( friend class BasicReadPort* port);
 
     struct Cluster
     {
@@ -45,11 +46,6 @@ private:
     };
 
     std::unordered_map<std::string, Cluster> map = { };
-    PortMap() noexcept;
-
-    friend class BasicWritePort;
-    friend class BasicReadPort;
-
 };
 
 class Port : public Log
@@ -75,33 +71,32 @@ private:
 
 class BasicWritePort : public Port
 {
-    friend class PortMap;
-    const uint32 _fanout;
-    Cycle _lastCycle = 0_cl;
-    uint32 _writeCounter = 0;
-    uint32 initialized_bandwidth = 0;
-    const uint32 installed_bandwidth;
-
-    virtual void init( const std::vector<BasicReadPort*>& readers) = 0;
-    virtual void clean_up( Cycle cycle) noexcept = 0;
-protected:
-    BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout);
-    void base_init( const std::vector<BasicReadPort*>& readers);
-    void prepare_to_write( Cycle cycle);
 public:
     auto get_fanout() const noexcept { return _fanout; }
     auto get_bandwidth() const noexcept { return initialized_bandwidth; }
+
+protected:
+    BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout);
+    void base_init( const std::vector<BasicReadPort*>& readers);
+
+    void reset_write_counter() noexcept { write_counter = 0; }
+    void increment_write_counter() noexcept
+    {
+        ++write_counter;
+        if ( write_counter > get_bandwidth())
+            throw PortError( get_key() + " port is overloaded by bandwidth");
+    }
+
+private:
+    virtual void init( const std::vector<BasicReadPort*>& readers) = 0;
+    virtual void clean_up( Cycle cycle) noexcept = 0;
+    friend class PortMap;
+
+    const uint32 _fanout = 0;
+    uint32 write_counter = 0;
+    uint32 initialized_bandwidth = 0;
+    const uint32 installed_bandwidth = 0;
 };
-
-// Make it inline since it is used often
-inline void BasicWritePort::prepare_to_write( Cycle cycle)
-{
-    _writeCounter = _lastCycle == cycle ? _writeCounter + 1 : 0;
-    _lastCycle = cycle;
-
-    if ( _writeCounter > get_bandwidth())
-        throw PortError( get_key() + " port is overloaded by bandwidth");
-}
 
 template<class T> class ReadPort;
     
@@ -120,13 +115,13 @@ public:
 
     void write( T&& what, Cycle cycle)
     {
-        prepare_to_write( cycle);
+        increment_write_counter( cycle);
         basic_write( std::forward<T>( what), cycle);
     }
 
     void write( const T& what, Cycle cycle)
     {
-        prepare_to_write( cycle);
+        increment_write_counter( cycle);
         basic_write( std::move( T( what)), cycle);
     }
 };
@@ -165,6 +160,7 @@ public:
 template<class T>
 void WritePort<T>::clean_up( Cycle cycle) noexcept
 {
+    reset_write_counter();
     for ( const auto& reader : destinations)
         reader->clean_up( cycle);
 }
