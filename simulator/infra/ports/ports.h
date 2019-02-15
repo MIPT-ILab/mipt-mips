@@ -135,7 +135,7 @@ public:
     void write( const T& what, Cycle cycle)
     {
         increment_write_counter( cycle);
-        basic_write( std::move( T( what)), cycle);
+        basic_write( T( what), cycle);  
     }
 
 private:
@@ -212,9 +212,9 @@ void WritePort<T>::basic_write( T&& what, Cycle cycle)
     // Copy data to all ports, but move to the first one
     auto it = std::next( destinations.begin());
     for ( ; it != destinations.end(); ++it)
-        (*it)->emplaceData( std::move( T( what)), cycle); // Force copy ctor
+        (*it)->emplaceData( T( what), cycle); // Force copy ctor
 
-    destinations.front()->emplaceData( std::forward<T>( what), cycle);
+    destinations.front()->emplaceData( std::move( what), cycle);
 }
 
 template<class T>
