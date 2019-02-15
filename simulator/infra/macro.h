@@ -157,10 +157,10 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
         return narrow_cast<ST>(value) >> shamt;
-
-    return (value & msb_set<T>()) == 0 // check MSB
-             ? value >> shamt          // just shift if MSB is zero
-             : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+    else
+        return (value & msb_set<T>()) == 0 // check MSB
+            ? value >> shamt          // just shift if MSB is zero
+            : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
 
 #endif
