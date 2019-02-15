@@ -47,6 +47,14 @@ TEST_CASE("Ports: fanout underload")
     CHECK_THROWS_AS( pm->init(), PortError);
 }
 
+TEST_CASE("Ports: type mismatch")
+{
+    auto pm = PortMap::create_port_map();
+    ReadPort<int> input( pm, "Key", PORT_LATENCY);
+    WritePort<std::string> output( pm, "Key", PORT_BW, PORT_FANOUT);
+    CHECK_THROWS_AS( pm->init(), PortError);
+}
+
 using PairOfPorts = std::pair<std::unique_ptr<ReadPort<int>>, std::unique_ptr<WritePort<int>>>;
 
 static PairOfPorts
