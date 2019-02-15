@@ -135,7 +135,7 @@ public:
     void write( const T& what, Cycle cycle)
     {
         increment_write_counter( cycle);
-        basic_write( T( what), cycle);  
+        basic_write( T( what), cycle);
     }
 
 private:
