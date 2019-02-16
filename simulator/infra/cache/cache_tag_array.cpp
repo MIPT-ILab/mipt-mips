@@ -150,7 +150,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = lru_module.update( num_set);
+    const uint32 way = narrow_cast<uint32>( lru_module.update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
@@ -159,7 +159,7 @@ uint32 CacheTagArray::write( Addr addr)
     // Remove old tag from lookup helper and add a new tag
     if ( entry.is_valid)
         lookup_helper[ num_set].erase( old_tag);
-    lookup_helper[ num_set].emplace( new_tag, narrow_cast<uint32>( way));
+    lookup_helper[ num_set].emplace( new_tag, way);
 
     // Update tag array
     entry.tag = new_tag;
