@@ -151,3 +151,5 @@ static_assert(count_leading_zeroes<uint128>(0x0) == 128);
 static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
+
+bool macros_tested = true;

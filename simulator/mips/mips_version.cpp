@@ -50,3 +50,5 @@ static_assert(  MIPS_III_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_IV_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_V_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_64_Instr.is_supported(MIPSVersion::v64));
+
+bool mips_version_tested = true;
