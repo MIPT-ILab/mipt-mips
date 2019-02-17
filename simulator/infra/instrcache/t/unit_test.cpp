@@ -15,7 +15,7 @@
 class Dummy {
     const size_t value;
 public:
-    explicit Dummy( uint32 val) : value( val) {};
+    explicit Dummy( size_t val) : value( val) {};
     bool is_same( const Dummy& rhs) const { return value == rhs.value; }
     bool operator==( const Dummy& rhs) const { return is_same(rhs); }
     friend std::ostream& operator<<( std::ostream& out, const Dummy& val)
