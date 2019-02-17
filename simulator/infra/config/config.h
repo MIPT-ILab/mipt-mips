@@ -45,9 +45,10 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
         if constexpr (std::is_same_v<T, bool>)
-            return out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(bugprone-suspicious-semicolon)
-
-        return out << std::dec << rhs.value;
+            out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(bugprone-suspicious-semicolon)
+        else
+            out << std::dec << rhs.value;
+        return out;
     }
 };
     

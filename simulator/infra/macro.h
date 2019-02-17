@@ -148,6 +148,7 @@ template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
 {
     using ST = sign_t<T>;
+    T result = 0;
     // Result of shifting right a signed value is implementation defined,
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
@@ -156,11 +157,12 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        return narrow_cast<ST>(value) >> shamt;
-
-    return (value & msb_set<T>()) == 0 // check MSB
-             ? value >> shamt          // just shift if MSB is zero
-             : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+        result = narrow_cast<ST>(value) >> shamt;
+    else if ((value & msb_set<T>()) == 0)
+        result = value >> shamt;        // just shift if MSB is zero
+    else
+        result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+    return result;
 }
 
 #endif
