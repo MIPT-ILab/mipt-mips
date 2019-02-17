@@ -20,7 +20,7 @@ TEST_CASE( "RF: read_write_rf")
     auto rf = std::make_unique<RF<MIPS32Instr>>();
 
     // Fill array using write() and check correctness using read()
-    for( size_t i = 0; i < 32; ++i)
+    for( uint8 i = 0; i < 32; ++i)
     {
         rf->write( MIPSRegister::from_cpu_index(i), i);
 
@@ -32,7 +32,7 @@ TEST_CASE( "RF: read_write_rf")
         CHECK( rf->read( MIPSRegister::zero()) == 0u);
     }
 
-    for( size_t i = 1; i < 32; ++i)
+    for( uint8 i = 1; i < 32; ++i)
     {
         rf->write( MIPSRegister::from_cpu_index(i), 0u);
         rf->write( MIPSRegister::from_cpu_index(i), 0x12345678u, 0xFFu);

@@ -19,10 +19,10 @@ static_assert(MIPSRegister::MAX_REG >= 32);
 // Testing methods of the class
 TEST_CASE( "MIPS_registers: ID_converters")
 {
-    for ( size_t i = 0; i < 32; ++i)
+    for ( uint8 i = 0; i < 32; ++i)
         CHECK( MIPSRegister::from_cpu_index(i).to_rf_index() == i);
 
-    for ( size_t i = 0; i < 32; ++i) {
+    for ( uint8 i = 0; i < 32; ++i) {
         CHECK( MIPSRegister::from_cp0_index(i).to_rf_index() > 32);
         CHECK( !MIPSRegister::from_cp0_index(i).is_mips_lo());
         CHECK( !MIPSRegister::from_cp0_index(i).is_mips_hi());
@@ -31,7 +31,7 @@ TEST_CASE( "MIPS_registers: ID_converters")
 
 TEST_CASE( "MIPS_registers: GDB_ID_converter")
 {
-    for ( size_t i = 0; i < 32; ++i)
+    for ( uint8 i = 0; i < 32; ++i)
         CHECK( MIPSRegister::from_gdb_index(i) == MIPSRegister::from_cpu_index(i));
     CHECK( MIPSRegister::from_gdb_index(32) == MIPSRegister::from_cp0_index(12));  // SR
     CHECK( MIPSRegister::from_gdb_index(33) == MIPSRegister::mips_lo());
@@ -42,7 +42,7 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
 
 TEST_CASE( "MIPS_registers: Equal")
 {
-    for ( size_t i = 0; i < 32; ++i)
+    for ( uint8 i = 0; i < 32; ++i)
     {
         CHECK(MIPSRegister::from_cpu_index(i) == MIPSRegister::from_cpu_index(i));
         if (i > 0) {
@@ -53,7 +53,7 @@ TEST_CASE( "MIPS_registers: Equal")
 
 TEST_CASE( "MIPS_registers: Hi_Lo_impossible")
 {
-    for ( size_t i = 0; i < 32; ++i)
+    for ( uint8 i = 0; i < 32; ++i)
     {
         auto reg = MIPSRegister::from_cpu_index(i);
         CHECK_FALSE(reg.is_mips_hi());
@@ -90,10 +90,9 @@ TEST_CASE( "MIPS_registers: Hi_register")
 
 TEST_CASE( "MIPS_registers: Lo_register")
 {
-    auto reg = MIPSRegister::mips_lo()  ;
+    auto reg = MIPSRegister::mips_lo();
     CHECK_FALSE(reg.is_zero());
     CHECK_FALSE(reg.is_mips_hi());
     CHECK(reg.is_mips_lo());
     CHECK_FALSE(reg.to_rf_index() < 32);
 }
-

@@ -42,8 +42,7 @@ class LRUModule
         { }
 
         void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
-
-        uint32 update( uint32 num_set) { return lru_info[ num_set].update(); }
+        auto update( uint32 num_set) { return lru_info[ num_set].update(); }
 
     private:
         std::vector<LRUCacheInfo> lru_info;
