@@ -155,7 +155,7 @@ TEST_CASE("Sequence id print")
 {
     MIPS32Instr instr( 0xb531fb2e);
     instr.set_sequence_id( 50);
-    ostringstream oss;
+    std::ostringstream oss;
     oss << instr << "; " << instr;
     CHECK( oss.str() == "{50}\tsdr $s1, 0xfb2e($t1); {50}\tsdr $s1, 0xfb2e($t1)" );
 }
