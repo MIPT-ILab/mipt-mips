@@ -151,6 +151,14 @@ TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
     CHECK(MIPS32Instr(0x0633000a).get_disasm() == "bgezall $s1, 10");
 }
 
+TEST_CASE("Sequence id print")
+{
+    MIPS32Instr instr( 0xb531fb2e);
+    instr.set_sequence_id( 50);
+    ostringstream oss;
+    oss << instr << "; " << instr;
+    CHECK( oss.str() == "{50}\tsdr $s1, 0xfb2e($t1); {50}\tsdr $s1, 0xfb2e($t1)" );
+}
 
 // ********* Converted SPIM TT tests with some additions **********
 // 55 done
