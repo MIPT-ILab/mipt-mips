@@ -104,7 +104,7 @@ std::ostream& BaseMIPSInstr<R>::dump( std::ostream& out) const
     if ( PC != 0)
         out << std::hex << "0x" << PC << ": ";
 
-    out << "{" << sequence_id << "}\t" << get_disasm() << "\t [";
+    out << "{" << std::dec << sequence_id << "}\t" << get_disasm() << "\t [";
     bool has_ma = ( is_load() || is_store()) && complete;
     if ( has_ma)
     {
