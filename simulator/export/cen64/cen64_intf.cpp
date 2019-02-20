@@ -54,7 +54,7 @@ void vr4300_cycle_extra(struct vr4300* vr4300, struct vr4300_stats* /* stats */)
 
 uint64 vr4300_get_register(struct vr4300* vr4300, size_t i)
 {
-    return vr4300->read_cpu_register( i);
+    return vr4300->read_cpu_register( narrow_cast<uint8>( i));
 }
 
 uint64 vr4300_get_pc(struct vr4300* vr4300)

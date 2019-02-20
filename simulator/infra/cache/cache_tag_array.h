@@ -42,8 +42,7 @@ class LRUModule
         { }
 
         void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
-
-        uint32 update( uint32 num_set) { return lru_info[ num_set].update(); }
+        auto update( uint32 num_set) { return lru_info[ num_set].update(); }
 
     private:
         std::vector<LRUCacheInfo> lru_info;
@@ -82,9 +81,10 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 line_size,
             uint32 addr_size_in_bits
         );
-
+        const size_t line_bits;
     public:
         const uint32 sets;
+        const size_t set_bits;
         const Addr   addr_mask;
 
         // extract set from address

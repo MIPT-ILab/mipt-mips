@@ -1,87 +1,84 @@
 /**
  * ports.cpp - template for simulation of ports.
  * @author Pavel Kryukov
- * Copyright 2017 MIPT-MIPS team
+ * Copyright 2017-2019 MIPT-MIPS team
  */
 
 #include "ports.h"
 
-/*
- * Initialize map of ports.
- *
- * Iterates all map and initalizes all port trees
-*/
+std::shared_ptr<PortMap> PortMap::create_port_map()
+{
+    struct PortMapHack : public PortMap {};
+    return std::make_shared<PortMapHack>();
+}
+
+std::shared_ptr<PortMap> PortMap::instance = nullptr;
+
+std::shared_ptr<PortMap> PortMap::get_instance()
+{
+    if ( instance == nullptr)
+        reset_instance();
+
+    return instance;
+}
+
+void PortMap::reset_instance()
+{
+    instance = create_port_map();
+}
+
+PortMap::PortMap() noexcept : Log( false) { }
+
 void PortMap::init() const
 {
-    for ( const auto& cluster : _map)
+    for ( const auto& cluster : map)
     {
-        auto writer = cluster.second.writer;
-        if (writer == nullptr)
+        if (cluster.second.writer == nullptr)
             throw PortError( cluster.first + " has no WritePort");
 
-        writer->init( cluster.second.readers);
+        cluster.second.writer->init( cluster.second.readers);
+        for ( const auto& r : cluster.second.readers)
+            r->init( cluster.second.writer->get_bandwidth());
     }
 }
 
-/*
- * Destroy map of ports.
- *
- * Iterates all map and de-initalizes all port trees
- * Then destroys content of map
-*/
-void PortMap::destroy()
+void PortMap::add_port( BasicWritePort* port)
 {
-    for ( const auto& cluster : _map)
-        cluster.second.writer->destroy();
+    if ( map[ port->get_key()].writer != nullptr)
+        throw PortError( port->get_key() + " has two WritePorts");
 
-    _map.clear();
+    map[ port->get_key()].writer = port;
 }
 
-/*
- * Find lost elements inside port
- *
- * Argument is the number of current cycle.
- * If some token couldn't be get in future, warnings
-*/
-void PortMap::clean_up( Cycle cycle)
+void PortMap::add_port( BasicReadPort* port)
 {
-    for ( const auto& cluster : _map)
-        cluster.second.writer->clean_up( cycle);
+    map[ port->get_key()].readers.push_back( port);
 }
 
-BasicWritePort::BasicWritePort( const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( key), _bandwidth(bandwidth), _fanout(fanout)
-{
-    if ( portMap[ _key].writer != nullptr)
-        serr << "Reusing of " << key
-             << " key for WritePort. Last WritePort will be used." << std::endl;
+Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
+    : Log( false), pm( std::move( port_map)), k( std::move( key))
+{ }
 
-    portMap[ _key].writer = this;
+BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)
+    : Port( port_map, key), _latency( latency)
+{
+    get_port_map()->add_port( this);
 }
 
-void BasicWritePort::check_init( const std::vector<Port*>& readers) const
+BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout) :
+    Port( port_map, key), _fanout(fanout), installed_bandwidth(bandwidth)
+{
+    get_port_map()->add_port( this);
+}
+
+void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
 {
     if ( readers.empty())
-        throw PortError( _key + " has no ReadPorts");
+        throw PortError( get_key() + " has no ReadPorts");
     if ( readers.size() > _fanout)
-        throw PortError( _key + " WritePort is overloaded by fanout");
+        throw PortError( get_key() + " WritePort is overloaded by fanout");
     if ( readers.size() != _fanout)
-        throw PortError( _key + " WritePort is underloaded by fanout");
-}
+        throw PortError( get_key() + " WritePort is underloaded by fanout");
 
-void BasicWritePort::prepare_to_write( Cycle cycle)
-{
-    if ( !_init)
-        throw PortError(_key + " WritePort was not initializated");
-
-    if ( _lastCycle != cycle)
-        _writeCounter = 0;
-
-    _lastCycle = cycle;
-
-    if ( _writeCounter >= _bandwidth)
-        throw PortError(_key + " port is overloaded by bandwidth");
-
-    // If we can add something more on that cycle, forwarding it to all ReadPorts.
-    _writeCounter++;
+    initialized_bandwidth = installed_bandwidth;
 }

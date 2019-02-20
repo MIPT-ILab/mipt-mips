@@ -16,9 +16,15 @@
 #include <infra/exception.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <kryucow_string.h>
 
 #include <sstream>
+
+enum class MIPSImm : uint8
+{
+    NO, SHIFT,                // R type
+    LOGIC, ARITH, TRAP, ADDR, // I type
+    JUMP                      // J type
+};
 
 enum OperationType : uint8
 {
@@ -56,6 +62,9 @@ void unknown_mips_instruction( I* i)
     throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
 }
 
+template <typename Key, typename Value, size_t CAPACITY>
+class LRUCache;
+
 template<typename R>
 class BaseMIPSInstr
 {
@@ -65,7 +74,10 @@ class BaseMIPSInstr
         using RegisterSInt = sign_t<RegisterUInt>;
     private:
         friend struct ALU;
+        using Execute = void (*)(BaseMIPSInstr*);
+        using DisasmCache = LRUCache<uint32, std::string, 8192>;
 
+        std::string_view opname = {};
         OperationType operation = OUT_UNKNOWN;
         Trap trap = Trap::NO_TRAP;
 
@@ -77,6 +89,7 @@ class BaseMIPSInstr
         MIPSRegister dst2 = MIPSRegister::zero();
 
         uint32 v_imm = NO_VAL32;
+        MIPSImm imm_type = MIPSImm::NO;
 
         RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
         RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
@@ -91,20 +104,22 @@ class BaseMIPSInstr
         bool complete   = false;
         bool _is_jump_taken = false; // actual result
         bool memory_complete = false;
+        const bool raw_valid = false;
+        bool print_dst = false;
+        bool print_src1 = false;
+        bool print_src2 = false;
 
         Addr new_PC = NO_VAL32;
-
         const Addr PC = NO_VAL32;
 
         uint64 sequence_id = NO_VAL64;
 
-        KryuCowString disasm = {};
+        Execute executor = unknown_mips_instruction;
 
         void init( const MIPSTableEntry<BaseMIPSInstr>& entry, MIPSVersion version);
-        std::string generate_disasm( const MIPSTableEntry<BaseMIPSInstr>& entry) const;
+        std::string generate_disasm() const;
 
-        using Execute = void (*)(BaseMIPSInstr*);
-        Execute executor = unknown_mips_instruction;
+        static DisasmCache& get_disasm_cache();
     public:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
@@ -131,7 +146,7 @@ class BaseMIPSInstr
         MIPSRegister get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
         MIPSRegister get_dst_num()  const { return dst;  }
         MIPSRegister get_dst2_num() const { return dst2; }
-        std::string_view get_disasm() const { return static_cast<std::string_view>( disasm); }
+        std::string get_disasm() const;
 
 	/* Checks if instruction can change PC in unusual way. */	
 	
@@ -148,7 +163,6 @@ class BaseMIPSInstr
 				      this->is_direct_branch()   ||
 				      this->is_indirect_branch(); }
 
-
         bool is_jump_taken() const { return  _is_jump_taken; }
 
         bool is_partial_load() const
@@ -164,31 +178,19 @@ class BaseMIPSInstr
         {
             return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
         }
-
-        bool is_store() const { return operation == OUT_STORE; }
-
-        bool is_nop() const { return raw == 0x0u; }
-        bool is_halt() const { return trap_type() == Trap::HALT; }
-
-        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
-
-        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
-
-        bool is_explicit_trap() const { return operation == OUT_TRAP; }
-
-        bool is_syscall() const { return operation == OUT_SYSCALL; }
-
-        bool is_break() const { return operation == OUT_BREAK; }
-
-        bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
-
         Trap trap_type() const { return trap; }
 
-        bool is_bubble() const { return is_nop() && PC == 0; }
+        bool is_store() const { return operation == OUT_STORE; }
+        bool is_nop() const { return raw == 0x0u; }
+        bool is_halt() const { return trap_type() == Trap::HALT; }
+        bool is_conditional_move() const { return operation == OUT_R_CONDM; }
+        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
+        bool is_explicit_trap() const { return operation == OUT_TRAP; }
+        bool is_syscall() const { return operation == OUT_SYSCALL; }
+        bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
 
+        void set_v_dst(RegisterUInt value); // for loads
         void set_v_imm( uint32 value) { v_imm = value; }
-        auto get_v_imm() { return v_imm; }
-
         void set_v_src( RegisterUInt value, uint8 index)
         {
             if ( index == 0)
@@ -200,13 +202,10 @@ class BaseMIPSInstr
         auto get_v_dst()  const { return v_dst; }
         auto get_v_dst2() const { return v_dst2; }
         auto get_mask()  const { return mask;  }
-
         auto get_mem_addr() const { return mem_addr; }
         auto get_mem_size() const { return mem_size; }
         auto get_new_PC() const { return new_PC; }
         auto get_PC() const { return PC; }
-
-        void set_v_dst(RegisterUInt value); // for loads
         auto get_v_src2() const { return v_src2; } // for stores
 
         void execute();

@@ -107,6 +107,9 @@ static_assert(find_first_set<uint64>(3) == 0);
 static_assert(find_first_set<uint64>(0xFFFF000) == 12);
 static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
 
+static_assert(log_bitwidth<uint32> == 5);
+static_assert(log_bitwidth<uint64> == 6);
+
 static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
 
 static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
@@ -148,3 +151,5 @@ static_assert(count_leading_zeroes<uint128>(0x0) == 128);
 static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
+
+bool macros_tested = true;

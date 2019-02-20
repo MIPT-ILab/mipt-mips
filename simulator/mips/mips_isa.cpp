@@ -5,6 +5,7 @@
  */
 
 #include <func_sim/alu.h>
+#include <infra/instrcache/LRUCache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
@@ -340,22 +342,32 @@ static const Table<I> isaMapCOP0 =
 };
 
 template<typename I>
+static const std::vector<const Table<I>*> all_isa_maps =
+{
+    &isaMapR<I>,
+    &isaMapRI<I>,
+    &isaMapMIPS32<I>,
+    &isaMapIJ<I>,
+    &isaMapCOP0<I>
+};
+
+template<typename I>
 MIPSTableEntry<I> unknown_instruction =
 { "Unknown instruction", unknown_mips_instruction, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> nop =
-{ "nop" , mips_sll<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "nop" , do_nothing<I>, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( const Table<I>& table, uint32 key)
+MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 {
     auto it = table.find( key);
     return it == table.end() ? unknown_instruction<I> : it->second;
 }
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( uint32 bytes)
+MIPSTableEntry<I> get_table_entry( uint32 bytes)
 {
     MIPSInstrDecoder instr( bytes);
 
@@ -381,15 +393,15 @@ auto find_entry( const M& map, std::string_view name)
 }
 
 template<typename I>
-const MIPSTableEntry<I>& get_table_entry( std::string_view str_opcode)
+MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 {
     if ( str_opcode == "nop")
         return nop<I>;
 
-    for ( const auto& map : { isaMapR<I>, isaMapRI<I>, isaMapMIPS32<I>, isaMapIJ<I>, isaMapCOP0<I> })
+    for ( const auto& map : all_isa_maps<I>)
     {
-        auto res = find_entry( map, str_opcode);
-        if ( res != map.end())
+        auto res = find_entry( *map, str_opcode);
+        if ( res != map->end())
             return res->second;
     }
 
@@ -399,6 +411,7 @@ const MIPSTableEntry<I>& get_table_entry( std::string_view str_opcode)
 template<typename R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
     raw( bytes),
+    raw_valid( true),
     new_PC( PC + 4),
     PC( PC)
 {
@@ -426,10 +439,14 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPS
     src2      = instr.get_register( entry.src2);
     dst       = instr.get_register( entry.dst);
     dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
-    disasm    = generate_disasm( entry);
+    opname    = entry.name;
+    print_dst = is_explicit_register( entry.dst);
+    print_src1 = is_explicit_register( entry.src1);
+    print_src2 = is_explicit_register( entry.src2);
+    imm_type   = entry.immediate_type;
 }
 
-static std::string print_immediate( Imm type, uint32 value)
+static std::string print_immediate( MIPSImm type, uint32 value)
 {
     std::ostringstream oss;
     switch ( type)
@@ -446,25 +463,18 @@ static std::string print_immediate( Imm type, uint32 value)
 }
 
 template<typename R>
-std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInstr<R>>& entry) const
+std::string BaseMIPSInstr<R>::generate_disasm() const
 {
-    const bool print_dst = is_explicit_register( entry.dst);
-
     std::ostringstream oss;
-    if ( PC != 0)
-        oss << std::hex << "0x" << PC << ": ";
-    oss << entry.name;
+    oss << opname;
 
-    if ( entry.immediate_type == Imm::ADDR)
+    if ( imm_type == Imm::ADDR)
     {
         oss << " $" << (print_dst ? dst : src2)
             << print_immediate( Imm::ADDR, v_imm)
             << "($" << src1 << ")" << std::dec;
         return oss.str();
     }
-
-    const bool print_src1 = is_explicit_register( entry.src1);
-    const bool print_src2 = is_explicit_register( entry.src2);
     
     if ( print_dst)
         oss <<  " $" << dst;
@@ -473,7 +483,7 @@ std::string BaseMIPSInstr<R>::generate_disasm( const MIPSTableEntry<BaseMIPSInst
     if ( print_src2)
         oss << ", $" << src2;
 
-    oss << print_immediate( entry.immediate_type, v_imm);
+    oss << print_immediate( imm_type, v_imm);
     return oss.str();
 }
 

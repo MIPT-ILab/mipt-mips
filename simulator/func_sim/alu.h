@@ -225,13 +225,13 @@ struct ALU
     void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->v_imm + 32); }
 
     template<typename I, typename T> static
-    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_src2; }
+    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> instr->v_src2; }
+    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2); }
+    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I> static
     void lui( I* instr)    { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 0x10u; }
@@ -281,16 +281,16 @@ struct ALU
     }
 
     template<typename I> static
-    void clo( I* instr)  { instr->v_dst = count_leading_ones<uint32>( instr->v_src1); }
+    void clo( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint32>( instr->v_src1)); }
 
     template<typename I> static
-    void dclo( I* instr) { instr->v_dst = count_leading_ones<uint64>( instr->v_src1); }
+    void dclo( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint64>( instr->v_src1)); }
 
     template<typename I> static
-    void clz( I* instr)  { instr->v_dst = count_leading_zeroes<uint32>(  instr->v_src1); }
+    void clz( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint32>(  instr->v_src1)); }
 
     template<typename I> static
-    void dclz( I* instr) { instr->v_dst = count_leading_zeroes<uint64>(  instr->v_src1); }
+    void dclz( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint64>(  instr->v_src1)); }
 
     template<typename I> static
     void jump( I* instr, Addr target)

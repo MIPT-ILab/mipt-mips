@@ -63,7 +63,7 @@ private:
     size_t copy_word( Addr dst, const Byte* src, size_t size) const noexcept
     {
         auto val = get_value_from_pointer<uint32, Endian::big>( src, size);
-        auto dqm = swap_endian( bitmask<uint32>( size * CHAR_BIT));
+        auto dqm = swap_endian( bitmask<uint32>( narrow_cast<uint32>( size * CHAR_BIT)));
         return bus_write_word( bus, dst, val, dqm);
     }
 
