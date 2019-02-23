@@ -9,8 +9,16 @@
 
 #include <infra/macro.h>
 #include <infra/types.h>
+#include <risc_v/riscv_register/riscv_register.h>
 
 #include <cassert>
+
+enum class Reg : uint8
+{
+    RS1, RS2, RD,
+    CSR1, CSR2, CSRD,
+    ZERO, RA
+};
 
 struct RISCVInstrDecoder
 {
@@ -56,7 +64,20 @@ struct RISCVInstrDecoder
         case 'S': return S_imm4_0 | (S_imm11_5 << 5);
         case 'U': return U_imm << 12;
         case 'J': return get_J_immediate();
+        case ' ': return 0;
         default: assert(0); return 0;
+        }
+    }
+
+    RISCVRegister get_register( Reg type) const noexcept
+    {
+        switch ( type) {
+        case Reg::ZERO:   return RISCVRegister::zero();
+        case Reg::RA:     return RISCVRegister::return_address();
+        case Reg::RS1:    return RISCVRegister::from_cpu_index( rs1);
+        case Reg::RS2:    return RISCVRegister::from_cpu_index( rs2);
+        case Reg::RD:     return RISCVRegister::from_cpu_index( rd);
+        default: assert(0);  return RISCVRegister::zero();
         }
     }
 

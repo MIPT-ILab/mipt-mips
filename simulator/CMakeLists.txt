@@ -39,7 +39,7 @@ set(CPPS
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp 
-    risc_v/riscv_isa.cpp 
+    risc_v/riscv_instr.cpp 
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
     kernel/kernel.cpp

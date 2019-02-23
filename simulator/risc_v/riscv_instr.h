@@ -6,9 +6,9 @@
 #ifndef RISCV_INSTR_H
 #define RISCV_INSTR_H
 
-#include "risc_v.h"
 #include "riscv_register/riscv_register.h"
 
+#include <func_sim/operation.h>
 #include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
@@ -31,6 +31,8 @@ class RISCVInstr
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
+        RegisterUInt v_imm = NO_VAL32;
+        char imm_type = ' ';
 
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -40,14 +42,12 @@ class RISCVInstr
 
         uint64 sequence_id = NO_VAL64;
 
-        std::string disasm = {};
-
+        OperationType operation = {};
     public:
         static const constexpr Endian endian = Endian::little;
-        RISCVInstr() = delete;
 
-        explicit
-        RISCVInstr( uint32 bytes, Addr PC = 0) : instr( bytes), PC( PC), new_PC( PC + 4) {};
+        RISCVInstr() = delete;
+        explicit RISCVInstr( uint32 bytes, Addr PC = 0);
 
          bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
