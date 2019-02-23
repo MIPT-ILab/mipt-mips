@@ -11,6 +11,7 @@
 #include "mips_register/mips_register.h"
 #include "mips_version.h"
 
+#include <func_sim/operation.h>
 #include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
@@ -24,26 +25,6 @@ enum class MIPSImm : uint8
     NO, SHIFT,                // R type
     LOGIC, ARITH, TRAP, ADDR, // I type
     JUMP                      // J type
-};
-
-enum OperationType : uint8
-{
-    OUT_ARITHM,
-    OUT_R_ACCUM,
-    OUT_R_CONDM,
-    OUT_R_JUMP,
-    OUT_SYSCALL,
-    OUT_BREAK,
-    OUT_R_SUBTR,
-    OUT_BRANCH,
-    OUT_TRAP,
-    OUT_LOAD,
-    OUT_LOADU,
-    OUT_PARTIAL_LOAD,
-    OUT_STORE,
-    OUT_J_JUMP,
-    OUT_J_SPECIAL,
-    OUT_UNKNOWN
 };
 
 template<typename I>
