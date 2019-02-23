@@ -3,4 +3,6 @@
  * Copyright 2018 MIPT-MIPS
  */
 
+#include "riscv_decoder.h" 
+
 #include <riscv.opcode.gen.h>
