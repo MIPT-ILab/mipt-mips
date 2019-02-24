@@ -9,6 +9,8 @@
 #include <func_sim/alu.h>
 #include <func_sim/operation.h>
 
+#include <vector>
+
 template<typename I> void do_nothing(I* /* instr */) { }
 template<typename I> auto execute_lui = do_nothing<I>;
 template<typename I> auto execute_auipc = do_nothing<I>;
