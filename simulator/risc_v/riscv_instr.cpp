@@ -105,7 +105,7 @@ struct RISCVTableEntry
 };
 
 template<typename I>
-static const RISCVTableEntry<I> cmd_desc[] =
+static const std::vector<RISCVTableEntry<I>> cmd_desc =
 {
     /*-------------- I --------------*/
     {'I', instr_lui,   execute_lui<I>,   OUT_ARITHM, 'U', Src1::ZERO, Src2::ZERO, Dst::RD},
