@@ -32,7 +32,12 @@ class RISCVInstr
         RegisterUInt v_src2 = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
         RegisterUInt v_imm = NO_VAL32;
+
         char imm_type = ' ';
+        char imm_print_type = ' ';
+        bool print_dst = false;
+        bool print_src1 = false;
+        bool print_src2 = false;
 
         Addr mem_addr = NO_VAL32;
         uint32 mem_size = NO_VAL32;
@@ -41,8 +46,11 @@ class RISCVInstr
         Addr new_PC = NO_VAL32;
 
         uint64 sequence_id = NO_VAL64;
+        std::string_view name = {};
 
         OperationType operation = {};
+
+        std::string generate_disasm() const;
     public:
         static const constexpr Endian endian = Endian::little;
 
@@ -136,6 +144,8 @@ class RISCVInstr
 
         void set_sequence_id( uint64 id) { sequence_id = id; }
         auto get_sequence_id() const { return sequence_id; }
+
+        std::string get_disasm() const;
 };
 
 template <typename T>
