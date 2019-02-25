@@ -31,35 +31,15 @@ void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::Fu
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
-    // fetch instruction
     FuncInstr instr = imem.fetch_instr( PC);
-
-    // set sequence_id
     instr.set_sequence_id(sequence_id);
     sequence_id++;
-
-    // read sources
     rf.read_sources( &instr);
-
-    // execute
     instr.execute();
-
-    // load/store
     mem->load_store( &instr);
-
-    // writeback
     rf.write_dst( instr);
-
-    // trap check
-    instr.check_trap();
-
-    // PC update
     PC = instr.get_new_PC();
-
-    // Check whether we execute nops
     update_and_check_nop_counter( instr);
-
-    // dump
     return instr;
 }
 

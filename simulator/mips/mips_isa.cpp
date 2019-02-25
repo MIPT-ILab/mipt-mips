@@ -409,20 +409,18 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
-    raw( bytes),
-    raw_valid( true),
-    new_PC( PC + 4),
-    PC( PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC)
+    : Operation( PC, PC + 4)
+    , raw( bytes)
+    , raw_valid( true)
 {
     init( get_table_entry<BaseMIPSInstr<R>>( raw), version);
 }
 
 template<typename R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
-    : raw( 0)
-    , new_PC( PC + 4)
-    , PC( PC)
+    : Operation( PC, PC + 4)
+    , raw( 0)
 {
     init( get_table_entry<BaseMIPSInstr<R>>( str_opcode), version);
 }

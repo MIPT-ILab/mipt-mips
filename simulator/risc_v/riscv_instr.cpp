@@ -179,7 +179,7 @@ const auto& find_entry( uint32 bytes)
 
 template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
-    : instr( bytes), PC( PC), new_PC( PC + 4)
+    : Operation( PC, PC + 4), instr( bytes)
 {
     const auto& entry = find_entry<RISCVInstr>( bytes);
     RISCVInstrDecoder decoder( bytes);
@@ -191,7 +191,7 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     src1  = decoder.get_register( entry.src1);
     src2  = decoder.get_register( entry.src2);
     dst   = decoder.get_register( entry.dst);
-    name  = entry.entry.name;
+    opname  = entry.entry.name;
     print_dst  = entry.dst == Dst::RD;
     print_src1 = entry.src1 == Src1::RS1;
     print_src2 = entry.src2 == Src1::RS1;    
@@ -213,7 +213,7 @@ template<typename T>
 std::string RISCVInstr<T>::generate_disasm() const
 {
     std::ostringstream oss;
-    oss << name;
+    oss << opname;
 
     if ( operation == OUT_LOAD || operation == OUT_LOADU || operation == OUT_STORE)
     {
