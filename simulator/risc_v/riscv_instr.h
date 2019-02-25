@@ -31,7 +31,7 @@ class RISCVInstr
         RegisterUInt v_src1 = NO_VAL32;
         RegisterUInt v_src2 = NO_VAL32;
         RegisterUInt v_dst = NO_VAL32;
-        RegisterUInt v_imm = NO_VAL32;
+        uint32 v_imm = NO_VAL32;
 
         char imm_type = ' ';
         char imm_print_type = ' ';
