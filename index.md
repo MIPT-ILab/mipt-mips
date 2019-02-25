@@ -20,7 +20,8 @@ Date | Event name
 12 Dec | **Advanced pipelining**<br/> • Slides: [L8](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%208%20-%20Advanced%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/pUw2sU9RZSY)
 19 Dec | **First Test**
 08 Feb | **Superscalar CPU and multicore systems**<br/> • Slides: [L9](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%209%20-%20Superscalar%20CPU%20and%20multicore%20systems.pptx?raw=true) <br/> • No video was recorded.
-15 Feb | **Caches, pt. I**
+15 Feb | **Caches, pt. I**<br/> • Slides: [L10](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2010%20-%20Caches.pptx)
+22 Feb | **Caches, pt. II**<br/> • Slides: [L11](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2011%20-%20Caches%2C%20part%202.pptx)
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).

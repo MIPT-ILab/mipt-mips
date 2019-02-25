@@ -10,6 +10,7 @@
 #include <func_sim/operation.h>
 
 #include <sstream>
+#include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
 template<typename I> auto execute_lui = do_nothing<I>;
@@ -108,7 +109,7 @@ struct RISCVTableEntry
 };
 
 template<typename I>
-static const RISCVTableEntry<I> cmd_desc[] =
+static const std::vector<RISCVTableEntry<I>> cmd_desc =
 {
     /*-------------- I --------------*/
     {'I', instr_lui,   execute_lui<I>,   OUT_ARITHM, 'U', 'x', Src1::ZERO, Src2::ZERO, Dst::RD},
