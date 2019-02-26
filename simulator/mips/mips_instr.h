@@ -37,7 +37,7 @@ template<typename R>
 class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 {
     private:
-        using typename BaseInstruction<R, MIPSRegister>::MyDatapath;
+        using MyDatapath = typename BaseInstruction<R, MIPSRegister>::MyDatapath;
         using DisasmCache = LRUCache<uint32, std::string, 8192>;
 
         const uint32 raw;
