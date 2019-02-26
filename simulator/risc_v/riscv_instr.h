@@ -18,7 +18,7 @@ template <typename T>
 class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 {
     private:
-        using typename BaseInstruction<T, RISCVRegister>::MyDatapath;
+        using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
 
         char imm_type = ' ';
