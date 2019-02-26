@@ -18,6 +18,7 @@ enum class Trap : uint8
     SYSCALL,
     UNSUPPORTED_SYSCALL,
     UNALIGNED_ADDRESS,
+    UNKNOWN_INSTRUCTION
 };
 
 #endif //TRAP_TYPES_H

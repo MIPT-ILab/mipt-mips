@@ -16,12 +16,6 @@
 #include <limits>
 #include <type_traits>
 
-template <typename To, typename From>
-static constexpr To narrow_cast(const From& value)
-{
-    return static_cast<To>( value);
-}
-
 /* Checks if values is power of two */
 template<typename T>
 constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }

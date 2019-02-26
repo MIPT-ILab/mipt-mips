@@ -6,6 +6,13 @@
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
+struct UnknownInstruction final : Exception
+{
+    explicit UnknownInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
+
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), kernel( Kernel::create_dummy_kernel()) { }
 
@@ -74,6 +81,9 @@ Trap FuncSim<ISA>::step_system()
 {
     const auto& instr = step();
     sout << instr << std::endl;
+
+    if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
+        throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
 
     if ( instr.is_syscall())
         return handle_syscall();

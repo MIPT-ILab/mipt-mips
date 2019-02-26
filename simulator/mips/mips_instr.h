@@ -30,31 +30,14 @@ enum class MIPSImm : uint8
 template<typename I>
 struct MIPSTableEntry;
 
-struct UnknownMIPSInstruction final : Exception
-{
-    explicit UnknownMIPSInstruction(const std::string& msg)
-        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
-    { }
-};
-
-template<typename I>
-void unknown_mips_instruction( I* i)
-{
-    throw UnknownMIPSInstruction( i->string_dump() + ' ' + i->bytes_dump());
-}
-
 template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache;
 
 template<typename R>
-class BaseMIPSInstr : public Operation, public RFacade<MIPSRegister>
+class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 {
-    public:
-        using RegisterUInt = R;
-        using RegisterSInt = sign_t<RegisterUInt>;
     private:
-        friend struct ALU;
-        using Execute = void (*)(BaseMIPSInstr*);
+        using typename BaseInstruction<R, MIPSRegister>::MyDatapath;
         using DisasmCache = LRUCache<uint32, std::string, 8192>;
 
         const uint32 raw;
@@ -62,15 +45,7 @@ class BaseMIPSInstr : public Operation, public RFacade<MIPSRegister>
 
         MIPSImm imm_type = MIPSImm::NO;
 
-        RegisterUInt v_src1 = NO_VAL<RegisterUInt>;
-        RegisterUInt v_src2 = NO_VAL<RegisterUInt>;
-        RegisterUInt v_dst  = NO_VAL<RegisterUInt>;
-        RegisterUInt v_dst2 = NO_VAL<RegisterUInt>;
-        RegisterUInt mask   = all_ones<RegisterUInt>();
-
-        Execute executor = unknown_mips_instruction;
-
-        void init( const MIPSTableEntry<BaseMIPSInstr>& entry, MIPSVersion version);
+        void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
         std::string generate_disasm() const;
 
         static DisasmCache& get_disasm_cache();
@@ -87,47 +62,27 @@ class BaseMIPSInstr : public Operation, public RFacade<MIPSRegister>
         }
 
         bool is_same( const BaseMIPSInstr& rhs) const {
-            return PC == rhs.PC && is_same_bytes( rhs.raw);
+            return this->PC == rhs.PC && is_same_bytes( rhs.raw);
         }
 
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
-                && sequence_id == rhs.sequence_id
-                && (dst.is_zero()  || v_dst == rhs.v_dst)
-                && (dst2.is_zero() || v_dst2 == rhs.v_dst2);
+                && this->sequence_id == rhs.sequence_id
+                && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
+                && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
         }
 
         std::string get_disasm() const;
 
         bool is_nop() const { return raw == 0x0u; }
-        bool is_divmult() const { return get_dst_num().is_mips_lo() && get_dst2_num().is_mips_hi(); }
 
-        void set_v_dst(RegisterUInt value); // for loads
-        void set_v_src( RegisterUInt value, uint8 index)
-        {
-            if ( index == 0)
-                v_src1 = value;
-            else
-                v_src2 = value;
-        }
-
-        auto get_v_dst()  const { return v_dst; }
-        auto get_v_dst2() const { return v_dst2; }
-        auto get_v_src2() const { return v_src2; } // for stores
-        auto get_mask()  const { return mask;  }
-
-        void execute();
-
-        std::ostream& dump( std::ostream& out) const;
         std::string string_dump() const;
         std::string bytes_dump() const;
+        friend std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr& instr)
+        {
+            return instr.dump_content( out, instr.get_disasm());
+        }
 };
-
-template<typename RegisterUInt>
-std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr<RegisterUInt>& instr)
-{
-    return instr.dump( out);
-}
 
 class MIPS32Instr : public BaseMIPSInstr<uint32>
 {

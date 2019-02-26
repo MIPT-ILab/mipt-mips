@@ -9,6 +9,7 @@
 #include <func_sim/alu.h>
 #include <func_sim/operation.h>
 
+#include <iomanip>
 #include <sstream>
 #include <vector>
 
@@ -179,22 +180,23 @@ const auto& find_entry( uint32 bytes)
 
 template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
-    : Operation( PC, PC + 4), instr( bytes)
+    : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<RISCVInstr>( bytes);
+    const auto& entry = find_entry<typename RISCVInstr<T>::MyDatapath>( bytes);
     RISCVInstrDecoder decoder( bytes);
 
-    operation = entry.type;
     imm_type = entry.immediate_type;
     imm_print_type = entry.immediate_print_type;
-    v_imm = decoder.get_immediate( imm_type);
-    src1  = decoder.get_register( entry.src1);
-    src2  = decoder.get_register( entry.src2);
-    dst   = decoder.get_register( entry.dst);
-    opname  = entry.entry.name;
-    print_dst  = entry.dst == Dst::RD;
-    print_src1 = entry.src1 == Src1::RS1;
-    print_src2 = entry.src2 == Src1::RS1;    
+
+    this->operation = entry.type;
+    this->v_imm = decoder.get_immediate( imm_type);
+    this->src1  = decoder.get_register( entry.src1);
+    this->src2  = decoder.get_register( entry.src2);
+    this->dst   = decoder.get_register( entry.dst);
+    this->opname  = entry.entry.name;
+    this->print_dst  = entry.dst == Dst::RD;
+    this->print_src1 = entry.src1 == Src1::RS1;
+    this->print_src2 = entry.src2 == Src1::RS2;
 }
 
 static std::string print_immediate( char print_type, uint32 value)
@@ -213,24 +215,24 @@ template<typename T>
 std::string RISCVInstr<T>::generate_disasm() const
 {
     std::ostringstream oss;
-    oss << opname;
+    oss << this->opname;
 
-    if ( operation == OUT_LOAD || operation == OUT_LOADU || operation == OUT_STORE)
+    if ( this->is_load() || this->is_store())
     {
-        oss << " $" << (print_dst ? dst : src2)
-            << print_immediate( imm_print_type, v_imm)
-            << "($" << src1 << ")" << std::dec;
+        oss << " $" << (this->print_dst ? this->dst : this->src2)
+            << print_immediate( imm_print_type, this->v_imm)
+            << "($" << this->src1 << ")" << std::dec;
         return oss.str();
     }
-    
-    if ( print_dst)
-        oss <<  " $" << dst;
-    if ( print_src1)
-        oss << ( print_dst ? ", $" : " $") << src1;
-    if ( print_src2)
-        oss << ", $" << src2;
 
-    oss << print_immediate( imm_print_type, v_imm);
+    if ( this->print_dst)
+        oss <<  " $" << this->dst;
+    if ( this->print_src1)
+        oss << ( this->print_dst ? ", $" : " $") << this->src1;
+    if ( this->print_src2)
+        oss << ", $" << this->src2;
+
+    oss << print_immediate( imm_print_type, this->v_imm);
     return oss.str();
 }
 
@@ -238,6 +240,24 @@ template<typename T>
 std::string RISCVInstr<T>::get_disasm() const
 {
     return generate_disasm();
+}
+
+template<typename R>
+std::string RISCVInstr<R>::string_dump() const
+{
+    std::ostringstream oss;
+    this->dump_content( oss, get_disasm());
+    return oss.str();
+}
+
+template<typename R>
+std::string RISCVInstr<R>::bytes_dump() const
+{
+     std::ostringstream oss;
+     oss << "Bytes:" << std::hex;
+     for ( const auto& b : unpack_array<uint32, endian>( instr))
+         oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
+     return oss.str();
 }
 
 template class RISCVInstr<uint32>;
