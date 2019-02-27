@@ -25,10 +25,26 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
     CHECK_NOTHROW( FuncSim<MIPS32>() );
 }
 
-TEST_CASE( "FuncSim: create empty memory and get lost")
+TEST_CASE( "FuncSim MIPS32: create empty memory and get lost")
 {
     auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<MIPS32> sim( false);
+    sim.set_memory( m);
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
+
+TEST_CASE( "FuncSim RISC-V: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<RISCV32> sim( false);
+    sim.set_memory( m);
+    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+}
+
+TEST_CASE( "FuncSim RISC-V 128 bit: create empty memory and get lost")
+{
+    auto m = FuncMemory::create_hierarchied_memory();
+    FuncSim<RISCV128> sim( false);
     sim.set_memory( m);
     CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
 }
