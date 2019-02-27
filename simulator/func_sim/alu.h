@@ -331,6 +331,9 @@ struct ALU
 
     template<typename I> static
     void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+
+    template<typename I> static
+    void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
 };
 
 #endif
