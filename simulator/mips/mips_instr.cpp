@@ -539,6 +539,7 @@ std::string BaseMIPSInstr<R>::get_disasm() const
     auto result = generate_disasm();
     get_disasm_cache().update( raw, result);
     return result;
+}
 
 template class BaseMIPSInstr<uint32>;
 template class BaseMIPSInstr<uint64>;
