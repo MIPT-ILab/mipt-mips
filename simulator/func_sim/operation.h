@@ -11,6 +11,8 @@
 #include <infra/types.h>
 #include <func_sim/trap_types.h>
 
+#include <sstream>
+
 enum OperationType : uint8
 {
     OUT_ARITHM,
@@ -31,6 +33,29 @@ enum OperationType : uint8
     OUT_J_SPECIAL,
     OUT_UNKNOWN
 };
+
+enum class Imm : uint8
+{
+    NO, SHIFT,
+    LOGIC, ARITH, TRAP, ADDR,
+    JUMP
+};
+
+static inline std::string print_immediate( Imm type, uint32 value)
+{
+    std::ostringstream oss;
+    switch ( type)
+    {
+    case Imm::ADDR:
+    case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
+    case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
+    case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
+    case Imm::ARITH: oss << ", "   << std::dec << narrow_cast<int16>(value); break;
+    case Imm::SHIFT: oss << ", "   << std::dec << value; break;
+    case Imm::NO:    break;
+    }
+    return oss.str();
+}
 
 class Operation
 {
@@ -94,6 +119,7 @@ protected:
     Addr mem_addr = NO_VAL32;
     uint32 mem_size = NO_VAL32;
     uint32 v_imm = NO_VAL32;
+    Imm imm_print_type = Imm::NO;
 
     // convert this to bitset
     bool complete   = false;
@@ -192,12 +218,38 @@ public:
 
 protected:
     BaseInstruction(Addr pc, Addr new_pc) : Datapath<T>(pc, new_pc) { }
+    std::string generate_disasm() const;
 
     R src1 = R::zero();
     R src2 = R::zero();
     R dst  = R::zero();
     R dst2 = R::zero();
 };
+
+template<typename T, typename R>
+std::string BaseInstruction<T, R>::generate_disasm() const
+{
+    std::ostringstream oss;
+    oss << this->opname;
+
+    if ( this->imm_print_type == Imm::ADDR)
+    {
+        oss << " $" << (this->print_dst ? this->dst : this->src2)
+            << print_immediate( Imm::ADDR, this->v_imm)
+            << "($" << this->src1 << ")" << std::dec;
+        return oss.str();
+    }
+
+    if ( this->print_dst)
+        oss <<  " $" << this->dst;
+    if ( this->print_src1)
+        oss << (this-> print_dst ? ", $" : " $") << this->src1;
+    if ( this->print_src2)
+        oss << ", $" << this->src2;
+
+    oss << print_immediate( this->imm_print_type, this->v_imm);
+    return oss.str();
+}
 
 template<typename T, typename R>
 std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std::string& disasm) const

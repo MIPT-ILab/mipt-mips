@@ -20,13 +20,6 @@
 
 #include <sstream>
 
-enum class MIPSImm : uint8
-{
-    NO, SHIFT,                // R type
-    LOGIC, ARITH, TRAP, ADDR, // I type
-    JUMP                      // J type
-};
-
 template<typename I>
 struct MIPSTableEntry;
 
@@ -43,11 +36,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         const uint32 raw;
         const bool raw_valid = false;
 
-        MIPSImm imm_type = MIPSImm::NO;
-
         void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
-        std::string generate_disasm() const;
-
         static DisasmCache& get_disasm_cache();
     public:
         BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);

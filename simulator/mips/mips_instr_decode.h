@@ -12,8 +12,6 @@
 
 #include "mips_register/mips_register.h"
 
-using Imm = MIPSImm;
-
 enum class Reg : uint8
 {
     RS, RT, RD,
@@ -52,15 +50,15 @@ struct MIPSInstrDecoder
         return ( bytes & mask) >> find_first_set( mask);
     }
 
-    uint32 get_immediate( Imm type) const
+    uint32 get_immediate( char type) const
     {
         switch ( type)
         {
-        case Imm::NO:    return 0;
-        case Imm::SHIFT: return shamt;
-        case Imm::JUMP:  return jump;
-        default:         return imm;
-        }    
+        case 'N': return 0;
+        case 'S': return shamt;
+        case 'J': return jump;
+        default:  return imm;
+        }
     }
 
     MIPSRegister get_register( Reg type) const
