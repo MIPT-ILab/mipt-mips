@@ -6,6 +6,13 @@
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
+struct UnknownInstruction final : Exception
+{
+    explicit UnknownInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
+
 template <typename ISA>
 FuncSim<ISA>::FuncSim( bool log) : Simulator( log), kernel( Kernel::create_dummy_kernel()) { }
 
@@ -31,35 +38,15 @@ void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::Fu
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
-    // fetch instruction
     FuncInstr instr = imem.fetch_instr( PC);
-
-    // set sequence_id
     instr.set_sequence_id(sequence_id);
     sequence_id++;
-
-    // read sources
     rf.read_sources( &instr);
-
-    // execute
     instr.execute();
-
-    // load/store
     mem->load_store( &instr);
-
-    // writeback
     rf.write_dst( instr);
-
-    // trap check
-    instr.check_trap();
-
-    // PC update
     PC = instr.get_new_PC();
-
-    // Check whether we execute nops
     update_and_check_nop_counter( instr);
-
-    // dump
     return instr;
 }
 
@@ -94,6 +81,9 @@ Trap FuncSim<ISA>::step_system()
 {
     const auto& instr = step();
     sout << instr << std::endl;
+
+    if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
+        throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
 
     if ( instr.is_syscall())
         return handle_syscall();

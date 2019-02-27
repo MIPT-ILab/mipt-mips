@@ -138,6 +138,7 @@ template<typename I> auto mips_tne     = ALU::trap<I, ALU::ne<I>>;
 template<typename I> auto mips_tnei    = ALU::trap<I, ALU::nei<I>>;
 template<typename I> auto mips_xor     = ALU::xorv<I>;
 template<typename I> auto mips_xori    = ALU::xori<I>;
+template<typename I> auto mips_unknown = ALU::unknown_instruction<I>;
 
 template<typename I>
 struct MIPSTableEntry
@@ -191,14 +192,14 @@ static const Table<I> isaMapR =
     {0x16, { "dsrlv", mips_dsrlv<I>, OUT_ARITHM, 0, Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_III_Instr} },
     {0x17, { "dsrav", mips_dsrav<I>, OUT_ARITHM, 0, Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_III_Instr} },
     // Multiplication/Division
-    {0x18, { "mult",   mips_mult<I>,  OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x19, { "multu",  mips_multu<I>, OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1A, { "div",    mips_div<I>,   OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1B, { "divu",   mips_divu<I>,  OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1C, { "dmult",  mips_dmult<I>, OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1D, { "dmultu", mips_dmultu<I>,OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1E, { "ddiv",   mips_ddiv<I>,  OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1F, { "ddivu",  mips_ddivu<I>, OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
+    {0x18, { "mult",   mips_mult<I>,  OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
+    {0x19, { "multu",  mips_multu<I>, OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1A, { "div",    mips_div<I>,   OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1B, { "divu",   mips_divu<I>,  OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1C, { "dmult",  mips_dmult<I>, OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1D, { "dmultu", mips_dmultu<I>,OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1E, { "ddiv",   mips_ddiv<I>,  OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1F, { "ddivu",  mips_ddivu<I>, OUT_DIVMULT, 0, Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
     // Addition/Subtraction
     {0x20, { "add",  mips_add<I>,  OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     {0x21, { "addu", mips_addu<I>, OUT_ARITHM, 0, Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
@@ -353,7 +354,7 @@ static const std::vector<const Table<I>*> all_isa_maps =
 
 template<typename I>
 MIPSTableEntry<I> unknown_instruction =
-{ "Unknown instruction", unknown_mips_instruction, OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "Unknown instruction", mips_unknown<I> , OUT_ARITHM, 0, Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> nop =
@@ -409,41 +410,40 @@ MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC) :
-    raw( bytes),
-    raw_valid( true),
-    new_PC( PC + 4),
-    PC( PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC)
+    : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
+    , raw( bytes)
+    , raw_valid( true)
 {
-    init( get_table_entry<BaseMIPSInstr<R>>( raw), version);
+    init( get_table_entry<MyDatapath>( raw), version);
 }
 
 template<typename R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
-    : raw( 0)
-    , new_PC( PC + 4)
-    , PC( PC)
+    : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
+    , raw( 0)
 {
-    init( get_table_entry<BaseMIPSInstr<R>>( str_opcode), version);
+    init( get_table_entry<MyDatapath>( str_opcode), version);
 }
 
 template<typename R>
-void BaseMIPSInstr<R>::init( const MIPSTableEntry<BaseMIPSInstr<R>>& entry, MIPSVersion version)
+void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     MIPSInstrDecoder instr( raw);
-    operation = entry.operation;
-    mem_size  = entry.mem_size;
-    executor  = entry.versions.is_supported(version) ? entry.function : unknown_mips_instruction<BaseMIPSInstr<R>>;
-    v_imm     = instr.get_immediate( entry.immediate_type);
-    src1      = instr.get_register( entry.src1);
-    src2      = instr.get_register( entry.src2);
-    dst       = instr.get_register( entry.dst);
-    dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
-    opname    = entry.name;
-    print_dst = is_explicit_register( entry.dst);
-    print_src1 = is_explicit_register( entry.src1);
-    print_src2 = is_explicit_register( entry.src2);
     imm_type   = entry.immediate_type;
+
+    this->operation = entry.operation;
+    this->mem_size  = entry.mem_size;
+    this->executor  = entry.versions.is_supported(version) ? entry.function : mips_unknown<MyDatapath>;
+    this->v_imm     = instr.get_immediate( entry.immediate_type);
+    this->src1      = instr.get_register( entry.src1);
+    this->src2      = instr.get_register( entry.src2);
+    this->dst       = instr.get_register( entry.dst);
+    this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
+    this->opname    = entry.name;
+    this->print_dst = is_explicit_register( entry.dst);
+    this->print_src1 = is_explicit_register( entry.src1);
+    this->print_src2 = is_explicit_register( entry.src2);
 }
 
 static std::string print_immediate( MIPSImm type, uint32 value)
@@ -466,24 +466,24 @@ template<typename R>
 std::string BaseMIPSInstr<R>::generate_disasm() const
 {
     std::ostringstream oss;
-    oss << opname;
+    oss << this->opname;
 
     if ( imm_type == Imm::ADDR)
     {
-        oss << " $" << (print_dst ? dst : src2)
-            << print_immediate( Imm::ADDR, v_imm)
-            << "($" << src1 << ")" << std::dec;
+        oss << " $" << (this->print_dst ? this->dst : this->src2)
+            << print_immediate( Imm::ADDR, this->v_imm)
+            << "($" << this->src1 << ")" << std::dec;
         return oss.str();
     }
-    
-    if ( print_dst)
-        oss <<  " $" << dst;
-    if ( print_src1)
-        oss << ( print_dst ? ", $" : " $") << src1;
-    if ( print_src2)
-        oss << ", $" << src2;
 
-    oss << print_immediate( imm_type, v_imm);
+    if ( this->print_dst)
+        oss <<  " $" << this->dst;
+    if ( this->print_src1)
+        oss << (this-> print_dst ? ", $" : " $") << this->src1;
+    if ( this->print_src2)
+        oss << ", $" << this->src2;
+
+    oss << print_immediate( imm_type, this->v_imm);
     return oss.str();
 }
 

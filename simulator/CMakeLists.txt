@@ -39,6 +39,7 @@ set(CPPS
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp 
+    risc_v/riscv_instr.cpp 
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
     kernel/kernel.cpp
@@ -71,6 +72,7 @@ set(TESTS_CPPS
     mips/t/unit_test.cpp
     func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
+    risc_v/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
     modules/core/t/unit_test.cpp

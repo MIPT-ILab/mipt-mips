@@ -14,14 +14,19 @@
 struct CheckerMismatch final : Exception
 {
     explicit CheckerMismatch(const std::string& msg)
-        : Exception("Checker mismatch", msg)
+        : Exception("Performance simulator and functional simulator executed different instructions\n"
+                    "Usually it indicates a bug in performance simulator\n"
+                    "The different instructions are\n"
+                    , msg)
     { }
 };
 
 struct Deadlock final : Exception
 {
     explicit Deadlock(const std::string& msg)
-        : Exception("Deadlock was detected", msg)
+        : Exception("No instructions executed in recent cycles\n"
+                    "Usually it indicates a bug in performance simulator\n"
+                    , msg)
     { }
 };
 

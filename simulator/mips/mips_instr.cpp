@@ -33,42 +33,10 @@ typename BaseMIPSInstr<R>::DisasmCache& BaseMIPSInstr<R>::get_disasm_cache()
 }
 
 template<typename R>
-void BaseMIPSInstr<R>::execute()
-{
-    executor(this);
-    complete = true;
-}
-
-template<typename R>
-void BaseMIPSInstr<R>::set_v_dst( R value)
-{
-    memory_complete = true;
-    if ( operation == OUT_LOAD || is_partial_load())
-    {
-        switch ( get_mem_size())
-        {
-            case 1: v_dst = narrow_cast<int8>( value); break;
-            case 2: v_dst = narrow_cast<int16>( value); break;
-            case 4: v_dst = narrow_cast<int32>( value); break;
-            case 8: v_dst = value; break;
-            default: assert( false);
-        }
-    }
-    else if ( operation == OUT_LOADU)
-    {
-        v_dst = value;
-    }
-    else
-    {
-        assert( false);
-    }
-}
-
-template<typename R>
 std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
-    dump( oss);
+    this->dump_content( oss, get_disasm());
     return oss.str();
 }
 
@@ -96,34 +64,6 @@ std::string BaseMIPSInstr<R>::get_disasm() const
     auto result = generate_disasm();
     get_disasm_cache().update( raw, result);
     return result;
-}
-
-template<typename R>
-std::ostream& BaseMIPSInstr<R>::dump( std::ostream& out) const
-{
-    if ( PC != 0)
-        out << std::hex << "0x" << PC << ": ";
-
-    out << "{" << std::dec << sequence_id << "}\t" << get_disasm() << "\t [";
-    bool has_ma = ( is_load() || is_store()) && complete;
-    if ( has_ma)
-    {
-        out << " $ma = 0x" << std::hex << get_mem_addr();
-    }
-    if ( !dst.is_zero() && (is_load() ? memory_complete : complete) && get_mask() != 0)
-    {
-        if ( has_ma)
-            out << ",";
-        out << " $" << dst << " = 0x" << std::hex << (v_dst & mask);
-        if ( !dst2.is_zero())
-            out << ", $" << dst2 << " = 0x" << v_dst2;
-    }
-    out << " ]";
-    if ( trap != Trap::NO_TRAP)
-        out << "\t trap";
-
-    out << std::dec;
-    return out;
 }
 
 template class BaseMIPSInstr<uint32>;
