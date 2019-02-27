@@ -18,11 +18,12 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 auto mips_multiplication(T x, T y) {
+    using UT = unsign_t<T>;
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    using ReturnType = std::pair<UT, UT>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    return ReturnType(value, value >> bitwidth<T>);
+    return ReturnType(narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T>));
 }
 
 template<typename T>
