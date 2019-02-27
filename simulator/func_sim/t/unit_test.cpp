@@ -13,6 +13,7 @@
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <mips/mips.h>
+#include <risc_v/risc_v.h>
 
 #include <sstream>
 
