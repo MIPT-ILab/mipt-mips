@@ -35,7 +35,6 @@ set(CPPS
     memory/elf/elf_loader.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
-    mips/mips_isa.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp 
@@ -92,8 +91,7 @@ add_custom_command(
 if (MSVC)
     # /Zc:rvalueCast is a workaround for VS non-standard behavior, see
     # https://developercommunity.visualstudio.com/content/problem/457095/cannot-bind-temporary-int-object-to-an-rvalue-refe.html
-    # 4661 is disabled to instantiate BaseMIPSInstr in two translation units
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4661 /Zc:rvalueCast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
