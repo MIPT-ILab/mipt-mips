@@ -20,11 +20,6 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
     private:
         using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
-
-        char imm_type = ' ';
-        char imm_print_type = ' ';
-
-        std::string generate_disasm() const;
     public:
         static const constexpr Endian endian = Endian::little;
 
