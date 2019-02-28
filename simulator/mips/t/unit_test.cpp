@@ -530,7 +530,7 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     
     CHECK( instr.is_direct_branch() );
     CHECK( !instr.is_direct_jump() );
-    CHECK( !instr.is_indirect_branch() );
+    CHECK( !instr.is_indirect_jump() );
 }
     
 TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
