@@ -274,8 +274,8 @@ struct ALU
     template<typename I, Predicate<I> p> static
     void branch( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken) {
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch) {
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }
@@ -296,7 +296,7 @@ struct ALU
     template<typename I> static
     void jump( I* instr, Addr target)
     {
-        instr->_is_jump_taken = true;
+        instr->is_taken_branch = true;
         instr->new_PC = target;
         check_halt_trap( instr);
     }
@@ -321,8 +321,8 @@ struct ALU
     template<typename I, Predicate<I> p> static
     void branch_and_link( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken)
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch)
         {
             instr->v_dst = instr->new_PC;
             instr->new_PC += sign_extend( instr) * 4;

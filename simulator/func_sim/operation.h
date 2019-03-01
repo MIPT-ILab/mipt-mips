@@ -67,13 +67,16 @@ public:
 	bool is_direct_branch() const { return operation == OUT_BRANCH; }
 
 	// target is known only at EXE stage
-	bool is_indirect_branch() const { return operation == OUT_R_JUMP; }
+	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
 	bool is_jump() const { return this->is_direct_jump()     ||
 				      this->is_direct_branch()   ||
-				      this->is_indirect_branch(); }
+				      this->is_indirect_jump(); }
 
-    bool is_jump_taken() const { return  _is_jump_taken; }
+    bool is_taken() const
+    {
+        return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
+    }
 
     bool is_partial_load() const
     {
@@ -123,7 +126,7 @@ protected:
 
     // convert this to bitset
     bool complete   = false;
-    bool _is_jump_taken = false; // actual result
+    bool is_taken_branch = false; // actual result
     bool memory_complete = false;
     bool print_dst = false;
     bool print_src1 = false;
