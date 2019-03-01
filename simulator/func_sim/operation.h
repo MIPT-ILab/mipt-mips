@@ -75,10 +75,8 @@ public:
 
     bool is_taken() const
     {
-        if ( ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) )
-            return true;
-        else
-            return  _is_branch_taken; }
+        return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
+    }
 
     bool is_partial_load() const
     {
@@ -128,7 +126,7 @@ protected:
 
     // convert this to bitset
     bool complete   = false;
-    bool _is_branch_taken = false; // actual result
+    bool is_taken_branch = false; // actual result
     bool memory_complete = false;
     bool print_dst = false;
     bool print_src1 = false;
