@@ -16,9 +16,16 @@ class InstrMemoryIface
 {
 protected:
     std::shared_ptr<ReadableMemory> mem = nullptr;
+    const Endian endian;
 public:
-    InstrMemoryIface() = default;
-    auto fetch( Addr pc) const { return mem->read<uint32, FuncInstr::endian>( pc); }
+    explicit InstrMemoryIface( Endian e) : endian( e) { }
+    auto fetch( Addr pc) const
+    {
+        return endian == Endian::little
+            ? mem->read<uint32, Endian::little>( pc)
+            : mem->read<uint32, Endian::big>( pc);
+    }
+
     void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
 
@@ -34,6 +41,7 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 {
 public:
     using Instr = typename ISA::FuncInstr;
+    InstrMemory() : InstrMemoryIface<Instr>( ISA::endianness) { }
     Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), PC); }
 };
 

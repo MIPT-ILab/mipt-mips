@@ -423,18 +423,20 @@ static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
 #endif
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( bytes)
     , raw_valid( true)
+    , endian( endian)
 {
     init( get_table_entry<MyDatapath>( raw), version);
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( 0)
+    , endian( endian)
 {
     init( get_table_entry<MyDatapath>( str_opcode), version);
 }
@@ -481,7 +483,8 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     for ( const auto& b : unpack_array<uint32, endian>( raw))
+     const auto& bytes = endian == Endian::little ? unpack_array<uint32, Endian::little>( raw) : unpack_array<uint32, Endian::big>( raw);
+     for ( const auto& b : bytes)
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return oss.str();
 }
