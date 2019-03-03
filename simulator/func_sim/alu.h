@@ -18,11 +18,12 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 auto mips_multiplication(T x, T y) {
+    using UT = unsign_t<T>;
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    using ReturnType = std::pair<UT, UT>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    return ReturnType(value, value >> bitwidth<T>);
+    return ReturnType(narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T>));
 }
 
 template<typename T>
@@ -273,8 +274,8 @@ struct ALU
     template<typename I, Predicate<I> p> static
     void branch( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken) {
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch) {
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }
@@ -295,7 +296,7 @@ struct ALU
     template<typename I> static
     void jump( I* instr, Addr target)
     {
-        instr->_is_jump_taken = true;
+        instr->is_taken_branch = true;
         instr->new_PC = target;
         check_halt_trap( instr);
     }
@@ -320,8 +321,8 @@ struct ALU
     template<typename I, Predicate<I> p> static
     void branch_and_link( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken)
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch)
         {
             instr->v_dst = instr->new_PC;
             instr->new_PC += sign_extend( instr) * 4;
@@ -331,6 +332,9 @@ struct ALU
 
     template<typename I> static
     void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+
+    template<typename I> static
+    void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
 };
 
 #endif

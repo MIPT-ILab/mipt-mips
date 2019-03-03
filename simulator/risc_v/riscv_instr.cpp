@@ -9,6 +9,7 @@
 #include <func_sim/alu.h>
 #include <func_sim/operation.h>
 
+#include <iomanip>
 #include <sstream>
 #include <vector>
 
@@ -101,7 +102,7 @@ struct RISCVTableEntry
     ALU::Execute<I> function;
     OperationType type;
     char immediate_type;
-    char immediate_print_type;
+    Imm immediate_print_type;
     Src1 src1;
     Src2 src2;
     Dst  dst;
@@ -112,60 +113,60 @@ template<typename I>
 static const std::vector<RISCVTableEntry<I>> cmd_desc =
 {
     /*-------------- I --------------*/
-    {'I', instr_lui,   execute_lui<I>,   OUT_ARITHM, 'U', 'x', Src1::ZERO, Src2::ZERO, Dst::RD},
-    {'I', instr_auipc, execute_auipc<I>, OUT_ARITHM, 'U', 'x', Src1::ZERO, Src2::ZERO, Dst::RD},
+    {'I', instr_lui,   execute_lui<I>,   OUT_ARITHM, 'U', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
+    {'I', instr_auipc, execute_auipc<I>, OUT_ARITHM, 'U', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
     // Jumps and branches
-    {'I', instr_jal,   execute_jal<I>,   OUT_J_JUMP, 'J', 'x', Src1::ZERO, Src2::ZERO, Dst::RD},
-    {'I', instr_jalr,  execute_jalr<I>,  OUT_R_JUMP, 'I', 'x', Src1::RS1,  Src2::ZERO, Dst::RD},
-    {'I', instr_beq,   execute_beq<I>,   OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
-    {'I', instr_bne,   execute_bne<I>,   OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
-    {'I', instr_blt,   execute_blt<I>,   OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
-    {'I', instr_bge,   execute_bge<I>,   OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
-    {'I', instr_bltu,  execute_bltu<I>,  OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
-    {'I', instr_bgeu,  execute_bgeu<I>,  OUT_BRANCH, 'B', 'd', Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_jal,   execute_jal<I>,   OUT_J_JUMP, 'J', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
+    {'I', instr_jalr,  execute_jalr<I>,  OUT_R_JUMP, 'I', Imm::LOGIC, Src1::RS1,  Src2::ZERO, Dst::RD},
+    {'I', instr_beq,   execute_beq<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_bne,   execute_bne<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_blt,   execute_blt<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_bge,   execute_bge<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_bltu,  execute_bltu<I>,  OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
+    {'I', instr_bgeu,  execute_bgeu<I>,  OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
     // Loads and stores
-    {'I', instr_lb,    execute_lb<I>,    OUT_LOAD,   'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_lh,    execute_lh<I>,    OUT_LOAD,   'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_lw,    execute_lw<I>,    OUT_LOAD,   'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_lbu,   execute_lbu<I>,   OUT_LOADU,  'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_lhu,   execute_lhu<I>,   OUT_LOADU,  'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_sb,    execute_sb<I>,    OUT_STORE,  'S', 'x', Src1::RS1, Src2::RS2,   Dst::ZERO},
-    {'I', instr_sh,    execute_sh<I>,    OUT_STORE,  'S', 'x', Src1::RS1, Src2::RS2,   Dst::ZERO},
-    {'I', instr_sw,    execute_sw<I>,    OUT_STORE,  'S', 'x', Src1::RS1, Src2::RS2,   Dst::ZERO},
+    {'I', instr_lb,    execute_lb<I>,    OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_lh,    execute_lh<I>,    OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_lw,    execute_lw<I>,    OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_lbu,   execute_lbu<I>,   OUT_LOADU,  'I', Imm::ADDR, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_lhu,   execute_lhu<I>,   OUT_LOADU,  'I', Imm::ADDR, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_sb,    execute_sb<I>,    OUT_STORE,  'S', Imm::ADDR, Src1::RS1, Src2::RS2,   Dst::ZERO},
+    {'I', instr_sh,    execute_sh<I>,    OUT_STORE,  'S', Imm::ADDR, Src1::RS1, Src2::RS2,   Dst::ZERO},
+    {'I', instr_sw,    execute_sw<I>,    OUT_STORE,  'S', Imm::ADDR, Src1::RS1, Src2::RS2,   Dst::ZERO},
     // Immediate arithmetics
-    {'I', instr_addi,  execute_addi<I>,  OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_slti,  execute_slti<I>,  OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_sltiu, execute_sltiu<I>, OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_xori,  execute_xori<I>,  OUT_ARITHM, 'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_ori,   execute_ori<I>,   OUT_ARITHM, 'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_andi,  execute_andi<I>,  OUT_ARITHM, 'I', 'x', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_slli,  execute_slli<I>,  OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_srli,  execute_srli<I>,  OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
-    {'I', instr_srai,  execute_srai<I>,  OUT_ARITHM, 'I', 'd', Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_addi,  execute_addi<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_slti,  execute_slti<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_sltiu, execute_sltiu<I>, OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_xori,  execute_xori<I>,  OUT_ARITHM, 'I', Imm::LOGIC, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_ori,   execute_ori<I>,   OUT_ARITHM, 'I', Imm::LOGIC, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_andi,  execute_andi<I>,  OUT_ARITHM, 'I', Imm::LOGIC, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_slli,  execute_slli<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_srli,  execute_srli<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
+    {'I', instr_srai,  execute_srai<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD},
     // Register-register arithmetics
-    {'I', instr_add,   execute_add<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_sub,   execute_sub<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_sll,   execute_sll<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_slt,   execute_slt<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_sltu,  execute_sltu<I>,  OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_xor,   execute_xor<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_srl,   execute_srl<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_sra,   execute_sra<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_or,    execute_or<I>,    OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
-    {'I', instr_and,   execute_and<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_add,   execute_add<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_sub,   execute_sub<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_sll,   execute_sll<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_slt,   execute_slt<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_sltu,  execute_sltu<I>,  OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_xor,   execute_xor<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_srl,   execute_srl<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_sra,   execute_sra<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_or,    execute_or<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
+    {'I', instr_and,   execute_and<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2,   Dst::RD},
     /*-------------- M --------------*/
-    {'M', instr_mul,    execute_mul<I>,    OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_div,    execute_div<I>,    OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_divu,   execute_divu<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
-    {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', ' ', Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_mul,    execute_mul<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_div,    execute_div<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_divu,   execute_divu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
+    {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD},
 };
 
 template<typename I>
-static const RISCVTableEntry<I> invalid_instr = {'I', {"unknown", 0, 0}, &do_nothing<I>, OUT_ARITHM, ' ', ' ', Src1::ZERO, Src2::ZERO, Dst::ZERO};
+static const RISCVTableEntry<I> invalid_instr = {'I', {"unknown", 0, 0}, &do_nothing<I>, OUT_ARITHM, ' ', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO};
 
 template<typename I>
 const auto& find_entry( uint32 bytes)
@@ -179,65 +180,45 @@ const auto& find_entry( uint32 bytes)
 
 template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
-    : Operation( PC, PC + 4), instr( bytes)
+    : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<RISCVInstr>( bytes);
+    const auto& entry = find_entry<typename RISCVInstr<T>::MyDatapath>( bytes);
     RISCVInstrDecoder decoder( bytes);
 
-    operation = entry.type;
-    imm_type = entry.immediate_type;
-    imm_print_type = entry.immediate_print_type;
-    v_imm = decoder.get_immediate( imm_type);
-    src1  = decoder.get_register( entry.src1);
-    src2  = decoder.get_register( entry.src2);
-    dst   = decoder.get_register( entry.dst);
-    opname  = entry.entry.name;
-    print_dst  = entry.dst == Dst::RD;
-    print_src1 = entry.src1 == Src1::RS1;
-    print_src2 = entry.src2 == Src1::RS1;    
-}
-
-static std::string print_immediate( char print_type, uint32 value)
-{
-    std::ostringstream oss;
-    switch ( print_type)
-    {
-    case 'x': oss << ", 0x" << std::hex << value << std::dec; break;
-    case 'd': oss << ", " << static_cast<int32>(value) << std::dec; break;
-    default: break;
-    }
-    return oss.str();
-}
-
-template<typename T>
-std::string RISCVInstr<T>::generate_disasm() const
-{
-    std::ostringstream oss;
-    oss << opname;
-
-    if ( operation == OUT_LOAD || operation == OUT_LOADU || operation == OUT_STORE)
-    {
-        oss << " $" << (print_dst ? dst : src2)
-            << print_immediate( imm_print_type, v_imm)
-            << "($" << src1 << ")" << std::dec;
-        return oss.str();
-    }
-    
-    if ( print_dst)
-        oss <<  " $" << dst;
-    if ( print_src1)
-        oss << ( print_dst ? ", $" : " $") << src1;
-    if ( print_src2)
-        oss << ", $" << src2;
-
-    oss << print_immediate( imm_print_type, v_imm);
-    return oss.str();
+    this->imm_print_type = entry.immediate_print_type;
+    this->operation = entry.type;
+    this->v_imm = decoder.get_immediate( entry.immediate_type);
+    this->src1  = decoder.get_register( entry.src1);
+    this->src2  = decoder.get_register( entry.src2);
+    this->dst   = decoder.get_register( entry.dst);
+    this->opname  = entry.entry.name;
+    this->print_dst  = entry.dst == Dst::RD;
+    this->print_src1 = entry.src1 == Src1::RS1;
+    this->print_src2 = entry.src2 == Src1::RS2;
 }
 
 template<typename T>
 std::string RISCVInstr<T>::get_disasm() const
 {
-    return generate_disasm();
+    return this->generate_disasm();
+}
+
+template<typename R>
+std::string RISCVInstr<R>::string_dump() const
+{
+    std::ostringstream oss;
+    this->dump_content( oss, get_disasm());
+    return oss.str();
+}
+
+template<typename R>
+std::string RISCVInstr<R>::bytes_dump() const
+{
+     std::ostringstream oss;
+     oss << "Bytes:" << std::hex;
+     for ( const auto& b : unpack_array<uint32, endian>( instr))
+         oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
+     return oss.str();
 }
 
 template class RISCVInstr<uint32>;

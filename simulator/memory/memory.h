@@ -82,7 +82,7 @@ void ReadableMemory::load( Instr* instr) const
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
     auto value = read<DstType, endian>( instr->get_mem_addr(), mask);
-    instr->set_v_dst( value);
+    instr->load( value);
 }
 
 class ZeroMemory : public ReadableMemory

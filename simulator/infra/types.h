@@ -12,26 +12,28 @@
 
 // C++11 fixed width integer types
 #include <cstdint>
+#include <iostream>
 
-/* Signed 8-bit integer type */
+template <typename To, typename From>
+static constexpr To narrow_cast(const From& value)
+{
+    return static_cast<To>( value);
+}
+
+// Signed types
 using int8 = int8_t;
-/* Signed 16-bit integer type */
 using int16 = int16_t;
-/* Signed 32-bit integer type */
 using int32 = int32_t;
-/* Signed 64-bit integer type */
 using int64 = int64_t;
-/* Unsigned 8-bit integer type */
+
+// Unsigned types
 using uint8 = uint8_t;
-/* Unsigned 16-bit integer type */
 using uint16 = uint16_t;
-/* Unsigned 32-bit integer type */
 using uint32 = uint32_t;
-/* Unsigned 64-bit integer type */
 using uint64 = uint64_t;
-/* Single precision 32-bit float type */
+
+// Float types
 using float32 = float;
-/* Double precision 64-bit float type */
 using float64 = double;
 
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
@@ -40,11 +42,15 @@ using float64 = double;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 
-/* Unsigned 128-bit integer type */
+using int128 = __int128;
 using uint128 = unsigned __int128;
 
-/* Signed 128-bit integer type */
-using int128 = __int128;
+static inline std::ostream& operator<<(std::ostream& out, uint128 value)
+{
+    if (out.flags() & std::ios::hex)
+        return out << narrow_cast<uint64>( value >> 64) << narrow_cast<uint64>( value);
+    return out << "..." << narrow_cast<uint64>( value);
+}
 
 #pragma GCC diagnostic pop
 

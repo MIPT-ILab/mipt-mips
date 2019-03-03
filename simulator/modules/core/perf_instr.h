@@ -23,7 +23,7 @@ public:
 
     auto get_dst_v() const { return std::make_pair( this->get_v_dst(), this->get_v_dst2()); }
     
-    bool is_misprediction() const { return bp_data.is_taken != this->is_jump_taken() || bp_data.target != this->get_new_PC(); }
+    bool is_misprediction() const { return bp_data.is_taken != this->is_taken() || bp_data.target != this->get_new_PC(); }
 
     // Get targets for the next instruction, predicted and actual
     Target get_predicted_target() const {
@@ -34,7 +34,7 @@ public:
         return Target( this->get_new_PC(), this->get_sequence_id() + 1);
     }
     
-    BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_jump_taken(), this->get_new_PC()); }
+    BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_taken(), this->get_new_PC()); }
 
     bool is_bypassible() const { return !this->is_conditional_move() &&
                                         !this->is_partial_load()     &&

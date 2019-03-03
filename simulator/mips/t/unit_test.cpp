@@ -13,13 +13,15 @@ TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 TEST_CASE( "MIPS32_instr: invalid instruction in ctor from string")
 {
     MIPS32Instr instr( "invalid_instruction_12345678");
-    CHECK_THROWS_AS( instr.execute(), UnknownMIPSInstruction);
+    instr.execute();
+    CHECK( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION );
 }
 
 TEST_CASE( "MIPS32_instr: MIPS64_instr in MIPS32_instr ctor")
 {
     MIPS32Instr instr( "dsllv");
-    CHECK_THROWS_AS( instr.execute(), UnknownMIPSInstruction);
+    instr.execute();
+    CHECK( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION );
 }
 
 TEST_CASE( "MIPS32_instr: Divmult")
@@ -528,7 +530,7 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     
     CHECK( instr.is_direct_branch() );
     CHECK( !instr.is_direct_jump() );
-    CHECK( !instr.is_indirect_branch() );
+    CHECK( !instr.is_indirect_jump() );
 }
     
 TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
