@@ -13,6 +13,8 @@ enum class MIPSVersion : unsigned {
     I, II, III, IV, V,
     v32,
     v64,
+    mars,
+    mars64,
 };
 
 template<MIPSVersion V> struct MIPSRegisterUIntGen;
@@ -23,6 +25,8 @@ template<> struct MIPSRegisterUIntGen<MIPSVersion::IV>  { using type = uint64; }
 template<> struct MIPSRegisterUIntGen<MIPSVersion::V>   { using type = uint64; };
 template<> struct MIPSRegisterUIntGen<MIPSVersion::v32> { using type = uint32; };
 template<> struct MIPSRegisterUIntGen<MIPSVersion::v64> { using type = uint64; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::mars>   { using type = uint32; };
+template<> struct MIPSRegisterUIntGen<MIPSVersion::mars64> { using type = uint64; };
 
 template<MIPSVersion V> using MIPSRegisterUInt = typename MIPSRegisterUIntGen<V>::type;
 
@@ -45,8 +49,8 @@ public:
     }
 };
 
-static constexpr const MIPSVersionMask MIPS_64_Instr  = MIPSVersionMask() | MIPSVersion::v64;
-static constexpr const MIPSVersionMask MIPS_32_Instr  = MIPS_64_Instr | MIPSVersion::v32;
+static constexpr const MIPSVersionMask MIPS_64_Instr  = MIPSVersionMask() | MIPSVersion::v64 | MIPSVersion::mars64;
+static constexpr const MIPSVersionMask MIPS_32_Instr  = MIPS_64_Instr | MIPSVersion::v32 | MIPSVersion::mars;
 // MIPS64 is a superset of MIPSV
 static constexpr const MIPSVersionMask MIPS_V_Instr   = MIPS_64_Instr | MIPSVersion::V;
 // MIPSI-V are supersets of precedessors

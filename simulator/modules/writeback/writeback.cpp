@@ -119,6 +119,8 @@ template class Writeback<MIPSIII>;
 template class Writeback<MIPSIV>;
 template class Writeback<MIPS32>;
 template class Writeback<MIPS64>;
+template class Writeback<MARS>;
+template class Writeback<MARS64>;
 template class Writeback<RISCV32>;
 template class Writeback<RISCV64>;
 template class Writeback<RISCV128>;
