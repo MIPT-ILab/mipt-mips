@@ -47,8 +47,8 @@ using uint128 = unsigned __int128;
 
 static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
-    if (out.flags() & std::ios::hex)
-        return out << narrow_cast<uint64>( value >> 64) << narrow_cast<uint64>( value);
+    if ((out.flags() & std::ios::hex) != 0)
+        return out << narrow_cast<uint64>( value >> 64ULL) << narrow_cast<uint64>( value);
     return out << "..." << narrow_cast<uint64>( value);
 }
 
