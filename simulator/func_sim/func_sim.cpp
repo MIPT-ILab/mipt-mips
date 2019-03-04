@@ -24,7 +24,7 @@ void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 }
 
 template <typename ISA>
-void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::FuncInstr& instr)
+void FuncSim<ISA>::update_and_check_nop_counter( const FuncInstr& instr)
 {
     if ( instr.is_nop())
         ++nops_in_a_row;
@@ -38,16 +38,31 @@ void FuncSim<ISA>::update_and_check_nop_counter( const typename FuncSim<ISA>::Fu
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
-    FuncInstr instr = imem.fetch_instr( PC);
+    FuncInstr instr = imem.fetch_instr( pc[0]);;
     instr.set_sequence_id(sequence_id);
     sequence_id++;
     rf.read_sources( &instr);
     instr.execute();
     mem->load_store( &instr);
     rf.write_dst( instr);
-    PC = instr.get_new_PC();
+    update_pc( instr);
     update_and_check_nop_counter( instr);
     return instr;
+}
+
+template <typename ISA>
+void FuncSim<ISA>::update_pc( const FuncInstr& instr)
+{
+    auto current_pc = pc[0];
+    for (size_t i = 0; i < instr.get_delayed_slots(); ++i) {
+        current_pc += 4;
+        pc[i] = current_pc;
+    }
+    pc[instr.get_delayed_slots()] = instr.get_new_PC();
+    if (delayed_slots > 0)
+        --delayed_slots;
+    else
+        delayed_slots = instr.get_delayed_slots();
 }
 
 static SyscallResult execute_syscall( Kernel* kernel)
@@ -149,6 +164,8 @@ template class FuncSim<MIPSIII>;
 template class FuncSim<MIPSIV>;
 template class FuncSim<MIPS32>;
 template class FuncSim<MIPS64>;
+template class FuncSim<MARS>;
+template class FuncSim<MARS64>;
 template class FuncSim<RISCV32>;
 template class FuncSim<RISCV64>;
 template class FuncSim<RISCV128>;

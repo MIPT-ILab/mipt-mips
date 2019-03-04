@@ -24,11 +24,13 @@ struct MIPS
 using MIPSI   = MIPS<MIPSVersion::I>;
 using MIPSII  = MIPS<MIPSVersion::II>;
 using MIPS32  = MIPS<MIPSVersion::v32>;
+using MARS    = MIPS<MIPSVersion::mars>;
 
 // 64 bit MIPS
 using MIPSIII = MIPS<MIPSVersion::III>;
 using MIPSIV  = MIPS<MIPSVersion::IV>;
 using MIPS64  = MIPS<MIPSVersion::v64>;
+using MARS64  = MIPS<MIPSVersion::mars64>;
 
 static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
 static_assert( std::is_base_of_v<MIPS64::FuncInstr, MIPS64Instr>);

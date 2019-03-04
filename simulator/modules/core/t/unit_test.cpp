@@ -74,9 +74,9 @@ TEST_CASE( "Perf_Sim: Register size")
     CHECK( PerfSim<MIPS64>( false).sizeof_register() == bytewidth<uint64>);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64")
+TEST_CASE( "Torture_Test: Perf_Sim , MARS 64, Core 64")
 {
-    PerfSim<MIPS64> sim( false);
+    PerfSim<MARS64> sim( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim.set_memory( mem);
     ElfLoader elf( TEST_PATH "/tt.core64.out");
@@ -88,7 +88,7 @@ TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64")
 
 static auto get_smc_loaded_simulator(bool init_checker)
 {
-    auto sim = std::make_shared<PerfSim<MIPS32>>( false);
+    auto sim = std::make_shared<PerfSim<MARS>>( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
     ElfLoader elf( TEST_PATH "/smc.out");

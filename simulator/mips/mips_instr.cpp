@@ -456,6 +456,9 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->print_dst = is_explicit_register( entry.dst);
     this->print_src1 = is_explicit_register( entry.src1);
     this->print_src2 = is_explicit_register( entry.src2);
+
+    bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
+    this->delayed_slots = has_delayed_slot ? 1 : 0;
 }
 
 template<typename R>

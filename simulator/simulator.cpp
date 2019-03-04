@@ -18,7 +18,7 @@
 #include "simulator.h"
 
 namespace config {
-    static AliasedValue<std::string> isa = { "I", "isa", "mips32", "modeled ISA"};
+    static AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
     static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
     static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
@@ -61,6 +61,8 @@ class SimulatorFactory {
         my_map.emplace("mips4",  std::make_unique<TBuilder<MIPSIV>>());
         my_map.emplace("mips32", std::make_unique<TBuilder<MIPS32>>());
         my_map.emplace("mips64", std::make_unique<TBuilder<MIPS64>>());
+        my_map.emplace("mars",   std::make_unique<TBuilder<MARS>>());
+        my_map.emplace("mars64", std::make_unique<TBuilder<MARS64>>());
         my_map.emplace("riscv32", std::make_unique<TBuilder<RISCV32>>());
         my_map.emplace("riscv64", std::make_unique<TBuilder<RISCV64>>());
         my_map.emplace("riscv128", std::make_unique<TBuilder<RISCV128>>());

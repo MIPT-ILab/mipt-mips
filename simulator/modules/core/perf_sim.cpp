@@ -147,6 +147,8 @@ template class PerfSim<MIPSIII>;
 template class PerfSim<MIPSIV>;
 template class PerfSim<MIPS32>;
 template class PerfSim<MIPS64>;
+template class PerfSim<MARS>;
+template class PerfSim<MARS64>;
 template class PerfSim<RISCV32>;
 template class PerfSim<RISCV64>;
 template class PerfSim<RISCV128>;
