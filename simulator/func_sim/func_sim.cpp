@@ -59,10 +59,14 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
         pc[i] = current_pc;
     }
     pc[instr.get_delayed_slots()] = instr.get_new_PC();
-    if (delayed_slots > 0)
+    if (delayed_slots > 0) {
+        for (size_t i = 0; i < delayed_slots; ++i)
+            pc[i] = pc[i + 1];
         --delayed_slots;
-    else
+    }
+    else {
         delayed_slots = instr.get_delayed_slots();
+    }
 }
 
 static SyscallResult execute_syscall( Kernel* kernel)
