@@ -141,14 +141,22 @@ void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class PerfSim<MIPSI>;
-template class PerfSim<MIPSII>;
-template class PerfSim<MIPSIII>;
-template class PerfSim<MIPSIV>;
-template class PerfSim<MIPS32>;
-template class PerfSim<MIPS64>;
-template class PerfSim<MARS>;
-template class PerfSim<MARS64>;
+template class PerfSim<MIPSI_LE>;
+template class PerfSim<MIPSII_LE>;
+template class PerfSim<MIPSIII_LE>;
+template class PerfSim<MIPSIV_LE>;
+template class PerfSim<MIPS32_LE>;
+template class PerfSim<MIPS64_LE>;
+template class PerfSim<MARS_LE>;
+template class PerfSim<MARS64_LE>;
+template class PerfSim<MIPSI_BE>;
+template class PerfSim<MIPSII_BE>;
+template class PerfSim<MIPSIII_BE>;
+template class PerfSim<MIPSIV_BE>;
+template class PerfSim<MIPS32_BE>;
+template class PerfSim<MIPS64_BE>;
+template class PerfSim<MARS_BE>;
+template class PerfSim<MARS64_BE>;
 template class PerfSim<RISCV32>;
 template class PerfSim<RISCV64>;
 template class PerfSim<RISCV128>;

@@ -216,7 +216,7 @@ std::string RISCVInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     for ( const auto& b : unpack_array<uint32, endian>( instr))
+     for ( const auto& b : unpack_array<uint32, Endian::little>( instr))
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return oss.str();
 }

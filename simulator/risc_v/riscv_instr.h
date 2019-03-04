@@ -21,7 +21,7 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
     public:
-        static const constexpr Endian endian = Endian::little;
+        static constexpr auto get_endian() { return Endian::little; }
 
         RISCVInstr() = delete;
         explicit RISCVInstr( uint32 bytes, Addr PC = 0);
