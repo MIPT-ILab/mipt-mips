@@ -42,18 +42,18 @@ struct RISCVInstrDecoder
 
     constexpr uint32 get_B_immediate() const noexcept
     {
-        return((B_imm4_1  << 1)
+        return (B_imm4_1  << 1)
             |  (B_imm10_5 << 5)
             |  (B_imm11   << 11)
-            |  (B_imm12   << 12) >> 1);
+            |  (B_imm12   << 12);
     }
 
     constexpr uint32 get_J_immediate() const noexcept
     {
-        return((J_imm10_1  << 1)
+        return (J_imm10_1  << 1)
             |  (J_imm11    << 11)
             |  (J_imm19_12 << 12)
-            |  (J_imm20    << 20) >> 1);
+            |  (J_imm20    << 20);
     }
 
     uint32 get_immediate(char subset) const noexcept
@@ -97,12 +97,12 @@ struct RISCVInstrDecoder
         , B_imm11   ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
         , B_imm4_1  ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
         , B_imm10_5 ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
-        , B_imm12   ( apply_mask( raw, 0b10000000'00000000'00000000'10000000))
+        , B_imm12   ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
         , U_imm     ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
-        , J_imm19_12( apply_mask( raw, 0b00000000'00001111'11110000'10000000))
-        , J_imm11   ( apply_mask( raw, 0b00000000'00010000'00000000'10000000))
-        , J_imm10_1 ( apply_mask( raw, 0b01111111'11100000'00000000'10000000))
-        , J_imm20   ( apply_mask( raw, 0b10000000'00000000'00000000'10000000))
+        , J_imm19_12( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
+        , J_imm11   ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
+        , J_imm10_1 ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
+        , J_imm20   ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
         , bytes     ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
     { }
 };
