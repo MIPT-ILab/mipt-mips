@@ -465,14 +465,14 @@ TEST_CASE( "MIPS32_instr: beq -1 and -1, one instr ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
-TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr ahead")
+TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr and delayed slot ahead")
 {
     MIPS32Instr instr( "beq");
     instr.set_v_src( 0, 0);
     instr.set_v_src( 1, 1);
     instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: beq -1 and -1, 1024 instr ahead")
@@ -506,7 +506,8 @@ TEST_CASE( "MIPS32_instr: bne two zeroes, 1024 instr ahead")
     instr.set_v_src( 0, 1);
     instr.set_v_imm( 1024);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
@@ -516,7 +517,8 @@ TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
     
 TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
@@ -825,7 +827,7 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     instr.set_v_imm( 0x0fff);
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfff * 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -837,7 +839,7 @@ TEST_CASE( "MIPS32_instr: jalr to 1024th byte")
     instr.set_v_src( 1024, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 1024);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
@@ -846,7 +848,7 @@ TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
     instr.set_v_src( 2, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
