@@ -92,18 +92,20 @@ CacheTagArraySize::CacheTagArraySize(
     uint32 line_size,
     uint32 addr_size_in_bits)
     : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
+    , line_bits( find_first_set( line_size))
     , sets( size_in_bytes / ( ways * line_size))
+    , set_bits( find_first_set( sets) + line_bits)
     , addr_mask( bitmask<Addr>( addr_size_in_bits))
 { }
 
 uint32 CacheTagArraySize::set( Addr addr) const
 {
-    return ( ( addr & addr_mask) / line_size) & (sets - 1);
+    return ( ( addr & addr_mask) >> line_bits) & (sets - 1);
 }
 
 Addr CacheTagArraySize::tag( Addr addr) const
 {
-    return ( addr & addr_mask) / line_size;
+    return ( addr & addr_mask) >> set_bits;
 }
 
 CacheTagArray::CacheTagArray(
@@ -148,7 +150,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const uint32 way = lru_module.update( num_set);
+    const uint32 way = narrow_cast<uint32>( lru_module.update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];

@@ -30,18 +30,8 @@
 #ifndef __vr4300_cpu_h__
 #define __vr4300_cpu_h__
 
-#include <infra/types.h>
-
+#include "cen64_rcp_interrupt_mask.h"
 #include <cstddef>
-
-enum rcp_interrupt_mask : uint64 {
-  MI_INTR_SP = 0x01,
-  MI_INTR_SI = 0x02,
-  MI_INTR_AI = 0x04,
-  MI_INTR_VI = 0x08,
-  MI_INTR_PI = 0x10,
-  MI_INTR_DP = 0x20
-};
 
 struct vr4300;
 struct vr4300_stats;
@@ -75,4 +65,3 @@ void signal_dd_interrupt(struct vr4300 *vr4300);
 }
 
 #endif
-

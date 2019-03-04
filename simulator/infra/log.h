@@ -33,7 +33,7 @@ public:
         return *this;
     }
 
-    template<size_t N>
+    template<size_t N> // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     LogOstream& operator<<(const char (&array)[N]) {
         return *this << static_cast<const char*>( array);
     }

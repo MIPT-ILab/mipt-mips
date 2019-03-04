@@ -16,16 +16,6 @@
 #include <limits>
 #include <type_traits>
 
-template <typename To, typename From>
-static constexpr To narrow_cast(const From& value)
-{
-    return static_cast<To>( value);
-}
-
-/* Returns size of a static array */
-template<typename T, size_t N>
-constexpr size_t countof( const T (& /* unused */)[N]) noexcept { return N; }
-
 /* Checks if values is power of two */
 template<typename T>
 constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }
@@ -36,11 +26,11 @@ void ignored( const T& /* unused */) noexcept { }
 
 /* Find minimal sizeof */
 template<typename ... Args>
-constexpr size_t min_sizeof() noexcept { return std::min({sizeof(Args)...}); }
+constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
 
 /* Find maximal sizeof */
 template<typename ... Args>
-constexpr size_t max_sizeof() noexcept { return std::max({sizeof(Args)...}); }
+constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
 
 /* Bit width of integer type */
 template<typename T>
@@ -128,8 +118,11 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
         return bitwidth<T>;
     using UT = typename std::make_unsigned<T>::type;
     UT uvalue{ value};
-    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1))) - 1;
+    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
 }
+
+template <typename T>
+constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
 
 /*
  * Templated no-value (non-trivial data of given size)
@@ -149,6 +142,7 @@ template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
 {
     using ST = sign_t<T>;
+    T result = 0;
     // Result of shifting right a signed value is implementation defined,
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
@@ -156,12 +150,13 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     if constexpr ((ST{ -2} >> 1u) == ST{ -1})
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
-        // NOLINTNEXTLINE(hicpp-signed-bitwise, bugprone-suspicious-semicolon)
-        return narrow_cast<ST>(value) >> shamt;
-
-    return (value & msb_set<T>()) == 0 // check MSB
-             ? value >> shamt          // just shift if MSB is zero
-             : ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
+        result = narrow_cast<ST>(value) >> shamt;
+    else if ((value & msb_set<T>()) == 0)
+        result = value >> shamt;        // just shift if MSB is zero
+    else
+        result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+    return result;
 }
 
 #endif

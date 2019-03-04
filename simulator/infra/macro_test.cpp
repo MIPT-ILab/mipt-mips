@@ -5,14 +5,12 @@
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
-
-static char hello_world[] = "Hello World!";
-static_assert(countof(hello_world) == sizeof(hello_world) / sizeof(char));
 
 static_assert(is_power_of_two(1u));
 static_assert(is_power_of_two(2u));
@@ -109,6 +107,9 @@ static_assert(find_first_set<uint64>(3) == 0);
 static_assert(find_first_set<uint64>(0xFFFF000) == 12);
 static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
 
+static_assert(log_bitwidth<uint32> == 5);
+static_assert(log_bitwidth<uint64> == 6);
+
 static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
 
 static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
@@ -126,8 +127,29 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data()) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data()) == 0x7856);
+
+template<Endian e>
+static constexpr auto check_to_pointer()
+{
+    std::array<Byte, 2> res{};
+    put_value_to_pointer<uint16, e>( res.data(), 0x3456);
+    return res;
+}
+
+static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
+static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
+
+static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
+static_assert( count_argc( some_argv.data()) == 3);
+
 /* Boost cannot instantiate count_leading_zeroes in constexpr context
 static_assert(count_leading_zeroes<uint128>(0x0) == 128);
 static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
+
+bool macros_tested = true;

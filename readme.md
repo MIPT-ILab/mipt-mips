@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/MIPT-ILab/mipt-mips.svg?branch=master)](https://travis-ci.com/MIPT-ILab/mipt-mips)
-[![Build status](https://ci.appveyor.com/api/projects/status/eungty6us329y8w1/branch/master?svg=true)](https://ci.appveyor.com/project/miptilab/mipt-mips/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/3a8h619rhn3pcdlm?svg=true)](https://ci.appveyor.com/project/pavelkryukov/mipt-mips)
 [![codecov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graph/badge.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
@@ -10,15 +10,17 @@ MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of p
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Simulation frequency gets up to 0.7 MHz on i5-7300U.
+* **Speed**. Up to 1.0 MHz simulation frequency on i5-7300U.
 
 MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
+* **Performance control** of developed or produced hardware
 * **Education**: simulator is a nice experimental frog to study CPU internals
 
 Key system-level features:
 * Compatibility with [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls convention
+* Interactive simulation with [GDB](https://github.com/MIPT-ILab/mipt-mips/wiki/Interactive-simulation-with-GDB)
 
 Key microarchitecture features:
 * Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
@@ -46,37 +48,23 @@ Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project file
 To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
 If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
 
-## Workflow example
-
-#### Clone
-  1. Check that your environment meets all the requirements above.
-  1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
-#### Build
-  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
-  1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
-  1. Go to the build directory: `cd /path/to/your/build/directory`
-  1. Run `cmake /path/to/mipt-mips/simulator` to configure CMake
-  1. Run `make` to get the `mipt-mips` binary file
-  1. If you changed some source code files, just type `make` to rebuild project
-#### Run
-  1. Now you can run simulation: `./mipt-mips -b /path/to/mipt-mips/traces/<tracename>.out`
-  1. See more command line options in the paragraph below
-#### Test
-  1. To run all unit tests, call `make unit-tests && ctest --verbose -C Release` from your build directory.
-
 ## Command line options
 
-### Basic options
+### Standalone run options
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
-* `-d` — enables detailed output of each cycle
 
 ### ISA and system-level options:
 
+* `-I` — modeled ISA. Default version is `mars`.
+    * `mips32`, `mips64` — state-of-the-art MIPS
+    * `riscv32`, `riscv64`, `riscv128` — RISC-V with all instructions
+    * `mars`, `mars64` — simplified MIPS without delayed branches
+    * `mipsI`, `mipsII`, `mipsIII`, `mipsIV` — legacy MIPS versions
 * `-f` — enables functional simulation only
-* `-I` — modeled ISA, default option is "mips32"
-* `--mars` — enables MARS-compatible mode
+* `--mars` — enables MARS-compatible mode of system calls
+* `-d` — enables detailed output of each cycle
 
 ### Performance mode options
 
@@ -92,6 +80,25 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 #### Execution pipeline
 * `--long-alu-latency` - number of execution stages required for long arithmetic instructions to be complete
+
+## Workflow example
+
+#### Clone
+  1. Check that your environment meets all the requirements above.
+  1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
+#### Build
+To build MIPT-MIPS faster, we recommend to install Ninja.
+  1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
+  1. Go to the build directory: `cd /path/to/your/build/directory`
+  1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
+  1. Run `ninja` to get the `mipt-mips` binary file
+  1. If you changed some source code files, just type `ninja` to rebuild project
+#### Run
+  1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
+  1. See more command line options in the paragraph below
+#### Test
+  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
+  1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## About MIPT-MIPS
 

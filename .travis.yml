@@ -25,17 +25,24 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-7
+    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-8 main
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
-    - g++-7
+    - libstdc++-7-dev # To fix lack of std::hash<enum E> in C++11
     - libboost-dev
-    - clang-tidy-7
+    - ninja-build
+  homebrew:
+    packages:
+    - ninja
 
 install:
   - pip install --user future
-  - if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then CXX=g++-7; fi
+  - |
+    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install g++-7
+        CXX=g++-7
+    fi
 # Download and build binutils on OS X
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -47,28 +54,41 @@ install:
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
     fi
+# Download GDB
+  - git clone --depth=1 https://github.com/bminor/binutils-gdb.git --single-branch --branch gdb-8.3-branch
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/traces && make tt
-  - cd $TRAVIS_BUILD_DIR/simulator
-  - mkdir release && cd release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - cd $TRAVIS_BUILD_DIR/traces            && make tt
+  - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
+# Prepare for GDB build
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure && make libdecnumber.a
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/readline     && ./configure && make libreadline.a
 
 script:
-  - make all unit-tests
+  - cd $TRAVIS_BUILD_DIR/simulator/release
+  - ninja mipt-mips unit-tests
   - ctest --verbose
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000
+  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
+  - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/traces/tt.core.universal.out
 
 after_success:
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/traces/fib.out -n 1000000 # Run a trace to see simulation frequency
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        run-clang-tidy-7.py -header-filter='.*'
+        sudo apt-get install clang-tidy-8 --allow-unauthenticated
+        cd $TRAVIS_BUILD_DIR/simulator/debug
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator
-        mkdir debug && cd debug
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1
-        make unit-tests && ctest
-        bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+        cd $TRAVIS_BUILD_DIR/simulator/debug
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+        ninja unit-tests && ctest
+        bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
     fi

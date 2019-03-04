@@ -9,7 +9,9 @@
 #ifndef ENDIAN_H
 #define ENDIAN_H
 
+#include "byte.h"
 #include "macro.h"
+
 #include <array>
 #include <climits>
 
@@ -89,6 +91,22 @@ template<typename T>
 static inline constexpr T swap_endian( T value) noexcept
 {
     return pack_array_le<T>( unpack_array_be<T>( value)); 
+}
+
+template<typename T, Endian e>
+static inline void constexpr put_value_to_pointer( Byte* buf, T value, size_t size = bytewidth<T>) {
+    auto array = unpack_array<T, e>(value);
+    for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
+        *(buf + i) = array[i];
+}
+
+template<typename T, Endian e>
+static inline constexpr T get_value_from_pointer( const Byte* buf, size_t size = bytewidth<T>) {
+    std::array<Byte, bytewidth<T>> array{};
+    for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
+        array[i] = *( buf + i);
+
+    return pack_array<T, e>( array);
 }
 
 #endif // ENDIAN_H

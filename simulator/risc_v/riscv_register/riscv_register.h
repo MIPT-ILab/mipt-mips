@@ -19,6 +19,7 @@
 class RISCVRegister {
     enum RegNum : uint8
     {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) RISCV_REG_ ## X
 #include "riscv_register.def"
 #undef REGISTER
@@ -37,13 +38,15 @@ public:
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
     static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static RISCVRegister from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
-    static const RISCVRegister zero;
-    static const RISCVRegister return_address;
-    static const RISCVRegister mips_hi;
-    static const RISCVRegister mips_lo;
-    static const RISCVRegister cause;
+    static constexpr RISCVRegister mips_hi() noexcept;
+    static constexpr RISCVRegister mips_lo() noexcept;
+    static constexpr RISCVRegister zero() noexcept;
+    static constexpr RISCVRegister return_address() noexcept;
+    static constexpr RISCVRegister cause() noexcept;
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
@@ -52,7 +55,13 @@ private:
     RegNum value = RISCV_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
 
-    explicit RISCVRegister( RegNum id) : value( id) {}
+    explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
 };
+
+constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }
+constexpr inline RISCVRegister RISCVRegister::return_address() noexcept { return RISCVRegister( RISCV_REG_rs); }
+constexpr inline RISCVRegister RISCVRegister::mips_hi() noexcept { return RISCVRegister( MAX_VAL_RegNum); }
+constexpr inline RISCVRegister RISCVRegister::mips_lo() noexcept { return RISCVRegister( MAX_VAL_RegNum); }
+constexpr inline RISCVRegister RISCVRegister::cause() noexcept { return RISCVRegister( MAX_VAL_RegNum); }
 
 #endif

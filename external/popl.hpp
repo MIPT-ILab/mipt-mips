@@ -1092,8 +1092,8 @@ inline std::string ConsoleOptionPrinter::print(const Attribute& max_attribute) c
 //	const size_t descriptionRightMargin(80);
 
 	for (const auto& option: option_parser_->options())
-		optionRightMargin = std::max(optionRightMargin, to_string(option).size() + 2);
-	optionRightMargin = std::min(maxDescriptionLeftMargin - 2, optionRightMargin);
+		optionRightMargin = (std::max)(optionRightMargin, to_string(option).size() + 2);
+	optionRightMargin = (std::min)(maxDescriptionLeftMargin - 2, optionRightMargin);
 
 	for (const auto& option: option_parser_->options())
 	{

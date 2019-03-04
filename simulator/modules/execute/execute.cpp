@@ -11,13 +11,13 @@ namespace config {
     Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
 } // namespace config
 
-
-template <typename ISA>
-Execute<ISA>::Execute( bool log) 
+template <typename FuncInstr>
+Execute<FuncInstr>::Execute( bool log) 
     : Log( log)
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
-    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY", PORT_BW, PORT_FANOUT);
+    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW , PORT_FANOUT);
+    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW , PORT_FANOUT);
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
@@ -31,7 +31,7 @@ Execute<ISA>::Execute( bool log)
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
                                                            last_execution_stage_latency);
 
-    rp_flush = make_read_port<bool>("MEMORY_2_ALL_FLUSH", PORT_LATENCY);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
     rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
@@ -53,8 +53,8 @@ Execute<ISA>::Execute( bool log)
     rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
-template <typename ISA>
-void Execute<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Execute<FuncInstr>::clock( Cycle cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
@@ -122,10 +122,18 @@ void Execute<ISA>::clock( Cycle cycle)
         /* bypass data */
         wp_bypass->write( instr.get_dst_v(), cycle);
 
-        if ( instr.is_mem_stage_required())
-            wp_mem_datapath->write( std::move( instr), cycle);
+        if( instr.is_jump())
+        {
+            wp_branch_datapath->write( std::move( instr) ,cycle);
+        }
+        else if( instr.is_mem_stage_required())
+        {
+            wp_mem_datapath->write( std::move( instr) ,cycle);
+        }
         else
+        {
             wp_writeback_datapath->write( std::move( instr), cycle);
+        }
     }
 }
 
@@ -133,13 +141,10 @@ void Execute<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Execute<MIPSI>;
-template class Execute<MIPSII>;
-template class Execute<MIPSIII>;
-template class Execute<MIPSIV>;
-template class Execute<MIPS32>;
-template class Execute<MIPS64>;
-template class Execute<RISCV32>;
-template class Execute<RISCV64>;
-template class Execute<RISCV128>;
+template class Execute<BaseMIPSInstr<uint32>>;
+template class Execute<BaseMIPSInstr<uint64>>;
+template class Execute<RISCVInstr<uint32>>;
+template class Execute<RISCVInstr<uint64>>;
+template class Execute<RISCVInstr<uint128>>;
+
 

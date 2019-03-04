@@ -16,7 +16,17 @@
 #include <memory>
 
 struct BadInputValue final : Exception {
-    BadInputValue() : Exception( "Bad input value") {}
+    explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
+};
+
+struct SyscallResult {
+    enum {
+        HALT,
+        UNSUPPORTED,
+        SUCCESS,
+        IGNORED,
+    } type;
+    uint64 code;
 };
 
 class Kernel {
@@ -24,21 +34,20 @@ protected:
     std::weak_ptr<Simulator> sim;
     std::shared_ptr<FuncMemory> mem;
 public:
-    static std::shared_ptr<Kernel> create_kernel( bool use_mars = false, std::istream& instream = std::cin,
-                                                  std::ostream& outstream = std::cout);
     static std::shared_ptr<Kernel> create_configured_kernel();
+    static std::shared_ptr<Kernel> create_dummy_kernel();
 
     void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
     void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
-    /* Return false if simulator should be stopped, e.g. on 'exit' syscall */
-    virtual bool execute() { return true; }
+
+    virtual SyscallResult execute() = 0;
 
     Kernel() = default;
     virtual ~Kernel() = default;
     Kernel( const Kernel&) = delete;
     Kernel( Kernel&&) = delete;
-    Kernel operator=( const Kernel&) = delete;
-    Kernel operator=( Kernel&&) = delete;
+    Kernel& operator=( const Kernel&) = delete;
+    Kernel& operator=( Kernel&&) = delete;
 };
 
 #endif //KERNEL_H

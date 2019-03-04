@@ -14,11 +14,10 @@
 
 #include <array>
 
-template <typename ISA>
+template <typename FuncInstr>
 class DataBypass
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register  = typename ISA::Register;
+    using Register  = typename FuncInstr::Register;
     using Instr     = PerfInstr<FuncInstr>;
 
     public:
@@ -143,8 +142,8 @@ class DataBypass
 };
 
 
-template <typename ISA>
-void DataBypass<ISA>::trace_new_dst_register( const Instr& instr, Register num)
+template <typename FuncInstr>
+void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register num)
 {
     auto& entry = get_entry( num);
 
@@ -174,8 +173,8 @@ void DataBypass<ISA>::trace_new_dst_register( const Instr& instr, Register num)
 }
 
 
-template <typename ISA>
-void DataBypass<ISA>::trace_new_dst2_register( const Instr& instr, Register num)
+template <typename FuncInstr>
+void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Register num)
 {
     auto& entry = get_entry( num);
 
@@ -189,8 +188,8 @@ void DataBypass<ISA>::trace_new_dst2_register( const Instr& instr, Register num)
 }
 
 
-template <typename ISA>
-void DataBypass<ISA>::trace_new_instr( const Instr& instr)
+template <typename FuncInstr>
+void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr)
 {
     const auto& dst  = instr.get_dst_num();
     const auto& dst2 = instr.get_dst2_num();
@@ -205,8 +204,8 @@ void DataBypass<ISA>::trace_new_instr( const Instr& instr)
 }
 
 
-template <typename ISA>
-void DataBypass<ISA>::update()
+template <typename FuncInstr>
+void DataBypass<FuncInstr>::update()
 {
     for ( auto& entry:scoreboard)
     {
@@ -234,8 +233,8 @@ void DataBypass<ISA>::update()
 }
 
 
-template <typename ISA>
-void DataBypass<ISA>::handle_flush()
+template <typename FuncInstr>
+void DataBypass<FuncInstr>::handle_flush()
 {
     for ( auto& entry:scoreboard)
         if ( entry.is_traced)

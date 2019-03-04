@@ -18,11 +18,12 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 template<typename T>
 auto mips_multiplication(T x, T y) {
+    using UT = unsign_t<T>;
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    using ReturnType = std::pair<UT, UT>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    return ReturnType(value, value >> bitwidth<T>);
+    return ReturnType(narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T>));
 }
 
 template<typename T>
@@ -46,7 +47,7 @@ struct ALU
     }
 
     template<typename I> static auto zero_extend( const I* instr) {
-        using T = typename I::RegisterSInt;
+        using T = typename I::RegisterUInt;
         return T{ narrow_cast<uint16>(instr->v_imm)};
     }
 
@@ -225,13 +226,13 @@ struct ALU
     void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->v_imm + 32); }
 
     template<typename I, typename T> static
-    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_src2; }
+    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> instr->v_src2; }
+    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I, typename T> static
-    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2); }
+    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
     template<typename I> static
     void lui( I* instr)    { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 0x10u; }
@@ -273,29 +274,32 @@ struct ALU
     template<typename I, Predicate<I> p> static
     void branch( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken) {
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch) {
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
+        }
+        else {
+            instr->new_PC = instr->PC + 4 * (1 + instr->get_delayed_slots());
         }
     }
 
     template<typename I> static
-    void clo( I* instr)  { instr->v_dst = count_leading_ones<uint32>( instr->v_src1); }
+    void clo( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint32>( instr->v_src1)); }
 
     template<typename I> static
-    void dclo( I* instr) { instr->v_dst = count_leading_ones<uint64>( instr->v_src1); }
+    void dclo( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint64>( instr->v_src1)); }
 
     template<typename I> static
-    void clz( I* instr)  { instr->v_dst = count_leading_zeroes<uint32>(  instr->v_src1); }
+    void clz( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint32>(  instr->v_src1)); }
 
     template<typename I> static
-    void dclz( I* instr) { instr->v_dst = count_leading_zeroes<uint64>(  instr->v_src1); }
+    void dclz( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint64>(  instr->v_src1)); }
 
     template<typename I> static
     void jump( I* instr, Addr target)
     {
-        instr->_is_jump_taken = true;
+        instr->is_taken_branch = true;
         instr->new_PC = target;
         check_halt_trap( instr);
     }
@@ -313,27 +317,27 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->new_PC; // link
+        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots()); // link
         j( instr);   // jump
     }
 
     template<typename I, Predicate<I> p> static
     void branch_and_link( I* instr)
     {
-        instr->_is_jump_taken = p( instr);
-        if ( instr->_is_jump_taken)
+        instr->is_taken_branch = p( instr);
+        if ( instr->is_taken_branch)
         {
-            instr->v_dst = instr->new_PC;
+            instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }
     }
 
     template<typename I> static
-    void syscall( I* instr) { instr->trap = Trap::SYSCALL; }
+    void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
 
     template<typename I> static
-    void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+    void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
 };
 
 #endif

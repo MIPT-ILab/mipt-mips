@@ -10,22 +10,24 @@
 
 #include <func_sim/instr_memory.h>
 #include <infra/cache/cache_tag_array.h>
-#include <infra/ports/ports.h>
 #include <modules/core/perf_instr.h>
+#include <modules/ports_instance.h>
  
-template <typename ISA>
+template <typename FuncInstr>
 class Fetch : public Log
 {
-    using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
 
 public:
     explicit Fetch( bool log);
     void clock( Cycle cycle);
-    void set_memory( std::shared_ptr<FuncMemory> mem) { memory.set_memory( std::move( mem)); }
+    void set_memory( std::unique_ptr<InstrMemoryIface<FuncInstr>> mem)
+    {
+        memory = std::move( mem);
+    }
 
 private:
-    InstrMemoryCached<FuncInstr> memory;
+    std::unique_ptr<InstrMemoryIface<FuncInstr>> memory = nullptr;
     std::unique_ptr<BaseBP> bp = nullptr;
     std::unique_ptr<CacheTagArray> tags = nullptr;
     

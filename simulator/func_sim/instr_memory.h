@@ -11,26 +11,52 @@
 
 #include <memory/memory.h>
 
-template<typename Instr>
-class InstrMemory
+template<typename FuncInstr>
+class InstrMemoryIface
 {
-    std::shared_ptr<ReadableMemory> mem;
+protected:
+    std::shared_ptr<ReadableMemory> mem = nullptr;
+    const Endian endian;
 public:
-    void set_memory( std::shared_ptr<ReadableMemory> m) { mem = std::move( m); }
-    auto fetch( Addr pc) const { return mem->read<uint32, Instr::endian>( pc); }
-    auto fetch_instr( Addr PC) { return Instr( fetch( PC), PC); }
+    explicit InstrMemoryIface( Endian e) : endian( e) { }
+    auto fetch( Addr pc) const
+    {
+        return endian == Endian::little
+            ? mem->read<uint32, Endian::little>( pc)
+            : mem->read<uint32, Endian::big>( pc);
+    }
+
+    void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
+    virtual FuncInstr fetch_instr( Addr PC) = 0;
+
+    virtual ~InstrMemoryIface() = default;
+    InstrMemoryIface( const InstrMemoryIface&) = delete;
+    InstrMemoryIface( InstrMemoryIface&&) noexcept = default;
+    InstrMemoryIface& operator=( const InstrMemoryIface&) = delete;
+    InstrMemoryIface& operator=( InstrMemoryIface&&) noexcept = default;
+};
+
+template<typename ISA>
+class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
+{
+public:
+    using Instr = typename ISA::FuncInstr;
+    InstrMemory() : InstrMemoryIface<Instr>( ISA::endianness) { }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage) We keep it as a macro to easily it from makefile
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 
-template<typename Instr>
-class InstrMemoryCached : public InstrMemory<Instr>
+template<typename ISA>
+class InstrMemoryCached : public InstrMemory<ISA>
 {
+    using Instr = typename ISA::FuncInstr;
     LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
-    Instr fetch_instr( Addr PC)
+    Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);
         if ( found && value.is_same_bytes( this->fetch( PC))) {
@@ -40,7 +66,7 @@ public:
         if ( found)
             instr_cache.erase( PC);
 
-        const Instr& instr = InstrMemory<Instr>::fetch_instr( PC);
+        auto instr = InstrMemory<ISA>::fetch_instr( PC);
         instr_cache.update( PC, instr);
         return instr;
     }

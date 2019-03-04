@@ -4,6 +4,7 @@
  */
 
 #include "perf_sim.h"
+#include <func_sim/instr_memory.h>
 #include <memory/elf/elf_loader.h>
 
 #include <chrono>
@@ -16,6 +17,7 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode( log),
     execute( log),
     mem( log),
+    branch( log),
     writeback( log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
@@ -24,14 +26,22 @@ PerfSim<ISA>::PerfSim(bool log) :
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
 
-    init_ports();
+    PortMap::get_instance()->init();
+}
+
+template <typename ISA>
+PerfSim<ISA>::~PerfSim<ISA>()
+{
+    PortMap::reset_instance();
 }
 
 template <typename ISA>
 void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    fetch.set_memory( m);
+    auto imemory = std::make_unique<InstrMemoryCached<ISA>>();
+    imemory->set_memory( m);
+    fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
 }
 
@@ -40,6 +50,12 @@ void PerfSim<ISA>::set_target( const Target& target)
 {
     wp_core_2_fetch_target->write( target, curr_cycle);
     writeback.set_target( target);
+}
+
+template<typename ISA>
+Addr PerfSim<ISA>::get_pc() const
+{
+    return writeback.get_next_PC();
 }
 
 template<typename ISA>
@@ -68,7 +84,6 @@ bool PerfSim<ISA>::is_halt() const
 template<typename ISA>
 void PerfSim<ISA>::clock()
 {
-    clean_up_ports( curr_cycle);
     clock_tree( curr_cycle);
     curr_cycle.inc();
 }
@@ -81,6 +96,7 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     decode.clock( cycle);
     execute.clock( cycle);
     mem.clock( cycle);
+    branch.clock( cycle);
 }
 
 template<typename ISA>
@@ -104,15 +120,43 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl;
 }
 
+template <typename ISA>
+uint64 PerfSim<ISA>::read_gdb_register( uint8 regno) const
+{
+    if ( regno == Register::get_gdb_pc_index())
+        return get_pc();
+
+    return read_register( Register::from_gdb_index( regno));
+}
+
+template <typename ISA>
+void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+{
+    if ( regno == Register::get_gdb_pc_index())
+        set_pc( value);
+    else
+        write_register( Register::from_gdb_index( regno), value);
+}
+
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class PerfSim<MIPSI>;
-template class PerfSim<MIPSII>;
-template class PerfSim<MIPSIII>;
-template class PerfSim<MIPSIV>;
-template class PerfSim<MIPS32>;
-template class PerfSim<MIPS64>;
+template class PerfSim<MIPSI_LE>;
+template class PerfSim<MIPSII_LE>;
+template class PerfSim<MIPSIII_LE>;
+template class PerfSim<MIPSIV_LE>;
+template class PerfSim<MIPS32_LE>;
+template class PerfSim<MIPS64_LE>;
+template class PerfSim<MARS_LE>;
+template class PerfSim<MARS64_LE>;
+template class PerfSim<MIPSI_BE>;
+template class PerfSim<MIPSII_BE>;
+template class PerfSim<MIPSIII_BE>;
+template class PerfSim<MIPSIV_BE>;
+template class PerfSim<MIPS32_BE>;
+template class PerfSim<MIPS64_BE>;
+template class PerfSim<MARS_BE>;
+template class PerfSim<MARS64_BE>;
 template class PerfSim<RISCV32>;
 template class PerfSim<RISCV64>;
 template class PerfSim<RISCV128>;

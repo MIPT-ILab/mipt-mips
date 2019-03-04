@@ -34,8 +34,20 @@ public:
         return copy_by_words( dst, src, size);
     }
 
-    std::string dump() const final { assert(0); return {}; }
-    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { assert(0); }
+    std::string dump() const final
+    {
+        throw CEN64MemoryUnsupportedInterface("dump");
+    }
+
+    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final
+    {
+        throw CEN64MemoryUnsupportedInterface("duplication");
+    }
+
+    size_t strlen( Addr /* addr */) const final
+    {
+        throw CEN64MemoryUnsupportedInterface("string output");
+    }
 
 private:
     bus_controller* const bus = nullptr;
@@ -44,17 +56,15 @@ private:
     {
         uint32 val;
         size_t result = bus_read_word( bus, src, &val);
-        auto tmp = unpack_array<uint32, Endian::big>( val);
-        std::copy( tmp.begin(), tmp.begin() + size, dst);
+        put_value_to_pointer<uint32, Endian::big>( dst, val, size);
         return result;
     }
 
     size_t copy_word( Addr dst, const Byte* src, size_t size) const noexcept
     {
-        std::array<Byte, 4> tmp{};
-        std::copy(src, src + size, tmp.begin()); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        uint32 dqm = swap_endian( bitmask<uint32>( size * CHAR_BIT));
-        return bus_write_word( bus, dst, pack_array<uint32, Endian::big>( tmp), dqm);
+        auto val = get_value_from_pointer<uint32, Endian::big>( src, size);
+        auto dqm = swap_endian( bitmask<uint32>( narrow_cast<uint32>( size * CHAR_BIT)));
+        return bus_write_word( bus, dst, val, dqm);
     }
 
     template<typename D, typename S>

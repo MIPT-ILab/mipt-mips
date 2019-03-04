@@ -8,11 +8,12 @@
 
 #include "perf_instr.h"
 
-#include <infra/ports/ports.h>
+#include <modules/branch/branch.h>
 #include <modules/decode/decode.h>
 #include <modules/execute/execute.h>
 #include <modules/fetch/fetch.h>
 #include <modules/mem/mem.h>
+#include <modules/ports_instance.h>
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
@@ -30,8 +31,10 @@ public:
     using RegisterUInt = typename ISA::RegisterUInt;
 
     explicit PerfSim( bool log);
-    ~PerfSim() override { destroy_ports(); }
+    ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
+    Trap run_single_step() final { return Trap::HALT; }
+    Trap run_until_trap( uint64 /* instrs_to_run */) final { return Trap::HALT; }
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
@@ -40,22 +43,15 @@ public:
     void init_checker() final { writeback.init_checker( *memory); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+    Addr get_pc() const final;
+    
+    uint64 read_cpu_register( uint8 regno) const final { return read_register( Register::from_cpu_index( regno)); }
+    uint64 read_gdb_register( uint8 regno) const final;
+    uint64 read_cause_register() const { return read_register( Register::cause()); }
 
-    uint64 read_cpu_register( uint8 regno) const final {
-        return narrow_cast<uint64>( rf.read( Register::from_cpu_index( regno)));
-    }
-
-    void write_cpu_register( uint8 regno, uint64 value) final {
-        rf.write( Register::from_cpu_index( regno), narrow_cast<RegisterUInt>( value));
-    }
-
-    uint64 read_cause_register() const {
-        return narrow_cast<uint64>( rf.read( Register::cause));
-    }
-
-    void write_cause_register( uint64 value) {
-        rf.write( Register::cause, narrow_cast<RegisterUInt>( value));
-    }
+    void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
+    void write_gdb_register( uint8 regno, uint64 value) final;
+    void write_cause_register( uint64 value) { write_register( Register::cause(), value); }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;
@@ -71,14 +67,15 @@ private:
     bool force_halt = false;
 
     /* simulator units */
-    RF<ISA> rf;
+    RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
 
-    Fetch<ISA> fetch;
-    Decode<ISA> decode;
-    Execute<ISA> execute;
-    Mem<ISA> mem;
+    Fetch<FuncInstr> fetch;
+    Decode<FuncInstr> decode;
+    Execute<FuncInstr> execute;
+    Mem<FuncInstr> mem;
+    Branch<FuncInstr> branch;
     Writeback<ISA> writeback;
 
     /* ports */
@@ -88,6 +85,9 @@ private:
     void clock_tree( Cycle cycle);
     void dump_statistics() const;
     bool is_halt() const;
+
+    uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
+    void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 };
 
 #endif

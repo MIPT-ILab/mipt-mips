@@ -6,33 +6,32 @@
 
 #include "../rf.h"
 
-// Catch2
 #include <catch.hpp>
+#include <mips/mips_register/mips_register.h>
+#include <func_sim/operation.h>
 
-// MIPS-MIPS modules
-#include <mips/mips.h>
-
+using MIPS32Instr = BaseInstruction<uint32, MIPSRegister>;
 
 static_assert(MIPSRegister::MAX_REG >= 32);
 
 TEST_CASE( "RF: read_write_rf")
 {
-    auto rf = std::make_unique<RF<MIPS32>>();
+    auto rf = std::make_unique<RF<MIPS32Instr>>();
 
     // Fill array using write() and check correctness using read()
-    for( size_t i = 0; i < 32; ++i)
+    for( uint8 i = 0; i < 32; ++i)
     {
         rf->write( MIPSRegister::from_cpu_index(i), i);
 
         // Try to write something in zero register
-        rf->write( MIPSRegister::zero, i);
+        rf->write( MIPSRegister::zero(), i);
 
         // Checks
         CHECK( rf->read( MIPSRegister::from_cpu_index(i)) == i);
-        CHECK( rf->read( MIPSRegister::zero) == 0u);
+        CHECK( rf->read( MIPSRegister::zero()) == 0u);
     }
 
-    for( size_t i = 1; i < 32; ++i)
+    for( uint8 i = 1; i < 32; ++i)
     {
         rf->write( MIPSRegister::from_cpu_index(i), 0u);
         rf->write( MIPSRegister::from_cpu_index(i), 0x12345678u, 0xFFu);
@@ -77,112 +76,22 @@ TEST_CASE( "RF: read_write_rf")
 
     // Additional checks for mips_hi_lo
     // Write 1 to HI and 0 to LO
-    rf->write( MIPSRegister::mips_hi, 1u);
-    rf->write( MIPSRegister::mips_lo, 0u);
+    rf->write( MIPSRegister::mips_hi(), 1u);
+    rf->write( MIPSRegister::mips_lo(), 0u);
 
-    CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
-
-    // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi, 0u, all_ones<uint32>(), -1 /* subtract */);
-    rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), -1 /* subtract */);
-    CHECK( rf->read( MIPSRegister::mips_hi) == 0u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == MAX_VAL32);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 1u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == 0u);
 
     // Check accumulating writes
-    rf->write( MIPSRegister::mips_hi, 0u, all_ones<uint32>(), +1 /* add */);
-    rf->write( MIPSRegister::mips_lo, 1u, all_ones<uint32>(), +1 /* add */);
-    CHECK( rf->read( MIPSRegister::mips_hi) == 1u);
-    CHECK( rf->read( MIPSRegister::mips_lo) == 0u);
-}
+    rf->write( MIPSRegister::mips_hi(), 0u, all_ones<uint32>(), -1 /* subtract */);
+    rf->write( MIPSRegister::mips_lo(), 1u, all_ones<uint32>(), -1 /* subtract */);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 0u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == MAX_VAL32);
 
-TEST_CASE( "RF: read_sources_write_dst_rf")
-{
-    auto rf = std::make_unique<RF<MIPS32>>();
-
-    // Fill Reg 25(it's src2) with some value
-    rf->write( MIPSRegister::from_cpu_index(25), 1);
-
-    // Create the instr( for example, "add")
-    auto instr = std::make_unique<MIPS32Instr>( 0x01398820);
-    // Use read_sources( "add") method( initialize src1 and src2)
-    rf->read_sources( instr.get());
-    // Execute instruction( to change v_dst field)
-    instr->execute();
-    // Check
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-
-    // Same
-    instr = std::make_unique<MIPS32Instr>( 0x01398821);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398824);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x0139880a);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x0139880b);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x71398802);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398827);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398825);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x03298804);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x03298806);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398822);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398823);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x01398826);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x0139882a);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
-    instr = std::make_unique<MIPS32Instr>( 0x0139882b);
-    rf->read_sources( instr.get());
-    instr->execute();
-    CHECK( instr->get_v_src2() == 1u);
-    CHECK( instr->get_v_dst() != NO_VAL64);
+    // Check accumulating writes
+    rf->write( MIPSRegister::mips_hi(), 0u, all_ones<uint32>(), +1 /* add */);
+    rf->write( MIPSRegister::mips_lo(), 1u, all_ones<uint32>(), +1 /* add */);
+    CHECK( rf->read( MIPSRegister::mips_hi()) == 1u);
+    CHECK( rf->read( MIPSRegister::mips_lo()) == 0u);
 }
 

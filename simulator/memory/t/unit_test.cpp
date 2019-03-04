@@ -269,3 +269,56 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     CHECK( mem1->dump() == mem2->dump());
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
+
+TEST_CASE( "Func_memory: ZeroMemory")
+{
+    ZeroMemory zm;
+    CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
+}
+
+TEST_CASE( "Func_memory: String length in zero memory")
+{
+    CHECK( ZeroMemory().strlen(0x10) == 0);
+}
+
+TEST_CASE( "Func_memory: String length, no zero bytes")
+{
+    auto mem = FuncMemory::create_hierarchied_memory( 1, 0, 0);
+    mem->write<uint16, Endian::big>( 0xABCD, 0x0);
+    CHECK( mem->strlen( 0x0) == 2);
+}
+
+TEST_CASE( "Func_memory: String length")
+{
+    const std::string hw("Hello World!");
+    auto mem = FuncMemory::create_hierarchied_memory( 24);
+    mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
+    CHECK( mem->strlen( 0x10) == 12);
+    CHECK( mem->strlen( 0x12) == 10);
+    CHECK( mem->read_string( 0x10) == "Hello World!");
+    CHECK( mem->read_string( 0x12) == "llo World!");
+    CHECK( mem->read_string_limited( 0x10, 50) == "Hello World!");
+    CHECK( mem->read_string_limited( 0x10, 5) == "Hello");
+}
+
+TEST_CASE( "Func_memory: String length, plain memory")
+{
+    const std::string hw("Hello World!");
+    auto mem = FuncMemory::create_plain_memory();
+    mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
+    CHECK( mem->strlen( 0x10) == 12);
+}
+
+TEST_CASE( "Func_memory: Write string")
+{
+    auto mem = FuncMemory::create_plain_memory();
+    mem->write_string( "MIPT-MIPS is cool", 0x20); 
+    CHECK( mem->read_string( 0x20) == "MIPT-MIPS is cool");
+}
+
+TEST_CASE( "Func_memory: Write string limited")
+{
+    auto mem = FuncMemory::create_plain_memory();
+    mem->write_string_limited( "MIPT-MIPS is cool", 0x20, 9);
+    CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
+}

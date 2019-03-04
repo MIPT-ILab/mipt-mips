@@ -28,7 +28,10 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     sim.set_memory( mem);
     sim.init_checker();
     sim.set_pc( 0x10);
+
+    CHECK_NOTHROW( sim.get_pc() == 0x10);
     CHECK_NOTHROW( sim.run( 1) );
+    CHECK_NOTHROW( sim.get_pc() == 0x14);
 }
 
 TEST_CASE( "PerfSim: create empty memory and get lost")
@@ -53,15 +56,27 @@ TEST_CASE( "Perf_Sim: signed register R/W")
     CHECK( narrow_cast<int32>( sim.read_cpu_register( 1)) == -1337 );
 }
 
+TEST_CASE( "Perf_Sim: GDB Register R/W")
+{
+    PerfSim<MIPS32> sim( false);
+    sim.write_gdb_register( 1, uint64{ MAX_VAL32});
+    CHECK( sim.read_gdb_register( 1) == MAX_VAL32 );
+    CHECK( sim.read_gdb_register( 0) == 0 );
+
+    sim.write_gdb_register( 37, 100500);
+    CHECK( sim.read_gdb_register( 37) == 100500);
+    CHECK( sim.get_pc() == 100500);
+}
+
 TEST_CASE( "Perf_Sim: Register size")
 {
     CHECK( PerfSim<MIPS32>( false).sizeof_register() == bytewidth<uint32>);
     CHECK( PerfSim<MIPS64>( false).sizeof_register() == bytewidth<uint64>);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64")
+TEST_CASE( "Torture_Test: Perf_Sim , MARS 64, Core 64")
 {
-    PerfSim<MIPS64> sim( false);
+    PerfSim<MARS64> sim( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim.set_memory( mem);
     ElfLoader elf( TEST_PATH "/tt.core64.out");
@@ -73,7 +88,7 @@ TEST_CASE( "Torture_Test: Perf_Sim , MIPS 64, Core 64")
 
 static auto get_smc_loaded_simulator(bool init_checker)
 {
-    auto sim = std::make_shared<PerfSim<MIPS32>>( false);
+    auto sim = std::make_shared<PerfSim<MARS>>( false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
     ElfLoader elf( TEST_PATH "/smc.out");

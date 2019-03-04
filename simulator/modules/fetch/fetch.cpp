@@ -14,13 +14,13 @@ namespace config {
     static Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
-template <typename ISA>
-Fetch<ISA>::Fetch(bool log) : Log( log)
+template <typename FuncInstr>
+Fetch<FuncInstr>::Fetch(bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
-    rp_flush_target = make_read_port<Target>("MEMORY_2_FETCH_TARGET", PORT_LATENCY);
+    rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", PORT_LATENCY);
 
     wp_target = make_write_port<Target>("TARGET", PORT_BW, PORT_FANOUT);
     rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
@@ -30,7 +30,7 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
 
     rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
 
-    rp_bp_update = make_read_port<BPInterface>("MEMORY_2_FETCH", PORT_LATENCY);
+    rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
 
     wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
     rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
@@ -44,8 +44,8 @@ Fetch<ISA>::Fetch(bool log) : Log( log)
                                             config::instruction_cache_line_size);
 }
 
-template <typename ISA>
-Target Fetch<ISA>::get_target( Cycle cycle)
+template <typename FuncInstr>
+Target Fetch<FuncInstr>::get_target( Cycle cycle)
 {
     /* receive flush and stall signals */
     const bool is_stall = rp_stall->is_ready( cycle) && rp_stall->read( cycle);
@@ -72,16 +72,16 @@ Target Fetch<ISA>::get_target( Cycle cycle)
     return Target();
 }
 
-template <typename ISA>
-void Fetch<ISA>::clock_bp( Cycle cycle)
+template <typename FuncInstr>
+void Fetch<FuncInstr>::clock_bp( Cycle cycle)
 {
     /* Process BP updates */
     if ( rp_bp_update->is_ready( cycle))
         bp->update( rp_bp_update->read( cycle));
 }
 
-template <typename ISA>
-void Fetch<ISA>::clock_instr_cache( Cycle cycle)
+template <typename FuncInstr>
+void Fetch<FuncInstr>::clock_instr_cache( Cycle cycle)
 {
     if( rp_long_latency_pc_holder->is_ready( cycle))
     {
@@ -98,8 +98,8 @@ void Fetch<ISA>::clock_instr_cache( Cycle cycle)
     wp_hit_or_miss->write( false, cycle);
 }
 
-template <typename ISA>
-void Fetch<ISA>::save_flush( Cycle cycle)
+template <typename FuncInstr>
+void Fetch<FuncInstr>::save_flush( Cycle cycle)
 {
     /* save PC in the case of flush signal */
     if( rp_flush_target->is_ready( cycle))
@@ -108,8 +108,8 @@ void Fetch<ISA>::save_flush( Cycle cycle)
         wp_target->write( rp_target->read( cycle), cycle);
 }
 
-template <typename ISA>
-Target Fetch<ISA>::get_cached_target( Cycle cycle)
+template <typename FuncInstr>
+Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
 {
     /* simulate request to the memory in the case of cache miss */
     if ( rp_hit_or_miss->is_ready( cycle))
@@ -141,8 +141,8 @@ Target Fetch<ISA>::get_cached_target( Cycle cycle)
 }
 
 
-template <typename ISA>
-void Fetch<ISA>::clock( Cycle cycle)
+template <typename FuncInstr>
+void Fetch<FuncInstr>::clock( Cycle cycle)
 {
     clock_bp( cycle);
 
@@ -156,7 +156,7 @@ void Fetch<ISA>::clock( Cycle cycle)
     /* hold PC for the stall case */
     wp_hold_pc->write( target, cycle);
 
-    Instr instr( memory.fetch_instr( target.address), bp->get_bp_info( target.address));
+    Instr instr( memory->fetch_instr( target.address), bp->get_bp_info( target.address));
     instr.set_sequence_id( target.sequence_id);
 
     /* set next target according to prediction */
@@ -172,12 +172,9 @@ void Fetch<ISA>::clock( Cycle cycle)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Fetch<MIPSI>;
-template class Fetch<MIPSII>;
-template class Fetch<MIPSIII>;
-template class Fetch<MIPSIV>;
-template class Fetch<MIPS32>;
-template class Fetch<MIPS64>;
-template class Fetch<RISCV32>;
-template class Fetch<RISCV64>;
-template class Fetch<RISCV128>;
+template class Fetch<BaseMIPSInstr<uint32>>;
+template class Fetch<BaseMIPSInstr<uint64>>;
+template class Fetch<RISCVInstr<uint32>>;
+template class Fetch<RISCVInstr<uint64>>;
+template class Fetch<RISCVInstr<uint128>>;
+

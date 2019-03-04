@@ -54,11 +54,16 @@ public:
     virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
     virtual std::string dump() const = 0;
+    virtual size_t strlen( Addr addr) const = 0;
+    std::string read_string( Addr addr) const;
+    std::string read_string_limited( Addr addr, size_t size) const;
 
     template<typename T, Endian endian> T read( Addr addr) const noexcept;
     template<typename T, Endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
+private:
+    std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
 template<typename T, Endian endian>
@@ -73,24 +78,21 @@ T ReadableMemory::read( Addr addr) const noexcept
 template<typename Instr>
 void ReadableMemory::load( Instr* instr) const
 {
-    static const constexpr Endian endian = Instr::endian;
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
-    auto value = read<DstType, endian>( instr->get_mem_addr(), mask);
-    instr->set_v_dst( value);
+    auto value = instr->get_endian() == Endian::little
+        ? read<DstType, Endian::little>( instr->get_mem_addr(), mask)
+        : read<DstType, Endian::big>( instr->get_mem_addr(), mask);
+    instr->load( value);
 }
 
 class ZeroMemory : public ReadableMemory
 {
 public:
-    size_t memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept final
-    {
-        std::fill_n( dst, size, Byte{});
-        return size;
-    }
-
+    size_t memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
     std::string dump() const final { return std::string( "empty memory\n"); }
+    size_t strlen( Addr /* addr */) const final { return 0; }
 };
 
 class WriteableMemory : public DestructableMemory
@@ -113,8 +115,14 @@ public:
         const auto& bytes = unpack_array<T, endian>( value);
         memcpy_host_to_guest( addr, bytes.data(), bytes.size());
     }
+
+    void write_string( const std::string& value, Addr addr);
+    void write_string_limited( const std::string& value, Addr addr, size_t size);
+private:
+    void write_string_by_size( const std::string& value, Addr addr, size_t size);
 };
 
+// NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually
 class FuncMemory : public ReadableMemory, public WriteableMemory
 {
 public:
@@ -140,15 +148,22 @@ private:
 template<typename Instr>
 void FuncMemory::store( const Instr& instr)
 {
-    static const constexpr Endian endian = Instr::endian;
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is an unhandled trap");
 
-    if ( ~instr.get_mask() == 0)
-        write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
-    else
-        masked_write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+    if ( ~instr.get_mask() == 0) {
+        if ( instr.get_endian() == Endian::little)
+            write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr());
+        else
+            write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr());
+    }
+    else {
+        if ( instr.get_endian() == Endian::little)
+            masked_write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        else
+            masked_write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+    }
 }
 
 template<typename Instr>
