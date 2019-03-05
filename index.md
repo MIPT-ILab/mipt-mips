@@ -62,6 +62,7 @@ MIPT | Name | Score | Comments
 **717** | **Arsen Davtyan** | **2** | **[#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)** |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+**712** | **Egor Bova** | **0 + ⅓** | **[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
