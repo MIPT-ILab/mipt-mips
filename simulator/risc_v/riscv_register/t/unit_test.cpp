@@ -38,8 +38,8 @@ TEST_CASE( "RISCV_registers: Equal")
 
 TEST_CASE( "RISCV_registers: no_mips")
 {
-    auto reg_hi = RISCVRegister::mips_hi();
-    auto reg_lo = RISCVRegister::mips_lo();
+    volatile auto reg_hi = RISCVRegister::mips_hi();
+    volatile auto reg_lo = RISCVRegister::mips_lo();
     for( uint8 i = 0; i < 32; ++i)
     {
         // Ensure that there are no mips regs
@@ -52,7 +52,7 @@ TEST_CASE( "RISCV_registers: no_mips")
 
 TEST_CASE( "RISCV_registers: return_address")
 {
-    auto reg = RISCVRegister::return_address();
+    volatile auto reg = RISCVRegister::return_address();
     CHECK( reg.to_rf_index() == 1u);
     CHECK_FALSE( reg.is_zero());
     CHECK_FALSE( reg.is_mips_hi());
@@ -61,7 +61,7 @@ TEST_CASE( "RISCV_registers: return_address")
 
 TEST_CASE( "RISCV_registers: Zero")
 {
-    auto reg = RISCVRegister::zero();
+    volatile auto reg = RISCVRegister::zero();
     CHECK( reg.is_zero());
     CHECK_FALSE( reg.is_mips_hi());
     CHECK_FALSE( reg.is_mips_lo());
