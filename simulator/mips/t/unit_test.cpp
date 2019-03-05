@@ -2687,6 +2687,26 @@ TEST_CASE( "MIPS32_instr: div 0 by 1")
     CHECK( instr.get_v_dst()  == 0);
 }
 
+TEST_CASE( "MIPS32_instr: div 1 by 0")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: div 0x80000000 by -1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0x7fffffff);
+}
+
 TEST_CASE( "MIPS32_instr: div 0x654aa8e0 by 0x1fa754c6")
 {
     MIPS32Instr instr( "div");
