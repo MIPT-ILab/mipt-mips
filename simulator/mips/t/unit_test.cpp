@@ -2479,7 +2479,7 @@ TEST_CASE( "MIPS32_instr: xori")
 	CHECK(instr.get_v_dst() == 1);
 	
 	instr.set_v_src( 0xa, 0);
-	instr.set_v_imm( 0x6);
+	instr.set_v_imm( 0x5);
 	instr.execute();
 	CHECK(instr.get_v_dst() == 0xf);
 }
@@ -2683,7 +2683,7 @@ TEST_CASE( "MIPS32_instr: div 0 by 1")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst2() == 0);
     CHECK( instr.get_v_dst()  == 0);
 }
 
@@ -2704,17 +2704,17 @@ TEST_CASE( "MIPS32_instr: div 0x80000000 by -1")
     instr.set_v_src( 0xffffffff, 1);
     instr.execute();
     CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0x7fffffff);
+    CHECK( instr.get_v_dst()  == 0);
 }
 
-TEST_CASE( "MIPS32_instr: div 0x654aa8e0 by 0x1fa754c6")
+TEST_CASE( "MIPS32_instr: div 0x4c4b4000 by 0x1dcd6500")
 {
     MIPS32Instr instr( "div");
-    instr.set_v_src( 0x5ef5fe52, 0);
-    instr.set_v_src( 0x1fa754c6, 1);
+    instr.set_v_src( 0x4c4b4000, 0);
+    instr.set_v_src( 0x1dcd6500, 1);
     instr.execute();
-    CHECK( instr.get_v_dst2() == 2);
-    CHECK( instr.get_v_dst()  == 3);
+    CHECK( instr.get_v_dst2() == 0x10b07600);
+    CHECK( instr.get_v_dst()  == 2);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
