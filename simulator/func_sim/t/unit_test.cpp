@@ -163,6 +163,8 @@ auto get_simulator_with_test( const std::string& test)
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
+    CHECK( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_until_trap( 1) == Trap::NO_TRAP );
+
     auto trap = get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
