@@ -113,12 +113,22 @@ void Writeback<ISA>::Checker::check( const FuncInstr& instr)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Writeback<MIPSI>;
-template class Writeback<MIPSII>;
-template class Writeback<MIPSIII>;
-template class Writeback<MIPSIV>;
-template class Writeback<MIPS32>;
-template class Writeback<MIPS64>;
+template class Writeback<MIPSI_LE>;
+template class Writeback<MIPSII_LE>;
+template class Writeback<MIPSIII_LE>;
+template class Writeback<MIPSIV_LE>;
+template class Writeback<MIPS32_LE>;
+template class Writeback<MIPS64_LE>;
+template class Writeback<MARS_LE>;
+template class Writeback<MARS64_LE>;
+template class Writeback<MIPSI_BE>;
+template class Writeback<MIPSII_BE>;
+template class Writeback<MIPSIII_BE>;
+template class Writeback<MIPSIV_BE>;
+template class Writeback<MIPS32_BE>;
+template class Writeback<MIPS64_BE>;
+template class Writeback<MARS_BE>;
+template class Writeback<MARS64_BE>;
 template class Writeback<RISCV32>;
 template class Writeback<RISCV64>;
 template class Writeback<RISCV128>;

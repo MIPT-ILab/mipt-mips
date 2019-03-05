@@ -18,7 +18,7 @@
 #include "simulator.h"
 
 namespace config {
-    static AliasedValue<std::string> isa = { "I", "isa", "mips32", "modeled ISA"};
+    static AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
     static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
     static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
@@ -55,12 +55,30 @@ class SimulatorFactory {
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static Map generate_map() {
         Map my_map;
-        my_map.emplace("mips1",  std::make_unique<TBuilder<MIPSI>>());
-        my_map.emplace("mips2",  std::make_unique<TBuilder<MIPSII>>());
-        my_map.emplace("mips3",  std::make_unique<TBuilder<MIPSIII>>());
-        my_map.emplace("mips4",  std::make_unique<TBuilder<MIPSIV>>());
+        my_map.emplace("mipsI",  std::make_unique<TBuilder<MIPSI>>());
+        my_map.emplace("mipsII",  std::make_unique<TBuilder<MIPSII>>());
+        my_map.emplace("mipsIII",  std::make_unique<TBuilder<MIPSIII>>());
+        my_map.emplace("mipsIV",  std::make_unique<TBuilder<MIPSIV>>());
         my_map.emplace("mips32", std::make_unique<TBuilder<MIPS32>>());
         my_map.emplace("mips64", std::make_unique<TBuilder<MIPS64>>());
+        my_map.emplace("mars",   std::make_unique<TBuilder<MARS>>());
+        my_map.emplace("mars64", std::make_unique<TBuilder<MARS64>>());
+        my_map.emplace("mipsIel",  std::make_unique<TBuilder<MIPSI_LE>>());
+        my_map.emplace("mipsIIel",  std::make_unique<TBuilder<MIPSII_LE>>());
+        my_map.emplace("mipsIIIel",  std::make_unique<TBuilder<MIPSIII_LE>>());
+        my_map.emplace("mipsIVel",  std::make_unique<TBuilder<MIPSIV_LE>>());
+        my_map.emplace("mips32el", std::make_unique<TBuilder<MIPS32_LE>>());
+        my_map.emplace("mips64el", std::make_unique<TBuilder<MIPS64_LE>>());
+        my_map.emplace("marseb",   std::make_unique<TBuilder<MARS_BE>>());
+        my_map.emplace("mars64eb", std::make_unique<TBuilder<MARS64_BE>>());
+        my_map.emplace("mipsIeb",  std::make_unique<TBuilder<MIPSI_BE>>());
+        my_map.emplace("mipsIIeb",  std::make_unique<TBuilder<MIPSII_BE>>());
+        my_map.emplace("mipsIIIeb",  std::make_unique<TBuilder<MIPSIII_BE>>());
+        my_map.emplace("mipsIVeb",  std::make_unique<TBuilder<MIPSIV_BE>>());
+        my_map.emplace("mips32eb", std::make_unique<TBuilder<MIPS32_BE>>());
+        my_map.emplace("mips64eb", std::make_unique<TBuilder<MIPS64_BE>>());
+        my_map.emplace("marseb",   std::make_unique<TBuilder<MARS_BE>>());
+        my_map.emplace("mars64eb", std::make_unique<TBuilder<MARS64_BE>>());
         my_map.emplace("riscv32", std::make_unique<TBuilder<RISCV32>>());
         my_map.emplace("riscv64", std::make_unique<TBuilder<RISCV64>>());
         my_map.emplace("riscv128", std::make_unique<TBuilder<RISCV128>>());

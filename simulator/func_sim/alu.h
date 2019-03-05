@@ -279,6 +279,9 @@ struct ALU
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }
+        else {
+            instr->new_PC = instr->PC + 4 * (1 + instr->get_delayed_slots());
+        }
     }
 
     template<typename I> static
@@ -314,7 +317,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->new_PC; // link
+        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots()); // link
         j( instr);   // jump
     }
 
@@ -324,7 +327,7 @@ struct ALU
         instr->is_taken_branch = p( instr);
         if ( instr->is_taken_branch)
         {
-            instr->v_dst = instr->new_PC;
+            instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }

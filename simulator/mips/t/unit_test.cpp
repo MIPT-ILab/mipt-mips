@@ -3,7 +3,39 @@
 
 // uArchSim modules
 #include "../mips_instr.h"
+#include "../mips.h"
 #include <memory/memory.h>
+
+class MIPS32Instr : public BaseMIPSInstr<uint32>
+{
+public:
+    explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, Endian::little, bytes, pc) { }
+    explicit MIPS32Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::little, pc) { }
+};
+
+class MIPS32BEInstr : public BaseMIPSInstr<uint32>
+{
+public:
+    explicit MIPS32BEInstr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, Endian::big, bytes, pc) { }
+    explicit MIPS32BEInstr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::big, pc) { }
+};
+
+class MIPS64Instr : public BaseMIPSInstr<uint64>
+{
+public:
+    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::little, bytes, pc) { }
+    explicit MIPS64Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::little, pc) { }
+};
+
+class MIPS64BEInstr : public BaseMIPSInstr<uint64>
+{
+public:
+    explicit MIPS64BEInstr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::big, bytes, pc) { }
+    explicit MIPS64BEInstr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::big, pc) { }
+};
+
+static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
+static_assert( std::is_base_of_v<MIPS64::FuncInstr, MIPS64Instr>);
 
 TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 {
@@ -22,6 +54,12 @@ TEST_CASE( "MIPS32_instr: MIPS64_instr in MIPS32_instr ctor")
     MIPS32Instr instr( "dsllv");
     instr.execute();
     CHECK( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION );
+}
+
+TEST_CASE( "MIPS32_disasm BE-LE")
+{
+    CHECK(MIPS32Instr(0x0139882C).get_disasm() == MIPS32BEInstr(0x0139882C).get_disasm());
+    CHECK(MIPS64Instr(0x0139882D).get_disasm() == MIPS64BEInstr(0x0139882D).get_disasm());
 }
 
 TEST_CASE( "MIPS32_instr: Divmult")
@@ -465,14 +503,14 @@ TEST_CASE( "MIPS32_instr: beq -1 and -1, one instr ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
-TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr ahead")
+TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr and delayed slot ahead")
 {
     MIPS32Instr instr( "beq");
     instr.set_v_src( 0, 0);
     instr.set_v_src( 1, 1);
     instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: beq -1 and -1, 1024 instr ahead")
@@ -506,7 +544,8 @@ TEST_CASE( "MIPS32_instr: bne two zeroes, 1024 instr ahead")
     instr.set_v_src( 0, 1);
     instr.set_v_imm( 1024);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
@@ -516,7 +555,8 @@ TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
     
 TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
@@ -825,7 +865,7 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     instr.set_v_imm( 0x0fff);
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfff * 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -837,7 +877,7 @@ TEST_CASE( "MIPS32_instr: jalr to 1024th byte")
     instr.set_v_src( 1024, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 1024);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
@@ -846,7 +886,7 @@ TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
     instr.set_v_src( 2, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -869,7 +909,14 @@ TEST_CASE( "MIPS32_instr: jr to 2nd byte (round up to 4th)")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE( "MIPS32_instr: lw")
+static auto get_plain_memory_with_data()
+{
+    auto memory = FuncMemory::create_plain_memory(15);
+    memory->write<uint32, Endian::little>( 0xABCD'1234, 0x1000);
+    return memory;
+}
+
+TEST_CASE( "MIPS32_instr: lw le")
 {
     CHECK(MIPS32Instr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
@@ -880,10 +927,23 @@ TEST_CASE( "MIPS32_instr: lw")
     instr.execute();
     CHECK( instr.get_mem_addr() == 0x1000);
 
-    auto memory = FuncMemory::create_plain_memory(15);
-    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x1000);
-    memory->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD);
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
+}
+
+TEST_CASE( "MIPS32_instr: lw be")
+{
+    CHECK(MIPS32BEInstr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
+    CHECK(MIPS32BEInstr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
+
+    MIPS32BEInstr instr( "lw");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x3412'CDAB);
 }
 
 TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
@@ -2319,19 +2379,17 @@ TEST_CASE( "MIPS32_instr: xor 1 and -1")
 
 TEST_CASE( "MIPS32_instr: load dump")
 {
-    MIPS32Instr instr(0x8d3104d0);
-    CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
-    CHECK( instr.bytes_dump() == "Bytes: 0xd0 0x04 0x31 0x8d");
+    MIPS32Instr instr(0x8d310ff0);
+    CHECK( instr.get_disasm() == "lw $s1, 0xff0($t1)");
+    CHECK( instr.bytes_dump() == "Bytes: 0xf0 0x0f 0x31 0x8d");
 
     instr.set_v_src( 0x10, 0);
     instr.set_sequence_id( 0);
     instr.execute();
-    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0 ]");
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0xff0($t1)\t [ $ma = 0x1000 ]");
 
-    auto memory = FuncMemory::create_plain_memory(12);
-    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x4e0);
-    memory->load_store( &instr);
-    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0, $s1 = 0xabcd ]" );
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0xff0($t1)\t [ $ma = 0x1000, $s1 = 0xabcd1234 ]" );
 }
 
 TEST_CASE( "MIPS32_instr: load dump with trap")
