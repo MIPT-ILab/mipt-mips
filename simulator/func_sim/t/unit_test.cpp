@@ -161,10 +161,16 @@ auto get_simulator_with_test( const std::string& test)
     return sim;
 }
 
+TEST_CASE( "Torture_Test: Stop on trap")
+{
+    auto trap = get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
+    CHECK( trap != Trap::NO_TRAP );
+    CHECK( trap != Trap::HALT );
+}
+
 TEST_CASE( "Torture_Test: MARS")
 {
     CHECK_NOTHROW( get_simulator_with_test<MARS>( TEST_PATH "/tt.core.universal.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test<MARS>( TEST_PATH "/tt.core.universal.out")->run_until_trap() );
     CHECK_NOTHROW( get_simulator_with_test<MARS>( TEST_PATH "/tt.core32.le.out")->run_no_limit() );
     CHECK_NOTHROW( get_simulator_with_test<MARS64>( TEST_PATH "/tt.core64.le.out")->run_no_limit() );
 }
@@ -172,6 +178,5 @@ TEST_CASE( "Torture_Test: MARS")
 TEST_CASE( "Torture_Test: Delayed branches")
 {
     CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal_reorder.out")->run_until_trap() );
     CHECK_NOTHROW( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() );
 }
