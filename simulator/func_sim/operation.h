@@ -215,6 +215,7 @@ class BaseInstruction : public Datapath<T>
 public:
     using MyDatapath = Datapath<T>;
     using Register = R;
+    using RegisterUInt = T;
     R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }

@@ -42,7 +42,7 @@ template<typename I> auto execute_slli = do_nothing<I>;
 template<typename I> auto execute_srli = do_nothing<I>;
 template<typename I> auto execute_srai = do_nothing<I>;
 template<typename I> auto execute_add = do_nothing<I>;
-template<typename I> auto execute_sub = do_nothing<I>;
+template<typename I> auto execute_sub = ALU::subtraction<I, typename I::RegisterUInt>;
 template<typename I> auto execute_sll = do_nothing<I>;
 template<typename I> auto execute_slt = do_nothing<I>;
 template<typename I> auto execute_sltu = do_nothing<I>;
@@ -187,6 +187,7 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
 
     this->imm_print_type = entry.immediate_print_type;
     this->operation = entry.type;
+    this->executor  = entry.function;
     this->v_imm = decoder.get_immediate( entry.immediate_type);
     this->src1  = decoder.get_register( entry.src1);
     this->src2  = decoder.get_register( entry.src2);
