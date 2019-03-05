@@ -2255,8 +2255,9 @@ TEST_CASE( "MIPS32_instr: sub 1 from 10")
     CHECK(instr.get_v_dst() == 9);
 }
 
-TEST_CASE( "MIPS32_instr: sub 1 from 0")
+TEST_CASE( "MIPS32_instr: sub 0 from 1")
 {
+    MIPS32Instr instr( "sub");
     instr.set_v_src( 1, 0);
     instr.set_v_src( 0, 1);
     instr.execute();
