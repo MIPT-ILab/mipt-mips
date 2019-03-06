@@ -3185,8 +3185,8 @@ static bool not_a_mips32_instruction( std::string_view name)
 TEST_CASE ( "MIPS64_instr: dadd two zeroes")
 {
     CHECK(MIPS32Instr(0x0139882C).get_disasm() == "dadd $s1, $t1, $t9");
-    /*CHECK( not_a_mips32_instruction("dadd"));                         <--!CHECK fails but dadd is 
-                                                                            64 bit instruction */
+    CHECK( not_a_mips32_instruction("dadd"));
+    
     MIPS64Instr instr( "dadd");
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
@@ -3313,8 +3313,7 @@ TEST_CASE( "MIPS64_instr: daddiu overflow")
 TEST_CASE ( "MIPS64_instr: daddu two zeroes")
 {
     CHECK(MIPS64Instr(0x0139882D).get_disasm() == "daddu $s1, $t1, $t9");
-    /*CHECK( not_a_mips32_instruction("daddu"));                         <--!CHECK fails but daddu is 
-                                                                            64 bit instruction */
+    CHECK( not_a_mips32_instruction("daddu"));
 
     MIPS64Instr instr( "daddu");
     instr.set_v_src( 0, 0);
