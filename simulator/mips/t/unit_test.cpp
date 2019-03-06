@@ -1066,39 +1066,35 @@ TEST_CASE( "MIPS32_instr: jr to 2nd byte (round up to 4th)")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE( "MIPS32_instr: lui 0 and 0x4d2")
+TEST_CASE( "MIPS32_instr: lui with 0x4d2")
 {
     CHECK(MIPS32Instr(0x3c1104d2).get_disasm() == "lui $s1, 0x4d2");
 
     MIPS32Instr instr( "lui");
-    instr.set_v_src( 0, 0);
     instr.set_v_imm( 0x4d2);
     instr.execute();
-    CHECK( instr.get_v_dst()  == 0x04d20000);
+    CHECK( instr.get_v_dst()  == 0x4d20000);
 }
 
-TEST_CASE( "MIPS32_instr: lui 0 and 1")
+TEST_CASE( "MIPS32_instr: lui with 1")
 {
     MIPS32Instr instr( "lui");
-    instr.set_v_src( 0, 0);
     instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst()  == 0x10000);
 }
 
-TEST_CASE( "MIPS32_instr: lui 0xffffffff and 0")
+TEST_CASE( "MIPS32_instr: lui with 0")
 {
     MIPS32Instr instr( "lui");
-    instr.set_v_src( 0xffffffff, 0);
     instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst()  == 0);
 }
 
-TEST_CASE( "MIPS32_instr: lui 0xffffdead and 0xfee1")
+TEST_CASE( "MIPS32_instr: lui with 0xfee1")
 {
     MIPS32Instr instr( "lui");
-    instr.set_v_src( 0xffffdead, 0);
     instr.set_v_imm( 0xfee1);
     instr.execute();
     CHECK( instr.get_v_dst()  == 0xfee10000);
