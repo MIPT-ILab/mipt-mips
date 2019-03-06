@@ -3116,31 +3116,6 @@ TEST_CASE( "MIPS32_instr: xor 1 and -1")
     instr.execute();
     CHECK( instr.get_v_dst() == 0xfffffffe);
 }
-
-TEST_CASE( "MIPS32_instr: xori")
-{
-    CHECK(MIPS32Instr(0x393104d2).get_disasm() == "xori $s1, $t1, 0x4d2");
-    MIPS32Instr instr( "xori");
-    instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
-    instr.execute();
-    CHECK(instr.get_v_dst() == 0);
-    
-    instr.set_v_src( 0, 0);
-    instr.set_v_imm( 1);
-    instr.execute();
-    CHECK(instr.get_v_dst() == 1);
-    
-    instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0);
-    instr.execute();
-    CHECK(instr.get_v_dst() == 1);
-    
-    instr.set_v_src( 0xa, 0);
-    instr.set_v_imm( 0x5);
-    instr.execute();
-    CHECK(instr.get_v_dst() == 0xf);
-}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: xori 0 with 0")
