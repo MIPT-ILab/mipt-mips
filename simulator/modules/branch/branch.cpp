@@ -49,10 +49,10 @@ void Branch<FuncInstr>::clock( Cycle cycle)
      
     bool is_misprediction = false;
 
-    if ( ( instr.get_bp_data() ).is_taken != instr.is_taken())
+    if ( instr.get_bp_data().is_taken != instr.is_taken())
         is_misprediction = true;
     else if ( instr.is_taken())
-        is_misprediction = ( instr.get_bp_data() ).target != instr.get_new_PC();
+        is_misprediction = instr.get_bp_data().target != instr.get_new_PC();
 
     /* handle misprediction */
     if ( is_misprediction )
