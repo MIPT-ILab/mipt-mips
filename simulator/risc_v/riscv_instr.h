@@ -14,33 +14,39 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+template<typename I>
+struct RISCVTableEntry;
+
 template <typename T>
 class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 {
-    private:
-        using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
-        uint32 instr = NO_VAL32;
-    public:
-        static constexpr auto get_endian() { return Endian::little; }
+private:
+    using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
+    uint32 instr = NO_VAL32;
+    void init( const RISCVTableEntry<MyDatapath>& entry);
 
-        RISCVInstr() = delete;
-        explicit RISCVInstr( uint32 bytes, Addr PC = 0);
+public:
+    static constexpr auto get_endian() { return Endian::little; }
 
-         bool is_same_bytes( uint32 bytes) const {
-            return bytes == instr;
-        }
-        
-        bool is_same( const RISCVInstr& rhs) const {
-            return this->PC == rhs.PC && is_same_bytes( rhs.instr);
-        }
+    RISCVInstr() = delete;
+    explicit RISCVInstr( uint32 bytes, Addr PC = 0);
+    explicit RISCVInstr( std::string_view name, Addr PC = 0);
 
-        bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
+     bool is_same_bytes( uint32 bytes) const {
+        return bytes == instr;
+    }
+    
+    bool is_same( const RISCVInstr& rhs) const {
+        return this->PC == rhs.PC && is_same_bytes( rhs.instr);
+    }
 
-        constexpr bool is_nop() const { return instr == 0x0U; }
+    bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
 
-        std::string get_disasm() const;
-        std::string string_dump() const;
-        std::string bytes_dump() const;
+    constexpr bool is_nop() const { return instr == 0x0U; }
+
+    std::string get_disasm() const;
+    std::string string_dump() const;
+    std::string bytes_dump() const;
 };
 
 template <typename T>
