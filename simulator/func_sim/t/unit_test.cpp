@@ -10,6 +10,7 @@
 
 // Module
 #include <kernel/kernel.h>
+#include <kernel/mars/mars_kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <mips/mips.h>
@@ -157,8 +158,23 @@ auto get_simulator_with_test( const std::string& test)
 
     ElfLoader elf( test);
     elf.load_to( mem.get());
+
+    auto kernel = create_mars_kernel();
+    kernel->set_memory( mem);
+    kernel->set_simulator( sim);
+    sim->set_kernel( kernel);
+
     sim->set_pc( elf.get_startPC());
     return sim;
+}
+
+TEST_CASE( "Torture_Test: Stop on trap")
+{
+    CHECK( get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_until_trap( 1) == Trap::NO_TRAP );
+
+    auto trap = get_simulator_with_test<MIPS32>( TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
+    CHECK( trap != Trap::NO_TRAP );
+    CHECK( trap != Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: MARS")
