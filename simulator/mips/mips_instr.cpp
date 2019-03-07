@@ -215,8 +215,8 @@ static const Table<I> isaMapR =
     {0x2A, { "slt",  mips_slt<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     {0x2B, { "sltu", mips_sltu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     // Doubleword addition/Subtraction
-    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
+    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2E, { "dsub",  mips_dsub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2F, { "dsubu", mips_dsubu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     // Conditional traps (MIPS II)
