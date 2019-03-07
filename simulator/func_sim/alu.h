@@ -24,7 +24,7 @@ auto mips_multiplication(T x, T y) {
     using ReturnType = std::pair<UT, UT>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
     return ReturnType(narrow_cast<UT>( value & all_ones<UT>()),
-                      narrow_cast<UT>(( value >> bitwidth<T>) & all_ones<UT>());
+                      narrow_cast<UT>(( value >> bitwidth<T>) & all_ones<UT>()));
 }
 
 template<typename T>
