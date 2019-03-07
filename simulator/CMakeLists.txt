@@ -84,8 +84,8 @@ add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND cat ${RISCV_DIR}/opcodes | python ${RISCV_DIR}/parse-opcodes -c > ${RISCV_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/opcodes ${RISCV_DIR}/parse-opcodes
+    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc > ${RISCV_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse-opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
 )
 
 if (MSVC)

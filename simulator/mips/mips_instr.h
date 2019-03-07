@@ -35,16 +35,16 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 
         const uint32 raw;
         const bool raw_valid = false;
+        const Endian endian;
 
         void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
         static DisasmCache& get_disasm_cache();
     public:
-        BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC);
-        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC);
-
-        static const constexpr Endian endian = Endian::little;
-
+        BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC);
+        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC );
         BaseMIPSInstr() = delete;
+
+        auto get_endian() const { return endian; }
 
         bool is_same_bytes( uint32 bytes) const {
             return raw == bytes;
@@ -71,20 +71,6 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         {
             return instr.dump_content( out, instr.get_disasm());
         }
-};
-
-class MIPS32Instr : public BaseMIPSInstr<uint32>
-{
-public:
-    explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, bytes, pc) { }
-    explicit MIPS32Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, pc) { }
-};
-
-class MIPS64Instr : public BaseMIPSInstr<uint64>
-{
-public:
-    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, bytes, pc) { }
-    explicit MIPS64Instr( std::string_view str_opcode, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, pc) { }
 };
 
 #endif //MIPS_INSTR_H

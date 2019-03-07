@@ -6,12 +6,11 @@
 
 #include "../rf.h"
 
-// Catch2
 #include <catch.hpp>
+#include <mips/mips_register/mips_register.h>
+#include <func_sim/operation.h>
 
-// MIPS-MIPS modules
-#include <mips/mips.h>
-
+using MIPS32Instr = BaseInstruction<uint32, MIPSRegister>;
 
 static_assert(MIPSRegister::MAX_REG >= 32);
 
@@ -94,19 +93,5 @@ TEST_CASE( "RF: read_write_rf")
     rf->write( MIPSRegister::mips_lo(), 1u, all_ones<uint32>(), +1 /* add */);
     CHECK( rf->read( MIPSRegister::mips_hi()) == 1u);
     CHECK( rf->read( MIPSRegister::mips_lo()) == 0u);
-}
-
-TEST_CASE( "RF: read_sources_write_dst_rf")
-{
-    RF<MIPS32Instr> rf;
-
-    // Fill Reg 25(it's src2) with some value
-    rf.write( MIPSRegister::from_cpu_index(25), 1);
-
-    MIPS32Instr instr( 0x01398820); // add
-    rf.read_sources( &instr);
-    instr.execute();
-    CHECK( instr.get_v_src2() == 1u);
-    CHECK( instr.get_v_dst() != NO_VAL64);
 }
 

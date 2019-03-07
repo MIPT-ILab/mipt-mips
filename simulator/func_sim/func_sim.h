@@ -27,17 +27,20 @@ class FuncSim : public Simulator
 
     private:
         RF<FuncInstr> rf;
-        Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
+        std::array<Addr, 8> pc;
+        size_t delayed_slots = 0;
+        void update_pc( const FuncInstr& instr);
+
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
         Trap handle_syscall();
         Trap step_system();
-        
+
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
@@ -53,10 +56,11 @@ class FuncSim : public Simulator
         Trap run_until_trap( uint64 instrs_to_run) final;
 
         void set_target(const Target& target) final {
-            PC = target.address;
+            pc[0] = target.address;
+            delayed_slots = 0;
             sequence_id = target.sequence_id;
         }
-        Addr get_pc() const final { return PC; }
+        Addr get_pc() const final { return pc[0]; }
 
         size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 

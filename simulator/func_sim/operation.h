@@ -67,13 +67,16 @@ public:
 	bool is_direct_branch() const { return operation == OUT_BRANCH; }
 
 	// target is known only at EXE stage
-	bool is_indirect_branch() const { return operation == OUT_R_JUMP; }
+	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
 	bool is_jump() const { return this->is_direct_jump()     ||
 				      this->is_direct_branch()   ||
-				      this->is_indirect_branch(); }
+				      this->is_indirect_jump(); }
 
-    bool is_jump_taken() const { return  _is_jump_taken; }
+    bool is_taken() const
+    {
+        return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
+    }
 
     bool is_partial_load() const
     {
@@ -108,6 +111,7 @@ public:
     auto get_sequence_id() const { return sequence_id; }
 
     void set_v_imm( uint32 value) { v_imm = value; }
+    auto get_delayed_slots() const { return delayed_slots; }
 
 protected:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
@@ -120,10 +124,11 @@ protected:
     uint32 mem_size = NO_VAL32;
     uint32 v_imm = NO_VAL32;
     Imm imm_print_type = Imm::NO;
+    uint8 delayed_slots = 0;
 
     // convert this to bitset
     bool complete   = false;
-    bool _is_jump_taken = false; // actual result
+    bool is_taken_branch = false; // actual result
     bool memory_complete = false;
     bool print_dst = false;
     bool print_src1 = false;
@@ -210,6 +215,7 @@ class BaseInstruction : public Datapath<T>
 public:
     using MyDatapath = Datapath<T>;
     using Register = R;
+    using RegisterUInt = T;
     R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }

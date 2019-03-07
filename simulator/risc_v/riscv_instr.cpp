@@ -14,7 +14,7 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto execute_lui = do_nothing<I>;
+template<typename I> auto execute_lui = ALU::upper_immediate<I, 12>;
 template<typename I> auto execute_auipc = do_nothing<I>;
 template<typename I> auto execute_jal = do_nothing<I>;
 template<typename I> auto execute_jalr = do_nothing<I>;
@@ -42,7 +42,7 @@ template<typename I> auto execute_slli = do_nothing<I>;
 template<typename I> auto execute_srli = do_nothing<I>;
 template<typename I> auto execute_srai = do_nothing<I>;
 template<typename I> auto execute_add = do_nothing<I>;
-template<typename I> auto execute_sub = do_nothing<I>;
+template<typename I> auto execute_sub = ALU::subtraction<I, typename I::RegisterUInt>;
 template<typename I> auto execute_sll = do_nothing<I>;
 template<typename I> auto execute_slt = do_nothing<I>;
 template<typename I> auto execute_sltu = do_nothing<I>;
@@ -116,7 +116,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_lui,   execute_lui<I>,   OUT_ARITHM, 'U', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
     {'I', instr_auipc, execute_auipc<I>, OUT_ARITHM, 'U', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
     // Jumps and branches
-    {'I', instr_jal,   execute_jal<I>,   OUT_J_JUMP, 'J', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RD},
+    {'I', instr_jal,   execute_jal<I>,   OUT_J_JUMP, 'J', Imm::ARITH, Src1::ZERO, Src2::ZERO, Dst::RD},
     {'I', instr_jalr,  execute_jalr<I>,  OUT_R_JUMP, 'I', Imm::LOGIC, Src1::RS1,  Src2::ZERO, Dst::RD},
     {'I', instr_beq,   execute_beq<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
     {'I', instr_bne,   execute_bne<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO},
@@ -178,19 +178,44 @@ const auto& find_entry( uint32 bytes)
     return invalid_instr<I>;
 }
 
+template<typename I>
+const auto& find_entry( std::string_view name)
+{
+    for (const auto& e : cmd_desc<I>)
+        if ( e.entry.name == name)
+            return e;
+        
+    return invalid_instr<I>;
+}
+
 template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<typename RISCVInstr<T>::MyDatapath>( bytes);
-    RISCVInstrDecoder decoder( bytes);
+    const auto& entry = find_entry<MyDatapath>( bytes);
+    init( entry);
 
-    this->imm_print_type = entry.immediate_print_type;
-    this->operation = entry.type;
+    RISCVInstrDecoder decoder( bytes);
     this->v_imm = decoder.get_immediate( entry.immediate_type);
     this->src1  = decoder.get_register( entry.src1);
     this->src2  = decoder.get_register( entry.src2);
     this->dst   = decoder.get_register( entry.dst);
+}
+
+template<typename T>
+RISCVInstr<T>::RISCVInstr( std::string_view name, Addr PC)
+    : BaseInstruction<T, RISCVRegister>( PC, PC + 4)
+{
+    const auto& entry = find_entry<MyDatapath>( name);
+    init( entry);
+}
+
+template<typename T>
+void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
+{
+    this->imm_print_type = entry.immediate_print_type;
+    this->operation = entry.type;
+    this->executor  = entry.function;
     this->opname  = entry.entry.name;
     this->print_dst  = entry.dst == Dst::RD;
     this->print_src1 = entry.src1 == Src1::RS1;
@@ -216,7 +241,7 @@ std::string RISCVInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     for ( const auto& b : unpack_array<uint32, endian>( instr))
+     for ( const auto& b : unpack_array<uint32, Endian::little>( instr))
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return oss.str();
 }

@@ -78,7 +78,7 @@ template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ll      = ALU::load_addr<I>;
-template<typename I> auto mips_lui     = ALU::lui<I>;
+template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
@@ -215,8 +215,8 @@ static const Table<I> isaMapR =
     {0x2A, { "slt",  mips_slt<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     {0x2B, { "sltu", mips_sltu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     // Doubleword addition/Subtraction
-    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
+    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2E, { "dsub",  mips_dsub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2F, { "dsubu", mips_dsubu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     // Conditional traps (MIPS II)
@@ -423,18 +423,20 @@ static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
 #endif
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, uint32 bytes, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( bytes)
     , raw_valid( true)
+    , endian( endian)
 {
     init( get_table_entry<MyDatapath>( raw), version);
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( 0)
+    , endian( endian)
 {
     init( get_table_entry<MyDatapath>( str_opcode), version);
 }
@@ -456,6 +458,9 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->print_dst = is_explicit_register( entry.dst);
     this->print_src1 = is_explicit_register( entry.src1);
     this->print_src2 = is_explicit_register( entry.src2);
+
+    bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
+    this->delayed_slots = has_delayed_slot ? 1 : 0;
 }
 
 template<typename R>
@@ -478,7 +483,8 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     for ( const auto& b : unpack_array<uint32, endian>( raw))
+     const auto& bytes = endian == Endian::little ? unpack_array<uint32, Endian::little>( raw) : unpack_array<uint32, Endian::big>( raw);
+     for ( const auto& b : bytes)
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return oss.str();
 }
