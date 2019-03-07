@@ -37,14 +37,14 @@ TEST_CASE( "FuncSim RISC-V: create empty memory and find unknown instruction")
 {
     FuncSim<RISCV32> sim( false);
     sim.set_memory( FuncMemory::create_hierarchied_memory());
-    CHECK( sim.run_until_trap() == Trap::UNKNOWN_INSTRUCTION);
+    CHECK( sim.run_until_trap( 200) == Trap::UNKNOWN_INSTRUCTION);
 }
 
 TEST_CASE( "FuncSim RISC-V 128 bit: create empty memory and find unknown instruction")
 {
     FuncSim<RISCV128> sim( false);
     sim.set_memory( FuncMemory::create_hierarchied_memory());
-    CHECK( sim.run_until_trap() == Trap::UNKNOWN_INSTRUCTION);
+    CHECK( sim.run_until_trap( 200) == Trap::UNKNOWN_INSTRUCTION);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")
