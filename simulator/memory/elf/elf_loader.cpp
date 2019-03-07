@@ -37,7 +37,7 @@ ElfLoader::ElfLoader( const std::string& filename, AddrDiff offset)
 void ElfLoader::load_to( WriteableMemory *memory) const
 {
     for ( const auto& section : reader->sections)
-        if ( section->get_flags() & SHF_ALLOC)
+        if ( ( section->get_flags() & SHF_ALLOC) != 0)
             load_elf_section( memory, *section, offset);
 }
 
