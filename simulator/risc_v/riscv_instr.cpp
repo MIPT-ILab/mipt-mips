@@ -14,7 +14,7 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto execute_lui = do_nothing<I>;
+template<typename I> auto execute_lui = ALU::upper_immediate<I, 12>;
 template<typename I> auto execute_auipc = do_nothing<I>;
 template<typename I> auto execute_jal = do_nothing<I>;
 template<typename I> auto execute_jalr = do_nothing<I>;
@@ -178,20 +178,44 @@ const auto& find_entry( uint32 bytes)
     return invalid_instr<I>;
 }
 
+template<typename I>
+const auto& find_entry( std::string_view name)
+{
+    for (const auto& e : cmd_desc<I>)
+        if ( e.entry.name == name)
+            return e;
+        
+    return invalid_instr<I>;
+}
+
 template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<typename RISCVInstr<T>::MyDatapath>( bytes);
-    RISCVInstrDecoder decoder( bytes);
+    const auto& entry = find_entry<MyDatapath>( bytes);
+    init( entry);
 
-    this->imm_print_type = entry.immediate_print_type;
-    this->operation = entry.type;
-    this->executor  = entry.function;
+    RISCVInstrDecoder decoder( bytes);
     this->v_imm = decoder.get_immediate( entry.immediate_type);
     this->src1  = decoder.get_register( entry.src1);
     this->src2  = decoder.get_register( entry.src2);
     this->dst   = decoder.get_register( entry.dst);
+}
+
+template<typename T>
+RISCVInstr<T>::RISCVInstr( std::string_view name, Addr PC)
+    : BaseInstruction<T, RISCVRegister>( PC, PC + 4)
+{
+    const auto& entry = find_entry<MyDatapath>( name);
+    init( entry);
+}
+
+template<typename T>
+void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
+{
+    this->imm_print_type = entry.immediate_print_type;
+    this->operation = entry.type;
+    this->executor  = entry.function;
     this->opname  = entry.entry.name;
     this->print_dst  = entry.dst == Dst::RD;
     this->print_src1 = entry.src1 == Src1::RS1;
