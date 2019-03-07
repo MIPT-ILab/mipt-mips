@@ -150,7 +150,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const uint32 way = narrow_cast<uint32>( lru_module.update( num_set));
+    const auto way = narrow_cast<uint32>( lru_module.update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
