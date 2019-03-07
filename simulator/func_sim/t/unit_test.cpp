@@ -28,26 +28,23 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 
 TEST_CASE( "FuncSim MIPS32: create empty memory and get lost")
 {
-    auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<MIPS32> sim( false);
-    sim.set_memory( m);
+    sim.set_memory( FuncMemory::create_hierarchied_memory());
     CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
 }
 
-TEST_CASE( "FuncSim RISC-V: create empty memory and get lost")
+TEST_CASE( "FuncSim RISC-V: create empty memory and find unknown instruction")
 {
-    auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<RISCV32> sim( false);
-    sim.set_memory( m);
-    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+    sim.set_memory( FuncMemory::create_hierarchied_memory());
+    CHECK( sim.run_until_trap() == Trap::UNKNOWN_INSTRUCTION);
 }
 
-TEST_CASE( "FuncSim RISC-V 128 bit: create empty memory and get lost")
+TEST_CASE( "FuncSim RISC-V 128 bit: create empty memory and find unknown instruction")
 {
-    auto m = FuncMemory::create_hierarchied_memory();
     FuncSim<RISCV128> sim( false);
-    sim.set_memory( m);
-    CHECK_THROWS_AS( sim.run_no_limit(), BearingLost);
+    sim.set_memory( FuncMemory::create_hierarchied_memory());
+    CHECK( sim.run_until_trap() == Trap::UNKNOWN_INSTRUCTION);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")
