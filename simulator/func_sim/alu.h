@@ -190,13 +190,43 @@ struct ALU
     bool geiu( const I* instr) { return instr->v_src1 >= narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
 
     template<typename I, typename T> static
-    void addition( I* instr)     { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_src2)); }
+    void addition( I* instr)     { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_src2); }
 
     template<typename I, typename T> static
-    void subtraction( I* instr)  { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2)); }
+    void subtraction( I* instr)  { instr->v_dst = narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2); }
 
     template<typename I, typename T> static
-    void addition_imm( I* instr) { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend( instr))); }
+    void addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend( instr)); }
+
+    template<typename I, typename T> static
+    void addition_overflow( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( instr->v_src2);
+        instr->v_dst = x + y;
+//      if ( add_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
+
+    template<typename I, typename T> static
+    void subtraction_overflow( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( instr->v_src2);
+        instr->v_dst = x - y;
+//      if ( sub_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( sign_extend( instr));
+        instr->v_dst = x + y;
+//      if ( add_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
 
     template<typename I, typename T> static
     void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }

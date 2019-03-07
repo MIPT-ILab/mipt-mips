@@ -18,8 +18,8 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto mips_add     = ALU::addition<I, int32>;
-template<typename I> auto mips_addi    = ALU::addition_imm<I, int32>;
+template<typename I> auto mips_add     = ALU::addition_overflow<I, uint32>;
+template<typename I> auto mips_addi    = ALU::addition_overflow_imm<I, uint32>;
 template<typename I> auto mips_addiu   = ALU::addition_imm<I, uint32>;
 template<typename I> auto mips_addu    = ALU::addition<I, uint32>;
 template<typename I> auto mips_and     = ALU::andv<I>;
@@ -43,8 +43,8 @@ template<typename I> auto mips_bnel    = ALU::branch<I, ALU::ne<I>>;
 template<typename I> auto mips_break   = ALU::breakpoint<I>;
 template<typename I> auto mips_clo     = ALU::clo<I>;
 template<typename I> auto mips_clz     = ALU::clz<I>;
-template<typename I> auto mips_dadd    = ALU::addition<I, int64>;
-template<typename I> auto mips_daddi   = ALU::addition_imm<I, int64>;
+template<typename I> auto mips_dadd    = ALU::addition_overflow<I, uint64>;
+template<typename I> auto mips_daddi   = ALU::addition_overflow_imm<I, uint64>;
 template<typename I> auto mips_daddiu  = ALU::addition_imm<I, uint64>;
 template<typename I> auto mips_daddu   = ALU::addition<I, uint64>;
 template<typename I> auto mips_dclo    = ALU::dclo<I>;
@@ -64,7 +64,7 @@ template<typename I> auto mips_dsrav   = ALU::srav<I, uint64>;
 template<typename I> auto mips_dsrl    = ALU::srl<I, uint64>;
 template<typename I> auto mips_dsrl32  = ALU::dsrl32<I>;
 template<typename I> auto mips_dsrlv   = ALU::srlv<I, uint64>;
-template<typename I> auto mips_dsub    = ALU::subtraction<I, int64>;
+template<typename I> auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
 template<typename I> auto mips_dsubu   = ALU::subtraction<I, uint64>;
 template<typename I> auto mips_j       = ALU::j<I>;
 template<typename I> auto mips_jal     = ALU::jump_and_link<I, ALU::j<I>>;
@@ -117,7 +117,7 @@ template<typename I> auto mips_sra     = ALU::sra<I, uint32>;
 template<typename I> auto mips_srav    = ALU::srav<I, uint32>;
 template<typename I> auto mips_srl     = ALU::srl<I, uint32>;
 template<typename I> auto mips_srlv    = ALU::srlv<I, uint32>;
-template<typename I> auto mips_sub     = ALU::subtraction<I, int32>;
+template<typename I> auto mips_sub     = ALU::subtraction_overflow<I, uint32>;
 template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
