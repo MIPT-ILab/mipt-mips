@@ -21,11 +21,36 @@ TEST_CASE("RISCV disassembly")
 TEST_CASE("RISCV invalid instruction")
 {
     CHECK( RISCVInstr<uint32>(0x0).get_disasm() == "unknown" );
+    CHECK( RISCVInstr<uint32>("qwerty").get_disasm() == "unknown" );
 }
 
 TEST_CASE("RISCV bytes dump")
 {
     CHECK( RISCVInstr<uint32>(0x204002b7).bytes_dump() == "Bytes: 0xb7 0x02 0x40 0x20");
+}
+
+TEST_CASE("RISCV lui 1")
+{
+    RISCVInstr<uint32> instr("lui");
+    instr.set_v_imm(0x1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x1000);
+}
+
+TEST_CASE("RISCV lui all fs")
+{
+    RISCVInstr<uint32> instr("lui");
+    instr.set_v_imm(0xfffff);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'f000ULL);
+}
+
+TEST_CASE("RISCV-128 lui all fs")
+{
+    RISCVInstr<uint64> instr("lui");
+    instr.set_v_imm(0xfffff);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'f000ULL);
 }
 
 TEST_CASE("RISCV sub")
