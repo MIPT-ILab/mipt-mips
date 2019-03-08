@@ -42,18 +42,18 @@ struct RISCVInstrDecoder
 
     constexpr uint32 get_B_immediate() const noexcept
     {
-        return (B_imm4_1  << 1)
-            |  (B_imm10_5 << 5)
-            |  (B_imm11   << 11)
-            |  (B_imm12   << 12);
+        return (B_imm4_1  << 1U)
+            |  (B_imm10_5 << 5U)
+            |  (B_imm11   << 11U)
+            |  (B_imm12   << 12U);
     }
 
     constexpr uint32 get_J_immediate() const noexcept
     {
-        return (J_imm10_1  << 1)
-            |  (J_imm11    << 11)
-            |  (J_imm19_12 << 12)
-            |  (J_imm20    << 20);
+        return (J_imm10_1  << 1U)
+            |  (J_imm11    << 11U)
+            |  (J_imm19_12 << 12U)
+            |  (J_imm20    << 20U);
     }
 
     uint32 get_immediate(char subset) const noexcept

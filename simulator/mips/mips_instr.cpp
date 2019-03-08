@@ -18,8 +18,8 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto mips_add     = ALU::addition<I, int32>;
-template<typename I> auto mips_addi    = ALU::addition_imm<I, int32>;
+template<typename I> auto mips_add     = ALU::addition_overflow<I, uint32>;
+template<typename I> auto mips_addi    = ALU::addition_overflow_imm<I, uint32>;
 template<typename I> auto mips_addiu   = ALU::addition_imm<I, uint32>;
 template<typename I> auto mips_addu    = ALU::addition<I, uint32>;
 template<typename I> auto mips_and     = ALU::andv<I>;
@@ -43,8 +43,8 @@ template<typename I> auto mips_bnel    = ALU::branch<I, ALU::ne<I>>;
 template<typename I> auto mips_break   = ALU::breakpoint<I>;
 template<typename I> auto mips_clo     = ALU::clo<I>;
 template<typename I> auto mips_clz     = ALU::clz<I>;
-template<typename I> auto mips_dadd    = ALU::addition<I, int64>;
-template<typename I> auto mips_daddi   = ALU::addition_imm<I, int64>;
+template<typename I> auto mips_dadd    = ALU::addition_overflow<I, uint64>;
+template<typename I> auto mips_daddi   = ALU::addition_overflow_imm<I, uint64>;
 template<typename I> auto mips_daddiu  = ALU::addition_imm<I, uint64>;
 template<typename I> auto mips_daddu   = ALU::addition<I, uint64>;
 template<typename I> auto mips_dclo    = ALU::dclo<I>;
@@ -64,7 +64,7 @@ template<typename I> auto mips_dsrav   = ALU::srav<I, uint64>;
 template<typename I> auto mips_dsrl    = ALU::srl<I, uint64>;
 template<typename I> auto mips_dsrl32  = ALU::dsrl32<I>;
 template<typename I> auto mips_dsrlv   = ALU::srlv<I, uint64>;
-template<typename I> auto mips_dsub    = ALU::subtraction<I, int64>;
+template<typename I> auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
 template<typename I> auto mips_dsubu   = ALU::subtraction<I, uint64>;
 template<typename I> auto mips_j       = ALU::j<I>;
 template<typename I> auto mips_jal     = ALU::jump_and_link<I, ALU::j<I>>;
@@ -78,7 +78,7 @@ template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ll      = ALU::load_addr<I>;
-template<typename I> auto mips_lui     = ALU::lui<I>;
+template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
@@ -117,7 +117,7 @@ template<typename I> auto mips_sra     = ALU::sra<I, uint32>;
 template<typename I> auto mips_srav    = ALU::srav<I, uint32>;
 template<typename I> auto mips_srl     = ALU::srl<I, uint32>;
 template<typename I> auto mips_srlv    = ALU::srlv<I, uint32>;
-template<typename I> auto mips_sub     = ALU::subtraction<I, int32>;
+template<typename I> auto mips_sub     = ALU::subtraction_overflow<I, uint32>;
 template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
@@ -215,8 +215,8 @@ static const Table<I> isaMapR =
     {0x2A, { "slt",  mips_slt<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     {0x2B, { "sltu", mips_sltu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
     // Doubleword addition/Subtraction
-    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
+    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2E, { "dsub",  mips_dsub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     {0x2F, { "dsubu", mips_dsubu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
     // Conditional traps (MIPS II)
