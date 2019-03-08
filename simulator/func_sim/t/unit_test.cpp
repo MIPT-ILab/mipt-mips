@@ -27,12 +27,18 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
     CHECK_THROWS_AS( Simulator::create_functional_simulator("pdp11"), InvalidISA);
 }
 
+static auto run_over_empty_memory( const std::string& isa)
+{
+    auto sim = Simulator::create_functional_simulator("mips32");
+    sim->set_memory( FuncMemory::create_hierarchied_memory());
+    return sim->run_no_limit();
+}
+
 TEST_CASE( "FuncSim: create empty memory and get lost")
 {
-    auto m   = FuncMemory::create_hierarchied_memory();
-    auto sim = Simulator::create_functional_simulator("mips32");
-    sim->set_memory( m);
-    CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
+    CHECK_THROWS_AS( run_over_empty_memory("mips32"), BearingLost);
+    CHECK_THROWS_AS( run_over_empty_memory("riscv32"), BearingLost);
+    CHECK_THROWS_AS( run_over_empty_memory("riscv128"), BearingLost);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")
