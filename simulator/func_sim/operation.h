@@ -64,13 +64,13 @@ public:
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
 	//target is known at ID stage but if branch is taken or not is known only at EXE stage
-	bool is_direct_branch() const { return operation == OUT_BRANCH; }
+	bool is_branch() const { return operation == OUT_BRANCH; }
 
 	// target is known only at EXE stage
 	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
 	bool is_jump() const { return this->is_direct_jump()     ||
-				      this->is_direct_branch()   ||
+				      this->is_branch()   ||
 				      this->is_indirect_jump(); }
 
     bool is_taken() const
@@ -115,7 +115,7 @@ public:
 
     Addr get_decoded_target() const
     {
-        if ( this->is_direct_branch() )
+        if ( this->is_branch() )
             return this->PC + 4 + Addr{ narrow_cast<uint64>(this->v_imm) } * 4;
         if ( this->is_direct_jump() )
             return ( (this->PC) & 0xf0000000 ) | ( (this->v_imm) << 2u );
