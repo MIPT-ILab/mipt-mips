@@ -41,8 +41,8 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 {
 public:
     using Instr = typename ISA::FuncInstr;
-    InstrMemory() : InstrMemoryIface<Instr>( ISA::endianness) { }
-    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), PC); }
+    explicit InstrMemory( Endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->endian, PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
@@ -56,6 +56,7 @@ class InstrMemoryCached : public InstrMemory<ISA>
     using Instr = typename ISA::FuncInstr;
     LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
+    explicit InstrMemoryCached( Endian endian) : InstrMemory<ISA>( endian) { }
     Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);
