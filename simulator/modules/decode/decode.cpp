@@ -99,12 +99,8 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
-    bool is_misprediction = false;
-
-    if ( instr.is_direct_jump() || instr.is_indirect_jump())
-        is_misprediction = ( instr.get_bp_data()).is_taken != instr.is_taken();
-    if ( instr.is_direct_jump())
-        is_misprediction = ( instr.get_bp_data()).target != instr.get_decoded_target();
+    bool is_misprediction = instr.is_direct_jump() &&
+    ( instr.get_bp_data().is_taken != instr.is_taken() || instr.get_bp_data().target != instr.get_decoded_target());
 
     /* handle misprediction */
     if ( is_misprediction)
