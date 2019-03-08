@@ -23,13 +23,6 @@ namespace config {
     static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
 
-struct InvalidISA final : Exception
-{
-    explicit InvalidISA(const std::string& isa)
-        : Exception("Invalid ISA", isa)
-    { }
-};
-
 class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;

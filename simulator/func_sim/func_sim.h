@@ -32,7 +32,7 @@ class FuncSim : public Simulator
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
-        std::array<Addr, 8> pc;
+        std::array<Addr, 8> pc = {};
         size_t delayed_slots = 0;
         void update_pc( const FuncInstr& instr);
 
