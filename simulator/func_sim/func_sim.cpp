@@ -18,9 +18,7 @@ FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
-{
-
-}
+{ }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
