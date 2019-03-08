@@ -14,6 +14,7 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
+// I
 template<typename I> auto execute_lui = ALU::upper_immediate<I, 12>;
 template<typename I> auto execute_auipc = do_nothing<I>;
 template<typename I> auto execute_jal = do_nothing<I>;
@@ -41,7 +42,7 @@ template<typename I> auto execute_andi = do_nothing<I>;
 template<typename I> auto execute_slli = do_nothing<I>;
 template<typename I> auto execute_srli = do_nothing<I>;
 template<typename I> auto execute_srai = do_nothing<I>;
-template<typename I> auto execute_add = do_nothing<I>;
+template<typename I> auto execute_add = ALU::addition<I, typename I::RegisterUInt>;
 template<typename I> auto execute_sub = ALU::subtraction<I, typename I::RegisterUInt>;
 template<typename I> auto execute_sll = do_nothing<I>;
 template<typename I> auto execute_slt = do_nothing<I>;
@@ -51,6 +52,7 @@ template<typename I> auto execute_srl = do_nothing<I>;
 template<typename I> auto execute_sra = do_nothing<I>;
 template<typename I> auto execute_or = do_nothing<I>;
 template<typename I> auto execute_and = do_nothing<I>;
+// System I
 template<typename I> auto execute_ecall = do_nothing<I>;
 template<typename I> auto execute_ebreak = do_nothing<I>;
 template<typename I> auto execute_uret = do_nothing<I>;
@@ -64,6 +66,7 @@ template<typename I> auto execute_csrrc = do_nothing<I>;
 template<typename I> auto execute_csrrwi = do_nothing<I>;
 template<typename I> auto execute_csrrsi = do_nothing<I>;
 template<typename I> auto execute_csrrci = do_nothing<I>;
+// M
 template<typename I> auto execute_mul = do_nothing<I>;
 template<typename I> auto execute_mulh = do_nothing<I>;
 template<typename I> auto execute_mulhsu = do_nothing<I>;

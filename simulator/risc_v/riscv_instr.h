@@ -50,9 +50,9 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 };
 
 template <typename T>
-static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& /* rhs */)
+static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& rhs)
 {
-    return out << "";
+    return out << rhs.string_dump();
 }
 
 #endif //RISCV_INSTR_H
