@@ -7,9 +7,9 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
+#include <func_sim/trap_types.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <func_sim/trap_types.h>
 
 #include <sstream>
 
@@ -111,6 +111,7 @@ public:
     auto get_sequence_id() const { return sequence_id; }
 
     void set_v_imm( uint32 value) { v_imm = value; }
+    auto get_delayed_slots() const { return delayed_slots; }
 
 protected:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
@@ -123,6 +124,7 @@ protected:
     uint32 mem_size = NO_VAL32;
     uint32 v_imm = NO_VAL32;
     Imm imm_print_type = Imm::NO;
+    uint8 delayed_slots = 0;
 
     // convert this to bitset
     bool complete   = false;
@@ -213,6 +215,7 @@ class BaseInstruction : public Datapath<T>
 public:
     using MyDatapath = Datapath<T>;
     using Register = R;
+    using RegisterUInt = T;
     R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }

@@ -14,22 +14,28 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+template<typename I>
+struct RISCVTableEntry;
+
 template <typename T>
 class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 {
     private:
         using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
+        void init( const RISCVTableEntry<MyDatapath>& entry);
+
     public:
-        static const constexpr Endian endian = Endian::little;
+        static constexpr auto get_endian() { return Endian::little; }
 
         RISCVInstr() = delete;
         explicit RISCVInstr( uint32 bytes, Addr PC = 0);
+        explicit RISCVInstr( std::string_view name, Addr PC = 0);
 
          bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
         }
-        
+
         bool is_same( const RISCVInstr& rhs) const {
             return this->PC == rhs.PC && is_same_bytes( rhs.instr);
         }

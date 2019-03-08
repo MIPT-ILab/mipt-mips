@@ -21,9 +21,13 @@ auto mips_multiplication(T x, T y) {
     using UT = unsign_t<T>;
     using T2 = doubled_t<T>;
     using UT2 = unsign_t<T2>;
-    using ReturnType = std::pair<UT, UT>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    return ReturnType(narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T>));
+    // With Boost < 1.68.0, result of narrowing cast of uint128 is undefined
+    // if the value does not fit to the built-in target type (e.g. uint64)
+    // To workaround that, we mask the value with full-ones mask first.
+    auto lo = narrow_cast<UT>( value & all_ones<UT>());
+    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
+    return std::make_pair( lo, hi);
 }
 
 template<typename T>
@@ -186,13 +190,43 @@ struct ALU
     bool geiu( const I* instr) { return instr->v_src1 >= narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
 
     template<typename I, typename T> static
-    void addition( I* instr)     { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_src2)); }
+    void addition( I* instr)     { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_src2); }
 
     template<typename I, typename T> static
-    void subtraction( I* instr)  { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2)); }
+    void subtraction( I* instr)  { instr->v_dst = narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2); }
 
     template<typename I, typename T> static
-    void addition_imm( I* instr) { instr->v_dst = narrow_cast<unsign_t<T>>( narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend( instr))); }
+    void addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend( instr)); }
+
+    template<typename I, typename T> static
+    void addition_overflow( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( instr->v_src2);
+        instr->v_dst = x + y;
+//      if ( add_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
+
+    template<typename I, typename T> static
+    void subtraction_overflow( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( instr->v_src2);
+        instr->v_dst = x - y;
+//      if ( sub_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm( I* instr)
+    {
+        auto x = narrow_cast<T>( instr->v_src1);
+        auto y = narrow_cast<T>( sign_extend( instr));
+        instr->v_dst = x + y;
+//      if ( add_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+    }
 
     template<typename I, typename T> static
     void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }
@@ -234,8 +268,8 @@ struct ALU
     template<typename I, typename T> static
     void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
-    template<typename I> static
-    void lui( I* instr)    { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 0x10u; }
+    template<typename I, size_t SHIFT> static
+    void upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << SHIFT; }
 
     template<typename I> static
     void andv( I* instr)   { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -279,6 +313,9 @@ struct ALU
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }
+        else {
+            instr->new_PC = instr->PC + 4 * (1 + instr->get_delayed_slots());
+        }
     }
 
     template<typename I> static
@@ -314,7 +351,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->new_PC; // link
+        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots()); // link
         j( instr);   // jump
     }
 
@@ -324,7 +361,7 @@ struct ALU
         instr->is_taken_branch = p( instr);
         if ( instr->is_taken_branch)
         {
-            instr->v_dst = instr->new_PC;
+            instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
             instr->new_PC += sign_extend( instr) * 4;
             check_halt_trap( instr);
         }

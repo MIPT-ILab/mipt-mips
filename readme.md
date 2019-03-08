@@ -54,12 +54,16 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
-* `-I` — modeled ISA, default option is "mips32"
 
 ### ISA and system-level options:
 
+* `-I` — modeled ISA. Default version is `mars`.
+    * `mips32`, `mips64` — state-of-the-art MIPS
+    * `riscv32`, `riscv64`, `riscv128` — RISC-V with all instructions
+    * `mars`, `mars64` — simplified MIPS without delayed branches
+    * `mipsI`, `mipsII`, `mipsIII`, `mipsIV` — legacy MIPS versions
 * `-f` — enables functional simulation only
-* `--mars` — enables MARS-compatible mode
+* `--mars` — enables MARS-compatible mode of system calls
 * `-d` — enables detailed output of each cycle
 
 ### Performance mode options

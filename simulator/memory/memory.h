@@ -78,10 +78,11 @@ T ReadableMemory::read( Addr addr) const noexcept
 template<typename Instr>
 void ReadableMemory::load( Instr* instr) const
 {
-    static const constexpr Endian endian = Instr::endian;
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
-    auto value = read<DstType, endian>( instr->get_mem_addr(), mask);
+    auto value = instr->get_endian() == Endian::little
+        ? read<DstType, Endian::little>( instr->get_mem_addr(), mask)
+        : read<DstType, Endian::big>( instr->get_mem_addr(), mask);
     instr->load( value);
 }
 
@@ -147,15 +148,22 @@ private:
 template<typename Instr>
 void FuncMemory::store( const Instr& instr)
 {
-    static const constexpr Endian endian = Instr::endian;
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is an unhandled trap");
 
-    if ( ~instr.get_mask() == 0)
-        write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr());
-    else
-        masked_write<DstType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+    if ( ~instr.get_mask() == 0) {
+        if ( instr.get_endian() == Endian::little)
+            write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr());
+        else
+            write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr());
+    }
+    else {
+        if ( instr.get_endian() == Endian::little)
+            masked_write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        else
+            masked_write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+    }
 }
 
 template<typename Instr>
