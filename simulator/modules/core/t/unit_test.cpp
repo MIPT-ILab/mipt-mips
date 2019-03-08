@@ -37,6 +37,7 @@ static auto run_empty_memory( const std::string& isa)
 {
     auto sim = CycleAccurateSimulator::create_simulator( isa, false);
     sim->set_memory( FuncMemory::create_hierarchied_memory());
+    sim->init_checker();
     return sim->run_no_limit();
 }
 
