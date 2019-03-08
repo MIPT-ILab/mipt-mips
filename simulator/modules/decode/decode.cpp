@@ -100,7 +100,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
     bool is_misprediction = instr.is_direct_jump() &&
-    ( instr.get_bp_data().is_taken != instr.is_taken() || instr.get_bp_data().target != instr.get_decoded_target());
+    ( !instr.get_bp_data().is_taken || instr.get_bp_data().target != instr.get_decoded_target());
 
     /* handle misprediction */
     if ( is_misprediction)
