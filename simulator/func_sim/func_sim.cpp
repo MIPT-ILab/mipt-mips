@@ -14,7 +14,11 @@ struct UnknownInstruction final : Exception
 };
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( bool log) : Simulator( log), kernel( Kernel::create_dummy_kernel()) { }
+FuncSim<ISA>::FuncSim( Endian endian, bool log)
+    : Simulator( log)
+    , imem( endian)
+    , kernel( Kernel::create_dummy_kernel())
+{ }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -162,22 +166,14 @@ void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class FuncSim<MIPSI_LE>;
-template class FuncSim<MIPSII_LE>;
-template class FuncSim<MIPSIII_LE>;
-template class FuncSim<MIPSIV_LE>;
-template class FuncSim<MIPS32_LE>;
-template class FuncSim<MIPS64_LE>;
-template class FuncSim<MARS_LE>;
-template class FuncSim<MARS64_LE>;
-template class FuncSim<MIPSI_BE>;
-template class FuncSim<MIPSII_BE>;
-template class FuncSim<MIPSIII_BE>;
-template class FuncSim<MIPSIV_BE>;
-template class FuncSim<MIPS32_BE>;
-template class FuncSim<MIPS64_BE>;
-template class FuncSim<MARS_BE>;
-template class FuncSim<MARS64_BE>;
+template class FuncSim<MIPSI>;
+template class FuncSim<MIPSII>;
+template class FuncSim<MIPSIII>;
+template class FuncSim<MIPSIV>;
+template class FuncSim<MIPS32>;
+template class FuncSim<MIPS64>;
+template class FuncSim<MARS>;
+template class FuncSim<MARS64>;
 template class FuncSim<RISCV32>;
 template class FuncSim<RISCV64>;
 template class FuncSim<RISCV128>;

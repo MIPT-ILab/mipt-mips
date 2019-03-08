@@ -4,7 +4,7 @@
 #include <sstream>
 
 template <typename ISA>
-Writeback<ISA>::Writeback(bool log) : Log( log)
+Writeback<ISA>::Writeback( Endian endian, bool log) : Log( log), endian( endian)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
@@ -15,10 +15,10 @@ Writeback<ISA>::Writeback(bool log) : Log( log)
 }
 
 template <typename ISA>
-void Writeback<ISA>::Checker::init( const FuncMemory& outer_mem)
+void Writeback<ISA>::Checker::init( Endian endian, const FuncMemory& outer_mem)
 {
     auto memory = FuncMemory::create_hierarchied_memory();
-    sim = std::make_shared<FuncSim<ISA>>();
+    sim = std::make_shared<FuncSim<ISA>>( endian);
     outer_mem.duplicate_to( memory);
     sim->set_memory( std::move( memory));
     active = true;
@@ -113,22 +113,14 @@ void Writeback<ISA>::Checker::check( const FuncInstr& instr)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class Writeback<MIPSI_LE>;
-template class Writeback<MIPSII_LE>;
-template class Writeback<MIPSIII_LE>;
-template class Writeback<MIPSIV_LE>;
-template class Writeback<MIPS32_LE>;
-template class Writeback<MIPS64_LE>;
-template class Writeback<MARS_LE>;
-template class Writeback<MARS64_LE>;
-template class Writeback<MIPSI_BE>;
-template class Writeback<MIPSII_BE>;
-template class Writeback<MIPSIII_BE>;
-template class Writeback<MIPSIV_BE>;
-template class Writeback<MIPS32_BE>;
-template class Writeback<MIPS64_BE>;
-template class Writeback<MARS_BE>;
-template class Writeback<MARS64_BE>;
+template class Writeback<MIPSI>;
+template class Writeback<MIPSII>;
+template class Writeback<MIPSIII>;
+template class Writeback<MIPSIV>;
+template class Writeback<MIPS32>;
+template class Writeback<MIPS64>;
+template class Writeback<MARS>;
+template class Writeback<MARS64>;
 template class Writeback<RISCV32>;
 template class Writeback<RISCV64>;
 template class Writeback<RISCV128>;
