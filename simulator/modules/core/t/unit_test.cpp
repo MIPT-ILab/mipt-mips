@@ -33,12 +33,18 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     CHECK_NOTHROW( sim->get_pc() == 0x14);
 }
 
-TEST_CASE( "PerfSim: create empty memory and get lost")
+static void run_empty_memory( const std::string& isa)
 {
-    auto m = FuncMemory::create_hierarchied_memory();
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
-    sim->set_memory( m);
-    CHECK_THROWS_AS( sim->run_no_limit(), Deadlock);
+    auto sim = CycleAccurateSimulator::create_simulator( isa, false);
+    sim->set_memory( FuncMemory::create_hierarchied_memory());
+    return sim->run_no_limit();
+}
+
+TEST_CASE( "Perf_Sim: deadlock on empty memory")
+{
+    CHECK_THROWS_AS( run_empty_memory("mips32"), Deadlock);
+    CHECK_THROWS_AS( run_empty_memory("riscv32"), Deadlock);
+    CHECK_THROWS_AS( run_empty_memory("riscv128"), Deadlock);
 }
 
 TEST_CASE( "Perf_Sim: unsigned register R/W")
