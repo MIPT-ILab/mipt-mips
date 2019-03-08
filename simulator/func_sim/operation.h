@@ -113,6 +113,15 @@ public:
     void set_v_imm( uint32 value) { v_imm = value; }
     auto get_delayed_slots() const { return delayed_slots; }
 
+    Addr get_decoded_target() const
+    {
+        if ( this->is_direct_branch() )
+            return this->PC + 4 + Addr{ narrow_cast<uint64>(this->v_imm) } * 4;
+        if ( this->is_direct_jump() )
+            return ( (this->PC) & 0xf0000000 ) | ( (this->v_imm) << 2u );
+        return 0;
+    }
+
 protected:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
 
