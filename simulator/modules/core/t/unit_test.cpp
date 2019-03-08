@@ -33,7 +33,7 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     CHECK_NOTHROW( sim->get_pc() == 0x14);
 }
 
-static void run_empty_memory( const std::string& isa)
+static auto run_empty_memory( const std::string& isa)
 {
     auto sim = CycleAccurateSimulator::create_simulator( isa, false);
     sim->set_memory( FuncMemory::create_hierarchied_memory());
