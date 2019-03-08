@@ -10,7 +10,7 @@
 #include <mips/mips.h>
 #include <modules/core/perf_sim.h>
 
-struct vr4300 : private PerfSim<MIPS64_BE>
+struct vr4300 : private PerfSim<MIPS64>
 {
     enum MiRegister : uint64 {
         MI_INIT_MODE_REG,
@@ -22,8 +22,7 @@ struct vr4300 : private PerfSim<MIPS64_BE>
     std::array<uint32, NUM_MI_REGISTERS> mi_regs = {};
 
 public:
-    template<typename ... Args>
-    explicit vr4300( Args ... args) : PerfSim<MIPS64_BE>( std::move( args)...) { }
+    explicit vr4300( bool log) : PerfSim<MIPS64>( Endian::big, log) { }
 
     int init( std::shared_ptr<FuncMemory> mem);
     void apply_mask_to_cause( uint64 mask);
@@ -41,9 +40,9 @@ public:
     void clear_rcp_interrupt(uint32 mask);
     void signal_rcp_interrupt(uint32 mask);
 
-    using PerfSim<MIPS64_BE>::clock;
-    using PerfSim<MIPS64_BE>::read_cpu_register;
-    using PerfSim<MIPS64_BE>::get_pc;
+    using PerfSim<MIPS64>::clock;
+    using PerfSim<MIPS64>::read_cpu_register;
+    using PerfSim<MIPS64>::get_pc;
 };
 
 #endif

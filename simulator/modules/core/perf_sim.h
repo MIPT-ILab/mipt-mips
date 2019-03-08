@@ -30,7 +30,7 @@ public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
 
-    explicit PerfSim( bool log);
+    explicit PerfSim( Endian endian, bool log);
     ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
     Trap run_single_step() final { return Trap::HALT; }
@@ -70,6 +70,7 @@ private:
     RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
     std::shared_ptr<Kernel> kernel;
+    const Endian endian;
 
     Fetch<FuncInstr> fetch;
     Decode<FuncInstr> decode;

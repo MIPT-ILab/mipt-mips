@@ -32,7 +32,7 @@ class FuncSim : public Simulator
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
-        std::array<Addr, 8> pc;
+        std::array<Addr, 8> pc = {};
         size_t delayed_slots = 0;
         void update_pc( const FuncInstr& instr);
 
@@ -45,7 +45,7 @@ class FuncSim : public Simulator
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
     public:
-        explicit FuncSim( bool log = false);
+        FuncSim( Endian endian, bool log = false);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
