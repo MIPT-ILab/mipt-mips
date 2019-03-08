@@ -29,7 +29,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 
 static auto run_over_empty_memory( const std::string& isa)
 {
-    auto sim = Simulator::create_functional_simulator("mips32");
+    auto sim = Simulator::create_functional_simulator( isa);
     sim->set_memory( FuncMemory::create_hierarchied_memory());
     return sim->run_no_limit();
 }
