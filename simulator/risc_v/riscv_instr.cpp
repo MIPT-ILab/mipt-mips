@@ -16,6 +16,11 @@
 template<typename I> void do_nothing(I* /* instr */) { }
 // I
 template<typename I> auto execute_lui = ALU::riscv_upper_immediate<I>;
+template<typename I> auto execute_auipc = do_nothing<I>;
+template<typename I> auto execute_jal = do_nothing<I>;
+template<typename I> auto execute_jalr = do_nothing<I>;
+template<typename I> auto execute_beq = do_nothing<I>;
+template<typename I> auto execute_bne = do_nothing<I>;
 template<typename I> auto execute_blt = do_nothing<I>;
 template<typename I> auto execute_bge = do_nothing<I>;
 template<typename I> auto execute_bltu = do_nothing<I>;
