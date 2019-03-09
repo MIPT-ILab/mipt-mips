@@ -33,6 +33,11 @@ public:
     Target get_actual_target() const {
         return Target( this->get_new_PC(), this->get_sequence_id() + 1);
     }
+
+    Target get_actual_decoded_target() const {
+        return Target( this->get_decoded_target(), this->get_sequence_id() + 1);
+    }
+
     
     BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_taken(), this->get_new_PC()); }
 

@@ -339,7 +339,7 @@ struct ALU
     }
 
     template<typename I> static
-    void j( I* instr)  { jump(instr, (instr->PC & 0xf0000000) | (instr->v_imm << 2u)); }
+    void j( I* instr)  { jump(instr, instr->get_decoded_target()); }
 
     template<typename I> static
     void jr( I* instr) {
