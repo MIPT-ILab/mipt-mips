@@ -268,8 +268,11 @@ struct ALU
     template<typename I, typename T> static
     void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
 
-    template<typename I, size_t SHIFT> static
-    void upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << SHIFT; }
+    template<typename I> static
+    void mips_upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 16ULL; }
+
+    template<typename I> static
+    void riscv_upper_immediate( I* instr) { instr->v_dst = instr->v_imm << 12ULL; }
 
     template<typename I> static
     void andv( I* instr)   { instr->v_dst = instr->v_src1 & instr->v_src2; }
