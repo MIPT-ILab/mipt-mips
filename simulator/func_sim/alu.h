@@ -310,7 +310,7 @@ struct ALU
     {
         instr->is_taken_branch = p( instr);
         if ( instr->is_taken_branch) {
-            instr->new_PC += sign_extend( instr) * 4;
+            instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
         else {
@@ -362,7 +362,7 @@ struct ALU
         if ( instr->is_taken_branch)
         {
             instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
-            instr->new_PC += sign_extend( instr) * 4;
+            instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
     }

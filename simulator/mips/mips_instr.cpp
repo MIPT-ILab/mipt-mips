@@ -442,6 +442,15 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
 }
 
 template<typename R>
+void BaseMIPSInstr<R>::init_target()
+{
+    if ( this->is_branch())
+        this->target = this->PC + 4 + ALU::sign_extend( this) * 4;
+    else if ( this->is_direct_jump())
+        this->target = (this->PC & 0xf0000000) | ( this->v_imm << 2u);
+}
+
+template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     MIPSInstrDecoder instr( raw);
@@ -461,6 +470,8 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;
+
+    init_target();
 }
 
 template<typename R>
