@@ -143,7 +143,7 @@ struct ALU
     void addr( I* instr) { instr->mem_addr = instr->v_src1 + sign_extend( instr); }
 
     template<typename I> static
-    void riscv_addr( I* instr) { instr->mem_addr = instr->v_src1 + sign_extend_12( instr); }
+    void riscv_addr( I* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src1 + sign_extend_12( instr)); }
 
     template<typename I> static
     void riscv_store_addr( I* instr) {
@@ -404,7 +404,7 @@ struct ALU
     void riscv_jump_and_link_register( I* instr)
     {
         instr->v_dst = instr->PC + 4;
-        jump( instr, instr->v_src1 + sign_extend_12( instr));
+        jump( instr, narrow_cast<Addr>( instr->v_src1 + sign_extend_12( instr)));
     }
 
     template<typename I> static
