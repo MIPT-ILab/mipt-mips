@@ -37,8 +37,8 @@ static auto run_over_empty_memory( const std::string& isa)
 TEST_CASE( "FuncSim: create empty memory and get lost")
 {
     CHECK_THROWS_AS( run_over_empty_memory("mips32"), BearingLost);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv32"), BearingLost);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv128"), BearingLost);
+    CHECK_THROWS_AS( run_over_empty_memory("riscv32"), UnknownInstruction);
+    CHECK_THROWS_AS( run_over_empty_memory("riscv128"), UnknownInstruction);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")

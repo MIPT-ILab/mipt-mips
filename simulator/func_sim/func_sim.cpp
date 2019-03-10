@@ -6,13 +6,6 @@
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
-struct UnknownInstruction final : Exception
-{
-    explicit UnknownInstruction(const std::string& msg)
-        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
-    { }
-};
-
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
