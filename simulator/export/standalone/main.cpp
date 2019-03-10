@@ -26,6 +26,7 @@ int main( int argc, const char* argv[]) try {
     sim->set_memory( memory);
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
+    sim->write_csr_register( "mscratch", 0x400'0000);
 
     auto kernel = Kernel::create_configured_kernel();
     kernel->set_memory( memory);

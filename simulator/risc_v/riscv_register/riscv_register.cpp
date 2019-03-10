@@ -27,3 +27,12 @@ RISCVRegister::RegNum RISCVRegister::get_csr_regnum( uint16 val)
     }
     return MAX_VAL_RegNum;
 }
+
+RISCVRegister::RegNum RISCVRegister::get_csr_regnum( std::string_view name)
+{
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define DECLARE_CSR(X, Y) if ( name == # X) return RegNum::RISCV_ ## Y;
+#include <riscv.opcode.gen.h>
+#undef DECLARE_CSR
+    return MAX_VAL_RegNum;
+}

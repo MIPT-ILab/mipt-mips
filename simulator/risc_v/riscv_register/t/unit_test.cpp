@@ -84,3 +84,16 @@ TEST_CASE( "RISCV_registers: invalid CSR")
     CHECK_FALSE( reg.is_mips_lo());
     CHECK_FALSE( reg.is_valid());
 }
+
+TEST_CASE( "RISCV_registers: CSR by name")
+{
+    auto reg = RISCVRegister::from_csr_name( "mscratch");
+    CHECK( reg.is_valid());
+    CHECK( reg == RISCVRegister::from_csr_index(0x340));
+}
+
+TEST_CASE( "RISCV_registers: CSR by invalid name")
+{
+    auto reg = RISCVRegister::from_csr_name( "balalaika");
+    CHECK( !reg.is_valid());
+}
