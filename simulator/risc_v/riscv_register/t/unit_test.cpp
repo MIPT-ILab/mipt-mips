@@ -89,7 +89,7 @@ TEST_CASE( "RISCV_registers: CSR by name")
 {
     auto reg = RISCVRegister::from_csr_name( "mscratch");
     CHECK( reg.is_valid());
-    CHECK( reg.dump() == RISCVRegister::from_csr_index(0x340));
+    CHECK( reg == RISCVRegister::from_csr_index(0x340));
 }
 
 TEST_CASE( "RISCV_registers: CSR by invalid name")
