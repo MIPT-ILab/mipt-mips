@@ -50,6 +50,11 @@ struct ALU
         return T{ narrow_cast<int16>(instr->v_imm)};
     }
 
+    template<typename I> static auto sign_extend_12( const I* instr) {
+        using T = typename I::RegisterUInt;
+        return arithmetic_rs( narrow_cast<T>( narrow_cast<int16>(instr->v_imm << 4ULL)), 4);
+    }
+
     template<typename I> static auto zero_extend( const I* instr) {
         using T = typename I::RegisterUInt;
         return T{ narrow_cast<uint16>(instr->v_imm)};
@@ -136,6 +141,15 @@ struct ALU
 
     template<typename I> static
     void addr( I* instr) { instr->mem_addr = instr->v_src1 + sign_extend( instr); }
+
+    template<typename I> static
+    void riscv_addr( I* instr) { instr->mem_addr = instr->v_src1 + sign_extend_12( instr); }
+
+    template<typename I> static
+    void riscv_store_addr( I* instr) {
+        riscv_addr( instr);
+        instr->mask = bitmask<typename I::RegisterUInt>(instr->mem_size * 8);
+    }
 
     // Predicate helpers - unary
     template<typename I> static
@@ -374,7 +388,55 @@ struct ALU
     void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
 
     template<typename I> static
+    void halt( I* instr)   { instr->trap = Trap::HALT; }
+
+    template<typename I> static
     void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
+
+    template<typename I> static
+    void riscv_jump_and_link( I* instr)
+    {
+        instr->v_dst = instr->PC + 4;
+        jump( instr, instr->get_decoded_target());
+    }
+
+    template<typename I> static
+    void riscv_jump_and_link_register( I* instr)
+    {
+        instr->v_dst = instr->PC + 4;
+        jump( instr, instr->v_src1 + sign_extend_12( instr));
+    }
+
+    template<typename I> static
+    void auipc( I* instr)
+    {
+        instr->v_dst = instr->PC + ( instr->v_imm << 12ULL);
+    }
+
+    template<typename I> static
+    void csrrw( I* instr)
+    {
+        instr->v_dst  = instr->v_src1; // CSR <- RS1
+        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+    }
+
+    template<typename I> static
+    void csrrs( I* instr)
+    {
+        instr->mask   = instr->v_src1;
+        instr->v_dst  = all_ones<typename I::RegisterUInt>(); // CSR <- 0xffff & RS1
+        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+    }
+
+    template<typename I> static
+    void csrrwi( I* instr)
+    {
+        instr->v_dst  = instr->v_imm;  // CSR <- RS1
+        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+    }
+
+    template<typename I, typename T> static
+    void riscv_addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend_12( instr)); }
 };
 
 #endif

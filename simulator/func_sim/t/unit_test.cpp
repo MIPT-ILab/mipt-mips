@@ -172,13 +172,56 @@ TEST_CASE( "Torture_Test: Stop on trap")
 
 TEST_CASE( "Torture_Test: MARS")
 {
-    CHECK_NOTHROW( get_simulator_with_test("mars", TEST_PATH "/tt.core.universal.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test("mars", TEST_PATH "/tt.core32.le.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test("mars64", TEST_PATH "/tt.core64.le.out")->run_no_limit() );
+    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core.universal.out")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core32.le.out")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars64", TEST_PATH "/tt.core64.le.out")->run_no_limit() == Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: Delayed branches")
 {
-    CHECK_NOTHROW( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() );
-    CHECK_NOTHROW( get_simulator_with_test("mips32", TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() == Trap::HALT  );
+}
+
+TEST_CASE( "Torture_Test: rvc32ui")
+{
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-add")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-addi")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-and")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-andi")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-auipc")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-beq")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bge")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bgeu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-blt")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bltu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bne")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-fence_i")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-jal")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-jalr")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lb")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lbu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lh")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lhu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lui")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lw")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-or")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-ori")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sb")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sh")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sll")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slli")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slt")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slti")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sltiu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sltu")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sra")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srai")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srl")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srli")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sub")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sw")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xor")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xori")->run_no_limit() == Trap::HALT  );
 }

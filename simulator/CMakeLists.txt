@@ -79,6 +79,7 @@ set(TESTS_CPPS
 )
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
+add_definitions(-DRISCV_TEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../riscv-tests\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
