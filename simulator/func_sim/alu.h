@@ -430,7 +430,7 @@ struct ALU
     void csrrw( I* instr)
     {
         instr->v_dst  = instr->v_src1; // CSR <- RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD  <- CSR
     }
 
     template<typename I> static
@@ -438,14 +438,14 @@ struct ALU
     {
         instr->mask   = instr->v_src1;
         instr->v_dst  = all_ones<typename I::RegisterUInt>(); // CSR <- 0xffff & RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD <- CSR
     }
 
     template<typename I> static
     void csrrwi( I* instr)
     {
         instr->v_dst  = instr->v_imm;  // CSR <- RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD  <- CSR
     }
 
     template<typename I, typename T> static

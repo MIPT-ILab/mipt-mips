@@ -66,7 +66,7 @@ struct RISCVInstrDecoder
         case 'S': return S_imm4_0 | (S_imm11_5 << 5);
         case 'U': return U_imm;
         case 'J': return get_J_immediate();
-        case 'C': return csr;
+        case 'C': return csr_imm;
         case ' ': return 0;
         default: assert(0); return 0;
         }
