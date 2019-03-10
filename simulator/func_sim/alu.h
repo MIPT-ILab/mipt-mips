@@ -60,6 +60,18 @@ struct ALU
         return T{ narrow_cast<uint16>(instr->v_imm)};
     }
 
+    template<typename I> static size_t shamt_imm( const I* instr) {
+        return narrow_cast<size_t>( instr->v_imm);
+    }
+
+    template<typename I> static size_t shamt_imm_32( const I* instr) {
+        return narrow_cast<size_t>( instr->v_imm) + 32U;
+    }
+
+    template<typename T, typename I> static size_t shamt_v_src2( const I* instr) {
+        return narrow_cast<size_t>( instr->v_src2 & bitmask<size_t>(log_bitwidth<T>));
+    }
+
     template<typename I>
     using Predicate = bool (*)( const I*);
 
@@ -252,35 +264,36 @@ struct ALU
     void move( I* instr)   { instr->v_dst = instr->v_src1; }
 
     template<typename I, typename T> static
-    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << instr->v_imm; }
+    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_imm( instr); }
 
     template<typename I> static
-    void dsll32( I* instr) { instr->v_dst = instr->v_src1 << (instr->v_imm + 32u); }
+    void dsll32( I* instr) { instr->v_dst = instr->v_src1 << shamt_imm_32( instr); }
 
     template<typename I, typename T> static
     void srl( I* instr)
     {
         // On 64-bit CPUs the result word is sign-extended
-        instr->v_dst = narrow_cast<typename I::RegisterUInt>(narrow_cast<typename I::RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> instr->v_imm)));
+        // FIXME(pkryukov) This is insane.
+        instr->v_dst = narrow_cast<typename I::RegisterUInt>(narrow_cast<typename I::RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> shamt_imm( instr))));
     }
 
     template<typename I> static
-    void dsrl32( I* instr) { instr->v_dst = instr->v_src1 >> (instr->v_imm + 32u); }
+    void dsrl32( I* instr) { instr->v_dst = instr->v_src1 >> shamt_imm_32( instr); }
 
     template<typename I, typename T> static
-    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_imm); }
+    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_imm( instr)); }
 
     template<typename I> static
-    void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, instr->v_imm + 32); }
+    void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, shamt_imm_32( instr)); }
 
     template<typename I, typename T> static
-    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
+    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_v_src2<T>( instr); }
 
     template<typename I, typename T> static
-    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> (instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
+    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> shamt_v_src2<T>( instr); }
 
     template<typename I, typename T> static
-    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), instr->v_src2 & bitmask<uint32>(log_bitwidth<T>)); }
+    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_v_src2<T>( instr)); }
 
     template<typename I> static
     void mips_upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 16ULL; }
