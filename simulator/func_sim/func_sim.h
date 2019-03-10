@@ -17,6 +17,12 @@
 #include <memory>
 #include <string>
 
+struct UnknownInstruction final : Exception
+{
+    explicit UnknownInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
 
 template <typename ISA>
 class FuncSim : public Simulator
