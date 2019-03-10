@@ -14,9 +14,11 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>(0x00f70463).get_disasm() == "beq $a4, $a5, 8");
     CHECK( RISCVInstr<uint32>(0x00052783).get_disasm() == "lw $a5, 0x0($a0)");
     CHECK( RISCVInstr<uint32>(0xf95ff06f).get_disasm() == "jal $zero, -108");
-    CHECK( RISCVInstr<uint32>(0x30529073).get_disasm() == "csrrw $mtvec, $t0");
+    CHECK( RISCVInstr<uint32>(0x30529073).get_disasm() == "csrrw $mtvec, $zero, $t0");
     CHECK( RISCVInstr<uint32>(0x10200073).get_disasm() == "sret");
     CHECK( RISCVInstr<uint32>(0x30200073).get_disasm() == "mret");
+    CHECK( RISCVInstr<uint32>(0x30202373).get_disasm() == "csrrs $medeleg, $t1, $zero");
+    CHECK( RISCVInstr<uint32>(0x30205073).get_disasm() == "csrrwi $medeleg, $zero, 0x0");
 }
 
 TEST_CASE("RISCV invalid instruction")
