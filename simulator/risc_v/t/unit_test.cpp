@@ -55,12 +55,19 @@ TEST_CASE("RISCV lui all fs")
     CHECK( instr.get_v_dst() == 0xffff'f000ULL);
 }
 
+TEST_CASE("RISCV lui 80000")
+{
+    RISCVInstr<uint64> instr(0x800007b7);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x8000'0000ULL);
+}
+
 TEST_CASE("RISCV-128 lui all fs")
 {
     RISCVInstr<uint64> instr("lui");
     instr.set_v_imm(0xfffff);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'f000ULL);
+    CHECK( instr.get_v_dst() == 0xffff'f000ULL);
 }
 
 TEST_CASE("RISCV sub")

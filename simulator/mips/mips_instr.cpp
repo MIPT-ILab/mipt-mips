@@ -78,7 +78,7 @@ template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ll      = ALU::load_addr<I>;
-template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
+template<typename I> auto mips_lui     = ALU::mips_upper_immediate<I>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
@@ -442,6 +442,15 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
 }
 
 template<typename R>
+void BaseMIPSInstr<R>::init_target()
+{
+    if ( this->is_branch())
+        this->target = this->PC + 4 + ALU::sign_extend( this) * 4;
+    else if ( this->is_direct_jump())
+        this->target = (this->PC & 0xf0000000) | ( this->v_imm << 2u);
+}
+
+template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     MIPSInstrDecoder instr( raw);
@@ -461,6 +470,8 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;
+
+    init_target();
 }
 
 template<typename R>
