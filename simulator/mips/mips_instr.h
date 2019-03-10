@@ -44,6 +44,8 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC );
         BaseMIPSInstr() = delete;
 
+        void init_target();
+
         auto get_endian() const { return endian; }
 
         bool is_same_bytes( uint32 bytes) const {

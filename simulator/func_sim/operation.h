@@ -104,23 +104,16 @@ public:
 
     auto get_mem_addr() const { return mem_addr; }
     auto get_mem_size() const { return mem_size; }
-    auto get_new_PC() const { return new_PC; }
     auto get_PC() const { return PC; }
 
     void set_sequence_id( uint64 id) { sequence_id = id; }
     auto get_sequence_id() const { return sequence_id; }
 
     void set_v_imm( uint32 value) { v_imm = value; }
-    auto get_delayed_slots() const { return delayed_slots; }
 
-    Addr get_decoded_target() const
-    {
-        if ( this->is_branch() )
-            return this->PC + 4 + Addr{ narrow_cast<uint64>(this->v_imm) } * 4;
-        if ( this->is_direct_jump() )
-            return ( (this->PC) & 0xf0000000 ) | ( (this->v_imm) << 2u );
-        return 0;
-    }
+    auto get_delayed_slots() const { return delayed_slots; }
+    Addr get_decoded_target() const { return target; }
+    auto get_new_PC() const { return new_PC; }
 
 protected:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
@@ -145,6 +138,7 @@ protected:
 
     const Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
+    Addr target = NO_VAL32;
 
     uint64 sequence_id = NO_VAL64;
 };

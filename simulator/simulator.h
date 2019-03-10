@@ -58,6 +58,7 @@ public:
     virtual uint64 read_gdb_register( uint8 regno) const = 0;
     virtual void write_cpu_register( uint8 regno, uint64 value) = 0;
     virtual void write_gdb_register( uint8 regno, uint64 value) = 0;
+    virtual void write_csr_register( std::string_view name, uint64 value) = 0;
 
     int get_exit_code() const { return exit_code; }
 

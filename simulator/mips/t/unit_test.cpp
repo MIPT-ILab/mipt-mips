@@ -426,6 +426,7 @@ TEST_CASE( "MIPS32_instr: beq two zeroes, one instr ahead")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
     instr.set_v_imm( 1);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
@@ -436,6 +437,7 @@ TEST_CASE( "MIPS32_instr: beq -1 and -1, one instr ahead")
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 1);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
@@ -446,6 +448,7 @@ TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr and delayed slot ahead")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 1, 1);
     instr.set_v_imm( 1);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
@@ -456,6 +459,7 @@ TEST_CASE( "MIPS32_instr: beq -1 and -1, 1024 instr ahead")
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 1024);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
 }
@@ -466,6 +470,7 @@ TEST_CASE( "MIPS32_instr: beq two zeroes, back to 1024 instr")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
     instr.set_v_imm( 0xffff - 1024 + 1);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
 }
@@ -480,6 +485,7 @@ TEST_CASE( "MIPS32_instr: bne two zeroes, 1024 instr ahead")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
     instr.set_v_imm( 1024);
+    instr.init_target();
     instr.execute();
     // Not taken
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
@@ -491,6 +497,7 @@ TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 1);
+    instr.init_target();
     instr.execute();
     // Not taken
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
@@ -502,6 +509,7 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 1, 1);
     instr.set_v_imm( 1024);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
     
@@ -516,6 +524,7 @@ TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
     instr.set_v_src( 1, 0);
     instr.set_v_src( 0xffffffff, 1);
     instr.set_v_imm( 0);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4);
 }
@@ -958,6 +967,7 @@ TEST_CASE( "MIPS32_instr: j to 4th instr")
     
     MIPS32Instr instr( "j");
     instr.set_v_imm( 4);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == 16);
 }
@@ -970,6 +980,7 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     
     MIPS32Instr instr( "jal");
     instr.set_v_imm( 0x0fff);
+    instr.init_target();
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfff * 4);
     CHECK( instr.get_v_dst() == instr.get_PC() + 8);
