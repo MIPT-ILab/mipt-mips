@@ -99,6 +99,6 @@ TEST_CASE( "MIPS_registers: Lo_register")
 
 TEST_CASE( "MIPS_registers: no csr register")
 {
-    auto reg = MIPSRegister::from_csr_regnum( "balalaika");
+    auto reg = MIPSRegister::from_csr_name( "balalaika");
     CHECK( reg.is_zero());
 }
