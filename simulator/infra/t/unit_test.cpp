@@ -1,10 +1,11 @@
 /**
- * macro_test.cpp - Compile-time testing of useful inline functions
+ * macro_test.cpp - testing of useful inline functions
  *
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <catch.hpp>
 #include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/macro.h>
@@ -152,4 +153,8 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-bool macros_tested = true;
+TEST_CASE("Arithmetic 128 bit shift")
+{
+    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
+    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+}
