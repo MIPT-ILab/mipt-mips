@@ -14,8 +14,6 @@
 // MIPT-MIPS modules
 #include "../riscv_register.h"
 
-static_assert(RISCVRegister::MAX_REG == 32);
-
 // Testing methods of the class
 TEST_CASE( "RISCV_registers: Size_t_converters")
 {
@@ -69,3 +67,20 @@ TEST_CASE( "RISCV_registers: Zero")
     CHECK_FALSE( reg.is_mips_lo());
 }
 
+TEST_CASE( "RISCV_registers: CSR")
+{
+    auto reg = RISCVRegister::from_csr_index(0x305);
+    CHECK_FALSE( reg.is_zero());
+    CHECK_FALSE( reg.is_mips_hi());
+    CHECK_FALSE( reg.is_mips_lo());
+    CHECK( reg.dump() == "mtvec");
+}
+
+TEST_CASE( "RISCV_registers: invalid CSR")
+{
+    auto reg = RISCVRegister::from_csr_index(0x8789);
+    CHECK_FALSE( reg.is_zero());
+    CHECK_FALSE( reg.is_mips_hi());
+    CHECK_FALSE( reg.is_mips_lo());
+    CHECK_FALSE( reg.is_valid());
+}
