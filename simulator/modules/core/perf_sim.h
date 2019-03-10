@@ -52,6 +52,7 @@ public:
     void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
     void write_gdb_register( uint8 regno, uint64 value) final;
     void write_cause_register( uint64 value) { write_register( Register::cause(), value); }
+    void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;

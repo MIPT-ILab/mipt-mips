@@ -96,3 +96,9 @@ TEST_CASE( "MIPS_registers: Lo_register")
     CHECK(reg.is_mips_lo());
     CHECK_FALSE(reg.to_rf_index() < 32);
 }
+
+TEST_CASE( "MIPS_registers: no csr register")
+{
+    auto reg = MIPSRegister::from_csr_regnum( "balalaika");
+    CHECK( reg.is_zero());
+}

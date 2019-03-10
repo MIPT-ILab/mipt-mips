@@ -69,6 +69,8 @@ class FuncSim : public Simulator
 
         void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
         void write_gdb_register( uint8 regno, uint64 value) final;
+
+        void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 };
 
 #endif

@@ -31,6 +31,7 @@ class RISCVRegister {
     };
 
     static RegNum get_csr_regnum( uint16 val);
+    static RegNum get_csr_regnum( std::string_view name);
 
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
@@ -44,9 +45,10 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static RISCVRegister from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
-    static RISCVRegister from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
-    static RISCVRegister from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
+    static auto from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
+    static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
