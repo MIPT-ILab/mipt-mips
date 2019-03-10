@@ -20,8 +20,8 @@ Date | Event name
 12 Dec | **Advanced pipelining**<br/> • Slides: [L8](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%208%20-%20Advanced%20Pipelining.pptx?raw=true) <br/> • [YouTube](https://youtu.be/pUw2sU9RZSY)
 19 Dec | **First Test**
 08 Feb | **Superscalar CPU and multicore systems**<br/> • Slides: [L9](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%209%20-%20Superscalar%20CPU%20and%20multicore%20systems.pptx?raw=true) <br/> • No video was recorded.
-15 Feb | **Caches, pt. I**<br/> • Slides: [L10](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2010%20-%20Caches.pptx)
-22 Feb | **Caches, pt. II**<br/> • Slides: [L11](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2011%20-%20Caches%2C%20part%202.pptx)
+15 Feb | **Caches, pt. I**<br/> • Slides: [L10](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2010%20-%20Caches.pptx)<br/> • _YouTube_
+22 Feb | **Caches, pt. II**<br/> • Slides: [L11](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2011%20-%20Caches%2C%20part%202.pptx)<br/> • [YouTube](https://youtu.be/twQdcDt94DM)
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
@@ -49,12 +49,12 @@ MIPT | Name | Score | Comments
 512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
 **711** | **Vyacheslav Kompan** | **10 + 1** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)**  |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+**711** | **Yan Logovskiy** | **4 + 4** | **[#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)**, **[#506](https://github.com/MIPT-ILab/mipt-mips/issues/506)** |
 **714** | **Yauheni Sharamed** | **6** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724)**
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 **718** | **Andrey Agrachev** | **4** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626)** |
 **717** | **Vsevolod Pukhov** | **4** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)**, **½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
-**711** | **Yan Logovskiy** | **4** | **[#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383)**, **[#506](https://github.com/MIPT-ILab/mipt-mips/issues/506)** |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |

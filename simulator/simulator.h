@@ -18,6 +18,13 @@ struct BearingLost final : Exception {
     BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
 };
 
+struct InvalidISA final : Exception
+{
+    explicit InvalidISA(const std::string& isa)
+        : Exception("Invalid ISA", isa)
+    { }
+};
+
 class FuncMemory;
 class Kernel;
 
@@ -40,6 +47,10 @@ public:
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::shared_ptr<Simulator> create_configured_simulator();
     static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa);
+    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log = false)
+    {
+        return create_simulator( isa, true, log);
+    }
 
     virtual size_t sizeof_register() const = 0;
 
@@ -47,6 +58,7 @@ public:
     virtual uint64 read_gdb_register( uint8 regno) const = 0;
     virtual void write_cpu_register( uint8 regno, uint64 value) = 0;
     virtual void write_gdb_register( uint8 regno, uint64 value) = 0;
+    virtual void write_csr_register( std::string_view name, uint64 value) = 0;
 
     int get_exit_code() const { return exit_code; }
 

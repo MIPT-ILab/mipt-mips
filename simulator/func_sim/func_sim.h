@@ -17,6 +17,12 @@
 #include <memory>
 #include <string>
 
+struct UnknownInstruction final : Exception
+{
+    explicit UnknownInstruction(const std::string& msg)
+        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+    { }
+};
 
 template <typename ISA>
 class FuncSim : public Simulator
@@ -32,7 +38,7 @@ class FuncSim : public Simulator
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
-        std::array<Addr, 8> pc;
+        std::array<Addr, 8> pc = {};
         size_t delayed_slots = 0;
         void update_pc( const FuncInstr& instr);
 
@@ -45,7 +51,7 @@ class FuncSim : public Simulator
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
     public:
-        explicit FuncSim( bool log = false);
+        FuncSim( Endian endian, bool log = false);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
@@ -69,6 +75,8 @@ class FuncSim : public Simulator
 
         void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
         void write_gdb_register( uint8 regno, uint64 value) final;
+
+        void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 };
 
 #endif
