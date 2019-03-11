@@ -13,6 +13,8 @@
 #include <infra/macro.h>
 #include <infra/log.h>
 
+#include <sstream>
+
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
@@ -172,9 +174,18 @@ TEST_CASE("Exception")
     }
 }
 
-TEST_CASE("Logging")
+TEST_CASE("Logging enabled")
 {
-    CHECK_NOTHROW( Log( true) << "Hello World! " << std::hex << 20 << std::endl );
+    std::ostringstream oss;
+    LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    CHECK( oss.str() == "Hello World! 1a\n" );
+}
+
+TEST_CASE("Logging disabled")
+{
+    std::ostringstream oss;
+    LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    CHECK( oss.str() == "" );
 }
 
 TEST_CASE("Find first set")
