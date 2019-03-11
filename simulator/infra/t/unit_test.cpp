@@ -185,7 +185,7 @@ TEST_CASE("Logging disabled")
 {
     std::ostringstream oss;
     LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
-    CHECK( oss.str() == "" );
+    CHECK( oss.str().empty() );
 }
 
 TEST_CASE("Find first set")
