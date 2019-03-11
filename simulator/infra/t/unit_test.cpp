@@ -158,3 +158,13 @@ TEST_CASE("Arithmetic 128 bit shift")
     CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
 }
+
+TEST_CASE("Exception")
+{
+    try {
+        throw Exception( "Hello World!")
+    }
+    catch (const std::runtime_error& e) {
+        CHECK( e.what() == "Unquailifed exception:\tHello World!" );
+    }
+}
