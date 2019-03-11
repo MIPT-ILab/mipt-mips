@@ -6,8 +6,10 @@
  */
 
 #include <catch.hpp>
+
 #include <infra/argv.h>
 #include <infra/endian.h>
+#include <infra/exception.h>
 #include <infra/macro.h>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
