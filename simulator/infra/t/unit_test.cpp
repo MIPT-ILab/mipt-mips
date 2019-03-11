@@ -176,3 +176,10 @@ TEST_CASE("Logging")
 {
     CHECK_NOTHROW( Log( true) << "Hello World! " << std::hex << 20 << std::endl );
 }
+
+TEST_CASE("Find first set")
+{
+    auto val = new int(0);
+    CHECK( find_first_set( *val) == bitwidth<int>() );
+    delete val;
+}
