@@ -34,7 +34,7 @@ before_build:
 - 7z x ninja.zip -oC:\projects\deps\ninja > nul
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make tt"
+- bash -lc "cd /c/projects/mipt-mips/mipt-tests/; make tt"
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"

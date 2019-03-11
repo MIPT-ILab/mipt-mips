@@ -78,7 +78,7 @@ set(TESTS_CPPS
     export/gdb/t/unit_test.cpp
 )
 
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../mips-tests\")
 add_definitions(-DRISCV_TEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../riscv-tests\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 

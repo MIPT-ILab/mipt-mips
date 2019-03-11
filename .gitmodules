@@ -1,5 +1,5 @@
 [submodule "traces"]
-	path = traces
+	path = mips-tests
 	url = https://github.com/MIPT-ILab/mips-traces.git
 [submodule "riscv-opcodes"]
 	path = riscv-opcodes
