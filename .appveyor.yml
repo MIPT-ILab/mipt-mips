@@ -43,5 +43,5 @@ build_script:
 - if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
 
 test_script:
-- .\mipt-mips -b ..\traces\fib.out -n 1000000
+- .\mipt-mips -b ..\mips-tests\fib.out -n 1000000
 - ctest -C Release --verbose
