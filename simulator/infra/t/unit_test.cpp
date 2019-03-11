@@ -13,6 +13,7 @@
 #include <infra/macro.h>
 #include <infra/log.h>
 
+#include <memory>
 #include <sstream>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
@@ -190,7 +191,6 @@ TEST_CASE("Logging disabled")
 
 TEST_CASE("Find first set")
 {
-    auto val = new int(0);
-    CHECK( find_first_set( *val) == bitwidth<int> );
-    delete val;
+    auto val = std::make_unique<unsigned>( 0);
+    CHECK( find_first_set( *val) == bitwidth<unsigned> );
 }
