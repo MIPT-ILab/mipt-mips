@@ -167,7 +167,7 @@ TEST_CASE("Arithmetic 128 bit shift")
 TEST_CASE("Exception")
 {
     try {
-        throw Exception( "Hello World!")
+        throw Exception( "Hello World!");
     }
     catch (const std::runtime_error& e) {
         CHECK( e.what() == "Unquailifed exception:\tHello World!" );
@@ -191,6 +191,6 @@ TEST_CASE("Logging disabled")
 TEST_CASE("Find first set")
 {
     auto val = new int(0);
-    CHECK( find_first_set( *val) == bitwidth<int>() );
+    CHECK( find_first_set( *val) == bitwidth<int> );
     delete val;
 }
