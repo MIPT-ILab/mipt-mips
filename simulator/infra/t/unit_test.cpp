@@ -11,6 +11,7 @@
 #include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
+#include <infra/log.h>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
@@ -169,4 +170,9 @@ TEST_CASE("Exception")
     catch (const std::runtime_error& e) {
         CHECK( e.what() == "Unquailifed exception:\tHello World!" );
     }
+}
+
+TEST_CASE("Logging")
+{
+    CHECK_NOTHROW( Log( true) << "Hello World! " << std::hex << 20 << std::endl );
 }
