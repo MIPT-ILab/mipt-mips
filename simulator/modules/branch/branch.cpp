@@ -42,6 +42,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
+    sout << "branch  cycle " << std::dec << cycle << ": ";
     auto instr = rp_datapath->read( cycle);
 
     /* acquiring real information for BPU */

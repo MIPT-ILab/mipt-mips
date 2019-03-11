@@ -206,11 +206,17 @@ struct ALU
     bool lti( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) <  sign_extend( instr); }
 
     template<typename I> static
+    bool lti_riscv( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) <  narrow_cast<typename I::RegisterSInt>( sign_extend_12( instr)); }
+
+    template<typename I> static
     bool gei( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) >= sign_extend( instr); }
 
     // Predicate helpers - immediate unsigned
     template<typename I> static
     bool ltiu( const I* instr) { return instr->v_src1 <  narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
+
+    template<typename I> static
+    bool ltiu_riscv( const I* instr) { return instr->v_src1 <  narrow_cast<typename I::RegisterUInt>(sign_extend_12( instr)); }
 
     template<typename I> static
     bool geiu( const I* instr) { return instr->v_src1 >= narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
@@ -323,6 +329,15 @@ struct ALU
     void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ zero_extend( instr); }
 
     template<typename I> static
+    void riscv_andi( I* instr)  { instr->v_dst = instr->v_src1 & sign_extend_12( instr); }
+
+    template<typename I> static
+    void riscv_ori( I* instr)   { instr->v_dst = instr->v_src1 | sign_extend_12( instr); }
+
+    template<typename I> static
+    void riscv_xori( I* instr)  { instr->v_dst = instr->v_src1 ^ sign_extend_12( instr); }
+
+    template<typename I> static
     void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
    
     template<typename I> static
@@ -430,7 +445,7 @@ struct ALU
     void csrrw( I* instr)
     {
         instr->v_dst  = instr->v_src1; // CSR <- RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD  <- CSR
     }
 
     template<typename I> static
@@ -438,14 +453,14 @@ struct ALU
     {
         instr->mask   = instr->v_src1;
         instr->v_dst  = all_ones<typename I::RegisterUInt>(); // CSR <- 0xffff & RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD <- CSR
     }
 
     template<typename I> static
     void csrrwi( I* instr)
     {
         instr->v_dst  = instr->v_imm;  // CSR <- RS1
-        instr->v_dst2 = instr->v_src2; // RS1 <- CSR
+        instr->v_dst2 = instr->v_src2; // RD  <- CSR
     }
 
     template<typename I, typename T> static

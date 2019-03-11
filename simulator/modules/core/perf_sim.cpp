@@ -92,12 +92,13 @@ void PerfSim<ISA>::clock()
 template<typename ISA>
 void PerfSim<ISA>::clock_tree( Cycle cycle)
 {
-    writeback.clock( cycle);
     fetch.clock( cycle);
     decode.clock( cycle);
     execute.clock( cycle);
     mem.clock( cycle);
     branch.clock( cycle);
+    writeback.clock( cycle);
+    sout << "******************\n";
 }
 
 template<typename ISA>

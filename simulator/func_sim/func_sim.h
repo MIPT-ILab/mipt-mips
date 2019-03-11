@@ -20,7 +20,7 @@
 struct UnknownInstruction final : Exception
 {
     explicit UnknownInstruction(const std::string& msg)
-        : Exception("Unknown MIPS instruction is an unhandled trap", msg)
+        : Exception("Unknown instruction is an unhandled trap", msg)
     { }
 };
 

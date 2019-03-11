@@ -133,6 +133,7 @@ protected:
     bool is_taken_branch = false; // actual result
     bool memory_complete = false;
     bool print_dst = false;
+    bool print_dst2 = false;
     bool print_src1 = false;
     bool print_src2 = false;
 
@@ -251,8 +252,10 @@ std::string BaseInstruction<T, R>::generate_disasm() const
 
     if ( this->print_dst)
         oss <<  " $" << this->dst;
+    if ( this->print_dst2)
+        oss <<  ", $" << this->dst2;
     if ( this->print_src1)
-        oss << (this-> print_dst ? ", $" : " $") << this->src1;
+        oss << (this->print_dst ? ", $" : " $") << this->src1;
     if ( this->print_src2)
         oss << ", $" << this->src2;
 
@@ -272,13 +275,20 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     {
         out << " $ma = 0x" << std::hex << this->get_mem_addr();
     }
-    if ( !dst.is_zero() && (this->is_load() ? this->memory_complete : this->complete) && this->get_mask() != 0)
+    if ( this->is_load() ? this->memory_complete : this->complete)
     {
-        if ( has_ma)
+        bool has_dst = !dst.is_zero() && this->get_mask();
+        if ( has_ma && has_dst)
             out << ",";
-        out << " $" << dst << " = 0x" << std::hex << (this->v_dst & this->mask);
-        if ( !dst2.is_zero())
-            out << ", $" << this->dst2 << " = 0x" << this->v_dst2;
+
+        if ( has_dst)
+            out << " $" << dst << " = 0x" << std::hex << (this->v_dst & this->mask);
+
+        if ( !dst2.is_zero()) {
+            if ( has_dst)
+                out << ",";
+            out << " $" << dst2 << " = 0x" << this->v_dst2;
+        }
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)
