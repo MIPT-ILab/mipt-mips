@@ -171,7 +171,7 @@ TEST_CASE("Exception")
         throw Exception( "Hello World!");
     }
     catch (const std::runtime_error& e) {
-        CHECK( std::string( "Unquailifed exception:\tHello World!") == e.what() );
+        CHECK( std::string( "Unquailifed exception:\tHello World!\n") == e.what() );
     }
 }
 
@@ -179,7 +179,7 @@ TEST_CASE("Logging enabled")
 {
     std::ostringstream oss;
     LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
-    CHECK( oss.str() == "Hello World! 1a\n" );
+    CHECK( oss.str() == "Hello World! 14\n" );
 }
 
 TEST_CASE("Logging disabled")
