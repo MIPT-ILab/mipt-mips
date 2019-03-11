@@ -72,6 +72,16 @@ struct ALU
         return narrow_cast<size_t>( instr->v_src2 & bitmask<size_t>(log_bitwidth<T>));
     }
 
+    template<typename T, typename I> static void sign_extend_dst( I* instr) {
+        using R = decltype(instr->v_dst);
+        if constexpr ( bitwidth<R> > bitwidth<T>) {
+            if ( ( instr->v_dst & msb_set<T>()) != 0)
+                instr->v_dst |= all_ones<R>() << bitwidth<T>;
+            else
+                instr->v_dst &= all_ones<R>();
+        }
+    }
+
     template<typename I>
     using Predicate = bool (*)( const I*);
 
@@ -228,6 +238,12 @@ struct ALU
     void subtraction( I* instr)  { instr->v_dst = narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2); }
 
     template<typename I, typename T> static
+    void riscv_addition( I* instr)     { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_src2); sign_extend_dst<T>( instr); }
+
+    template<typename I, typename T> static
+    void riscv_subtraction( I* instr)  { instr->v_dst = narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2); sign_extend_dst<T>( instr); }
+
+    template<typename I, typename T> static
     void addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend( instr)); }
 
     template<typename I, typename T> static
@@ -270,7 +286,7 @@ struct ALU
     void move( I* instr)   { instr->v_dst = instr->v_src1; }
 
     template<typename I, typename T> static
-    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_imm( instr); }
+    void sll( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_imm( instr); sign_extend_dst<T>( instr); }
 
     template<typename I> static
     void dsll32( I* instr) { instr->v_dst = instr->v_src1 << shamt_imm_32( instr); }
@@ -279,33 +295,37 @@ struct ALU
     void srl( I* instr)
     {
         // On 64-bit CPUs the result word is sign-extended
-        // FIXME(pkryukov) This is insane.
-        instr->v_dst = narrow_cast<typename I::RegisterUInt>(narrow_cast<typename I::RegisterSInt>(narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> shamt_imm( instr))));
+        instr->v_dst = narrow_cast<unsign_t<T>>(narrow_cast<T>(instr->v_src1) >> shamt_imm( instr));
+        sign_extend_dst<T>( instr); 
     }
 
     template<typename I> static
     void dsrl32( I* instr) { instr->v_dst = instr->v_src1 >> shamt_imm_32( instr); }
 
     template<typename I, typename T> static
-    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_imm( instr)); }
+    void sra( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_imm( instr)); sign_extend_dst<T>( instr); }
 
     template<typename I> static
     void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, shamt_imm_32( instr)); }
 
     template<typename I, typename T> static
-    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_v_src2<T>( instr); }
+    void sllv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) << shamt_v_src2<T>( instr); sign_extend_dst<T>( instr); }
 
     template<typename I, typename T> static
-    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> shamt_v_src2<T>( instr); }
+    void srlv( I* instr)   { instr->v_dst = narrow_cast<T>( instr->v_src1) >> shamt_v_src2<T>( instr); sign_extend_dst<T>( instr); }
 
     template<typename I, typename T> static
-    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_v_src2<T>( instr)); }
+    void srav( I* instr)   { instr->v_dst = arithmetic_rs( narrow_cast<T>( instr->v_src1), shamt_v_src2<T>( instr)); sign_extend_dst<T>( instr); }
 
     template<typename I> static
     void mips_upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 16ULL; }
 
     template<typename I> static
-    void riscv_upper_immediate( I* instr) { instr->v_dst = instr->v_imm << 12ULL; }
+    void riscv_upper_immediate( I* instr)
+    {
+        instr->v_dst = instr->v_imm << 12ULL;
+        sign_extend_dst<uint32>( instr);
+    }
 
     template<typename I> static
     void andv( I* instr)   { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -438,7 +458,9 @@ struct ALU
     template<typename I> static
     void auipc( I* instr)
     {
-        instr->v_dst = instr->PC + ( instr->v_imm << 12ULL);
+        instr->v_dst = instr->v_imm << 12ULL;
+        sign_extend_dst<uint32>( instr);
+        instr->v_dst += instr->PC;
     }
 
     template<typename I> static
@@ -464,7 +486,11 @@ struct ALU
     }
 
     template<typename I, typename T> static
-    void riscv_addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend_12( instr)); }
+    void riscv_addition_imm( I* instr)
+    {
+        instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( sign_extend_12( instr));
+        sign_extend_dst<T>( instr);
+    }
 };
 
 #endif
