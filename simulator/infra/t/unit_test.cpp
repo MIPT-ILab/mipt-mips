@@ -171,7 +171,7 @@ TEST_CASE("Exception")
         throw Exception( "Hello World!");
     }
     catch (const std::runtime_error& e) {
-        CHECK( e.what() == "Unquailifed exception:\tHello World!" );
+        CHECK( std::string( "Unquailifed exception:\tHello World!") == e.what() );
     }
 }
 
