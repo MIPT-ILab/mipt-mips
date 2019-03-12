@@ -75,7 +75,7 @@ public:
     inline void write_dst( const FuncInstr& instr)
     {
         write( instr.get_dst_num(),  instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
-        write( instr.get_dst2_num(), instr.get_v_dst2());
+        write( instr.get_dst2_num(), instr.get_v_dst2(), all_ones<RegisterUInt>(), instr.get_accumulation_type());
     }
 };
 
