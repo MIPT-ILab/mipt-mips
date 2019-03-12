@@ -47,7 +47,7 @@ struct RISCVInstrDecoder
         return (B_imm4_1  << 1U)
             |  (B_imm10_5 << 5U)
             |  (B_imm11   << 11U)
-            |  (B_imm12 == 1 ? all_ones<uint32>() << 12U : 0);
+            |  (B_imm12   << 12U);
     }
 
     constexpr uint32 get_J_immediate() const noexcept
@@ -55,7 +55,7 @@ struct RISCVInstrDecoder
         return (J_imm10_1  << 1U)
             |  (J_imm11    << 11U)
             |  (J_imm19_12 << 12U)
-            |  (J_imm20 == 1 ? all_ones<uint32>() << 20U : 0);
+            |  (J_imm20    << 20U);
     }
 
     uint32 get_immediate(char subset) const noexcept

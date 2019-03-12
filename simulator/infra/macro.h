@@ -167,4 +167,21 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
     return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
 
+template<size_t N, typename T>
+constexpr T sign_extension( T value)
+{
+    if constexpr (N < bitwidth<T>) {
+        const constexpr T msb = T{ 1} << ( N - 1);
+        return ( ( value & bitmask<T>(N)) ^ msb) - msb;
+    }
+    return value;
+}
+
+template<size_t N>
+uint128 sign_extension( uint128 value)
+{
+    const uint128 msb = uint128{ 1} << ( N - 1);
+    return ( ( value & bitmask<uint128>(N)) ^ msb) - msb;
+}
+
 #endif

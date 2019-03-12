@@ -145,6 +145,16 @@ static constexpr auto check_to_pointer()
     return res;
 }
 
+static_assert(sign_extension<16, uint32>( 0)          == 0);
+static_assert(sign_extension<16, uint32>( 0x1234)     == 0x1234);
+static_assert(sign_extension<16, uint32>( 0x8000)     == 0xffff8000);
+static_assert(sign_extension<16, uint32>( 0xffff)     == 0xffffffff);
+static_assert(sign_extension<16, uint32>( 0xffffffff) == 0xffffffff);
+static_assert(sign_extension<8,  uint32>( 0xffff0000) == 0x0);
+static_assert(sign_extension<16, uint32>( 0xffff0000) == 0x0);
+static_assert(sign_extension<17, uint32>( 0xffff0000) == 0xffff0000);
+static_assert(sign_extension<32, uint64>( 0x80000000) == 0xffff'ffff'8000'0000);
+
 static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
 static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
@@ -159,10 +169,11 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-TEST_CASE("Arithmetic 128 bit shift")
+TEST_CASE("128 instructions")
 {
     CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+    CHECK( ~sign_extension<16, uint128>( 0xff00) == 0xff );
 }
 
 TEST_CASE("Exception")
