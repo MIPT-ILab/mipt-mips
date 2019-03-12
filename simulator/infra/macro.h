@@ -171,7 +171,7 @@ template<size_t N, typename T>
 T sign_extension( T value)
 {
     if constexpr (N < bitwidth<T>) {
-        const constexpr T msb = T{ 1} << ( N - 1);
+        const T msb = T{ 1} << ( N - 1);
         return ( ( value & bitmask<T>(N)) ^ msb) - msb;
     }
     return value;
