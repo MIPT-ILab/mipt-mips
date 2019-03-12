@@ -172,7 +172,7 @@ T sign_extension( T value)
 {
     if constexpr (N < bitwidth<T>) {
         const T msb = T{ 1} << ( N - 1);
-        return ( ( value & bitmask<T>(N)) ^ msb) - msb;
+        value = ( ( value & bitmask<T>(N)) ^ msb) - msb;
     }
     return value;
 }
