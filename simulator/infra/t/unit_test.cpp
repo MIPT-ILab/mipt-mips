@@ -1,13 +1,20 @@
 /**
- * macro_test.cpp - Compile-time testing of useful inline functions
+ * macro_test.cpp - testing of useful inline functions
  *
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
  * Copyright 2017-2018 MIPT-MIPS
  */
 
+#include <catch.hpp>
+
 #include <infra/argv.h>
 #include <infra/endian.h>
+#include <infra/exception.h>
 #include <infra/macro.h>
+#include <infra/log.h>
+
+#include <memory>
+#include <sstream>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
@@ -152,4 +159,52 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-bool macros_tested = true;
+TEST_CASE("arithmetic shift for 128 instructions")
+{
+    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
+    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+}
+
+TEST_CASE("sign extension")
+{
+    CHECK( sign_extension<16, uint32>( 0)          == 0);
+    CHECK( sign_extension<16, uint32>( 0x1234)     == 0x1234);
+    CHECK( sign_extension<16, uint32>( 0x8000)     == 0xffff8000);
+    CHECK( sign_extension<16, uint32>( 0xffff)     == 0xffffffff);
+    CHECK( sign_extension<16, uint32>( 0xffffffff) == 0xffffffff);
+    CHECK( sign_extension<8,  uint32>( 0xffff0000) == 0x0);
+    CHECK( sign_extension<16, uint32>( 0xffff0000) == 0x0);
+    CHECK( sign_extension<17, uint32>( 0xffff0000) == 0xffff0000);
+    CHECK( sign_extension<32, uint64>( 0x80000000) == 0xffff'ffff'8000'0000);
+    CHECK( ~sign_extension<16, uint128>( 0xff00) == 0xff );
+}
+
+TEST_CASE("Exception")
+{
+    try {
+        throw Exception( "Hello World!");
+    }
+    catch (const std::runtime_error& e) {
+        CHECK( std::string( "Unqualified exception:\tHello World!\n") == e.what() );
+    }
+}
+
+TEST_CASE("Logging enabled")
+{
+    std::ostringstream oss;
+    LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    CHECK( oss.str() == "Hello World! 14\n" );
+}
+
+TEST_CASE("Logging disabled")
+{
+    std::ostringstream oss;
+    LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    CHECK( oss.str().empty() );
+}
+
+TEST_CASE("Find first set")
+{
+    auto val = std::make_unique<unsigned>( 0);
+    CHECK( find_first_set( *val) == bitwidth<unsigned> );
+}

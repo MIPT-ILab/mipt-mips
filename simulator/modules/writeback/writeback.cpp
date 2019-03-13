@@ -76,6 +76,9 @@ void Writeback<ISA>::writeback_bubble( Cycle cycle)
 template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
+    if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
+        throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
+
     rf->write_dst( instr);
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
@@ -87,9 +90,6 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     next_PC = instr.get_actual_target().address;
     if ( executed_instrs >= instrs_to_run || instr.is_halt())
         wp_halt->write( true, cycle);
-
-    sout << "Executed instructions: " << executed_instrs
-         << std::endl << std::endl;
 }
 
 template <typename ISA>

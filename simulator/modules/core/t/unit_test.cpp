@@ -73,7 +73,19 @@ TEST_CASE( "Perf_Sim: Register size")
     CHECK( CycleAccurateSimulator::create_simulator( "mips64", false)->sizeof_register() == bytewidth<uint64>);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim , MARS 64, Core 64")
+TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
+{
+    auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
+    auto mem = FuncMemory::create_hierarchied_memory();
+    sim->set_memory( mem);
+    ElfLoader elf( TEST_PATH "/tt.core.universal.out");
+    elf.load_to( mem.get());
+    sim->init_checker();
+    sim->set_pc( elf.get_startPC());
+    CHECK( sim->run_no_limit() == Trap::NO_TRAP);
+}
+
+TEST_CASE( "Torture_Test: Perf_Sim , MARS 64, Core 32")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mars64", false);
     auto mem = FuncMemory::create_hierarchied_memory();
@@ -82,10 +94,10 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 64, Core 64")
     elf.load_to( mem.get());
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
-    CHECK_NOTHROW( sim->run_no_limit() );
+    CHECK( sim->run_no_limit() == Trap::NO_TRAP);
 }
 
-static auto get_smc_loaded_simulator(bool init_checker)
+static auto get_smc_loaded_simulator( bool init_checker)
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
     auto mem = FuncMemory::create_hierarchied_memory();
@@ -106,4 +118,16 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
 TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 {
     CHECK_THROWS_AS( get_smc_loaded_simulator( true)->run_no_limit(), CheckerMismatch);
+}
+
+TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
+{
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
+    auto mem = FuncMemory::create_hierarchied_memory();
+    sim->set_memory( mem);
+    ElfLoader elf( RISCV_TEST_PATH "/isa/rv32ui-p-simple");
+    elf.load_to( mem.get());
+    sim->init_checker();
+    sim->set_pc( elf.get_startPC());
+    CHECK( sim->run_no_limit() == Trap::NO_TRAP);
 }

@@ -1,8 +1,8 @@
-MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It is able to measure _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation.
+MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPUs It is able to measure _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation.
 
 This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 The project is being developed by a group of students under the guidance of Intel employees.
-Additionally, MIPT-MIPS is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
+Additionally, it is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
 Lectures and seminars are delivered each **Friday 18:30, room 108 of RT building**.
 

@@ -34,7 +34,7 @@ before_build:
 - 7z x ninja.zip -oC:\projects\deps\ninja > nul
 
 build_script:
-- bash -lc "cd /c/projects/mipt-mips/traces/; make tt"
+- bash -lc "cd /c/projects/mipt-mips/mips-tests/; make tt"
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
@@ -43,5 +43,5 @@ build_script:
 - if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
 
 test_script:
-- .\mipt-mips -b ..\traces\fib.out -n 1000000
+- .\mipt-mips -b ..\mips-tests\fib.out -n 1000000
 - ctest -C Release --verbose
