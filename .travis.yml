@@ -75,7 +75,7 @@ script:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/mips-tests/fib.out -n 1000000
   - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/mips-tests/tt.core.universal.out
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/mips-tests/tt.core.universal_reorder.out
 
 after_success:
   - |
