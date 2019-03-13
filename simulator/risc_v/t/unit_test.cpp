@@ -91,7 +91,8 @@ TEST_CASE("RISCV lui all fs")
 
 TEST_CASE("RISCV lui 80000")
 {
-    RISCVInstr<uint64> instr(0x800007b7);
+    RISCVInstr<uint64> instr("lui");
+    instr.set_v_imm(0x80000);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff'ffff'8000'0000ULL);
 }

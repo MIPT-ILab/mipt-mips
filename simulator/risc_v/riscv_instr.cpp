@@ -243,8 +243,10 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     if ( entry.dst == Dst::CSR)
         this->dst2 = decoder.get_register( Dst::RD);
 
-    if ( this->is_branch() || this->is_direct_jump())
-        this->target = this->PC + narrow_cast<int32>( this->v_imm);
+    if ( this->is_branch())
+        this->target = this->PC + sign_extension<12, Addr>( this->v_imm);
+    else if ( this->is_direct_jump())
+        this->target = this->PC + sign_extension<20, Addr>( this->v_imm);
 }
 
 template<typename T>
