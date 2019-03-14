@@ -159,10 +159,24 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-TEST_CASE("Arithmetic 128 bit shift")
+TEST_CASE("arithmetic shift for 128 instructions")
 {
     CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+}
+
+TEST_CASE("sign extension")
+{
+    CHECK( sign_extension<16, uint32>( 0)          == 0);
+    CHECK( sign_extension<16, uint32>( 0x1234)     == 0x1234);
+    CHECK( sign_extension<16, uint32>( 0x8000)     == 0xffff8000);
+    CHECK( sign_extension<16, uint32>( 0xffff)     == 0xffffffff);
+    CHECK( sign_extension<16, uint32>( 0xffffffff) == 0xffffffff);
+    CHECK( sign_extension<8,  uint32>( 0xffff0000) == 0x0);
+    CHECK( sign_extension<16, uint32>( 0xffff0000) == 0x0);
+    CHECK( sign_extension<17, uint32>( 0xffff0000) == 0xffff0000);
+    CHECK( sign_extension<32, uint64>( 0x80000000) == 0xffff'ffff'8000'0000);
+    CHECK( ~sign_extension<16, uint128>( 0xff00) == 0xff );
 }
 
 TEST_CASE("Exception")
