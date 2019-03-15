@@ -7,9 +7,9 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
+#include <func_sim/trap_types.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <func_sim/trap_types.h>
 
 #include <sstream>
 
@@ -64,13 +64,13 @@ public:
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
 	//target is known at ID stage but if branch is taken or not is known only at EXE stage
-	bool is_direct_branch() const { return operation == OUT_BRANCH; }
+	bool is_branch() const { return operation == OUT_BRANCH; }
 
 	// target is known only at EXE stage
 	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
 	bool is_jump() const { return this->is_direct_jump()     ||
-				      this->is_direct_branch()   ||
+				      this->is_branch()   ||
 				      this->is_indirect_jump(); }
 
     bool is_taken() const
@@ -104,14 +104,16 @@ public:
 
     auto get_mem_addr() const { return mem_addr; }
     auto get_mem_size() const { return mem_size; }
-    auto get_new_PC() const { return new_PC; }
     auto get_PC() const { return PC; }
 
     void set_sequence_id( uint64 id) { sequence_id = id; }
     auto get_sequence_id() const { return sequence_id; }
 
     void set_v_imm( uint32 value) { v_imm = value; }
+
     auto get_delayed_slots() const { return delayed_slots; }
+    Addr get_decoded_target() const { return target; }
+    auto get_new_PC() const { return new_PC; }
 
 protected:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
@@ -131,11 +133,13 @@ protected:
     bool is_taken_branch = false; // actual result
     bool memory_complete = false;
     bool print_dst = false;
+    bool print_dst2 = false;
     bool print_src1 = false;
     bool print_src2 = false;
 
     const Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
+    Addr target = NO_VAL32;
 
     uint64 sequence_id = NO_VAL64;
 };
@@ -192,10 +196,10 @@ void Datapath<T>::load( const T& value)
     {
         switch ( get_mem_size())
         {
-            case 1: v_dst = narrow_cast<int8>( value); break;
-            case 2: v_dst = narrow_cast<int16>( value); break;
-            case 4: v_dst = narrow_cast<int32>( value); break;
-            case 8: v_dst = value; break;
+            case 1: v_dst = sign_extension<8>( value); break;
+            case 2: v_dst = sign_extension<16>( value); break;
+            case 4: v_dst = sign_extension<32>( value); break;
+            case 8: v_dst = sign_extension<64>( value); break;
             default: assert( false);
         }
     }
@@ -248,8 +252,10 @@ std::string BaseInstruction<T, R>::generate_disasm() const
 
     if ( this->print_dst)
         oss <<  " $" << this->dst;
+    if ( this->print_dst2)
+        oss <<  ", $" << this->dst2;
     if ( this->print_src1)
-        oss << (this-> print_dst ? ", $" : " $") << this->src1;
+        oss << (this->print_dst ? ", $" : " $") << this->src1;
     if ( this->print_src2)
         oss << ", $" << this->src2;
 
@@ -269,13 +275,20 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     {
         out << " $ma = 0x" << std::hex << this->get_mem_addr();
     }
-    if ( !dst.is_zero() && (this->is_load() ? this->memory_complete : this->complete) && this->get_mask() != 0)
+    if ( this->is_load() ? this->memory_complete : this->complete)
     {
-        if ( has_ma)
+        bool has_dst = !dst.is_zero() && this->get_mask();
+        if ( has_ma && has_dst)
             out << ",";
-        out << " $" << dst << " = 0x" << std::hex << (this->v_dst & this->mask);
-        if ( !dst2.is_zero())
-            out << ", $" << this->dst2 << " = 0x" << this->v_dst2;
+
+        if ( has_dst)
+            out << " $" << dst << " = 0x" << std::hex << (this->v_dst & this->mask);
+
+        if ( !dst2.is_zero()) {
+            if ( has_dst)
+                out << ",";
+            out << " $" << dst2 << " = 0x" << this->v_dst2;
+        }
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)

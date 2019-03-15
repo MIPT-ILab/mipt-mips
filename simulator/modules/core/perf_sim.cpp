@@ -11,14 +11,15 @@
 #include <iostream>
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim(bool log) :
+PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     CycleAccurateSimulator( log),
+    endian( endian),
     fetch( log),
     decode( log),
     execute( log),
     mem( log),
     branch( log),
-    writeback( log)
+    writeback( endian, log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
@@ -39,7 +40,7 @@ template <typename ISA>
 void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    auto imemory = std::make_unique<InstrMemoryCached<ISA>>();
+    auto imemory = std::make_unique<InstrMemoryCached<ISA>>( endian);
     imemory->set_memory( m);
     fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
@@ -91,12 +92,13 @@ void PerfSim<ISA>::clock()
 template<typename ISA>
 void PerfSim<ISA>::clock_tree( Cycle cycle)
 {
-    writeback.clock( cycle);
     fetch.clock( cycle);
     decode.clock( cycle);
     execute.clock( cycle);
     mem.clock( cycle);
     branch.clock( cycle);
+    writeback.clock( cycle);
+    sout << "******************\n";
 }
 
 template<typename ISA>
@@ -141,22 +143,14 @@ void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 
-template class PerfSim<MIPSI_LE>;
-template class PerfSim<MIPSII_LE>;
-template class PerfSim<MIPSIII_LE>;
-template class PerfSim<MIPSIV_LE>;
-template class PerfSim<MIPS32_LE>;
-template class PerfSim<MIPS64_LE>;
-template class PerfSim<MARS_LE>;
-template class PerfSim<MARS64_LE>;
-template class PerfSim<MIPSI_BE>;
-template class PerfSim<MIPSII_BE>;
-template class PerfSim<MIPSIII_BE>;
-template class PerfSim<MIPSIV_BE>;
-template class PerfSim<MIPS32_BE>;
-template class PerfSim<MIPS64_BE>;
-template class PerfSim<MARS_BE>;
-template class PerfSim<MARS64_BE>;
+template class PerfSim<MIPSI>;
+template class PerfSim<MIPSII>;
+template class PerfSim<MIPSIII>;
+template class PerfSim<MIPSIV>;
+template class PerfSim<MIPS32>;
+template class PerfSim<MIPS64>;
+template class PerfSim<MARS>;
+template class PerfSim<MARS64>;
 template class PerfSim<RISCV32>;
 template class PerfSim<RISCV64>;
 template class PerfSim<RISCV128>;

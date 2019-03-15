@@ -18,8 +18,8 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto mips_add     = ALU::addition<I, int32>;
-template<typename I> auto mips_addi    = ALU::addition_imm<I, int32>;
+template<typename I> auto mips_add     = ALU::addition_overflow<I, uint32>;
+template<typename I> auto mips_addi    = ALU::addition_overflow_imm<I, uint32>;
 template<typename I> auto mips_addiu   = ALU::addition_imm<I, uint32>;
 template<typename I> auto mips_addu    = ALU::addition<I, uint32>;
 template<typename I> auto mips_and     = ALU::andv<I>;
@@ -43,8 +43,8 @@ template<typename I> auto mips_bnel    = ALU::branch<I, ALU::ne<I>>;
 template<typename I> auto mips_break   = ALU::breakpoint<I>;
 template<typename I> auto mips_clo     = ALU::clo<I>;
 template<typename I> auto mips_clz     = ALU::clz<I>;
-template<typename I> auto mips_dadd    = ALU::addition<I, int64>;
-template<typename I> auto mips_daddi   = ALU::addition_imm<I, int64>;
+template<typename I> auto mips_dadd    = ALU::addition_overflow<I, uint64>;
+template<typename I> auto mips_daddi   = ALU::addition_overflow_imm<I, uint64>;
 template<typename I> auto mips_daddiu  = ALU::addition_imm<I, uint64>;
 template<typename I> auto mips_daddu   = ALU::addition<I, uint64>;
 template<typename I> auto mips_dclo    = ALU::dclo<I>;
@@ -64,7 +64,7 @@ template<typename I> auto mips_dsrav   = ALU::srav<I, uint64>;
 template<typename I> auto mips_dsrl    = ALU::srl<I, uint64>;
 template<typename I> auto mips_dsrl32  = ALU::dsrl32<I>;
 template<typename I> auto mips_dsrlv   = ALU::srlv<I, uint64>;
-template<typename I> auto mips_dsub    = ALU::subtraction<I, int64>;
+template<typename I> auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
 template<typename I> auto mips_dsubu   = ALU::subtraction<I, uint64>;
 template<typename I> auto mips_j       = ALU::j<I>;
 template<typename I> auto mips_jal     = ALU::jump_and_link<I, ALU::j<I>>;
@@ -78,7 +78,7 @@ template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ll      = ALU::load_addr<I>;
-template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
+template<typename I> auto mips_lui     = ALU::mips_upper_immediate<I>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
@@ -117,7 +117,7 @@ template<typename I> auto mips_sra     = ALU::sra<I, uint32>;
 template<typename I> auto mips_srav    = ALU::srav<I, uint32>;
 template<typename I> auto mips_srl     = ALU::srl<I, uint32>;
 template<typename I> auto mips_srlv    = ALU::srlv<I, uint32>;
-template<typename I> auto mips_sub     = ALU::subtraction<I, int32>;
+template<typename I> auto mips_sub     = ALU::subtraction_overflow<I, uint32>;
 template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
@@ -442,6 +442,15 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
 }
 
 template<typename R>
+void BaseMIPSInstr<R>::init_target()
+{
+    if ( this->is_branch())
+        this->target = this->PC + 4 + ALU::sign_extend( this) * 4;
+    else if ( this->is_direct_jump())
+        this->target = (this->PC & 0xf0000000) | ( this->v_imm << 2u);
+}
+
+template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     MIPSInstrDecoder instr( raw);
@@ -461,6 +470,8 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;
+
+    init_target();
 }
 
 template<typename R>

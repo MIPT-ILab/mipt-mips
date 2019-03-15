@@ -4,9 +4,9 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
 
-# MIPT-MIPS
+# MIPT-MIPS / MIPT-V
 
-MIPT-MIPS is a pre-silicon simulator of MIPS CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
+MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
 * **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
 * **Simplicity**. Our source files are much more readable than RTL.
@@ -31,7 +31,7 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 
 ## Requirements
 
-MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
+We use C++17 features and Boost 1.61. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
 * GCC 7
 * Clang 5.0
 * Apple LLVM 7.3.0
@@ -41,7 +41,7 @@ MIPT-MIPS uses C++17 features and Boost 1.61. Thus, you have to [use compilers](
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
-MIPT-MIPS build system is CMake. You should install CMake 3.9 or higher.
+Our build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
@@ -87,7 +87,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
-To build MIPT-MIPS faster, we recommend to install Ninja.
+To build simulator faster, we recommend to install Ninja.
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
   1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
@@ -100,7 +100,7 @@ To build MIPT-MIPS faster, we recommend to install Ninja.
   1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
   1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
-## About MIPT-MIPS
+## About MIPT-MIPS / MIPT-V
 
 [![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
 [![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/drec.gif?raw=true)](https://mipt.ru/drec/)
@@ -108,7 +108,7 @@ To build MIPT-MIPS faster, we recommend to install Ninja.
 
 This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 
-The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
+The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) and [RISC-V](http://en.wikipedia.org/wiki/RISC-V)  instruction set in both functional and performance simulators.
 
 ### May I contribute?
 

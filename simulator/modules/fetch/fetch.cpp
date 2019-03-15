@@ -38,6 +38,10 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
     rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
 
+    /* port needed for handling misprediction at decode stage */
+    rp_bp_update_from_decode = make_read_port<BPInterface>("DECODE_2_FETCH", PORT_LATENCY);
+    rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
+
     bp = BaseBP::create_configured_bp();
     tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
                                             config::instruction_cache_ways,
@@ -54,6 +58,8 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
     const Target external_target = rp_external_target->is_ready( cycle) ? rp_external_target->read( cycle) : Target();
     const Target hold_target     = rp_hold_pc->is_ready( cycle) ? rp_hold_pc->read( cycle) : Target();
     const Target flushed_target  = rp_flush_target->is_ready( cycle) ? rp_flush_target->read( cycle) : Target();
+    const Target flushed_target_from_decode = rp_flush_target_from_decode->is_ready( cycle) ?
+                                                                rp_flush_target_from_decode->read( cycle) : Target();
     const Target branch_target   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : Target();
 
     /* Multiplexing */
@@ -62,6 +68,9 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
 
     if( flushed_target.valid)
         return flushed_target;
+
+    if( flushed_target_from_decode.valid)
+        return flushed_target_from_decode;
 
     if ( !is_stall && branch_target.valid)
         return branch_target;
@@ -78,6 +87,8 @@ void Fetch<FuncInstr>::clock_bp( Cycle cycle)
     /* Process BP updates */
     if ( rp_bp_update->is_ready( cycle))
         bp->update( rp_bp_update->read( cycle));
+    else if ( rp_bp_update_from_decode->is_ready( cycle))
+        bp->update( rp_bp_update_from_decode->read(cycle));
 }
 
 template <typename FuncInstr>
@@ -104,6 +115,8 @@ void Fetch<FuncInstr>::save_flush( Cycle cycle)
     /* save PC in the case of flush signal */
     if( rp_flush_target->is_ready( cycle))
         wp_target->write( rp_flush_target->read( cycle), cycle);
+    else if( rp_flush_target_from_decode->is_ready( cycle))
+        wp_target->write( rp_flush_target_from_decode->read( cycle), cycle);
     else if( rp_target->is_ready( cycle))
         wp_target->write( rp_target->read( cycle), cycle);
 }

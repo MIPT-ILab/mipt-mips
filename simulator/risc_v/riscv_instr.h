@@ -40,7 +40,12 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
             return this->PC == rhs.PC && is_same_bytes( rhs.instr);
         }
 
-        bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
+        bool is_same_checker( const RISCVInstr& rhs) const {
+            return is_same( rhs)
+                && this->sequence_id == rhs.sequence_id
+                && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
+                && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
+        }
 
         constexpr bool is_nop() const { return instr == 0x0U; }
 
@@ -50,9 +55,9 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 };
 
 template <typename T>
-static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& /* rhs */)
+static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& rhs)
 {
-    return out << "";
+    return out << rhs.string_dump();
 }
 
 #endif //RISCV_INSTR_H

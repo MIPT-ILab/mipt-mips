@@ -42,13 +42,14 @@ private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
+    const Endian endian;
 
     class Checker {
         std::shared_ptr<FuncSim<ISA>> sim;
         bool active = false;
     public:
         void check( const FuncInstr& instr);
-        void init( const FuncMemory& mem);
+        void init( Endian endian, const FuncMemory& mem);
         void set_target( const Target& value);
     } checker;
 
@@ -71,10 +72,10 @@ private:
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
 
 public:
-    explicit Writeback( bool log);
+    explicit Writeback( Endian endian, bool log);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
-    void init_checker( const FuncMemory& mem) { checker.init( mem); }
+    void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
     void set_target( const Target& value);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
