@@ -64,8 +64,6 @@ TEST_CASE( "MIPS32_disasm BE-LE")
 
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Load_Store")
 {
-    CHECK(MIPS32Instr(0xa13104d2).get_disasm() == "sb $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa131fb2e).get_disasm() == "sb $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0xa53104d2).get_disasm() == "sh $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0xa531fb2e).get_disasm() == "sh $s1, 0xfb2e($t1)");
     CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
@@ -1332,6 +1330,26 @@ TEST_CASE( "MIPS32_instr: lw be")
     get_plain_memory_with_data()->load_store( &instr);
     CHECK( instr.get_v_dst() == 0x3412'CDAB);
 }
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sb (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0xa13104d2).get_disasm() == "sb $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa131fb2e).get_disasm() == "sb $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sb");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0x12, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint8, Endian::little>( 0x1000);
+    CHECK( value == 0x12);
+}
+////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: madd 0 by 0")
 {
@@ -2217,7 +2235,6 @@ TEST_CASE ( "MIPS32_instr: sll 1 by 31")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x80000000);
 }
-
 
 TEST_CASE ( "MIPS64_instr: sll 100 by 0")
 {
