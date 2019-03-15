@@ -1022,7 +1022,7 @@ TEST_CASE( "MIPS32_instr: lui with 0xfee1")
 
 static auto get_plain_memory_with_data()
 {
-    auto memory = FuncMemory::create_plain_memory(13);
+    auto memory = FuncMemory::create_plain_memory(15);
     memory->write<uint32, Endian::little>( 0xABCD'1234, 0x1000);
     memory->write<uint32, Endian::little>( 0xBADC'5678, 0x1004);
     return memory;
