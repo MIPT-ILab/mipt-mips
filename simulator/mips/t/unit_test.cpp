@@ -62,26 +62,6 @@ TEST_CASE( "MIPS32_disasm BE-LE")
     CHECK(MIPS64Instr(0x0139882D).get_disasm() == MIPS64BEInstr(0x0139882D).get_disasm());
 }
 
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Load_Store")
-{
-    CHECK(MIPS32Instr(0xa53104d2).get_disasm() == "sh $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa531fb2e).get_disasm() == "sh $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xad31fb2e).get_disasm() == "sw $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xa93104d2).get_disasm() == "swl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa931fb2e).get_disasm() == "swl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb93104d2).get_disasm() == "swr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb931fb2e).get_disasm() == "swr $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xe13104d2).get_disasm() == "sc $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xe131fb2e).get_disasm() == "sc $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xfd3104d2).get_disasm() == "sd $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xfd31fb2e).get_disasm() == "sd $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb13104d2).get_disasm() == "sdl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb131fb2e).get_disasm() == "sdl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb53104d2).get_disasm() == "sdr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb531fb2e).get_disasm() == "sdr $s1, 0xfb2e($t1)");
-}
-
 TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
 {
     CHECK(MIPS32Instr(0x0621fffc).get_disasm() == "bgez $s1, -4");
@@ -1332,7 +1312,7 @@ TEST_CASE( "MIPS32_instr: lw be")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE( "MIPS32_instr: sb (most significant bit is 0)")
+TEST_CASE( "MIPS32_instr: sb")
 {
     CHECK(MIPS32Instr(0xa13104d2).get_disasm() == "sb $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0xa131fb2e).get_disasm() == "sb $s1, 0xfb2e($t1)");
@@ -1348,6 +1328,160 @@ TEST_CASE( "MIPS32_instr: sb (most significant bit is 0)")
     memory->load_store( &instr);
     auto value = memory->read<uint8, Endian::little>( 0x1000);
     CHECK( value == 0x12);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sh")
+{
+    CHECK(MIPS32Instr(0xa53104d2).get_disasm() == "sh $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa531fb2e).get_disasm() == "sh $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sh");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint16, Endian::little>( 0x1000);
+    CHECK( value == 0xdead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sw")
+{
+    CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xad31fb2e).get_disasm() == "sw $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sw");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1000);
+    CHECK( value == 0xfee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: swl (instr->mem_addr % 4 = 2)")
+{
+    CHECK(MIPS32Instr(0xa93104d2).get_disasm() == "swl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa931fb2e).get_disasm() == "swl $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "swl");
+    instr.set_v_src( 2, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.set_v_imm( 0x1003);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    CHECK( value == 0xfee1'abcd);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: swr (instr->mem_addr % 4 = 2)")
+{
+    CHECK(MIPS32Instr(0xb93104d2).get_disasm() == "swr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb931fb2e).get_disasm() == "swr $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "swr");
+    instr.set_v_src( 2, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    CHECK( value == 0x5678'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//Data cache model is not implemeted so sc is tested like sh
+TEST_CASE( "MIPS32_instr: sc")
+{
+    CHECK(MIPS32Instr(0xe13104d2).get_disasm() == "sc $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xe131fb2e).get_disasm() == "sc $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sc");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xdead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1001);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1001);
+    CHECK( value == 0x78ab'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: sd")
+{
+    CHECK(MIPS64Instr(0xfd3104d2).get_disasm() == "sd $s1, 0x4d2($t1)");
+    CHECK(MIPS64Instr(0xfd31fb2e).get_disasm() == "sd $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sd");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//Instructions sdl and sdr are not implemented
+TEST_CASE( "MIPS64_instr: sdl")
+{
+    CHECK(MIPS32Instr(0xb13104d2).get_disasm() == "sdl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb131fb2e).get_disasm() == "sdl $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sdl");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: sdr")
+{
+    CHECK(MIPS32Instr(0xb53104d2).get_disasm() == "sdr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb531fb2e).get_disasm() == "sdr $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sdr");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.set_v_imm( 0x1000);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
