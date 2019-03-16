@@ -244,9 +244,9 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
         this->dst2 = decoder.get_register( Dst::RD);
 
     if ( this->is_branch())
-        this->target = this->PC + sign_extension<12, Addr>( this->v_imm);
+        this->target = this->PC + sign_extension<12>( narrow_cast<Addr>( this->v_imm));
     else if ( this->is_direct_jump())
-        this->target = this->PC + sign_extension<20, Addr>( this->v_imm);
+        this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));
 }
 
 template<typename T>
