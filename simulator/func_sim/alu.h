@@ -50,10 +50,6 @@ struct ALU
         return T{ narrow_cast<int16>(instr->v_imm)};
     }
 
-    template<typename I> static auto sign_extend_12( const I* instr) {
-        return sign_extension<12, typename I::RegisterUInt>( instr->v_imm);
-    }
-
     template<typename I> static size_t shamt_imm( const I* instr) {
         return narrow_cast<size_t>( instr->v_imm);
     }
@@ -146,16 +142,7 @@ struct ALU
     }
 
     template<typename I> static
-    void addr( I* instr) { instr->mem_addr = instr->v_src1 + sign_extend( instr); }
-
-    template<typename I> static
-    void riscv_addr( I* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src1 + sign_extend_12( instr)); }
-
-    template<typename I> static
-    void riscv_store_addr( I* instr) {
-        riscv_addr( instr);
-        instr->mask = bitmask<typename I::RegisterUInt>(instr->mem_size * 8);
-    }
+    void addr( I* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src1 + instr->v_imm); }
 
     // Predicate helpers - unary
     template<typename I> static
@@ -200,17 +187,11 @@ struct ALU
     bool lti( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) <  sign_extend( instr); }
 
     template<typename I> static
-    bool lti_riscv( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) <  narrow_cast<typename I::RegisterSInt>( sign_extend_12( instr)); }
-
-    template<typename I> static
     bool gei( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src1) >= sign_extend( instr); }
 
     // Predicate helpers - immediate unsigned
     template<typename I> static
-    bool ltiu( const I* instr) { return instr->v_src1 <  narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
-
-    template<typename I> static
-    bool ltiu_riscv( const I* instr) { return instr->v_src1 <  narrow_cast<typename I::RegisterUInt>(sign_extend_12( instr)); }
+    bool ltiu( const I* instr) { return instr->v_src1 < instr->v_imm; }
 
     template<typename I> static
     bool geiu( const I* instr) { return instr->v_src1 >= narrow_cast<typename I::RegisterUInt>(sign_extend( instr)); }
@@ -297,10 +278,10 @@ struct ALU
     void dsra32( I* instr) { instr->v_dst = arithmetic_rs( instr->v_src1, shamt_imm_32( instr)); }
 
     template<typename I> static
-    void mips_upper_immediate( I* instr) { instr->v_dst = narrow_cast<typename I::RegisterUInt>( sign_extend( instr)) << 16ULL; }
+    void mips_upper_immediate( I* instr) { instr->v_dst = instr->v_imm << 16ULL; }
 
     template<typename I> static
-    void riscv_upper_immediate( I* instr) { instr->v_dst = sign_extension<20, typename I::RegisterUInt>( instr->v_imm) << 12ULL; }
+    void riscv_upper_immediate( I* instr) { instr->v_dst = sign_extension<32>( instr->v_imm << 12ULL); }
 
     template<typename I> static
     void andv( I* instr)   { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -322,15 +303,6 @@ struct ALU
 
     template<typename I> static
     void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ instr->v_imm; }
-
-    template<typename I> static
-    void riscv_andi( I* instr)  { instr->v_dst = instr->v_src1 & sign_extend_12( instr); }
-
-    template<typename I> static
-    void riscv_ori( I* instr)   { instr->v_dst = instr->v_src1 | sign_extend_12( instr); }
-
-    template<typename I> static
-    void riscv_xori( I* instr)  { instr->v_dst = instr->v_src1 ^ sign_extend_12( instr); }
 
     template<typename I> static
     void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
@@ -427,7 +399,7 @@ struct ALU
     void riscv_jump_and_link_register( I* instr)
     {
         instr->v_dst = instr->PC + 4;
-        jump( instr, narrow_cast<Addr>( instr->v_src1 + sign_extend_12( instr)));
+        jump( instr, narrow_cast<Addr>( instr->v_src1 + instr->v_imm));
     }
 
     template<typename I> static
@@ -462,7 +434,7 @@ struct ALU
     template<typename I, typename T> static
     void riscv_addition_imm( I* instr)
     {
-        instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + sign_extend_12( instr));
+        instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
     }
 };
 

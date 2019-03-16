@@ -47,7 +47,7 @@ static bool test_imm_instr( std::string_view name, T dst, T src, T imm)
 {
     RISCVInstr<T> instr( name);
     instr.set_v_src( src, 0);
-    instr.set_v_imm( imm);
+    instr.set_v_imm( sign_extension<12>( imm));
     instr.execute();
     return instr.get_v_dst() == dst;
 }
@@ -76,7 +76,7 @@ TEST_CASE("RISCV lui 1")
     CHECK( RISCVInstr<uint32>(0x204002b7).get_disasm() == "lui $t0, 0x20400");
 
     RISCVInstr<uint32> instr("lui");
-    instr.set_v_imm(0x1);
+    instr.set_v_imm( sign_extension<20, uint32>( 0x1));
     instr.execute();
     CHECK( instr.get_v_dst() == 0x1000);
 }
@@ -84,7 +84,7 @@ TEST_CASE("RISCV lui 1")
 TEST_CASE("RISCV lui all fs")
 {
     RISCVInstr<uint32> instr("lui");
-    instr.set_v_imm(0xfffff);
+    instr.set_v_imm( sign_extension<20, uint32>( 0xfffff));
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff'f000ULL);
 }
@@ -92,7 +92,7 @@ TEST_CASE("RISCV lui all fs")
 TEST_CASE("RISCV lui 80000")
 {
     RISCVInstr<uint64> instr("lui");
-    instr.set_v_imm(0x80000);
+    instr.set_v_imm( sign_extension<20, uint64>( 0x80000));
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff'ffff'8000'0000ULL);
 }
@@ -100,7 +100,7 @@ TEST_CASE("RISCV lui 80000")
 TEST_CASE("RISCV-128 lui all fs")
 {
     RISCVInstr<uint64> instr("lui");
-    instr.set_v_imm(0xfffff);
+    instr.set_v_imm( sign_extension<20, uint64>( 0xfffff));
     instr.execute();
     CHECK( ~instr.get_v_dst() == 0xfff);
 }
