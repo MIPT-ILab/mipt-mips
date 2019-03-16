@@ -273,14 +273,14 @@ static const Table<I> isaMapIJ =
     {0x6, { "blez", mips_blez<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
     {0x7, { "bgtz", mips_bgtz<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
     // Addition/Subtraction
-    {0x8, { "addi",  mips_addi<I>,  OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x9, { "addiu", mips_addiu<I>, OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0x8, { "addi",  mips_addi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0x9, { "addiu", mips_addiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
     // Logical operations
-    {0xA, { "slti",  mips_slti<I>,  OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xB, { "sltiu", mips_sltiu<I>, OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xC, { "andi",  mips_andi<I>,  OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xD, { "ori",   mips_ori<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xE, { "xori",  mips_xori<I>,  OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xA, { "slti",  mips_slti<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xB, { "sltiu", mips_sltiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xC, { "andi",  mips_andi<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xD, { "ori",   mips_ori<I>,   OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xE, { "xori",  mips_xori<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
     {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
@@ -292,8 +292,8 @@ static const Table<I> isaMapIJ =
     {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
     {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
     // Doubleword addition
-    {0x18, { "daddi",  mips_daddi<I>,  OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
-    {0x19, { "daddiu", mips_daddiu<I>, OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
+    {0x18, { "daddi",  mips_daddi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
+    {0x19, { "daddiu", mips_daddiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
     // Loads
     {0x20, { "lb",  mips_lb<I>,  OUT_LOAD, 1, 'I',         Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
     {0x21, { "lh",  mips_lh<I>,  OUT_LOAD, 2, 'I',         Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
@@ -458,7 +458,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->operation = entry.operation;
     this->mem_size  = entry.mem_size;
     this->executor  = entry.versions.is_supported(version) ? entry.function : mips_unknown<MyDatapath>;
-    this->v_imm     = instr.get_immediate( entry.imm_type);
+    this->v_imm     = instr.get_immediate<R>( entry.imm_type);
     this->src1      = instr.get_register( entry.src1);
     this->src2      = instr.get_register( entry.src2);
     this->dst       = instr.get_register( entry.dst);

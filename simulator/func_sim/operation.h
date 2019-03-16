@@ -47,7 +47,7 @@ std::string print_immediate( Imm type, T value)
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:
+    case Imm::ADDR:  oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
     case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;

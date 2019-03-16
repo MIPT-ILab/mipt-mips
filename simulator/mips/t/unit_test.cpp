@@ -143,8 +143,8 @@ TEST_CASE ( "MIPS32_instr: add overflow")
 
 TEST_CASE( "MIPS32_instr: addi two zeroes")
 {
-    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, -1234");
     
     MIPS32Instr instr( "addi");
     instr.set_v_src( 0, 0);
@@ -186,8 +186,8 @@ TEST_CASE( "MIPS32_instr: addi overflow")
     
 TEST_CASE( "MIPS32_instr: addiu two zeroes")
 {
-    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS32Instr instr( "addiu");
     instr.set_v_src( 0, 0);
@@ -227,8 +227,8 @@ TEST_CASE( "MIPS32_instr: addiu overflow")
 
 TEST_CASE( "MIPS64_instr: addiu two zeroes")
 {
-    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS64Instr instr( "addiu");
     instr.set_v_src( 0, 0);
@@ -2172,8 +2172,8 @@ TEST_CASE( "MIPS64_instr: sllv by 64 (shift-variable ovreflow)")
 
 TEST_CASE( "MIPS32_instr: slti 0 < 0")
 {
-    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, -1234");
 
     MIPS32Instr instr( "slti");
     instr.set_v_src( 0, 0);
@@ -2239,8 +2239,8 @@ TEST_CASE( "MIPS32_instr: slti -1 < 1")
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < 0")
 {
-    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, -1234");
     
     MIPS32Instr instr( "sltiu");
     instr.set_v_src( 0, 0);
@@ -3190,8 +3190,8 @@ TEST_CASE ( "MIPS64_instr: dadd overflow")
 
 TEST_CASE( "MIPS64_instr: daddi two zeroes")
 {
-    CHECK(MIPS64Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 0x4d2");
-    CHECK(MIPS64Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, 0xfb2e");
+    CHECK(MIPS64Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, -1234");
     CHECK( not_a_mips32_instruction("daddi"));
 
     MIPS64Instr instr( "daddi");
@@ -3233,8 +3233,8 @@ TEST_CASE( "MIPS64_instr: daddi overflow")
     
 TEST_CASE( "MIPS64_instr: daddiu two zeroes")
 {
-    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, -1234");
     CHECK( not_a_mips32_instruction("daddiu"));
 
     MIPS64Instr instr( "daddiu");
