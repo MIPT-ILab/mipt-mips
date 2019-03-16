@@ -404,9 +404,9 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
+        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
         if ( instr->is_taken_branch)
         {
-            instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
             instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
