@@ -54,11 +54,6 @@ struct ALU
         return sign_extension<12, typename I::RegisterUInt>( instr->v_imm);
     }
 
-    template<typename I> static auto zero_extend( const I* instr) {
-        using T = typename I::RegisterUInt;
-        return T{ narrow_cast<uint16>(instr->v_imm)};
-    }
-
     template<typename I> static size_t shamt_imm( const I* instr) {
         return narrow_cast<size_t>( instr->v_imm);
     }
@@ -320,13 +315,13 @@ struct ALU
     void nor( I* instr)   { instr->v_dst = ~(instr->v_src1 | instr->v_src2); }
 
     template<typename I> static
-    void andi( I* instr)  { instr->v_dst = instr->v_src1 & zero_extend( instr); }
+    void andi( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_imm; }
 
     template<typename I> static
-    void ori( I* instr)   { instr->v_dst = instr->v_src1 | zero_extend( instr); }
+    void ori( I* instr)   { instr->v_dst = instr->v_src1 | instr->v_imm; }
 
     template<typename I> static
-    void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ zero_extend( instr); }
+    void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ instr->v_imm; }
 
     template<typename I> static
     void riscv_andi( I* instr)  { instr->v_dst = instr->v_src1 & sign_extend_12( instr); }
