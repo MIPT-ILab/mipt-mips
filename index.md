@@ -57,8 +57,8 @@ MIPT | Name | Score | Comments
 **717** | **Vsevolod Pukhov** | **4** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)**, **½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
+**712** | **Egor Bova** | **+ 3** | **½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
-**712** | **Egor Bova** | **+ 2** | **¼[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
 **717** | **Ivan Startsev** | **2** | **[#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)** |
 **717** | **Arsen Davtyan** | **2** | **[#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)** |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |

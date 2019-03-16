@@ -119,8 +119,8 @@ TEST_CASE ( "MIPS32_instr: add overflow")
 
 TEST_CASE( "MIPS32_instr: addi two zeroes")
 {
-    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, -1234");
     
     MIPS32Instr instr( "addi");
     instr.set_v_src( 0, 0);
@@ -162,8 +162,8 @@ TEST_CASE( "MIPS32_instr: addi overflow")
     
 TEST_CASE( "MIPS32_instr: addiu two zeroes")
 {
-    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS32Instr instr( "addiu");
     instr.set_v_src( 0, 0);
@@ -203,8 +203,8 @@ TEST_CASE( "MIPS32_instr: addiu overflow")
 
 TEST_CASE( "MIPS64_instr: addiu two zeroes")
 {
-    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS64Instr instr( "addiu");
     instr.set_v_src( 0, 0);
@@ -1828,6 +1828,270 @@ TEST_CASE( "MIPS64_instr: ldr")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+TEST_CASE( "MIPS32_instr: lb (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x813104d2).get_disasm() == "lb $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8131fb2e).get_disasm() == "lb $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lb");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x34);
+}
+
+TEST_CASE( "MIPS32_instr: lb (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lb");
+    instr.set_v_src( 4, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffffffab);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lbu (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x913104d2).get_disasm() == "lbu $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9131fb2e).get_disasm() == "lbu $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lbu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x34);
+}
+
+TEST_CASE( "MIPS32_instr: lbu (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lbu");
+    instr.set_v_src( 4, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xab);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lh (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x853104d2).get_disasm() == "lh $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8531fb2e).get_disasm() == "lh $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lh");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: lh (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lh");
+    instr.set_v_src( 3, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+}
+
+TEST_CASE( "MIPS32_instr: lh unaligned address trap")
+{
+    MIPS32Instr instr( "lh");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 1);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lhu (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x953104d2).get_disasm() == "lhu $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9531fb2e).get_disasm() == "lhu $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lhu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: lhu (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lhu");
+    instr.set_v_src( 3, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD);
+}
+
+TEST_CASE( "MIPS32_instr: lhu unaligned address trap")
+{
+    MIPS32Instr instr( "lhu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 1);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 0)")
+{
+    CHECK(MIPS32Instr(0x893104d2).get_disasm() == "lwl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8931fb2e).get_disasm() == "lwl $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lwl");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffd);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x3400'0000);
+}
+
+TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 3)")
+{
+    MIPS32Instr instr( "lwl");
+    instr.set_v_src( 4, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 0)")
+{
+    CHECK(MIPS32Instr(0x993104d2).get_disasm() == "lwr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9931fb2e).get_disasm() == "lwr $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lwr");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
+}
+
+TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 3)")
+{
+    MIPS32Instr instr( "lwr");
+    instr.set_v_src( 4, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xDC56'78AB);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: ll (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0xc13104d2).get_disasm() == "ll $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xc131fb2e).get_disasm() == "ll $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "ll");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: ll (most significant bit is 1)")
+{
+    MIPS32Instr instr( "ll");
+    instr.set_v_src( 3, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ld")
+{
+    CHECK(MIPS64Instr(0xdd3104d2).get_disasm() == "ld $s1, 0x4d2($t1)");
+    CHECK(MIPS64Instr(0xdd31fb2e).get_disasm() == "ld $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ld");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0fff);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xBADC'5678'ABCD'1234);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ldl")
+{
+    CHECK(MIPS32Instr(0x693104d2).get_disasm() == "ldl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x6931fb2e).get_disasm() == "ldl $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ldl");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0ffd);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffe);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x5678'ABCD'1234'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ldr")
+{
+    CHECK(MIPS32Instr(0x6d3104d2).get_disasm() == "ldr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x6d31fb2e).get_disasm() == "ldr $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ldr");
+    instr.set_v_src( 1, 0);
+    instr.set_v_imm( 0x0ffd);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffe);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x5678'ABCD'1234'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
 TEST_CASE( "MIPS32_instr: lw le")
 {
     CHECK(MIPS32Instr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
@@ -2708,8 +2972,8 @@ TEST_CASE( "MIPS64_instr: sllv by 64 (shift-variable ovreflow)")
 
 TEST_CASE( "MIPS32_instr: slti 0 < 0")
 {
-    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, -1234");
 
     MIPS32Instr instr( "slti");
     instr.set_v_src( 0, 0);
@@ -2775,8 +3039,8 @@ TEST_CASE( "MIPS32_instr: slti -1 < 1")
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < 0")
 {
-    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, -1234");
     
     MIPS32Instr instr( "sltiu");
     instr.set_v_src( 0, 0);
@@ -3726,8 +3990,8 @@ TEST_CASE ( "MIPS64_instr: dadd overflow")
 
 TEST_CASE( "MIPS64_instr: daddi two zeroes")
 {
-    CHECK(MIPS64Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 0x4d2");
-    CHECK(MIPS64Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, 0xfb2e");
+    CHECK(MIPS64Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, -1234");
     CHECK( not_a_mips32_instruction("daddi"));
 
     MIPS64Instr instr( "daddi");
@@ -3769,8 +4033,8 @@ TEST_CASE( "MIPS64_instr: daddi overflow")
     
 TEST_CASE( "MIPS64_instr: daddiu two zeroes")
 {
-    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, -1234");
     CHECK( not_a_mips32_instruction("daddiu"));
 
     MIPS64Instr instr( "daddiu");
