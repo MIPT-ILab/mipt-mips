@@ -38,13 +38,12 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         const Endian endian;
 
         void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
+        void init_target();
         static DisasmCache& get_disasm_cache();
     public:
         BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC);
-        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC );
+        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC );
         BaseMIPSInstr() = delete;
-
-        void init_target();
 
         auto get_endian() const { return endian; }
 
