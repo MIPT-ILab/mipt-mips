@@ -190,7 +190,7 @@ static bool riscv_torture_test_passes( const std::string& isa, const std::string
     return res == Trap::HALT && sim->read_cpu_register( 3 /* gp */) == 1;
 }
 
-TEST_CASE( "Torture_Test: rvc32ui")
+TEST_CASE( "Torture_Test: rv32ui")
 {
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-add")  );
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-addi")  );
@@ -233,7 +233,7 @@ TEST_CASE( "Torture_Test: rvc32ui")
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xori")  );
 }
 
-TEST_CASE( "Torture_Test: rvc64ui")
+TEST_CASE( "Torture_Test: rv64ui")
 {
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-add")  );
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-addi")  );
@@ -287,3 +287,37 @@ TEST_CASE( "Torture_Test: rvc64ui")
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xor")  );
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xori")  );
 }
+
+// See tracker #925
+#if 0
+
+TEST_CASE( "Torture_Test: rv32um")
+{
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-div") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-divu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mul") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulh") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulhsu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulhu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-rem") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-remu") );
+}
+
+TEST_CASE( "Torture_Test: rv64um")
+{
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-div") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divuw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mul") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulh") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulhsu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulhu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-rem") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remuw" );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remw") );
+}
+
+#endif
