@@ -41,12 +41,13 @@ enum class Imm : uint8
     JUMP
 };
 
-static inline std::string print_immediate( Imm type, uint32 value)
+template<typename T>
+std::string print_immediate( Imm type, T value)
 {
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:
+    case Imm::ADDR:  oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
     case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
@@ -109,8 +110,6 @@ public:
     void set_sequence_id( uint64 id) { sequence_id = id; }
     auto get_sequence_id() const { return sequence_id; }
 
-    void set_v_imm( uint32 value) { v_imm = value; }
-
     auto get_delayed_slots() const { return delayed_slots; }
     Addr get_decoded_target() const { return target; }
     auto get_new_PC() const { return new_PC; }
@@ -165,6 +164,7 @@ public:
     T get_v_dst() const { return v_dst; }
     T get_v_dst2() const { return v_dst2; }
     T get_mask() const { return mask; }
+    void set_v_imm( uint32 value) { v_imm = value; }
 
     void load( const T& value);
     void execute();
@@ -176,6 +176,7 @@ protected:
     T v_src2 = NO_VAL32;
     T v_dst  = NO_VAL32;
     T v_dst2 = NO_VAL32;
+    T v_imm  = NO_VAL32;
     T mask   = all_ones<T>();
 
     Execute executor;

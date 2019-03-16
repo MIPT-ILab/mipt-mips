@@ -25,24 +25,24 @@ template<typename I> auto execute_blt = ALU::branch<I, ALU::lt<I>>;
 template<typename I> auto execute_bge = ALU::branch<I, ALU::ge<I>>;
 template<typename I> auto execute_bltu = ALU::branch<I, ALU::ltu<I>>;
 template<typename I> auto execute_bgeu = ALU::branch<I, ALU::geu<I>>;
-template<typename I> auto execute_lb = ALU::riscv_addr<I>;
-template<typename I> auto execute_lh = ALU::riscv_addr<I>;
-template<typename I> auto execute_lw = ALU::riscv_addr<I>;
-template<typename I> auto execute_lbu = ALU::riscv_addr<I>;
-template<typename I> auto execute_lhu = ALU::riscv_addr<I>;
-template<typename I> auto execute_lwu = ALU::riscv_addr<I>;
-template<typename I> auto execute_ld = ALU::riscv_addr<I>;
-template<typename I> auto execute_sb = ALU::riscv_store_addr<I>;
-template<typename I> auto execute_sh = ALU::riscv_store_addr<I>;
-template<typename I> auto execute_sw = ALU::riscv_store_addr<I>;
-template<typename I> auto execute_sd = ALU::riscv_store_addr<I>;
+template<typename I> auto execute_lb = ALU::addr<I>;
+template<typename I> auto execute_lh = ALU::addr<I>;
+template<typename I> auto execute_lw = ALU::addr<I>;
+template<typename I> auto execute_lbu = ALU::addr<I>;
+template<typename I> auto execute_lhu = ALU::addr<I>;
+template<typename I> auto execute_lwu = ALU::addr<I>;
+template<typename I> auto execute_ld = ALU::addr<I>;
+template<typename I> auto execute_sb = ALU::store_addr<I>;
+template<typename I> auto execute_sh = ALU::store_addr<I>;
+template<typename I> auto execute_sw = ALU::store_addr<I>;
+template<typename I> auto execute_sd = ALU::store_addr<I>;
 template<typename I> auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
 template<typename I> auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
-template<typename I> auto execute_slti = ALU::set<I, ALU::lti_riscv<I>>;
-template<typename I> auto execute_sltiu = ALU::set<I, ALU::ltiu_riscv<I>>;
-template<typename I> auto execute_xori = ALU::riscv_xori<I>;
-template<typename I> auto execute_ori = ALU::riscv_ori<I>;
-template<typename I> auto execute_andi = ALU::riscv_andi<I>;
+template<typename I> auto execute_slti = ALU::set<I, ALU::lti<I>>;
+template<typename I> auto execute_sltiu = ALU::set<I, ALU::ltiu<I>>;
+template<typename I> auto execute_xori = ALU::xori<I>;
+template<typename I> auto execute_ori = ALU::ori<I>;
+template<typename I> auto execute_andi = ALU::andi<I>;
 template<typename I> auto execute_slli = ALU::sll<I, typename I::RegisterUInt>;
 template<typename I> auto execute_slliw = ALU::sll<I, uint32>;
 template<typename I> auto execute_srli = ALU::srl<I, typename I::RegisterUInt>;
@@ -71,7 +71,7 @@ template<typename I> auto execute_uret = ALU::riscv_jump_and_link_register<I>;
 template<typename I> auto execute_sret = ALU::riscv_jump_and_link_register<I>;
 template<typename I> auto execute_mret = ALU::riscv_jump_and_link_register<I>;
 template<typename I> auto execute_wfi = do_nothing<I>;
-template<typename I> auto execute_fence = ALU::riscv_addr<I>;
+template<typename I> auto execute_fence = ALU::addr<I>;
 template<typename I> auto execute_csrrw = ALU::csrrw<I>;
 template<typename I> auto execute_csrrs = ALU::csrrs<I>;
 template<typename I> auto execute_csrrc = do_nothing<I>;
@@ -236,7 +236,7 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     init( entry);
 
     RISCVInstrDecoder decoder( bytes);
-    this->v_imm = decoder.get_immediate( entry.immediate_type);
+    this->v_imm = decoder.get_immediate<T>( entry.immediate_type);
     this->src1  = decoder.get_register( entry.src1);
     this->src2  = decoder.get_register( entry.src2);
     this->dst   = decoder.get_register( entry.dst);
@@ -244,9 +244,9 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
         this->dst2 = decoder.get_register( Dst::RD);
 
     if ( this->is_branch())
-        this->target = this->PC + sign_extension<12, Addr>( this->v_imm);
+        this->target = this->PC + sign_extension<12>( narrow_cast<Addr>( this->v_imm));
     else if ( this->is_direct_jump())
-        this->target = this->PC + sign_extension<20, Addr>( this->v_imm);
+        this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));
 }
 
 template<typename T>
