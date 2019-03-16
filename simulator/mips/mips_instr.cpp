@@ -78,7 +78,7 @@ template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ll      = ALU::load_addr<I>;
-template<typename I> auto mips_lui     = ALU::mips_upper_immediate<I>;
+template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
@@ -429,39 +429,46 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 byte
     , raw_valid( true)
     , endian( endian)
 {
-    init( get_table_entry<MyDatapath>( raw), version);
+    auto entry = get_table_entry<MyDatapath>( raw);
+    MIPSInstrDecoder instr( raw);
+    init( entry, version);
+ 
+    this->src1  = instr.get_register( entry.src1);
+    this->src2  = instr.get_register( entry.src2);
+    this->dst   = instr.get_register( entry.dst);
+    this->v_imm = MIPSInstrDecoder::get_immediate<R>( entry.imm_type, instr.get_immediate_value( entry.imm_type));
+
+    init_target();
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( 0)
     , endian( endian)
 {
-    init( get_table_entry<MyDatapath>( str_opcode), version);
+    auto entry = get_table_entry<MyDatapath>( str_opcode);
+    init( entry, version);
+    this->v_imm = MIPSInstrDecoder::get_immediate<R>( entry.imm_type, immediate);
+    init_target();
 }
 
 template<typename R>
 void BaseMIPSInstr<R>::init_target()
 {
     if ( this->is_branch())
-        this->target = this->PC + 4 + ALU::sign_extend( this) * 4;
+        this->target = this->PC + 4 + ( sign_extension<bitwidth<R>, Addr>( this->v_imm) << 2U);
     else if ( this->is_direct_jump())
-        this->target = (this->PC & 0xf0000000) | ( this->v_imm << 2u);
+        this->target = ( this->PC & 0xf0000000) | ( this->v_imm << 2U);
 }
 
 template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
-    MIPSInstrDecoder instr( raw);
     this->imm_print_type = entry.imm_print_type;
     this->operation = entry.operation;
     this->mem_size  = entry.mem_size;
     this->executor  = entry.versions.is_supported(version) ? entry.function : mips_unknown<MyDatapath>;
-    this->v_imm     = instr.get_immediate<R>( entry.imm_type);
-    this->src1      = instr.get_register( entry.src1);
-    this->src2      = instr.get_register( entry.src2);
-    this->dst       = instr.get_register( entry.dst);
     this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
     this->opname    = entry.name;
     this->print_dst = is_explicit_register( entry.dst);
@@ -470,8 +477,6 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;
-
-    init_target();
 }
 
 template<typename R>
