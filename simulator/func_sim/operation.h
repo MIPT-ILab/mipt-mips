@@ -164,7 +164,6 @@ public:
     T get_v_dst() const { return v_dst; }
     T get_v_dst2() const { return v_dst2; }
     T get_mask() const { return mask; }
-    void set_v_imm( uint32 value) { v_imm = value; }
 
     void load( const T& value);
     void execute();

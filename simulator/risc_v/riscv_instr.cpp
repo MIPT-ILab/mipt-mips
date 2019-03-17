@@ -15,10 +15,10 @@
 
 template<typename I> auto do_nothing = ALU::unknown_instruction<I>;
 // I
-template<typename I> auto execute_lui = ALU::riscv_upper_immediate<I>;
+template<typename I> auto execute_lui = ALU::upper_immediate<I, 12>;
 template<typename I> auto execute_auipc = ALU::auipc<I>;
-template<typename I> auto execute_jal = ALU::riscv_jump_and_link<I>;
-template<typename I> auto execute_jalr = ALU::riscv_jump_and_link_register<I>;
+template<typename I> auto execute_jal = ALU::jump_and_link<I, ALU::j<I>>;
+template<typename I> auto execute_jalr = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
 template<typename I> auto execute_beq = ALU::branch<I, ALU::eq<I>>;
 template<typename I> auto execute_bne = ALU::branch<I, ALU::ne<I>>;
 template<typename I> auto execute_blt = ALU::branch<I, ALU::lt<I>>;
@@ -67,9 +67,9 @@ template<typename I> auto execute_and = ALU::andv<I>;
 // System I
 template<typename I> auto execute_ecall = ALU::halt<I>;
 template<typename I> auto execute_ebreak = do_nothing<I>;
-template<typename I> auto execute_uret = ALU::riscv_jump_and_link_register<I>;
-template<typename I> auto execute_sret = ALU::riscv_jump_and_link_register<I>;
-template<typename I> auto execute_mret = ALU::riscv_jump_and_link_register<I>;
+template<typename I> auto execute_uret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> auto execute_sret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> auto execute_mret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
 template<typename I> auto execute_wfi = do_nothing<I>;
 template<typename I> auto execute_fence = ALU::addr<I>;
 template<typename I> auto execute_csrrw = ALU::csrrw<I>;
@@ -236,25 +236,34 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     init( entry);
 
     RISCVInstrDecoder decoder( bytes);
-    this->v_imm = decoder.get_immediate<T>( entry.immediate_type);
+    this->v_imm = RISCVInstrDecoder::get_immediate<T>( entry.immediate_type, decoder.get_immediate_value( entry.immediate_type));
     this->src1  = decoder.get_register( entry.src1);
     this->src2  = decoder.get_register( entry.src2);
     this->dst   = decoder.get_register( entry.dst);
     if ( entry.dst == Dst::CSR)
         this->dst2 = decoder.get_register( Dst::RD);
-
-    if ( this->is_branch())
-        this->target = this->PC + sign_extension<12>( narrow_cast<Addr>( this->v_imm));
-    else if ( this->is_direct_jump())
-        this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));
+    init_target();
 }
 
+
 template<typename T>
-RISCVInstr<T>::RISCVInstr( std::string_view name, Addr PC)
+RISCVInstr<T>::RISCVInstr( std::string_view name, uint32 immediate, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4)
 {
     const auto& entry = find_entry<MyDatapath>( name);
     init( entry);
+
+    this->v_imm = RISCVInstrDecoder::get_immediate<T>( entry.immediate_type, immediate);
+    init_target();
+}
+
+template<typename T>
+void RISCVInstr<T>::init_target()
+{
+    if ( this->is_branch())
+        this->target = this->PC + sign_extension<12>( narrow_cast<Addr>( this->v_imm));
+    else if ( this->is_direct_jump())
+        this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));
 }
 
 template<typename T>
