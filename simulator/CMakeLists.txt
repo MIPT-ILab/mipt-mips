@@ -72,6 +72,7 @@ set(TESTS_CPPS
     func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
+    risc_v/t/riscv64_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
     modules/core/t/unit_test.cpp
