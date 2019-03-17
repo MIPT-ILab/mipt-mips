@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
+static const std::string valid_elf_file = TEST_PATH "/tt.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
@@ -163,24 +163,16 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 1) == Trap::NO_TRAP );
-
-    auto trap = get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
-TEST_CASE( "Torture_Test: MARS")
+TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core.universal.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core32.le.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars64", TEST_PATH "/tt.core64.le.out")->run_no_limit() == Trap::HALT );
-}
-
-TEST_CASE( "Torture_Test: Delayed branches")
-{
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT  );
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("mars",   valid_elf_file)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
 }
 
 static bool riscv_torture_test_passes( const std::string& isa, const std::string& test)
