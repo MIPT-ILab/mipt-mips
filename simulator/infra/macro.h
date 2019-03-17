@@ -93,9 +93,9 @@ static constexpr bool has_zero( const T& value)
 }
 
 template <typename T>
-static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
+static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
-    size_t count = 0;
+    uint8 count = 0;
     for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
     {
         if ( ( value & mask) != 0)
@@ -106,7 +106,7 @@ static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 }
 
 template <typename T>
-static constexpr inline size_t count_leading_ones(const T& value) noexcept
+static constexpr inline auto count_leading_ones( const T& value) noexcept
 {
     return count_leading_zeroes<T>( ~value);
 }

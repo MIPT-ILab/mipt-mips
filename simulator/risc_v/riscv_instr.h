@@ -24,13 +24,14 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
         void init( const RISCVTableEntry<MyDatapath>& entry);
+        void init_target();
 
     public:
         static constexpr auto get_endian() { return Endian::little; }
 
         RISCVInstr() = delete;
         explicit RISCVInstr( uint32 bytes, Addr PC = 0);
-        explicit RISCVInstr( std::string_view name, Addr PC = 0);
+        explicit RISCVInstr( std::string_view name, uint32 immediate, Addr PC = 0);
 
          bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;

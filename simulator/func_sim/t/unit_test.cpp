@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
+static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
@@ -163,24 +163,16 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 1) == Trap::NO_TRAP );
-
-    auto trap = get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
-TEST_CASE( "Torture_Test: MARS")
+TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core.universal.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core32.le.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars64", TEST_PATH "/tt.core64.le.out")->run_no_limit() == Trap::HALT );
-}
-
-TEST_CASE( "Torture_Test: Delayed branches")
-{
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT  );
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() == Trap::HALT  );
+    CHECK( get_simulator_with_test("mars",   valid_elf_file)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
 }
 
 static bool riscv_torture_test_passes( const std::string& isa, const std::string& test)
@@ -190,7 +182,7 @@ static bool riscv_torture_test_passes( const std::string& isa, const std::string
     return res == Trap::HALT && sim->read_cpu_register( 3 /* gp */) == 1;
 }
 
-TEST_CASE( "Torture_Test: rvc32ui")
+TEST_CASE( "Torture_Test: rv32ui")
 {
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-add")  );
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-addi")  );
@@ -233,7 +225,7 @@ TEST_CASE( "Torture_Test: rvc32ui")
     CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xori")  );
 }
 
-TEST_CASE( "Torture_Test: rvc64ui")
+TEST_CASE( "Torture_Test: rv64ui")
 {
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-add")  );
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-addi")  );
@@ -287,3 +279,37 @@ TEST_CASE( "Torture_Test: rvc64ui")
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xor")  );
     CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xori")  );
 }
+
+// See tracker #925
+#if 0
+
+TEST_CASE( "Torture_Test: rv32um")
+{
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-div") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-divu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mul") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulh") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulhsu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-mulhu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-rem") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32um-p-remu") );
+}
+
+TEST_CASE( "Torture_Test: rv64um")
+{
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-div") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divuw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-divw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mul") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulh") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulhsu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulhu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-mulw") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-rem") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remu") );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remuw" );
+    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv64um-p-remw") );
+}
+
+#endif

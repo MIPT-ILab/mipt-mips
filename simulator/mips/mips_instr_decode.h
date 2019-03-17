@@ -50,16 +50,27 @@ struct MIPSInstrDecoder
         return ( bytes & mask) >> find_first_set( mask);
     }
 
-    template<typename R>
-    R get_immediate( char type) const
+    uint32 get_immediate_value( char type) const
     {
         switch ( type)
         {
         case 'N': return 0;
         case 'S': return shamt;
         case 'J': return jump;
-        case 'L': return imm;
-        default:  return sign_extension<16, R>( imm);
+        default:  return imm;
+        }
+    }
+
+    template<typename R>
+    static R get_immediate( char type, uint32 value) noexcept
+    {
+        switch ( type)
+        {
+        case 'N':
+        case 'S':
+        case 'J':
+        case 'L': return value;
+        default:  return sign_extension<16, R>( value);
         }
     }
 
