@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-static const std::string valid_elf_file = TEST_PATH "/tt.universal.out";
+static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
