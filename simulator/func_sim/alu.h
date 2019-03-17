@@ -201,10 +201,8 @@ struct ALU
     template<typename I> static void auipc( I* instr) { upper_immediate<I, 12>( instr); instr->v_dst += instr->PC; }
 
     // Leading zero/ones
-    template<typename I> static void clo( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint32>( instr->v_src1)); }
-    template<typename I> static void dclo( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_ones<uint64>( instr->v_src1)); }
-    template<typename I> static void clz( I* instr)  { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint32>(  instr->v_src1)); }
-    template<typename I> static void dclz( I* instr) { instr->v_dst = narrow_cast<uint32>( count_leading_zeroes<uint64>(  instr->v_src1)); }
+    template<typename I, typename T> static void clo( I* instr)  { instr->v_dst = count_leading_ones<T>( instr->v_src1); }
+    template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
 
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
