@@ -129,7 +129,7 @@ class DataBypass
         // in accordance with a type of the instruction
         Latency get_instruction_latency( const Instr& instr) const
         {
-            if ( instr.is_mem_stage_required())
+            if ( instr.is_mem_stage_required() || instr.is_branch_stage_required())
                 return 2_lt;
 
             if ( instr.is_long_arithmetic())

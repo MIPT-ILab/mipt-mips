@@ -49,10 +49,10 @@ public:
 
     auto is_mem_stage_required() const { return this->is_load()  ||
                                                 this->is_store() ||
-                                                this->is_jump()  ||
                                                 this->is_explicit_trap(); }
 
     auto is_branch_stage_required() const { return this->is_branch() ||
+                                                   this->is_jump()   ||
                                                    this->is_indirect_jump(); }
 };
 
