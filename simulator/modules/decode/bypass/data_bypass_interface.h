@@ -42,6 +42,7 @@ private:
     //  .......
     // EXECUTE_N  - last_execution_stage_value     | Bypassing stage
     // MEM        - MAX_VAL8 - 2                   | Bypassing stage
+    // BRANCH     - MAX_VAL8 - 2                   | Bypassing stage
     // WRITEBACK  - MAX_VAL8 - 1                   | Bypassing stage
     // IN_RF      - MAX_VAL8
 
