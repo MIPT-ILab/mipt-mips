@@ -163,7 +163,7 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
     {
         entry.ready_stage.set_to_mem_stage();
     }
-    else if ( instr.is_branch())
+    else if ( instr.is_branch() || instr.is_jump())
     {
         entry.ready_stage.set_to_branch_stage();
     }

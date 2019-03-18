@@ -46,10 +46,10 @@ private:
     // WRITEBACK  - MAX_VAL8 - 1                   | Bypassing stage
     // IN_RF      - MAX_VAL8
 
-    static constexpr const Latency IN_RF_STAGE = Latency( MAX_VAL8);
-    static constexpr const Latency MEM_STAGE   = IN_RF_STAGE - 2_lt;
-    static constexpr const Latency BRANCH_STAGE   = IN_RF_STAGE - 2_lt;
-    static constexpr const Latency WB_STAGE    = IN_RF_STAGE - 1_lt;
+    static constexpr const Latency IN_RF_STAGE  = Latency( MAX_VAL8);
+    static constexpr const Latency MEM_STAGE    = IN_RF_STAGE - 2_lt;
+    static constexpr const Latency BRANCH_STAGE = IN_RF_STAGE - 2_lt;
+    static constexpr const Latency WB_STAGE     = IN_RF_STAGE - 1_lt;
 };
 
 
@@ -77,7 +77,7 @@ public:
             bypass_direction = 2;
 
         if ( bypassing_stage.is_branch_stage())
-                    bypass_direction = 4;
+            bypass_direction = 4;
 
         if ( bypassing_stage.is_writeback())
             bypass_direction = 3;
