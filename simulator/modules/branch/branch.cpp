@@ -22,6 +22,7 @@ Branch<FuncInstr>::Branch( bool log) : Log( log)
 
     wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                                 PORT_BW, PORT_FANOUT);
+    wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
 }
 
 template <typename FuncInstr>

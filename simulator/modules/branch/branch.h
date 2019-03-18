@@ -15,7 +15,10 @@ class FuncMemory;
 template <typename FuncInstr>
 class Branch : public Log
 {    
-        using Instr = PerfInstr<FuncInstr>;
+    using Instr = PerfInstr<FuncInstr>;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
+    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
+
     private:
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -29,7 +32,11 @@ class Branch : public Log
         std::unique_ptr<ReadPort<Instr>> rp_recive_datapath_from_mem = nullptr;
 
         std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
-    
+
+        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
+
+        static constexpr const uint8 SRC_REGISTERS_NUM = 2;
+
     public:
         explicit Branch( bool log);
         void clock( Cycle cycle);
