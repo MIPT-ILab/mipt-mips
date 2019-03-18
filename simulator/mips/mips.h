@@ -15,8 +15,8 @@ struct MIPS
     using Register = MIPSRegister;
     using RegisterUInt = MIPSRegisterUInt<version>;
     using FuncInstr = BaseMIPSInstr<RegisterUInt>;
-    static auto create_instr( uint32 bytes, Addr PC) {
-        return FuncInstr( version, bytes, PC);
+    static auto create_instr( uint32 bytes, Endian endian, Addr PC) {
+        return FuncInstr( version, endian, bytes, PC);
     }
 };
 
@@ -24,13 +24,12 @@ struct MIPS
 using MIPSI   = MIPS<MIPSVersion::I>;
 using MIPSII  = MIPS<MIPSVersion::II>;
 using MIPS32  = MIPS<MIPSVersion::v32>;
+using MARS    = MIPS<MIPSVersion::mars>;
 
 // 64 bit MIPS
 using MIPSIII = MIPS<MIPSVersion::III>;
 using MIPSIV  = MIPS<MIPSVersion::IV>;
 using MIPS64  = MIPS<MIPSVersion::v64>;
-
-static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
-static_assert( std::is_base_of_v<MIPS64::FuncInstr, MIPS64Instr>);
+using MARS64  = MIPS<MIPSVersion::mars64>;
 
 #endif // MIPS_H_

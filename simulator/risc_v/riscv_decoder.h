@@ -16,7 +16,7 @@
 enum class Reg : uint8
 {
     RS1, RS2, RD,
-    CSR1, CSR2, CSRD,
+    CSR, SEPC, MEPC,
     ZERO, RA
 };
 
@@ -38,25 +38,27 @@ struct RISCVInstrDecoder
     const uint32 J_imm11;
     const uint32 J_imm10_1;
     const uint32 J_imm20;
+    const uint32 csr_imm;
+    const uint32 csr;
     const uint32 bytes;
 
     constexpr uint32 get_B_immediate() const noexcept
     {
-        return((B_imm4_1  << 1)
-            |  (B_imm10_5 << 5)
-            |  (B_imm11   << 11)
-            |  (B_imm12   << 12) >> 1);
+        return (B_imm4_1  << 1U)
+            |  (B_imm10_5 << 5U)
+            |  (B_imm11   << 11U)
+            |  (B_imm12   << 12U);
     }
 
     constexpr uint32 get_J_immediate() const noexcept
     {
-        return((J_imm10_1  << 1)
-            |  (J_imm11    << 11)
-            |  (J_imm19_12 << 12)
-            |  (J_imm20    << 20) >> 1);
+        return (J_imm10_1  << 1U)
+            |  (J_imm11    << 11U)
+            |  (J_imm19_12 << 12U)
+            |  (J_imm20    << 20U);
     }
 
-    uint32 get_immediate(char subset) const noexcept
+    uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
         case 'I': return I_imm;
@@ -64,8 +66,22 @@ struct RISCVInstrDecoder
         case 'S': return S_imm4_0 | (S_imm11_5 << 5);
         case 'U': return U_imm;
         case 'J': return get_J_immediate();
+        case 'C': return csr_imm;
         case ' ': return 0;
         default: assert(0); return 0;
+        }
+    }
+
+    template<typename R>
+    static R get_immediate( char subset, uint32 value) noexcept
+    {
+        switch (subset) {
+        case 'I':
+        case 'B':
+        case 'S': return sign_extension<12, R>( value);
+        case 'U':
+        case 'J': return sign_extension<20, R>( value);
+        default:  return value;
         }
     }
 
@@ -77,6 +93,9 @@ struct RISCVInstrDecoder
         case Reg::RS1:    return RISCVRegister::from_cpu_index( rs1);
         case Reg::RS2:    return RISCVRegister::from_cpu_index( rs2);
         case Reg::RD:     return RISCVRegister::from_cpu_index( rd);
+        case Reg::CSR:    return RISCVRegister::from_csr_index( csr);
+        case Reg::SEPC:   return RISCVRegister::from_csr_index( 0x141);
+        case Reg::MEPC:   return RISCVRegister::from_csr_index( 0x341);
         default: assert(0);  return RISCVRegister::zero();
         }
     }
@@ -97,12 +116,14 @@ struct RISCVInstrDecoder
         , B_imm11   ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
         , B_imm4_1  ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
         , B_imm10_5 ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
-        , B_imm12   ( apply_mask( raw, 0b10000000'00000000'00000000'10000000))
+        , B_imm12   ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
         , U_imm     ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
-        , J_imm19_12( apply_mask( raw, 0b00000000'00001111'11110000'10000000))
-        , J_imm11   ( apply_mask( raw, 0b00000000'00010000'00000000'10000000))
-        , J_imm10_1 ( apply_mask( raw, 0b01111111'11100000'00000000'10000000))
-        , J_imm20   ( apply_mask( raw, 0b10000000'00000000'00000000'10000000))
+        , J_imm19_12( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
+        , J_imm11   ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
+        , J_imm10_1 ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
+        , J_imm20   ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
+        , csr_imm   ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , csr       ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
         , bytes     ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
     { }
 };

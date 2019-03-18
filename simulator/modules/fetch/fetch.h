@@ -52,6 +52,10 @@ private:
     std::unique_ptr<WritePort<Target>> wp_long_latency_pc_holder = nullptr;
     std::unique_ptr<WritePort<bool>> wp_hit_or_miss = nullptr;
 
+    /* port needed for habdling misprediction at decode stage */
+    std::unique_ptr<ReadPort<BPInterface>> rp_bp_update_from_decode = nullptr;
+    std::unique_ptr<ReadPort<Target>> rp_flush_target_from_decode = nullptr;
+
     Target get_target( Cycle cycle);
     Target get_cached_target( Cycle cycle);
     void clock_bp( Cycle cycle);

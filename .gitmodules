@@ -1,6 +1,9 @@
 [submodule "traces"]
-	path = traces
+	path = mips-tests
 	url = https://github.com/MIPT-ILab/mips-traces.git
 [submodule "riscv-opcodes"]
 	path = riscv-opcodes
 	url = https://github.com/riscv/riscv-opcodes
+[submodule "riscv-tests"]
+	path = riscv-tests
+	url = https://github.com/MIPT-ILab/riscv-tests-prebuilt.git

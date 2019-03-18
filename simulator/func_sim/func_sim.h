@@ -17,6 +17,12 @@
 #include <memory>
 #include <string>
 
+struct UnknownInstruction final : Exception
+{
+    explicit UnknownInstruction(const std::string& msg)
+        : Exception("Unknown instruction is an unhandled trap", msg)
+    { }
+};
 
 template <typename ISA>
 class FuncSim : public Simulator
@@ -27,22 +33,25 @@ class FuncSim : public Simulator
 
     private:
         RF<FuncInstr> rf;
-        Addr PC = NO_VAL32;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
 
+        std::array<Addr, 8> pc = {};
+        size_t delayed_slots = 0;
+        void update_pc( const FuncInstr& instr);
+
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
         Trap handle_syscall();
         Trap step_system();
-        
+
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
     public:
-        explicit FuncSim( bool log = false);
+        FuncSim( Endian endian, bool log = false);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
@@ -53,10 +62,11 @@ class FuncSim : public Simulator
         Trap run_until_trap( uint64 instrs_to_run) final;
 
         void set_target(const Target& target) final {
-            PC = target.address;
+            pc[0] = target.address;
+            delayed_slots = 0;
             sequence_id = target.sequence_id;
         }
-        Addr get_pc() const final { return PC; }
+        Addr get_pc() const final { return pc[0]; }
 
         size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
 
@@ -65,6 +75,8 @@ class FuncSim : public Simulator
 
         void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
         void write_gdb_register( uint8 regno, uint64 value) final;
+
+        void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 };
 
 #endif

@@ -17,7 +17,7 @@ struct RISCV
     using FuncInstr = RISCVInstr<T>;
     using Register = RISCVRegister;
     using RegisterUInt = T;
-    static auto create_instr( uint32 bytes, Addr PC) {
+    static auto create_instr( uint32 bytes, Endian, Addr PC) {
         return FuncInstr( bytes, PC);
     }
 };

@@ -25,7 +25,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS
-    infra/macro_test.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
@@ -35,7 +34,6 @@ set(CPPS
     memory/elf/elf_loader.cpp
     func_sim/func_sim.cpp
     mips/mips_instr.cpp
-    mips/mips_isa.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     risc_v/riscv_register/riscv_register.cpp 
@@ -57,6 +55,7 @@ set(CPPS
 )
 
 set(TESTS_CPPS
+    infra/t/unit_test.cpp
     infra/cache/t/unit_test.cpp
     infra/config/t/unit_test.cpp
     infra/instrcache/t/unit_test.cpp
@@ -73,27 +72,28 @@ set(TESTS_CPPS
     func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
+    risc_v/t/riscv64_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     func_sim/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
 )
 
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../traces\")
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../mips-tests\")
+add_definitions(-DRISCV_TEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../riscv-tests\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND cat ${RISCV_DIR}/opcodes | python ${RISCV_DIR}/parse-opcodes -c > ${RISCV_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/opcodes ${RISCV_DIR}/parse-opcodes
+    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc > ${RISCV_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse-opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
 )
 
 if (MSVC)
     # /Zc:rvalueCast is a workaround for VS non-standard behavior, see
     # https://developercommunity.visualstudio.com/content/problem/457095/cannot-bind-temporary-int-object-to-an-rvalue-refe.html
-    # 4661 is disabled to instantiate BaseMIPSInstr in two translation units
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4661 /Zc:rvalueCast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")

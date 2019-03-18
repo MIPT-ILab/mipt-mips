@@ -22,8 +22,7 @@ struct vr4300 : private PerfSim<MIPS64>
     std::array<uint32, NUM_MI_REGISTERS> mi_regs = {};
 
 public:
-    template<typename ... Args>
-    explicit vr4300( Args ... args) : PerfSim<MIPS64>( std::move( args)...) { }
+    explicit vr4300( bool log) : PerfSim<MIPS64>( Endian::big, log) { }
 
     int init( std::shared_ptr<FuncMemory> mem);
     void apply_mask_to_cause( uint64 mask);

@@ -16,9 +16,16 @@ class InstrMemoryIface
 {
 protected:
     std::shared_ptr<ReadableMemory> mem = nullptr;
+    const Endian endian;
 public:
-    InstrMemoryIface() = default;
-    auto fetch( Addr pc) const { return mem->read<uint32, FuncInstr::endian>( pc); }
+    explicit InstrMemoryIface( Endian e) : endian( e) { }
+    auto fetch( Addr pc) const
+    {
+        return endian == Endian::little
+            ? mem->read<uint32, Endian::little>( pc)
+            : mem->read<uint32, Endian::big>( pc);
+    }
+
     void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
 
@@ -34,7 +41,8 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 {
 public:
     using Instr = typename ISA::FuncInstr;
-    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), PC); }
+    explicit InstrMemory( Endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->endian, PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
@@ -48,6 +56,7 @@ class InstrMemoryCached : public InstrMemory<ISA>
     using Instr = typename ISA::FuncInstr;
     LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
+    explicit InstrMemoryCached( Endian endian) : InstrMemory<ISA>( endian) { }
     Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);

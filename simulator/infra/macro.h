@@ -93,9 +93,9 @@ static constexpr bool has_zero( const T& value)
 }
 
 template <typename T>
-static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
+static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
-    size_t count = 0;
+    uint8 count = 0;
     for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
     {
         if ( ( value & mask) != 0)
@@ -106,7 +106,7 @@ static constexpr inline size_t count_leading_zeroes(const T& value) noexcept
 }
 
 template <typename T>
-static constexpr inline size_t count_leading_ones(const T& value) noexcept
+static constexpr inline auto count_leading_ones( const T& value) noexcept
 {
     return count_leading_zeroes<T>( ~value);
 }
@@ -157,6 +157,24 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     else
         result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
     return result;
+}
+
+static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
+{
+    if ((value & msb_set<uint128>()) == 0)
+        return value >> shamt;        // just shift if MSB is zero
+
+    return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+}
+
+template<size_t N, typename T>
+T sign_extension( T value)
+{
+    if constexpr (N < bitwidth<T>) {
+        const T msb = T{ 1} << ( N - 1);
+        value = ( ( value & bitmask<T>(N)) ^ msb) - msb;
+    }
+    return value;
 }
 
 #endif

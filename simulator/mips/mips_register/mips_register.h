@@ -66,6 +66,7 @@ public:
         }
     }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
+    static auto from_csr_name( std::string_view) { return zero(); }
 
     size_t to_rf_index() const { return value; }
 

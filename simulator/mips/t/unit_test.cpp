@@ -3,7 +3,39 @@
 
 // uArchSim modules
 #include "../mips_instr.h"
+#include "../mips.h"
 #include <memory/memory.h>
+
+class MIPS32Instr : public BaseMIPSInstr<uint32>
+{
+public:
+    explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, Endian::little, bytes, pc) { }
+    explicit MIPS32Instr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::little, immediate, 0xc000) { }
+};
+
+class MIPS32BEInstr : public BaseMIPSInstr<uint32>
+{
+public:
+    explicit MIPS32BEInstr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, Endian::big, bytes, pc) { }
+    explicit MIPS32BEInstr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::big, immediate, 0xc000) { }
+};
+
+class MIPS64Instr : public BaseMIPSInstr<uint64>
+{
+public:
+    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::little, bytes, pc) { }
+    explicit MIPS64Instr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::little, immediate, 0xc000) { }
+};
+
+class MIPS64BEInstr : public BaseMIPSInstr<uint64>
+{
+public:
+    explicit MIPS64BEInstr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::big, bytes, pc) { }
+    explicit MIPS64BEInstr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::big, immediate, 0xc000) { }
+};
+
+static_assert( std::is_base_of_v<MIPS32::FuncInstr, MIPS32Instr>);
+static_assert( std::is_base_of_v<MIPS64::FuncInstr, MIPS64Instr>);
 
 TEST_CASE( "MIPS32_instr_init: Process_Wrong_Args_Of_Constr")
 {
@@ -24,133 +56,10 @@ TEST_CASE( "MIPS32_instr: MIPS64_instr in MIPS32_instr ctor")
     CHECK( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION );
 }
 
-TEST_CASE( "MIPS32_instr: Divmult")
+TEST_CASE( "MIPS32_disasm BE-LE")
 {
-    CHECK(MIPS32Instr(0x0229001c).is_divmult());
-    CHECK(MIPS32Instr("dmult").is_divmult());
-    CHECK(MIPS32Instr(0x0229001d).is_divmult());
-    CHECK(MIPS32Instr("dmultu").is_divmult());
-    CHECK(MIPS32Instr(0x72290000).is_divmult());
-    CHECK(MIPS32Instr("madd").is_divmult());
-    CHECK(MIPS32Instr(0x72290001).is_divmult());
-    CHECK(MIPS32Instr("maddu").is_divmult());
-    CHECK(MIPS32Instr(0x72290004).is_divmult());
-    CHECK(MIPS32Instr("msub").is_divmult());
-    CHECK(MIPS32Instr(0x72290005).is_divmult());
-    CHECK(MIPS32Instr("msubu").is_divmult());
-    CHECK(MIPS32Instr(0x0229001a).is_divmult());
-    CHECK(MIPS32Instr("div").is_divmult());
-    CHECK(MIPS32Instr(0x0229001b).is_divmult());
-    CHECK(MIPS32Instr("divu").is_divmult());
-    CHECK(MIPS32Instr(0x0229001e).is_divmult());
-    CHECK(MIPS32Instr("ddiv").is_divmult());
-    CHECK(MIPS32Instr(0x0229001f).is_divmult());
-    CHECK(MIPS32Instr("ddivu").is_divmult());
-}
-
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_R")
-{
-    CHECK(MIPS32Instr(0x0139882C).get_disasm() == "dadd $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x0139882D).get_disasm() == "daddu $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x0229001a).get_disasm() == "div $s1, $t1");
-    CHECK(MIPS32Instr(0x0229001e).get_disasm() == "ddiv $s1, $t1");
-    CHECK(MIPS32Instr(0x0229001b).get_disasm() == "divu $s1, $t1");
-    CHECK(MIPS32Instr(0x0229001f).get_disasm() == "ddivu $s1, $t1");
-    CHECK(MIPS32Instr(0x0229001c).get_disasm() == "dmult $s1, $t1");
-    CHECK(MIPS32Instr(0x0229001d).get_disasm() == "dmultu $s1, $t1");
-    CHECK(MIPS32Instr(0x72290000).get_disasm() == "madd $s1, $t1");
-    CHECK(MIPS32Instr(0x72290001).get_disasm() == "maddu $s1, $t1");
-    CHECK(MIPS32Instr(0x72290004).get_disasm() == "msub $s1, $t1");
-    CHECK(MIPS32Instr(0x72290005).get_disasm() == "msubu $s1, $t1");
-    CHECK(MIPS32Instr(0x00098cf8).get_disasm() == "dsll $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x00098cfc).get_disasm() == "dsll32 $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x00098cfb).get_disasm() == "dsra $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x00098cff).get_disasm() == "dsra32 $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x00098cfa).get_disasm() == "dsrl $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x00098cfe).get_disasm() == "dsrl32 $s1, $t1, 19");
-    CHECK(MIPS32Instr(0x01398822).get_disasm() == "sub $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x0139882e).get_disasm() == "dsub $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x01398823).get_disasm() == "subu $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x0139882f).get_disasm() == "dsubu $s1, $t1, $t9");
-    CHECK(MIPS32Instr(0x0139882a).get_disasm() == "slt $s1, $t1, $t9");
-}
-
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_IJ")
-{
-    CHECK(MIPS32Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, 0xfb2e");
-    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, 0xfb2e");
-    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, 0xfb2e");
-    CHECK(MIPS32Instr(0x393104d2).get_disasm() == "xori $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x3c1104d2).get_disasm() == "lui $s1, 0x4d2");
-}
-
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Load_Store")
-{
-    CHECK(MIPS32Instr(0x813104d2).get_disasm() == "lb $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x8131fb2e).get_disasm() == "lb $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x913104d2).get_disasm() == "lbu $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x9131fb2e).get_disasm() == "lbu $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x853104d2).get_disasm() == "lh $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x8531fb2e).get_disasm() == "lh $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x953104d2).get_disasm() == "lhu $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x9531fb2e).get_disasm() == "lhu $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x893104d2).get_disasm() == "lwl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x8931fb2e).get_disasm() == "lwl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x993104d2).get_disasm() == "lwr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x9931fb2e).get_disasm() == "lwr $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xc13104d2).get_disasm() == "ll $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xc131fb2e).get_disasm() == "ll $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xdd3104d2).get_disasm() == "ld $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xdd31fb2e).get_disasm() == "ld $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x693104d2).get_disasm() == "ldl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x6931fb2e).get_disasm() == "ldl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0x6d3104d2).get_disasm() == "ldr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0x6d31fb2e).get_disasm() == "ldr $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xa13104d2).get_disasm() == "sb $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa131fb2e).get_disasm() == "sb $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xa53104d2).get_disasm() == "sh $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa531fb2e).get_disasm() == "sh $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xad31fb2e).get_disasm() == "sw $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xa93104d2).get_disasm() == "swl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xa931fb2e).get_disasm() == "swl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb93104d2).get_disasm() == "swr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb931fb2e).get_disasm() == "swr $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xe13104d2).get_disasm() == "sc $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xe131fb2e).get_disasm() == "sc $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xfd3104d2).get_disasm() == "sd $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xfd31fb2e).get_disasm() == "sd $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb13104d2).get_disasm() == "sdl $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb131fb2e).get_disasm() == "sdl $s1, 0xfb2e($t1)");
-    CHECK(MIPS32Instr(0xb53104d2).get_disasm() == "sdr $s1, 0x4d2($t1)");
-    CHECK(MIPS32Instr(0xb531fb2e).get_disasm() == "sdr $s1, 0xfb2e($t1)");
-}
-
-TEST_CASE( "MIPS32_instr_disasm: Process_Disasm_Branches")
-{
-    CHECK(MIPS32Instr(0x0621fffc).get_disasm() == "bgez $s1, -4");
-    CHECK(MIPS32Instr(0x0621000c).get_disasm() == "bgez $s1, 12");
-    CHECK(MIPS32Instr(0x0631fffa).get_disasm() == "bgezal $s1, -6");
-    CHECK(MIPS32Instr(0x0631000a).get_disasm() == "bgezal $s1, 10");
-    CHECK(MIPS32Instr(0x1e20fff9).get_disasm() == "bgtz $s1, -7");
-    CHECK(MIPS32Instr(0x1e200008).get_disasm() == "bgtz $s1, 8");
-    CHECK(MIPS32Instr(0x1a20fff7).get_disasm() == "blez $s1, -9");
-    CHECK(MIPS32Instr(0x1a200006).get_disasm() == "blez $s1, 6");
-    CHECK(MIPS32Instr(0x0630fff5).get_disasm() == "bltzal $s1, -11");
-    CHECK(MIPS32Instr(0x06300004).get_disasm() == "bltzal $s1, 4");
-    CHECK(MIPS32Instr(0x0620fff3).get_disasm() == "bltz $s1, -13");
-    CHECK(MIPS32Instr(0x06200002).get_disasm() == "bltz $s1, 2");
-    CHECK(MIPS32Instr(0x0622fff3).get_disasm() == "bltzl $s1, -13");
-    CHECK(MIPS32Instr(0x06220003).get_disasm() == "bltzl $s1, 3");
-    CHECK(MIPS32Instr(0x0623fffd).get_disasm() == "bgezl $s1, -3");
-    CHECK(MIPS32Instr(0x0623000d).get_disasm() == "bgezl $s1, 13");
-    CHECK(MIPS32Instr(0x0632fff6).get_disasm() == "bltzall $s1, -10");
-    CHECK(MIPS32Instr(0x06320003).get_disasm() == "bltzall $s1, 3");
-    CHECK(MIPS32Instr(0x0633fffb).get_disasm() == "bgezall $s1, -5");
-    CHECK(MIPS32Instr(0x0633000a).get_disasm() == "bgezall $s1, 10");
+    CHECK(MIPS32Instr(0x0139882C).get_disasm() == MIPS32BEInstr(0x0139882C).get_disasm());
+    CHECK(MIPS64Instr(0x0139882D).get_disasm() == MIPS64BEInstr(0x0139882D).get_disasm());
 }
 
 TEST_CASE("Sequence id print")
@@ -210,30 +119,27 @@ TEST_CASE ( "MIPS32_instr: add overflow")
 
 TEST_CASE( "MIPS32_instr: addi two zeroes")
 {
-    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x213104d2).get_disasm() == "addi $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2131fb2e).get_disasm() == "addi $s1, $t1, -1234");
     
     MIPS32Instr instr( "addi");
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: addi 0 and 1")
 {
-    MIPS32Instr instr( "addi");
+    MIPS32Instr instr( "addi", 1);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS32_instr: addi 1 and -1")
 {
-    MIPS32Instr instr( "addi");
+    MIPS32Instr instr( "addi", 0xffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
@@ -241,9 +147,8 @@ TEST_CASE( "MIPS32_instr: addi 1 and -1")
 /*      Overflow exception isn't implemented (#130)
 TEST_CASE( "MIPS32_instr: addi overflow")
 {
-    MIPS32Instr instr( "addi");
+    MIPS32Instr instr( "addi", 1);
     instr.set_v_src( 0x7fffffff, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xfee1dead);
     CHECK( instr.trap_type() != Trap::NO_TRAP);
@@ -253,39 +158,35 @@ TEST_CASE( "MIPS32_instr: addi overflow")
     
 TEST_CASE( "MIPS32_instr: addiu two zeroes")
 {
-    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS32Instr instr( "addiu");
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: addiu 0 and 1")
 {
-    MIPS32Instr instr( "addiu");
+    MIPS32Instr instr( "addiu", 1);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS32_instr: addiu 1 and -1")
 {
-    MIPS32Instr instr( "addiu");
+    MIPS32Instr instr( "addiu", 0xffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: addiu overflow")
 {
-    MIPS32Instr instr( "addiu");
+    MIPS32Instr instr( "addiu", 2);
     instr.set_v_src( 0x7fffffff, 0);
-    instr.set_v_imm( 2);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x80000001);
     CHECK( instr.has_trap() == false);
@@ -294,39 +195,35 @@ TEST_CASE( "MIPS32_instr: addiu overflow")
 
 TEST_CASE( "MIPS64_instr: addiu two zeroes")
 {
-    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 0x4d2");
-    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS64Instr(0x253104d2).get_disasm() == "addiu $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x2531fb2e).get_disasm() == "addiu $s1, $t1, -1234");
     
     MIPS64Instr instr( "addiu");
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS64_instr: addiu 0 and 1")
 {
-    MIPS64Instr instr( "addiu");
+    MIPS64Instr instr( "addiu", 1);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS64_instr: addiu 1 and -1")
 {
-    MIPS64Instr instr( "addiu");
+    MIPS64Instr instr( "addiu", 0xffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
     
 TEST_CASE( "MIPS64_instr: addiu overflow")
 {
-    MIPS64Instr instr( "addiu");
+    MIPS64Instr instr( "addiu", 2);
     instr.set_v_src( 0x7fffffff, 0);
-    instr.set_v_imm( 2);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x80000001);
     CHECK( instr.has_trap() == false);
@@ -409,36 +306,492 @@ TEST_CASE ( "MIPS32_instr: andi two zeroes")
     
     MIPS32Instr instr( "andi");
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE ( "MIPS32_instr: andi 1 and 1")
 {
-    MIPS32Instr instr( "andi");
+    MIPS32Instr instr( "andi", 1);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE ( "MIPS32_instr: andi 1 and -1")
 {
-    MIPS32Instr instr( "andi");
+    MIPS32Instr instr( "andi", 0xffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE ( "MIPS32_instr: andi -1 and -1")
 {
-    MIPS32Instr instr( "andi");
+    MIPS32Instr instr( "andi", 0xffff);
     instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000ffff);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bgez 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0621fffc).get_disasm() == "bgez $s1, -4");
+    CHECK(MIPS32Instr(0x0621000c).get_disasm() == "bgez $s1, 12");
+
+    MIPS32Instr instr( "bgez", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgez 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgez", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgez -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgez", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgez 1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bgez", 1024);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: bgez 1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bgez", 0xffff - 1024 + 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bgezal 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0631fffa).get_disasm() == "bgezal $s1, -6");
+    CHECK(MIPS32Instr(0x0631000a).get_disasm() == "bgezal $s1, 10");
+
+    MIPS32Instr instr( "bgezal", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezal 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezal", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezal -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezal", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezal 1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bgezal", 1024);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezal 1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bgezal", 0xffff - 1024 + 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bgezall 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0633fffb).get_disasm() == "bgezall $s1, -5");
+    CHECK(MIPS32Instr(0x0633000a).get_disasm() == "bgezall $s1, 10");
+
+    MIPS32Instr instr( "bgezall", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezall 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezall", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezall -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezall", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezall 1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bgezall", 1024);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezall 1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bgezall", 0xffff - 1024 + 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bgezl 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0623fffd).get_disasm() == "bgezl $s1, -3");
+    CHECK(MIPS32Instr(0x0623000d).get_disasm() == "bgezl $s1, 13");
+
+    MIPS32Instr instr( "bgezl", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezl 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezl", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezl -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgezl", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgezl 1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bgezl", 1024);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: bgezl 1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bgezl", 0xffff - 1024 + 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bgtz 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x1e20fff9).get_disasm() == "bgtz $s1, -7");
+    CHECK(MIPS32Instr(0x1e200008).get_disasm() == "bgtz $s1, 8");
+
+    MIPS32Instr instr( "bgtz", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgtz 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgtz", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgtz -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bgtz", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bgtz 1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bgtz", 1024);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: bgtz 1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bgtz", 0xffff - 1024 + 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: blez 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x1a20fff7).get_disasm() == "blez $s1, -9");
+    CHECK(MIPS32Instr(0x1a200006).get_disasm() == "blez $s1, 6");
+
+    MIPS32Instr instr( "blez", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: blez 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "blez", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: blez -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "blez", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: blez -1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "blez", 1024);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: blez -1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "blez", 0xffff - 1024 + 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bltz 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0620fff3).get_disasm() == "bltz $s1, -13");
+    CHECK(MIPS32Instr(0x06200002).get_disasm() == "bltz $s1, 2");
+
+    MIPS32Instr instr( "bltz", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltz 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltz", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltz -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltz", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltz -1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bltz", 1024);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: bltz -1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bltz", 0xffff - 1024 + 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bltzal 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0630fff5).get_disasm() == "bltzal $s1, -11");
+    CHECK(MIPS32Instr(0x06300004).get_disasm() == "bltzal $s1, 4");
+
+    MIPS32Instr instr( "bltzal", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzal 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzal", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzal -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzal", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzal -1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bltzal", 1024);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzal -1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bltzal", 0xffff - 1024 + 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bltzl 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0622fff3).get_disasm() == "bltzl $s1, -13");
+    CHECK(MIPS32Instr(0x06220003).get_disasm() == "bltzl $s1, 3");
+
+    MIPS32Instr instr( "bltzl", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzl 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzl", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzl -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzl", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzl -1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bltzl", 1024);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+}
+
+TEST_CASE( "MIPS32_instr: bltzl -1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bltzl", 0xffff - 1024 + 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: bltzall 0, 1 instruction ahead")
+{
+    CHECK(MIPS32Instr(0x0632fff6).get_disasm() == "bltzall $s1, -10");
+    CHECK(MIPS32Instr(0x06320003).get_disasm() == "bltzall $s1, 3");
+
+    MIPS32Instr instr( "bltzall", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzall 1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzall", 1);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzall -1, 1 instruction ahead")
+{
+    MIPS32Instr instr( "bltzall", 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzall -1, 1024 instructions ahead")
+{
+    MIPS32Instr instr( "bltzall", 1024);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+}
+
+TEST_CASE( "MIPS32_instr: bltzall -1, back to 1024 instruction")
+{
+    MIPS32Instr instr( "bltzall", 0xffff - 1024 + 1);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.execute();
+    CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
+    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -447,50 +800,45 @@ TEST_CASE( "MIPS32_instr: beq two zeroes, one instr ahead")
     CHECK(MIPS32Instr(0x1229ffff).get_disasm() == "beq $s1, $t1, -1");
     CHECK(MIPS32Instr(0x1229000e).get_disasm() == "beq $s1, $t1, 14");
     
-    MIPS32Instr instr( "beq");
+    MIPS32Instr instr( "beq", 1);
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: beq -1 and -1, one instr ahead")
 {
-    MIPS32Instr instr( "beq");
+    MIPS32Instr instr( "beq", 1);
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
-TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr ahead")
+TEST_CASE( "MIPS32_instr: beq 0 and 1, one instr and delayed slot ahead")
 {
-    MIPS32Instr instr( "beq");
+    MIPS32Instr instr( "beq", 1);
     instr.set_v_src( 0, 0);
     instr.set_v_src( 1, 1);
-    instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: beq -1 and -1, 1024 instr ahead")
 {
-    MIPS32Instr instr( "beq");
+    MIPS32Instr instr( "beq", 1024);
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
-    instr.set_v_imm( 1024);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
 }
 
 TEST_CASE( "MIPS32_instr: beq two zeroes, back to 1024 instr")
 {
-    MIPS32Instr instr( "beq");
+    MIPS32Instr instr( "beq", 0xffff - 1024 + 1);
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_imm( 0xffff - 1024 + 1);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
 }
@@ -501,44 +849,42 @@ TEST_CASE( "MIPS32_instr: bne two zeroes, 1024 instr ahead")
     CHECK(MIPS32Instr(0x1629fff1).get_disasm() == "bne $s1, $t1, -15");
     CHECK(MIPS32Instr(0x16290000).get_disasm() == "bne $s1, $t1, 0");
     
-    MIPS32Instr instr( "bne");
+    MIPS32Instr instr( "bne", 1024);
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
-    instr.set_v_imm( 1024);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bne -1 and -1, one instr ahead")
 {
-    MIPS32Instr instr( "bne");
+    MIPS32Instr instr( "bne", 1);
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 0xffffffff, 1);
-    instr.set_v_imm( 1);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    // Not taken
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 }
     
 TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
 {
-    MIPS32Instr instr( "bne");
+    MIPS32Instr instr( "bne", 1024);
     instr.set_v_src( 0xffffffff, 0);
     instr.set_v_src( 1, 1);
-    instr.set_v_imm( 1024);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
     
-    CHECK( instr.is_direct_branch() );
+    CHECK( instr.is_branch() );
     CHECK( !instr.is_direct_jump() );
-    CHECK( !instr.is_indirect_branch() );
+    CHECK( !instr.is_indirect_jump() );
 }
     
 TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
 {
-    MIPS32Instr instr( "bne");
+    MIPS32Instr instr( "bne", 0);
     instr.set_v_src( 1, 0);
     instr.set_v_src( 0xffffffff, 1);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4);
 }
@@ -659,6 +1005,176 @@ TEST_CASE( "MIPS64_instr: dclz 0x02ffaa00cc720000")
     instr.set_v_src( 0x02ffaa00cc720000, 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 6);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: div 1 by 1")
+{
+    CHECK(MIPS32Instr(0x0229001a).get_disasm() == "div $s1, $t1");
+    CHECK(MIPS32Instr(0x0229001a).is_divmult());
+    CHECK(MIPS32Instr("div").is_divmult());
+
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS32_instr: div -1 by 1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffffffff);
+}
+
+TEST_CASE( "MIPS32_instr: div -1 by -1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS32_instr: div 1 by -1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffffffff);
+}
+
+TEST_CASE( "MIPS32_instr: div 0 by 1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: div 1 by 0")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: div 0x80000000 by -1")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: div 0x4c4b4000 by 0x1dcd6500")
+{
+    MIPS32Instr instr( "div");
+    instr.set_v_src( 0x4c4b4000, 0);
+    instr.set_v_src( 0x1dcd6500, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x10b07600);
+    CHECK( instr.get_v_dst()  == 2);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: divu 1 by 1")
+{
+    CHECK(MIPS32Instr(0x0229001b).get_disasm() == "divu $s1, $t1");
+    CHECK(MIPS32Instr(0x0229001b).is_divmult());
+    CHECK(MIPS32Instr("divu").is_divmult());
+
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS32_instr: divu -1 by 1")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffffffff);
+}
+
+TEST_CASE( "MIPS32_instr: divu -1 by -1")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS32_instr: divu 1 by -1")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: divu 0 by 1")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: divu 1 by 0")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: divu 0x80000000 by -1")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x80000000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: divu 0x4c4b4000 by 0x1dcd6500")
+{
+    MIPS32Instr instr( "divu");
+    instr.set_v_src( 0x4c4b4000, 0);
+    instr.set_v_src( 0x1dcd6500, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x10b07600);
+    CHECK( instr.get_v_dst()  == 2);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -809,8 +1325,7 @@ TEST_CASE( "MIPS32_instr: j to 4th instr")
     CHECK(MIPS32Instr(0x0bfffb2e).get_disasm() == "j 0x3fffb2e");
     CHECK(MIPS32Instr(0x080004d2).get_disasm() == "j 0x4d2");
     
-    MIPS32Instr instr( "j");
-    instr.set_v_imm( 4);
+    MIPS32Instr instr( "j", 4);
     instr.execute();
     CHECK( instr.get_new_PC() == 16);
 }
@@ -821,11 +1336,10 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     CHECK(MIPS32Instr(0x0ffffb2e).get_disasm() == "jal 0x3fffb2e");
     CHECK(MIPS32Instr(0x0c0004d2).get_disasm() == "jal 0x4d2");
     
-    MIPS32Instr instr( "jal");
-    instr.set_v_imm( 0x0fff);
+    MIPS32Instr instr( "jal", 0x0fff);
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfff * 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -837,7 +1351,7 @@ TEST_CASE( "MIPS32_instr: jalr to 1024th byte")
     instr.set_v_src( 1024, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 1024);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
@@ -846,7 +1360,7 @@ TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
     instr.set_v_src( 2, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 4);
+    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -869,31 +1383,636 @@ TEST_CASE( "MIPS32_instr: jr to 2nd byte (round up to 4th)")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE( "MIPS32_instr: lw")
+TEST_CASE( "MIPS32_instr: lui with 0x4d2")
+{
+    CHECK(MIPS32Instr(0x3c1104d2).get_disasm() == "lui $s1, 0x4d2");
+
+    MIPS32Instr instr( "lui", 0x4d2);
+    instr.execute();
+    CHECK( instr.get_v_dst()  == 0x4d20000);
+}
+
+TEST_CASE( "MIPS32_instr: lui with 1")
+{
+    MIPS32Instr instr( "lui", 1);
+    instr.execute();
+    CHECK( instr.get_v_dst()  == 0x10000);
+}
+
+TEST_CASE( "MIPS32_instr: lui with 0")
+{
+    MIPS32Instr instr( "lui", 0);
+    instr.execute();
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS32_instr: lui with 0xfee1")
+{
+    MIPS32Instr instr( "lui", 0xfee1);
+    instr.execute();
+    CHECK( instr.get_v_dst()  == 0xfee10000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+static auto get_plain_memory_with_data()
+{
+    auto memory = FuncMemory::create_plain_memory(15);
+    memory->write<uint32, Endian::little>( 0xABCD'1234, 0x1000);
+    memory->write<uint32, Endian::little>( 0xBADC'5678, 0x1004);
+    return memory;
+}
+
+TEST_CASE( "MIPS32_instr: lb (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x813104d2).get_disasm() == "lb $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8131fb2e).get_disasm() == "lb $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lb", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x34);
+}
+
+TEST_CASE( "MIPS32_instr: lb (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lb", 0x0fff);
+    instr.set_v_src( 4, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffffffab);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lbu (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x913104d2).get_disasm() == "lbu $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9131fb2e).get_disasm() == "lbu $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lbu", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x34);
+}
+
+TEST_CASE( "MIPS32_instr: lbu (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lbu", 0x0fff);
+    instr.set_v_src( 4, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xab);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lh (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x853104d2).get_disasm() == "lh $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8531fb2e).get_disasm() == "lh $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lh", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: lh (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lh", 0x0fff);
+    instr.set_v_src( 3, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+}
+
+TEST_CASE( "MIPS32_instr: lh unaligned address trap")
+{
+    MIPS32Instr instr( "lh", 0);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 1);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lhu (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0x953104d2).get_disasm() == "lhu $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9531fb2e).get_disasm() == "lhu $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lhu", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: lhu (most significant bit is 1)")
+{
+    MIPS32Instr instr( "lhu", 0x0fff);
+    instr.set_v_src( 3, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD);
+}
+
+TEST_CASE( "MIPS32_instr: lhu unaligned address trap")
+{
+    MIPS32Instr instr( "lhu", 0);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 1);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 0)")
+{
+    CHECK(MIPS32Instr(0x893104d2).get_disasm() == "lwl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x8931fb2e).get_disasm() == "lwl $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lwl", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffd);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x3400'0000);
+}
+
+TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 3)")
+{
+    MIPS32Instr instr( "lwl", 0x0fff);
+    instr.set_v_src( 4, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 0)")
+{
+    CHECK(MIPS32Instr(0x993104d2).get_disasm() == "lwr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x9931fb2e).get_disasm() == "lwr $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "lwr", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
+}
+
+TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 3)")
+{
+    MIPS32Instr instr( "lwr", 0x0fff);
+    instr.set_v_src( 4, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1003);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xDC56'78AB);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: ll (most significant bit is 0)")
+{
+    CHECK(MIPS32Instr(0xc13104d2).get_disasm() == "ll $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xc131fb2e).get_disasm() == "ll $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "ll", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x1234);
+}
+
+TEST_CASE( "MIPS32_instr: ll (most significant bit is 1)")
+{
+    MIPS32Instr instr( "ll", 0x0fff);
+    instr.set_v_src( 3, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ld")
+{
+    CHECK(MIPS64Instr(0xdd3104d2).get_disasm() == "ld $s1, 0x4d2($t1)");
+    CHECK(MIPS64Instr(0xdd31fb2e).get_disasm() == "ld $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ld", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xBADC'5678'ABCD'1234);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ldl")
+{
+    CHECK(MIPS32Instr(0x693104d2).get_disasm() == "ldl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x6931fb2e).get_disasm() == "ldl $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ldl", 0x0ffd);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffe);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x5678'ABCD'1234'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ldr")
+{
+    CHECK(MIPS32Instr(0x6d3104d2).get_disasm() == "ldr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0x6d31fb2e).get_disasm() == "ldr $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "ldr", 0x0ffd);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x0ffe);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x5678'ABCD'1234'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: lw le")
 {
     CHECK(MIPS32Instr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
     CHECK(MIPS32Instr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
 
-    MIPS32Instr instr( "lw");
+    MIPS32Instr instr( "lw", 0x0fff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0x0fff);
     instr.execute();
     CHECK( instr.get_mem_addr() == 0x1000);
 
-    auto memory = FuncMemory::create_plain_memory(15);
-    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x1000);
-    memory->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD);
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0xABCD'1234);
 }
+
+TEST_CASE( "MIPS32_instr: lw be")
+{
+    CHECK(MIPS32BEInstr(0x8d3104d2).get_disasm() == "lw $s1, 0x4d2($t1)");
+    CHECK(MIPS32BEInstr(0x8d31fb2e).get_disasm() == "lw $s1, 0xfb2e($t1)");
+
+    MIPS32BEInstr instr( "lw", 0x0fff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.get_v_dst() == 0x3412'CDAB);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sb 0x12")
+{
+    CHECK(MIPS32Instr(0xa13104d2).get_disasm() == "sb $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa131fb2e).get_disasm() == "sb $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sb", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0x12, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint8, Endian::little>( 0x1000);
+    CHECK( value == 0x12);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sh 0xdead")
+{
+    CHECK(MIPS32Instr(0xa53104d2).get_disasm() == "sh $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa531fb2e).get_disasm() == "sh $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sh", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint16, Endian::little>( 0x1000);
+    CHECK( value == 0xdead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sw 0xfee1'dead")
+{
+    CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xad31fb2e).get_disasm() == "sw $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sw", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1000);
+    CHECK( value == 0xfee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: swl (instr->mem_addr % 4 = 2)")
+{
+    CHECK(MIPS32Instr(0xa93104d2).get_disasm() == "swl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xa931fb2e).get_disasm() == "swl $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "swl", 0x1003);
+    instr.set_v_src( 2, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    CHECK( value == 0xfee1'abcd);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: swr (instr->mem_addr % 4 = 2)")
+{
+    CHECK(MIPS32Instr(0xb93104d2).get_disasm() == "swr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb931fb2e).get_disasm() == "swr $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "swr", 0x1000);
+    instr.set_v_src( 2, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1002);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    CHECK( value == 0x5678'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//Data cache model is not implemeted so sc is tested like sh
+TEST_CASE( "MIPS32_instr: sc 0xdead")
+{
+    CHECK(MIPS32Instr(0xe13104d2).get_disasm() == "sc $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xe131fb2e).get_disasm() == "sc $s1, 0xfb2e($t1)");
+
+    MIPS32Instr instr( "sc", 0x1000);
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xdead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1001);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::little>( 0x1001);
+    CHECK( value == 0x78ab'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: sd 0xdead'beef'fee1'dead")
+{
+    CHECK(MIPS64Instr(0xfd3104d2).get_disasm() == "sd $s1, 0x4d2($t1)");
+    CHECK(MIPS64Instr(0xfd31fb2e).get_disasm() == "sd $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sd", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//Instructions sdl and sdr are not implemented
+TEST_CASE( "MIPS64_instr: sdl 0xdead'beef'fee1'dead")
+{
+    CHECK(MIPS32Instr(0xb13104d2).get_disasm() == "sdl $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb131fb2e).get_disasm() == "sdl $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sdl", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: sdr 0xdead'beef'fee1'dead")
+{
+    CHECK(MIPS32Instr(0xb53104d2).get_disasm() == "sdr $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xb531fb2e).get_disasm() == "sdr $s1, 0xfb2e($t1)");
+
+    MIPS64Instr instr( "sdr", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead'beef'fee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint64, Endian::little>( 0x1000);
+    CHECK( value == 0xdead'beef'fee1'dead);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+static void check_move( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0x12345678, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x12345678);
+}
+
+static void mult_check_0_by_0( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+static void mult_check_1_by_1( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+static void mult_check_minus1_by_minus1( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+static void mult_check_minus1_by_1( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xffffffff);
+    CHECK( instr.get_v_dst()  == 0xffffffff);
+}
+
+static void mult_check_10000_by_10000( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0x10000, 0);
+    instr.set_v_src( 0x10000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+static void mult_check_min_int_by_min_int( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0x80000000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x40000000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+static void mult_unsigned_check_minus1_by_minus1( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xfffffffe);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+static void mult_unsigned_check_minus1_by_1( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffffffff);
+}
+
+static void mult_unsigned_check_min_int_by_min_int( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 0x80000000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x40000000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+static void mult_unsigned_check_random( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.set_v_src( 0xcecb8f27, 0);
+    instr.set_v_src( 0xfd87b5f2, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xcccccccb);
+    CHECK( instr.get_v_dst()  == 0x7134e5de);
+}
+
+static void mult_signed_tests( std::string_view name)
+{
+    mult_check_0_by_0( name);
+    mult_check_1_by_1( name);
+    mult_check_minus1_by_minus1( name);
+    mult_check_minus1_by_1( name);
+    mult_check_10000_by_10000( name);
+    mult_check_min_int_by_min_int( name);
+}
+
+static void mult_unsigned_tests( std::string_view name)
+{
+    mult_check_0_by_0( name);
+    mult_check_1_by_1( name);
+    mult_unsigned_check_minus1_by_minus1( name);
+    mult_unsigned_check_minus1_by_1( name);
+    mult_check_10000_by_10000( name);
+    mult_unsigned_check_min_int_by_min_int( name);
+    mult_unsigned_check_random( name);
+}
+
+TEST_CASE( "MIPS32_instr: madd")
+{
+    CHECK(MIPS32Instr(0x72290000).get_disasm() == "madd $s1, $t1");
+    CHECK(MIPS32Instr(0x72290000).is_divmult());
+    CHECK(MIPS32Instr("madd").is_divmult());
+    CHECK(MIPS32Instr("madd").get_accumulation_type() == 1);
+    mult_signed_tests( "madd");
+}
+
+TEST_CASE( "MIPS32_instr: maddu")
+{
+    CHECK(MIPS32Instr(0x72290001).get_disasm() == "maddu $s1, $t1");
+    CHECK(MIPS32Instr(0x72290001).is_divmult());
+    CHECK(MIPS32Instr("maddu").is_divmult());
+    CHECK(MIPS32Instr("maddu").get_accumulation_type() == 1);
+    mult_unsigned_tests( "maddu");
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
 {
     CHECK(MIPS32Instr(0x408d2000).get_disasm() == "mfc0 $a0, $Cause");
-
-    MIPS32Instr instr( "mfc0");
-    instr.set_v_src( 0x12345678, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0x12345678);
+    check_move( "mfc0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -901,22 +2020,14 @@ TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
 TEST_CASE( "MIPS32_instr: mfhi 0xdeadbeef")
 {
     CHECK(MIPS32Instr(0x00008810).get_disasm() == "mfhi $s1");
-    
-    MIPS32Instr instr( "mfhi");
-    instr.set_v_src( 0xdeadbeef, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xdeadbeef);
+    check_move( "mfhi");
 }
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: mflo 0xfee1dead")
 {
     CHECK(MIPS32Instr(0x00008812).get_disasm() == "mflo $s1");
-    
-    MIPS32Instr instr( "mflo");
-    instr.set_v_src( 0xfee1dead, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
+    check_move( "mflo");
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1002,14 +2113,30 @@ TEST_CASE( "MIPS32_instr: movz 3 if 0 is equal to 0")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+TEST_CASE( "MIPS32_instr: msub")
+{
+    CHECK(MIPS32Instr(0x72290004).get_disasm() == "msub $s1, $t1");
+    CHECK(MIPS32Instr(0x72290004).is_divmult());
+    CHECK(MIPS32Instr( "msub").is_divmult());
+    CHECK(MIPS32Instr( "msub").get_accumulation_type() == -1);
+    mult_signed_tests( "msub");
+}
+
+TEST_CASE( "MIPS32_instr: msubu")
+{
+    CHECK(MIPS32Instr(0x72290005).get_disasm() == "msubu $s1, $t1");
+    CHECK(MIPS32Instr(0x72290005).is_divmult());
+    CHECK(MIPS32Instr( "msubu").is_divmult());
+    CHECK(MIPS32Instr( "msubu").get_accumulation_type() == -1);
+    mult_unsigned_tests( "msubu");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 TEST_CASE( "MIPS32_instr: mtc0 0x12345678")
 {
     CHECK(MIPS32Instr(0x40046800).get_disasm() == "mtc0 $Cause, $a0");
-
-    MIPS32Instr instr( "mtc0");
-    instr.set_v_src( 0x12345678, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0x12345678);
+    check_move( "mtc0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1017,22 +2144,14 @@ TEST_CASE( "MIPS32_instr: mtc0 0x12345678")
 TEST_CASE( "MIPS32_instr: mthi 0x12345678")
 {
     CHECK(MIPS32Instr(0x02200011).get_disasm() == "mthi $s1");
-    
-    MIPS32Instr instr( "mthi");
-    instr.set_v_src( 0x12345678, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0x12345678);
+    check_move( "mthi");
 }
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: mtlo 0xfeedc0de")
 {
     CHECK(MIPS32Instr(0x02200013).get_disasm() == "mtlo $s1");
-    
-    MIPS32Instr instr( "mtlo");
-    instr.set_v_src( 0xfeedc0de, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xfeedc0de);
+    check_move( "mtlo");
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1066,246 +2185,31 @@ TEST_CASE( "MIPS32_instr: mul 1 by 10")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE( "MIPS32_instr: mult 0 by 0")
+TEST_CASE( "MIPS32_instr: mult")
 {
-    CHECK(MIPS32Instr(0x02290018).get_disasm() == "mult $s1, $t1");
-    CHECK(MIPS32Instr(0x02290018).is_divmult());
-    CHECK(MIPS32Instr("mult").is_divmult());
-
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 0, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0);
+    CHECK(MIPS32Instr( 0x02290018).get_disasm() == "mult $s1, $t1");
+    CHECK(MIPS32Instr( 0x02290018).is_divmult());
+    CHECK(MIPS32Instr( "mult").is_divmult());
+    CHECK(MIPS32Instr( "mult").get_accumulation_type() == 0);
+    mult_signed_tests( "mult");
 }
 
-TEST_CASE( "MIPS32_instr: mult 1 by 1")
+TEST_CASE( "MIPS32_instr: multu")
 {
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 1, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 1);
+    CHECK(MIPS32Instr( 0x02290019).get_disasm() == "multu $s1, $t1");
+    CHECK(MIPS32Instr( 0x02290019).is_divmult());
+    CHECK(MIPS32Instr( "multu").is_divmult());
+    CHECK(MIPS32Instr( "multu").get_accumulation_type() == 0);
+    mult_unsigned_tests( "multu");
 }
 
-TEST_CASE( "MIPS32_instr: mult -1 by -1")
-{
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_src( 0xffffffff, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 1);
-}
-
-TEST_CASE( "MIPS32_instr: mult -1 by 1")
-{
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0xffffffff);
-    CHECK( instr.get_v_dst()  == 0xffffffff);
-}
-
-TEST_CASE( "MIPS32_instr: mult 0x10000 by 0x10000")
-{
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 0x10000, 0);
-    instr.set_v_src( 0x10000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 1);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS32_instr: mult 0x80000000 by 0x80000000")
-{
-    MIPS32Instr instr( "mult");
-    instr.set_v_src( 0x80000000, 0);
-    instr.set_v_src( 0x80000000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0x40000000);
-    CHECK( instr.get_v_dst()  == 0);
-}
-////////////////////////////////////////////////////////////////////////////////
-
-TEST_CASE( "MIPS32_instr: multu 0 by 0")
-{
-    CHECK(MIPS32Instr(0x02290019).get_disasm() == "multu $s1, $t1");
-    CHECK(MIPS32Instr(0x02290019).is_divmult());
-    CHECK(MIPS32Instr("multu").is_divmult());
-
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS32_instr: multu 1 by 1")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 1, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 1);
-}
-
-TEST_CASE( "MIPS32_instr: multu -1 by -1")
-{
-    MIPS32Instr instr( "multu");    
-    instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_src( 0xffffffff, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0xfffffffe);
-    CHECK( instr.get_v_dst()  == 1);
-}
-
-TEST_CASE( "MIPS32_instr: multu -1 by 0")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS32_instr: multu -1 by 1")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0xffffffff);
-}
-
-TEST_CASE( "MIPS32_instr: multu 0x10000 by 0x10000")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0x10000, 0);
-    instr.set_v_src( 0x10000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 1);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS32_instr: multu 0x80000000 by 0x80000000")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0x80000000, 0);
-    instr.set_v_src( 0x80000000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0x40000000);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS32_instr: multu 0xcecb8f27 by 0xfd87b5f2")
-{
-    MIPS32Instr instr( "multu");
-    instr.set_v_src( 0xcecb8f27, 0);
-    instr.set_v_src( 0xfd87b5f2, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0xcccccccb);
-    CHECK( instr.get_v_dst()  == 0x7134e5de);
-}
-
-
-TEST_CASE( "MIPS64_instr: multu 0 by 0")
-{
-    CHECK(MIPS64Instr(0x02290019).get_disasm() == "multu $s1, $t1");
-    
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS64_instr: multu 1 by 1")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 1, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 1);
-}
-
-TEST_CASE( "MIPS64_instr: multu -1 by -1")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0xffffffffffffffff, 0);
-    instr.set_v_src( 0xffffffffffffffff, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0xfffffffe);
-    CHECK( instr.get_v_dst()  == 1);
-}
-
-TEST_CASE( "MIPS64_instr: multu -1 by 0")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0xffffffffffffffff, 0);
-    instr.set_v_src( 0, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS64_instr: multu -1 by 1")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0xffffffffffffffff, 0);
-    instr.set_v_src( 1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0);
-    CHECK( instr.get_v_dst()  == 0xffffffff);
-}
-
-TEST_CASE( "MIPS64_instr: multu 0x10000 by 0x10000")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0x10000, 0);
-    instr.set_v_src( 0x10000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 1);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS64_instr: multu 0x80000000 by 0x80000000")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0x80000000, 0);
-    instr.set_v_src( 0x80000000, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0x40000000);
-    CHECK( instr.get_v_dst()  == 0);
-}
-
-TEST_CASE( "MIPS64_instr: multu 0xcecb8f27 by 0xfd87b5f2")
-{
-    MIPS64Instr instr( "multu");
-    instr.set_v_src( 0xcecb8f27, 0);
-    instr.set_v_src( 0xfd87b5f2, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst2() == 0xcccccccb);
-    CHECK( instr.get_v_dst()  == 0x7134e5de);
-}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: nop")
 {
     CHECK(MIPS32Instr(0x00000000).get_disasm() == "nop");
     CHECK(MIPS32Instr     ("nop").get_disasm() == "nop");
-    
-    MIPS32Instr instr( "nop");
-    instr.execute();
+    MIPS32Instr( "nop").execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1403,27 +2307,24 @@ TEST_CASE( "MIPS32_instr: ori 0 and 0")
 {
     CHECK(MIPS32Instr(0x353104d2).get_disasm() == "ori $s1, $t1, 0x4d2");
     
-    MIPS32Instr instr( "ori");
+    MIPS32Instr instr( "ori", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: ori 1 and 1")
 {
-    MIPS32Instr instr( "ori");
+    MIPS32Instr instr( "ori", 1);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS32_instr: ori 1 and -1")
 {
-    MIPS32Instr instr( "ori");
+    MIPS32Instr instr( "ori", 0x0000ffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0x0000ffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000ffff);
 }
@@ -1433,36 +2334,32 @@ TEST_CASE ( "MIPS32_instr: sll 0x00098cc0 by 0")
 {
     CHECK(MIPS32Instr(0x00098cc0).get_disasm() == "sll $s1, $t1, 19");
     
-    MIPS32Instr instr( "sll");
+    MIPS32Instr instr( "sll", 0);
     instr.set_v_src( 0x00098cc0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x00098cc0);
 }
 
 TEST_CASE ( "MIPS32_instr: sll 51 by 1")
 {
-    MIPS32Instr instr( "sll");
+    MIPS32Instr instr( "sll", 1);
     instr.set_v_src( 51, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 102);
 }
 
 TEST_CASE ( "MIPS32_instr: sll 0xaabbccdd by 8")
 {
-    MIPS32Instr instr( "sll");
+    MIPS32Instr instr( "sll", 8);
     instr.set_v_src( 0xaabbccdd, 0);
-    instr.set_v_imm( 8);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xbbccdd00);
 }
 
 TEST_CASE ( "MIPS32_instr: sll 1 by 31")
 {
-    MIPS32Instr instr( "sll");
+    MIPS32Instr instr( "sll", 31);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 31);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x80000000);
 }
@@ -1472,38 +2369,100 @@ TEST_CASE ( "MIPS64_instr: sll 100 by 0")
 {
     CHECK(MIPS64Instr(0x00098cc0).get_disasm() == "sll $s1, $t1, 19");
 
-    MIPS64Instr instr( "sll");
+    MIPS64Instr instr( "sll", 0);
     instr.set_v_src( 100, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 100);
 }
 
 TEST_CASE ( "MIPS64_instr: sll 3 by 2")
 {
-    MIPS64Instr instr( "sll");
+    MIPS64Instr instr( "sll", 2);
     instr.set_v_src( 3, 0);
-    instr.set_v_imm( 2);
     instr.execute();
     CHECK( instr.get_v_dst() == 12);
 }
 
 TEST_CASE ( "MIPS64_instr: sll 1 by 16")
 {
-    MIPS64Instr instr( "sll");
+    MIPS64Instr instr( "sll", 16);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 16);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x10000);
 }
 
 TEST_CASE ( "MIPS64_instr: sll 1 by 31")
 {
-    MIPS64Instr instr( "sll");
+    MIPS64Instr instr( "sll", 31);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 31);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x80000000);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'8000'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32Instr: slt 0 < 0")
+{
+    CHECK(MIPS32Instr(0x0139882a).get_disasm() == "slt $s1, $t1, $t9");
+
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slt 1 < 0")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slt 0 < 1")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: slt -1 < 0")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: slt 0 < -1")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slt 1 < -1")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slt -1 < 1")
+{
+    MIPS32Instr instr( "slt");
+    instr.set_v_src( 0xffffffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1562,69 +2521,123 @@ TEST_CASE( "MIPS64_instr: sllv by 64 (shift-variable ovreflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: slti 0 < 0")
+{
+    CHECK(MIPS32Instr(0x293104d2).get_disasm() == "slti $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2931fb2e).get_disasm() == "slti $s1, $t1, -1234");
+
+    MIPS32Instr instr( "slti", 0);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slti 1 < 0")
+{
+    MIPS32Instr instr( "slti", 0);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slti 0 < 1")
+{
+    MIPS32Instr instr( "slti", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: slti -1 < 0")
+{
+    MIPS32Instr instr( "slti", 0);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: slti 0 < -1")
+{
+    MIPS32Instr instr( "slti", 0xffff);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slti 1 < -1")
+{
+    MIPS32Instr instr( "slti", 0xffff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: slti -1 < 1")
+{
+    MIPS32Instr instr( "slti", 1);
+    instr.set_v_src( 0xffffffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < 0")
 {
-    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 0x4d2");
-    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, 0xfb2e");
+    CHECK(MIPS32Instr(0x2d3104d2).get_disasm() == "sltiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x2d31fb2e).get_disasm() == "sltiu $s1, $t1, -1234");
     
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu 1 < 0")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 0);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < 1")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 1);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu -1 < 0")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 0);
     instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu 0 < -1")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 0xffff);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu -1 < 1")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 1);
     instr.set_v_src( 0xffffffff, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
 
 TEST_CASE( "MIPS32_instr: sltiu 1 < -1")
 {
-    MIPS32Instr instr( "sltiu");
+    MIPS32Instr instr( "sltiu", 0xffff);
     instr.set_v_src( 1, 0);
-    instr.set_v_imm( 0xffff);
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
 }
@@ -1691,36 +2704,32 @@ TEST_CASE( "MIPS32_instr: sra 0xabcd1234 by 0")
 {
     CHECK(MIPS32Instr(0x00098cc3).get_disasm() == "sra $s1, $t1, 19");
     
-    MIPS32Instr instr( "sra");
+    MIPS32Instr instr( "sra", 0);
     instr.set_v_src( 0xabcd1234, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xabcd1234);
 }
 
 TEST_CASE( "MIPS32_instr: sra 49 by 1")
 {
-    MIPS32Instr instr( "sra");
+    MIPS32Instr instr( "sra", 1);
     instr.set_v_src( 49, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 24);
 }
 
 TEST_CASE( "MIPS32_instr: sra 0x1000 by 4")
 {
-    MIPS32Instr instr( "sra");
+    MIPS32Instr instr( "sra", 4);
     instr.set_v_src( 0x1000, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x100);
 }
 
 TEST_CASE( "MIPS32_instr: sra 0xffa00000 by 8")
 {
-    MIPS32Instr instr( "sra");
+    MIPS32Instr instr( "sra", 8);
     instr.set_v_src( 0xffa00000, 0);
-    instr.set_v_imm( 8);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffffa000);
 }
@@ -1730,38 +2739,34 @@ TEST_CASE( "MIPS64_instr: sra 0xdeadc0dde by 0")
 {
     CHECK(MIPS64Instr(0x00098cc3).get_disasm() == "sra $s1, $t1, 19");
 
-    MIPS64Instr instr( "sra");
+    MIPS64Instr instr( "sra", 0);
     instr.set_v_src( 0xdeadc0de, 0);
-    instr.set_v_imm( 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xdeadc0de);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'dead'c0de);
 }
 
 TEST_CASE( "MIPS64_instr: sra 0x0fffffff by 2")
 {
-    MIPS64Instr instr( "sra");
+    MIPS64Instr instr( "sra", 2);
     instr.set_v_src( 0x0fffffff, 0);
-    instr.set_v_imm( 2);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x03ffffff);
 }
 
 TEST_CASE( "MIPS64_instr: sra 0xdead by 4")
 {
-    MIPS64Instr instr( "sra");
+    MIPS64Instr instr( "sra", 4);
     instr.set_v_src( 0xdead, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0dea);
 }
 
 TEST_CASE( "MIPS64_instr: sra 0xf1234567 by 16")
 {
-    MIPS64Instr instr( "sra");
+    MIPS64Instr instr( "sra", 16);
     instr.set_v_src( 0xf1234567, 0);
-    instr.set_v_imm( 16);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfffff123);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'f123);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1839,7 +2844,7 @@ TEST_CASE( "MIPS64_instr: srav 0xff000000 by 4")
     instr.set_v_src( 0xff000000, 0);
     instr.set_v_src( 4, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfff00000);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'fff0'0000);
 }
 
 TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 32 (shift-variable overflow)")
@@ -1848,43 +2853,39 @@ TEST_CASE( "MIPS64_instr: srav 0xffff0000 by 32 (shift-variable overflow)")
     instr.set_v_src( 0xffff0000, 0);
     instr.set_v_src( 32, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff0000);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'0000);
 }
 
 TEST_CASE ( "MIPS32_instr: srl 0xdeadbeef by 0")
 {
     CHECK(MIPS32Instr(0x00098cc2).get_disasm() == "srl $s1, $t1, 19");
     
-    MIPS32Instr instr( "srl");
+    MIPS32Instr instr( "srl", 0);
     instr.set_v_src( 0xdeadbeef, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xdeadbeef);
 }
 
 TEST_CASE ( "MIPS32_instr: srl 0xabcd1234 by 5")
 {
-    MIPS32Instr instr( "srl");
+    MIPS32Instr instr( "srl", 5);
     instr.set_v_src( 0xabcd1234, 0);
-    instr.set_v_imm( 5);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x055e6891);
 }
 
 TEST_CASE ( "MIPS32_instr: srl 0xc0dec0de by 4")
 {
-    MIPS32Instr instr( "srl");
+    MIPS32Instr instr( "srl", 4);
     instr.set_v_src( 0xc0dec0de, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0c0dec0d);
 }
 
 TEST_CASE ( "MIPS32_instr: srl 0x80000000 by 16")
 {
-    MIPS32Instr instr( "srl");
+    MIPS32Instr instr( "srl", 16);
     instr.set_v_src( 0x80000000, 0);
-    instr.set_v_imm( 16);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x00008000);
 }
@@ -1945,6 +2946,76 @@ TEST_CASE( "MIPS64_instr: srlv 0x11 by 0x00000a00 (shift-variable overflow)")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x11);
 }
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sub 1 from 1")
+{
+    CHECK(MIPS32Instr(0x01398822).get_disasm() == "sub $s1, $t1, $t9");
+    MIPS32Instr instr( "sub");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: sub 1 from 10")
+{
+    MIPS32Instr instr( "sub");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 9);
+}
+
+TEST_CASE( "MIPS32_instr: sub 0 from 1")
+{
+    MIPS32Instr instr( "sub");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+    
+/*  Overflow exception is not implemented (#130)
+TEST_CASE( "MIPS32_instr: sub overflow")
+{
+    instr.get_v_dst( 0xfee1dead);
+    instr.set_v_src( 0x80000000, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0xfee1dead);
+    CHECK(instr.trap_type() != Trap::NO_TRAP);
+}*/
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: subu 1 from 1")
+{
+    CHECK(MIPS32Instr(0x01398823).get_disasm() == "subu $s1, $t1, $t9");
+    MIPS32Instr instr( "subu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: subu 1 from 10")
+{ 
+    MIPS32Instr instr( "subu");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 9);
+}
+
+TEST_CASE( "MIPS32_instr: subu 0 from 1")
+{   
+    MIPS32Instr instr( "subu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: syscall")
 {
@@ -1983,18 +3054,16 @@ TEST_CASE( "MIPS32_instr: teqi if equal")
     CHECK(MIPS32Instr(0x062c04d2).get_disasm() == "teqi $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062cfb2e).get_disasm() == "teqi $s1, 0xfb2e");
     
-    MIPS32Instr instr( "teqi");
+    MIPS32Instr instr( "teqi", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: teqi if not equal")
 {
-    MIPS32Instr instr( "teqi");
+    MIPS32Instr instr( "teqi", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
@@ -2035,27 +3104,24 @@ TEST_CASE( "MIPS32_instr: tgei if less")
     CHECK(MIPS32Instr(0x062804d2).get_disasm() == "tgei $s1, 0x4d2");
     CHECK(MIPS32Instr(0x0628fb2e).get_disasm() == "tgei $s1, 0xfb2e");
     
-    MIPS32Instr instr( "tgei");
+    MIPS32Instr instr( "tgei", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tgei if equal")
 {
-    MIPS32Instr instr( "tgei");
+    MIPS32Instr instr( "tgei", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tgei if greater")
 {
-    MIPS32Instr instr( "tgei");
+    MIPS32Instr instr( "tgei", 1);
     instr.set_v_src( 8, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
@@ -2066,27 +3132,24 @@ TEST_CASE( "MIPS32_instr: tgeiu if less")
     CHECK(MIPS32Instr(0x062904d2).get_disasm() == "tgeiu $s1, 0x4d2");
     CHECK(MIPS32Instr(0x0629fb2e).get_disasm() == "tgeiu $s1, 0xfb2e");
 
-    MIPS32Instr instr( "tgeiu");
+    MIPS32Instr instr( "tgeiu", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tgeiu if equal")
 {
-    MIPS32Instr instr( "tgeiu");
+    MIPS32Instr instr( "tgeiu", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tgeiu if greater-unsigned")
 {
-    MIPS32Instr instr( "tgeiu");
+    MIPS32Instr instr( "tgeiu", 1);
     instr.set_v_src( 0xfffffffc, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
@@ -2157,27 +3220,24 @@ TEST_CASE( "MIPS32_instr: tlti if less")
     CHECK(MIPS32Instr(0x062a04d2).get_disasm() == "tlti $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062afb2e).get_disasm() == "tlti $s1, 0xfb2e");
 
-    MIPS32Instr instr( "tlti");
+    MIPS32Instr instr( "tlti", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tlti if equal")
 {
-    MIPS32Instr instr( "tlti");
+    MIPS32Instr instr( "tlti", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tlti if greater")
 {
-    MIPS32Instr instr( "tlti");
+    MIPS32Instr instr( "tlti", 1);
     instr.set_v_src( 8, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
@@ -2188,27 +3248,24 @@ TEST_CASE( "MIPS32_instr: tltiu if less")
     CHECK(MIPS32Instr(0x062b04d2).get_disasm() == "tltiu $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062bfb2e).get_disasm() == "tltiu $s1, 0xfb2e");
 
-    MIPS32Instr instr( "tltiu");
+    MIPS32Instr instr( "tltiu", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tltiu if equal")
 {
-    MIPS32Instr instr( "tltiu");
+    MIPS32Instr instr( "tltiu", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tltiu if greater-unsigned")
 {
-    MIPS32Instr instr( "tltiu");
+    MIPS32Instr instr( "tltiu", 1);
     instr.set_v_src( 0xfffffffc, 0);
-    instr.set_v_imm( 1);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
@@ -2270,18 +3327,16 @@ TEST_CASE( "MIPS32_instr: tnei if not equal")
     CHECK(MIPS32Instr(0x062e04d2).get_disasm() == "tnei $s1, 0x4d2");
     CHECK(MIPS32Instr(0x062efb2e).get_disasm() == "tnei $s1, 0xfb2e");
 
-    MIPS32Instr instr( "tnei");
+    MIPS32Instr instr( "tnei", 4);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 4);
     instr.execute();
     CHECK( instr.trap_type() == Trap::EXPLICIT_TRAP);
 }
 
 TEST_CASE( "MIPS32_instr: tnei if equal")
 {
-    MIPS32Instr instr( "tnei");
+    MIPS32Instr instr( "tnei", 0);
     instr.set_v_src( 0, 0);
-    instr.set_v_imm( 0);
     instr.execute();
     CHECK( instr.trap_type() == Trap::NO_TRAP);
 }
@@ -2317,21 +3372,53 @@ TEST_CASE( "MIPS32_instr: xor 1 and -1")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+TEST_CASE( "MIPS32_instr: xori 0 with 0")
+{
+    CHECK(MIPS32Instr(0x393104d2).get_disasm() == "xori $s1, $t1, 0x4d2");
+    MIPS32Instr instr( "xori", 0);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS32_instr: xori 0 with 1")
+{
+    MIPS32Instr instr( "xori", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: xori 1 with 0")
+{
+    MIPS32Instr instr( "xori", 0);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS32_instr: xori 0xa with 0x5")
+{   
+    MIPS32Instr instr( "xori", 5);
+    instr.set_v_src( 0xa, 0);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0xf);
+}
+////////////////////////////////////////////////////////////////////////////////
+
 TEST_CASE( "MIPS32_instr: load dump")
 {
-    MIPS32Instr instr(0x8d3104d0);
-    CHECK( instr.get_disasm() == "lw $s1, 0x4d0($t1)");
-    CHECK( instr.bytes_dump() == "Bytes: 0xd0 0x04 0x31 0x8d");
+    MIPS32Instr instr(0x8d310ff0);
+    CHECK( instr.get_disasm() == "lw $s1, 0xff0($t1)");
+    CHECK( instr.bytes_dump() == "Bytes: 0xf0 0x0f 0x31 0x8d");
 
     instr.set_v_src( 0x10, 0);
     instr.set_sequence_id( 0);
     instr.execute();
-    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0 ]");
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0xff0($t1)\t [ $ma = 0x1000 ]");
 
-    auto memory = FuncMemory::create_plain_memory(12);
-    memory->write<uint32, MIPS32Instr::endian>( 0xABCD, 0x4e0);
-    memory->load_store( &instr);
-    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4e0, $s1 = 0xabcd ]" );
+    get_plain_memory_with_data()->load_store( &instr);
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0xff0($t1)\t [ $ma = 0x1000, $s1 = 0xabcd1234 ]" );
 }
 
 TEST_CASE( "MIPS32_instr: load dump with trap")
@@ -2355,3 +3442,763 @@ TEST_CASE( "MIPS32_instr: mult dump")
     instr.execute();
     CHECK( instr.string_dump() == "{0}\tmult $s1, $t1\t [ $lo = 0x0, $hi = 0x40000000 ]" );
 }
+////////////////////////////////////////////////////////////////////////////////
+
+//-------------------------MIPS64Instr unit-tests-----------------------------//
+
+static bool not_a_mips32_instruction( std::string_view name)
+{
+    MIPS32Instr instr( name);
+    instr.execute(); 
+    return instr.trap_type() == Trap::UNKNOWN_INSTRUCTION;
+}
+
+TEST_CASE ( "MIPS64_instr: dadd two zeroes")
+{
+    CHECK(MIPS32Instr(0x0139882C).get_disasm() == "dadd $s1, $t1, $t9");
+    CHECK( not_a_mips32_instruction("dadd"));
+    
+    MIPS64Instr instr( "dadd");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE ( "MIPS64_instr: dadd 0 and 1")
+{
+    MIPS64Instr instr( "dadd");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE ( "MIPS64_instr: dadd 1 and -1")
+{
+    MIPS64Instr instr( "dadd");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffffffffffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+/*     Overflow exception isn't implemented (#130)
+TEST_CASE ( "MIPS64_instr: dadd overflow")
+{
+    MIPS64Instr instr( "dadd");
+    instr.set_v_src( 0x7fffffffffffffff, 0);
+    instr.set_v_src( 0x7fffffffffffffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.trap_type() != Trap::NO_TRAP);
+} */
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: daddi two zeroes")
+{
+    CHECK(MIPS64Instr(0x613104d2).get_disasm() == "daddi $s1, $t1, 1234");
+    CHECK(MIPS64Instr(0x6131fb2e).get_disasm() == "daddi $s1, $t1, -1234");
+    CHECK( not_a_mips32_instruction("daddi"));
+
+    MIPS64Instr instr( "daddi", 0);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS64_instr: daddi 0 and 1")
+{
+    MIPS64Instr instr( "daddi", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS64_instr: daddi 1 and -1")
+{
+    MIPS64Instr instr( "daddi", 0xffff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+    
+/*      Overflow exception isn't implemented (#130)
+TEST_CASE( "MIPS64_instr: daddi overflow")
+{
+    MIPS64Instr instr( "daddi", 1);
+    instr.set_v_src( 0x7fffffffffffffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.trap_type() != Trap::NO_TRAP);
+}*/
+////////////////////////////////////////////////////////////////////////////////
+    
+TEST_CASE( "MIPS64_instr: daddiu two zeroes")
+{
+    CHECK(MIPS32Instr(0x653104d2).get_disasm() == "daddiu $s1, $t1, 1234");
+    CHECK(MIPS32Instr(0x6531fb2e).get_disasm() == "daddiu $s1, $t1, -1234");
+    CHECK( not_a_mips32_instruction("daddiu"));
+
+    MIPS64Instr instr( "daddiu", 0);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS64_instr: daddiu 0 and 1")
+{
+    MIPS64Instr instr( "daddiu", 1);
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE( "MIPS64_instr: daddiu 1 and -1")
+{
+    MIPS64Instr instr( "daddiu", 0xffff);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+/*      Overflow exception isn't implemented (#130)
+TEST_CASE( "MIPS64_instr: daddiu overflow")
+{
+    MIPS64Instr instr( "daddiu", 1);
+    instr.set_v_src( 0x7fffffffffffffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.trap_type() != Trap::NO_TRAP);
+}*/
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE ( "MIPS64_instr: daddu two zeroes")
+{
+    CHECK(MIPS64Instr(0x0139882D).get_disasm() == "daddu $s1, $t1, $t9");
+    CHECK( not_a_mips32_instruction("daddu"));
+
+    MIPS64Instr instr( "daddu");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE ( "MIPS64_instr: daddu 0 and 1")
+{
+    MIPS64Instr instr( "daddu");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 1);
+}
+
+TEST_CASE ( "MIPS64_instr: daddu 1 and -1")
+{
+    MIPS64Instr instr( "daddu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+}
+
+TEST_CASE ( "MIPS64_instr: daddu overflow")
+{
+    MIPS64Instr instr( "daddu");
+    instr.set_v_src( 0x7fff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0x7fff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'fffe);
+    CHECK( instr.has_trap() == false);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ddiv 1 by 1")
+{
+    CHECK(MIPS32Instr(0x0229001e).get_disasm() == "ddiv $s1, $t1");
+    CHECK(MIPS64Instr(0x0229001e).is_divmult());
+    CHECK(MIPS64Instr( "ddiv").is_divmult());
+    CHECK( not_a_mips32_instruction( "ddiv"));
+
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv -1 by 1")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffff'ffff'ffff'ffff);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv -1 by -1")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv 1 by -1")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffff'ffff'ffff'ffff);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv 0 by 1")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv 1 by 0")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv 0x8000'0000'0000'0000 by -1")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 0x8000'0000'0000'0000, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddiv 0x4c4b'4000'0000'0000 by 0x1dcd'6500'0000'0000")
+{
+    MIPS64Instr instr( "ddiv");
+    instr.set_v_src( 0x4c4b'4000'0000'0000, 0);
+    instr.set_v_src( 0x1dcd'6500'0000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x10b0'7600'0000'0000);
+    CHECK( instr.get_v_dst()  == 2);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: ddivu 1 by 1")
+{
+    CHECK(MIPS32Instr(0x0229001f).get_disasm() == "ddivu $s1, $t1");
+    CHECK(MIPS32Instr(0x0229001f).is_divmult());
+    CHECK(MIPS32Instr( "ddivu").is_divmult());
+    CHECK( not_a_mips32_instruction( "ddivu"));
+
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu -1 by 1")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffff'ffff'ffff'ffff);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu -1 by -1")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu 1 by -1")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu 0 by 1")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu 1 by 0")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu 0x8000'0000'0000'0000 by -1")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 0x8000'0000'0000'0000, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x8000'0000'0000'0000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: ddivu 0x4c4b'4000'0000'0000 by 0x1dcd'6500'0000'0000")
+{
+    MIPS64Instr instr( "ddivu");
+    instr.set_v_src( 0x4c4b'4000'0000'0000, 0);
+    instr.set_v_src( 0x1dcd'6500'0000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x10b0'7600'0000'0000);
+    CHECK( instr.get_v_dst()  == 2);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dmult 0 by 0")
+{
+    CHECK(MIPS64Instr(0x0229001c).get_disasm() == "dmult $s1, $t1");
+    CHECK(MIPS64Instr(0x0229001c).is_divmult());
+    CHECK(MIPS64Instr("dmult").is_divmult());
+    CHECK( not_a_mips32_instruction("dmult"));
+
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmult 1 by 1")
+{
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: dmult -1 by -1")
+{
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: dmult -1 by 1")
+{
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xffff'ffff'ffff'ffff);
+    CHECK( instr.get_v_dst()  == 0xffff'ffff'ffff'ffff);
+}
+
+TEST_CASE( "MIPS64_instr: dmult 0x100000000 by 0x100000000")
+{
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 0x100000000, 0);
+    instr.set_v_src( 0x100000000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmult 0x8000'0000'0000'0000 by 0x8000'0000'0000'0000")
+{
+    MIPS64Instr instr( "dmult");
+    instr.set_v_src( 0x8000'0000'0000'0000, 0);
+    instr.set_v_src( 0x8000'0000'0000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x4000'0000'0000'0000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dmultu 0 by 0")
+{
+    CHECK(MIPS64Instr(0x0229001d).get_disasm() == "dmultu $s1, $t1");
+    CHECK(MIPS64Instr(0x0229001d).is_divmult());
+    CHECK(MIPS64Instr("dmultu").is_divmult());
+    CHECK( not_a_mips32_instruction("dmultu"));
+
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu 1 by 1")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu -1 by -1")
+{
+    MIPS64Instr instr( "dmultu");    
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xffff'ffff'ffff'fffe);
+    CHECK( instr.get_v_dst()  == 1);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu -1 by 0")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu -1 by 1")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0xffff'ffff'ffff'ffff, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0);
+    CHECK( instr.get_v_dst()  == 0xffff'ffff'ffff'ffff);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu 0x100000000 by 0x100000000")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0x100000000, 0);
+    instr.set_v_src( 0x100000000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 1);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu 0x8000'0000'0000'0000 by 0x8000'0000'0000'0000")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0x8000'0000'0000'0000, 0);
+    instr.set_v_src( 0x8000'0000'0000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0x4000'0000'0000'0000);
+    CHECK( instr.get_v_dst()  == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dmultu 0xcecb'8f27'0000'0000 by 0xfd87'b5f2'0000'0000")
+{
+    MIPS64Instr instr( "dmultu");
+    instr.set_v_src( 0xcecb'8f27'0000'0000, 0);
+    instr.set_v_src( 0xfd87'b5f2'0000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst2() == 0xcccc'cccb'7134'e5de);
+    CHECK( instr.get_v_dst()  == 0);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE ( "MIPS64_instr: dsll 0xaaaa'aaaa'0009'8cc0 by 0")
+{
+    CHECK(MIPS32Instr(0x00098cf8).get_disasm() == "dsll $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsll"));
+
+    MIPS64Instr instr( "dsll", 0);
+    instr.set_v_src( 0xaaaa'aaaa'0009'8cc0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xaaaa'aaaa'0009'8cc0);
+}
+
+TEST_CASE ( "MIPS64_instr: dsll 51 by 1")
+{
+    MIPS64Instr instr( "dsll", 1);
+    instr.set_v_src( 51, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 102);
+}
+
+TEST_CASE ( "MIPS64_instr: dsll 0x8899'aabb'ccdd'eeff by 8")
+{
+    MIPS64Instr instr( "dsll", 8);
+    instr.set_v_src( 0x8899'aabb'ccdd'eeff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x99aa'bbcc'ddee'ff00);
+}
+
+TEST_CASE ( "MIPS64_instr: dsll 1 by 63")
+{
+    MIPS64Instr instr( "dsll", 63);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x8000'0000'0000'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsll32 0xaaaa'aaaa'0009'8ccf by 0")
+{
+    CHECK(MIPS32Instr(0x00098cfc).get_disasm() == "dsll32 $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsll32"));
+
+    MIPS64Instr instr( "dsll32", 0);
+    instr.set_v_src( 0xaaaa'aaaa'0009'8ccf, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x0009'8ccf'0000'0000);
+}
+
+TEST_CASE ( "MIPS64_instr: dsll32 0x8899'aabb'ccdd'eeff by 8")
+{
+    MIPS64Instr instr( "dsll32", 8);
+    instr.set_v_src( 0x8899'aabb'ccdd'eeff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xddee'ff00'0000'0000);
+}
+
+TEST_CASE( "MIPS64_instr: dsll32 1 by 31")
+{
+    MIPS64Instr instr( "dsll32", 31);
+    instr.set_v_src( 1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x8000'0000'0000'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsra 0xabcd'1234'abcd'1234 by 0")
+{
+    CHECK(MIPS64Instr(0x00098cfb).get_disasm() == "dsra $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsra"));
+    
+    MIPS64Instr instr( "dsra", 0);
+    instr.set_v_src( 0xabcd'1234'abcd'1234, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xabcd'1234'abcd'1234);
+}
+
+TEST_CASE( "MIPS64_instr: dsra 49 by 1")
+{
+    MIPS64Instr instr( "dsra", 1);
+    instr.set_v_src( 49, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 24);
+}
+
+TEST_CASE( "MIPS64_instr: dsra 0x1000 by 4")
+{
+    MIPS64Instr instr( "dsra", 4);
+    instr.set_v_src( 0x1000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x100);
+}
+
+TEST_CASE( "MIPS64_instr: dsra 0xffa0'0000'0000'0000 by 16")
+{
+    MIPS64Instr instr( "dsra", 16);
+    instr.set_v_src( 0xffa0'0000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffa0'0000'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsra32 0xabcd'1234'abcd'1234 by 0")
+{
+    CHECK(MIPS64Instr(0x00098cff).get_disasm() == "dsra32 $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsra32"));
+    
+    MIPS64Instr instr( "dsra32", 0);
+    instr.set_v_src( 0xabcd'1234'abcd'1234, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'abcd'1234);
+}
+
+TEST_CASE( "MIPS64_instr: dsra32 0x1000'0000'0000 by 4")
+{
+    MIPS64Instr instr( "dsra32", 4);
+    instr.set_v_src( 0x1000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x100);
+}
+
+TEST_CASE( "MIPS64_instr: dsra32 0xffa0'0000'0000'0000 by 16")
+{
+    MIPS64Instr instr( "dsra32", 16);
+    instr.set_v_src( 0xffa0'0000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffa0);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsrl 0xabcd'1234'abcd'1234 by 0")
+{
+    CHECK(MIPS32Instr(0x00098cfa).get_disasm() == "dsrl $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsrl"));
+    
+    MIPS64Instr instr( "dsrl", 0);
+    instr.set_v_src( 0xabcd'1234'abcd'1234, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xabcd'1234'abcd'1234);
+}
+
+TEST_CASE( "MIPS64_instr: dsrl 49 by 1")
+{
+    MIPS64Instr instr( "dsrl", 1);
+    instr.set_v_src( 49, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 24);
+}
+
+TEST_CASE( "MIPS64_instr: dsrl 0x1000 by 4")
+{
+    MIPS64Instr instr( "dsrl", 4);
+    instr.set_v_src( 0x1000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x100);
+}
+
+TEST_CASE( "MIPS64_instr: dsrl 0xffa0'0000'0000'0000 by 16")
+{
+    MIPS64Instr instr( "dsrl", 16);
+    instr.set_v_src( 0xffa0'0000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffa0'0000'0000);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsrl32 0xabcd'1234'abcd'1234 by 0")
+{
+    CHECK(MIPS32Instr(0x00098cfe).get_disasm() == "dsrl32 $s1, $t1, 19");
+    CHECK( not_a_mips32_instruction("dsrl32"));
+    
+    MIPS64Instr instr( "dsrl32", 0);
+    instr.set_v_src( 0xabcd'1234'abcd'1234, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xabcd1234);
+}
+
+TEST_CASE( "MIPS64_instr: dsrl32 0x1000'0000'0000 by 4")
+{
+    MIPS64Instr instr( "dsrl32", 4);
+    instr.set_v_src( 0x1000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x100);
+}
+
+TEST_CASE( "MIPS64_instr: dsrl32 0xffa0'0000'0000'0000 by 16")
+{
+    MIPS64Instr instr( "dsrl32", 16);
+    instr.set_v_src( 0xffa0'0000'0000'0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffa0);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: dsub 1 from 1")
+{
+    CHECK(MIPS64Instr(0x0139882e).get_disasm() == "dsub $s1, $t1, $t9");
+    CHECK( not_a_mips32_instruction("dsub"));
+
+    MIPS64Instr instr( "dsub");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dsub 1 from 10")
+{
+    MIPS64Instr instr( "dsub");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 9);
+}
+
+TEST_CASE( "MIPS64_instr: dsub 0 from 1")
+{
+    MIPS64Instr instr( "dsub");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+    
+/*  Overflow exception is not implemented (#130)
+TEST_CASE( "MIPS64_instr: dsub overflow")
+{
+    instr.get_v_dst( 0xfee1dead);
+    instr.set_v_src( 0x8000000000000000, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0xfee1dead);
+    CHECK(instr.trap_type() != Trap::NO_TRAP);
+}*/
+////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS64_instr: dsubu 1 from 1")
+{
+    CHECK(MIPS32Instr(0x0139882f).get_disasm() == "dsubu $s1, $t1, $t9");
+    CHECK( not_a_mips32_instruction("dsubu"));
+
+    MIPS64Instr instr( "dsubu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 0);
+}
+
+TEST_CASE( "MIPS64_instr: dsubu 1 from 10")
+{ 
+    MIPS64Instr instr( "dsubu");
+    instr.set_v_src( 10, 0);
+    instr.set_v_src( 1, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 9);
+}
+
+TEST_CASE( "MIPS64_instr: dsubu 0 from 1")
+{   
+    MIPS64Instr instr( "dsubu");
+    instr.set_v_src( 1, 0);
+    instr.set_v_src( 0, 1);
+    instr.execute();
+    CHECK(instr.get_v_dst() == 1);
+}
+////////////////////////////////////////////////////////////////////////////////

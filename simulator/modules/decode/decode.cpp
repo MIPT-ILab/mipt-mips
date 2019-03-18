@@ -7,6 +7,8 @@
 
 #include "decode.h"
 
+static constexpr const uint32 FLUSHED_STAGES_NUM = 1;
+
 namespace config {
     extern Value<uint64> long_alu_latency;
 } // namespace config
@@ -36,6 +38,12 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
                                                            PORT_LATENCY);
 
     bypassing_unit = std::make_unique<BypassingUnit>( config::long_alu_latency);
+
+    /*ports for handling mispredict at decode stage*/
+    wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", PORT_LATENCY);
+    wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
 }
 
 
@@ -55,7 +63,8 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
     /* receive flush signal */
-    const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle)) ||
+                    ( rp_flush_fetch->is_ready( cycle) && rp_flush_fetch->read( cycle));
 
     /* update bypassing unit */
     bypassing_unit->update();
@@ -86,6 +95,24 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     }
 
     auto instr = read_instr( cycle);
+
+    /* acquiring real information for BPU */
+    wp_bp_update->write( instr.get_bp_upd(), cycle);
+
+    bool is_misprediction = instr.is_direct_jump() &&
+    ( !instr.get_bp_data().is_taken || instr.get_bp_data().target != instr.get_decoded_target());
+
+    /* handle misprediction */
+    if ( is_misprediction)
+    {
+        // flushing fetch stage, instr fetch will appear at decode stage next clock,
+        // so we send flush signal to decode
+        wp_flush_fetch->write( true, cycle);
+
+        /* sending valid PC to fetch stage */
+        wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
+        sout << "\nmisprediction on ";
+    }
 
     if ( bypassing_unit->is_stall( instr))
     {

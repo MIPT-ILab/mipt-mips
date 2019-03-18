@@ -14,32 +14,39 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+template<typename I>
+struct RISCVTableEntry;
+
 template <typename T>
 class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 {
     private:
         using MyDatapath = typename BaseInstruction<T, RISCVRegister>::MyDatapath;
         uint32 instr = NO_VAL32;
+        void init( const RISCVTableEntry<MyDatapath>& entry);
+        void init_target();
 
-        char imm_type = ' ';
-        char imm_print_type = ' ';
-
-        std::string generate_disasm() const;
     public:
-        static const constexpr Endian endian = Endian::little;
+        static constexpr auto get_endian() { return Endian::little; }
 
         RISCVInstr() = delete;
         explicit RISCVInstr( uint32 bytes, Addr PC = 0);
+        explicit RISCVInstr( std::string_view name, uint32 immediate, Addr PC = 0);
 
          bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
         }
-        
+
         bool is_same( const RISCVInstr& rhs) const {
             return this->PC == rhs.PC && is_same_bytes( rhs.instr);
         }
 
-        bool is_same_checker( const RISCVInstr& /* rhs */) const { return false; }
+        bool is_same_checker( const RISCVInstr& rhs) const {
+            return is_same( rhs)
+                && this->sequence_id == rhs.sequence_id
+                && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
+                && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
+        }
 
         constexpr bool is_nop() const { return instr == 0x0U; }
 
@@ -49,9 +56,9 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 };
 
 template <typename T>
-static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& /* rhs */)
+static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& rhs)
 {
-    return out << "";
+    return out << rhs.string_dump();
 }
 
 #endif //RISCV_INSTR_H

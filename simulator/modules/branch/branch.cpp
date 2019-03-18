@@ -42,13 +42,23 @@ void Branch<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
+    sout << "branch  cycle " << std::dec << cycle << ": ";
     auto instr = rp_datapath->read( cycle);
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
      
+    bool is_misprediction = false;
+
+    if ( instr.is_branch() || instr.is_indirect_jump())
+    {
+        is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
+        if ( instr.is_taken())
+            is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
+    }
+
     /* handle misprediction */
-    if ( instr.is_misprediction())
+    if ( is_misprediction )
     {
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
