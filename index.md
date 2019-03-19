@@ -23,6 +23,7 @@ Date | Event name
 15 Feb | **Caches, pt. I**<br/> • Slides: [L10](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2010%20-%20Caches.pptx)<br/> • _YouTube_
 22 Feb | **Caches, pt. II**<br/> • Slides: [L11](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2011%20-%20Caches%2C%20part%202.pptx)<br/> • [YouTube](https://youtu.be/twQdcDt94DM)
 15 Mar | **Out-of-order execution**<br/> • Slides: [L12](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2012%20-%20Out-of-order%20execution.pptx?raw=true)<br/> • _YouTube_
+22 Mar | **Out-of-order execution: load-store architecture**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
