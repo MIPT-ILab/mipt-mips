@@ -42,34 +42,6 @@ TEST_CASE("RISCV add")
     CHECK( instr.get_v_dst() == 0x1f);
 }
 
-template<typename T>
-static bool test_imm_instr( std::string_view name, T dst, T src, T imm)
-{
-    RISCVInstr<T> instr( name, imm);
-    instr.set_v_src( src, 0);
-    instr.execute();
-    return instr.get_v_dst() == dst;
-}
-
-TEST_CASE("RISCV addiw")
-{
-    CHECK( test_imm_instr<uint64>( "addiw", 0x00000000, 0x00000000, 0x000 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x00000002, 0x00000001, 0x001 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x0000000a, 0x00000003, 0x007 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xfffffffffffff800, 0x0000000000000000, 0x800 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xffffffff80000000, 0xffffffff80000000, 0x000 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x000000007ffff800, 0xffffffff80000000, 0x800 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x00000000000007ff, 0x00000000, 0x7ff ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x000000007fffffff, 0x7fffffff, 0x000 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xffffffff800007fe, 0x7fffffff, 0x7ff ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xffffffff800007ff, 0xffffffff80000000, 0x7ff ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x000000007ffff7ff, 0x000000007fffffff, 0x800 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xffffffffffffffff, 0x0000000000000000, 0xfff ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0x0000000000000000, 0xffffffffffffffff, 0x001 ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xfffffffffffffffe, 0xffffffffffffffff, 0xfff ) );
-    CHECK( test_imm_instr<uint64>( "addiw", 0xffffffff80000000, 0x7fffffff, 0x001 ) );
-}
-
 TEST_CASE("RISCV lui 1")
 {
     CHECK( RISCVInstr<uint32>(0x204002b7).get_disasm() == "lui $t0, 0x20400");
