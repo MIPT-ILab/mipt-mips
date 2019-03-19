@@ -97,7 +97,7 @@ To build simulator faster, we recommend to install Ninja.
   1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
   1. See more command line options in the paragraph below
 #### Test
-  1. Go to `traces` subdirectory and build MIPS traces just by typing `make`
+  1. Go to `mipt-tests` subdirectory and build MIPS traces just by typing `make`
   1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## About MIPT-MIPS / MIPT-V
