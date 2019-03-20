@@ -7,6 +7,7 @@ Additionally, it is a supporting project to MIPT lectures on Computer Architectu
 Lectures and seminars are delivered each **Friday 18:30, room 108 of RT building**.
 
 ## Computer Architecture
+YouTube playlist: [MIPT-MIPS 2018/2019](https://www.youtube.com/playlist?list=PLhJz09Rm90Dowrv0kKhryUSSXUsI1N7Kq)
 
 Date | Event name
 :----: | ----------------------------
