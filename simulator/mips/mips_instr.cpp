@@ -139,6 +139,15 @@ template<typename I> auto mips_xor     = ALU::xorv<I>;
 template<typename I> auto mips_xori    = ALU::xori<I>;
 template<typename I> auto mips_unknown = ALU::unknown_instruction<I>;
 
+//CP1 instructions
+template<typename I> auto mips_add_s   = ALU::addition_overflow<I, uint32>;
+template<typename I> auto mips_sub_s   = ALU::subtraction_overflow<I, uint32>;
+template<typename I> auto mips_mul_s   = ALU::multiplication<I, int32>;
+template<typename I> auto mips_div_s   = ALU::division<I, int32>;
+template<typename I> auto mips_abs_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_mov_s   = ALU::move<I>;
+template<typename I> auto mips_neg_s   = ALU::subtraction<I, uint32>;
+
 template<typename I>
 struct MIPSTableEntry
 {
@@ -343,13 +352,27 @@ static const Table<I> isaMapCOP0 =
 };
 
 template<typename I>
+static const Table<I> isaMapCOP1 =
+{
+    {0x00, { "add.s", mips_add_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x01, { "sub.s", mips_sub_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x02, { "mul.s", mips_mul_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x03, { "div.s", mips_div_s<I>, OUT_DIVMULT, 0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    //0x04
+    {0x05, { "abs.s", mips_abs_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x06, { "mov.s", mips_mov_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x07, { "neg.s", mips_neg_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+};
+
+template<typename I>
 static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
     &isaMapRI<I>,
     &isaMapMIPS32<I>,
     &isaMapIJ<I>,
-    &isaMapCOP0<I>
+    &isaMapCOP0<I>,
+    &isaMapCOP1<I>
 };
 
 template<typename I>
@@ -380,6 +403,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
         case 0x0:  return get_table_entry( isaMapR<I>,      instr.funct);
         case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
         case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
+        case 0x11: return get_table_entry( isaMapCOP1<I>,   instr.funct);
         case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);
         default:   return get_table_entry( isaMapIJ<I>,     instr.opcode);
     }
