@@ -23,9 +23,12 @@ class MIPSRegister {
 #define REGISTER(X) MIPS_REG_ ## X
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define CP0_REGISTER(X) MIPS_CP1_REG_ ## X
 #include "mips_register.def"
 #undef REGISTER
 #undef CP0_REGISTER
+#undef CP1_REGISTER
         MAX_VAL_RegNum
     };
 
@@ -49,6 +52,11 @@ public:
     static constexpr MIPSRegister from_cp0_index( uint8 id) noexcept
     {
         return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP0_REG_Context0 + id)});
+    }
+
+    static constexpr MIPSRegister from_cp1_index( uint8 id) noexcept
+    {
+        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP1_REG_f0 + id)});
     }
 
     static MIPSRegister from_gdb_index( uint8 id)
