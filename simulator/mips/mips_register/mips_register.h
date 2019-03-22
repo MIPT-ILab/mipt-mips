@@ -24,7 +24,7 @@ class MIPSRegister {
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define CP0_REGISTER(X) MIPS_CP1_REG_ ## X
+#define CP1_REGISTER(X) MIPS_CP1_REG_ ## X
 #include "mips_register.def"
 #undef REGISTER
 #undef CP0_REGISTER
