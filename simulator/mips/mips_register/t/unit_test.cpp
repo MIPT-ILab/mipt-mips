@@ -7,6 +7,7 @@
 // generic C
 #include <cassert>
 #include <cstdlib>
+#include <sstream>
 
 // Catch2
 #include <catch.hpp>
