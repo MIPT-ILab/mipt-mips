@@ -69,7 +69,7 @@ struct MIPSInstrDecoder
         default:  return imm;
         }
     }
-    
+
     template<typename R>
     static R get_immediate( char type, uint32 value) noexcept
     {
