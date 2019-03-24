@@ -140,13 +140,13 @@ template<typename I> auto mips_xori    = ALU::xori<I>;
 template<typename I> auto mips_unknown = ALU::unknown_instruction<I>;
 
 //CP1 instructions
-template<typename I> auto mips_add_s   = ALU::addition_overflow<I, uint32>;
-template<typename I> auto mips_sub_s   = ALU::subtraction_overflow<I, uint32>;
-template<typename I> auto mips_mul_s   = ALU::multiplication<I, int32>;
-template<typename I> auto mips_div_s   = ALU::division<I, int32>;
 template<typename I> auto mips_abs_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_add_s   = ALU::addition_overflow<I, uint32>;
+template<typename I> auto mips_div_s   = ALU::division<I, int32>;
 template<typename I> auto mips_mov_s   = ALU::move<I>;
+template<typename I> auto mips_mul_s   = ALU::multiplication<I, int32>;
 template<typename I> auto mips_neg_s   = ALU::subtraction<I, uint32>;
+template<typename I> auto mips_sub_s   = ALU::subtraction_overflow<I, uint32>;
 
 template<typename I>
 struct MIPSTableEntry
@@ -359,8 +359,8 @@ static const Table<I> isaMapCOP1 =
     {0x02, { "mul.s", mips_mul_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
     {0x03, { "div.s", mips_div_s<I>, OUT_DIVMULT, 0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
     //0x04
-    {0x05, { "abs.s", mips_abs_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x06, { "mov.s", mips_mov_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x05, { "abs.s", mips_abs_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x06, { "mov.s", mips_mov_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
     {0x07, { "neg.s", mips_neg_s<I>, OUT_ARITHM,  0, 'S', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
 };
 
