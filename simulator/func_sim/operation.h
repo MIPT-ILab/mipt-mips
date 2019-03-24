@@ -31,7 +31,8 @@ enum OperationType : uint8
     OUT_STORE,
     OUT_J_JUMP,
     OUT_J_SPECIAL,
-    OUT_UNKNOWN
+    OUT_UNKNOWN,
+    OUT_FPU
 };
 
 enum class Imm : uint8
