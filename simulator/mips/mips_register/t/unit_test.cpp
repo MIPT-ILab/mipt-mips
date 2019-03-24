@@ -40,6 +40,16 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
     CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::cause());
 }
 
+TEST_CASE( "MIPS_registers: CP1_ID_converter")
+{
+    for ( uint8 i = 0; i < 32; ++i)
+    {
+        CHECK( MIPSRegister::from_cp1_index(i).to_rf_index() > 32);
+        CHECK( MIPSRegister::from_cp1_index(i).to_rf_index() > 
+               MIPSRegister::from_cp0_index(i).to_rf_index());
+    }
+}
+
 TEST_CASE( "MIPS_registers: Equal")
 {
     for ( uint8 i = 0; i < 32; ++i)
