@@ -25,7 +25,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-8
+    - llvm-toolchain-xenial-8
     - sourceline: deb http://www.emdebian.org/debian/ squeeze main
     update: true
     packages:
