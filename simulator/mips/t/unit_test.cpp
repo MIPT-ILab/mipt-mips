@@ -77,9 +77,14 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x460208c1).get_disasm() == "sub.s $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c2).get_disasm() == "mul.s $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c3).get_disasm() == "div.s $f3, $f1, $f2");
+    CHECK(MIPS32Instr(0x460008c4).get_disasm() == "sqrt.s $f3, $f1");
     CHECK(MIPS32Instr(0x460008c5).get_disasm() == "abs.s $f3, $f1");
     CHECK(MIPS32Instr(0x460008c6).get_disasm() == "mov.s $f3, $f1");
     CHECK(MIPS32Instr(0x460008c7).get_disasm() == "neg.s $f3, $f1");
+    CHECK(MIPS32Instr(0x460008c8).get_disasm() == "round.l.s $f3, $f1");
+    CHECK(MIPS32Instr(0x460008c9).get_disasm() == "trunc.l.s $f3, $f1");
+    CHECK(MIPS32Instr(0x460008ca).get_disasm() == "ceil.l.s $f3, $f1");
+    CHECK(MIPS32Instr(0x460008cb).get_disasm() == "floor.l.s $f3, $f1");
 }    
 
 // ********* Converted SPIM TT tests with some additions **********
