@@ -48,6 +48,10 @@ TEST_CASE( "MIPS_registers: CP1_ID_converter")
         CHECK( MIPSRegister::from_cp1_index(i).to_rf_index() > 
                MIPSRegister::from_cp0_index(i).to_rf_index());
     }
+    
+    std::ostringstream oss;
+    oss << MIPSRegister::from_cp1_index(3);
+    CHECK( oss.str() == "f3");
 }
 
 TEST_CASE( "MIPS_registers: Equal")
