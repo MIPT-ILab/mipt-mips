@@ -69,19 +69,7 @@ struct MIPSInstrDecoder
         default:  return imm;
         }
     }
-
-    uint32 get_fmt( char type) const
-    {
-        switch ( type)
-        {
-        case 'S':
-        case 'D':
-        case 'W':
-        case 'L':
-        default:  return fmt;
-        }
-    }
-
+    
     template<typename R>
     static R get_immediate( char type, uint32 value) noexcept
     {
