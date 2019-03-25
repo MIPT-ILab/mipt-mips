@@ -549,22 +549,6 @@ static const Table<I> isaMapCOP1_w =
 };
 
 template<typename I>
-static const Table<I> isaMapCOP1_l =
-{
-    // Converts
-    {0x20, { "cvt.s.l", mips_cvt_s_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
-    {0x21, { "cvt.d.l", mips_cvt_d_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
-};
-
-template<typename I>
-static const Table<I> isaMapCOP1_w =
-{
-    // Converts
-    {0x20, { "cvt.s.w", mips_cvt_s_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x21, { "cvt.d.w", mips_cvt_d_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
-};
-
-template<typename I>
 static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
