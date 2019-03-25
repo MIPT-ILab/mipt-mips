@@ -16,6 +16,8 @@ enum class Reg : uint8
 {
     RS, RT, RD,
     CP0_RT, CP0_RD,
+    CP1_FT, CP1_FS,
+    CP1_FD,
     ZERO, RA,
     HI, LO, HI_LO
 };
@@ -30,7 +32,10 @@ static inline bool is_explicit_register( Reg type)
         || type == Reg::RT
         || type == Reg::RD
         || type == Reg::CP0_RT
-        || type == Reg::CP0_RD;
+        || type == Reg::CP0_RD
+        || type == Reg::CP1_FT
+        || type == Reg::CP1_FS
+        || type == Reg::CP1_FD;
 }
 
 struct MIPSInstrDecoder
@@ -44,6 +49,10 @@ struct MIPSInstrDecoder
     const uint32 imm;
     const uint32 jump;
     const uint32 bytes;
+    const uint32 fd;
+    const uint32 fs;
+    const uint32 ft;
+    const uint32 fmt;
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
     {
@@ -87,6 +96,9 @@ struct MIPSInstrDecoder
         case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
         case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
         case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
+        case Reg::CP1_FD: return MIPSRegister::from_cp1_index( fd);
+        case Reg::CP1_FS: return MIPSRegister::from_cp1_index( fs);
+        case Reg::CP1_FT: return MIPSRegister::from_cp1_index( ft);
         default: assert(0);  return MIPSRegister::zero();
         }
     }
@@ -101,6 +113,10 @@ struct MIPSInstrDecoder
         , imm    ( apply_mask( raw, 0b00000000'00000000'11111111'11111111))
         , jump   ( apply_mask( raw, 0b00000011'11111111'11111111'11111111))
         , bytes  ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , fd     ( apply_mask( raw, 0b00000000'00000000'00000111'11000000)) 
+        , fs     ( apply_mask( raw, 0b00000000'00000000'11111000'00000000))
+        , ft     ( apply_mask( raw, 0b00000000'00011111'00000000'00000000))
+        , fmt    ( apply_mask( raw, 0b00000011'11100000'00000000'00000000))
     { }
 };
 
