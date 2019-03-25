@@ -23,7 +23,7 @@ Date | Event name
 08 Feb | **Superscalar CPU and multicore systems**<br/> • Slides: [L9](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%209%20-%20Superscalar%20CPU%20and%20multicore%20systems.pptx?raw=true), no video was recorded.
 15/22<br/>Feb | **Caches, pts I and II**<br/> • Slides: [L10-11](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2011%20-%20Caches%2C%20part%202.pptx), [YouTube L10](https://youtu.be/S8FopsF86VQ), [YouTube L11](https://youtu.be/twQdcDt94DM)
 15 Mar | **Out-of-order execution**<br/> • Slides: [L12](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2012%20-%20Out-of-order%20execution.pptx?raw=true), [YouTube](https://youtu.be/rmnHFtVwjBY)
-22 Mar | **Out-of-order execution: load-store architecture**
+22 Mar | **Out-of-order execution: load-store architecture**<br/> • Slides: [L13](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2013%20-%20Load-Store%20Architecture.pptx?raw=true)
 29 Mar | **Virtual Memory**
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
