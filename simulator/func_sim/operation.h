@@ -37,7 +37,7 @@ enum OperationType : uint8
 
 enum class Imm : uint8
 {
-    NO, CP1I, SHIFT,
+    NO, SHIFT,
     LOGIC, ARITH, TRAP, ADDR,
     JUMP
 };
@@ -54,7 +54,6 @@ std::string print_immediate( Imm type, T value)
     case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
     case Imm::ARITH: oss << ", "   << std::dec << narrow_cast<int16>(value); break;
     case Imm::SHIFT: oss << ", "   << std::dec << value; break;
-    case Imm::CP1I:  oss << " "    << std::dec << narrow_cast<int16>(value); break;
     case Imm::NO:    break;
     }
     return oss.str();
