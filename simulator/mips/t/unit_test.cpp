@@ -77,6 +77,14 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x460008c5).get_disasm() == "abs.s $f3, $f1");
     CHECK(MIPS32Instr(0x462208c0).get_disasm() == "add.d $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c0).get_disasm() == "add.s $f3, $f1, $f2");
+    CHECK(MIPS32Instr(0x45000002).get_disasm() == "bc1f 2");
+    CHECK(MIPS32Instr(0x4500fffe).get_disasm() == "bc1f -2");
+    CHECK(MIPS32Instr(0x45010002).get_disasm() == "bc1t 2");
+    CHECK(MIPS32Instr(0x4501fffe).get_disasm() == "bc1t -2");
+    CHECK(MIPS32Instr(0x45020002).get_disasm() == "bc1fl 2");
+    CHECK(MIPS32Instr(0x4502fffe).get_disasm() == "bc1fl -2");
+    CHECK(MIPS32Instr(0x45030002).get_disasm() == "bc1tl 2");
+    CHECK(MIPS32Instr(0x4503fffe).get_disasm() == "bc1tl -2");
     CHECK(MIPS32Instr(0x46211830).get_disasm() == "c.f.d $f3, $f1");
     CHECK(MIPS32Instr(0x46011830).get_disasm() == "c.f.s $f3, $f1");
     CHECK(MIPS32Instr(0x46211831).get_disasm() == "c.un.d $f3, $f1");

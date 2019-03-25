@@ -144,6 +144,10 @@ template<typename I> auto mips_abs_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_abs_s     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_add_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_add_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_bc1f      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_bc1t      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_bc1fl      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_bc1tl      = ALU::unknown_instruction<I>;
 template<typename I> auto mips_c_f_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_c_f_s     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_c_un_d    = ALU::unknown_instruction<I>;
@@ -549,6 +553,16 @@ static const Table<I> isaMapCOP1_w =
 };
 
 template<typename I>
+static const Table<I> isaMapCOP1I =
+{
+    // Branches
+    {0x0, { "bc1f",  mips_bc1f<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x1, { "bc1t",  mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x2, { "bc1fl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x3, { "bc1tl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+};
+
+template<typename I>
 static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
@@ -560,7 +574,8 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapCOP1_s<I>,
     &isaMapCOP1_d<I>,
     &isaMapCOP1_l<I>,
-    &isaMapCOP1_w<I>
+    &isaMapCOP1_w<I>,
+    &isaMapCOP1I<I>
 };
 
 template<typename I>
@@ -583,6 +598,7 @@ MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
+        case 0x8:  return get_table_entry( isaMapCOP1I<I>,  instr.ft);
         case 0x10: return get_table_entry( isaMapCOP1_s<I>, instr.funct);
         case 0x11: return get_table_entry( isaMapCOP1_d<I>, instr.funct);
         case 0x14: return get_table_entry( isaMapCOP1_w<I>, instr.funct);
