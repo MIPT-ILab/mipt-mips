@@ -466,7 +466,6 @@ MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
-        case 0x10: return get_table_entry( isaMapCOP1_s<I>, instr.funct);
         case 0x11: return get_table_entry( isaMapCOP1_d<I>, instr.funct);
         default:   return get_table_entry( isaMapCOP1_s<I>, instr.funct);
     }
