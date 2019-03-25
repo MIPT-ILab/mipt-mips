@@ -556,10 +556,10 @@ template<typename I>
 static const Table<I> isaMapCOP1I =
 {
     // Branches
-    {0x0, { "bc1f",  mips_bc1f<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x1, { "bc1t",  mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x2, { "bc1fl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x3, { "bc1tl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::CP1I, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x0, { "bc1f",  mips_bc1f<I>, OUT_FPU, 0, 'I', Imm::ARITH, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x1, { "bc1t",  mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::ARITH, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x2, { "bc1fl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::ARITH, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x3, { "bc1tl", mips_bc1t<I>, OUT_FPU, 0, 'I', Imm::ARITH, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
 };
 
 template<typename I>
