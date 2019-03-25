@@ -139,19 +139,87 @@ template<typename I> auto mips_xor     = ALU::xorv<I>;
 template<typename I> auto mips_xori    = ALU::xori<I>;
 template<typename I> auto mips_unknown = ALU::unknown_instruction<I>;
 
-//CP1 instructions
+// CP1 instructions
+template<typename I> auto mips_abs_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_abs_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_add_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_add_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_f_d     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_f_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_un_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_un_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_eq_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_eq_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ueq_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ueq_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_olt_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_olt_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ult_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ult_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ole_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ole_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ule_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ule_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_sf_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_sf_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngle_d  = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngle_s  = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_seq_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_seq_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngl_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngl_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_lt_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_lt_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_nge_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_nge_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_le_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_le_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngt_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_c_ngt_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_ceil_l_d  = ALU::unknown_instruction<I>;
 template<typename I> auto mips_ceil_l_s  = ALU::unknown_instruction<I>;
+template<typename I> auto mips_ceil_w_d  = ALU::unknown_instruction<I>;
+template<typename I> auto mips_ceil_w_s  = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cfc1      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_ctc1      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_d_l   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_d_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_d_w   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_s_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_s_l   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_s_w   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_l_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_l_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_w_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_cvt_w_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_div_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_div_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_dmfc1     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_dmtc1     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_floor_l_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_floor_l_s = ALU::unknown_instruction<I>;
+template<typename I> auto mips_floor_w_d = ALU::unknown_instruction<I>;
+template<typename I> auto mips_floor_w_s = ALU::unknown_instruction<I>;
+template<typename I> auto mips_mfc1      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_mov_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mov_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_mtc1      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_mul_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mul_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_neg_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_neg_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_round_l_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_round_l_s = ALU::unknown_instruction<I>;
-template<typename I> auto mips_sub_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_round_w_d = ALU::unknown_instruction<I>;
+template<typename I> auto mips_round_w_s = ALU::unknown_instruction<I>;
+template<typename I> auto mips_sqrt_d    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_sqrt_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_sub_d     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_sub_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_trunc_l_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_l_s = ALU::unknown_instruction<I>;
+template<typename I> auto mips_trunc_w_d = ALU::unknown_instruction<I>;
+template<typename I> auto mips_trunc_w_s = ALU::unknown_instruction<I>;
 
 template<typename I>
 struct MIPSTableEntry
@@ -359,18 +427,125 @@ static const Table<I> isaMapCOP0 =
 template<typename I>
 static const Table<I> isaMapCOP1 =
 {
-    {0x00, { "add.s",      mips_add_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x01, { "sub.s",      mips_sub_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x02, { "mul.s",      mips_mul_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x03, { "div.s",      mips_div_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x04, { "sqrt.s",     mips_sqrt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x05, { "abs.s",      mips_abs_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x06, { "mov.s",      mips_mov_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x07, { "neg.s",      mips_neg_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x08, { "round.l.s",  mips_round_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x09, { "trunc.l.s",  mips_trunc_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0A, { "ceil.l.s",   mips_ceil_l_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0B, { "floor.l.s",  mips_floor_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    // Moves from Floating Point
+    {0x00, { "mfc1",  mips_mfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_I_Instr} },
+    {0x01, { "dmfc1", mips_dmfc1<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_III_Instr} },
+    {0x02, { "cfc1",  mips_cfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_I_Instr} },
+    // 0x03
+    // Moves to Floating Point
+    {0x04, { "mtc1",  mips_mtc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_I_Instr} },
+    {0x05, { "dmtc1", mips_dmtc1<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_III_Instr} },
+    {0x06, { "ctc1",  mips_ctc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_III_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP1_s =
+{
+    // Formatted basic instructions
+    {0x00, { "add.s",     mips_add_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x01, { "sub.s",     mips_sub_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x02, { "mul.s",     mips_mul_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x03, { "div.s",     mips_div_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    // FPU specific instructions
+    {0x04, { "sqrt.s",    mips_sqrt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x05, { "abs.s",     mips_abs_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x06, { "mov.s",     mips_mov_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x07, { "neg.s",     mips_neg_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x08, { "round.l.s", mips_round_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x09, { "trunc.l.s", mips_trunc_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0A, { "ceil.l.s",  mips_ceil_l_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0B, { "floor.l.s", mips_floor_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0C, { "round.w.s", mips_round_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0D, { "trunc.w.s", mips_trunc_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0E, { "ceil.w.s",  mips_ceil_w_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0F, { "floor.w.s", mips_floor_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    // 0x10 - 0x20
+    // Converts
+    {0x21, { "cvt.d.s",   mips_cvt_d_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    // 0x22 - 0x23
+    {0x24, { "cvt.w.s",   mips_cvt_w_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x25, { "cvt.l.s",   mips_cvt_l_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    // 0x26 - 0x2F
+    // Conditions
+    {0x30, { "c.f.s",     mips_c_f_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x31, { "c.un.s",    mips_c_un_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x32, { "c.eq.s",    mips_c_eq_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x33, { "c.ueq.s",   mips_c_ueq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x34, { "c.olt.s",   mips_c_olt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x35, { "c.ult.s",   mips_c_ult_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x36, { "c.ole.s",   mips_c_ole_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x37, { "c.ule.s",   mips_c_ule_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x38, { "c.sf.s",    mips_c_sf_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x39, { "c.ngle.s",  mips_c_ngle_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3A, { "c.seq.s",   mips_c_seq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3B, { "c.ngl.s",   mips_c_ngl_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3C, { "c.lt.s",    mips_c_lt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3D, { "c.nge.s",   mips_c_nge_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3E, { "c.le.s",    mips_c_le_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3F, { "c.ngt.s",   mips_c_ngt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP1_d =
+{
+    // Formatted basic instructions
+    {0x00, { "add.d",     mips_add_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x01, { "sub.d",     mips_sub_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x02, { "mul.d",     mips_mul_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x03, { "div.d",     mips_div_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    // FPU specific instructions
+    {0x04, { "sqrt.d",    mips_sqrt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x05, { "abs.d",     mips_abs_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x06, { "mov.d",     mips_mov_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x07, { "neg.d",     mips_neg_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x08, { "round.l.d", mips_round_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x09, { "trunc.l.d", mips_trunc_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0A, { "ceil.l.d",  mips_ceil_l_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0B, { "floor.l.d", mips_floor_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x0C, { "round.w.d", mips_round_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0D, { "trunc.w.d", mips_trunc_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0E, { "ceil.w.d",  mips_ceil_w_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x0F, { "floor.w.d", mips_floor_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    // 0x10 - 0x1F
+    // Converts
+    {0x20, { "cvt.s.d",   mips_cvt_s_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    // 0x21 - 0x23
+    {0x24, { "cvt.w.d",   mips_cvt_w_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x25, { "cvt.l.d",   mips_cvt_l_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    // 0x26 - 0x2F
+    // Conditions
+    {0x30, { "c.f.d",     mips_c_f_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x31, { "c.un.d",    mips_c_un_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x32, { "c.eq.d",    mips_c_eq_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x33, { "c.ueq.d",   mips_c_ueq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x34, { "c.olt.d",   mips_c_olt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x35, { "c.ult.d",   mips_c_ult_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x36, { "c.ole.d",   mips_c_ole_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x37, { "c.ule.d",   mips_c_ule_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x38, { "c.sf.d",    mips_c_sf_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x39, { "c.ngle.d",  mips_c_ngle_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3A, { "c.seq.d",   mips_c_seq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3B, { "c.ngl.d",   mips_c_ngl_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3C, { "c.lt.d",    mips_c_lt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3D, { "c.nge.d",   mips_c_nge_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3E, { "c.le.d",    mips_c_le_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+    {0x3F, { "c.ngt.d",   mips_c_ngt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::ZERO,   MIPS_I_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP1_l =
+{
+    // Converts
+    {0x20, { "cvt.s.l", mips_cvt_s_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
+    {0x21, { "cvt.d.l", mips_cvt_d_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP1_w =
+{
+    // Converts
+    {0x20, { "cvt.s.w", mips_cvt_s_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x21, { "cvt.d.w", mips_cvt_d_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
 };
 
 template<typename I>
@@ -381,7 +556,11 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapMIPS32<I>,
     &isaMapIJ<I>,
     &isaMapCOP0<I>,
-    &isaMapCOP1<I>
+    &isaMapCOP1<I>,
+    &isaMapCOP1_s<I>,
+    &isaMapCOP1_d<I>,
+    &isaMapCOP1_l<I>,
+    &isaMapCOP1_w<I>
 };
 
 template<typename I>
@@ -400,6 +579,19 @@ MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 }
 
 template<typename I>
+MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
+{
+    switch ( instr.fmt)
+    {
+        case 0x10: return get_table_entry( isaMapCOP1_s<I>, instr.funct);
+        case 0x11: return get_table_entry( isaMapCOP1_d<I>, instr.funct);
+        case 0x14: return get_table_entry( isaMapCOP1_w<I>, instr.funct);
+        case 0x15: return get_table_entry( isaMapCOP1_l<I>, instr.funct);
+        default:   return get_table_entry( isaMapCOP1<I>,   instr.fmt);
+    }
+}
+
+template<typename I>
 MIPSTableEntry<I> get_table_entry( uint32 bytes)
 {
     MIPSInstrDecoder instr( bytes);
@@ -412,7 +604,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
         case 0x0:  return get_table_entry( isaMapR<I>,      instr.funct);
         case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
         case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
-        case 0x11: return get_table_entry( isaMapCOP1<I>,   instr.funct);
+        case 0x11: return get_cp1_entry<I>( instr);
         case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);
         default:   return get_table_entry( isaMapIJ<I>,     instr.opcode);
     }
