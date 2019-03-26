@@ -241,6 +241,17 @@ template<typename I> auto mips_trunc_l_s = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_w_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_w_s = ALU::unknown_instruction<I>;
 
+/* Printing of 3 sources is not implemented
+template<typename I> auto mips_madd_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_madd_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_msub_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_msub_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmadd_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmadd_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmsub_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmsub_s   = ALU::unknown_instruction<I>;
+*/
+
 template<typename I>
 struct MIPSTableEntry
 {
@@ -604,6 +615,20 @@ static const Table<I> isaMapCOP1X =
     {0x9, { "sdxc1", mips_sdxc1<I>,  OUT_STORE, 8, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     // 0xa - 0xe
     // 0xf PREFX
+    // Advanced multiplication
+    /* Printing of 3 sources is not implemented
+    {0x20, { "madd.s", mips_madd_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    {0x21, { "madd.d", mips_madd_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    // 0x22 - 0x27
+    {0x28, { "msub.s", mips_msub_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    {0x29, { "msub.d", mips_msub_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    // 0x2A - 0x2F
+    {0x30, { "nmadd.s", mips_nmadd_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    {0x31, { "nmadd.d", mips_nmadd_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    // 0x32 - 0x37
+    {0x38, { "nmsub.s", mips_nmsub_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    {0x39, { "nmsub.d", mips_nmsub_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
+    */
 };
 
 template<typename I>
