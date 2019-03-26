@@ -415,16 +415,14 @@ static const Table<I> isaMapIJ =
     {0x2E, { "swr", mips_swr<I>, OUT_STORE, 4, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
 //  {0x2F, { "cache"
     // Advanced loads and stores
-    {0x30, { "ll", mips_ll<I>,  OUT_LOAD,  2, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x37, { "ld", mips_ld<I>,  OUT_LOAD,  8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
-    {0x38, { "sc", mips_sc<I>,  OUT_STORE, 2, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x3F, { "sd", mips_sd<I>,  OUT_STORE, 8, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_III_Instr} },
-    // CP1 loads
+    {0x30, { "ll",   mips_ll<I>,   OUT_LOAD,  2, 'I', Imm::ADDR, Src1::RS,      Src2::ZERO, Dst::RT,     MIPS_I_Instr} },
     {0x31, { "lwc1", mips_lwc1<I>, OUT_LOAD,  4, 'I', Imm::ADDR, Src1::CP1_FMT, Src2::ZERO, Dst::CP1_FT, MIPS_I_Instr} },
     {0x35, { "ldc1", mips_ldc1<I>, OUT_LOAD,  8, 'I', Imm::ADDR, Src1::CP1_FMT, Src2::ZERO, Dst::CP1_FT, MIPS_II_Instr} },
-    // CP1 stores
+    {0x37, { "ld",   mips_ld<I>,   OUT_LOAD,  8, 'I', Imm::ADDR, Src1::RS,      Src2::ZERO, Dst::RT,     MIPS_III_Instr} },
+    {0x38, { "sc",   mips_sc<I>,   OUT_STORE, 2, 'I', Imm::ADDR, Src1::RS,      Src2::RT,   Dst::ZERO,   MIPS_I_Instr} },
     {0x39, { "swc1", mips_swc1<I>, OUT_STORE, 4, 'I', Imm::ADDR, Src1::CP1_FMT, Src2::ZERO, Dst::CP1_FT, MIPS_I_Instr} },
     {0x3D, { "sdc1", mips_sdc1<I>, OUT_STORE, 8, 'I', Imm::ADDR, Src1::CP1_FMT, Src2::ZERO, Dst::CP1_FT, MIPS_II_Instr} },
+    {0x3F, { "sd",   mips_sd<I>,   OUT_STORE, 8, 'I', Imm::ADDR, Src1::RS,      Src2::RT,   Dst::ZERO,   MIPS_III_Instr} },
 };
 
 template<typename I>
