@@ -486,8 +486,8 @@ static const Table<I> isaMapCOP1_s =
     {0x12, { "movz.s",    mips_movz_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     {0x13, { "movn.s",    mips_movn_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     // 0x14
-    {0x15, { "recip.s",   mips_recip_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
-    {0x16, { "rsqrt.s",   mips_rsqrt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
+    {0x15, { "recip.s",   mips_recip_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_IV_Instr} },
+    {0x16, { "rsqrt.s",   mips_rsqrt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_IV_Instr} },
     // Converts
     {0x21, { "cvt.d.s",   mips_cvt_d_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
     // 0x22 - 0x23
@@ -538,8 +538,8 @@ static const Table<I> isaMapCOP1_d =
     {0x12, { "movz.d",    mips_movz_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     {0x13, { "movn.d",    mips_movn_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     // 0x14
-    {0x15, { "recip.d",   mips_recip_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
-    {0x16, { "rsqrt.d",   mips_rsqrt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
+    {0x15, { "recip.d",   mips_recip_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_IV_Instr} },
+    {0x16, { "rsqrt.d",   mips_rsqrt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_IV_Instr} },
     // 0x17 - 0x20
     // Converts
     {0x20, { "cvt.s.d",   mips_cvt_s_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
@@ -596,12 +596,12 @@ template<typename I>
 static const Table<I> isaMapCOP1X =
 {
     // Loads
-    {0x0, { "lwxc1", mips_lwxc1<I>,  OUT_LOAD,  4, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::CP1_FD, MIPS_IV_Instr} },
-    {0x1, { "ldxc1", mips_ldxc1<I>,  OUT_LOAD,  8, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::CP1_FD, MIPS_IV_Instr} },
+    {0x0, { "lwxc1", mips_lwxc1<I>,  OUT_LOAD,  4, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
+    {0x1, { "ldxc1", mips_ldxc1<I>,  OUT_LOAD,  8, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     // 0x2 - 0x7
     // Stores
-    {0x8, { "swxc1", mips_swxc1<I>,  OUT_STORE, 4, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::CP1_FD, MIPS_IV_Instr} },
-    {0x9, { "sdxc1", mips_sdxc1<I>,  OUT_STORE, 8, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::CP1_FD, MIPS_IV_Instr} },
+    {0x8, { "swxc1", mips_swxc1<I>,  OUT_STORE, 4, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
+    {0x9, { "sdxc1", mips_sdxc1<I>,  OUT_STORE, 8, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::FD, MIPS_IV_Instr} },
     // 0xa - 0xe
     // 0xf PREFX
 };
