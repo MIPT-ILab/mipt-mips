@@ -18,6 +18,7 @@ enum class Reg : uint8
     CP0_RT, CP0_RD,
     CP1_FT, CP1_FS,
     CP1_FD, FCSR,
+    CP1_FMT,
     ZERO, RA,
     HI, LO, HI_LO
 };
@@ -36,6 +37,7 @@ static inline bool is_explicit_register( Reg type)
         || type == Reg::CP1_FT
         || type == Reg::CP1_FS
         || type == Reg::CP1_FD
+        || type == Reg::CP1_FMT
         || type == Reg::FCSR;
 }
 
@@ -87,20 +89,21 @@ struct MIPSInstrDecoder
     MIPSRegister get_register( Reg type) const
     {
         switch ( type) {
-        case Reg::HI:     return MIPSRegister::mips_hi();
-        case Reg::LO:     return MIPSRegister::mips_lo();
-        case Reg::HI_LO:  return MIPSRegister::mips_lo();
-        case Reg::ZERO:   return MIPSRegister::zero();
-        case Reg::RA:     return MIPSRegister::return_address();
-        case Reg::RS:     return MIPSRegister::from_cpu_index( rs);
-        case Reg::RT:     return MIPSRegister::from_cpu_index( rt);
-        case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
-        case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
-        case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
-        case Reg::CP1_FD: return MIPSRegister::from_cp1_index( fd);
-        case Reg::CP1_FS: return MIPSRegister::from_cp1_index( fs);
-        case Reg::CP1_FT: return MIPSRegister::from_cp1_index( ft);
-        case Reg::FCSR:   return MIPSRegister::mips_fcsr();
+        case Reg::HI:      return MIPSRegister::mips_hi();
+        case Reg::LO:      return MIPSRegister::mips_lo();
+        case Reg::HI_LO:   return MIPSRegister::mips_lo();
+        case Reg::ZERO:    return MIPSRegister::zero();
+        case Reg::RA:      return MIPSRegister::return_address();
+        case Reg::RS:      return MIPSRegister::from_cpu_index( rs);
+        case Reg::RT:      return MIPSRegister::from_cpu_index( rt);
+        case Reg::RD:      return MIPSRegister::from_cpu_index( rd);
+        case Reg::CP0_RT:  return MIPSRegister::from_cp0_index( rt);
+        case Reg::CP0_RD:  return MIPSRegister::from_cp0_index( rd);
+        case Reg::CP1_FD:  return MIPSRegister::from_cp1_index( fd);
+        case Reg::CP1_FS:  return MIPSRegister::from_cp1_index( fs);
+        case Reg::CP1_FT:  return MIPSRegister::from_cp1_index( ft);
+        case Reg::CP1_FMT: return MIPSRegister::from_cp1_index( fmt);
+        case Reg::FCSR:    return MIPSRegister::mips_fcsr();
         default: assert(0);  return MIPSRegister::zero();
         }
     }
