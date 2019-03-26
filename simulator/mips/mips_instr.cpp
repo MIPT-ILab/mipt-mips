@@ -234,8 +234,7 @@ struct MIPSTableEntry
     uint8 mem_size;
     char imm_type;
     Imm imm_print_type;
-    Src1 src1;
-    Src2 src2;
+    std::vector<Reg> sources;
     Dst  dst;
     MIPSVersionMask versions;
     MIPSTableEntry() = delete;
@@ -250,77 +249,77 @@ static const Table<I> isaMapR =
 {
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
-    {0x0, { "sll",  mips_sll<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
+    {0x0, { "sll",  mips_sll<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_I_Instr} },
 //  {0x1, { "movci"
-    {0x2, { "srl",  mips_srl<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
-    {0x3, { "sra",  mips_sra<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
+    {0x2, { "srl",  mips_srl<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x3, { "sra",  mips_sra<I>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_I_Instr} },
     // Variable shifts
-    {0x4, { "sllv", mips_sllv<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_I_Instr} },
+    {0x4, { "sllv", mips_sllv<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_I_Instr} },
 //  {0x5
-    {0x6, { "srlv", mips_srlv<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_I_Instr} },
-    {0x7, { "srav", mips_srav<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_I_Instr} },
+    {0x6, { "srlv", mips_srlv<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_I_Instr} },
+    {0x7, { "srav", mips_srav<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_I_Instr} },
     // Indirect branches
-    {0x8, { "jr",   mips_jr<I>  , OUT_R_JUMP, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x9, { "jalr", mips_jalr<I>, OUT_R_JUMP, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::RD,   MIPS_I_Instr} },
+    {0x8, { "jr",   mips_jr<I>  , OUT_R_JUMP, 0, 'N', Imm::NO, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
+    {0x9, { "jalr", mips_jalr<I>, OUT_R_JUMP, 0, 'N', Imm::NO, { Reg::RS }, Dst::RD,   MIPS_I_Instr} },
     // Conditional moves (MIPS IV)
-    {0xA, { "movz", mips_movz<I>, OUT_R_CONDM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
-    {0xB, { "movn", mips_movn<I>, OUT_R_CONDM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
+    {0xA, { "movz", mips_movz<I>, OUT_R_CONDM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
+    {0xB, { "movn", mips_movn<I>, OUT_R_CONDM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_IV_Instr | MIPS_32_Instr} },
     // System calls
-    {0xC, { "syscall", mips_syscall<I>, OUT_SYSCALL, 0, 'N', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0xD, { "break",   mips_break<I>,   OUT_BREAK,   0, 'N', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0xC, { "syscall", mips_syscall<I>, OUT_SYSCALL, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr} },
+    {0xD, { "break",   mips_break<I>,   OUT_BREAK,   0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr} },
     // Hi/Lo manipulators
-    {0x10, { "mfhi", mips_mfhi<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::HI, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
-    {0x11, { "mthi", mips_mthi<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::HI, MIPS_I_Instr} },
-    {0x12, { "mflo", mips_mflo<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::LO, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
-    {0x13, { "mtlo", mips_mtlo<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::LO, MIPS_I_Instr} },
+    {0x10, { "mfhi", mips_mfhi<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::HI }, Dst::RD, MIPS_I_Instr} },
+    {0x11, { "mthi", mips_mthi<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::HI, MIPS_I_Instr} },
+    {0x12, { "mflo", mips_mflo<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::LO }, Dst::RD, MIPS_I_Instr} },
+    {0x13, { "mtlo", mips_mtlo<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::LO, MIPS_I_Instr} },
     // Doubleword variable shifts
-    {0x14, { "dsllv", mips_dsllv<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_III_Instr} },
-    {0x16, { "dsrlv", mips_dsrlv<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_III_Instr} },
-    {0x17, { "dsrav", mips_dsrav<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::RS, Dst::RD, MIPS_III_Instr} },
+    {0x14, { "dsllv", mips_dsllv<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_III_Instr} },
+    {0x16, { "dsrlv", mips_dsrlv<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_III_Instr} },
+    {0x17, { "dsrav", mips_dsrav<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT, Reg::RS }, Dst::RD, MIPS_III_Instr} },
     // Multiplication/Division
-    {0x18, { "mult",   mips_mult<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x19, { "multu",  mips_multu<I>, OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1A, { "div",    mips_div<I>,   OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1B, { "divu",   mips_divu<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_I_Instr} },
-    {0x1C, { "dmult",  mips_dmult<I>, OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1D, { "dmultu", mips_dmultu<I>,OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1E, { "ddiv",   mips_ddiv<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
-    {0x1F, { "ddivu",  mips_ddivu<I>, OUT_DIVMULT, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_III_Instr} },
+    {0x18, { "mult",   mips_mult<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_I_Instr} },
+    {0x19, { "multu",  mips_multu<I>, OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1A, { "div",    mips_div<I>,   OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1B, { "divu",   mips_divu<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_I_Instr} },
+    {0x1C, { "dmult",  mips_dmult<I>, OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1D, { "dmultu", mips_dmultu<I>,OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1E, { "ddiv",   mips_ddiv<I>,  OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_III_Instr} },
+    {0x1F, { "ddivu",  mips_ddivu<I>, OUT_DIVMULT, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_III_Instr} },
     // Addition/Subtraction
-    {0x20, { "add",  mips_add<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x21, { "addu", mips_addu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x22, { "sub",  mips_sub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x23, { "subu", mips_subu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x20, { "add",  mips_add<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x21, { "addu", mips_addu<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x22, { "sub",  mips_sub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x23, { "subu", mips_subu<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
     // Logical operations
-    {0x24, { "and", mips_and<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x25, { "or",  mips_or<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x26, { "xor", mips_xor<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x27, { "nor", mips_nor<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x24, { "and", mips_and<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x25, { "or",  mips_or<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x26, { "xor", mips_xor<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x27, { "nor", mips_nor<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
 //  {0x28
 //  {0x29
-    {0x2A, { "slt",  mips_slt<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
-    {0x2B, { "sltu", mips_sltu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_I_Instr} },
+    {0x2A, { "slt",  mips_slt<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
+    {0x2B, { "sltu", mips_sltu<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_I_Instr} },
     // Doubleword addition/Subtraction
-    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
-    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
-    {0x2E, { "dsub",  mips_dsub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
-    {0x2F, { "dsubu", mips_dsubu<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD, MIPS_III_Instr} },
+    {0x2C, { "dadd",  mips_dadd<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x2D, { "daddu", mips_daddu<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x2E, { "dsub",  mips_dsub<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x2F, { "dsubu", mips_dsubu<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD, MIPS_III_Instr} },
     // Conditional traps (MIPS II)
-    {0x30, { "tge",  mips_tge<I>,  OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x31, { "tgeu", mips_tgeu<I>, OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x32, { "tlt",  mips_tlt<I>,  OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x33, { "tltu", mips_tltu<I>, OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x34, { "teq",  mips_teq<I>,  OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
+    {0x30, { "tge",  mips_tge<I>,  OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x31, { "tgeu", mips_tgeu<I>, OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x32, { "tlt",  mips_tlt<I>,  OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x33, { "tltu", mips_tltu<I>, OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x34, { "teq",  mips_teq<I>,  OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
 //  {0x35
-    {0x36, { "tne",  mips_tne<I>,  OUT_TRAP, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
+    {0x36, { "tne",  mips_tne<I>,  OUT_TRAP, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
 //  {0x37
     // Doubleword shifts
-    {0x38, { "dsll",   mips_dsll<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} },
-    {0x3A, { "dsrl",   mips_dsrl<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} },
-    {0x3B, { "dsra",   mips_dsra<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} },
-    {0x3C, { "dsll32", mips_dsll32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} },
-    {0x3E, { "dsrl32", mips_dsrl32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} },
-    {0x3F, { "dsra32", mips_dsra32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, Src1::RT, Src2::ZERO, Dst::RD, MIPS_III_Instr} }
+    {0x38, { "dsll",   mips_dsll<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x3A, { "dsrl",   mips_dsrl<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x3B, { "dsra",   mips_dsra<I>  , OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x3C, { "dsll32", mips_dsll32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x3E, { "dsrl32", mips_dsrl32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} },
+    {0x3F, { "dsra32", mips_dsra32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Reg::RT }, Dst::RD, MIPS_III_Instr} }
 };
 
 //unordered map for RI-instructions
@@ -328,22 +327,22 @@ template<typename I>
 static const Table<I> isaMapRI =
 {
     // Branches
-    {0x0,  { "bltz",  mips_bltz<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x1,  { "bgez",  mips_bgez<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
+    {0x0,  { "bltz",  mips_bltz<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
+    {0x1,  { "bgez",  mips_bgez<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
+    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     // Conditional traps
-    {0x8,  { "tgei",  mips_tgei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0x9,  { "tgeiu", mips_tgeiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0xA,  { "tlti",  mips_tlti<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0xB,  { "tltiu", mips_tltiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0xC,  { "teqi",  mips_teqi<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
-    {0xE,  { "tnei",  mips_tnei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_II_Instr} },
+    {0x8,  { "tgei",  mips_tgei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x9,  { "tgeiu", mips_tgeiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0xA,  { "tlti",  mips_tlti<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0xB,  { "tltiu", mips_tltiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0xC,  { "teqi",  mips_teqi<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0xE,  { "tnei",  mips_tnei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     // Linking branches
-    {0x10, { "bltzal",  mips_bltzal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RA, MIPS_I_Instr} },
-    {0x11, { "bgezal",  mips_bgezal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RA, MIPS_I_Instr} },
-    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RA, MIPS_II_Instr} },
-    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RA, MIPS_II_Instr} }
+    {0x10, { "bltzal",  mips_bltzal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
+    {0x11, { "bgezal",  mips_bgezal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
+    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
+    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -351,215 +350,215 @@ template<typename I>
 static const Table<I> isaMapIJ =
 {
     // Direct jumps
-    {0x2, { "j",   mips_j<I>,   OUT_J_JUMP, 0, 'J', Imm::JUMP, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr } },
-    {0x3, { "jal", mips_jal<I>, OUT_J_JUMP, 0, 'J', Imm::JUMP, Src1::ZERO, Src2::ZERO, Dst::RA, MIPS_I_Instr } },
+    {0x2, { "j",   mips_j<I>,   OUT_J_JUMP, 0, 'J', Imm::JUMP, { }, Dst::ZERO, MIPS_I_Instr } },
+    {0x3, { "jal", mips_jal<I>, OUT_J_JUMP, 0, 'J', Imm::JUMP, { }, Dst::RA, MIPS_I_Instr } },
     // Branches
-    {0x4, { "beq",  mips_beq<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x5, { "bne",  mips_bne<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x6, { "blez", mips_blez<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x7, { "bgtz", mips_bgtz<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x4, { "beq",  mips_beq<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x5, { "bne",  mips_bne<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x6, { "blez", mips_blez<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
+    {0x7, { "bgtz", mips_bgtz<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
     // Addition/Subtraction
-    {0x8, { "addi",  mips_addi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x9, { "addiu", mips_addiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0x8, { "addi",  mips_addi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x9, { "addiu", mips_addiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
     // Logical operations
-    {0xA, { "slti",  mips_slti<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xB, { "sltiu", mips_sltiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xC, { "andi",  mips_andi<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xD, { "ori",   mips_ori<I>,   OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xE, { "xori",  mips_xori<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, Src1::ZERO, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0xA, { "slti",  mips_slti<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0xB, { "sltiu", mips_sltiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0xC, { "andi",  mips_andi<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0xD, { "ori",   mips_ori<I>,   OUT_ARITHM, 0, 'L', Imm::LOGIC, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0xE, { "xori",  mips_xori<I>,  OUT_ARITHM, 0, 'L', Imm::LOGIC, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, { }, Dst::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
-    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
-    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::RS, Src2::RT, Dst::ZERO, MIPS_II_Instr} },
+    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
     // Doubleword unaligned loads
-    {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
-    {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
+    {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
+    {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
     // Doubleword addition
-    {0x18, { "daddi",  mips_daddi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
-    {0x19, { "daddiu", mips_daddiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
+    {0x18, { "daddi",  mips_daddi<I>,  OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
+    {0x19, { "daddiu", mips_daddiu<I>, OUT_ARITHM, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
     // Loads
-    {0x20, { "lb",  mips_lb<I>,  OUT_LOAD, 1, 'I',         Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x21, { "lh",  mips_lh<I>,  OUT_LOAD, 2, 'I',         Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x22, { "lwl", mips_lwl<I>, OUT_PARTIAL_LOAD, 4, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x23, { "lw",  mips_lw<I>,  OUT_LOAD, 4, 'I',         Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x24, { "lbu", mips_lbu<I>, OUT_LOADU, 1, 'I',        Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x25, { "lhu", mips_lhu<I>, OUT_LOADU, 2, 'I',        Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x26, { "lwr", mips_lwr<I>, OUT_PARTIAL_LOAD, 4, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x27, { "lwu", mips_lwu<I>, OUT_LOADU, 4, 'I',        Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
+    {0x20, { "lb",  mips_lb<I>,  OUT_LOAD, 1, 'I',         Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x21, { "lh",  mips_lh<I>,  OUT_LOAD, 2, 'I',         Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x22, { "lwl", mips_lwl<I>, OUT_PARTIAL_LOAD, 4, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x23, { "lw",  mips_lw<I>,  OUT_LOAD, 4, 'I',         Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x24, { "lbu", mips_lbu<I>, OUT_LOADU, 1, 'I',        Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x25, { "lhu", mips_lhu<I>, OUT_LOADU, 2, 'I',        Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x26, { "lwr", mips_lwr<I>, OUT_PARTIAL_LOAD, 4, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x27, { "lwu", mips_lwu<I>, OUT_LOADU, 4, 'I',        Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
     // Stores
-    {0x28, { "sb",  mips_sb<I>,  OUT_STORE, 1, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x29, { "sh",  mips_sh<I>,  OUT_STORE, 2, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x2A, { "swl", mips_swl<I>, OUT_STORE, 4, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x2B, { "sw",  mips_sw<I>,  OUT_STORE, 4, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x2C, { "sdl", mips_sdl<I>, OUT_STORE, 8, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_III_Instr} },
-    {0x2D, { "sdr", mips_sdr<I>, OUT_STORE, 8, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_III_Instr} },
-    {0x2E, { "swr", mips_swr<I>, OUT_STORE, 4, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
+    {0x28, { "sb",  mips_sb<I>,  OUT_STORE, 1, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x29, { "sh",  mips_sh<I>,  OUT_STORE, 2, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x2A, { "swl", mips_swl<I>, OUT_STORE, 4, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x2B, { "sw",  mips_sw<I>,  OUT_STORE, 4, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x2C, { "sdl", mips_sdl<I>, OUT_STORE, 8, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_III_Instr} },
+    {0x2D, { "sdr", mips_sdr<I>, OUT_STORE, 8, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_III_Instr} },
+    {0x2E, { "swr", mips_swr<I>, OUT_STORE, 4, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
 //  {0x2F, { "cache"
     // Advanced loads and stores
-    {0x30, { "ll", mips_ll<I>,  OUT_LOAD,  2, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_I_Instr} },
-    {0x37, { "ld", mips_ld<I>,  OUT_LOAD,  8, 'I', Imm::ADDR, Src1::RS, Src2::ZERO, Dst::RT, MIPS_III_Instr} },
-    {0x38, { "sc", mips_sc<I>,  OUT_STORE, 2, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_I_Instr} },
-    {0x3F, { "sd", mips_sd<I>,  OUT_STORE, 8, 'I', Imm::ADDR, Src1::RS, Src2::RT, Dst::ZERO, MIPS_III_Instr} }
+    {0x30, { "ll", mips_ll<I>,  OUT_LOAD,  2, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_I_Instr} },
+    {0x37, { "ld", mips_ld<I>,  OUT_LOAD,  8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
+    {0x38, { "sc", mips_sc<I>,  OUT_STORE, 2, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_I_Instr} },
+    {0x3F, { "sd", mips_sd<I>,  OUT_STORE, 8, 'I', Imm::ADDR, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_III_Instr} }
 };
 
 template<typename I>
 static const Table<I> isaMapMIPS32 =
 {
     // Advanced multiplication
-    {0x00, { "madd",  mips_madd<I>,  OUT_R_ACCUM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_32_Instr} },
-    {0x01, { "maddu", mips_maddu<I>, OUT_R_ACCUM, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_32_Instr} },
-    {0x02, { "mul",   mips_mul<I>,   OUT_ARITHM,  0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::RD,    MIPS_32_Instr} },
-    {0x04, { "msub",  mips_msub<I>,  OUT_R_SUBTR, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_32_Instr} },
-    {0x05, { "msubu", mips_msubu<I>, OUT_R_SUBTR, 0, 'N', Imm::NO, Src1::RS, Src2::RT, Dst::HI_LO, MIPS_32_Instr} },
+    {0x00, { "madd",  mips_madd<I>,  OUT_R_ACCUM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_32_Instr} },
+    {0x01, { "maddu", mips_maddu<I>, OUT_R_ACCUM, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_32_Instr} },
+    {0x02, { "mul",   mips_mul<I>,   OUT_ARITHM,  0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::RD,    MIPS_32_Instr} },
+    {0x04, { "msub",  mips_msub<I>,  OUT_R_SUBTR, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_32_Instr} },
+    {0x05, { "msubu", mips_msubu<I>, OUT_R_SUBTR, 0, 'N', Imm::NO, { Reg::RS, Reg::RT }, Dst::HI_LO, MIPS_32_Instr} },
     // Count leading zeroes/ones
-    {0x20, { "clz",  mips_clz<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::RD, MIPS_32_Instr} },
-    {0x21, { "clo",  mips_clo<I>,  OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::RD, MIPS_32_Instr} },
-    {0x24, { "dclz", mips_dclz<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::RD, MIPS_64_Instr} },
-    {0x25, { "dclo", mips_dclo<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RS, Src2::ZERO, Dst::RD, MIPS_64_Instr} }
+    {0x20, { "clz",  mips_clz<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::RD, MIPS_32_Instr} },
+    {0x21, { "clo",  mips_clo<I>,  OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::RD, MIPS_32_Instr} },
+    {0x24, { "dclz", mips_dclz<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::RD, MIPS_64_Instr} },
+    {0x25, { "dclo", mips_dclo<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RS }, Dst::RD, MIPS_64_Instr} }
 };
 
 template<typename I>
 static const Table<I> isaMapCOP0 =
 {
-    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::RT, Src2::ZERO, Dst::CP0_RD, MIPS_I_Instr} },
-    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::CP0_RT, Src2::ZERO, Dst::RD, MIPS_I_Instr} },
+    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
+    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RT }, Dst::RD, MIPS_I_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1 =
 {
     // Moves from Floating Point
-    {0x00, { "mfc1",  mips_mfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_I_Instr} },
-    {0x01, { "dmfc1", mips_dmfc1<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_III_Instr} },
-    {0x02, { "cfc1",  mips_cfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::RT,     MIPS_I_Instr} },
+    {0x00, { "mfc1",  mips_mfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::RT,     MIPS_I_Instr} },
+    {0x01, { "dmfc1", mips_dmfc1<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::RT,     MIPS_III_Instr} },
+    {0x02, { "cfc1",  mips_cfc1<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::RT,     MIPS_I_Instr} },
     // 0x03
     // Moves to Floating Point
-    {0x04, { "mtc1",  mips_mtc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_I_Instr} },
-    {0x05, { "dmtc1", mips_dmtc1<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_III_Instr} },
-    {0x06, { "ctc1",  mips_ctc1<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::RT,     Src2::ZERO, Dst::CP1_FS, MIPS_III_Instr} },
+    {0x04, { "mtc1",  mips_mtc1<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::RT },     Dst::FS, MIPS_I_Instr} },
+    {0x05, { "dmtc1", mips_dmtc1<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::RT },     Dst::FS, MIPS_III_Instr} },
+    {0x06, { "ctc1",  mips_ctc1<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::RT },     Dst::FS, MIPS_III_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1_s =
 {
     // Formatted basic instructions
-    {0x00, { "add.s",     mips_add_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x01, { "sub.s",     mips_sub_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x02, { "mul.s",     mips_mul_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x03, { "div.s",     mips_div_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x00, { "add.s",     mips_add_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x01, { "sub.s",     mips_sub_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x02, { "mul.s",     mips_mul_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x03, { "div.s",     mips_div_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
     // FPU specific instructions
-    {0x04, { "sqrt.s",    mips_sqrt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x05, { "abs.s",     mips_abs_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x06, { "mov.s",     mips_mov_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x07, { "neg.s",     mips_neg_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x08, { "round.l.s", mips_round_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x09, { "trunc.l.s", mips_trunc_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0A, { "ceil.l.s",  mips_ceil_l_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0B, { "floor.l.s", mips_floor_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0C, { "round.w.s", mips_round_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0D, { "trunc.w.s", mips_trunc_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0E, { "ceil.w.s",  mips_ceil_w_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0F, { "floor.w.s", mips_floor_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x04, { "sqrt.s",    mips_sqrt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x05, { "abs.s",     mips_abs_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x06, { "mov.s",     mips_mov_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x07, { "neg.s",     mips_neg_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x08, { "round.l.s", mips_round_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x09, { "trunc.l.s", mips_trunc_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0A, { "ceil.l.s",  mips_ceil_l_s<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0B, { "floor.l.s", mips_floor_l_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0C, { "round.w.s", mips_round_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0D, { "trunc.w.s", mips_trunc_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0E, { "ceil.w.s",  mips_ceil_w_s<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0F, { "floor.w.s", mips_floor_w_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
     // 0x10 - 0x20
     // Converts
-    {0x21, { "cvt.d.s",   mips_cvt_d_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x21, { "cvt.d.s",   mips_cvt_d_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
     // 0x22 - 0x23
-    {0x24, { "cvt.w.s",   mips_cvt_w_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x25, { "cvt.l.s",   mips_cvt_l_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x24, { "cvt.w.s",   mips_cvt_w_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x25, { "cvt.l.s",   mips_cvt_l_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
     // 0x26 - 0x2F
     // Conditions
-    {0x30, { "c.f.s",     mips_c_f_s<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x31, { "c.un.s",    mips_c_un_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x32, { "c.eq.s",    mips_c_eq_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x33, { "c.ueq.s",   mips_c_ueq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x34, { "c.olt.s",   mips_c_olt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x35, { "c.ult.s",   mips_c_ult_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x36, { "c.ole.s",   mips_c_ole_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x37, { "c.ule.s",   mips_c_ule_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x38, { "c.sf.s",    mips_c_sf_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x39, { "c.ngle.s",  mips_c_ngle_s<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3A, { "c.seq.s",   mips_c_seq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3B, { "c.ngl.s",   mips_c_ngl_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3C, { "c.lt.s",    mips_c_lt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3D, { "c.nge.s",   mips_c_nge_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3E, { "c.le.s",    mips_c_le_s<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3F, { "c.ngt.s",   mips_c_ngt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
+    {0x30, { "c.f.s",     mips_c_f_s<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x31, { "c.un.s",    mips_c_un_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x32, { "c.eq.s",    mips_c_eq_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x33, { "c.ueq.s",   mips_c_ueq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x34, { "c.olt.s",   mips_c_olt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x35, { "c.ult.s",   mips_c_ult_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x36, { "c.ole.s",   mips_c_ole_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x37, { "c.ule.s",   mips_c_ule_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x38, { "c.sf.s",    mips_c_sf_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x39, { "c.ngle.s",  mips_c_ngle_s<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3A, { "c.seq.s",   mips_c_seq_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3B, { "c.ngl.s",   mips_c_ngl_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3C, { "c.lt.s",    mips_c_lt_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3D, { "c.nge.s",   mips_c_nge_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3E, { "c.le.s",    mips_c_le_s<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3F, { "c.ngt.s",   mips_c_ngt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1_d =
 {
     // Formatted basic instructions
-    {0x00, { "add.d",     mips_add_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x01, { "sub.d",     mips_sub_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x02, { "mul.d",     mips_mul_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x03, { "div.d",     mips_div_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x00, { "add.d",     mips_add_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x01, { "sub.d",     mips_sub_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x02, { "mul.d",     mips_mul_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
+    {0x03, { "div.d",     mips_div_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FD, MIPS_I_Instr} },
     // FPU specific instructions
-    {0x04, { "sqrt.d",    mips_sqrt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x05, { "abs.d",     mips_abs_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x06, { "mov.d",     mips_mov_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x07, { "neg.d",     mips_neg_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x08, { "round.l.d", mips_round_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x09, { "trunc.l.d", mips_trunc_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0A, { "ceil.l.d",  mips_ceil_l_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0B, { "floor.l.d", mips_floor_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
-    {0x0C, { "round.w.d", mips_round_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0D, { "trunc.w.d", mips_trunc_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0E, { "ceil.w.d",  mips_ceil_w_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
-    {0x0F, { "floor.w.d", mips_floor_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_II_Instr} },
+    {0x04, { "sqrt.d",    mips_sqrt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x05, { "abs.d",     mips_abs_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x06, { "mov.d",     mips_mov_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x07, { "neg.d",     mips_neg_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x08, { "round.l.d", mips_round_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x09, { "trunc.l.d", mips_trunc_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0A, { "ceil.l.d",  mips_ceil_l_d<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0B, { "floor.l.d", mips_floor_l_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x0C, { "round.w.d", mips_round_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0D, { "trunc.w.d", mips_trunc_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0E, { "ceil.w.d",  mips_ceil_w_d<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
+    {0x0F, { "floor.w.d", mips_floor_w_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_II_Instr} },
     // 0x10 - 0x1F
     // Converts
-    {0x20, { "cvt.s.d",   mips_cvt_s_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
+    {0x20, { "cvt.s.d",   mips_cvt_s_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
     // 0x21 - 0x23
-    {0x24, { "cvt.w.d",   mips_cvt_w_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_I_Instr} },
-    {0x25, { "cvt.l.d",   mips_cvt_l_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO,   Dst::CP1_FD, MIPS_III_Instr} },
+    {0x24, { "cvt.w.d",   mips_cvt_w_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x25, { "cvt.l.d",   mips_cvt_l_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
     // 0x26 - 0x2F
     // Conditions
-    {0x30, { "c.f.d",     mips_c_f_d<I>,     OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x31, { "c.un.d",    mips_c_un_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x32, { "c.eq.d",    mips_c_eq_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x33, { "c.ueq.d",   mips_c_ueq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x34, { "c.olt.d",   mips_c_olt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x35, { "c.ult.d",   mips_c_ult_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x36, { "c.ole.d",   mips_c_ole_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x37, { "c.ule.d",   mips_c_ule_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x38, { "c.sf.d",    mips_c_sf_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x39, { "c.ngle.d",  mips_c_ngle_d<I>,  OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3A, { "c.seq.d",   mips_c_seq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3B, { "c.ngl.d",   mips_c_ngl_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3C, { "c.lt.d",    mips_c_lt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3D, { "c.nge.d",   mips_c_nge_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3E, { "c.le.d",    mips_c_le_d<I>,    OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
-    {0x3F, { "c.ngt.d",   mips_c_ngt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::CP1_FT, Dst::FCSR,   MIPS_I_Instr} },
+    {0x30, { "c.f.d",     mips_c_f_d<I>,     OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x31, { "c.un.d",    mips_c_un_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x32, { "c.eq.d",    mips_c_eq_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x33, { "c.ueq.d",   mips_c_ueq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x34, { "c.olt.d",   mips_c_olt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x35, { "c.ult.d",   mips_c_ult_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x36, { "c.ole.d",   mips_c_ole_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x37, { "c.ule.d",   mips_c_ule_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x38, { "c.sf.d",    mips_c_sf_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x39, { "c.ngle.d",  mips_c_ngle_d<I>,  OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3A, { "c.seq.d",   mips_c_seq_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3B, { "c.ngl.d",   mips_c_ngl_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3C, { "c.lt.d",    mips_c_lt_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3D, { "c.nge.d",   mips_c_nge_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3E, { "c.le.d",    mips_c_le_d<I>,    OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
+    {0x3F, { "c.ngt.d",   mips_c_ngt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FT }, Dst::FCSR,   MIPS_I_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1_l =
 {
     // Converts
-    {0x20, { "cvt.s.l", mips_cvt_s_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
-    {0x21, { "cvt.d.l", mips_cvt_d_l<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_III_Instr} },
+    {0x20, { "cvt.s.l", mips_cvt_s_l<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
+    {0x21, { "cvt.d.l", mips_cvt_d_l<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_III_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1_w =
 {
     // Converts
-    {0x20, { "cvt.s.w", mips_cvt_s_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
-    {0x21, { "cvt.d.w", mips_cvt_d_w<I>, OUT_FPU, 0, 'N', Imm::NO, Src1::CP1_FS, Src2::ZERO, Dst::CP1_FD, MIPS_I_Instr} },
+    {0x20, { "cvt.s.w", mips_cvt_s_w<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
+    {0x21, { "cvt.d.w", mips_cvt_d_w<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS }, Dst::FD, MIPS_I_Instr} },
 };
 
 template<typename I>
 static const Table<I> isaMapCOP1I =
 {
     // Branches
-    {0x0, { "bc1f",  mips_bc1f<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::FCSR,   Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x1, { "bc1t",  mips_bc1t<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::FCSR, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x2, { "bc1fl", mips_bc1fl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::FCSR, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
-    {0x3, { "bc1tl", mips_bc1tl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, Src1::FCSR, Src2::ZERO, Dst::ZERO, MIPS_I_Instr} },
+    {0x0, { "bc1f",  mips_bc1f<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::FCSR }, Dst::ZERO, MIPS_I_Instr} },
+    {0x1, { "bc1t",  mips_bc1t<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::FCSR }, Dst::ZERO, MIPS_I_Instr} },
+    {0x2, { "bc1fl", mips_bc1fl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::FCSR }, Dst::ZERO, MIPS_I_Instr} },
+    {0x3, { "bc1tl", mips_bc1tl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::FCSR }, Dst::ZERO, MIPS_I_Instr} },
 };
 
 template<typename I>
@@ -580,11 +579,11 @@ static const std::vector<const Table<I>*> all_isa_maps =
 
 template<typename I>
 MIPSTableEntry<I> unknown_instruction =
-{ "Unknown instruction", mips_unknown<I> , OUT_ARITHM, 0, 'N', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "Unknown instruction", mips_unknown<I> , OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> nop =
-{ "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, MIPS_I_Instr};
+{ "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
 MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
@@ -673,9 +672,10 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 byte
     auto entry = get_table_entry<MyDatapath>( raw);
     MIPSInstrDecoder instr( raw);
     init( entry, version);
- 
-    this->src1  = instr.get_register( entry.src1);
-    this->src2  = instr.get_register( entry.src2);
+
+    for ( size_t i = 0; i < entry.sources.size(); ++i)
+        this->set_src( i, instr.get_register( entry.sources[i]));
+
     this->dst   = instr.get_register( entry.dst);
     this->v_imm = MIPSInstrDecoder::get_immediate<R>( entry.imm_type, instr.get_immediate_value( entry.imm_type));
 
@@ -713,8 +713,8 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();
     this->opname    = entry.name;
     this->print_dst = is_explicit_register( entry.dst);
-    this->print_src1 = is_explicit_register( entry.src1);
-    this->print_src2 = is_explicit_register( entry.src2);
+    this->print_src1 = !entry.sources.empty()    && is_explicit_register( entry.sources[0]);
+    this->print_src2 =  entry.sources.size() > 1 && is_explicit_register( entry.sources[1]);
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;
