@@ -16,14 +16,11 @@ enum class Reg : uint8
 {
     RS, RT, RD,
     CP0_RT, CP0_RD,
-    CP1_FT, CP1_FS,
-    CP1_FD, FCSR,
+    FT, FS, FD, FCSR,
     ZERO, RA,
     HI, LO, HI_LO
 };
 
-using Src1 = Reg;
-using Src2 = Reg;
 using Dst  = Reg;
 
 static inline bool is_explicit_register( Reg type)
@@ -33,9 +30,9 @@ static inline bool is_explicit_register( Reg type)
         || type == Reg::RD
         || type == Reg::CP0_RT
         || type == Reg::CP0_RD
-        || type == Reg::CP1_FT
-        || type == Reg::CP1_FS
-        || type == Reg::CP1_FD
+        || type == Reg::FT
+        || type == Reg::FS
+        || type == Reg::FD
         || type == Reg::FCSR;
 }
 
@@ -87,22 +84,23 @@ struct MIPSInstrDecoder
     MIPSRegister get_register( Reg type) const
     {
         switch ( type) {
-        case Reg::HI:      return MIPSRegister::mips_hi();
-        case Reg::LO:      return MIPSRegister::mips_lo();
-        case Reg::HI_LO:   return MIPSRegister::mips_lo();
-        case Reg::ZERO:    return MIPSRegister::zero();
-        case Reg::RA:      return MIPSRegister::return_address();
-        case Reg::RS:      return MIPSRegister::from_cpu_index( rs);
-        case Reg::RT:      return MIPSRegister::from_cpu_index( rt);
-        case Reg::RD:      return MIPSRegister::from_cpu_index( rd);
-        case Reg::CP0_RT:  return MIPSRegister::from_cp0_index( rt);
-        case Reg::CP0_RD:  return MIPSRegister::from_cp0_index( rd);
-        case Reg::CP1_FD:  return MIPSRegister::from_cp1_index( fd);
-        case Reg::CP1_FS:  return MIPSRegister::from_cp1_index( fs);
-        case Reg::CP1_FT:  return MIPSRegister::from_cp1_index( ft);
-        case Reg::FCSR:    return MIPSRegister::mips_fcsr();
-        default: assert(0);  return MIPSRegister::zero();
+        case Reg::ZERO:   break;
+        case Reg::HI:     return MIPSRegister::mips_hi();
+        case Reg::LO:     return MIPSRegister::mips_lo();
+        case Reg::HI_LO:  return MIPSRegister::mips_lo();
+        case Reg::RA:     return MIPSRegister::return_address();
+        case Reg::RS:     return MIPSRegister::from_cpu_index( rs);
+        case Reg::RT:     return MIPSRegister::from_cpu_index( rt);
+        case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
+        case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
+        case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
+        case Reg::FD:     return MIPSRegister::from_cp1_index( fd);
+        case Reg::FS:     return MIPSRegister::from_cp1_index( fs);
+        case Reg::FT:     return MIPSRegister::from_cp1_index( ft);
+        case Reg::FCSR:   return MIPSRegister::mips_fcsr();
+        default: assert(0);
         }
+        return MIPSRegister::zero();
     }
 
     explicit constexpr MIPSInstrDecoder(uint32 raw) noexcept
