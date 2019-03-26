@@ -141,8 +141,8 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x460008cb).get_disasm() == "floor.l.s $f3, $f1");
     CHECK(MIPS32Instr(0x462008cf).get_disasm() == "floor.w.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008cf).get_disasm() == "floor.w.s $f3, $f1");
-    CHECK(MIPS32Instr(0xd4230fa3).get_disasm() == "ldc1 $f3, 0xfa3($f1)");
-    CHECK(MIPS32Instr(0xc4230fa3).get_disasm() == "lwc1 $f3, 0xfa3($f1)");
+    CHECK(MIPS32Instr(0xd5230fa3).get_disasm() == "ldc1 $f3, 0xfa3($t1)");
+    CHECK(MIPS32Instr(0xc5230fa3).get_disasm() == "lwc1 $f3, 0xfa3($t1)");
     CHECK(MIPS32Instr(0x4d2b0041).get_disasm() == "ldxc1 $f1, $t1, $t3");
     CHECK(MIPS32Instr(0x4d2b0040).get_disasm() == "lwxc1 $f1, $t1, $t3");
     CHECK(MIPS32Instr(0x44090800).get_disasm() == "mfc1 $t1, $f1");
@@ -165,13 +165,13 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x460008cc).get_disasm() == "round.w.s $f3, $f1");
     CHECK(MIPS32Instr(0x462008d6).get_disasm() == "rsqrt.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008d6).get_disasm() == "rsqrt.s $f3, $f1");
-    CHECK(MIPS32Instr(0xf4230fa3).get_disasm() == "sdc1 $f3, 0xfa3($f1)");
+    CHECK(MIPS32Instr(0xf5230fa3).get_disasm() == "sdc1 $f3, 0xfa3($t1)");
     CHECK(MIPS32Instr(0x4d2b0049).get_disasm() == "sdxc1 $f1, $t1, $t3");
     CHECK(MIPS32Instr(0x462008c4).get_disasm() == "sqrt.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008c4).get_disasm() == "sqrt.s $f3, $f1");
     CHECK(MIPS32Instr(0x462208c1).get_disasm() == "sub.d $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c1).get_disasm() == "sub.s $f3, $f1, $f2");
-    CHECK(MIPS32Instr(0xe4230fa3).get_disasm() == "swc1 $f3, 0xfa3($f1)");
+    CHECK(MIPS32Instr(0xe5230fa3).get_disasm() == "swc1 $f3, 0xfa3($t1)");
     CHECK(MIPS32Instr(0x4d2b0048).get_disasm() == "swxc1 $f1, $t1, $t3");
     CHECK(MIPS32Instr(0x462008c9).get_disasm() == "trunc.l.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008c9).get_disasm() == "trunc.l.s $f3, $f1");
