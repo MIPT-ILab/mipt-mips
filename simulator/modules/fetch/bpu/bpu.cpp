@@ -25,16 +25,26 @@ namespace config {
 template<typename T>
 class BP final: public BaseBP
 {
-    std::vector<std::vector<T>> data;
+    struct BTBEntry {
+        bool valid;
+        Addr target;
+    };
+
+    struct Entry {
+        T direction;
+        BTBEntry target;
+    };
+
+    std::vector<std::vector<Entry>> data;
     CacheTagArray tags;
 
     bool is_way_taken( size_t way, Addr PC) const
     {
-        return data[ way][ tags.set(PC)].is_taken( PC);
+        return (data[ way][ tags.set(PC)].direction).is_taken( PC);
     }
 public:
     BP( uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
-        : data( ways, std::vector<T>( size_in_entries / ways))
+        : data( ways, std::vector<Entry>( size_in_entries / ways))
         , tags( size_in_entries,
             ways,
             // we're reusing existing CacheTagArray functionality,
@@ -65,7 +75,7 @@ public:
 
         // return saved target only in case it is predicted taken
         if ( is_hit && is_way_taken( way, PC))
-            return data[ way][ tags.set(PC)].getTarget();
+            return (data[ way][ tags.set(PC)].direction).getTarget();
 
         return PC + 4;
     }
@@ -78,12 +88,12 @@ public:
 
         if ( !is_hit) { // miss
             way = tags.write( bp_upd.pc); // add new entry to cache
-            auto& entry = data[ way][ set];
+            auto& entry = (data[ way][ set]).direction;
             entry.reset();
             entry.update_target( bp_upd.target);
         }
 
-        data[ way][ set].update( bp_upd.is_taken, bp_upd.target);
+        (data[ way][ set].direction).update( bp_upd.is_taken, bp_upd.target);
     }
 };
 
