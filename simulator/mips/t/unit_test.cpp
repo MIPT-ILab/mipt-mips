@@ -150,8 +150,14 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
 //  CHECK(MIPS32Instr(0x4c0208e0).get_disasm() == "madd.s $f3, $f0, $f1, $f2");
     CHECK(MIPS32Instr(0x462008c6).get_disasm() == "mov.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008c6).get_disasm() == "mov.s $f3, $f1");
+    CHECK(MIPS32Instr(0x01205801).get_disasm() == "movf $t3, $t1, $f31");
+    CHECK(MIPS32Instr(0x462008d1).get_disasm() == "movf.d $f3, $f1, $f31");
+    CHECK(MIPS32Instr(0x460008d1).get_disasm() == "movf.s $f3, $f1, $f31");
     CHECK(MIPS32Instr(0x462908d3).get_disasm() == "movn.d $f3, $f1, $t1");
     CHECK(MIPS32Instr(0x460908d3).get_disasm() == "movn.s $f3, $f1, $t1");
+    CHECK(MIPS32Instr(0x01215801).get_disasm() == "movt $t3, $t1, $f31");
+    CHECK(MIPS32Instr(0x462108d1).get_disasm() == "movt.d $f3, $f1, $f31");
+    CHECK(MIPS32Instr(0x460108d1).get_disasm() == "movt.s $f3, $f1, $f31");
     CHECK(MIPS32Instr(0x462908d2).get_disasm() == "movz.d $f3, $f1, $t1");
     CHECK(MIPS32Instr(0x460908d2).get_disasm() == "movz.s $f3, $f1, $t1");
 //  CHECK(MIPS32Instr(0x4c0208e9).get_disasm() == "msub.d $f3, $f0, $f1, $f2");

@@ -211,10 +211,16 @@ template<typename I> auto mips_lwxc1     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mfc1      = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mov_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mov_s     = ALU::unknown_instruction<I>;
-template<typename I> auto mips_movz_d    = ALU::unknown_instruction<I>;
-template<typename I> auto mips_movz_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movf      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movf_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movf_s    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movn_d    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movn_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movt      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movt_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movt_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movz_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_movz_s    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mtc1      = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mul_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mul_s     = ALU::unknown_instruction<I>;
@@ -632,6 +638,30 @@ static const Table<I> isaMapCOP1X =
 };
 
 template<typename I>
+static const Table<I> isaMapMOVCI =
+{
+    // Moves on FP condition
+    {0x0, { "movf",  mips_movf<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::RS, Reg::FCSR }, Dst::RD, MIPS_IV_Instr} },
+    {0x1, { "movt",  mips_movt<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::RS, Reg::FCSR }, Dst::RD, MIPS_IV_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapMOVCF_d =
+{
+    // Moves on FP condition
+    {0x0, { "movf.d",  mips_movf_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FCSR }, Dst::FD, MIPS_IV_Instr} },
+    {0x1, { "movt.d",  mips_movt_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FCSR }, Dst::FD, MIPS_IV_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapMOVCF_s =
+{
+    // Moves on FP condition
+    {0x0, { "movf.s",  mips_movf_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FCSR }, Dst::FD, MIPS_IV_Instr} },
+    {0x1, { "movt.s",  mips_movt_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FS, Reg::FCSR }, Dst::FD, MIPS_IV_Instr} },
+};
+
+template<typename I>
 static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
@@ -645,7 +675,10 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapCOP1_d<I>,
     &isaMapCOP1_l<I>,
     &isaMapCOP1_w<I>,
-    &isaMapCOP1I<I>
+    &isaMapCOP1I<I>,
+    &isaMapMOVCI<I>,
+    &isaMapMOVCF_s<I>,
+    &isaMapMOVCF_d<I>
 };
 
 template<typename I>
@@ -664,13 +697,34 @@ MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 }
 
 template<typename I>
+MIPSTableEntry<I> get_special_entry( MIPSInstrDecoder& instr)
+{
+    if ( instr.funct == 0x1)
+        return get_table_entry( isaMapMOVCI<I>, instr.ft);
+    else
+        return get_table_entry( isaMapR<I>,     instr.funct);
+}
+
+template<typename I>
 MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
         case 0x8:  return get_table_entry( isaMapCOP1I<I>,  instr.ft);
-        case 0x10: return get_table_entry( isaMapCOP1_s<I>, instr.funct);
-        case 0x11: return get_table_entry( isaMapCOP1_d<I>, instr.funct);
+        case 0x10:
+        {
+            if ( instr.funct == 0x11)
+                return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
+            else
+                return get_table_entry( isaMapCOP1_s<I>,  instr.funct);
+        } 
+        case 0x11:
+        {
+            if ( instr.funct == 0x11)
+                return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
+            else
+                return get_table_entry( isaMapCOP1_d<I>,  instr.funct);
+        } 
         case 0x14: return get_table_entry( isaMapCOP1_w<I>, instr.funct);
         case 0x15: return get_table_entry( isaMapCOP1_l<I>, instr.funct);
         default:   return get_table_entry( isaMapCOP1<I>,   instr.fmt);
@@ -687,7 +741,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
 
     switch ( instr.opcode)
     {
-        case 0x0:  return get_table_entry( isaMapR<I>,      instr.funct);
+        case 0x0:  return get_special_entry<I>( instr);
         case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
         case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
         case 0x11: return get_cp1_entry<I>( instr);
