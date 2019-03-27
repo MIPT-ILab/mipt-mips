@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-static const std::string valid_elf_file = TEST_PATH "/tt.core32.out";
+static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
@@ -163,127 +163,16 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 1) == Trap::NO_TRAP );
-
-    auto trap = get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal.out")->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
-TEST_CASE( "Torture_Test: MARS")
+TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core.universal.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars", TEST_PATH "/tt.core32.le.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mars64", TEST_PATH "/tt.core64.le.out")->run_no_limit() == Trap::HALT );
-}
-
-TEST_CASE( "Torture_Test: Delayed branches")
-{
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT  );
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/tt.core32.le_reorder.out")->run_no_limit() == Trap::HALT  );
-}
-
-static bool riscv_torture_test_passes( const std::string& isa, const std::string& test)
-{
-    auto sim = get_simulator_with_test(isa, test);
-    auto res = sim->run( 10000);
-    return res == Trap::HALT && sim->read_cpu_register( 3 /* gp */) == 1;
-}
-
-TEST_CASE( "Torture_Test: rvc32ui")
-{
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-add")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-addi")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-and")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-andi")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-auipc")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-beq")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bge")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bgeu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-blt")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bltu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-bne")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-fence_i")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-jal")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-jalr")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lb")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lbu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lh")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lhu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lui")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-lw")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-or")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-ori")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sb")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sh")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sll")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slli")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slt")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-slti")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sltiu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sltu")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sra")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srai")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srl")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-srli")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sub")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-sw")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xor")  );
-    CHECK( riscv_torture_test_passes("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-xori")  );
-}
-
-TEST_CASE( "Torture_Test: rvc64ui")
-{
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-add")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-addi")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-addiw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-addw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-and")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-andi")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-auipc")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-beq")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-bge")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-bgeu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-blt")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-bltu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-bne")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-fence_i")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-jal")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-jalr")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lb")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lbu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-ld")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lh")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lhu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lui")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-lwu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-or")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-ori")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sb")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sd")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sh")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sll")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-slli")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-slliw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sllw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-slt")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-slti")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sltiu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sltu")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sra")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-srai")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sraiw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sraw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-srl")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-srli")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-srliw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-srlw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sub")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-subw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-sw")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xor")  );
-    CHECK( riscv_torture_test_passes("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-xori")  );
+    CHECK( get_simulator_with_test("mars",    valid_elf_file)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
 }

@@ -58,7 +58,7 @@ struct RISCVInstrDecoder
             |  (J_imm20    << 20U);
     }
 
-    uint32 get_immediate(char subset) const noexcept
+    uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
         case 'I': return I_imm;
@@ -69,6 +69,19 @@ struct RISCVInstrDecoder
         case 'C': return csr_imm;
         case ' ': return 0;
         default: assert(0); return 0;
+        }
+    }
+
+    template<typename R>
+    static R get_immediate( char subset, uint32 value) noexcept
+    {
+        switch (subset) {
+        case 'I':
+        case 'B':
+        case 'S': return sign_extension<12, R>( value);
+        case 'U':
+        case 'J': return sign_extension<20, R>( value);
+        default:  return value;
         }
     }
 

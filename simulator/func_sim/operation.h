@@ -31,6 +31,7 @@ enum OperationType : uint8
     OUT_STORE,
     OUT_J_JUMP,
     OUT_J_SPECIAL,
+    OUT_FPU,
     OUT_UNKNOWN
 };
 
@@ -41,12 +42,13 @@ enum class Imm : uint8
     JUMP
 };
 
-static inline std::string print_immediate( Imm type, uint32 value)
+template<typename T>
+std::string print_immediate( Imm type, T value)
 {
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:
+    case Imm::ADDR:  oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
     case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
@@ -109,8 +111,6 @@ public:
     void set_sequence_id( uint64 id) { sequence_id = id; }
     auto get_sequence_id() const { return sequence_id; }
 
-    void set_v_imm( uint32 value) { v_imm = value; }
-
     auto get_delayed_slots() const { return delayed_slots; }
     Addr get_decoded_target() const { return target; }
     auto get_new_PC() const { return new_PC; }
@@ -136,6 +136,7 @@ protected:
     bool print_dst2 = false;
     bool print_src1 = false;
     bool print_src2 = false;
+    bool print_src3 = false;
 
     const Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
@@ -176,6 +177,7 @@ protected:
     T v_src2 = NO_VAL32;
     T v_dst  = NO_VAL32;
     T v_dst2 = NO_VAL32;
+    T v_imm  = NO_VAL32;
     T mask   = all_ones<T>();
 
     Execute executor;
@@ -232,6 +234,7 @@ protected:
 
     R src1 = R::zero();
     R src2 = R::zero();
+    R src3 = R::zero();
     R dst  = R::zero();
     R dst2 = R::zero();
 };
@@ -258,6 +261,8 @@ std::string BaseInstruction<T, R>::generate_disasm() const
         oss << (this->print_dst ? ", $" : " $") << this->src1;
     if ( this->print_src2)
         oss << ", $" << this->src2;
+    if ( this->print_src3)
+        oss << ", $" << this->src3;
 
     oss << print_immediate( this->imm_print_type, this->v_imm);
     return oss.str();
