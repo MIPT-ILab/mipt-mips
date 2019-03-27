@@ -696,8 +696,23 @@ MIPSTableEntry<I> get_special_entry( MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
         return get_table_entry( isaMapMOVCI<I>, instr.ft);
-    else
-        return get_table_entry( isaMapR<I>,     instr.funct);
+    return get_table_entry( isaMapR<I>, instr.funct);
+}
+
+template<typename I>
+MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
+{
+    if ( instr.funct == 0x11)
+        return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
+    return get_table_entry( isaMapCOP1_s<I>, instr.funct);
+}
+
+template<typename I>
+MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
+{
+    if ( instr.funct == 0x11)
+        return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
+    return get_table_entry( isaMapCOP1_d<I>,  instr.funct);
 }
 
 template<typename I>
@@ -706,20 +721,8 @@ MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
     switch ( instr.fmt)
     {
         case 0x8:  return get_table_entry( isaMapCOP1I<I>,  instr.ft);
-        case 0x10:
-        {
-            if ( instr.funct == 0x11)
-                return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
-            else
-                return get_table_entry( isaMapCOP1_s<I>,  instr.funct);
-        } 
-        case 0x11:
-        {
-            if ( instr.funct == 0x11)
-                return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
-            else
-                return get_table_entry( isaMapCOP1_d<I>,  instr.funct);
-        } 
+        case 0x10: return get_COP1_s_entry( instr);
+        case 0x11: return get_COP1_d_entry( instr);
         case 0x14: return get_table_entry( isaMapCOP1_w<I>, instr.funct);
         case 0x15: return get_table_entry( isaMapCOP1_l<I>, instr.funct);
         default:   return get_table_entry( isaMapCOP1<I>,   instr.fmt);
