@@ -209,6 +209,8 @@ template<typename I> auto mips_lwc1      = ALU::unknown_instruction<I>;
 template<typename I> auto mips_ldxc1     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_lwxc1     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mfc1      = ALU::unknown_instruction<I>;
+template<typename I> auto mips_madd_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_madd_s    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mov_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mov_s     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movf      = ALU::unknown_instruction<I>;
@@ -221,11 +223,17 @@ template<typename I> auto mips_movt_d    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movt_s    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movz_d    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_movz_s    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_msub_d    = ALU::unknown_instruction<I>;
+template<typename I> auto mips_msub_s    = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mtc1      = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mul_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_mul_s     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_neg_d     = ALU::unknown_instruction<I>;
 template<typename I> auto mips_neg_s     = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmadd_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmadd_s   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmsub_d   = ALU::unknown_instruction<I>;
+template<typename I> auto mips_nmsub_s   = ALU::unknown_instruction<I>;
 template<typename I> auto mips_recip_d   = ALU::unknown_instruction<I>;
 template<typename I> auto mips_recip_s   = ALU::unknown_instruction<I>;
 template<typename I> auto mips_round_l_d = ALU::unknown_instruction<I>;
@@ -246,17 +254,6 @@ template<typename I> auto mips_trunc_l_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_l_s = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_w_d = ALU::unknown_instruction<I>;
 template<typename I> auto mips_trunc_w_s = ALU::unknown_instruction<I>;
-
-/* Printing of 3 sources is not implemented
-template<typename I> auto mips_madd_d    = ALU::unknown_instruction<I>;
-template<typename I> auto mips_madd_s    = ALU::unknown_instruction<I>;
-template<typename I> auto mips_msub_d    = ALU::unknown_instruction<I>;
-template<typename I> auto mips_msub_s    = ALU::unknown_instruction<I>;
-template<typename I> auto mips_nmadd_d   = ALU::unknown_instruction<I>;
-template<typename I> auto mips_nmadd_s   = ALU::unknown_instruction<I>;
-template<typename I> auto mips_nmsub_d   = ALU::unknown_instruction<I>;
-template<typename I> auto mips_nmsub_s   = ALU::unknown_instruction<I>;
-*/
 
 template<typename I>
 struct MIPSTableEntry
@@ -622,7 +619,6 @@ static const Table<I> isaMapCOP1X =
     // 0xa - 0xe
     // 0xf PREFX
     // Advanced multiplication
-    /* Printing of 3 sources is not implemented
     {0x20, { "madd.s", mips_madd_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
     {0x21, { "madd.d", mips_madd_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
     // 0x22 - 0x27
@@ -634,7 +630,6 @@ static const Table<I> isaMapCOP1X =
     // 0x32 - 0x37
     {0x38, { "nmsub.s", mips_nmsub_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
     {0x39, { "nmsub.d", mips_nmsub_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Reg::FR, Reg::FS, Reg::FT }, Dst::FD, MIPS_IV_Instr} },
-    */
 };
 
 template<typename I>
@@ -841,6 +836,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->print_dst = is_explicit_register( entry.dst);
     this->print_src1 = !entry.sources.empty()    && is_explicit_register( entry.sources[0]);
     this->print_src2 =  entry.sources.size() > 1 && is_explicit_register( entry.sources[1]);
+    this->print_src3 =  entry.sources.size() > 2 && is_explicit_register( entry.sources[2]);
 
     bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
     this->delayed_slots = has_delayed_slot ? 1 : 0;

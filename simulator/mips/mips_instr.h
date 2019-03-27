@@ -76,6 +76,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
             switch (index) {
             case 0: this->src1 = reg; break;
             case 1: this->src2 = reg; break;
+            case 2: this->src3 = reg; break;
             default: assert(0);
             }
         }
