@@ -12,7 +12,7 @@
         Instr instr( #name, imm); \
         instr.set_v_src( narrow_cast<uint64>( src), 0); \
         instr.execute(); \
-        CHECK( instr.get_v_dst() == dst); \
+        CHECK( instr.get_v_dst() == ( dst)); \
     }
 
 #define TEST_IMM_SRC1_EQ_DEST( no, name, dst, src, imm)       TEST_IMM_OP( no, name, dst, src, imm)
@@ -27,7 +27,7 @@
         instr.set_v_src( narrow_cast<uint64>( src1), 0); \
         instr.set_v_src( narrow_cast<uint64>( src2), 1); \
         instr.execute(); \
-        CHECK( instr.get_v_dst() == dst); \
+        CHECK( instr.get_v_dst() == ( dst)); \
     }
 
 #define TEST_RR_SRC1_EQ_DEST( no, name, dst, src1, src2) TEST_RR_OP( no, name, dst, src1, src2)
@@ -77,7 +77,7 @@
         } \
         memory->load_store( &store); \
         memory->load_store( &load); \
-        CHECK( load.get_v_dst() == data); \
+        CHECK( load.get_v_dst() == ( data)); \
     }
 
 #define TEST_ST_SRC12_BYPASS( n, level1, level2, load, store, data, immediate, address) TEST_ST_OP( n, load, store, data, immediate, address)
