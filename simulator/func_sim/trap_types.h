@@ -53,14 +53,13 @@ class Trap {
                 { Trap::UNSUPPORTED_SYSCALL, GDB_SIGNAL_SYS  },  // Not implemented in gdb_interface
                 { Trap::UNALIGNED_ADDRESS,   GDB_SIGNAL_BUS  },
                 { Trap::UNKNOWN_INSTRUCTION, GDB_SIGNAL_ILL  },  // Not implemented in gdb_interface
-            }
-    };
+            };
 
-    auto it = gdb_trap_conv.find( value);
-    if ( it == gdb_trap_conv.end())
-        return GDB_SIGNAL_0;
-    return it->second;
-} 
+            auto it = gdb_trap_conv.find( value);
+            if ( it == gdb_trap_conv.end())
+                return GDB_SIGNAL_0;
+            return it->second;
+        }
 
     private:
         TrapType value;
