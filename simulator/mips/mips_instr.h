@@ -29,17 +29,6 @@ class LRUCache;
 template<typename R>
 class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 {
-    private:
-        using MyDatapath = typename BaseInstruction<R, MIPSRegister>::MyDatapath;
-        using DisasmCache = LRUCache<uint32, std::string, 8192>;
-
-        const uint32 raw;
-        const bool raw_valid = false;
-        const Endian endian;
-
-        void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
-        void init_target();
-        static DisasmCache& get_disasm_cache();
     public:
         BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC);
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC );
@@ -68,9 +57,28 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 
         std::string string_dump() const;
         std::string bytes_dump() const;
-        friend std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr& instr)
-        {
+        friend std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr& instr) {
             return instr.dump_content( out, instr.get_disasm());
+        }
+    private:
+        using MyDatapath = typename BaseInstruction<R, MIPSRegister>::MyDatapath;
+        using DisasmCache = LRUCache<uint32, std::string, 8192>;
+
+        const uint32 raw;
+        const bool raw_valid = false;
+        const Endian endian;
+
+        void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
+        void init_target();
+        static DisasmCache& get_disasm_cache();
+        
+        void set_src( size_t index, MIPSRegister reg) {
+            switch (index) {
+            case 0: this->src1 = reg; break;
+            case 1: this->src2 = reg; break;
+            case 2: this->src3 = reg; break;
+            default: assert(0);
+            }
         }
 };
 

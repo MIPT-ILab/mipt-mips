@@ -7,6 +7,7 @@
 // generic C
 #include <cassert>
 #include <cstdlib>
+#include <sstream>
 
 // Catch2
 #include <catch.hpp>
@@ -38,6 +39,20 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
     CHECK( MIPSRegister::from_gdb_index(34) == MIPSRegister::mips_hi());
     CHECK( MIPSRegister::from_gdb_index(35) == MIPSRegister::from_cp0_index( 8));  // BadVAddr
     CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::cause());
+}
+
+TEST_CASE( "MIPS_registers: CP1_ID_converter")
+{
+    for ( uint8 i = 0; i < 32; ++i)
+    {
+        CHECK( MIPSRegister::from_cp1_index(i).to_rf_index() > 32);
+        CHECK( MIPSRegister::from_cp1_index(i).to_rf_index() > 
+               MIPSRegister::from_cp0_index(i).to_rf_index());
+    }
+    
+    std::ostringstream oss;
+    oss << MIPSRegister::from_cp1_index(3);
+    CHECK( oss.str() == "f3");
 }
 
 TEST_CASE( "MIPS_registers: Equal")
