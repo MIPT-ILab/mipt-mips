@@ -16,23 +16,9 @@
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
+#include <infra/lru/LRUCacheInfo.h>
 
 // Replacement algorithm modules (LRU)
-class LRUCacheInfo
-{
-    public:
-        explicit LRUCacheInfo( std::size_t ways);
-
-        void touch( std::size_t way);
-        std::size_t update();
-        std::size_t get_ways() const { return ways; }
-
-    private:
-        std::list<std::size_t> lru_list{};
-        std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
-
-        const std::size_t ways;
-};
 
 class LRUModule
 {
@@ -50,7 +36,7 @@ class LRUModule
 
 struct CacheTagArrayInvalidSizeException final : Exception
 {
-    explicit CacheTagArrayInvalidSizeException(const std::string& msg) 
+    explicit CacheTagArrayInvalidSizeException(const std::string& msg)
         : Exception("Invalid cache size", msg)
     { }
 };

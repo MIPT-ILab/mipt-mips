@@ -13,16 +13,16 @@
 #include <utility>
 
 #include <infra/types.h>
+#include <infra/lru/LRUCacheInfo.h>
 
 template <typename Key, typename Value, size_t CAPACITY>
 class LRUCache
 {
         struct Deleter;
     public:
-        LRUCache()
+        LRUCache() : lru_module ( CAPACITY)
         {
             data.reserve( CAPACITY);
-            lru_hash.reserve( CAPACITY);
             for (size_t i = 0; i < CAPACITY; ++i)
                 free_list.emplace_back(i);
             arena = std::unique_ptr<void, Deleter>( allocate_memory());
@@ -44,7 +44,7 @@ class LRUCache
 
         static auto get_capacity() { return CAPACITY; }
 
-        auto size() const { return lru_hash.size(); }
+        auto size() const { return data.size(); }
         bool empty() const { return size() == 0; }
 
         // First return value is true if and only if the value was found
@@ -59,7 +59,7 @@ class LRUCache
 
         void touch( const Key& key)
         {
-            lru_list.splice( lru_list.begin(), lru_list, lru_hash.find( key)->second);
+            lru_module.touch( key);
         }
 
         void update( const Key& key, const Value& value)
@@ -73,31 +73,26 @@ class LRUCache
         void erase( const Key& key)
         {
             auto data_it = data.find( key);
-            auto lru_it  = lru_hash.find( key);
-            assert ( ( data_it == data.end()) == ( lru_it == lru_hash.end()));
+            assert ( data_it == data.end());
             if ( data_it != data.end())
             {
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
-                lru_list.erase( lru_it->second);
-                lru_hash.erase( lru_it);
             }
         }
 
     private:
         void allocate( const Key& key, const Value& value)
         {
-            if ( lru_hash.size() == CAPACITY)
-                erase( lru_list.back());
+            if ( data.size() == CAPACITY)
+                erase( lru_module.update());
 
             // Add a new element
             auto index = free_list.front();
             free_list.pop_front();
             new (&storage[index]) Value( value);
             data.emplace( key, index);
-            auto ptr = lru_list.insert( lru_list.begin(), key);
-            lru_hash.emplace( key, ptr);
         }
 
         static void* allocate_memory()
@@ -111,11 +106,10 @@ class LRUCache
         };
 
         std::unordered_map<Key, size_t> data{};
-        std::list<Key> lru_list{};
         std::list<size_t> free_list{};
         std::unique_ptr<void, Deleter> arena = nullptr;
         Value* storage = nullptr;
-        std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
+        LRUCacheInfo lru_module;
 };
 
 #endif // LRUCACHE_H
