@@ -1,9 +1,11 @@
-// Catch2
-#include <catch.hpp>
+/* MIPS Instruction unit tests
+ * @author: Pavel Kryukov, Vsevolod Pukhov, Egor Bova
+ * Copyright (C) MIPT-MIPS 2017-2019
+ */
 
-// uArchSim modules
-#include "../mips_instr.h"
+#include <catch.hpp>
 #include "../mips.h"
+#include "../mips_instr.h"
 #include <memory/memory.h>
 
 class MIPS32Instr : public BaseMIPSInstr<uint32>
