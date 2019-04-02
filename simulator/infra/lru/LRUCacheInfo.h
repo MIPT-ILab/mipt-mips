@@ -16,14 +16,16 @@ class LRUCacheInfo
         explicit LRUCacheInfo( std::size_t ways);
 
         void touch( std::size_t way);
+        void erase( std::size_t way);
         std::size_t update();
         std::size_t get_ways() const { return ways; }
+
 
     private:
         std::list<std::size_t> lru_list{};
         std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
-
         const std::size_t ways;
 };
+
 
 #endif // LRUCACHEINFO_H

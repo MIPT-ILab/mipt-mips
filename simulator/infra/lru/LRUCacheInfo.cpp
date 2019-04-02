@@ -31,6 +31,13 @@ void LRUCacheInfo::touch( std::size_t way)
     lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
 }
 
+void LRUCacheInfo::erase( std::size_t way)
+{
+    const auto lru_it = lru_hash.find( way);
+    assert( lru_it != lru_hash.end());
+    lru_list.splice( lru_list.end(), lru_list, lru_it->second);
+}
+
 std::size_t LRUCacheInfo::update()
 {
     // remove the least recently used element from the tail
