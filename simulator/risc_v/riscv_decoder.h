@@ -20,6 +20,12 @@ enum class Reg : uint8
     ZERO, RA
 };
 
+enum CompressedOp
+{
+    LWSP, LDSP, LQSP,
+    SWSP, SDSP, SQSP
+};
+
 struct RISCVInstrDecoder
 {
     const uint32 sz;
@@ -41,6 +47,11 @@ struct RISCVInstrDecoder
     const uint32 csr_imm;
     const uint32 csr;
     const uint32 bytes;
+    const uint16 Cx_imm1;   // 1-bit immediate for Compressed ISA subset
+    const uint16 Cx_imm2;
+    const uint16 Cx_imm3;
+    const uint16 Cx_imm5;
+    const uint16 Cx_imm6;
 
     constexpr uint32 get_B_immediate() const noexcept
     {
@@ -69,6 +80,32 @@ struct RISCVInstrDecoder
         case 'C': return csr_imm;
         case ' ': return 0;
         default: assert(0); return 0;
+        }
+    }
+
+    uint16 get_compressed_immediate_value( CompressedOp op) const noexcept
+    {
+        switch (op) {
+            case LWSP: return ( (Cx_imm1)            << 5U)
+                            | ( (Cx_imm5 & 0b11100))
+                            | ( (Cx_imm5 & 0b00011)  << 6U)
+
+            case LDSP: return ( (Cx_imm1)            << 5U)
+                            | ( (Cx_imm5 & 0b11000))
+                            | ( (Cx_imm5 & 0b00111)  << 6U)
+
+            case LQSP: return ( (Cx_imm1)            << 5U)
+                            | ( (Cx_imm5 & 0b10000))
+                            | ( (Cx_imm5 & 0b01111)  << 6U)
+
+            case SWSP: return ( (Cx_imm6 & 0b111100))
+                            | ( (Cx_imm6 & 0b000011) << 6U)
+
+            case SDSP: return ( (Cx_imm6 & 0b111000))
+                            | ( (Cx_imm6 & 0b000111) << 6U)
+
+            case SQSP: return ( (Cx_imm6 & 0b110000))
+                            | ( (Cx_imm6 & 0b001111) << 6U)
         }
     }
 
@@ -125,6 +162,11 @@ struct RISCVInstrDecoder
         , csr_imm   ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
         , csr       ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
         , bytes     ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , Cx_imm1   ( apply_mask( raw, 0b00000000'00000000'00010000'00000000))
+        , Cx_imm2   ( apply_mask( raw, 0b00000000'00000000'00000000'01100000))
+        , Cx_imm3   ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
+        , Cx_imm5   ( apply_mask( raw, 0b00000000'00000000'00000000'00111110))
+        , Cx_imm6   ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
     { }
 };
 
