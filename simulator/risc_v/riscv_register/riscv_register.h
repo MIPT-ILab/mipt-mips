@@ -30,6 +30,15 @@ class RISCVRegister {
         , MAX_VAL_RegNum
     };
 
+    enum RegNumPopular : uint16
+    {
+//NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define REGISTER(X) RISCV_REG_ ## X
+#include "riscv_register_popular.def"
+#undef REGISTER
+        , MAX_VAL_RegNumPopular
+    };
+
     static RegNum get_csr_regnum( uint16 val);
     static RegNum get_csr_regnum( std::string_view name);
 
