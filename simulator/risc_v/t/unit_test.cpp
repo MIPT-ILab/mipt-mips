@@ -10,7 +10,7 @@
 
 TEST_CASE("RISCV disassembly")
 {
-    CHECK( RISCVInstr<uint32>(0x597).get_disasm() == "auipc $a1, 0x0" );
+    CHECK( RISCVInstr<uint32>(0x00000597).get_disasm() == "auipc $a1, 0x0" );
     CHECK( RISCVInstr<uint32>(0x00f70463).get_disasm() == "beq $a4, $a5, 8");
     CHECK( RISCVInstr<uint32>(0x00052783).get_disasm() == "lw $a5, 0x0($a0)");
     CHECK( RISCVInstr<uint32>(0xf95ff06f).get_disasm() == "jal $zero, -108");
@@ -19,6 +19,42 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>(0x30200073).get_disasm() == "mret");
     CHECK( RISCVInstr<uint32>(0x30202373).get_disasm() == "csrrs $medeleg, $t1, $zero");
     CHECK( RISCVInstr<uint32>(0x30205073).get_disasm() == "csrrwi $medeleg, $zero, 0x0");
+    CHECK( RISCVInstr<uint32>(0x00004082).get_disasm() == "c.lwsp $ra, 0x0($sp)");
+    CHECK( RISCVInstr<uint32>(0x0000df86).get_disasm() == "c.swsp $ra, 0xfc($sp)");
+    CHECK( RISCVInstr<uint32>(0x00006082).get_disasm() == "c.ldsp $ra, 0x0($sp)");
+    CHECK( RISCVInstr<uint32>(0x0000ff86).get_disasm() == "c.sdsp $ra, 0x1f8($sp)");
+    CHECK( RISCVInstr<uint32>(0x00004110).get_disasm() == "c.lw $a2, 0x0($a0)");
+    CHECK( RISCVInstr<uint32>(0x00006298).get_disasm() == "c.ld $a4, 0x0($a3)");
+    CHECK( RISCVInstr<uint32>(0x0000b001).get_disasm() == "c.j -2048");
+    CHECK( RISCVInstr<uint32>(0x00002ffd).get_disasm() == "c.jal 2046");
+    CHECK( RISCVInstr<uint32>(0x00008882).get_disasm() == "c.jr $a7");
+    CHECK( RISCVInstr<uint32>(0x00009582).get_disasm() == "c.jalr $a1");
+    CHECK( RISCVInstr<uint32>(0x0000d281).get_disasm() == "c.beqz $a3, -256");
+    CHECK( RISCVInstr<uint32>(0x0000effd).get_disasm() == "c.bnez $a5, 254");
+    CHECK( RISCVInstr<uint32>(0x000048fd).get_disasm() == "c.li $a7, 31");
+    CHECK( RISCVInstr<uint32>(0x00006405).get_disasm() == "c.lui $s0, 1");
+    CHECK( RISCVInstr<uint32>(0x0000647d).get_disasm() == "c.lui $s0, 31");
+    CHECK( RISCVInstr<uint32>(0x00007401).get_disasm() == "c.lui $s0, 0xfffe0");
+    CHECK( RISCVInstr<uint32>(0x0000747d).get_disasm() == "c.lui $s0, 0xfffff");
+    CHECK( RISCVInstr<uint32>(0x00001681).get_disasm() == "c.addi $a3, -32");
+    CHECK( RISCVInstr<uint32>(0x00003681).get_disasm() == "c.addiw $a3, -32");
+    CHECK( RISCVInstr<uint32>(0x00007101).get_disasm() == "c.addi16sp $sp, -512");
+    CHECK( RISCVInstr<uint32>(0x0000617d).get_disasm() == "c.addi16sp $sp, 496");
+    CHECK( RISCVInstr<uint32>(0x00001ff4).get_disasm() == "c.addi4spn $a3, $sp, 1020");
+    CHECK( RISCVInstr<uint32>(0x00000054).get_disasm() == "c.addi4spn $a3, $sp, 4");
+    CHECK( RISCVInstr<uint32>(0x00000586).get_disasm() == "c.slli $a1, 1");
+    CHECK( RISCVInstr<uint32>(0x000082fd).get_disasm() == "c.srli $a3, 31");
+    CHECK( RISCVInstr<uint32>(0x00008709).get_disasm() == "c.srai $a4, 2");
+    CHECK( RISCVInstr<uint32>(0x00008bbd).get_disasm() == "c.andi $a5, 15");
+    CHECK( RISCVInstr<uint32>(0x000088a2).get_disasm() == "c.mv $a7, $s0");
+    CHECK( RISCVInstr<uint32>(0x00007d31).get_disasm() == "c.add $a0, $a2");
+    CHECK( RISCVInstr<uint32>(0x00008df1).get_disasm() == "c.and $a1, $a2");
+    CHECK( RISCVInstr<uint32>(0x00008ef5).get_disasm() == "c.or $a2, $a3");
+    CHECK( RISCVInstr<uint32>(0x00008eb9).get_disasm() == "c.xor $a3, $a4");
+    CHECK( RISCVInstr<uint32>(0x00008f1d).get_disasm() == "c.sub $a4, $a5");
+    CHECK( RISCVInstr<uint32>(0x00009d31).get_disasm() == "c.addw $a0, $a2");
+    CHECK( RISCVInstr<uint32>(0x00009e99).get_disasm() == "c.subw $a3, $a4");
+    CHECK( RISCVInstr<uint32>(0x00009002).get_disasm() == "c.ebreak");
 }
 
 TEST_CASE("RISCV invalid instruction")
