@@ -33,7 +33,7 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         explicit RISCVInstr( uint32 bytes, Addr PC = 0);
         explicit RISCVInstr( std::string_view name, uint32 immediate, Addr PC = 0);
 
-         bool is_same_bytes( uint32 bytes) const {
+        bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
         }
 
