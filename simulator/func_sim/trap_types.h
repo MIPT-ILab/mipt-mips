@@ -27,7 +27,7 @@ class Trap {
     public:
         enum TrapType : uint8
         {
-
+            //NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
             #define TRAP(name) name,
             #include <func_sim/trap_types.def>
             #undef TRAP
