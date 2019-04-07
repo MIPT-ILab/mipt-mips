@@ -33,6 +33,7 @@ set(CPPS
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
     func_sim/func_sim.cpp
+    func_sim/trap_types.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp

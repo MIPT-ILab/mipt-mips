@@ -8,11 +8,12 @@
 
 // MIPT-MIPS modules
 #include <infra/types.h>
+#include "riscv.opcode.gen.h"
 
-#include <unordered_map>
+#include <array>
+#include <string_view>
 
-
-// Now there are no such enumeration in mipt-mips
+// Temporary enumeration
 enum GDB_TrapType : uint8
 {
     GDB_SIGNAL_0    = 0,
@@ -22,47 +23,37 @@ enum GDB_TrapType : uint8
     GDB_SIGNAL_ILL  = 4,
 };
 
-
 class Trap {
     public:
         enum TrapType : uint8
         {
-            NO_TRAP,
-            HALT,
-            EXPLICIT_TRAP,
-            BREAKPOINT,
-            SYSCALL,
-            INTEGER_OVERFLOW,
-            UNSUPPORTED_SYSCALL,
-            UNALIGNED_ADDRESS,
-            UNKNOWN_INSTRUCTION
+
+            #define TRAP(name) name,
+            #include <func_sim/trap_types.def>
+            #undef TRAP
+            MAX_TRAP_TYPE
         };
 
         constexpr Trap(TrapType id) : value(id) { }
 
         bool operator==(Trap trap) const { return value == trap.value; }
         bool operator!=(Trap trap) const { return value != trap.value; }
-
-        uint8 to_gdb_format()
+        
+        void set_from_gdb_format(GDB_TrapType id);
+        uint8 to_gdb_format();
+        
+        void set_from_riscv_format(uint8 id);
+        uint8 to_riscv_format();
+        
+        friend std::ostream& operator<<( std::ostream& out, const Trap& trap)
         {
-            static const std::unordered_map<TrapType, uint8> gdb_trap_conv =
-            {
-                { Trap::NO_TRAP,             GDB_SIGNAL_0    },  // New
-                { Trap::EXPLICIT_TRAP,       GDB_SIGNAL_TRAP },
-                { Trap::BREAKPOINT,          GDB_SIGNAL_TRAP },
-                { Trap::UNSUPPORTED_SYSCALL, GDB_SIGNAL_SYS  },  // Not implemented in gdb_interface
-                { Trap::UNALIGNED_ADDRESS,   GDB_SIGNAL_BUS  },
-                { Trap::UNKNOWN_INSTRUCTION, GDB_SIGNAL_ILL  },  // Not implemented in gdb_interface
-            };
-
-            auto it = gdb_trap_conv.find( value);
-            if ( it == gdb_trap_conv.end())
-                return GDB_SIGNAL_0;
-            return it->second;
+            return out << TrapStrTable.at( trap.value);
         }
 
     private:
-        TrapType value;
+        TrapType value = Trap::NO_TRAP;
+        
+        static std::array<std::string_view, MAX_TRAP_TYPE> TrapStrTable;
 };
 
-#endif //TRAP_TYPES_H
+#endif // TRAP_TYPES_H
