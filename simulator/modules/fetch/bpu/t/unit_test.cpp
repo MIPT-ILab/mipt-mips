@@ -133,7 +133,7 @@ TEST_CASE( "Two bit predictor, advanced")
     // Moderate "Un" - learning
     bp->update( BPInterface( PC, false, NO_VAL32));
     CHECK( bp->is_taken(PC) );
-    CHECK( bp->get_target(PC) == target);
+    CHECK( bp->get_target(PC) == NO_VAL32);
 
     // Strong "un" - learning
     bp->update( BPInterface( PC, false, NO_VAL32));
