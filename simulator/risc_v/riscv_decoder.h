@@ -74,7 +74,7 @@ struct RISCVInstrDecoder
         switch (subset) {
         case 'I': return I_imm;
         case 'B': return get_B_immediate();
-        case 'S': return S_imm4_0 | (S_imm11_5 << 5);
+        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
         case 'U': return U_imm;
         case 'J': return get_J_immediate();
         case 'C': return csr_imm;
@@ -86,26 +86,26 @@ struct RISCVInstrDecoder
     uint16 get_compressed_immediate_value( CompressedOp op) const noexcept
     {
         switch (op) {
-            case LWSP: return ( (Cx_imm1)            << 5U)
-                            | ( (Cx_imm5 & 0b11100))
-                            | ( (Cx_imm5 & 0b00011)  << 6U)
+            case LWSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask(Cx_imm5, 0b11100))
+                            | ( apply_mask(Cx_imm5, 0b00011) << 6U);
 
-            case LDSP: return ( (Cx_imm1)            << 5U)
-                            | ( (Cx_imm5 & 0b11000))
-                            | ( (Cx_imm5 & 0b00111)  << 6U)
+            case LDSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask(Cx_imm5, 0b11000))
+                            | ( apply_mask(Cx_imm5, 0b00111) << 6U);
 
-            case LQSP: return ( (Cx_imm1)            << 5U)
-                            | ( (Cx_imm5 & 0b10000))
-                            | ( (Cx_imm5 & 0b01111)  << 6U)
+            case LQSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask(Cx_imm5, 0b10000))
+                            | ( apply_mask(Cx_imm5, 0b01111) << 6U);
 
-            case SWSP: return ( (Cx_imm6 & 0b111100))
-                            | ( (Cx_imm6 & 0b000011) << 6U)
+            case SWSP: return ( apply_mask(Cx_imm6, 0b111100))
+                            | ( apply_mask(Cx_imm6, 0b000011) << 6U);
 
-            case SDSP: return ( (Cx_imm6 & 0b111000))
-                            | ( (Cx_imm6 & 0b000111) << 6U)
+            case SDSP: return ( apply_mask(Cx_imm6, 0b111000))
+                            | ( apply_mask(Cx_imm6, 0b000111) << 6U);
 
-            case SQSP: return ( (Cx_imm6 & 0b110000))
-                            | ( (Cx_imm6 & 0b001111) << 6U)
+            case SQSP: return ( apply_mask(Cx_imm6, 0b110000))
+                            | ( apply_mask(Cx_imm6, 0b001111) << 6U);
         }
     }
 
