@@ -32,6 +32,9 @@ struct RISCVInstrDecoder
     const uint32 rd;
     const uint32 rs1;
     const uint32 rs2;
+    const uint16 rd_;
+    const uint16 rs1_;
+    const uint16 rs2_;
     const uint32 I_imm;
     const uint32 S_imm4_0;
     const uint32 S_imm11_5;
@@ -146,7 +149,11 @@ struct RISCVInstrDecoder
         : sz        ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
         , rd        ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , rs1       ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , rs2       ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
+        , rs2       ( ( apply_mask( raw, 0b00000001'11110000'00000000'00000000)) // If instr is 16-bit,
+                   || ( apply_mask( raw, 0b00000000'00000000'00000000'01111100)))// then rs2 is in other place
+        , rd_       ( apply_mask( raw, 0b00000000'00000000'00000000'00011100)
+        , rs1_      ( apply_mask( raw, 0b00000000'00000000'00000011'10000000)
+        , rs2_      ( apply_mask( raw, 0b00000000'00000000'00000000'00011100)
         , I_imm     ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
         , S_imm4_0  ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , S_imm11_5 ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
