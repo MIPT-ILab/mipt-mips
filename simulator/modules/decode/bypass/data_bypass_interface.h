@@ -48,7 +48,6 @@ private:
     static constexpr const Latency MEM_STAGE   = IN_RF_STAGE - 2_lt;
     static constexpr const Latency WB_STAGE    = IN_RF_STAGE - 1_lt;
     static constexpr const Latency BRANCH_STAGE   = IN_RF_STAGE - 3_lt;
-
 };
 
 
