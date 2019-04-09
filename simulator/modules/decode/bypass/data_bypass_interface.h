@@ -19,7 +19,7 @@ public:
 
     void inc() { value = value + 1_lt; }
 
-    static constexpr const uint8 BYPASSING_STAGES_NUMBER = 4;
+    static constexpr const uint8 BYPASSING_STAGES_NUMBER = 5;
 
     void set_to_stage( Latency v) { value = v; }
     void set_to_first_execution_stage() { set_to_stage( 0_lt); }
@@ -30,6 +30,7 @@ public:
     bool is_same_stage( Latency v) const  { return value == v; }
     bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
     bool is_mem_stage() const { return is_same_stage( MEM_STAGE); }
+    bool is_branch() const { return is_same_stage( BRANCH_STAGE); }
     bool is_writeback() const { return is_same_stage( WB_STAGE); }
     bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
@@ -46,6 +47,8 @@ private:
     static constexpr const Latency IN_RF_STAGE = Latency( MAX_VAL8);
     static constexpr const Latency MEM_STAGE   = IN_RF_STAGE - 2_lt;
     static constexpr const Latency WB_STAGE    = IN_RF_STAGE - 1_lt;
+    static constexpr const Latency BRANCH_STAGE   = IN_RF_STAGE - 3_lt;
+
 };
 
 
@@ -74,6 +77,10 @@ public:
 
         if ( bypassing_stage.is_writeback())
             bypass_direction = 3;
+
+        if ( bypassing_stage.is_branch())
+            bypass_direction = 4;
+
         
         return bypass_direction;
     }
