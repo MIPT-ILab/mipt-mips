@@ -86,6 +86,10 @@ class DataBypass
                     next_stage_after_first_execution_stage.set_to_first_execution_stage();
                     next_stage_after_first_execution_stage.inc();
                 }
+                else if ( instr.is_branch_stage_required())
+                {
+                    next_stage_after_first_execution_stage.set_to_branch_stage();
+                }
                 else if ( instr.is_mem_stage_required())
                 {
                     next_stage_after_first_execution_stage.set_to_mem_stage();
@@ -128,6 +132,9 @@ class DataBypass
             if ( instr.is_mem_stage_required())
                 return 2_lt;
 
+            if ( instr.is_branch_stage_required())
+                return 2_lt;
+
             if ( instr.is_long_arithmetic())
                 return long_alu_latency;
 
@@ -154,6 +161,10 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
     if ( instr.is_long_arithmetic())
     {
         entry.ready_stage.set_to_stage( long_alu_latency - 1_lt);
+    }
+    else if ( instr.is_jump())
+    {
+        entry.ready_stage.set_to_branch_stage();
     }
     else if ( instr.is_load())
     {
