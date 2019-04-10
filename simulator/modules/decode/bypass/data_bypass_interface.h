@@ -30,7 +30,7 @@ public:
     bool is_same_stage( Latency v) const  { return value == v; }
     bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
     bool is_mem_stage() const { return is_same_stage( MEM_STAGE); }
-    bool is_branch() const { return is_same_stage( BRANCH_STAGE); }
+    bool is_branch_stage() const { return is_same_stage( BRANCH_STAGE); }
     bool is_writeback() const { return is_same_stage( WB_STAGE); }
     bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
@@ -77,7 +77,7 @@ public:
         if ( bypassing_stage.is_writeback())
             bypass_direction = 3;
 
-        if ( bypassing_stage.is_branch())
+        if ( bypassing_stage.is_branch_stage())
             bypass_direction = 4;
 
         
