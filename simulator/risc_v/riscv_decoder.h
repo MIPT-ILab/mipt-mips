@@ -16,6 +16,7 @@
 enum class Reg : uint8
 {
     RS1, RS2, RD,
+    RS1_, RS2_, RD_,
     CSR, SEPC, MEPC,
     ZERO, RA
 };
@@ -133,6 +134,9 @@ struct RISCVInstrDecoder
         case Reg::RS1:    return RISCVRegister::from_cpu_index( rs1);
         case Reg::RS2:    return RISCVRegister::from_cpu_index( rs2);
         case Reg::RD:     return RISCVRegister::from_cpu_index( rd);
+        case Reg::RS1_:   return RISCVRegister::from_cpu_index( rs1_, RISCVRegister::separator::popular);
+        case Reg::RS2_:   return RISCVRegister::from_cpu_index( rs2_, RISCVRegister::separator::popular);
+        case Reg::RD_:    return RISCVRegister::from_cpu_index( rd_, RISCVRegister::separator::popular);
         case Reg::CSR:    return RISCVRegister::from_csr_index( csr);
         case Reg::SEPC:   return RISCVRegister::from_csr_index( 0x141);
         case Reg::MEPC:   return RISCVRegister::from_csr_index( 0x341);
