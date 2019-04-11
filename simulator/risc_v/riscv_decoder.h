@@ -21,10 +21,11 @@ enum class Reg : uint8
     ZERO, RA
 };
 
-enum CompressedOp
+enum ImmediateType
 {
-    LWSP, LDSP, LQSP,
-    SWSP, SDSP, SQSP
+    I, B, S, U, J, C, NONE,
+    C_LWSP, C_LDSP, C_LQSP,
+    C_SWSP, C_SDSP, C_SQSP
 };
 
 struct RISCVInstrDecoder
@@ -73,55 +74,57 @@ struct RISCVInstrDecoder
             |  (J_imm20    << 20U);
     }
 
-    uint32 get_immediate_value( char subset) const noexcept
+    uint32 get_immediate_value( ImmediateType subset) const noexcept
     {
         switch (subset) {
-        case 'I': return I_imm;
-        case 'B': return get_B_immediate();
-        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
-        case 'U': return U_imm;
-        case 'J': return get_J_immediate();
-        case 'C': return csr_imm;
-        case ' ': return 0;
-        default: assert(0); return 0;
+        case I: return I_imm;
+        case B: return get_B_immediate();
+        case S: return S_imm4_0 | (S_imm11_5 << 5U);
+        case U: return U_imm;
+        case J: return get_J_immediate();
+        case C: return csr_imm;
+        case NONE: return 0;
+        default: return get_compressed_immediate_value( subset);
         }
     }
 
-    uint16 get_compressed_immediate_value( CompressedOp op) const noexcept
+    uint16 get_compressed_immediate_value( ImmediateType type) const noexcept
     {
-        switch (op) {
-            case LWSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+        switch (type) {
+            case C_LWSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
                             | ( apply_mask(Cx_imm5, 0b11100))
                             | ( apply_mask(Cx_imm5, 0b00011) << 6U);
 
-            case LDSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+            case C_LDSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
                             | ( apply_mask(Cx_imm5, 0b11000))
                             | ( apply_mask(Cx_imm5, 0b00111) << 6U);
 
-            case LQSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
+            case C_LQSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
                             | ( apply_mask(Cx_imm5, 0b10000))
                             | ( apply_mask(Cx_imm5, 0b01111) << 6U);
 
-            case SWSP: return ( apply_mask(Cx_imm6, 0b111100))
+            case C_SWSP: return ( apply_mask(Cx_imm6, 0b111100))
                             | ( apply_mask(Cx_imm6, 0b000011) << 6U);
 
-            case SDSP: return ( apply_mask(Cx_imm6, 0b111000))
+            case C_SDSP: return ( apply_mask(Cx_imm6, 0b111000))
                             | ( apply_mask(Cx_imm6, 0b000111) << 6U);
 
-            case SQSP: return ( apply_mask(Cx_imm6, 0b110000))
+            case C_SQSP: return ( apply_mask(Cx_imm6, 0b110000))
                             | ( apply_mask(Cx_imm6, 0b001111) << 6U);
+
+            default:     assert(0); return 0;
         }
     }
 
     template<typename R>
-    static R get_immediate( char subset, uint32 value) noexcept
+    static R get_immediate( ImmediateType type, uint32 value) noexcept
     {
-        switch (subset) {
-        case 'I':
-        case 'B':
-        case 'S': return sign_extension<12, R>( value);
-        case 'U':
-        case 'J': return sign_extension<20, R>( value);
+        switch (type) {
+        case I:
+        case B:
+        case S: return sign_extension<12, R>( value);
+        case U:
+        case J: return sign_extension<20, R>( value);
         default:  return value;
         }
     }
