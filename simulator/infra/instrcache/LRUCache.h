@@ -73,7 +73,6 @@ class LRUCache
         void erase( const Key& key)
         {
             auto data_it = data.find( key);
-            assert ( data_it == data.end());
             if ( data_it != data.end())
             {
                 free_list.emplace_front( data_it->second);
@@ -94,6 +93,7 @@ class LRUCache
             free_list.pop_front();
             new (&storage[index]) Value( value);
             data.emplace( key, index);
+            lru_module.allocate( key);
         }
 
         static void* allocate_memory()

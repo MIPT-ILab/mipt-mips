@@ -1,5 +1,5 @@
 /**
- * cache_tag_array.h
+ * LRUCacheInfo.h
  * Header for the least recently used line replacement module.
  * @author Oleg Ladin, Denis Los
  */
@@ -17,6 +17,7 @@ class LRUCacheInfo
 
         void touch( std::size_t way);
         void erase( std::size_t way);
+        void allocate( std::size_t way);
         std::size_t update();
         std::size_t get_ways() const { return ways; }
 
