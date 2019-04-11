@@ -30,15 +30,6 @@ class RISCVRegister {
         , MAX_VAL_RegNum
     };
 
-    enum RegNumPopular : uint16
-    {
-//NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define REGISTER(X) RISCV_REG_ ## X
-#include "riscv_register_popular.def"
-#undef REGISTER
-        , MAX_VAL_RegNumPopular
-    };
-
     enum separator
     {
         ordinary,
@@ -50,6 +41,7 @@ class RISCVRegister {
 
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
+    static const uint8 shift = uint8( RISCV_REG_s0);
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
@@ -60,10 +52,10 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static auto from_cpu_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
-    static auto from_gdb_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
-    static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
-    static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
+    static RISCVRegister from_cpu_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
+    static RISCVRegister from_gdb_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
+    static RISCVRegister from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
+    static RISCVRegister from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
@@ -78,12 +70,10 @@ public:
     bool is_valid() const { return value != MAX_VAL_RegNum; }
 
 private:
-    RegNum          value         = MAX_VAL_RegNum;
-    RegNumPopular   value_popular = MAX_VAL_RegNumPopular;
+    RegNum value = MAX_VAL_RegNum;
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
-    explicit constexpr RISCVRegister( RegNumPopular id) noexcept : value_popular( id) {}
 };
 
 constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }

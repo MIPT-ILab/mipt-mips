@@ -37,18 +37,20 @@ RISCVRegister::RegNum RISCVRegister::get_csr_regnum( std::string_view name)
     return MAX_VAL_RegNum;
 }
 
-auto RISCVRegister::from_cpu_index( uint8 id, RISCVRegister::separator type)
+RISCVRegister RISCVRegister::from_cpu_index( uint8 id, RISCVRegister::separator type)
 {
+    const uint8 id_shift = id + shift;
     switch (type) {
-        case RISCVRegister::separator::ordinary:    return RISCVRegister( RegNum{ id});
-        case RISCVRegister::separator::popular:     return RISCVRegister( RegNumPopular{ id});
+        case RISCVRegister::separator::popular:     return RISCVRegister( RegNum{ id_shift});
+        default:                                    return RISCVRegister( RegNum{ id});
     }
 }
 
- auto RISCVRegister::from_gdb_index( uint8 id, RISCVRegister::separator type)
+ RISCVRegister RISCVRegister::from_gdb_index( uint8 id, RISCVRegister::separator type)
  {
+    const uint8 id_shift = id + shift;
      switch (type) {
-         case RISCVRegister::separator::ordinary:    return RISCVRegister( RegNum{ id});
-         case RISCVRegister::separator::popular:     return RISCVRegister( RegNumPopular{ id});
+         case RISCVRegister::separator::popular:     return RISCVRegister( RegNum{ id_shift});
+         default:                                    return RISCVRegister( RegNum{ id});
      }
  }
