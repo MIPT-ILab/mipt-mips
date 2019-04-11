@@ -30,18 +30,18 @@ class RISCVRegister {
         , MAX_VAL_RegNum
     };
 
-    enum separator
-    {
-        ordinary,
-        popular
-    };
-
     static RegNum get_csr_regnum( uint16 val);
     static RegNum get_csr_regnum( std::string_view name);
 
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
     static const uint8 shift = uint8( RISCV_REG_s0);
+
+    enum separator
+    {
+        ordinary,
+        popular
+    };
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
