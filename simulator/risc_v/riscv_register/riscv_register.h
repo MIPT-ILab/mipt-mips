@@ -39,6 +39,12 @@ class RISCVRegister {
         , MAX_VAL_RegNumPopular
     };
 
+    enum separator
+    {
+        ordinary,
+        popular
+    };
+
     static RegNum get_csr_regnum( uint16 val);
     static RegNum get_csr_regnum( std::string_view name);
 
@@ -54,8 +60,8 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static auto from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
-    static auto from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_cpu_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
+    static auto from_gdb_index( uint8 id = uint8( MAX_REG), separator type = separator::ordinary);
     static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
     static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
@@ -72,10 +78,12 @@ public:
     bool is_valid() const { return value != MAX_VAL_RegNum; }
 
 private:
-    RegNum value = RISCV_REG_zero;
+    RegNum          value         = MAX_VAL_RegNum;
+    RegNumPopular   value_popular = MAX_VAL_RegNumPopular;
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
+    explicit constexpr RISCVRegister( RegNumPopular id) noexcept : value_popular( id) {}
 };
 
 constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }

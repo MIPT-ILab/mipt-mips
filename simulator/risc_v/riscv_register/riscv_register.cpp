@@ -36,3 +36,19 @@ RISCVRegister::RegNum RISCVRegister::get_csr_regnum( std::string_view name)
 #undef DECLARE_CSR
     return MAX_VAL_RegNum;
 }
+
+auto RISCVRegister::from_cpu_index( uint8 id, RISCVRegister::separator type)
+{
+    switch (type) {
+        case RISCVRegister::separator::ordinary:    return RISCVRegister( RegNum{ id});
+        case RISCVRegister::separator::popular:     return RISCVRegister( RegNumPopular{ id});
+    }
+}
+
+ auto RISCVRegister::from_gdb_index( uint8 id, RISCVRegister::separator type)
+ {
+     switch (type) {
+         case RISCVRegister::separator::ordinary:    return RISCVRegister( RegNum{ id});
+         case RISCVRegister::separator::popular:     return RISCVRegister( RegNumPopular{ id});
+     }
+ }
