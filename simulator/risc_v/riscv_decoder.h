@@ -149,8 +149,9 @@ struct RISCVInstrDecoder
         : sz        ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
         , rd        ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , rs1       ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , rs2       ( ( apply_mask( raw, 0b00000001'11110000'00000000'00000000)) // If instr is 16-bit,
-                   || ( apply_mask( raw, 0b00000000'00000000'00000000'01111100)))// then rs2 is in other place
+        , rs2       ( apply_mask( raw, 0b11111111'11111111'00000000'00000000)     // If instr is 16-bit,
+                        ? apply_mask( raw, 0b00000001'11110000'00000000'00000000) // then rs2 is in other place
+                        : apply_mask( raw, 0b00000000'00000000'00000000'01111100))
         , rd_       ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
         , rs1_      ( apply_mask( raw, 0b00000000'00000000'00000011'10000000))
         , rs2_      ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
