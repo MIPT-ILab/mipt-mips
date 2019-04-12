@@ -25,6 +25,7 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>(0x0000ff86).get_disasm() == "c_sdsp $rs, 0x1f8($sp)");
     CHECK( RISCVInstr<uint32>(0x00004110).get_disasm() == "c_lw $a2, 0x0($a0)");
     CHECK( RISCVInstr<uint32>(0x00006298).get_disasm() == "c_ld $a4, 0x0($a3)");
+    CHECK( RISCVInstr<uint32>(0x0000defc).get_disasm() == "c_sw $a5, 0x7c($a3)");
     CHECK( RISCVInstr<uint32>(0x0000b001).get_disasm() == "c_j -2048");
     CHECK( RISCVInstr<uint32>(0x00002ffd).get_disasm() == "c_jal 2046");
     CHECK( RISCVInstr<uint32>(0x00008882).get_disasm() == "c_jr $a7");
