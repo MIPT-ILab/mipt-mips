@@ -26,7 +26,7 @@ enum ImmediateType
     I, B, S, U, J, C, NONE,
     C_LWSP, C_LDSP, C_LQSP,
     C_SWSP, C_SDSP, C_SQSP,
-    C_LW
+    C_LW, C_SW
 };
 
 struct RISCVInstrDecoder
@@ -93,29 +93,33 @@ struct RISCVInstrDecoder
     {
         switch (type) {
             case C_LWSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b11100))
+                            | ( apply_mask( Cx_imm5, 0b11100) << 2U)
                             | ( apply_mask( Cx_imm5, 0b00011) << 6U);
 
             case C_LDSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b11000))
+                            | ( apply_mask( Cx_imm5, 0b11000) << 3U)
                             | ( apply_mask( Cx_imm5, 0b00111) << 6U);
 
             case C_LQSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b10000))
+                            | ( apply_mask( Cx_imm5, 0b10000) << 4U)
                             | ( apply_mask( Cx_imm5, 0b01111) << 6U);
 
-            case C_SWSP: return ( apply_mask( Cx_imm6, 0b111100))
+            case C_SWSP: return ( apply_mask( Cx_imm6, 0b111100) << 2U)
                             | ( apply_mask( Cx_imm6, 0b000011) << 6U);
 
-            case C_SDSP: return ( apply_mask( Cx_imm6, 0b111000))
+            case C_SDSP: return ( apply_mask( Cx_imm6, 0b111000) << 3U)
                             | ( apply_mask( Cx_imm6, 0b000111) << 6U);
 
-            case C_SQSP: return ( apply_mask( Cx_imm6, 0b110000))
+            case C_SQSP: return ( apply_mask( Cx_imm6, 0b110000) << 4U)
                             | ( apply_mask( Cx_imm6, 0b001111) << 6U);
 
-            case C_LW:   return ( apply_mask( Cx_imm2, 0b10) << 1U)
+            case C_LW:   return ( apply_mask( Cx_imm2, 0b10) << 2U)
                             | ( apply_mask( Cx_imm2, 0b01) << 6U)
                             | ( apply_mask( Cx_imm3, 0b111) << 3U);
+
+            case C_SW:   return (apply_mask( Cx_imm2, 0b10) << 2U)
+                                | ( apply_mask( Cx_imm2, 0b01) << 6U)
+                                | ( apply_mask( Cx_imm3, 0b111) << 3U);
 
             default:     assert(0); return 0;
         }
