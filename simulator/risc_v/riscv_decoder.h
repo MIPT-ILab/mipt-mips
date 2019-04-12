@@ -18,14 +18,15 @@ enum class Reg : uint8
     RS1, RS2, RD,
     RS1_, RS2_, RD_,
     CSR, SEPC, MEPC,
-    ZERO, RA
+    ZERO, RA, SP
 };
 
 enum ImmediateType
 {
     I, B, S, U, J, C, NONE,
     C_LWSP, C_LDSP, C_LQSP,
-    C_SWSP, C_SDSP, C_SQSP
+    C_SWSP, C_SDSP, C_SQSP,
+    C_LW
 };
 
 struct RISCVInstrDecoder
@@ -91,26 +92,30 @@ struct RISCVInstrDecoder
     uint16 get_compressed_immediate_value( ImmediateType type) const noexcept
     {
         switch (type) {
-            case C_LWSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask(Cx_imm5, 0b11100))
-                            | ( apply_mask(Cx_imm5, 0b00011) << 6U);
+            case C_LWSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask( Cx_imm5, 0b11100))
+                            | ( apply_mask( Cx_imm5, 0b00011) << 6U);
 
-            case C_LDSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask(Cx_imm5, 0b11000))
-                            | ( apply_mask(Cx_imm5, 0b00111) << 6U);
+            case C_LDSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask( Cx_imm5, 0b11000))
+                            | ( apply_mask( Cx_imm5, 0b00111) << 6U);
 
-            case C_LQSP: return ( apply_mask(Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask(Cx_imm5, 0b10000))
-                            | ( apply_mask(Cx_imm5, 0b01111) << 6U);
+            case C_LQSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask( Cx_imm5, 0b10000))
+                            | ( apply_mask( Cx_imm5, 0b01111) << 6U);
 
-            case C_SWSP: return ( apply_mask(Cx_imm6, 0b111100))
-                            | ( apply_mask(Cx_imm6, 0b000011) << 6U);
+            case C_SWSP: return ( apply_mask( Cx_imm6, 0b111100))
+                            | ( apply_mask( Cx_imm6, 0b000011) << 6U);
 
-            case C_SDSP: return ( apply_mask(Cx_imm6, 0b111000))
-                            | ( apply_mask(Cx_imm6, 0b000111) << 6U);
+            case C_SDSP: return ( apply_mask( Cx_imm6, 0b111000))
+                            | ( apply_mask( Cx_imm6, 0b000111) << 6U);
 
-            case C_SQSP: return ( apply_mask(Cx_imm6, 0b110000))
-                            | ( apply_mask(Cx_imm6, 0b001111) << 6U);
+            case C_SQSP: return ( apply_mask( Cx_imm6, 0b110000))
+                            | ( apply_mask( Cx_imm6, 0b001111) << 6U);
+
+            case C_LW:   return ( apply_mask( Cx_imm2, 0b10) << 1U)
+                            | ( apply_mask( Cx_imm2, 0b01) << 6U)
+                            | ( apply_mask( Cx_imm3, 0b111) << 3U);
 
             default:     assert(0); return 0;
         }
@@ -134,6 +139,7 @@ struct RISCVInstrDecoder
         switch ( type) {
         case Reg::ZERO:   return RISCVRegister::zero();
         case Reg::RA:     return RISCVRegister::return_address();
+        case Reg::SP:     return RISCVRegister::from_cpu_index( 2);
         case Reg::RS1:    return RISCVRegister::from_cpu_index( rs1);
         case Reg::RS2:    return RISCVRegister::from_cpu_index( rs2);
         case Reg::RD:     return RISCVRegister::from_cpu_index( rd);
@@ -155,7 +161,9 @@ struct RISCVInstrDecoder
     explicit constexpr RISCVInstrDecoder(uint32 raw) noexcept
         : sz        ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
         , rd        ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , rs1       ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , rs1       ( apply_mask( raw, 0b11111111'11111111'00000000'00000000)     // If instr is 16-bit,
+                      ? apply_mask( raw, 0b00000000'00001111'10000000'00000000) // then rs1 is in other place
+                      : apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , rs2       ( apply_mask( raw, 0b11111111'11111111'00000000'00000000)     // If instr is 16-bit,
                         ? apply_mask( raw, 0b00000001'11110000'00000000'00000000) // then rs2 is in other place
                         : apply_mask( raw, 0b00000000'00000000'00000000'01111100))
@@ -180,7 +188,7 @@ struct RISCVInstrDecoder
         , Cx_imm1   ( apply_mask( raw, 0b00000000'00000000'00010000'00000000))
         , Cx_imm2   ( apply_mask( raw, 0b00000000'00000000'00000000'01100000))
         , Cx_imm3   ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
-        , Cx_imm5   ( apply_mask( raw, 0b00000000'00000000'00000000'00111110))
+        , Cx_imm5   ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
         , Cx_imm6   ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
     { }
 };
