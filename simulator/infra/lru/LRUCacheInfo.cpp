@@ -30,7 +30,7 @@ void LRUCacheInfo::touch( std::size_t way)
     lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
 }
 
-void LRUCacheInfo::erase( std::size_t way)
+void LRUCacheInfo::set_to_erase( std::size_t way)
 {
     const auto lru_it = lru_hash.find( way);
     assert( lru_it != lru_hash.end());
@@ -52,6 +52,16 @@ std::size_t LRUCacheInfo::update()
 
 void LRUCacheInfo::allocate( std::size_t way)
 {
+    if ( lru_hash.size() >= ways)
+        erase_lru_element();
     lru_list.push_front( way);
     lru_hash.emplace( way, lru_list.begin());
 }
+
+void LRUCacheInfo::erase_lru_element() {
+        std::size_t lru_elem = lru_list.back();
+        lru_list.pop_back();
+        lru_hash.erase( lru_elem);
+}
+
+

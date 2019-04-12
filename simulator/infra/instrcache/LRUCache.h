@@ -78,14 +78,14 @@ class LRUCache
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
-                lru_module.erase( key);
+                lru_module.set_to_erase( key);
             }
         }
 
     private:
         void allocate( const Key& key, const Value& value)
         {
-            if ( data.size() == CAPACITY)
+            if ( size() == CAPACITY)
                 erase( lru_module.update());
 
             // Add a new element

@@ -91,7 +91,7 @@ TEST_CASE( "check_method_empty: Check_Method_Empty")
     CHECK( !instr_cache.empty());
 }
 
-/*
+
 TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Check")
 {
     constexpr const auto CAPACITY = 8192u;
@@ -109,5 +109,5 @@ TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Ch
     CHECK( !cache.empty());
     CHECK( !cache.find( 2).first);
 }
-*/
+
 
