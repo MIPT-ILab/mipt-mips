@@ -19,10 +19,10 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>(0x30200073).get_disasm() == "mret");
     CHECK( RISCVInstr<uint32>(0x30202373).get_disasm() == "csrrs $medeleg, $t1, $zero");
     CHECK( RISCVInstr<uint32>(0x30205073).get_disasm() == "csrrwi $medeleg, $zero, 0x0");
-    CHECK( RISCVInstr<uint32>(0x00004082).get_disasm() == "c_lwsp $ra, 0x0($sp)");
-    CHECK( RISCVInstr<uint32>(0x0000df86).get_disasm() == "c_swsp $ra, 0xfc($sp)");
-    CHECK( RISCVInstr<uint32>(0x00006082).get_disasm() == "c_ldsp $ra, 0x0($sp)");
-    CHECK( RISCVInstr<uint32>(0x0000ff86).get_disasm() == "c_sdsp $ra, 0x1f8($sp)");
+    CHECK( RISCVInstr<uint32>(0x00004082).get_disasm() == "c_lwsp $rs, 0x0($sp)");
+    CHECK( RISCVInstr<uint32>(0x0000df86).get_disasm() == "c_swsp $rs, 0xfc($sp)");
+    CHECK( RISCVInstr<uint32>(0x00006082).get_disasm() == "c_ldsp $rs, 0x0($sp)");
+    CHECK( RISCVInstr<uint32>(0x0000ff86).get_disasm() == "c_sdsp $rs, 0x1f8($sp)");
     CHECK( RISCVInstr<uint32>(0x00004110).get_disasm() == "c_lw $a2, 0x0($a0)");
     CHECK( RISCVInstr<uint32>(0x00006298).get_disasm() == "c_ld $a4, 0x0($a3)");
     CHECK( RISCVInstr<uint32>(0x0000b001).get_disasm() == "c_j -2048");
