@@ -97,6 +97,7 @@ template<typename I> auto execute_c_sqsp = do_nothing<I>;
 template<typename I> auto execute_c_lw = do_nothing<I>;
 template<typename I> auto execute_c_ld = do_nothing<I>;
 template<typename I> auto execute_c_lq = do_nothing<I>;
+template<typename I> auto execute_c_sw = do_nothing<I>;
 template<typename I> auto execute_c_j = do_nothing<I>;
 template<typename I> auto execute_c_jal = do_nothing<I>;
 template<typename I> auto execute_c_jr = do_nothing<I>;
@@ -189,6 +190,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sd,     execute_sd<I>,     OUT_STORE,  ImmediateType::S,      Imm::ADDR, Src1::RS1, Src2::RS2,   Dst::ZERO, 8},
     {'I', instr_c_lwsp, execute_c_lwsp<I>, OUT_LOAD,   ImmediateType::C_LWSP, Imm::ADDR, Src1::SP,  Src2::ZERO,  Dst::RD, 4},
     {'I', instr_c_lw,   execute_c_lw<I>,   OUT_LOAD,   ImmediateType::C_LW,   Imm::ADDR, Src1::RS1_,Src2::ZERO,  Dst::RD_, 4},
+    {'I', instr_c_swsp, execute_c_swsp<I>, OUT_STORE,  ImmediateType::C_SWSP, Imm::ADDR, Src1::SP,  Src2::RS2,   Dst::ZERO, 4},
+    {'I', instr_c_sw,   execute_c_sw<I>,   OUT_STORE,  ImmediateType::C_SW,   Imm::ADDR, Src1::RS1_,Src2::RS2_,  Dst::ZERO, 4},
     // Immediate arithmetics
     {'I', instr_addi,   execute_addi<I>,   OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
     {'I', instr_slli,   execute_slli<I>,   OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
