@@ -22,7 +22,6 @@ struct CacheReplacementInterface
     virtual std::size_t update() = 0;
     virtual std::size_t get_ways() const = 0;
     virtual std::size_t get_hash_size() const = 0;
-
 };
 
 class LRUCacheInfo : public CacheReplacementInterface
