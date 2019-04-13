@@ -26,7 +26,7 @@ enum ImmediateType
     I, B, S, U, J, C, NONE,
     C_LWSP, C_LDSP, C_LQSP,
     C_SWSP, C_SDSP, C_SQSP,
-    C_LW, C_SW
+    C_LW, C_SW, C_ADDI
 };
 
 struct RISCVInstrDecoder
@@ -117,9 +117,12 @@ struct RISCVInstrDecoder
                             | ( apply_mask( Cx_imm2, 0b01) << 6U)
                             | ( apply_mask( Cx_imm3, 0b111) << 3U);
 
-            case C_SW:   return (apply_mask( Cx_imm2, 0b10) << 2U)
-                                | ( apply_mask( Cx_imm2, 0b01) << 6U)
-                                | ( apply_mask( Cx_imm3, 0b111) << 3U);
+            case C_SW:   return ( apply_mask( Cx_imm2, 0b10) << 2U)
+                            | ( apply_mask( Cx_imm2, 0b01) << 6U)
+                            | ( apply_mask( Cx_imm3, 0b111) << 3U);
+
+            case C_ADDI: return ( apply_mask( Cx_imm1, 0b1) << 5U)
+                            | ( apply_mask( Cx_imm5, 0b11111));
 
             default:     assert(0); return 0;
         }
