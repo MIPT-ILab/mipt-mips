@@ -39,7 +39,7 @@ enum class Imm : uint8
 {
     NO, SHIFT,
     LOGIC, ARITH, TRAP, ADDR,
-    JUMP, C_ARITH
+    JUMP, C_ARITH, C_JUMP
 };
 
 template<typename T>
@@ -51,6 +51,7 @@ std::string print_immediate( Imm type, T value)
     case Imm::ADDR:     oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC:    oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:     oss <<  " 0x" << std::hex << value << std::dec; break;
+    case Imm::C_JUMP:   oss <<    " " << std::dec << value; break;
     case Imm::TRAP:     oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
     case Imm::ARITH:    oss << ", "   << std::dec << narrow_cast<int16>(value); break;
     case Imm::C_ARITH:  oss << ", "   << std::dec << (narrow_cast<int8>(value << 2U) >> 2U); break;
