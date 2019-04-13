@@ -1,12 +1,12 @@
 /**
- * LRUCacheInfo.cpp
- * Implementation of the least recently used line replacement module.
- * @author Oleg Ladin, Denis Los
+ * CacheReplacement.cpp
+ * Cache replacement algorithms module.
+ * @author Oleg Ladin, Denis Los, Andrey Agrachev
  */
 
  #include <cassert>
 
- #include "infra/lru/LRUCacheInfo.h"
+ #include "infra/replacement/CacheReplacement.h"
 
  LRUCacheInfo::LRUCacheInfo( std::size_t ways)
     : ways( ways)

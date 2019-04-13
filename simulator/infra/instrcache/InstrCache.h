@@ -3,8 +3,8 @@
  * @author Denis Los
 */
 
-#ifndef LRUCACHE_H
-#define LRUCACHE_H
+#ifndef INSTRCACHE_H
+#define INSTRCACHE_H
 
 #include <cassert>
 #include <list>
@@ -13,15 +13,18 @@
 #include <utility>
 
 #include <infra/types.h>
-#include <infra/lru/LRUCacheInfo.h>
+#include <infra/replacement/CacheReplacement.h>
 
 template <typename Key, typename Value, size_t CAPACITY>
-class LRUCache
+class InstrCache
 {
         struct Deleter;
     public:
-        LRUCache() : lru_module ( CAPACITY)
+        InstrCache(int replacement_policy = LRU)
         {
+            if (replacement_policy == LRU)
+                lru_module = new LRUCacheInfo( CAPACITY);
+            ///// insert pseudo-LRU option!
             data.reserve( CAPACITY);
             for (size_t i = 0; i < CAPACITY; ++i)
                 free_list.emplace_back(i);
@@ -31,16 +34,17 @@ class LRUCache
             storage = static_cast<Value*>(std::align( alignof(Value), sizeof(Value) * CAPACITY, ptr, space));
         }
 
-        ~LRUCache()
+        ~InstrCache()
         {
             for (const auto& e : data)
                 storage[ e.second].~Value();
+            delete lru_module;
         }
 
-        LRUCache(const LRUCache&) = delete;
-        LRUCache(LRUCache&&) = delete;
-        LRUCache& operator=(const LRUCache&) = delete;
-        LRUCache& operator=(LRUCache&&) = delete;
+        InstrCache(const InstrCache&) = delete;
+        InstrCache(InstrCache&&) = delete;
+        InstrCache& operator=(const InstrCache&) = delete;
+        InstrCache& operator=(InstrCache&&) = delete;
 
         static auto get_capacity() { return CAPACITY; }
 
@@ -59,7 +63,7 @@ class LRUCache
 
         void touch( const Key& key)
         {
-            lru_module.touch( key);
+            lru_module->touch( key);
         }
 
         void update( const Key& key, const Value& value)
@@ -78,7 +82,7 @@ class LRUCache
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
-                lru_module.set_to_erase( key);
+                lru_module->set_to_erase( key);
             }
         }
 
@@ -86,14 +90,14 @@ class LRUCache
         void allocate( const Key& key, const Value& value)
         {
             if ( size() == CAPACITY)
-                erase( lru_module.update());
+                erase( lru_module->update());
 
             // Add a new element
             auto index = free_list.front();
             free_list.pop_front();
             new (&storage[index]) Value( value);
             data.emplace( key, index);
-            lru_module.allocate( key);
+            lru_module->allocate( key);
         }
 
         static void* allocate_memory()
@@ -110,8 +114,8 @@ class LRUCache
         std::list<size_t> free_list{};
         std::unique_ptr<void, Deleter> arena = nullptr;
         Value* storage = nullptr;
-        LRUCacheInfo lru_module;
+        CacheReplacementInterface* lru_module;
 };
 
-#endif // LRUCACHE_H
+#endif // INSTRCACHE_H
 

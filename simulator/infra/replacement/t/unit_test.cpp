@@ -3,7 +3,7 @@
  * @author Andrey Agrachev
  */
 
-#include "../LRUCacheInfo.h"
+#include "../CacheReplacement.h"
 
 #include <catch.hpp>
 

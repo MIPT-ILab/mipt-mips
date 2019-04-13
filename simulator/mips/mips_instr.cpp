@@ -3,12 +3,12 @@
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2018 MIPT-MIPS
  */
- 
+
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
 
 #include <func_sim/alu.h>
-#include <infra/instrcache/LRUCache.h>
+#include <infra/instrcache/InstrCache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -432,7 +432,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 byte
     auto entry = get_table_entry<MyDatapath>( raw);
     MIPSInstrDecoder instr( raw);
     init( entry, version);
- 
+
     this->src1  = instr.get_register( entry.src1);
     this->src2  = instr.get_register( entry.src2);
     this->dst   = instr.get_register( entry.dst);

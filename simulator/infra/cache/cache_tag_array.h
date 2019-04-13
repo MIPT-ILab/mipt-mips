@@ -16,22 +16,21 @@
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
-#include <infra/lru/LRUCacheInfo.h>
+#include <infra/replacement/CacheReplacement.h>
 
 // Replacement algorithm modules (LRU)
 
-class LRUModule
+class ReplacementModule
 {
     public:
-        LRUModule( std::size_t number_of_sets, std::size_t number_of_ways)
-            : lru_info( number_of_sets, LRUCacheInfo( number_of_ways))
-        { }
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, int replacement_policy = LRU);
+        ~ReplacementModule() { replacement_info.clear(); }
 
-        void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
-        auto update( uint32 num_set) { return lru_info[ num_set].update(); }
+        void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
+        auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
     private:
-        std::vector<LRUCacheInfo> lru_info;
+        std::vector<CacheReplacementInterface*> replacement_info;
 };
 
 struct CacheTagArrayInvalidSizeException final : Exception
@@ -111,7 +110,7 @@ class CacheTagArray : public CacheTagArraySize
 
         // hash tabe to lookup tags in O(1)
         std::vector<std::unordered_map<Addr, Way>> lookup_helper;
-        LRUModule lru_module; // LRU algorithm module
+        ReplacementModule replacement_module; // LRU algorithm module
 };
 
 #endif // CACHE_TAG_ARRAY_H

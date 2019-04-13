@@ -6,7 +6,7 @@
 #include <catch.hpp>
 
 // Modules
-#include "../LRUCache.h"
+#include "../InstrCache.h"
 
 #include <infra/types.h>
 
@@ -21,7 +21,7 @@ public:
 
 TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")
 {
-    LRUCache<Addr, Dummy, 8192> cache{};
+    InstrCache<Addr, Dummy, 8192> cache{};
 
     const Addr PC = 0x401c04;
     const Dummy test_number( 0x103abf9, 0x401c04);
@@ -35,11 +35,11 @@ TEST_CASE( "update_and_find_int: Update_Find_And_Check_Using_Int")
 
 TEST_CASE( "check_method_size: Check_Method_Size")
 {
-    LRUCache<Addr, Dummy, 8192> instr_cache{};
+    InstrCache<Addr, Dummy, 8192> instr_cache{};
 
     uint32 instr_bytes = 0x2484ae10;
     Addr PC = 0x30ae17;
-    const std::size_t SIZE = LRUCache<Addr, Dummy, 8192>::get_capacity() / 12;
+    const std::size_t SIZE = InstrCache<Addr, Dummy, 8192>::get_capacity() / 12;
 
     for ( std::size_t i = 0; i < SIZE; ++i)
     {
@@ -54,7 +54,7 @@ TEST_CASE( "check_method_size: Check_Method_Size")
 
 TEST_CASE( "update_and_find: Update_Find_And_Check")
 {
-    LRUCache<Addr, Dummy, 8192> instr_cache{};
+    InstrCache<Addr, Dummy, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x3c010400;
     const Addr PC = 0x401c04;
@@ -66,7 +66,7 @@ TEST_CASE( "update_and_find: Update_Find_And_Check")
 
 TEST_CASE( "check_method_erase: Check_Method_Erase")
 {
-    LRUCache<Addr, Dummy, 8192> instr_cache{};
+    InstrCache<Addr, Dummy, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x3c010400;
     const Addr PC = 0x401c04;
@@ -80,7 +80,7 @@ TEST_CASE( "check_method_erase: Check_Method_Erase")
 
 TEST_CASE( "check_method_empty: Check_Method_Empty")
 {
-    LRUCache<Addr, Dummy, 8192> instr_cache{};
+    InstrCache<Addr, Dummy, 8192> instr_cache{};
 
     const uint32 instr_bytes = 0x2484ae10;
     const Addr PC = 0x400d05;
@@ -96,7 +96,7 @@ TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Ch
 {
     constexpr const auto CAPACITY = 8192u;
 
-    LRUCache<std::size_t, Dummy, CAPACITY> cache;
+    InstrCache<std::size_t, Dummy, CAPACITY> cache;
     for ( std::size_t i = 1; i <= CAPACITY; ++i) // note the <=
         cache.update( i, Dummy( i, i));
 

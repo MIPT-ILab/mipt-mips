@@ -6,7 +6,7 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
-#include <infra/instrcache/LRUCache.h>
+#include <infra/instrcache/InstrCache.h>
 #include <infra/types.h>
 
 #include <memory/memory.h>
@@ -54,7 +54,7 @@ template<typename ISA>
 class InstrMemoryCached : public InstrMemory<ISA>
 {
     using Instr = typename ISA::FuncInstr;
-    LRUCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
+    InstrCache<Addr, Instr, INSTR_CACHE_CAPACITY> instr_cache{};
 public:
     explicit InstrMemoryCached( Endian endian) : InstrMemory<ISA>( endian) { }
     Instr fetch_instr( Addr PC) final

@@ -28,7 +28,7 @@ set(CPPS
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
-    infra/lru/LRUCacheInfo.cpp
+    infra/replacement/CacheReplacement.cpp
     memory/memory.cpp
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp
@@ -60,7 +60,7 @@ set(TESTS_CPPS
     infra/cache/t/unit_test.cpp
     infra/config/t/unit_test.cpp
     infra/instrcache/t/unit_test.cpp
-    infra/lru/t/unit_test.cpp
+    infra/replacement/t/unit_test.cpp
     infra/ports/port_queue/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     infra/ports/t/example_test.cpp

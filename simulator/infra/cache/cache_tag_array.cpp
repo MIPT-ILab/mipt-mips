@@ -80,7 +80,7 @@ CacheTagArray::CacheTagArray(
     : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
     , tags( sets, std::vector<Tag>( ways))
     , lookup_helper( sets, std::unordered_map<Addr, uint32>( ways))
-    , lru_module( sets, ways)
+    , replacement_module( sets, ways)
 { }
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
@@ -91,7 +91,7 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        lru_module.touch( num_set, way);
+        replacement_module.touch( num_set, way);
     }
 
     return lookup_result;
@@ -114,7 +114,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = narrow_cast<uint32>( lru_module.update( num_set));
+    const auto way = narrow_cast<uint32>( replacement_module.update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
@@ -131,3 +131,12 @@ uint32 CacheTagArray::write( Addr addr)
 
     return way;
 }
+
+ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, int replacement_policy)
+{
+    if (replacement_policy == LRU)
+        for( int i = 0; i < static_cast<int>(number_of_sets); i++)
+            replacement_info.push_back( new LRUCacheInfo( number_of_ways));
+}
+
+
