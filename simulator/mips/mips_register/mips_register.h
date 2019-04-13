@@ -23,9 +23,12 @@ class MIPSRegister {
 #define REGISTER(X) MIPS_REG_ ## X
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define CP1_REGISTER(X) MIPS_CP1_REG_ ## X
 #include "mips_register.def"
 #undef REGISTER
 #undef CP0_REGISTER
+#undef CP1_REGISTER
         MAX_VAL_RegNum
     };
 
@@ -51,6 +54,11 @@ public:
         return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP0_REG_Context0 + id)});
     }
 
+    static constexpr MIPSRegister from_cp1_index( uint8 id) noexcept
+    {
+        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP1_REG_f0 + id)});
+    }
+
     static MIPSRegister from_gdb_index( uint8 id)
     {
         if (id < 32u)
@@ -66,12 +74,13 @@ public:
         }
     }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
-    static auto from_csr_name( std::string_view) { return zero(); }
+    static auto from_csr_name( std::string_view /* unused */) { return zero(); }
 
     size_t to_rf_index() const { return value; }
 
     static constexpr MIPSRegister mips_hi() noexcept;
     static constexpr MIPSRegister mips_lo() noexcept;
+    static constexpr MIPSRegister mips_fcsr() noexcept;
     static constexpr MIPSRegister zero() noexcept;
     static constexpr MIPSRegister return_address() noexcept;
     static constexpr MIPSRegister cause() noexcept;
@@ -88,6 +97,7 @@ private:
 
 inline constexpr MIPSRegister MIPSRegister::mips_hi() noexcept { return MIPSRegister( MIPS_REG_hi); }
 inline constexpr MIPSRegister MIPSRegister::mips_lo() noexcept { return MIPSRegister( MIPS_REG_lo); }
+inline constexpr MIPSRegister MIPSRegister::mips_fcsr() noexcept { return MIPSRegister( MIPS_CP1_REG_f31); }
 inline constexpr MIPSRegister MIPSRegister::zero() noexcept { return MIPSRegister( MIPS_REG_zero); }
 inline constexpr MIPSRegister MIPSRegister::return_address() noexcept { return MIPSRegister( MIPS_REG_ra); }
 inline constexpr MIPSRegister MIPSRegister::cause() noexcept { return MIPSRegister( MIPS_CP0_REG_Cause); }
