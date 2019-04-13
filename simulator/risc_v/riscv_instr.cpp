@@ -201,6 +201,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_slliw,  execute_slliw<I>,  OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
     {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
     {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
+    {'I', instr_c_addi, execute_c_addi<I>, OUT_ARITHM, ImmediateType::C_ADDI, Imm::C_ARITH, Src1::ZERO, Src2::ZERO,  Dst::RD, 0},
     // Immediate logic and comparison
     {'I', instr_slti,   execute_slti<I>,   OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
     {'I', instr_sltiu,  execute_sltiu<I>,  OUT_ARITHM, ImmediateType::I,      Imm::ARITH, Src1::RS1, Src2::ZERO,  Dst::RD, 0},
