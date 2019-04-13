@@ -8,7 +8,7 @@
 
  #include "infra/replacement/CacheReplacement.h"
 
- LRUCacheInfo::LRUCacheInfo( std::size_t ways)
+LRUCacheInfo::LRUCacheInfo( std::size_t ways)
     : ways( ways)
 {
     assert( ways != 0u);

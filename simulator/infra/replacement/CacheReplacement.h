@@ -29,12 +29,12 @@ class LRUCacheInfo : public CacheReplacementInterface
     public:
         explicit LRUCacheInfo( std::size_t ways);
 
-        void touch( std::size_t way);
-        void set_to_erase( std::size_t way);
-        void allocate( std::size_t way);
-        std::size_t update();
-        std::size_t get_ways() const { return ways; }
-        std::size_t get_hash_size() const { return lru_hash.size(); }
+        void touch( std::size_t way) override ;
+        void set_to_erase( std::size_t way) override ;
+        void allocate( std::size_t way) override ;
+        std::size_t update() override ;
+        std::size_t get_ways() const override { return ways; }
+        std::size_t get_hash_size() const override { return lru_hash.size(); }
 
 
     private:
