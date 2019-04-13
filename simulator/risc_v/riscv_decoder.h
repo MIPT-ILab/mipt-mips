@@ -58,6 +58,7 @@ struct RISCVInstrDecoder
     const uint16 Cx_imm3;
     const uint16 Cx_imm5;
     const uint16 Cx_imm6;
+    const uint16 Cx_imm11;
 
     constexpr uint32 get_B_immediate() const noexcept
     {
@@ -197,6 +198,7 @@ struct RISCVInstrDecoder
         , Cx_imm3   ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
         , Cx_imm5   ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
         , Cx_imm6   ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
+        , Cx_imm11  ( apply_mask( raw, 0b00000000'00000000'00011111'11111100))
     { }
 };
 
