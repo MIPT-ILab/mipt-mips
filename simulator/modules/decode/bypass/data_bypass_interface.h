@@ -46,7 +46,7 @@ private:
     // IN_RF      - MAX_VAL8
 
     static constexpr const Latency IN_RF_STAGE  = Latency( MAX_VAL8);
-    static constexpr const Latency MEM_STAGE    = IN_RF_STAGE - 3_lt;
+    static constexpr const Latency MEM_STAGE    = IN_RF_STAGE - 2_lt;
     static constexpr const Latency WB_STAGE     = IN_RF_STAGE - 1_lt;
     static constexpr const Latency BRANCH_STAGE = IN_RF_STAGE - 2_lt;
 };
