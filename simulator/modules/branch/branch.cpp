@@ -54,6 +54,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
 
     if ( instr.is_branch() || instr.is_indirect_jump())
     {
+        num_branches++;
         is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
         if ( instr.is_taken())
             is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
@@ -62,6 +63,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
     /* handle misprediction */
     if ( is_misprediction )
     {
+        num_mispredictions++;
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
           

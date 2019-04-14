@@ -20,6 +20,9 @@ class Branch : public Log
         using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
+        uint64  num_branches       = 0;
+        float64 num_mispredictions = 0;
+
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
 
@@ -39,6 +42,9 @@ class Branch : public Log
     public:
         explicit Branch( bool log);
         void clock( Cycle cycle);
+        auto get_mispredict_rate() const { return ( num_branches != 0) 
+                                                  ? num_mispredictions / num_branches * 100
+                                                  : 0; }
 };
 
 #endif // BRANCH_H
