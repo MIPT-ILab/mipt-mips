@@ -10,7 +10,6 @@
 #include <list>
 #include <unordered_map>
 
-enum replacement_polices { LRU, pseudo_LRU };
 
 struct CacheReplacementInterface
 {

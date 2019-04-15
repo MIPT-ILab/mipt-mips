@@ -132,9 +132,9 @@ uint32 CacheTagArray::write( Addr addr)
     return way;
 }
 
-ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, int replacement_policy)
+ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy)
 {
-    if (replacement_policy == LRU)
+    if (replacement_policy == "LRU")
         for( int i = 0; i < static_cast<int>(number_of_sets); i++)
             replacement_info.push_back( new LRUCacheInfo( number_of_ways));
 }

@@ -23,7 +23,7 @@
 class ReplacementModule
 {
     public:
-        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, int replacement_policy = LRU);
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy = "LRU");
         ~ReplacementModule() { replacement_info.clear(); }
 
         void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
