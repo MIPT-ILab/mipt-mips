@@ -53,7 +53,7 @@ class Execute : public Log
 
 
     public:
-        explicit Execute( bool log);
+        explicit Execute( bool log, uint32 writeback_bandwidth = PORT_BW);
         void clock( Cycle cycle);
 };
 

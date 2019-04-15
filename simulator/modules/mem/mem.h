@@ -32,7 +32,7 @@ class Mem : public Log
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
     public:
-        explicit Mem( bool log);
+        explicit Mem( bool log, uint32 writeback_bandwidth = PORT_BW);
         void clock( Cycle cycle);
         void set_memory( const std::shared_ptr<FuncMemory>& mem) { memory = mem; }
 };
