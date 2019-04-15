@@ -28,7 +28,7 @@ set(CPPS
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
-    infra/replacement/CacheReplacement.cpp
+    infra/replacement/cache_replacement.cpp
     memory/memory.cpp
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp

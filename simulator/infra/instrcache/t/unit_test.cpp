@@ -6,7 +6,7 @@
 #include <catch.hpp>
 
 // Modules
-#include "../InstrCache.h"
+#include "../instr_cache.h"
 
 #include <infra/types.h>
 

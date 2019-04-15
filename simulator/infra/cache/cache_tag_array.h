@@ -16,7 +16,7 @@
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
-#include <infra/replacement/CacheReplacement.h>
+#include <infra/replacement/cache_replacement.h>
 
 // Replacement algorithm modules (LRU)
 

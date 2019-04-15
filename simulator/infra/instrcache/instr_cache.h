@@ -13,7 +13,7 @@
 #include <utility>
 
 #include <infra/types.h>
-#include <infra/replacement/CacheReplacement.h>
+#include <infra/replacement/cache_replacement.h>
 
 template <typename Key, typename Value, size_t CAPACITY>
 class InstrCache

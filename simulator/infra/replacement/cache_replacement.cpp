@@ -6,7 +6,7 @@
 
  #include <cassert>
 
- #include "infra/replacement/CacheReplacement.h"
+ #include "infra/replacement/cache_replacement.h"
 
 LRUCacheInfo::LRUCacheInfo( std::size_t ways)
     : ways( ways)

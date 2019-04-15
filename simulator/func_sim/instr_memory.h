@@ -6,7 +6,7 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
-#include <infra/instrcache/InstrCache.h>
+#include <infra/instrcache/instr_cache.h>
 #include <infra/types.h>
 
 #include <memory/memory.h>

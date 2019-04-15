@@ -8,7 +8,7 @@
 #include "mips_instr_decode.h"
 
 #include <func_sim/alu.h>
-#include <infra/instrcache/InstrCache.h>
+#include <infra/instrcache/instr_cache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
