@@ -4,9 +4,13 @@
  * @author Oleg Ladin, Denis Los, Andrey Agrachev
  */
 
- #include "infra/replacement/cache_replacement.h"
+#include "infra/replacement/cache_replacement.h"
 
- class LRUCacheInfo : public CacheReplacementInterface
+#include <list>
+#include <unordered_map>
+#include <cassert>
+
+class LRUCacheInfo : public CacheReplacementInterface
 {
     public:
         explicit LRUCacheInfo( std::size_t ways);
@@ -16,8 +20,6 @@
         void allocate( std::size_t way) override ;
         std::size_t update() override ;
         std::size_t get_ways() const override { return ways; }
-        std::size_t get_hash_size() const override { return lru_hash.size(); }
-
 
     private:
         std::list<std::size_t> lru_list{};
@@ -77,20 +79,15 @@ void LRUCacheInfo::allocate( std::size_t way)
 }
 
 void LRUCacheInfo::erase_lru_element() {
-        std::size_t lru_elem = lru_list.back();
-        lru_list.pop_back();
-        lru_hash.erase( lru_elem);
+    std::size_t lru_elem = lru_list.back();
+    lru_list.pop_back();
+    lru_hash.erase( lru_elem);
 }
 
 std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::string& name, std::size_t ways)
 {
     if (name == "LRU")
-    {
-        std::unique_ptr<LRUCacheInfo> returned_pointer( new LRUCacheInfo( ways));
-        return returned_pointer;
-
-    }
-    assert(false); //wrong policy name
-    return nullptr;
+        return std::make_unique<LRUCacheInfo>( ways);
     //if (name == "pseudo-LRU")
+    throw UndefinedCacheReplacementPolicyName("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
 }
