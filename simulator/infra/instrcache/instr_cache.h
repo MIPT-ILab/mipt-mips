@@ -20,8 +20,9 @@ class InstrCache
 {
         struct Deleter;
     public:
-        InstrCache() : lru_module( CAPACITY)
+        InstrCache()
         {
+            lru_module = create_cache_replacement( "LRU", CAPACITY);
             data.reserve( CAPACITY);
             for (size_t i = 0; i < CAPACITY; ++i)
                 free_list.emplace_back(i);
@@ -59,7 +60,7 @@ class InstrCache
 
         void touch( const Key& key)
         {
-            lru_module.touch( key);
+            lru_module->touch( key);
         }
 
         void update( const Key& key, const Value& value)
@@ -78,7 +79,7 @@ class InstrCache
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
-                lru_module.set_to_erase( key);
+                lru_module->set_to_erase( key);
             }
         }
 
@@ -86,14 +87,14 @@ class InstrCache
         void allocate( const Key& key, const Value& value)
         {
             if ( size() == CAPACITY)
-                erase( lru_module.update());
+                erase( lru_module->update());
 
             // Add a new element
             auto index = free_list.front();
             free_list.pop_front();
             new (&storage[index]) Value( value);
             data.emplace( key, index);
-            lru_module.allocate( key);
+            lru_module->allocate( key);
         }
 
         static void* allocate_memory()
@@ -110,7 +111,7 @@ class InstrCache
         std::list<size_t> free_list{};
         std::unique_ptr<void, Deleter> arena = nullptr;
         Value* storage = nullptr;
-        LRUCacheInfo lru_module;
+        std::unique_ptr<CacheReplacementInterface> lru_module;
 };
 
 #endif // INSTRCACHE_H
