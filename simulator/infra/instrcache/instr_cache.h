@@ -97,11 +97,12 @@ class InstrCache
 
         auto get_first_empty() const noexcept
         {
-            for ( size_t i = 0; i < CAPACITY; ++i)
-                if ( !valid_elements[i])
-                    return i;
+            size_t i = 0;
+            for ( ; i < CAPACITY; ++i)
+                if ( valid_elements[i])
+                    continue;
 
-            return CAPACITY;
+            return i;
         }
 
         std::unordered_map<Key, size_t> data{};
