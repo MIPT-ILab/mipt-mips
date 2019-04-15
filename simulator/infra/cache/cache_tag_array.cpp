@@ -136,7 +136,7 @@ ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t nu
 {
     if (replacement_policy == "LRU")
         for( int i = 0; i < static_cast<int>(number_of_sets); i++)
-            replacement_info.push_back( new LRUCacheInfo( number_of_ways));
+            replacement_info.emplace_back( new LRUCacheInfo( number_of_ways));
 }
 
 

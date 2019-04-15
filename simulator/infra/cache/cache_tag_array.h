@@ -10,6 +10,7 @@
 #include <list>
 #include <unordered_map>
 #include <utility>
+#include <memory>
 #include <vector>
 
 #include <infra/exception.h>
@@ -30,7 +31,7 @@ class ReplacementModule
         auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
     private:
-        std::vector<CacheReplacementInterface*> replacement_info;
+        std::vector<std::unique_ptr<CacheReplacementInterface>> replacement_info;
 };
 
 struct CacheTagArrayInvalidSizeException final : Exception
