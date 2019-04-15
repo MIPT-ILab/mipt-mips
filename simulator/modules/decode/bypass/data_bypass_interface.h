@@ -22,39 +22,43 @@ public:
     static constexpr const uint8 BYPASSING_STAGES_NUMBER = 5;
 
     void set_to_stage( Latency v) { value = v; }
-    void set_to_first_execution_stage() { set_to_stage( 0_lt); }
-    void set_to_mem_stage()    { set_to_stage( MEM_STAGE); }
-    void set_to_writeback()    { set_to_stage( WB_STAGE); }
-    void set_to_branch_stage() { set_to_stage( BRANCH_STAGE); }
+    void set_to_first_execution_stage() { set_to_stage( 0_lt); 
+                                          set_direction_to_first_execution_stage(); }
+    void set_to_mem_stage()    { set_to_stage( MEM_OR_BRANCH_STAGE); 
+                                 set_direction_to_mem_stage(); }
+    void set_to_writeback()    { set_to_stage( WB_STAGE); 
+                                 set_direction_to_writeback(); }
+    void set_to_branch_stage() { set_to_stage( MEM_OR_BRANCH_STAGE); 
+                                 set_direction_to_branch_stage(); }
     void set_to_in_RF()        { set_to_stage( IN_RF_STAGE); }
-
-    void set_direction_to_first_execution_stage() { bypass_direction = 0; }
-    void set_direction_to_mem_stage()             { bypass_direction = 2; }
-    void set_direction_to_writeback()       { bypass_direction = 3; }
-    void set_direction_to_branch_stage()          { bypass_direction = 4; }
-
 
     bool is_same_stage( Latency v) const  { return value == v; }
     bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
-    bool is_mem_stage() const { return is_same_stage( MEM_STAGE); }
-    bool is_branch_stage() const { return is_same_stage( BRANCH_STAGE); }
+    bool is_mem_or_branch_stage() const { return is_same_stage( MEM_OR_BRANCH_STAGE); }
     bool is_writeback() const { return is_same_stage( WB_STAGE); }
     bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
-    uint8 bypass_direction = 0;
+    auto get_direction() const{ return bypass_direction; }
+
 private:
+    void set_direction_to_first_execution_stage() { bypass_direction = 0; }
+    void set_direction_to_mem_stage()             { bypass_direction = 2; }
+    void set_direction_to_writeback()             { bypass_direction = 3; }
+    void set_direction_to_branch_stage()          { bypass_direction = 4; }
+
+    uint8 bypass_direction = 0;
     Latency value = IN_RF_STAGE;
     // EXECUTE_0  - 0                              | Bypassing stage
     //  .......
     // EXECUTE_N  - last_execution_stage_value     | Bypassing stage
     // MEM        - MAX_VAL8 - 2                   | Bypassing stage
+    // BRANCH     - MAX_VAL8 - 2                   | Bypassing stage
     // WRITEBACK  - MAX_VAL8 - 1                   | Bypassing stage
     // IN_RF      - MAX_VAL8
 
     static constexpr const Latency IN_RF_STAGE  = Latency( MAX_VAL8);
-    static constexpr const Latency MEM_STAGE    = IN_RF_STAGE - 2_lt;
+    static constexpr const Latency MEM_OR_BRANCH_STAGE    = IN_RF_STAGE - 2_lt;
     static constexpr const Latency WB_STAGE     = IN_RF_STAGE - 1_lt;
-    static constexpr const Latency BRANCH_STAGE = IN_RF_STAGE - 2_lt;
 };
 
 
@@ -72,23 +76,10 @@ public:
     {
         uint8 bypass_direction = 0;
 
-        //if ( bypassing_stage.is_first_execution_stage())
-        //    bypass_direction = 0;
-
         if ( bypassing_stage.is_same_stage( last_execution_stage))
             bypass_direction = 1;
         else 
-            bypass_direction = bypassing_stage.bypass_direction;
-/*
-        if ( bypassing_stage.is_mem_stage())
-            bypass_direction = 2;
-
-        if ( bypassing_stage.is_writeback())
-            bypass_direction = 3;
-
-        if ( bypassing_stage.is_branch_stage())
-            bypass_direction = 2;
-*/
+            bypass_direction = bypassing_stage.get_direction();
         
         return bypass_direction;
     }
