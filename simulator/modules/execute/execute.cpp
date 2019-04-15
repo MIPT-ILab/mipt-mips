@@ -12,13 +12,13 @@ namespace config {
 } // namespace config
 
 template <typename FuncInstr>
-Execute<FuncInstr>::Execute( bool log) 
+Execute<FuncInstr>::Execute( bool log, uint32 writeback_bandwidth) 
     : Log( log)
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW , PORT_FANOUT);
     wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW , PORT_FANOUT);
-    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", writeback_bandwidth, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
     if (config::long_alu_latency < 2)

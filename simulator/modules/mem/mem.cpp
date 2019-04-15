@@ -7,9 +7,9 @@
 #include <memory/memory.h>
 
 template <typename FuncInstr>
-Mem<FuncInstr>::Mem( bool log) : Log( log)
+Mem<FuncInstr>::Mem( bool log, uint32 writeback_bandwidth) : Log( log)
 {
-    wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", writeback_bandwidth, PORT_FANOUT);
     rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
