@@ -51,7 +51,7 @@ public:
                                                 this->is_store() ||
                                                 this->is_explicit_trap(); }
 
-    auto is_branch_stage_required() const { return this->is_load()  ||
+    auto is_branch_stage_required() const { return //this->is_load()  ||
                                                    this->is_jump(); }
 };
 

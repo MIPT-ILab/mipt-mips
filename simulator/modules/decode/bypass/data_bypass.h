@@ -89,14 +89,17 @@ class DataBypass
                 else if ( instr.is_branch_stage_required())
                 {
                     next_stage_after_first_execution_stage.set_to_branch_stage();
+                    next_stage_after_first_execution_stage.set_direction_to_branch_stage();
                 }
                 else if ( instr.is_mem_stage_required())
                 {
                     next_stage_after_first_execution_stage.set_to_mem_stage();
+                    next_stage_after_first_execution_stage.set_direction_to_mem_stage();
                 }
                 else
                 {
                     next_stage_after_first_execution_stage.set_to_writeback();
+                    next_stage_after_first_execution_stage.set_direction_to_writeback();
                 }
             }
         };
@@ -152,6 +155,7 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
     auto& entry = get_entry( num);
 
     entry.current_stage.set_to_first_execution_stage();
+    entry.current_stage.set_direction_to_first_execution_stage();
     entry.set_next_stage_after_first_execution_stage( instr);
 
 
@@ -162,14 +166,17 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
     else if ( instr.is_jump())
     {
         entry.ready_stage.set_to_branch_stage();
+        entry.ready_stage.set_direction_to_branch_stage();
     }
     else if ( instr.is_load())
     {
         entry.ready_stage.set_to_mem_stage();
+        entry.ready_stage.set_direction_to_mem_stage();
     }
     else
     {
         entry.ready_stage.set_to_first_execution_stage();
+        entry.ready_stage.set_direction_to_first_execution_stage();
     }
 
     if ( !instr.is_bypassible())
@@ -187,6 +194,7 @@ void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Registe
     auto& entry = get_entry( num);
 
     entry.current_stage.set_to_first_execution_stage();
+    entry.current_stage.set_direction_to_first_execution_stage();
     entry.set_next_stage_after_first_execution_stage( instr);
 
     // values of registers used for the 2nd destination cannot be bypassed
@@ -228,8 +236,11 @@ void DataBypass<FuncInstr>::update()
 
         if ( entry.current_stage.is_first_execution_stage())
             entry.current_stage = entry.next_stage_after_first_execution_stage;
-        else if ( entry.current_stage.is_same_stage( long_alu_latency - 1_lt))
+        else if ( entry.current_stage.is_same_stage( long_alu_latency - 1_lt) || entry.current_stage.is_mem_stage())
+        {
             entry.current_stage.set_to_writeback();
+            entry.current_stage.set_direction_to_writeback();
+        }
         else
             entry.current_stage.inc();
         
