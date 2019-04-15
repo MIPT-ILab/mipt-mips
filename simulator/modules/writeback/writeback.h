@@ -72,7 +72,7 @@ private:
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
 
 public:
-    explicit Writeback( Endian endian, bool log, uint32 bandwidth = PORT_BW);
+    explicit Writeback( Endian endian, bool log);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
