@@ -25,6 +25,8 @@ Date | Event name
 15 Mar | **Out-of-order execution**<br/> • Slides: [L12](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2012%20-%20Out-of-order%20execution.pptx?raw=true), [YouTube](https://youtu.be/rmnHFtVwjBY)
 22 Mar | **Out-of-order execution: load-store architecture**<br/> • Slides: [L13](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2013%20-%20Load-Store%20Architecture.pptx?raw=true), [YouTube](https://youtu.be/zMAlhLq5O3I)
 29 Mar | **Virtual Memory**<br/> • Slides: [L14](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2014%20-%20Virtual%20Memory.pptx?raw=true), [YouTube](https://youtu.be/WiobWMd4tuo)
+05 Apr | **Multiprocessor Systems**<br/> • Slides: L15
+12 Apr | **Simultaneous Multithreading**<br/> • Slides: [L16](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2016%20-%20Simultaneous%20Multithreading.pptx?raw=true), no video was recorded.
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
