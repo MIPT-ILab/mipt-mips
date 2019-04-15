@@ -9,7 +9,6 @@
 #include <bitset>
 #include <cassert>
 #include <memory>
-#include <type_traits>
 #include <unordered_map>
 #include <utility>
 
@@ -83,12 +82,16 @@ class InstrCache
     private:
         void allocate( const Key& key, const Value& value)
         {
-            if ( size() == CAPACITY)
+            size_t index;
+            if ( size() == CAPACITY) {
+                index = lru_module->update();
                 // FIXME(pikryukov): think about this.
-                erase( narrow_cast<Key>( lru_module->update()));
+                erase( narrow_cast<Key>( index));
+            }
+            else {
+                index = get_first_empty();
+            }
 
-            // Add a new element
-            auto index = get_first_empty();
             storage.emplace( index, value);
             valid_elements[index] = true;
             data.emplace( key, index);
