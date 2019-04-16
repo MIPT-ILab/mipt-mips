@@ -23,13 +23,13 @@ public:
 
     void set_to_stage( Latency v) { value = v; }
     void set_to_first_execution_stage() { set_to_stage( 0_lt); 
-                                          set_direction_to_first_execution_stage(); }
+                                          bypass_direction = 0; }
     void set_to_mem_stage()    { set_to_stage( MEM_OR_BRANCH_STAGE); 
-                                 set_direction_to_mem_stage(); }
+                                 bypass_direction = 2; }
     void set_to_writeback()    { set_to_stage( WB_STAGE); 
-                                 set_direction_to_writeback(); }
+                                 bypass_direction = 3; }
     void set_to_branch_stage() { set_to_stage( MEM_OR_BRANCH_STAGE); 
-                                 set_direction_to_branch_stage(); }
+                                 bypass_direction = 4; }
     void set_to_in_RF()        { set_to_stage( IN_RF_STAGE); }
 
     bool is_same_stage( Latency v) const  { return value == v; }
@@ -38,16 +38,12 @@ public:
     bool is_writeback() const { return is_same_stage( WB_STAGE); }
     bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
-    auto get_direction() const{ return bypass_direction; }
+    auto get_bypass_direction_value() const{ return bypass_direction; }
 
 private:
-    void set_direction_to_first_execution_stage() { bypass_direction = 0; }
-    void set_direction_to_mem_stage()             { bypass_direction = 2; }
-    void set_direction_to_writeback()             { bypass_direction = 3; }
-    void set_direction_to_branch_stage()          { bypass_direction = 4; }
-
     uint8 bypass_direction = 0;
     Latency value = IN_RF_STAGE;
+    
     // EXECUTE_0  - 0                              | Bypassing stage
     //  .......
     // EXECUTE_N  - last_execution_stage_value     | Bypassing stage
@@ -79,7 +75,7 @@ public:
         if ( bypassing_stage.is_same_stage( last_execution_stage))
             bypass_direction = 1;
         else 
-            bypass_direction = bypassing_stage.get_direction();
+            bypass_direction = bypassing_stage.get_bypass_direction_value();
         
         return bypass_direction;
     }
