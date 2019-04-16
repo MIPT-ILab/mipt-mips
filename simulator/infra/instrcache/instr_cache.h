@@ -10,7 +10,6 @@
 #include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
 
-#include <cassert>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -31,7 +30,7 @@ class InstrCache
         ~InstrCache()
         {
             for ( const auto& k : pointers)
-                 storage.destroy( pointers.second);
+                 storage.destroy( k.second);
         }
 
         InstrCache(const InstrCache&) = delete;
@@ -56,7 +55,7 @@ class InstrCache
 
         void touch( const Key& key)
         {
-            lru_module->touch( key);
+            lru_module->touch( pointers[key]);
         }
 
         void update( const Key& key, const Value& value)
