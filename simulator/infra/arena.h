@@ -30,16 +30,19 @@ public:
     template<typename... Args> void emplace( std::size_t position, Args&& ... args)
         noexcept( std::is_nothrow_constructible<T, Args...>::value)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         new (storage + position) T( std::forward<Args>( args)...);
     }
 
     void destroy( std::size_t position)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         (storage + position)->~T();
     }
 
     const T& operator[]( std::size_t position) const noexcept
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return storage[position];
     }
 private:
@@ -58,12 +61,17 @@ private:
 
     static void* allocate_memory( std::size_t capacity)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         return std::malloc( get_space( capacity) + sizeof(T));
     }
 
     struct Deleter
     {
-        void operator()(void *p) { std::free(p); }
+        void operator()(void *p)
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            std::free(p);
+        }
     };
 
     std::unique_ptr<void, Deleter> arena = nullptr;
