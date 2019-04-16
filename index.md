@@ -25,6 +25,8 @@ Date | Event name
 15 Mar | **Out-of-order execution**<br/> • Slides: [L12](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2012%20-%20Out-of-order%20execution.pptx?raw=true), [YouTube](https://youtu.be/rmnHFtVwjBY)
 22 Mar | **Out-of-order execution: load-store architecture**<br/> • Slides: [L13](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2013%20-%20Load-Store%20Architecture.pptx?raw=true), [YouTube](https://youtu.be/zMAlhLq5O3I)
 29 Mar | **Virtual Memory**<br/> • Slides: [L14](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2014%20-%20Virtual%20Memory.pptx?raw=true), [YouTube](https://youtu.be/WiobWMd4tuo)
+05 Apr | **Multiprocessor Systems**<br/> • Slides: L15
+12 Apr | **Simultaneous Multithreading**<br/> • Slides: [L16](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2018/Lecture%2016%20-%20Simultaneous%20Multithreading.pptx?raw=true), no video was recorded.
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2017).
@@ -53,11 +55,11 @@ MIPT | Name | Score | Comments
 **711** | **Vyacheslav Kompan** | **10 + 1** | **[#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)**  |
 **711** | **Yan Logovskiy** | **4 + 5** | **[#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383), [#506](https://github.com/MIPT-ILab/mipt-mips/issues/506), ¼[#613](https://github.com/MIPT-ILab/mipt-mips/issues/613)** |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+**714** | **Yauheni Sharamed** | **6 + 2** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724), [#649](https://github.com/MIPT-ILab/mipt-mips/issues/649)**
 **712** | **Egor Bova** | **+ 8** | **½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#235](https://github.com/MIPT-ILab/mipt-mips/issues/235)** |
-**714** | **Yauheni Sharamed** | **6** | **[#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724)**
+**718** | **Andrey Agrachev** | **4 + 2** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626), [#830](https://github.com/MIPT-ILab/mipt-mips/issues/830)** |
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
-**718** | **Andrey Agrachev** | **4** | **[#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626)** |
 **717** | **Vsevolod Pukhov** | **4** | **[#589](https://github.com/MIPT-ILab/mipt-mips/issues/589)**, **½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530)** |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |

@@ -16,6 +16,7 @@ class LRUCacheInfo : public CacheReplacementInterface
 {
     public:
         explicit LRUCacheInfo( std::size_t ways);
+
         void touch( std::size_t way) override ;
         void set_to_erase( std::size_t way) override ;
         void allocate( std::size_t way) override ;
@@ -83,8 +84,6 @@ void LRUCacheInfo::erase_lru_element() {
     lru_list.pop_back();
     lru_hash.erase( lru_elem);
 }
-
-////////////////////////////////////////////////////////////////////////////////////
 
 class Pseudo_LRUCacheInfo : public CacheReplacementInterface
 {
@@ -187,10 +186,12 @@ std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::
 {
     if (name == "LRU")
         return std::make_unique<LRUCacheInfo>( ways);
+
     if (name == "Pseudo-LRU")
         return std::make_unique<Pseudo_LRUCacheInfo>( ways);
     else
         throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
 }
-
-
+    //if (name == "pseudo-LRU")
+    throw UndefinedCacheReplacementPolicyName("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
+}

@@ -87,7 +87,9 @@ class InstrCache
         void allocate( const Key& key, const Value& value)
         {
             if ( size() == CAPACITY)
-                erase( lru_module->update());
+                // FIXME(pikryukov): think about this.
+                erase( narrow_cast<Key>( lru_module->update()));
+
 
             // Add a new element
             auto index = free_list.front();

@@ -36,6 +36,7 @@ TEST_CASE( "LRU: Check_set_to_erase_method")
     CHECK( test_lru_module->update() == 2);
 }
 
+
 TEST_CASE( "LRU: Check_Untouched_way")
 {
     auto test_lru_module = create_cache_replacement( "LRU", 3);
@@ -43,7 +44,6 @@ TEST_CASE( "LRU: Check_Untouched_way")
     test_lru_module->touch( 2);
     CHECK( test_lru_module->update() == 1);
 }
-
 
 TEST_CASE( "LRU: Check_allocate_method")
 {
@@ -56,6 +56,7 @@ TEST_CASE( "LRU: Check_erase_lru_element_method")
     auto test_lru_module = create_cache_replacement( "LRU", 3);
     CHECK_NOTHROW(test_lru_module->allocate(1));
 }
+
 
 TEST_CASE( "LRU && Pseudo-LRU: Check_get_ways_method")
 {
@@ -110,4 +111,10 @@ TEST_CASE( "Pseudo-LRU: Check_touch_method_with_odd_number_of elements")
     test_lru_module->touch( 2);
     test_lru_module->touch( 1);
     CHECK( test_lru_module->update() == 2); //way number 3 doesn't exist
+}
+
+TEST_CASE( "Check_get_ways_method")
+{
+    auto test_lru_module = create_cache_replacement( "LRU", 3);
+    CHECK(test_lru_module->get_ways() == 3);
 }
