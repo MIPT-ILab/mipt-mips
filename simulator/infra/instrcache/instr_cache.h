@@ -22,6 +22,10 @@ class InstrCache
         InstrCache()
         {
             lru_module = create_cache_replacement( "LRU", CAPACITY);
+            // Touch everything to initialize order
+            for (size_t i = 0; i < CAPACITY; ++i)
+                lru_module->touch( i);
+
             keys.resize( CAPACITY);
             pointers.reserve( CAPACITY);
             storage.allocate( CAPACITY);
@@ -30,7 +34,7 @@ class InstrCache
         ~InstrCache()
         {
             for ( const auto& k : pointers)
-                 storage.destroy( k.second);
+                storage.destroy( k.second);
         }
 
         InstrCache(const InstrCache&) = delete;
@@ -88,7 +92,7 @@ class InstrCache
             storage.emplace( index, value);
             keys[index] = key;
             pointers.emplace( key, index);
-            lru_module->allocate( index);
+            lru_module->touch( index);
         }
 
         std::vector<Key> keys{};
