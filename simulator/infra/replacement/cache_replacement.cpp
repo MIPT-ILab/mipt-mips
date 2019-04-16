@@ -192,6 +192,3 @@ std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::
     else
         throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
 }
-    //if (name == "pseudo-LRU")
-    throw UndefinedCacheReplacementPolicyName("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
-}

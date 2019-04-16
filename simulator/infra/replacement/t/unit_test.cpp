@@ -112,9 +112,3 @@ TEST_CASE( "Pseudo-LRU: Check_touch_method_with_odd_number_of elements")
     test_lru_module->touch( 1);
     CHECK( test_lru_module->update() == 2); //way number 3 doesn't exist
 }
-
-TEST_CASE( "Check_get_ways_method")
-{
-    auto test_lru_module = create_cache_replacement( "LRU", 3);
-    CHECK(test_lru_module->get_ways() == 3);
-}
