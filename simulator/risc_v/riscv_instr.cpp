@@ -79,7 +79,7 @@ template<typename I> auto execute_csrrwi = ALU::csrrwi<I>;
 template<typename I> auto execute_csrrsi = do_nothing<I>;
 template<typename I> auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> auto execute_mul = do_nothing<I>;
+template<typename I> auto execute_mul = ALU::riscv_multiplication_l<I, int32>;
 template<typename I> auto execute_mulh = do_nothing<I>;
 template<typename I> auto execute_mulhsu = do_nothing<I>;
 template<typename I> auto execute_mulhu = do_nothing<I>;
@@ -194,7 +194,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_fence,  execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     {'I', instr_fence_i,execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     /*-------------- M --------------*/
-    {'M', instr_mul,    execute_mul<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mul,    execute_mul<I>,    OUT_DIVMULT,' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 4},
     {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
     {'M', instr_mulhsu, execute_mulhsu<I>, OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
     {'M', instr_mulhu,  execute_mulhu<I>,  OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
