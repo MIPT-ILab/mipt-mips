@@ -27,15 +27,14 @@ class Trap {
 
         constexpr Trap(TrapType id) : value(id) { }
 
-        bool operator==(Trap trap) const { return value == trap.value; }
-        bool operator!=(Trap trap) const { return value != trap.value; }
-        
+        operator uint8() const { return value; }
+
         void set_from_gdb_format(uint8 id);
         uint8 to_gdb_format();
-        
+
         void set_from_riscv_format(uint8 id);
         uint8 to_riscv_format();
-        
+
         friend std::ostream& operator<<( std::ostream& out, const Trap& trap)
         {
             return out << TrapStrTable.at( trap.value);
@@ -43,7 +42,7 @@ class Trap {
 
     private:
         TrapType value = Trap::NO_TRAP;
-        
+
         static std::array<std::string_view, MAX_TRAP_TYPE> TrapStrTable;
 };
 
