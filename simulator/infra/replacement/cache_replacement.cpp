@@ -5,11 +5,11 @@
  */
 
 #include "infra/replacement/cache_replacement.h"
+#include <tree.hh>
 
 #include <list>
 #include <unordered_map>
 #include <cassert>
-#include <cmath>
 #include "tree.hh"
 
 class LRUCacheInfo : public CacheReplacementInterface
@@ -97,59 +97,71 @@ class Pseudo_LRUCacheInfo : public CacheReplacementInterface
         void allocate( std::size_t ) override;
 
     private:
-        enum flags { LEFT, RIGHT};
+        enum flags { Left = -2, Right = -1};
 
-        tree<std::size_t> lru_tree;
-        void construct_tree( tree<std::size_t>::iterator node_it, int depth);
+        tree<int> lru_tree;
+        void construct_tree( tree<int>::iterator node_it, int depth);
         void construct_leaf_layer();
         int calculate_depth() const;
-        std::size_t reverse_flag( std::size_t flag);
+        int side_of_the_sibling ( tree<int>::iterator node_it);
+        static int reverse_flag( int flag);
 
         const std::size_t ways;
-        size_t leaf_iterator = 0;
+        int leaf_iterator = 0;
 };
 
 Pseudo_LRUCacheInfo::Pseudo_LRUCacheInfo( std::size_t ways)
     : ways( ways)
 {
-    lru_tree.insert( lru_tree.begin(), LEFT);
+    lru_tree.insert( lru_tree.begin(), Left);
     construct_tree( lru_tree.begin(), calculate_depth());
 }
 
 int Pseudo_LRUCacheInfo::calculate_depth() const
 {
     int i = 0;
-    for (; pow(2, i) < ways; ++i);
+        for ( int numerator = ways; numerator != 1; numerator = numerator/2)
+        {
+            if (numerator%2 != 0)
+                throw CacheReplacementException("Number of ways must be the power of 2!");
+            i++;
+        }
     return i;
 }
 
-void Pseudo_LRUCacheInfo::construct_tree( tree<std::size_t>::iterator node_it, int depth)
+void Pseudo_LRUCacheInfo::construct_tree( tree<int>::iterator node_it, int depth)
 {
     if (lru_tree.depth( node_it) < depth)
     {
         if ( lru_tree.depth( node_it) != depth - 1)
         {
-            auto left_it = lru_tree.append_child( node_it, LEFT);
-            auto right_it = lru_tree.append_child( node_it, LEFT);
+            auto left_it = lru_tree.append_child( node_it, Left);
+            auto right_it = lru_tree.append_child( node_it, Left);
             construct_tree( left_it, depth);
             construct_tree( right_it, depth);
         }
         else
         {
-            if ( leaf_iterator != ways)
-                lru_tree.append_child(node_it, leaf_iterator++);
-            if ( leaf_iterator != ways)
-                lru_tree.append_child(node_it, leaf_iterator++);
+            lru_tree.append_child(node_it, leaf_iterator++);
+            lru_tree.append_child(node_it, leaf_iterator++);
         }
     }
 }
 
-std::size_t Pseudo_LRUCacheInfo::reverse_flag( std::size_t flag)
+int Pseudo_LRUCacheInfo::reverse_flag( int flag)
 {
-    if ( flag == LEFT)
-        return RIGHT;
+    if ( flag == Left) {
+        return Right;
+        }
     else
-        return LEFT;
+        return Left;
+}
+
+int Pseudo_LRUCacheInfo::side_of_the_sibling ( tree<int>::iterator node_it)
+{
+    if  (lru_tree.index( node_it) == 0)
+        return Left;
+    return Right;
 }
 
 void Pseudo_LRUCacheInfo::touch( std::size_t way)
@@ -158,7 +170,7 @@ void Pseudo_LRUCacheInfo::touch( std::size_t way)
         throw CacheReplacementException( "Requsted way number ( " + std::to_string( way) + ") is out of the capacity (" + std::to_string( ways) +")\n");
     auto found_it = std::find(lru_tree.begin(), lru_tree.end(), way);
     for ( auto i = found_it; i != lru_tree.begin(); i = lru_tree.parent( i))
-        if ( lru_tree.index( i) == *lru_tree.parent( i))
+        if ( side_of_the_sibling( i) == *lru_tree.parent( i))
             lru_tree.replace( lru_tree.parent( i), reverse_flag( *lru_tree.parent( i)));
 }
 
@@ -167,11 +179,12 @@ std::size_t Pseudo_LRUCacheInfo::update()
     auto node_it = lru_tree.begin();
     while ( lru_tree.number_of_children( node_it) != 0)
     {
-        if (*node_it == RIGHT && lru_tree.number_of_children( node_it) == 2)
-            node_it = lru_tree.child( node_it, 1); //go to the right child if it exists
+        if (*node_it == Right && lru_tree.number_of_children( node_it) == 2)
+            node_it = lru_tree.child( node_it, 1); //go to the Right child if it exists
         else
-            node_it = lru_tree.child( node_it, 0); //go tot he left child
+            node_it = lru_tree.child( node_it, 0); //go tot he Left child
     }
+    touch( *node_it);
     return *node_it;
 }
 
@@ -189,6 +202,6 @@ std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::
 
     if (name == "Pseudo-LRU")
         return std::make_unique<Pseudo_LRUCacheInfo>( ways);
-    else
-        throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
+
+    throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
 }
