@@ -3,8 +3,8 @@
  * @author Denis Los
 */
 
-#ifndef LRUCACHE_H
-#define LRUCACHE_H
+#ifndef INSTRCACHE_H
+#define INSTRCACHE_H
 
 #include <cassert>
 #include <list>
@@ -13,16 +13,17 @@
 #include <utility>
 
 #include <infra/types.h>
+#include <infra/replacement/cache_replacement.h>
 
 template <typename Key, typename Value, size_t CAPACITY>
-class LRUCache
+class InstrCache
 {
         struct Deleter;
     public:
-        LRUCache()
+        InstrCache()
         {
+            lru_module = create_cache_replacement( "LRU", CAPACITY);
             data.reserve( CAPACITY);
-            lru_hash.reserve( CAPACITY);
             for (size_t i = 0; i < CAPACITY; ++i)
                 free_list.emplace_back(i);
             arena = std::unique_ptr<void, Deleter>( allocate_memory());
@@ -31,20 +32,20 @@ class LRUCache
             storage = static_cast<Value*>(std::align( alignof(Value), sizeof(Value) * CAPACITY, ptr, space));
         }
 
-        ~LRUCache()
+        ~InstrCache()
         {
             for (const auto& e : data)
                 storage[ e.second].~Value();
         }
 
-        LRUCache(const LRUCache&) = delete;
-        LRUCache(LRUCache&&) = delete;
-        LRUCache& operator=(const LRUCache&) = delete;
-        LRUCache& operator=(LRUCache&&) = delete;
+        InstrCache(const InstrCache&) = delete;
+        InstrCache(InstrCache&&) = delete;
+        InstrCache& operator=(const InstrCache&) = delete;
+        InstrCache& operator=(InstrCache&&) = delete;
 
         static auto get_capacity() { return CAPACITY; }
 
-        auto size() const { return lru_hash.size(); }
+        auto size() const { return data.size(); }
         bool empty() const { return size() == 0; }
 
         // First return value is true if and only if the value was found
@@ -59,7 +60,7 @@ class LRUCache
 
         void touch( const Key& key)
         {
-            lru_list.splice( lru_list.begin(), lru_list, lru_hash.find( key)->second);
+            lru_module->touch( key);
         }
 
         void update( const Key& key, const Value& value)
@@ -73,31 +74,28 @@ class LRUCache
         void erase( const Key& key)
         {
             auto data_it = data.find( key);
-            auto lru_it  = lru_hash.find( key);
-            assert ( ( data_it == data.end()) == ( lru_it == lru_hash.end()));
             if ( data_it != data.end())
             {
                 free_list.emplace_front( data_it->second);
                 storage[data_it->second].~Value();
                 data.erase( data_it);
-                lru_list.erase( lru_it->second);
-                lru_hash.erase( lru_it);
+                lru_module->set_to_erase( key);
             }
         }
 
     private:
         void allocate( const Key& key, const Value& value)
         {
-            if ( lru_hash.size() == CAPACITY)
-                erase( lru_list.back());
+            if ( size() == CAPACITY)
+                // FIXME(pikryukov): think about this.
+                erase( narrow_cast<Key>( lru_module->update()));
 
             // Add a new element
             auto index = free_list.front();
             free_list.pop_front();
             new (&storage[index]) Value( value);
             data.emplace( key, index);
-            auto ptr = lru_list.insert( lru_list.begin(), key);
-            lru_hash.emplace( key, ptr);
+            lru_module->allocate( key);
         }
 
         static void* allocate_memory()
@@ -111,12 +109,11 @@ class LRUCache
         };
 
         std::unordered_map<Key, size_t> data{};
-        std::list<Key> lru_list{};
         std::list<size_t> free_list{};
         std::unique_ptr<void, Deleter> arena = nullptr;
         Value* storage = nullptr;
-        std::unordered_map<Key, typename std::list<Key>::const_iterator> lru_hash{};
+        std::unique_ptr<CacheReplacementInterface> lru_module;
 };
 
-#endif // LRUCACHE_H
+#endif // INSTRCACHE_H
 
