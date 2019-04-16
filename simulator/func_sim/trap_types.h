@@ -13,15 +13,6 @@
 #include <array>
 #include <string_view>
 
-// Temporary enumeration
-enum GDB_TrapType : uint8
-{
-    GDB_SIGNAL_0    = 0,
-    GDB_SIGNAL_TRAP = 5,
-    GDB_SIGNAL_SYS  = 12,
-    GDB_SIGNAL_BUS  = 10,
-    GDB_SIGNAL_ILL  = 4,
-};
 
 class Trap {
     public:
@@ -39,7 +30,7 @@ class Trap {
         bool operator==(Trap trap) const { return value == trap.value; }
         bool operator!=(Trap trap) const { return value != trap.value; }
         
-        void set_from_gdb_format(GDB_TrapType id);
+        void set_from_gdb_format(uint8 id);
         uint8 to_gdb_format();
         
         void set_from_riscv_format(uint8 id);

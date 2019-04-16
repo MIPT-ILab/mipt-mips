@@ -10,9 +10,19 @@ std::array<std::string_view, Trap::MAX_TRAP_TYPE> Trap::TrapStrTable =
     #undef TRAP
 }};
 
+
+enum GDB_TrapType : uint8
+{
+    GDB_SIGNAL_0    = 0,
+    GDB_SIGNAL_TRAP = 5,
+    GDB_SIGNAL_SYS  = 12,
+    GDB_SIGNAL_BUS  = 10,
+    GDB_SIGNAL_ILL  = 4,
+};
+
 uint8 Trap::to_gdb_format()
 {
-    static const std::unordered_map<TrapType, GDB_TrapType> to_gdb_conv =
+    static const std::unordered_map<TrapType, uint8> to_gdb_conv =
     {
         { Trap::NO_TRAP,             GDB_SIGNAL_0    },
         { Trap::HALT,                GDB_SIGNAL_0    },
@@ -52,9 +62,9 @@ uint8 Trap::to_riscv_format()
     return it->second;
 }
 
-void Trap::set_from_gdb_format(GDB_TrapType id)
+void Trap::set_from_gdb_format(uint8 id)
 {
-    static const std::unordered_map<GDB_TrapType, TrapType> from_gdb_conv =
+    static const std::unordered_map<uint8, TrapType> from_gdb_conv =
     {
         { GDB_SIGNAL_0,    Trap::NO_TRAP             },
         { GDB_SIGNAL_TRAP, Trap::BREAKPOINT          },
@@ -69,7 +79,7 @@ void Trap::set_from_gdb_format(GDB_TrapType id)
     value = it->second;
 }
 
-void Trap::set_from_riscv_format(uint8_t id)
+void Trap::set_from_riscv_format(uint8 id)
 {
     static const std::unordered_map<uint8, TrapType> from_riscv_conv =
     {
