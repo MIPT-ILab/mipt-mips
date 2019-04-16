@@ -6,15 +6,15 @@
 #ifndef INSTRCACHE_H
 #define INSTRCACHE_H
 
-#include <bitset>
+#include <infra/arena.h>
+#include <infra/types.h>
+#include <infra/replacement/cache_replacement.h>
+
 #include <cassert>
 #include <memory>
 #include <unordered_map>
 #include <utility>
-
-#include <infra/arena.h>
-#include <infra/types.h>
-#include <infra/replacement/cache_replacement.h>
+#include <vector>
 
 template <typename Key, typename Value, size_t CAPACITY>
 class InstrCache
@@ -61,7 +61,7 @@ class InstrCache
 
         void update( const Key& key, const Value& value)
         {
-            if ( data.find( key) == data.end())
+            if ( pointers.find( key) == pointers.end())
                 allocate( key, value);
             else
                 touch( key);
@@ -75,7 +75,7 @@ class InstrCache
                 auto index = data_it->second;
                 storage.destroy( index);
                 keys[index] = Key{};
-                data.erase( data_it);
+                pointers.erase( data_it);
                 lru_module->set_to_erase( index);
             }
         }
@@ -83,7 +83,7 @@ class InstrCache
     private:
         void allocate( const Key& key, const Value& value)
         {
-            size_t index = lru_module->update();
+            const size_t index = lru_module->update();
             erase( keys[index]);
 
             storage.emplace( index, value);
@@ -99,4 +99,3 @@ class InstrCache
 };
 
 #endif // INSTRCACHE_H
-
