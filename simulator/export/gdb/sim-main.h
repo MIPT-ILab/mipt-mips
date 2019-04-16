@@ -9,10 +9,6 @@
 /* BFD config */
 #include <bfd/config.h>
 
-/* GDB simulator utilities */
-#include "sim-basics.h"
-#include "sim-base.h"
-
 
 #define CPU_NUM 1
 
