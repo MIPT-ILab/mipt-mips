@@ -48,7 +48,7 @@ struct RISCVInstrDecoder
     const uint32 rd;
     const uint32 rs1;
     const uint32 rs2;
-    const uint32 rs2_compressed; // rs2 is in another place for 16-bit instrs
+    const uint32 rs2_compr; // rs2 is in another place for 16-bit instrs
     const uint32 rd_3_bits;
     const uint32 rs1_3_bits;
     const uint32 rs2_3_bits;
@@ -169,7 +169,7 @@ struct RISCVInstrDecoder
         case Reg::SP:             return RISCVRegister::from_cpu_index( 2);
         case Reg::RS1:            return RISCVRegister::from_cpu_index( rs1);
         case Reg::RS2:            return RISCVRegister::from_cpu_index( rs2);
-        case Reg::RS2_COMPR: return RISCVRegister::from_cpu_index( rs2_compressed);
+        case Reg::RS2_COMPR:      return RISCVRegister::from_cpu_index( rs2_compr);
         case Reg::RD:             return RISCVRegister::from_cpu_index( rd);
         case Reg::RS1_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs1_3_bits);
         case Reg::RS2_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs2_3_bits);
@@ -187,35 +187,35 @@ struct RISCVInstrDecoder
     }
 
     explicit constexpr RISCVInstrDecoder(uint32 raw) noexcept
-        : sz             ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
-        , rd             ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , rs1            ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , rs2            ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
-        , rs2_compressed ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
-        , rd_3_bits      ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
-        , rs1_3_bits     ( apply_mask( raw, 0b00000000'00000000'00000011'10000000))
-        , rs2_3_bits     ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
-        , I_imm          ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , S_imm4_0       ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , S_imm11_5      ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
-        , B_imm11        ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
-        , B_imm4_1       ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
-        , B_imm10_5      ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
-        , B_imm12        ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , U_imm          ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
-        , J_imm19_12     ( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
-        , J_imm11        ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
-        , J_imm10_1      ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
-        , J_imm20        ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , csr_imm        ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , csr            ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , bytes          ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
-        , Cx_imm1        ( apply_mask( raw, 0b00000000'00000000'00010000'00000000))
-        , Cx_imm2        ( apply_mask( raw, 0b00000000'00000000'00000000'01100000))
-        , Cx_imm3        ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
-        , Cx_imm5        ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
-        , Cx_imm6        ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
-        , Cx_imm11       ( apply_mask( raw, 0b00000000'00000000'00011111'11111100))
+        : sz         ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
+        , rd         ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
+        , rs1        ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , rs2        ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
+        , rs2_compr  ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
+        , rd_3_bits  ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
+        , rs1_3_bits ( apply_mask( raw, 0b00000000'00000000'00000011'10000000))
+        , rs2_3_bits ( apply_mask( raw, 0b00000000'00000000'00000000'00011100))
+        , I_imm      ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
+        , S_imm4_0   ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
+        , S_imm11_5  ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
+        , B_imm11    ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
+        , B_imm4_1   ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
+        , B_imm10_5  ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
+        , B_imm12    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
+        , U_imm      ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
+        , J_imm19_12 ( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
+        , J_imm11    ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
+        , J_imm10_1  ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
+        , J_imm20    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
+        , csr_imm    ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , csr        ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
+        , bytes      ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , Cx_imm1    ( apply_mask( raw, 0b00000000'00000000'00010000'00000000))
+        , Cx_imm2    ( apply_mask( raw, 0b00000000'00000000'00000000'01100000))
+        , Cx_imm3    ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
+        , Cx_imm5    ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
+        , Cx_imm6    ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
+        , Cx_imm11   ( apply_mask( raw, 0b00000000'00000000'00011111'11111100))
     { }
 };
 
