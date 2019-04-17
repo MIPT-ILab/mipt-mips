@@ -168,6 +168,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_lui,    execute_lui<I>,    OUT_ARITHM, 'U',                   Imm::LOGIC,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     {'I', instr_auipc,  execute_auipc<I>,  OUT_ARITHM, 'U',                   Imm::LOGIC,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     {'I', instr_c_li,   execute_c_li<I>,   OUT_ARITHM, ImmediateType::C_LI,   Imm::ARITH,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
+    {'I', instr_c_lui,  execute_c_lui<I>,  OUT_ARITHM, ImmediateType::C_LUI,  Imm::LOGIC,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     // Jumps and branches
     {'I', instr_jal,    execute_jal<I>,    OUT_J_JUMP, 'J',                   Imm::ARITH,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     {'I', instr_jalr,   execute_jalr<I>,   OUT_R_JUMP, 'I',                   Imm::LOGIC,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
