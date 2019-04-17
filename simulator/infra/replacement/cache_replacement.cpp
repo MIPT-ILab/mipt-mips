@@ -183,7 +183,6 @@ std::size_t Pseudo_LRUCacheInfo::update()
 }
 
 void Pseudo_LRUCacheInfo::set_to_erase( std::size_t ) { throw CacheReplacementException( "Set_to_erase method is not supposed to be used in perfomance simulation"); }
-void Pseudo_LRUCacheInfo::allocate( std::size_t ) { throw CacheReplacementException( "Allocate method is not supposed to be used in perfomance simulation"); }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
