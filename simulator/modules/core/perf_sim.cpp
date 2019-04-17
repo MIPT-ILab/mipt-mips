@@ -73,7 +73,7 @@ Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 
     dump_statistics();
 
-    return Trap::NO_TRAP;
+    return Trap(Trap::NO_TRAP);
 }
 
 template<typename ISA>

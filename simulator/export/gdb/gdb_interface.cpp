@@ -35,20 +35,8 @@ using GDBTrap = std::pair<enum sim_stop, int>;
 
 static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
 {
-    static const std::unordered_map<Trap, GDBTrap> trap_converter =
-    {
-        { Trap::HALT,              { sim_exited, 0                } },
-        { Trap::BREAKPOINT,        { sim_stopped, GDB_SIGNAL_TRAP } },
-        { Trap::EXPLICIT_TRAP,     { sim_stopped, GDB_SIGNAL_TRAP } },
-        { Trap::UNALIGNED_ADDRESS, { sim_stopped, GDB_SIGNAL_BUS  } },
-    };
-
-    auto it = trap_converter.find( mipt_trap);
-    if ( it == trap_converter.end())
-        return GDBTrap( sim_polling, 0);
-    if ( it->second.first == sim_exited)
-        return GDBTrap( sim_exited, exit_code);
-    return it->second;
+    if ( mipt_trap != Trap::HALT)
+        return GDBTrap( sim_stopped, mipt_trap.to_gdb_format());
 }
 
 /* Holder of simulation instances */

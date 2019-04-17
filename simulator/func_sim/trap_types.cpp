@@ -1,4 +1,5 @@
 #include "trap_types.h"
+#include "trap_types_internal.h"
 
 #include <unordered_map>
 
@@ -9,16 +10,6 @@ std::array<std::string_view, Trap::MAX_TRAP_TYPE> Trap::TrapStrTable =
     #include "trap_types.def"
     #undef TRAP
 }};
-
-
-enum GDB_TrapType : uint8
-{
-    GDB_SIGNAL_0    = 0,
-    GDB_SIGNAL_TRAP = 5,
-    GDB_SIGNAL_SYS  = 12,
-    GDB_SIGNAL_BUS  = 10,
-    GDB_SIGNAL_ILL  = 4,
-};
 
 uint8 Trap::to_gdb_format()
 {

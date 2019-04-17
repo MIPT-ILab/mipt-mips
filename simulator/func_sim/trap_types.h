@@ -25,9 +25,17 @@ class Trap {
             MAX_TRAP_TYPE
         };
 
-        constexpr Trap(TrapType id) : value(id) { }
+        explicit constexpr Trap( TrapType id) : value(id) { }
 
-        operator uint8() const { return value; }
+        Trap& operator=( TrapType id) { value = id; return *this; }
+
+        bool operator==( Trap trap)     const { return value == trap.value; }
+        bool operator==( TrapType trap) const { return value == trap; }
+        bool operator!=( Trap trap)     const { return value != trap.value; }
+        bool operator!=( TrapType trap) const { return value != trap; }
+
+        std::size_t get_hash() const noexcept { return std::hash<std::uint8_t>{}(value); }
+
 
         void set_from_gdb_format(uint8 id);
         uint8 to_gdb_format();
@@ -52,7 +60,7 @@ namespace std
     {
         std::size_t operator()(const Trap& trap) const noexcept
         {
-            return std::hash<std::uint8_t>{}(uint8(trap));
+            return trap.get_hash();
         }
     };
 }
