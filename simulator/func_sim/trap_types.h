@@ -46,4 +46,16 @@ class Trap {
         static std::array<std::string_view, MAX_TRAP_TYPE> TrapStrTable;
 };
 
+namespace std
+{
+    template<> struct hash<Trap>
+    {
+        std::size_t operator()(const Trap& trap) const noexcept
+        {
+            return std::hash<std::uint8_t>{}(uint8(trap));
+        }
+    };
+}
+
+
 #endif // TRAP_TYPES_H
