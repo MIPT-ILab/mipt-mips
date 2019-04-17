@@ -9,7 +9,7 @@
 
 TEST_CASE( "Check_bad_string_pass_to_factory_method")
 {
-    CHECK_THROWS_AS( create_cache_replacement( "BAD STRING", 3), UndefinedCacheReplacementPolicyName);
+    CHECK_THROWS_AS( create_cache_replacement( "BAD STRING", 3), CacheReplacementException);
 }
 
 TEST_CASE( "Check_get_ways_method")
@@ -77,7 +77,7 @@ TEST_CASE( "Pseudo-LRU: Check_forbidden_to_call_methods")
 
 TEST_CASE( "Pseudo-LRU: Check_bad_way_number_in_touch_method")
 {
-    CHECK_THROWS_AS( create_cache_replacement( "Pseudo-LRU", 4), CacheReplacementException);
+    CHECK_THROWS_AS( create_cache_replacement( "Pseudo-LRU", 3), CacheReplacementException);
 }
 
 TEST_CASE( "Pseudo-LRU: Check_update_method")
@@ -93,7 +93,7 @@ TEST_CASE( "Pseudo-LRU: Check_touch_method")
     CHECK( test_lru_module->update() == 2);
 }
 
-TEST_CASE( "Pseudo-LRU: Check_touch_method_2")
+TEST_CASE( "Pseudo-LRU: Check_update_method_to_initiate_a_touch_method")
 {
     auto test_lru_module = create_cache_replacement( "Pseudo-LRU", 4);
     test_lru_module->touch( 2);
@@ -102,6 +102,26 @@ TEST_CASE( "Pseudo-LRU: Check_touch_method_2")
     CHECK( test_lru_module->update() == 0);
 }
 
+TEST_CASE( "Pseudo-LRU: Check_touch_method_2")
+{
+    auto test_lru_module = create_cache_replacement( "LRU", 4);
+    test_lru_module->touch( 0);
+    test_lru_module->touch( 1);
+    test_lru_module->touch( 2);
+    test_lru_module->touch( 3);
+    CHECK( test_lru_module->update() == 0);
+}
+
+TEST_CASE( "Pseudo-LRU: Check_touch_method_3")
+{
+    auto test_lru_module = create_cache_replacement( "LRU", 4);
+    test_lru_module->touch( 0);
+    test_lru_module->touch( 1);
+    test_lru_module->touch( 2);
+    test_lru_module->touch( 3);
+    test_lru_module->touch( 0);
+    CHECK( test_lru_module->update() == 1);
+}
 
 TEST_CASE ( "Pseudo-LRU: Check_touch_method_with_big_number_of elements")
 {
