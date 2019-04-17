@@ -167,6 +167,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     /*-------------- I --------------*/
     {'I', instr_lui,    execute_lui<I>,    OUT_ARITHM, 'U',                   Imm::LOGIC,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     {'I', instr_auipc,  execute_auipc<I>,  OUT_ARITHM, 'U',                   Imm::LOGIC,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
+    {'I', instr_c_li,   execute_c_li<I>,   OUT_ARITHM, ImmediateType::C_LI,   Imm::ARITH,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     // Jumps and branches
     {'I', instr_jal,    execute_jal<I>,    OUT_J_JUMP, 'J',                   Imm::ARITH,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     {'I', instr_jalr,   execute_jalr<I>,   OUT_R_JUMP, 'I',                   Imm::LOGIC,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
@@ -202,7 +203,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_slliw,  execute_slliw<I>,  OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
-    {'I', instr_c_addi, execute_c_addi<I>, OUT_ARITHM, ImmediateType::C_ADDI, Imm::C_ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
+    {'I', instr_c_addi, execute_c_addi<I>, OUT_ARITHM, ImmediateType::C_ADDI, Imm::ARITH,   Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
     // Immediate logic and comparison
     {'I', instr_slti,   execute_slti<I>,   OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_sltiu,  execute_sltiu<I>,  OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
