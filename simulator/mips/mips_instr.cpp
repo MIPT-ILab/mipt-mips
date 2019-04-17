@@ -3,12 +3,12 @@
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
  * Copyright 2018 MIPT-MIPS
  */
- 
+
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
 
 #include <func_sim/alu.h>
-#include <infra/instrcache/LRUCache.h>
+#include <infra/instrcache/instr_cache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 

@@ -170,6 +170,7 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
 template<size_t N, typename T>
 T sign_extension( T value)
 {
+    // NOLINTNEXTLINE(bugprone-suspicious-semicolon)
     if constexpr (N < bitwidth<T>) {
         const T msb = T{ 1} << ( N - 1);
         value = ( ( value & bitmask<T>(N)) ^ msb) - msb;

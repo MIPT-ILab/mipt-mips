@@ -20,6 +20,8 @@ Branch<FuncInstr>::Branch( bool log) : Log( log)
     rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", PORT_LATENCY);
     wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , PORT_BW , PORT_FANOUT);    
 
+    wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+
     wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
                                                                 PORT_BW, PORT_FANOUT);
 }
@@ -52,6 +54,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
 
     if ( instr.is_branch() || instr.is_indirect_jump())
     {
+        num_branches++;
         is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
         if ( instr.is_taken())
             is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
@@ -60,6 +63,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
     /* handle misprediction */
     if ( is_misprediction )
     {
+        num_mispredictions++;
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
           
@@ -73,6 +77,9 @@ void Branch<FuncInstr>::clock( Cycle cycle)
 
     /* log */
     sout << instr << std::endl;
+
+    /* bypass data */
+    wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
     /* data path */
     wp_datapath->write( std::move( instr), cycle);
