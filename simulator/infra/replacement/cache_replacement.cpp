@@ -120,7 +120,7 @@ std::size_t Pseudo_LRUCacheInfo::calculate_depth() const
 {
     if (is_power_of_two( ways) ==  false)
         throw CacheReplacementException("Number of ways must be the power of 2!");
-    return 32 - count_leading_zeroes<uint32>( ways) - 1;
+    return 32 - count_leading_zeroes<uint32>( narrow_cast<uint32>( ways)) - 1;
 }
 
 void Pseudo_LRUCacheInfo::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth)

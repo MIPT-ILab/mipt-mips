@@ -696,7 +696,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
    iterator tree_find_breadth(const T &inT) const
-   { return tree_find_breadth(in, iterator(*this->in_)); }
+   { return tree_find_breadth(inT, iterator(*this->in_)); }
 
 	//////////////////////////////////////////////////////////////////////////
    iterator tree_find_breadth(const T &inT, bool (*obj)(const T&, const T&)) const
