@@ -80,7 +80,7 @@ template<typename I> auto execute_csrrsi = do_nothing<I>;
 template<typename I> auto execute_csrrci = do_nothing<I>;
 // M
 template<typename I> auto execute_mul = ALU::riscv_multiplication_l<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulh = do_nothing<I>;
+template<typename I> auto execute_mulh = ALU::riscv_multiplication_h<I, typename I::RegisterUInt>;
 template<typename I> auto execute_mulhsu = do_nothing<I>;
 template<typename I> auto execute_mulhu = do_nothing<I>;
 template<typename I> auto execute_div = do_nothing<I>;

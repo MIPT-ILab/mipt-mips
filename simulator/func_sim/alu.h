@@ -183,8 +183,12 @@ struct ALU
     }
 
     // RISCV mul/div
-    //template<typename I, typename T> static void riscv_multiplication_h( I* instr) { instr->v_dst = riscv_multiplication_hight<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_multiplication_l( I* instr) { instr->v_dst = riscv_multiplication_low  <T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void riscv_multiplication_h( I* instr) { instr->v_dst = riscv_multiplication_high<T>(instr->v_src1, instr->v_src2); }
+    
+    
+    
+    //template<typename I, typename T> static void riscv128_multiplication_h( I* instr) { instr->v_dst = riscv128_multiplication_high<T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void riscv_multiplication_l( I* instr) { instr->v_dst = riscv_multiplication_low <T>(instr->v_src1, instr->v_src2); }
 
     // MIPS mul/div
     template<typename I, typename T> static void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }

@@ -44,6 +44,10 @@ using float64 = double;
 
 using int128 = __int128;
 using uint128 = unsigned __int128;
+// next types are not used, but they are reqired by compiller
+/*using int256 = __int128;
+using uint128 = unsigned __int128;
+*/
 
 static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
@@ -58,11 +62,16 @@ static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-/* Unsigned 128-bit integer type */
+/* Unsigned 128-bit and 256-bit integer types */
 using uint128 = boost::multiprecision::uint128_t;
+using uint256 = boost::multiprecision::uint256_t;
 
-/* Unsigned 128-bit integer type */
+/* Signed 128-bit and 256-bit integer types */
 using int128 = boost::multiprecision::int128_t;
+using int256 = boost::multiprecision::int256_t;
+
+template<> struct doubled<uint128> { using type = uint256; };
+template<> struct doubled<int128>  { using type = int256;  };
 
 #endif // __SIZEOF_INT128__
 
@@ -93,15 +102,15 @@ template<typename T> using sign_t = typename sign<T>::type;
 
 /* Convert type to 2x type */
 template<typename> struct doubled;
-template<> struct doubled<uint8>  { using type = uint16; };
-template<> struct doubled<uint16> { using type = uint32; };
-template<> struct doubled<uint32> { using type = uint64; };
-template<> struct doubled<uint64> { using type = uint128; };
+template<> struct doubled<uint8>   { using type = uint16; };
+template<> struct doubled<uint16>  { using type = uint32; };
+template<> struct doubled<uint32>  { using type = uint64; };
+template<> struct doubled<uint64>  { using type = uint128; };
 
-template<> struct doubled<int8>   { using type = int16;  };
-template<> struct doubled<int16>  { using type = int32;  };
-template<> struct doubled<int32>  { using type = int64;  };
-template<> struct doubled<int64>  { using type = int128;  };
+template<> struct doubled<int8>    { using type = int16;  };
+template<> struct doubled<int16>   { using type = int32;  };
+template<> struct doubled<int32>   { using type = int64;  };
+template<> struct doubled<int64>   { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
