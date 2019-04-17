@@ -11,9 +11,9 @@
 
 #include <memory>
 
-struct UndefinedCacheReplacementPolicyName final : Exception
+struct CacheReplacementException final : Exception
 {
-    explicit UndefinedCacheReplacementPolicyName( const std::string& msg)
+    explicit CacheReplacementException( const std::string& msg)
         : Exception( msg)
     { }
 };
