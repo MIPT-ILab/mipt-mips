@@ -440,8 +440,8 @@ public:
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	iterator tree_iterator() const { return iterator( *(this) ); }
-	iterator tree_iterator() { return iterator( *(this) ); }
+	iterator get_tree_iterator() const { return iterator( *(this) ); }
+	iterator get_tree_iterator() { return iterator( *(this) ); }
 
 	//////////////////////////////////////////////////////////////////////////
 	// copy constructor - now visible

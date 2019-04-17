@@ -128,7 +128,7 @@ Pseudo_LRUCacheInfo::Pseudo_LRUCacheInfo( std::size_t ways)
     : ways( ways)
 {
     lru_tree.data( node(Points_left, Left));
-    construct_tree( lru_tree.tree_iterator(), calculate_depth());
+    construct_tree( lru_tree.get_tree_iterator(), calculate_depth());
 }
 
 std::size_t Pseudo_LRUCacheInfo::calculate_depth() const
@@ -174,14 +174,14 @@ int Pseudo_LRUCacheInfo::reverse_flag( int flag) //more readable than multiplyin
 void Pseudo_LRUCacheInfo::touch( std::size_t way)
 {
     auto found_it = lru_tree.tree_find_depth( node( way, Left));
-    for ( auto i = found_it; i != lru_tree.tree_iterator(); i = i.out())
+    for ( auto i = found_it; i != lru_tree.get_tree_iterator(); i = i.out())
         if ( i.data().position == i.out().data().value)
             i.out().data().value = reverse_flag(i.out().data().value);
 }
 
 std::size_t Pseudo_LRUCacheInfo::update()
 {
-    auto node_it = lru_tree.tree_iterator();
+    auto node_it = lru_tree.get_tree_iterator();
     while ( node_it.size() != 0)
     {
         if (node_it.data().value == Points_right)
