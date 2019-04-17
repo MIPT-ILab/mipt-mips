@@ -175,9 +175,9 @@ struct RISCVInstrDecoder
         case Reg::RS2:            return RISCVRegister::from_cpu_index( rs2);
         case Reg::RS2_COMPRESSED: return RISCVRegister::from_cpu_index( rs2_compressed);
         case Reg::RD:             return RISCVRegister::from_cpu_index( rd);
-        case Reg::RS1_3_BITS:     return RISCVRegister::from_cpu_index( rs1_3_bits, RISCVRegister::separator::popular);
-        case Reg::RS2_3_BITS:     return RISCVRegister::from_cpu_index( rs2_3_bits, RISCVRegister::separator::popular);
-        case Reg::RD_3_BITS:      return RISCVRegister::from_cpu_index( rd_3_bits, RISCVRegister::separator::popular);
+        case Reg::RS1_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs1_3_bits);
+        case Reg::RS2_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs2_3_bits);
+        case Reg::RD_3_BITS:      return RISCVRegister::from_cpu_popular_index( rd_3_bits);
         case Reg::CSR:            return RISCVRegister::from_csr_index( csr);
         case Reg::SEPC:           return RISCVRegister::from_csr_index( 0x141);
         case Reg::MEPC:           return RISCVRegister::from_csr_index( 0x341);
