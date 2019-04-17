@@ -9,7 +9,7 @@
 template<typename T>
 auto riscv_multiplication_low(T x, T y) {
     using UT = unsign_t<T>;
-    auto lo = narrow_cast<UT>( x * y);
+    auto lo = narrow_cast<UT>( x * y & all_ones<UT>());
     return lo;
 }
 
