@@ -23,10 +23,23 @@ enum class Reg : uint8
 
 enum ImmediateType
 {
-    I, B, S, U, J, C, NONE,
-    C_LWSP, C_LDSP, C_LQSP,
-    C_SWSP, C_SDSP, C_SQSP,
-    C_LW, C_SW, C_ADDI, C_JAL
+    I = 'I',
+    B = 'B',
+    S = 'S',
+    U = 'U',
+    J = 'J',
+    C = 'C',
+    NONE = ' ',  // ASCII code of ' ' is 32
+    C_LWSP = 33, // ASCII code of the first letter is 65
+    C_LDSP = 34,
+    C_LQSP = 35,
+    C_SWSP = 36,
+    C_SDSP = 37,
+    C_SQSP = 38,
+    C_LW   = 39,
+    C_SW   = 40,
+    C_ADDI = 41,
+    C_JAL  = 42
 };
 
 struct RISCVInstrDecoder
@@ -77,23 +90,23 @@ struct RISCVInstrDecoder
             |  (J_imm20    << 20U);
     }
 
-    uint32 get_immediate_value( ImmediateType subset) const noexcept
+    uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
-        case I: return I_imm;
-        case B: return get_B_immediate();
-        case S: return S_imm4_0 | (S_imm11_5 << 5U);
-        case U: return U_imm;
-        case J: return get_J_immediate();
-        case C: return csr_imm;
-        case NONE: return 0;
+        case 'I': return I_imm;
+        case 'B': return get_B_immediate();
+        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
+        case 'U': return U_imm;
+        case 'J': return get_J_immediate();
+        case 'C': return csr_imm;
+        case ' ': return 0;
         default: return get_compressed_immediate_value( subset);
         }
     }
 
-    uint16 get_compressed_immediate_value( ImmediateType type) const noexcept
+    uint16 get_compressed_immediate_value( char subset) const noexcept
     {
-        switch (type) {
+        switch (subset) {
             case C_LWSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
                             | ( apply_mask( Cx_imm5, 0b11100) << 2U)
                             | ( apply_mask( Cx_imm5, 0b00011) << 6U);
@@ -140,9 +153,9 @@ struct RISCVInstrDecoder
     }
 
     template<typename R>
-    static R get_immediate( ImmediateType type, uint32 value) noexcept
+    static R get_immediate( char subset, uint32 value) noexcept
     {
-        switch (type) {
+        switch (subset) {
         case I:
         case B:
         case S: return sign_extension<12, R>( value);
