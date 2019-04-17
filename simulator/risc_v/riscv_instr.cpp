@@ -178,7 +178,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_bge,    execute_bge<I>,    OUT_BRANCH, 'B',                   Imm::ARITH, Src1::RS1,        Src2::RS2,        Dst::ZERO,      0},
     {'I', instr_bltu,   execute_bltu<I>,   OUT_BRANCH, 'B',                   Imm::ARITH, Src1::RS1,        Src2::RS2,        Dst::ZERO,      0},
     {'I', instr_bgeu,   execute_bgeu<I>,   OUT_BRANCH, 'B',                   Imm::ARITH, Src1::RS1,        Src2::RS2,        Dst::ZERO,      0},
-    {'I', instr_c_jal,  execute_c_jal<I>,  OUT_BRANCH, ImmediateType::C_JAL,  Imm::JUMP,  Src1::ZERO,       Src2::ZERO,       Dst::ZERO,      0},
+    {'I', instr_c_jal,  execute_c_jal<I>,  OUT_BRANCH, ImmediateType::C_JAL,  Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,      0},
     // Loads and stores
     {'I', instr_lb,     execute_lb<I>,     OUT_LOAD,   'I',                   Imm::ADDR,  Src1::RS1,        Src2::ZERO,       Dst::RD,        1},
     {'I', instr_lh,     execute_lh<I>,     OUT_LOAD,   'I',                   Imm::ADDR,  Src1::RS1,        Src2::ZERO,       Dst::RD,        2},

@@ -110,44 +110,44 @@ struct RISCVInstrDecoder
     {
         switch (subset) {
             case C_LWSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b11100) << 2U)
-                            | ( apply_mask( Cx_imm5, 0b00011) << 6U);
+                              | ( apply_mask( Cx_imm5, 0b11100) << 2U)
+                              | ( apply_mask( Cx_imm5, 0b00011) << 6U);
 
             case C_LDSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b11000) << 3U)
-                            | ( apply_mask( Cx_imm5, 0b00111) << 6U);
+                              | ( apply_mask( Cx_imm5, 0b11000) << 3U)
+                              | ( apply_mask( Cx_imm5, 0b00111) << 6U);
 
             case C_LQSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b10000) << 4U)
-                            | ( apply_mask( Cx_imm5, 0b01111) << 6U);
+                              | ( apply_mask( Cx_imm5, 0b10000) << 4U)
+                              | ( apply_mask( Cx_imm5, 0b01111) << 6U);
 
             case C_SWSP: return ( apply_mask( Cx_imm6, 0b111100) << 2U)
-                            | ( apply_mask( Cx_imm6, 0b000011) << 6U);
+                              | ( apply_mask( Cx_imm6, 0b000011) << 6U);
 
             case C_SDSP: return ( apply_mask( Cx_imm6, 0b111000) << 3U)
-                            | ( apply_mask( Cx_imm6, 0b000111) << 6U);
+                              | ( apply_mask( Cx_imm6, 0b000111) << 6U);
 
             case C_SQSP: return ( apply_mask( Cx_imm6, 0b110000) << 4U)
-                            | ( apply_mask( Cx_imm6, 0b001111) << 6U);
+                              | ( apply_mask( Cx_imm6, 0b001111) << 6U);
 
             case C_LW:   return ( apply_mask( Cx_imm2, 0b10) << 2U)
-                            | ( apply_mask( Cx_imm2, 0b01) << 6U)
-                            | ( apply_mask( Cx_imm3, 0b111) << 3U);
+                              | ( apply_mask( Cx_imm2, 0b01) << 6U)
+                              | ( apply_mask( Cx_imm3, 0b111) << 3U);
 
             case C_ADDI: return sign_extension<6>( ( apply_mask( Cx_imm1, 0b1) << 5U)
                                                  | ( apply_mask( Cx_imm5, 0b11111)));
 
-            case C_JAL:  return ( apply_mask( Cx_imm11, 0b10000000000) << 11U)
-                            | ( apply_mask( Cx_imm11, 0b01000000000) << 4U)
-                            | ( apply_mask( Cx_imm11, 0b00110000000) << 8U)
-                            | ( apply_mask( Cx_imm11, 0b00001000000) << 10U)
-                            | ( apply_mask( Cx_imm11, 0b00000100000) << 6U)
-                            | ( apply_mask( Cx_imm11, 0b00000010000) << 7U)
-                            | ( apply_mask( Cx_imm11, 0b00000001110) << 1U)
-                            | ( apply_mask( Cx_imm11, 0b00000000001) << 5U);
+            case C_JAL:  return sign_extension<12>( ( apply_mask( Cx_imm11, 0b10000000000) << 11U)
+                                                  | ( apply_mask( Cx_imm11, 0b01000000000) << 4U)
+                                                  | ( apply_mask( Cx_imm11, 0b00110000000) << 8U)
+                                                  | ( apply_mask( Cx_imm11, 0b00001000000) << 10U)
+                                                  | ( apply_mask( Cx_imm11, 0b00000100000) << 6U)
+                                                  | ( apply_mask( Cx_imm11, 0b00000010000) << 7U)
+                                                  | ( apply_mask( Cx_imm11, 0b00000001110) << 1U)
+                                                  | ( apply_mask( Cx_imm11, 0b00000000001) << 5U));
 
-            case C_LUI:  return ( ( apply_mask( Cx_imm1, 0b1) * 0xfffe0)
-                                  | apply_mask( Cx_imm5, 0b11111));
+            case C_LUI:  return ( apply_mask( Cx_imm1, 0b1) * 0xfffe0)
+                                | apply_mask( Cx_imm5, 0b11111);
 
             default:     assert(0); return 0;
         }
