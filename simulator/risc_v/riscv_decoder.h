@@ -41,7 +41,8 @@ enum ImmediateType
     C_ADDI = 40,
     C_LI   = 40,
     C_JAL  = 41,
-    C_LUI  = 42
+    C_LUI  = 42,
+    C_SRLI = 43
 };
 
 struct RISCVInstrDecoder
@@ -148,6 +149,9 @@ struct RISCVInstrDecoder
 
             case C_LUI:  return ( apply_mask( Cx_imm1, 0b1) * 0xfffe0)
                                 | apply_mask( Cx_imm5, 0b11111);
+
+            case C_SRLI: return ( apply_mask( Cx_imm1, 0b1) << 5U)
+                              | ( apply_mask( Cx_imm5, 0b11111));
 
             default:     assert(0); return 0;
         }
