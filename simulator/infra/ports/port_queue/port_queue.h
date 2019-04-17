@@ -10,36 +10,23 @@
 #ifndef PORT_QUEUE_H
 #define PORT_QUEUE_H
 
-#include <boost/align/aligned_alloc.hpp>
-#include <memory>
-#include <type_traits>
+#include <infra/arena.h>
 
 template<typename T>
 class PortQueue
 {
-    static void* allocate( size_t size)
-    {
-        return boost::alignment::aligned_alloc( alignof(T), sizeof(T) * size);
-    }
-
-    struct Deleter
-    {
-        void operator()(void *p) { boost::alignment::aligned_free(p); }
-    };
-
-    std::unique_ptr<void, Deleter> arena = nullptr;
-    T* arena_start = nullptr;
-    const T* arena_end = nullptr;
-    T* p_front = nullptr;
-    T* p_back = nullptr;
+    Arena<T> arena{};
+    size_t p_front = 0;
+    size_t p_back = 0;
     size_t occupied = 0;
+    size_t capacity = 0;
 
-    inline void advance_ptr( T* PortQueue::* p) noexcept
+    template<size_t PortQueue::* p>
+    inline void advance_ptr() noexcept
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        ++( this->*p);
-        if (this->*p == arena_end)
-            this->*p = arena_start;
+        ++(this->*p);
+        if (this->*p == capacity)
+            this->*p = 0;
     }
 
     void clear()
@@ -64,31 +51,28 @@ public:
     void resize( size_t size)
     {
         clear();
-        arena = std::unique_ptr<void, Deleter>( allocate( size));
-        arena_start = static_cast<T*>( arena.get());
-        arena_end = arena_start + size; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        p_front = p_back = arena_start;
-        occupied = 0;
+        arena.allocate( size);
+        p_front = p_back = occupied = 0;
+        capacity = size;
     }
 
     template<typename... Args> void emplace( Args&& ... args)
         noexcept( std::is_nothrow_constructible<T, Args...>::value)
     {
-        new (p_back) T( std::forward<Args>( args)...);
-        advance_ptr( &PortQueue::p_back);
+        arena.emplace( p_back, std::forward<Args>( args)...);
+        advance_ptr<&PortQueue::p_back>();
         ++occupied;
     }
 
     bool full() const noexcept
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        return arena_start + occupied == arena_end;
+        return occupied == capacity;
     }
 
     void pop() noexcept
     {
-        p_front->~T();
-        advance_ptr( &PortQueue::p_front);
+        arena.destroy( p_front);
+        advance_ptr<&PortQueue::p_front>();
         --occupied;
     }
 
@@ -99,7 +83,7 @@ public:
 
     const T& front() const noexcept
     {
-        return *p_front;
+        return arena[p_front];
     }
 };
 
