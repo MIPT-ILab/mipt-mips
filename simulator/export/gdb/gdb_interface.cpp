@@ -35,8 +35,12 @@ using GDBTrap = std::pair<enum sim_stop, int>;
 
 static GDBTrap translate_trap( Trap mipt_trap, int exit_code)
 {
-    if ( mipt_trap != Trap::HALT)
-        return GDBTrap( sim_stopped, mipt_trap.to_gdb_format());
+    if ( mipt_trap == Trap::HALT)
+        return GDBTrap( sim_exited, exit_code);
+    auto ret = mipt_trap.to_gdb_format();
+    if ( ret == GDB_SIGNAL_0)
+        return GDBTrap( sim_polling, GDB_SIGNAL_0);
+    return GDBTrap( sim_stopped, ret);
 }
 
 /* Holder of simulation instances */
