@@ -111,7 +111,6 @@ class Pseudo_LRUCacheInfo : public CacheReplacementInterface
         void allocate( std::size_t ) override;
 
     private:
-
         enum flags { Left = 0, Right = 1};
 
         core::tree<node> lru_tree;
