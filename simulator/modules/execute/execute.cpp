@@ -51,6 +51,9 @@ Execute<FuncInstr>::Execute( bool log)
 
     rps_bypass[0].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+
+    rps_bypass[0].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[1].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
 }    
 
 template <typename FuncInstr>
