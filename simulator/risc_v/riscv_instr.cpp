@@ -191,7 +191,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sd,     execute_sd<I>,     OUT_STORE,  'S',                   Imm::ADDR,    Src1::RS1,        Src2::RS2,        Dst::ZERO,      8},
     {'I', instr_c_lwsp, execute_c_lwsp<I>, OUT_LOAD,   ImmediateType::C_LWSP, Imm::ADDR,    Src1::SP,         Src2::ZERO,       Dst::RD,        4},
     {'I', instr_c_lw,   execute_c_lw<I>,   OUT_LOAD,   ImmediateType::C_LW,   Imm::ADDR,    Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS, 4},
-    {'I', instr_c_swsp, execute_c_swsp<I>, OUT_STORE,  ImmediateType::C_SWSP, Imm::ADDR,    Src1::SP,         Src2::RS2_COMPRESSED, Dst::ZERO, 4},
+    {'I', instr_c_swsp, execute_c_swsp<I>, OUT_STORE,  ImmediateType::C_SWSP, Imm::ADDR,    Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,      4},
     {'I', instr_c_sw,   execute_c_sw<I>,   OUT_STORE,  ImmediateType::C_SW,   Imm::ADDR,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,      4},
     // Immediate arithmetics
     {'I', instr_addi,   execute_addi<I>,   OUT_ARITHM, 'I',                   Imm::ARITH,   Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
