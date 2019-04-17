@@ -205,6 +205,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, 'I',                   Imm::ARITH, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, 'I',                   Imm::ARITH, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_c_addi, execute_c_addi<I>, OUT_ARITHM, ImmediateType::C_ADDI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,        0},
+    {'I', instr_c_srli, execute_c_srli<I>, OUT_ARITHM, ImmediateType::C_SRLI, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS,0},
     // Immediate logic and comparison
     {'I', instr_slti,   execute_slti<I>,   OUT_ARITHM, 'I',                   Imm::ARITH, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_sltiu,  execute_sltiu<I>,  OUT_ARITHM, 'I',                   Imm::ARITH, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
@@ -320,8 +321,14 @@ void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
     this->opname  = entry.entry.name;
     this->print_dst  = entry.dst == Dst::RD || entry.dst == Dst::CSR;
     this->print_dst2 = entry.dst == Dst::CSR;
-    this->print_src1 = entry.src1 == Src1::RS1;
-    this->print_src2 = entry.src2 == Src1::RS2;
+    this->print_src1 = ( entry.src1 != Src1::ZERO)
+                    && ( entry.src1 != Src1::SEPC)
+                    && ( entry.src1 != Src1::MEPC)
+                    && ( entry.src1 != Src1::CSR);
+    this->print_src2 = ( entry.src2 != Src2::ZERO)
+                    && ( entry.src2 != Src2::SEPC)
+                    && ( entry.src2 != Src2::MEPC)
+                    && ( entry.src2 != Src2::CSR);
 }
 
 template<typename T>
