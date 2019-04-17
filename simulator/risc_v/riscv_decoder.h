@@ -39,6 +39,7 @@ enum ImmediateType
     C_LW   = 39, // C_LW and C_SW are similar
     C_SW   = 39,
     C_ADDI = 40,
+    C_LI   = 40,
     C_JAL  = 41
 };
 
@@ -132,8 +133,8 @@ struct RISCVInstrDecoder
                             | ( apply_mask( Cx_imm2, 0b01) << 6U)
                             | ( apply_mask( Cx_imm3, 0b111) << 3U);
 
-            case C_ADDI: return ( apply_mask( Cx_imm1, 0b1) << 5U)
-                            | ( apply_mask( Cx_imm5, 0b11111));
+            case C_ADDI: return sign_extension<6>( ( apply_mask( Cx_imm1, 0b1) << 5U)
+                                                 | ( apply_mask( Cx_imm5, 0b11111)));
 
             case C_JAL:  return ( apply_mask( Cx_imm11, 0b10000000000) << 11U)
                             | ( apply_mask( Cx_imm11, 0b01000000000) << 4U)
