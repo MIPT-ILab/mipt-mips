@@ -154,7 +154,7 @@ std::size_t Pseudo_LRUCacheInfo::which_sibling( core::tree<LRU_tree_node>::itera
 
 void Pseudo_LRUCacheInfo::touch( std::size_t way)
 {
-    auto found_it = lru_tree.tree_find_depth( LRU_tree_node( way));
+    auto found_it = lru_tree.tree_find_depth( LRU_tree_node( static_cast<int>(way)));
     for ( auto i = found_it; i != lru_tree.get_tree_iterator(); i = i.out())
         if ( which_sibling( i) == i.out().data().lru_branch_ptr)
             i.out().data().lru_branch_ptr = reverse_flag(static_cast<enum Flags>(i.out().data().lru_branch_ptr));
