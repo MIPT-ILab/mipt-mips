@@ -40,7 +40,8 @@ enum ImmediateType
     C_SW   = 39,
     C_ADDI = 40,
     C_LI   = 40,
-    C_JAL  = 41
+    C_JAL  = 41,
+    C_LUI  = 42
 };
 
 struct RISCVInstrDecoder
@@ -68,12 +69,12 @@ struct RISCVInstrDecoder
     const uint32 csr_imm;
     const uint32 csr;
     const uint32 bytes;
-    const uint16 Cx_imm1;   // 1-bit immediate for Compressed ISA subset
-    const uint16 Cx_imm2;
-    const uint16 Cx_imm3;
-    const uint16 Cx_imm5;
-    const uint16 Cx_imm6;
-    const uint16 Cx_imm11;
+    const uint32 Cx_imm1;   // 1-bit immediate for Compressed ISA subset
+    const uint32 Cx_imm2;
+    const uint32 Cx_imm3;
+    const uint32 Cx_imm5;
+    const uint32 Cx_imm6;
+    const uint32 Cx_imm11;
 
     constexpr uint32 get_B_immediate() const noexcept
     {
@@ -105,7 +106,7 @@ struct RISCVInstrDecoder
         }
     }
 
-    uint16 get_compressed_immediate_value( char subset) const noexcept
+    uint32 get_compressed_immediate_value( char subset) const noexcept
     {
         switch (subset) {
             case C_LWSP: return ( apply_mask( Cx_imm1, 0b1) << 5U)
@@ -144,6 +145,9 @@ struct RISCVInstrDecoder
                             | ( apply_mask( Cx_imm11, 0b00000010000) << 7U)
                             | ( apply_mask( Cx_imm11, 0b00000001110) << 1U)
                             | ( apply_mask( Cx_imm11, 0b00000000001) << 5U);
+
+            case C_LUI:  return ( ( apply_mask( Cx_imm1, 0b1) * 0xfffe0)
+                                  | apply_mask( Cx_imm5, 0b11111));
 
             default:     assert(0); return 0;
         }
