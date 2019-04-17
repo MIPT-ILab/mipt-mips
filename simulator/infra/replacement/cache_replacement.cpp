@@ -17,7 +17,6 @@ class LRUCacheInfo : public CacheReplacementInterface
 
         void touch( std::size_t way) override ;
         void set_to_erase( std::size_t way) override ;
-        void allocate( std::size_t way) override ;
         std::size_t update() override ;
         std::size_t get_ways() const override { return ways; }
 
@@ -25,7 +24,6 @@ class LRUCacheInfo : public CacheReplacementInterface
         std::list<std::size_t> lru_list{};
         std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
         const std::size_t ways;
-        void erase_lru_element();
 };
 
 LRUCacheInfo::LRUCacheInfo( std::size_t ways)
@@ -68,20 +66,6 @@ std::size_t LRUCacheInfo::update()
     lru_hash.insert_or_assign( lru_elem, ptr);
 
     return lru_elem;
-}
-
-void LRUCacheInfo::allocate( std::size_t way)
-{
-    if ( lru_hash.size() >= ways)
-        erase_lru_element();
-    lru_list.push_front( way);
-    lru_hash.emplace( way, lru_list.begin());
-}
-
-void LRUCacheInfo::erase_lru_element() {
-    std::size_t lru_elem = lru_list.back();
-    lru_list.pop_back();
-    lru_hash.erase( lru_elem);
 }
 
 std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::string& name, std::size_t ways)
