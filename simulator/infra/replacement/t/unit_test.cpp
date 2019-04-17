@@ -73,8 +73,6 @@ TEST_CASE( "Pseudo-LRU: Check_get_ways_method")
 TEST_CASE( "Pseudo-LRU: Check_forbidden_to_call_methods")
 {
     auto test_pseudo_lru_module = create_cache_replacement( "Pseudo-LRU", 4);
-    CHECK_THROWS_AS( test_pseudo_lru_module->allocate( 4), CacheReplacementException);
-    CHECK_THROWS_AS( test_pseudo_lru_module->set_to_erase( 4), CacheReplacementException);
 }
 
 TEST_CASE( "Pseudo-LRU: Check_bad_way_number_in_touch_method")
