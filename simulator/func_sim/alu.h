@@ -183,7 +183,7 @@ struct ALU
     }
 
     // RISCV mul/div
-    template<typename I, typename T> static void riscv_multiplication_h( I* instr) { instr->v_dst = riscv_multiplication_high<T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void riscv_multiplication_h( I* instr) { instr->v_dst = riscv_multiplication_high_unsigned<T>(instr->v_src1, instr->v_src2); }
     
     
     
