@@ -29,26 +29,27 @@ enum ImmediateType
     U = 'U',
     J = 'J',
     C = 'C',
-    NONE = ' ',  // ASCII code of ' ' is 32
-    C_LWSP = 33, // ASCII code of the first letter is 65
-    C_LDSP = 34,
-    C_LQSP = 35,
-    C_SWSP = 36,
-    C_SDSP = 37,
-    C_SQSP = 38,
-    C_LW   = 39, // C_LW and C_SW are similar
-    C_SW   = 39,
-    C_ADDI = 40,
-    C_LI   = 40,
-    C_ANDI = 40,
-    C_J    = 41,
-    C_JAL  = 41,
-    C_LUI  = 42,
-    C_SRLI = 43,
-    C_SRAI = 43,
-    C_SLLI = 43,
-    C_BEQZ = 44,
-    C_BNEZ = 44
+    NONE       = ' ', // ASCII code of ' ' is 32
+    C_LWSP     = 33,  // ASCII code of the first letter is 65
+    C_LDSP     = 34,
+    C_LQSP     = 35,
+    C_SWSP     = 36,
+    C_SDSP     = 37,
+    C_SQSP     = 38,
+    C_LW       = 39,  // C_LW and C_SW are similar
+    C_SW       = 39,
+    C_ADDI     = 40,
+    C_LI       = 40,
+    C_ANDI     = 40,
+    C_J        = 41,
+    C_JAL      = 41,
+    C_LUI      = 42,
+    C_SRLI     = 43,
+    C_SRAI     = 43,
+    C_SLLI     = 43,
+    C_BEQZ     = 44,
+    C_BNEZ     = 44,
+    C_ADDI4SPN = 45
 };
 
 struct RISCVInstrDecoder
@@ -81,6 +82,7 @@ struct RISCVInstrDecoder
     const uint32 Compr_imm12_10;
     const uint32 Compr_imm6_2;
     const uint32 Compr_imm12_7;
+    const uint32 Compr_imm12_5;
     const uint32 Compr_imm12_2;
 
     constexpr uint32 get_B_immediate() const noexcept
@@ -165,6 +167,11 @@ struct RISCVInstrDecoder
                                                  | ( apply_mask( Compr_imm6_2, 0b00110) << 1U)
                                                  | ( apply_mask( Compr_imm6_2, 0b00001) << 5U));
 
+            case C_ADDI4SPN: return ( apply_mask( Compr_imm12_5, 0b11000000) << 4U)
+                                  | ( apply_mask( Compr_imm12_5, 0b00111100) << 6U)
+                                  | ( apply_mask( Compr_imm12_5, 0b00000010) << 2U)
+                                  | ( apply_mask( Compr_imm12_5, 0b00000001) << 3U);
+
             default:     assert(0); return 0;
         }
     }
@@ -236,6 +243,7 @@ struct RISCVInstrDecoder
         , Compr_imm12_10 ( apply_mask( raw, 0b00000000'00000000'00011100'00000000))
         , Compr_imm6_2   ( apply_mask( raw, 0b00000000'00000000'00000000'01111100))
         , Compr_imm12_7  ( apply_mask( raw, 0b00000000'00000000'00011111'10000000))
+        , Compr_imm12_5  ( apply_mask( raw, 0b00000000'00000000'00011111'11100000))
         , Compr_imm12_2  ( apply_mask( raw, 0b00000000'00000000'00011111'11111100))
     { }
 };
