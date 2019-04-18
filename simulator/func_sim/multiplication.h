@@ -35,9 +35,9 @@ template<typename T>
 auto riscv_multiplication_high_ss(T x, T y) {
     using ST = sign_t<T>;
     using UT = unsign_t<T>;
-    bool x_is_neg = x & ( UT{ 1} << (bitwidth<T> - 1));
-    bool y_is_neg = y & ( UT{ 1} << (bitwidth<T> - 1));
-    bool result_is_neg = x_is_neg ^ y_is_neg;
+    auto x_is_neg = x >> (bitwidth<T> - 1);
+    auto y_is_neg = y >> (bitwidth<T> - 1);
+    auto result_is_neg = x_is_neg ^ y_is_neg;
     auto x_abs = ( x_is_neg) 
                  ? ~( UT{ x} - 1)
                  : UT{x};
