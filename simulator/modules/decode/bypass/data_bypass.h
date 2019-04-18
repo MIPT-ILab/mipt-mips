@@ -46,7 +46,8 @@ class DataBypass
 
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
-                    ( instruction_latency < writeback_stage_info.operation_latency));
+                    ( instruction_latency < writeback_stage_info.operation_latency &&
+                      writeback_stage_info.writeback_bandwidth == 1));
         }
 
         // returns a bypass command for a source register of an instruction
@@ -104,6 +105,7 @@ class DataBypass
         struct FuncUnitInfo
         {
             Latency operation_latency = 0_lt;
+            uint32 writeback_bandwidth = 2;
 
             void update()
             {

@@ -4,8 +4,9 @@
 #include <sstream>
 
 template <typename ISA>
-Writeback<ISA>::Writeback( Endian endian, bool log) : Log( log), endian( endian)
+Writeback<ISA>::Writeback( Endian endian, bool log, uint32 writeback_bandwidth) : Log( log), endian( endian)
 {
+    set_bandwidth( writeback_bandwidth);
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
     rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", PORT_LATENCY);
@@ -43,7 +44,7 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
     auto ports = { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get() };
     std::vector<Instr> result;
-    result.reserve( 1); // depends on WB througput
+    result.reserve( bandwidth); // depends on WB througput
 
     for ( auto& port : ports)
         if ( port->is_ready( cycle))
@@ -55,14 +56,19 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
 template <typename ISA>
 void Writeback<ISA>::clock( Cycle cycle)
 {
-    sout << "wb      cycle " << std::dec << cycle << ": ";
-
     auto instrs = read_instructions( cycle);
 
     if ( instrs.empty())
+    {
+        sout << "wb      cycle " << std::dec << cycle << ": ";
         writeback_bubble( cycle);
+    }
     else
-        writeback_instruction( instrs.front(), cycle);
+        for( uint32 i = 0; i < bandwidth && i < instrs.size(); i++)
+        {
+            sout << "wb      cycle " << std::dec << cycle << ": ";
+            writeback_instruction( instrs.at(i), cycle);
+        }
 }
 
 template <typename ISA>
@@ -108,6 +114,12 @@ void Writeback<ISA>::Checker::check( const FuncInstr& instr)
         << "PerfSim output: " << instr     << std::endl;
 
     throw CheckerMismatch(oss.str());
+}
+
+template <typename ISA>
+void Writeback<ISA>::set_bandwidth( uint32 writeback_bandwidth)
+{
+    bandwidth = writeback_bandwidth;
 }
 
 #include <mips/mips.h>

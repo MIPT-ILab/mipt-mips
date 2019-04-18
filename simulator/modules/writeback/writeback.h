@@ -42,6 +42,7 @@ private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
+    uint32 bandwidth = PORT_BW;
     const Endian endian;
 
     class Checker {
@@ -72,11 +73,12 @@ private:
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
 
 public:
-    explicit Writeback( Endian endian, bool log);
+    explicit Writeback( Endian endian, bool log, uint32 writeback_bandwidth);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
     void set_target( const Target& value);
+    void set_bandwidth( uint32 writeback_bandwidth);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }

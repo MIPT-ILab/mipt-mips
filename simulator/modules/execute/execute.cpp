@@ -105,7 +105,13 @@ void Execute<FuncInstr>::clock( Cycle cycle)
         {
             const auto bypass_direction = bypass_source.command_port->read( cycle).get_bypass_direction();
             const auto data = bypass_source.data_ports.at( bypass_direction)->read( cycle).first;
-            instr.set_v_src( data, src_index);
+            if ( bypass_source.data_ports.at( bypass_direction)->is_ready( cycle))
+            {
+                const auto data2 = bypass_source.data_ports.at( bypass_direction)->read( cycle).first;
+                instr.set_v_src( data2, src_index);
+            }
+            else
+                instr.set_v_src( data, src_index);
         }
         ++src_index;
     }
@@ -138,6 +144,8 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             wp_writeback_datapath->write( std::move( instr), cycle);
         }
     }
+    //sout << "\ninstr dst  = " << std::hex << instr.get_v_dst() << std::endl;
+
 }
 
 
