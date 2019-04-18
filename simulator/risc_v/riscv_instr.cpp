@@ -232,6 +232,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_and,    execute_and<I>,    OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,        0},
     {'I', instr_xor,    execute_xor<I>,    OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,        0},
     {'I', instr_or,     execute_or<I>,     OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,        0},
+    {'I', instr_c_xor,  execute_c_xor<I>,  OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS,0},
     // CSR
     {'I', instr_ecall,  execute_ecall<I>,  OUT_BREAK,  ' ',                   Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,      0},
     {'I', instr_sret,   execute_sret<I>,   OUT_R_JUMP, ' ',                   Imm::NO,    Src1::SEPC,       Src2::ZERO,       Dst::ZERO,      0},
