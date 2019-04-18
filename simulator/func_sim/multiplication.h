@@ -33,7 +33,6 @@ return hi;
 
 template<typename T>
 auto riscv_multiplication_high_ss(T x, T y) {
-    using ST = sign_t<T>;
     using UT = unsign_t<T>;
     auto x_is_neg = x >> (bitwidth<T> - 1);
     auto y_is_neg = y >> (bitwidth<T> - 1);
@@ -49,8 +48,8 @@ auto riscv_multiplication_high_ss(T x, T y) {
     auto result = UT{ hi_abs}; 
     if( result_is_neg)
         result = ( lo_abs == 0)
-                 ? narrow_cast<ST>( ~result + 1)
-                 : ~result;
+                 ? narrow_cast<UT>( ~result + 1)
+                 : narrow_cast<UT>( ~result);
     else
         result = narrow_cast<UT>( hi_abs);
         
@@ -59,9 +58,8 @@ auto riscv_multiplication_high_ss(T x, T y) {
 
 template<typename T>
 auto riscv_multiplication_high_su(T x, T y) {
-    using ST = sign_t<T>;
     using UT = unsign_t<T>;
-    bool x_is_neg = x & ( UT{ 1} << (bitwidth<T> - 1));
+    auto x_is_neg = x >> (bitwidth<T> - 1);
     auto x_abs = ( x_is_neg) 
                  ? ~( UT{ x} - 1)
                  : UT{x};
@@ -70,8 +68,8 @@ auto riscv_multiplication_high_su(T x, T y) {
     auto result = UT{ hi_abs}; 
     if( x_is_neg)
         result = ( lo_abs == 0)
-                 ? narrow_cast<ST>( ~result + 1)
-                 : ~result;
+                 ? narrow_cast<UT>( ~result + 1)
+                 : narrow_cast<UT>( ~result);
     else
         result = narrow_cast<UT>( hi_abs);
         
