@@ -46,6 +46,7 @@ enum ImmediateType
     C_LUI  = 42,
     C_SRLI = 43,
     C_SRAI = 43,
+    C_SLLI = 43,
     C_BEQZ = 44,
     C_BNEZ = 44
 };
