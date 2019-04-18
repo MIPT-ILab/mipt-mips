@@ -46,8 +46,8 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static auto from_cpu_index( uint8 id = uint8( MAX_REG)) { return RISCVRegister( RegNum{ id}); }
-    static auto from_gdb_index( uint8 id = uint8( MAX_REG)) { return RISCVRegister( RegNum{ id}); }
+    static auto from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
     static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
     static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
     static auto from_cpu_popular_index( uint8 id) {  id += shift; return RISCVRegister( RegNum{ id}); }
