@@ -7,8 +7,8 @@
 #include "../rf.h"
 
 #include <catch.hpp>
-#include <mips/mips_register/mips_register.h>
 #include <func_sim/operation.h>
+#include <mips/mips_register/mips_register.h>
 
 using MIPS32Instr = BaseInstruction<uint32, MIPSRegister>;
 

@@ -120,7 +120,7 @@ protected:
 
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
-    Trap trap = Trap::NO_TRAP;
+    Trap trap = Trap(Trap::NO_TRAP);
 
     Addr mem_addr = NO_VAL32;
     uint32 mem_size = NO_VAL32;
@@ -136,6 +136,7 @@ protected:
     bool print_dst2 = false;
     bool print_src1 = false;
     bool print_src2 = false;
+    bool print_src3 = false;
 
     const Addr PC = NO_VAL32;
     Addr new_PC = NO_VAL32;
@@ -233,6 +234,7 @@ protected:
 
     R src1 = R::zero();
     R src2 = R::zero();
+    R src3 = R::zero();
     R dst  = R::zero();
     R dst2 = R::zero();
 };
@@ -259,6 +261,8 @@ std::string BaseInstruction<T, R>::generate_disasm() const
         oss << (this->print_dst ? ", $" : " $") << this->src1;
     if ( this->print_src2)
         oss << ", $" << this->src2;
+    if ( this->print_src3)
+        oss << ", $" << this->src3;
 
     oss << print_immediate( this->imm_print_type, this->v_imm);
     return oss.str();

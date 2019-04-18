@@ -49,7 +49,7 @@ static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
 class A
 {
 public:
-    A( std::shared_ptr<PortMap> map)
+    explicit A( const std::shared_ptr<PortMap>& map)
         : to_B( map, "A_to_B", PORT_BW, PORT_FANOUT)
         , from_B( map, "B_to_A", PORT_LATENCY)
         , init( map, "init_A", PORT_LATENCY)
@@ -93,7 +93,7 @@ private:
 class B
 {
 public:
-    B( std::shared_ptr<PortMap> map)
+    explicit B( const std::shared_ptr<PortMap>& map)
         : to_A( map, "B_to_A", PORT_BW, PORT_FANOUT)
         , from_A( map, "A_to_B", PORT_LATENCY)
     { };

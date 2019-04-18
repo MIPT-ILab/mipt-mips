@@ -14,50 +14,34 @@
 /* TODO: move implemetations to .cpp file */
 
 /* each inherited class has to implement at least these methods:
- * 1. bool is_taken( PC);
- * 2. void update( bool is_taken, Addr target)
+ * 1. bool is_taken( Addr PC, Addr target);
+ * 2. void update( bool is_taken)
  */
 
-class BPEntry
-{
-    protected:
-    Addr _target = NO_VAL32;
-
-public:
-    Addr getTarget() const { return _target;}
-    void reset() { _target = NO_VAL32; }
-    void update_target(Addr target) { _target = target; }
-};
-
-
-/* static predictors */
-
-class BPEntryStatic : public BPEntry
-{
-public:
-    void update( bool is_taken, Addr target) {if (is_taken) _target = target; }
-};
-
 template<bool DIRECTION>
-class BPEntryAlwaysOneDirection final : public BPEntryStatic
+class BPEntryAlwaysOneDirection final
 {
 public:
-    bool is_taken( Addr /* unused */) const { return DIRECTION; }
+    bool is_taken( Addr /* unused */, Addr /* target */) const { return DIRECTION; }
+    void update( bool /* is_taken */) { }
+    void reset() { }
 };
 
 using BPEntryAlwaysTaken = BPEntryAlwaysOneDirection<true>;
 using BPEntryAlwaysNotTaken = BPEntryAlwaysOneDirection<false>;
 
-class BPEntryBackwardJumps final : public BPEntryStatic
+class BPEntryBackwardJumps final
 {
 public:
     /* prediction */
-    bool is_taken( Addr PC) const { return _target < PC ; }
+    bool is_taken( Addr PC, Addr target) const { return target < PC ; }
+    void update( bool /* is_taken */) { }
+    void reset() { }
 };
 
 /* dynamic predictors */
 
-class BPEntryOneBit final : public BPEntry
+class BPEntryOneBit final
 {
 private:
     enum class State
@@ -71,24 +55,18 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr /* unused */) const { return state == State::T; }
+    bool is_taken( Addr /* unused */, Addr /* target */) const { return state == State::T; }
 
     /* update */
-    void update( bool is_taken, Addr target)
+    void update( bool is_taken)
     {
-        if ( is_taken && _target != target) {
-            /* if the address has somehow changed, we should update it appropriately */
-            reset();
-            update_target(target);
-        }
-
         state = static_cast<State>( is_taken);
     }
 
-    void reset() { BPEntry::reset(); state = default_state; }
+    void reset() { state = default_state; }
 };
 
-class BPEntryTwoBit : public BPEntry
+class BPEntryTwoBit
 {
 public:
     class State
@@ -144,26 +122,19 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr /* unused */) const
+    bool is_taken( Addr /* unused */, Addr /* target */) const
     {
         return state.is_taken();
     }
 
     /* update */
-    void update( bool is_taken, Addr target)
+    void update( bool is_taken)
     {
-        if ( is_taken && _target != target) {
-            /* if the address has somehow changed, we should update it appropriately */
-            reset();
-            update_target( target);
-        }
-
         state.update( is_taken);
     }
 
     void reset()
     {
-        BPEntry::reset();
         state.reset();
     }
 };
@@ -171,7 +142,7 @@ public:
 
 /* adaptive predictors */
 template<size_t DEPTH>
-class BPEntryAdaptive final : public BPEntry
+class BPEntryAdaptive final
 {
     static const constexpr uint32 default_pattern = 0;
     /* The index is a pattern, and the value is prediction state,
@@ -214,27 +185,20 @@ public:
     BPEntryAdaptive() = default;
 
     /* prediction */
-    bool is_taken( Addr /* unused */) const
+    bool is_taken( Addr /* unused */, Addr /* target */) const
     {
         return state_table.at( current_pattern.get_value()).is_taken();
     }
 
     /* update */
-    void update( bool is_taken, Addr target)
+    void update( bool is_taken)
     {
-        if ( is_taken && _target != target) {
-            reset();
-            update_target( target);
-        }
-
         state_table.at( current_pattern.get_value()).update( is_taken);
         current_pattern.update( is_taken);
     }
 
     void reset()
     {
-        BPEntry::reset();
-
         for(auto& elem : state_table)
             elem.reset();
 
