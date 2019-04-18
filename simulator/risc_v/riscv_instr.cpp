@@ -122,7 +122,6 @@ template<typename I> auto execute_c_xor = do_nothing<I>;
 template<typename I> auto execute_c_sub = do_nothing<I>;
 template<typename I> auto execute_c_addw = do_nothing<I>;
 template<typename I> auto execute_c_subw = do_nothing<I>;
-template<typename I> auto execute_c_ebreak = do_nothing<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -269,6 +268,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_c_srli, execute_c_srli<I>, OUT_ARITHM, ImmediateType::C_SRLI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     {'I', instr_c_srai, execute_c_srai<I>, OUT_ARITHM, ImmediateType::C_SRAI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     {'I', instr_c_slli, execute_c_slli<I>, OUT_ARITHM, ImmediateType::C_SLLI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
+    {'I', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,       Src2::ZERO,       Dst::RD_3_BITS,         0},
     // Immediate logic and comparison
     {'I', instr_c_andi, execute_c_andi<I>, OUT_ARITHM, ImmediateType::C_ANDI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     // Register-register arithmetics
