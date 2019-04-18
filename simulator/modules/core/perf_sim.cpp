@@ -11,14 +11,14 @@
 #include <iostream>
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim( Endian endian, bool log, uint32 writeback_bandwidth) :
+PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     CycleAccurateSimulator( log),
     endian( endian),
     fetch( log),
     decode( log),
-    execute( log, writeback_bandwidth),
-    mem( log, writeback_bandwidth),
-    branch( log, writeback_bandwidth),
+    execute( log),
+    mem( log),
+    branch( log),
     writeback( endian, log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);

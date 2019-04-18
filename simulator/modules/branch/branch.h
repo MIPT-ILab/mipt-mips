@@ -34,7 +34,7 @@ class Branch : public Log
         std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
     
     public:
-        explicit Branch( bool log, uint32 writeback_bandwidth = PORT_BW);
+        explicit Branch( bool log);
         void clock( Cycle cycle);
         auto get_mispredict_rate() const { return ( num_branches != 0) 
                                                   ? num_mispredictions / num_branches * 100
