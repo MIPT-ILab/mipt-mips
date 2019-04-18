@@ -49,7 +49,7 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>    (0x8bbd).get_disasm() == "c_andi $a5, 15");
     CHECK( RISCVInstr<uint32>    (0x88a2).get_disasm() == "c_mv $a7, $s0");
     CHECK( RISCVInstr<uint32>    (0x8df1).get_disasm() == "c_and $a1, $a2");
-    CHECK( RISCVInstr<uint32>    (0x8ef5).get_disasm() == "c_or $a2, $a3");
+    CHECK( RISCVInstr<uint32>    (0x8e55).get_disasm() == "c_or $a2, $a3");
     CHECK( RISCVInstr<uint32>    (0x8eb9).get_disasm() == "c_xor $a3, $a4");
     CHECK( RISCVInstr<uint32>    (0x8f1d).get_disasm() == "c_sub $a4, $a5");
     CHECK( RISCVInstr<uint32>    (0x9d31).get_disasm() == "c_addw $a0, $a2");
