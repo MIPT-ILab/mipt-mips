@@ -40,6 +40,7 @@ enum ImmediateType
     C_SW   = 39,
     C_ADDI = 40,
     C_LI   = 40,
+    C_ANDI = 40,
     C_JAL  = 41,
     C_LUI  = 42,
     C_SRLI = 43,
