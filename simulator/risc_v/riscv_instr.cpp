@@ -226,6 +226,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sraw,   execute_sraw<I>,   OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,         0},
     {'I', instr_srlw,   execute_srlw<I>,   OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,         0},
     {'I', instr_c_sub,  execute_c_sub<I>,  OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
+    {'I', instr_c_addw, execute_c_addw<I>, OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
+    {'I', instr_c_subw, execute_c_subw<I>, OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
     // Register-register logic and comparison
     {'I', instr_slt,    execute_slt<I>,    OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,         0},
     {'I', instr_sltu,   execute_sltu<I>,   OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,         0},
