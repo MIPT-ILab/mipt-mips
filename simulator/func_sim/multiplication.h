@@ -80,23 +80,24 @@ template<typename T>
 auto riscv_division(T x, T y) {
     using UT = unsign_t<T>;
     if ( y == 0)
-        return narrow_cast<T>( all_ones<UT>());
+        return narrow_cast<UT>( all_ones<UT>());
 
     if constexpr( !std::is_same_v<T, unsign_t<T>>)
         if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return T{1} << ( bitwidth<T> - 1);
+            return narrow_cast<UT>( UT{1} << ( bitwidth<T> - 1));
 
     return narrow_cast<UT>( x / y);
 }
 
 template<typename T>
 auto riscv_remainder(T x, T y) {
+    using UT = unsign_t<T>;
     if ( y == 0)
-        return x;
+        return narrow_cast<UT>( x);
 
     if constexpr( !std::is_same_v<T, unsign_t<T>>)
         if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return T{ 0};
+            return narrow_cast<UT>( 0);
 
     return narrow_cast<UT>( x % y);
 }
