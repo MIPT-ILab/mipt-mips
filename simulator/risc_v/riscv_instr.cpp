@@ -194,14 +194,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_fence,  execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     {'I', instr_fence_i,execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     /*-------------- M --------------*/
-    {'M', instr_mul,    execute_mul<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_mulh,   execute_mulh<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_div,    execute_div<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_divu,   execute_divu<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_rem,    execute_rem<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_remu,   execute_remu<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mul,    execute_mul<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_div,    execute_div<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_divu,   execute_divu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
 };
 
 template<typename I>
