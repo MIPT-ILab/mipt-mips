@@ -83,13 +83,13 @@ Trap FuncSim<ISA>::handle_syscall()
 {
     auto result = execute_syscall( kernel.get());
     switch ( result.type) {
-    case SyscallResult::HALT:        exit_code = result.code; return Trap::HALT;
-    case SyscallResult::IGNORED:     return Trap::SYSCALL;
-    case SyscallResult::SUCCESS:     return Trap::NO_TRAP;
-    case SyscallResult::UNSUPPORTED: return Trap::UNSUPPORTED_SYSCALL;
+    case SyscallResult::HALT:        exit_code = result.code; return Trap(Trap::HALT);
+    case SyscallResult::IGNORED:     return Trap(Trap::SYSCALL);
+    case SyscallResult::SUCCESS:     return Trap(Trap::NO_TRAP);
+    case SyscallResult::UNSUPPORTED: return Trap(Trap::UNSUPPORTED_SYSCALL);
     default: assert( 0);
     }
-    return Trap::NO_TRAP;
+    return Trap(Trap::NO_TRAP);
 }
 
 template<typename ISA>
@@ -114,9 +114,9 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
         if ( trap == Trap::HALT)
-            return Trap::HALT;
+            return Trap(Trap::HALT);
     }
-    return Trap::NO_TRAP;
+    return Trap(Trap::NO_TRAP);
 }
 
 template <typename ISA>
@@ -128,14 +128,14 @@ Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
         if ( trap != Trap::NO_TRAP)
             return trap;
     }
-    return Trap::NO_TRAP;
+    return Trap(Trap::NO_TRAP);
 }
 
 template <typename ISA>
 Trap FuncSim<ISA>::run_single_step()
 {
     auto trap = step_system();
-    return trap == Trap::NO_TRAP ? Trap::BREAKPOINT : trap;
+    return trap == Trap(Trap::NO_TRAP) ? Trap(Trap::BREAKPOINT) : trap;
 }
 
 template <typename ISA>
