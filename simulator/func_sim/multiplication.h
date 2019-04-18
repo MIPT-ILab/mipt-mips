@@ -86,7 +86,7 @@ auto riscv_division(T x, T y) {
         if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
             return T{1} << ( bitwidth<T> - 1);
 
-    return x / y;
+    return narrow_cast<UT>( x / y);
 }
 
 template<typename T>
@@ -98,5 +98,5 @@ auto riscv_remainder(T x, T y) {
         if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
             return T{ 0};
 
-    return x % y;
+    return narrow_cast<UT>( x % y);
 }
