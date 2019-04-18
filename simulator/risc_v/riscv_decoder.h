@@ -42,7 +42,8 @@ enum ImmediateType
     C_LI   = 40,
     C_JAL  = 41,
     C_LUI  = 42,
-    C_SRLI = 43
+    C_SRLI = 43,
+    C_SRAI = 43
 };
 
 struct RISCVInstrDecoder
