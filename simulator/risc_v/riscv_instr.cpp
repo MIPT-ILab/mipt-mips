@@ -213,6 +213,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_xori,   execute_xori<I>,   OUT_ARITHM, 'I',                   Imm::LOGIC, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_ori,    execute_ori<I>,    OUT_ARITHM, 'I',                   Imm::LOGIC, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
     {'I', instr_andi,   execute_andi<I>,   OUT_ARITHM, 'I',                   Imm::LOGIC, Src1::RS1,        Src2::ZERO,       Dst::RD,        0},
+    {'I', instr_c_andi, execute_c_andi<I>, OUT_ARITHM, ImmediateType::C_ANDI, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS,0},
     // Register-register arithmetics
     {'I', instr_add,    execute_add<I>,    OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,        0},
     {'I', instr_sub,    execute_sub<I>,    OUT_ARITHM, ' ',                   Imm::NO,    Src1::RS1,        Src2::RS2,        Dst::RD,        0},
