@@ -144,8 +144,6 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             wp_writeback_datapath->write( std::move( instr), cycle);
         }
     }
-    //sout << "\ninstr dst  = " << std::hex << instr.get_v_dst() << std::endl;
-
 }
 
 
