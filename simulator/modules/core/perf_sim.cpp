@@ -11,7 +11,7 @@
 #include <iostream>
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim( Endian endian, bool log, uint32 writeback_bandwidth) :
+PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     CycleAccurateSimulator( log),
     endian( endian),
     fetch( log),
@@ -19,13 +19,14 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log, uint32 writeback_bandwidth) :
     execute( log),
     mem( log),
     branch( log),
-    writeback( endian, log, writeback_bandwidth)
+    writeback( endian, log)
 {
     wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
+    writeback.set_bandwidth( 2*PORT_BW);
 
     PortMap::get_instance()->init();
 }

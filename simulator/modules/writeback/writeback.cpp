@@ -4,9 +4,8 @@
 #include <sstream>
 
 template <typename ISA>
-Writeback<ISA>::Writeback( Endian endian, bool log, uint32 writeback_bandwidth) : Log( log), endian( endian)
+Writeback<ISA>::Writeback( Endian endian, bool log) : Log( log), endian( endian)
 {
-    set_bandwidth( writeback_bandwidth);
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
     rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", PORT_LATENCY);

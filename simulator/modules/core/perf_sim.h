@@ -30,7 +30,7 @@ public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
 
-    explicit PerfSim( Endian endian, bool log, uint32 writeback_bandwidth = 2*PORT_BW);
+    explicit PerfSim( Endian endian, bool log);
     ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
     Trap run_single_step() final { return Trap(Trap::HALT); }
