@@ -10,47 +10,33 @@
 #include <list>
 #include <unordered_map>
 #include <utility>
+#include <memory>
 #include <vector>
 
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
+#include <infra/replacement/cache_replacement.h>
 
 // Replacement algorithm modules (LRU)
-class LRUCacheInfo
+
+class ReplacementModule
 {
     public:
-        explicit LRUCacheInfo( std::size_t ways);
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy = "LRU");
+        ~ReplacementModule() { replacement_info.clear(); }
 
-        void touch( std::size_t way);
-        std::size_t update();
-        std::size_t get_ways() const { return ways; }
-
-    private:
-        std::list<std::size_t> lru_list{};
-        std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
-
-        const std::size_t ways;
-};
-
-class LRUModule
-{
-    public:
-        LRUModule( std::size_t number_of_sets, std::size_t number_of_ways)
-            : lru_info( number_of_sets, LRUCacheInfo( number_of_ways))
-        { }
-
-        void touch( uint32 num_set, uint32 num_way) { lru_info[ num_set].touch( num_way); }
-        auto update( uint32 num_set) { return lru_info[ num_set].update(); }
+        void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
+        auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
     private:
-        std::vector<LRUCacheInfo> lru_info;
+        std::vector<std::unique_ptr<CacheReplacementInterface>> replacement_info;
 };
 
 struct CacheTagArrayInvalidSizeException final : Exception
 {
-    explicit CacheTagArrayInvalidSizeException(const std::string& msg) 
+    explicit CacheTagArrayInvalidSizeException(const std::string& msg)
         : Exception("Invalid cache size", msg)
     { }
 };
@@ -125,7 +111,7 @@ class CacheTagArray : public CacheTagArraySize
 
         // hash tabe to lookup tags in O(1)
         std::vector<std::unordered_map<Addr, Way>> lookup_helper;
-        LRUModule lru_module; // LRU algorithm module
+        ReplacementModule replacement_module; // LRU algorithm module
 };
 
 #endif // CACHE_TAG_ARRAY_H

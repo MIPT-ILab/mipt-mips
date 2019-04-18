@@ -120,7 +120,7 @@ protected:
 
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
-    Trap trap = Trap::NO_TRAP;
+    Trap trap = Trap(Trap::NO_TRAP);
 
     Addr mem_addr = NO_VAL32;
     uint32 mem_size = NO_VAL32;

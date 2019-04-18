@@ -10,42 +10,6 @@
 // MIPT-MIPS includes
 #include "infra/cache/cache_tag_array.h"
 
-LRUCacheInfo::LRUCacheInfo( std::size_t ways)
-    : ways( ways)
-{
-    assert( ways != 0u);
-
-    lru_hash.reserve( ways);
-
-    for ( std::size_t i = 0; i < ways; i++)
-    {
-        lru_list.push_front( i);
-        lru_hash.emplace( i, lru_list.begin());
-    }
-}
-
-void LRUCacheInfo::touch( std::size_t way)
-{
-    const auto lru_it = lru_hash.find( way);
-    assert( lru_it != lru_hash.end());
-
-    // Put the way to the head of the list
-    lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
-}
-
-std::size_t LRUCacheInfo::update()
-{
-    // remove the least recently used element from the tail
-    std::size_t lru_elem = lru_list.back();
-    lru_list.pop_back();
-
-    // put it to the head
-    auto ptr = lru_list.insert( lru_list.begin(), lru_elem);
-    lru_hash.insert_or_assign( lru_elem, ptr);
-
-    return lru_elem;
-}
-
 CacheTagArraySizeCheck::CacheTagArraySizeCheck(
     uint32 size_in_bytes,
     uint32 ways,
@@ -116,7 +80,7 @@ CacheTagArray::CacheTagArray(
     : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
     , tags( sets, std::vector<Tag>( ways))
     , lookup_helper( sets, std::unordered_map<Addr, uint32>( ways))
-    , lru_module( sets, ways)
+    , replacement_module( sets, ways)
 { }
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
@@ -127,7 +91,7 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        lru_module.touch( num_set, way);
+        replacement_module.touch( num_set, way);
     }
 
     return lookup_result;
@@ -150,7 +114,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = narrow_cast<uint32>( lru_module.update( num_set));
+    const auto way = narrow_cast<uint32>( replacement_module.update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
@@ -167,3 +131,11 @@ uint32 CacheTagArray::write( Addr addr)
 
     return way;
 }
+
+ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy)
+{
+    for ( std::size_t i = 0; i < number_of_sets; i++)
+        replacement_info.emplace_back( create_cache_replacement( replacement_policy, number_of_ways));
+}
+
+
