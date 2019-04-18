@@ -41,6 +41,7 @@ enum ImmediateType
     C_ADDI = 40,
     C_LI   = 40,
     C_ANDI = 40,
+    C_J    = 41,
     C_JAL  = 41,
     C_LUI  = 42,
     C_SRLI = 43,
@@ -140,7 +141,7 @@ struct RISCVInstrDecoder
             case C_ADDI: return sign_extension<6>( ( apply_mask( Cx_imm1, 0b1) << 5U)
                                                  | ( apply_mask( Cx_imm5, 0b11111)));
 
-            case C_JAL:  return sign_extension<12>( ( apply_mask( Cx_imm11, 0b10000000000) << 11U)
+            case C_J:    return sign_extension<12>( ( apply_mask( Cx_imm11, 0b10000000000) << 11U)
                                                   | ( apply_mask( Cx_imm11, 0b01000000000) << 4U)
                                                   | ( apply_mask( Cx_imm11, 0b00110000000) << 8U)
                                                   | ( apply_mask( Cx_imm11, 0b00001000000) << 10U)
