@@ -44,10 +44,6 @@ using float64 = double;
 
 using int128 = __int128;
 using uint128 = unsigned __int128;
-// next types are not used, but they are reqired by compiller
-/*using int256 = __int128;
-using uint128 = unsigned __int128;
-*/
 
 static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
