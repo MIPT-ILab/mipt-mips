@@ -58,16 +58,11 @@ static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-/* Unsigned 128-bit and 256-bit integer types */
+/* Unsigned 128-bit integer type */
 using uint128 = boost::multiprecision::uint128_t;
-using uint256 = boost::multiprecision::uint256_t;
 
-/* Signed 128-bit and 256-bit integer types */
+/* Signed 128-bit integer type */
 using int128 = boost::multiprecision::int128_t;
-using int256 = boost::multiprecision::int256_t;
-
-template<> struct doubled<uint128> { using type = uint256; };
-template<> struct doubled<int128>  { using type = int256;  };
 
 #endif // __SIZEOF_INT128__
 
