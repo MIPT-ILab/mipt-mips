@@ -100,7 +100,6 @@ auto riscv_multiplication_high_su(T x, T y) { return riscv_multiplication_high_u
 
 #endif
 
-
 template<typename T>
 auto riscv_division(T x, T y) {
     using UT = unsign_t<T>;
@@ -114,12 +113,14 @@ auto riscv_division(T x, T y) {
     return x / y;
 }
 
+template<typename T>
+auto riscv_remainder(T x, T y) {
+    if ( y == 0)
+        return x;
 
+    if constexpr( !std::is_same_v<T, unsign_t<T>>)
+        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
+            return T{ 0};
 
-
-
-
-
-
-
-
+    return x % y;
+}

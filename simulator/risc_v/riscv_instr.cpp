@@ -85,8 +85,8 @@ template<typename I> auto execute_mulhsu = ALU::riscv_mult_h_su<I, typename I::R
 template<typename I> auto execute_mulhu = ALU::riscv_mult_h_uu<I, typename I::RegisterUInt>;
 template<typename I> auto execute_div = ALU::riscv_div<I, sign_t<typename I::RegisterUInt>>;
 template<typename I> auto execute_divu = ALU::riscv_div<I, typename I::RegisterUInt>;
-template<typename I> auto execute_rem = do_nothing<I>;
-template<typename I> auto execute_remu = do_nothing<I>;
+template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -194,14 +194,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_fence,  execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     {'I', instr_fence_i,execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR, Src1::RS1, Src2::ZERO, Dst::ZERO, 0},
     /*-------------- M --------------*/
-    {'M', instr_mul,    execute_mul<I>,    OUT_DIVMULT,' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 4},
-    {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_div,    execute_div<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_divu,   execute_divu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
-    {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mul,    execute_mul<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulh,   execute_mulh<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulhsu, execute_mulhsu<I>, OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_mulhu,  execute_mulhu<I>,  OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_div,    execute_div<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_divu,   execute_divu<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_rem,    execute_rem<I>,    OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
+    {'M', instr_remu,   execute_remu<I>,   OUT_DIVMULT, ' ', Imm::NO, Src1::RS1, Src2::RS2, Dst::RD, 0},
 };
 
 template<typename I>
