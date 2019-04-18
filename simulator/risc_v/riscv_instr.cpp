@@ -159,6 +159,19 @@ struct RISCVTableEntry
     Dst  dst;
     uint32 mem_size;
     RISCVTableEntry() = delete;
+    bool check_print_dst( Reg reg) const
+    {
+        return ( reg != Reg::ZERO)
+            && ( reg != Reg::MEPC)
+            && ( reg != Reg::SEPC);
+    }
+    bool check_print_src( Reg reg) const
+    {
+        return ( reg != Reg::ZERO)
+            && ( reg != Reg::SEPC)
+            && ( reg != Reg::MEPC)
+            && ( reg != Reg::CSR);
+    }
 };
 
 template<typename I>
@@ -340,18 +353,10 @@ void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
     this->operation = entry.type;
     this->executor  = entry.function;
     this->opname  = entry.entry.name;
-    this->print_dst  = ( entry.dst != Dst::ZERO)
-                    && ( entry.dst != Dst::MEPC)
-                    && ( entry.dst != Dst::SEPC);
+    this->print_dst  = entry.check_print_dst( entry.dst);
     this->print_dst2 = entry.dst == Dst::CSR;
-    this->print_src1 = ( entry.src1 != Src1::ZERO)
-                    && ( entry.src1 != Src1::SEPC)
-                    && ( entry.src1 != Src1::MEPC)
-                    && ( entry.src1 != Src1::CSR);
-    this->print_src2 = ( entry.src2 != Src2::ZERO)
-                    && ( entry.src2 != Src2::SEPC)
-                    && ( entry.src2 != Src2::MEPC)
-                    && ( entry.src2 != Src2::CSR);
+    this->print_src1 = entry.check_print_src( entry.src1);
+    this->print_src2 = entry.check_print_src( entry.src2);
 }
 
 template<typename T>
