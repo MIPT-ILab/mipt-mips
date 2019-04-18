@@ -45,7 +45,9 @@ enum ImmediateType
     C_JAL  = 41,
     C_LUI  = 42,
     C_SRLI = 43,
-    C_SRAI = 43
+    C_SRAI = 43,
+    C_BEQZ = 44,
+    C_BNEZ = 44
 };
 
 struct RISCVInstrDecoder
@@ -155,6 +157,12 @@ struct RISCVInstrDecoder
 
             case C_SRLI: return ( apply_mask( Cx_imm1, 0b1) << 5U)
                               | ( apply_mask( Cx_imm5, 0b11111));
+
+            case C_BEQZ: return sign_extension<9>( ( apply_mask( Cx_imm3, 0b100) << 8U)
+                                                 | ( apply_mask( Cx_imm3, 0b011) << 3U)
+                                                 | ( apply_mask( Cx_imm5, 0b11000) << 6U)
+                                                 | ( apply_mask( Cx_imm5, 0b00110) << 1U)
+                                                 | ( apply_mask( Cx_imm5, 0b00001) << 5U));
 
             default:     assert(0); return 0;
         }
