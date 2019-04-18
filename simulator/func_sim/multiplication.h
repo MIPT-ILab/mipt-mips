@@ -12,7 +12,6 @@ auto riscv_multiplication_low(T x, T y) {
     return lo;
 }
 
-#if defined (__SIZEOF_INT128__)
 // For RISCV-128bit result of multiplication is 256 bit type,
 // which is not defined in ABI.
 // So, we have to use Karatsuba algorithm to get high register of 
@@ -78,27 +77,6 @@ auto riscv_multiplication_high_su(T x, T y) {
         
     return result;
 }
-
-#else 
-// __SIZEOF_INT128__
-// using boost types
-template<typename T>
-auto riscv_multiplication_high_uu(T x, T y) {
-    using UT = unsign_t<T>;
-    using T2 = doubled_t<T>;
-    using UT2 = unsign_t<T2>;
-    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
-    return hi;
-}
-
-template<typename T>
-auto riscv_multiplication_high_ss(T x, T y) { return riscv_multiplication_high_uu( x, y); }
-
-template<typename T>
-auto riscv_multiplication_high_su(T x, T y) { return riscv_multiplication_high_uu( x, y); }
-
-#endif
 
 template<typename T>
 auto riscv_division(T x, T y) {
