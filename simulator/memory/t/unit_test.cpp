@@ -328,7 +328,7 @@ TEST_CASE( "Func_memory: Write to 0")
     class DummyStore {
     public:
         Addr get_mem_addr() const { return 0; };
-        std::size_t get_mem_size() const { return 8; }
+        uint32 get_mem_size() const { return 8; }
         auto get_endian() const { return Endian::little; } 
         uint64 get_mask() const { return all_ones<uint64>(); }
         bool is_load() const { return false; }
