@@ -122,6 +122,7 @@ template<typename I> auto execute_c_xor = do_nothing<I>;
 template<typename I> auto execute_c_sub = do_nothing<I>;
 template<typename I> auto execute_c_addw = do_nothing<I>;
 template<typename I> auto execute_c_subw = do_nothing<I>;
+template<typename I> auto execute_c_ebreak = do_nothing<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -251,11 +252,13 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     /*------ Compressed Instructions ------*/
+    {'I', instr_c_ebreak,execute_c_ebreak<I>,OUT_BREAK,  ' ',                   Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_li,   execute_c_li<I>,   OUT_ARITHM, ImmediateType::C_LI,   Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
     {'I', instr_c_lui,  execute_c_lui<I>,  OUT_ARITHM, ImmediateType::C_LUI,  Imm::LOGIC, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
     // Jumps and branches
     {'I', instr_c_jal,  execute_c_jal<I>,  OUT_BRANCH, ImmediateType::C_JAL,  Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_j,    execute_c_j<I>,    OUT_BRANCH, ImmediateType::C_J,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
+    {'I', instr_c_jr,   execute_c_jr<I>,   OUT_BRANCH, ImmediateType::NONE,   Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_beqz, execute_c_beqz<I>, OUT_BRANCH, ImmediateType::C_BEQZ, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_bnez, execute_c_bnez<I>, OUT_BRANCH, ImmediateType::C_BNEZ, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0},
     // Loads and stores
