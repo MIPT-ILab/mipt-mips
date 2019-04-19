@@ -334,6 +334,7 @@ TEST_CASE( "Func_memory: Write to 0")
         bool is_load() const { return false; }
         bool is_store() const { return true; }
         uint64 get_v_src2() const { return NO_VAL64; }
+        uint64 get_v_dst() const { return 0; }
         void load(uint64 /* unused */) { }
     } store;
     auto mem = FuncMemory::create_plain_memory();
