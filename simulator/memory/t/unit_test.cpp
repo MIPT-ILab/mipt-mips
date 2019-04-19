@@ -322,3 +322,21 @@ TEST_CASE( "Func_memory: Write string limited")
     mem->write_string_limited( "MIPT-MIPS is cool", 0x20, 9);
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
 }
+
+TEST_CASE( "Func_memory: Write to 0")
+{
+    class DummyStore {
+    public:
+        Addr get_mem_addr() const { return 0; };
+        uint32 get_mem_size() const { return 8; }
+        auto get_endian() const { return Endian::little; } 
+        uint64 get_mask() const { return all_ones<uint64>(); }
+        bool is_load() const { return false; }
+        bool is_store() const { return true; }
+        uint64 get_v_src2() const { return NO_VAL64; }
+        uint64 get_v_dst() const { return 0; }
+        void load(uint64 /* unused */) { }
+    } store;
+    auto mem = FuncMemory::create_plain_memory();
+    CHECK_THROWS_AS( mem->load_store( &store), Exception);
+}
