@@ -157,27 +157,54 @@ struct ALU
     template<typename I, typename T> static void riscv_subtraction( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>, typename I::RegisterUInt>(narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2)); }
     template<typename I, typename T> static void addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_imm); }
 
+    template<typename T, typename T_src1, typename T_src2> static
+    bool is_addition_overflow( T_src1 src1, T_src2 src2)
+    {
+        if ( std::numeric_limits<T>::max() - narrow_cast<T>( src1) < narrow_cast<T>( src2))
+            return true;
+        return false;
+    }
+
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
+        if ( is_addition_overflow<T>( instr->v_src1, instr->v_src2))
+            instr->trap = Trap::INTEGER_OVERFLOW;
         addition<I, T>( instr);
-//      if ( add_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
     }
+
+    template<typename I, typename T> static
+    void addition_overflow_restored( I* instr)
+    {
+        if ( is_addition_overflow<T>( instr->v_src1, instr->v_src2))
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            addition<I, T>( instr);
+    }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm( I* instr)
+    {
+        if ( is_addition_overflow<T>( instr->v_src1, instr->v_imm))
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        addition_imm<I, T>( instr);
+    }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm_restored( I* instr)
+    {
+        if ( is_addition_overflow<T>( instr->v_src1, instr->v_imm))
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            addition_imm<I, T>( instr);
+    }
+
 
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
         subtraction<I, T>( instr);
 //      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
-    }
-
-    template<typename I, typename T> static
-    void addition_overflow_imm( I* instr)
-    {
-        addition_imm<I, T>( instr);
-//      if ( add_overflow( x, y))
 //          instr->trap = Trap::INTEGER_OVERFLOW;
     }
 

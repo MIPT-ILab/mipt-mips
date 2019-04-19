@@ -18,8 +18,8 @@
 #include <vector>
 
 template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> auto mips_add     = ALU::addition_overflow<I, uint32>;
-template<typename I> auto mips_addi    = ALU::addition_overflow_imm<I, uint32>;
+template<typename I> auto mips_add     = ALU::addition_overflow_restored<I, uint32>;
+template<typename I> auto mips_addi    = ALU::addition_overflow_imm_restored<I, uint32>;
 template<typename I> auto mips_addiu   = ALU::addition_imm<I, uint32>;
 template<typename I> auto mips_addu    = ALU::addition<I, uint32>;
 template<typename I> auto mips_and     = ALU::andv<I>;
@@ -43,8 +43,8 @@ template<typename I> auto mips_bnel    = ALU::branch<I, ALU::ne<I>>;
 template<typename I> auto mips_break   = ALU::breakpoint<I>;
 template<typename I> auto mips_clo     = ALU::clo<I, uint32>;
 template<typename I> auto mips_clz     = ALU::clz<I, uint32>;
-template<typename I> auto mips_dadd    = ALU::addition_overflow<I, uint64>;
-template<typename I> auto mips_daddi   = ALU::addition_overflow_imm<I, uint64>;
+template<typename I> auto mips_dadd    = ALU::addition_overflow_restored<I, uint64>;
+template<typename I> auto mips_daddi   = ALU::addition_overflow_imm_restored<I, uint64>;
 template<typename I> auto mips_daddiu  = ALU::addition_imm<I, uint64>;
 template<typename I> auto mips_daddu   = ALU::addition<I, uint64>;
 template<typename I> auto mips_dclo    = ALU::clo<I, uint64>;

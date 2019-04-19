@@ -196,7 +196,6 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
 }    
 
 // ********* Converted SPIM TT tests with some additions **********
-// 55 done
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -220,13 +219,13 @@ TEST_CASE ( "MIPS32_instr: add 0 and 1")
     CHECK( instr.get_v_dst() == 1);
 }
 
-TEST_CASE ( "MIPS32_instr: add 1 and -1")
+TEST_CASE ( "MIPS32_instr: add 1 and -2")
 {
     MIPS32Instr instr( "add");
     instr.set_v_src( 1, 0);
-    instr.set_v_src( 0xffffffff, 1);
+    instr.set_v_src( 0xfffffffe, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0);
+    CHECK( instr.get_v_dst() == 0xffffffff);
 }
 
 /*     Overflow exception isn't implemented (#130)
@@ -260,23 +259,23 @@ TEST_CASE( "MIPS32_instr: addi 0 and 1")
     CHECK( instr.get_v_dst() == 1);
 }
 
-TEST_CASE( "MIPS32_instr: addi 1 and -1")
+TEST_CASE( "MIPS32_instr: addi 1 and -2")
 {
-    MIPS32Instr instr( "addi", 0xffff);
+    MIPS32Instr instr( "addi", 0xfffffffe);
     instr.set_v_src( 1, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0);
+    CHECK( instr.get_v_dst() == 0xffffffff);
 }
     
-/*      Overflow exception isn't implemented (#130)
+/*   Overflow exception isn't implemented (#130) */
 TEST_CASE( "MIPS32_instr: addi overflow")
 {
-    MIPS32Instr instr( "addi", 1);
-    instr.set_v_src( 0x7fffffff, 0);
+    MIPS32Instr instr( "addi", 2);
+    instr.set_v_src( 0xfffffffe, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
-    CHECK( instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK( instr.get_v_dst() == NO_VAL32);
+    CHECK( instr.trap_type() == Trap::INTEGER_OVERFLOW);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
     
@@ -3107,7 +3106,7 @@ TEST_CASE( "MIPS32_instr: sub overflow")
     instr.set_v_src( 0x80000000, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 0xfee1dead);
+    CHECK(instr.get_v_dst() == NO_VAL32);
     CHECK(instr.trap_type() != Trap::NO_TRAP);
 }*/
 ////////////////////////////////////////////////////////////////////////////////
@@ -3598,13 +3597,13 @@ TEST_CASE ( "MIPS64_instr: dadd 0 and 1")
     CHECK( instr.get_v_dst() == 1);
 }
 
-TEST_CASE ( "MIPS64_instr: dadd 1 and -1")
+TEST_CASE ( "MIPS64_instr: dadd 1 and -2")
 {
     MIPS64Instr instr( "dadd");
     instr.set_v_src( 1, 0);
-    instr.set_v_src( 0xffffffffffffffff, 1);
+    instr.set_v_src( 0xfffffffffffffffe, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0);
+    CHECK( instr.get_v_dst() == 0xffffffffffffffff);
 }
 
 /*     Overflow exception isn't implemented (#130)
@@ -3639,12 +3638,12 @@ TEST_CASE( "MIPS64_instr: daddi 0 and 1")
     CHECK( instr.get_v_dst() == 1);
 }
 
-TEST_CASE( "MIPS64_instr: daddi 1 and -1")
+TEST_CASE( "MIPS64_instr: daddi 1 and -2")
 {
-    MIPS64Instr instr( "daddi", 0xffff);
+    MIPS64Instr instr( "daddi", 0xfffffffe);
     instr.set_v_src( 1, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0);
+    CHECK( instr.get_v_dst() == 0xffffffffffffffff);
 }
     
 /*      Overflow exception isn't implemented (#130)
