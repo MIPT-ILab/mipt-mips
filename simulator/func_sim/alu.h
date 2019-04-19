@@ -158,21 +158,6 @@ struct ALU
     template<typename I, typename T> static void riscv_subtraction( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>, typename I::RegisterUInt>(narrow_cast<T>( instr->v_src1) - narrow_cast<T>( instr->v_src2)); }
     template<typename I, typename T> static void addition_imm( I* instr) { instr->v_dst = narrow_cast<T>( instr->v_src1) + narrow_cast<T>( instr->v_imm); }
 
-    template<typename T, typename T_src1, typename T_src2> static
-    auto test_addition_overflow( T_src1 src1, T_src2 src2)
-    {
-        using T_src1_signed = sign_t<T_src1>;
-        using T_src2_signed = sign_t<T_src2>;
-        using T_signed      = sign_t<T>;
-
-        auto val1 = narrow_cast<T_src1_signed>( src1);
-        auto val2 = narrow_cast<T_src2_signed>( src2);
-        auto result = narrow_cast<T_signed>( val1) + narrow_cast<T_signed>( val2);
-
-        bool is_overflow = ( val1 > 0 && val2 > 0 && result < 0) || ( val1 < 0 && val2 < 0 && result > 0);
-        return std::make_pair( narrow_cast<T>( result), is_overflow);
-    }
-
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
