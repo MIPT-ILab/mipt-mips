@@ -78,7 +78,7 @@ public:
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
     void set_target( const Target& value);
-    void set_bandwidth( uint32 writeback_bandwidth);
+    void set_bandwidth( uint32 writeback_bandwidth) { bandwidth = writeback_bandwidth;}
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }

@@ -43,7 +43,7 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
     auto ports = { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get() };
     std::vector<Instr> result;
-    result.reserve( bandwidth); // depends on WB througput
+    result.reserve( bandwidth);
 
     for ( auto& port : ports)
         if ( port->is_ready( cycle))
@@ -62,12 +62,11 @@ void Writeback<ISA>::clock( Cycle cycle)
         sout << "wb      cycle " << std::dec << cycle << ": ";
         writeback_bubble( cycle);
     }
-    else
-        for( uint32 i = 0; i < bandwidth && i < instrs.size(); i++)
-        {
-            sout << "wb      cycle " << std::dec << cycle << ": ";
-            writeback_instruction( instrs.at(i), cycle);
-        }
+    for( const auto& i : instrs)
+    {
+        sout << "wb      cycle " << std::dec << cycle << ": ";
+        writeback_instruction( i, cycle);
+    }
 }
 
 template <typename ISA>
@@ -113,12 +112,6 @@ void Writeback<ISA>::Checker::check( const FuncInstr& instr)
         << "PerfSim output: " << instr     << std::endl;
 
     throw CheckerMismatch(oss.str());
-}
-
-template <typename ISA>
-void Writeback<ISA>::set_bandwidth( uint32 writeback_bandwidth)
-{
-    bandwidth = writeback_bandwidth;
 }
 
 #include <mips/mips.h>
