@@ -161,9 +161,9 @@ struct ALU
     template<typename T, typename T_src1, typename T_src2> static
     auto test_addition_overflow( T_src1 src1, T_src2 src2)
     {
-        typedef typename std::make_signed<T_src1>::type T_src1_signed;
-        typedef typename std::make_signed<T_src2>::type T_src2_signed;
-        typedef typename std::make_signed<T>     ::type T_signed;
+        using T_src1_signed = sign_t<T_src1>;
+        using T_src2_signed = sign_t<T_src2>;
+        using T_signed      = sign_t<T>;
 
         auto val1 = narrow_cast<T_src1_signed>( src1);
         auto val2 = narrow_cast<T_src2_signed>( src2);
