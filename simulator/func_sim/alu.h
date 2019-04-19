@@ -182,11 +182,17 @@ struct ALU
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
+<<<<<<< HEAD
         auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
         if (ret.second)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
             instr->v_dst = ret.first;
+=======
+        subtraction<I, T>( instr);
+//      if ( sub_overflow( x, y))
+//          instr->trap = Trap::INTEGER_OVERFLOW;
+>>>>>>> upstream/master
     }
 
     // RISCV mul/div

@@ -193,6 +193,7 @@ auto test_addition_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+<<<<<<< HEAD
 template<typename T, typename T_src1, typename T_src2> static
 auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
 {
@@ -208,4 +209,6 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+=======
+>>>>>>> upstream/master
 #endif
