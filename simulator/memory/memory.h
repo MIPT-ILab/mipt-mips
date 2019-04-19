@@ -150,7 +150,7 @@ void FuncMemory::store( const Instr& instr)
 {
     using DstType = decltype( std::declval<Instr>().get_v_dst());
     if ( instr.get_mem_addr() == 0)
-        throw Exception("Store data to zero is an cricital error");
+        throw Exception("Store data to zero is a cricital error");
 
     if ( ~instr.get_mask() == 0) {
         if ( instr.get_endian() == Endian::little)
