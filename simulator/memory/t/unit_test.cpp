@@ -337,5 +337,5 @@ TEST_CASE( "Func_memory: Write to 0")
         void load(uint64 /* unused */) { }
     } store;
     auto mem = FuncMemory::create_plain_memory();
-    CHECK_THROWS_AS( mem->load_store( store), Exception);
+    CHECK_THROWS_AS( mem->load_store( &store), Exception);
 }
