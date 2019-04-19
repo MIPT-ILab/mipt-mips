@@ -106,9 +106,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             const auto bypass_direction = bypass_source.command_port->read( cycle).get_bypass_direction();
             auto data = bypass_source.data_ports.at( bypass_direction)->read( cycle).first;
             while ( bypass_source.data_ports.at( bypass_direction)->is_ready( cycle))
-            {
                 data = bypass_source.data_ports.at( bypass_direction)->read( cycle).first;
-            }
             instr.set_v_src( data, src_index);
         }
         ++src_index;
