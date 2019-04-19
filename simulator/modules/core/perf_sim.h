@@ -41,6 +41,11 @@ public:
     void clock() final;
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
+    void set_writeback_bandwidth( uint32 wb_bandwidth) 
+    { 
+        decode.set_wb_bandwidth( wb_bandwidth);
+        writeback.set_bandwidth( wb_bandwidth);
+    }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
     Addr get_pc() const final;

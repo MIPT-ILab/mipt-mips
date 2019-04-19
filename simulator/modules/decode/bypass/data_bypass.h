@@ -47,7 +47,8 @@ class DataBypass
             return (( !is_in_RF( instr, 0) && !is_bypassible( instr, 0)) ||
                     ( !is_in_RF( instr, 1) && !is_bypassible( instr, 1)) ||
                     ( instruction_latency < writeback_stage_info.operation_latency &&
-                      writeback_stage_info.writeback_bandwidth == 1));
+                      Latency( writeback_stage_info.writeback_bandwidth) < 
+                        writeback_stage_info.operation_latency)); 
         }
 
         // returns a bypass command for a source register of an instruction
@@ -66,6 +67,11 @@ class DataBypass
 
         // handles a flush of the pipeline
         void handle_flush();
+
+        void set_bandwidth( uint32 wb_bandwidth)
+        {
+            writeback_stage_info.writeback_bandwidth = wb_bandwidth;
+        }
 
     private:
         const Latency long_alu_latency;
@@ -105,7 +111,7 @@ class DataBypass
         struct FuncUnitInfo
         {
             Latency operation_latency = 0_lt;
-            uint32 writeback_bandwidth = 2;
+            uint32 writeback_bandwidth = 1;
 
             void update()
             {
