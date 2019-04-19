@@ -161,24 +161,29 @@ struct ALU
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
-        addition<I, T>( instr);
-//      if ( add_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
+        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
     }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm( I* instr)
+    {
+        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
+    }
+
 
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
         subtraction<I, T>( instr);
 //      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
-    }
-
-    template<typename I, typename T> static
-    void addition_overflow_imm( I* instr)
-    {
-        addition_imm<I, T>( instr);
-//      if ( add_overflow( x, y))
 //          instr->trap = Trap::INTEGER_OVERFLOW;
     }
 
