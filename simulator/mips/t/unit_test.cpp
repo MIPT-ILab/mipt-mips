@@ -3098,17 +3098,16 @@ TEST_CASE( "MIPS32_instr: sub 0 from 1")
     instr.execute();
     CHECK(instr.get_v_dst() == 1);
 }
-    
-/*  Overflow exception is not implemented (#130)
+
 TEST_CASE( "MIPS32_instr: sub overflow")
 {
-    instr.get_v_dst( 0xfee1dead);
+    MIPS32Instr instr( "sub");
     instr.set_v_src( 0x80000000, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 0xfee1dead);
-    CHECK(instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK(instr.get_v_dst() == NO_VAL32);
+    CHECK(instr.trap_type() == Trap::INTEGER_OVERFLOW);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: subu 1 from 1")
@@ -4282,17 +4281,16 @@ TEST_CASE( "MIPS64_instr: dsub 0 from 1")
     instr.execute();
     CHECK(instr.get_v_dst() == 1);
 }
-    
-/*  Overflow exception is not implemented (#130)
+
 TEST_CASE( "MIPS64_instr: dsub overflow")
 {
-    instr.get_v_dst( 0xfee1dead);
+    MIPS64Instr instr( "dsub");
     instr.set_v_src( 0x8000000000000000, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 0xfee1dead);
-    CHECK(instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK(instr.get_v_dst() == NO_VAL32);
+    CHECK(instr.trap_type() == Trap::INTEGER_OVERFLOW);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS64_instr: dsubu 1 from 1")
