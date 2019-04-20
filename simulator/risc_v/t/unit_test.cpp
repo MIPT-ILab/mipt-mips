@@ -38,9 +38,9 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>    (0x7401).get_disasm() == "c_lui $s0, 0xfffe0");
     CHECK( RISCVInstr<uint32>    (0x747d).get_disasm() == "c_lui $s0, 0xfffff");
     CHECK( RISCVInstr<uint32>    (0x1681).get_disasm() == "c_addi $a3, -32");
-    //CHECK( RISCVInstr<uint32>    (0x3681).get_disasm() == "c_addiw $a3, -32");
-    //CHECK( RISCVInstr<uint32>    (0x7101).get_disasm() == "c_addi16sp $sp, -512");
-    //CHECK( RISCVInstr<uint32>    (0x617d).get_disasm() == "c_addi16sp $sp, 496");
+    CHECK( RISCVInstr<uint32>    (0x3681).get_disasm() == "c_addiw $a3, -32");
+    CHECK( RISCVInstr<uint32>    (0x7101).get_disasm() == "c_addi16sp $sp, -512");
+    CHECK( RISCVInstr<uint32>    (0x617d).get_disasm() == "c_addi16sp $sp, 496");
     CHECK( RISCVInstr<uint32>    (0x1ff4).get_disasm() == "c_addi4spn $a3, $sp, 1020");
     CHECK( RISCVInstr<uint32>    (0x0054).get_disasm() == "c_addi4spn $a3, $sp, 4");
     CHECK( RISCVInstr<uint32>    (0x0586).get_disasm() == "c_slli $a1, 1");
