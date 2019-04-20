@@ -134,7 +134,7 @@ uint32 CacheTagArray::write( Addr addr)
 
 ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy)
 {
-    for( int i = 0; i < static_cast<int>(number_of_sets); i++)
+    for ( std::size_t i = 0; i < number_of_sets; i++)
         replacement_info.emplace_back( create_cache_replacement( replacement_policy, number_of_ways));
 }
 
