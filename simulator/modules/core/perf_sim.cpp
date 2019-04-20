@@ -27,6 +27,8 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
 
+    set_writeback_bandwidth( PORT_BW);
+
     PortMap::get_instance()->init();
 }
 
