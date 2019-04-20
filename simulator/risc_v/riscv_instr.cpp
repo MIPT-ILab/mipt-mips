@@ -158,6 +158,7 @@ struct RISCVTableEntry
     Src2 src2;
     Dst  dst;
     uint32 mem_size;
+    base_t base = RV_ANY;
     RISCVTableEntry() = delete;
     bool check_print_dst( Reg reg) const
     {
@@ -251,11 +252,11 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'M', instr_divu,   execute_divu<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
-    /*------ Compressed Instructions ------*/
+    /*-------------- C --------------*/
     // Breakpoint
     {'C', instr_c_ebreak,   execute_c_ebreak<I>,   OUT_BREAK,  ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     // Jumps and branches
-    {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
+    {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, RV32},
     {'C', instr_c_j,        execute_c_j<I>,        OUT_BRANCH, ImmediateType::C_J,        Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'C', instr_c_jr,       execute_c_jr<I>,       OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
     {'C', instr_c_jalr,     execute_c_jalr<I>,     OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
@@ -273,6 +274,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_srai,     execute_c_srai<I>,     OUT_ARITHM, ImmediateType::C_SRAI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     {'C', instr_c_slli,     execute_c_slli<I>,     OUT_ARITHM, ImmediateType::C_SLLI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
     {'C', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0},
+    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, RV64},
     // Constant-Generation
     {'C', instr_c_li,       execute_c_li<I>,       OUT_ARITHM, ImmediateType::C_LI,       Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
         /* If Dst == 2 for instr_c_lui, then it is instr_c_addi16sp */
@@ -299,12 +301,20 @@ static const RISCVTableEntry<I> invalid_instr =
 {'I', {"unknown", 0, 0}, &ALU::unknown_instruction<I>, OUT_ARITHM, ' ', Imm::NO, Src1::ZERO, Src2::ZERO, Dst::ZERO, 0};
 
 template<typename I>
-const auto& find_entry( uint32 bytes)
+const auto& find_entry( uint32 bytes, uint16 base)
 {
     for (const auto& e : cmd_desc<I>)
-        if ( e.entry.check_mask( bytes))
-            return e;
-        
+        if ( e.entry.check_mask( bytes)) {
+            switch(e.base)
+            {
+                case RV_ANY:     return e;
+                case RV32:       if ( base == 4) return e; break;
+                case RV64:       if ( base == 8) return e; break;
+                case RV128:      if ( base == 16) return e; break;
+                case RV64_RV128: if ( ( base == 8) || ( base == 16)) return e; break;
+            }
+        }
+
     return invalid_instr<I>;
 }
 
@@ -322,7 +332,7 @@ template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<MyDatapath>( bytes);
+    const auto& entry = find_entry<MyDatapath>( bytes, sizeof( T));
     init( entry);
 
     RISCVInstrDecoder decoder( bytes);
