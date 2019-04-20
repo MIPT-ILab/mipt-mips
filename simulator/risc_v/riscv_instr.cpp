@@ -161,13 +161,13 @@ struct RISCVTableEntry
     uint32 mem_size;
     base_t base = RV_ANY;
     RISCVTableEntry() = delete;
-    bool check_print_dst( Reg reg) const
+    static bool check_print_dst( Reg reg) const
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::MEPC)
             && ( reg != Reg::SEPC);
     }
-    bool check_print_src( Reg reg) const
+    static bool check_print_src( Reg reg) const
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::SEPC)
