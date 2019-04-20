@@ -38,20 +38,22 @@ enum ImmediateType
     C_SQSP     = 38,
     C_LW       = 39,  // C_LW and C_SW are similar
     C_SW       = 39,
-    C_ADDI     = 40,
-    C_LI       = 40,
-    C_ANDI     = 40,
-    C_ADDIW    = 40,
-    C_J        = 41,
-    C_JAL      = 41,
-    C_LUI      = 42,
-    C_SRLI     = 43,
-    C_SRAI     = 43,
-    C_SLLI     = 43,
-    C_BEQZ     = 44,
-    C_BNEZ     = 44,
-    C_ADDI4SPN = 45,
-    C_ADDI16SP = 46
+    C_LD       = 40,
+    C_SD       = 40,
+    C_ADDI     = 41,
+    C_LI       = 41,
+    C_ANDI     = 41,
+    C_ADDIW    = 41,
+    C_J        = 42,
+    C_JAL      = 42,
+    C_LUI      = 43,
+    C_SRLI     = 44,
+    C_SRAI     = 44,
+    C_SLLI     = 44,
+    C_BEQZ     = 45,
+    C_BNEZ     = 45,
+    C_ADDI4SPN = 46,
+    C_ADDI16SP = 47
 };
 
 struct RISCVInstrDecoder
@@ -144,6 +146,9 @@ struct RISCVInstrDecoder
             case C_LW:   return ( apply_mask( Compr_imm6_5, 0b10) << 2U)
                               | ( apply_mask( Compr_imm6_5, 0b01) << 6U)
                               | ( apply_mask( Compr_imm12_10, 0b111) << 3U);
+
+            case C_LD:   return ( apply_mask( Compr_imm12_10, 0b111) << 3U)
+                              | ( apply_mask( Compr_imm6_5, 0b11) << 6U);
 
             case C_ADDI: return sign_extension<6>( ( apply_mask( Compr_imm12, 0b1) << 5U)
                                                  | ( apply_mask( Compr_imm6_2, 0b11111)));
