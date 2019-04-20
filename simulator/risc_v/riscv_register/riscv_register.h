@@ -65,7 +65,7 @@ public:
     bool is_valid() const { return value != MAX_VAL_RegNum; }
 
 private:
-    RegNum value = MAX_VAL_RegNum;
+    RegNum value = RISCV_REG_zero;
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
