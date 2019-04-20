@@ -35,7 +35,7 @@ class RISCVRegister {
 
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
-    static const uint8 shift = uint8( RISCV_REG_s0);
+    static const uint8 popular_reg_shift = uint8( RISCV_REG_s0);
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
@@ -50,7 +50,7 @@ public:
     static auto from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
     static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
     static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
-    static auto from_cpu_popular_index( uint8 id) {  id += shift; return RISCVRegister( RegNum{ id}); }
+    static auto from_cpu_popular_index( uint8 id) {  id += popular_reg_shift; return RISCVRegister( RegNum{ id}); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
