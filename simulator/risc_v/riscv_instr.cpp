@@ -161,13 +161,13 @@ struct RISCVTableEntry
     uint32 mem_size;
     Base base = RV_ANY;
     RISCVTableEntry() = delete;
-    static bool check_print_dst( Reg reg) const
+    static bool check_print_dst( Reg reg)
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::MEPC)
             && ( reg != Reg::SEPC);
     }
-    static bool check_print_src( Reg reg) const
+    static bool check_print_src( Reg reg)
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::SEPC)
@@ -313,11 +313,11 @@ const auto& find_entry( uint32 bytes, uint16 base)
             switch(e.base)
             {
                 case RV_ANY:     return e;
-                case RV32:       if ( base == 4) return e; break;
-                case RV64:       if ( base == 8) return e; break;
-                case RV128:      if ( base == 16) return e; break;
-                case RV32_RV64:  if ( ( base == 4) || ( base == 8)) return e; break;
-                case RV64_RV128: if ( ( base == 8) || ( base == 16)) return e; break;
+                case RV32:       if ( base == 32) return e; break;
+                case RV64:       if ( base == 64) return e; break;
+                case RV128:      if ( base == 128) return e; break;
+                case RV32_RV64:  if ( ( base == 32) || ( base == 64)) return e; break;
+                case RV64_RV128: if ( ( base == 64) || ( base == 128)) return e; break;
             }
         }
 
@@ -338,7 +338,7 @@ template<typename T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
-    const auto& entry = find_entry<MyDatapath>( bytes, sizeof( T));
+    const auto& entry = find_entry<MyDatapath>( bytes, bitwidth<T>);
     init( entry);
 
     RISCVInstrDecoder decoder( bytes);
