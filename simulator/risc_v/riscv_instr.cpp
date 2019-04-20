@@ -273,8 +273,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_srli,     execute_c_srli<I>,     OUT_ARITHM, ImmediateType::C_SRLI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     {'C', instr_c_srai,     execute_c_srai<I>,     OUT_ARITHM, ImmediateType::C_SRAI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     {'C', instr_c_slli,     execute_c_slli<I>,     OUT_ARITHM, ImmediateType::C_SLLI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
-    {'C', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0},
-    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, RV64},
+    {'C', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0, RV32_RV64},
+    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, RV64_RV128},
     // Constant-Generation
     {'C', instr_c_li,       execute_c_li<I>,       OUT_ARITHM, ImmediateType::C_LI,       Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
         /* If Dst == 2 for instr_c_lui, then it is instr_c_addi16sp */
@@ -283,8 +283,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_andi,     execute_c_andi<I>,     OUT_ARITHM, ImmediateType::C_ANDI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0},
     // Register-register arithmetics
     {'C', instr_c_sub,      execute_c_sub<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
-    {'C', instr_c_addw,     execute_c_addw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
-    {'C', instr_c_subw,     execute_c_subw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
+    {'C', instr_c_addw,     execute_c_addw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, RV64_RV128},
+    {'C', instr_c_subw,     execute_c_subw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, RV64_RV128},
         /* If Src2 == 0 for instr_c_mv, then it is instr_c_jr */
     {'C', instr_c_mv,       execute_c_mv<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0},
         /* if Src2 == 0 && Dst == 0 for instr_c_add, then it is instr_c_ebreak */
@@ -311,6 +311,7 @@ const auto& find_entry( uint32 bytes, uint16 base)
                 case RV32:       if ( base == 4) return e; break;
                 case RV64:       if ( base == 8) return e; break;
                 case RV128:      if ( base == 16) return e; break;
+                case RV32_RV64:  if ( ( base == 4) || ( base == 8)) return e; break;
                 case RV64_RV128: if ( ( base == 8) || ( base == 16)) return e; break;
             }
         }
