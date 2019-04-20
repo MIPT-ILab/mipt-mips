@@ -49,7 +49,8 @@ enum ImmediateType
     C_SLLI     = 43,
     C_BEQZ     = 44,
     C_BNEZ     = 44,
-    C_ADDI4SPN = 45
+    C_ADDI4SPN = 45,
+    C_ADDI16SP = 46
 };
 
 struct RISCVInstrDecoder
@@ -171,6 +172,12 @@ struct RISCVInstrDecoder
                                   | ( apply_mask( Compr_imm12_5, 0b00111100) << 6U)
                                   | ( apply_mask( Compr_imm12_5, 0b00000010) << 2U)
                                   | ( apply_mask( Compr_imm12_5, 0b00000001) << 3U);
+
+            case C_ADDI16SP: return sign_extension<10>( ( apply_mask( Compr_imm12, 0b1) << 9U)
+                                                      | ( apply_mask( Compr_imm6_2, 0b10000) << 4U)
+                                                      | ( apply_mask( Compr_imm6_2, 0b01000) << 6U)
+                                                      | ( apply_mask( Compr_imm6_2, 0b00110) << 7U)
+                                                      | ( apply_mask( Compr_imm6_2, 0b00001) << 5U));
 
             default:     assert(0); return 0;
         }
