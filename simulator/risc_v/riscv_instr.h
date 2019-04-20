@@ -61,7 +61,7 @@ static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& 
     return out << rhs.string_dump();
 }
 
-enum base_t
+enum Base
 {
     RV_ANY, RV32, RV64, RV128,
     RV32_RV64, RV64_RV128

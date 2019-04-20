@@ -159,7 +159,7 @@ struct RISCVTableEntry
     Src2 src2;
     Dst  dst;
     uint32 mem_size;
-    base_t base = RV_ANY;
+    Base base = RV_ANY;
     RISCVTableEntry() = delete;
     static bool check_print_dst( Reg reg) const
     {
