@@ -252,13 +252,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'M', instr_rem,    execute_rem<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0},
     /*------ Compressed Instructions ------*/
-    {'I', instr_c_ebreak,execute_c_ebreak<I>,OUT_BREAK,  ' ',                   Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
+    {'I', instr_c_ebreak,execute_c_ebreak<I>,OUT_BREAK,' ',                   Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_li,   execute_c_li<I>,   OUT_ARITHM, ImmediateType::C_LI,   Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
     {'I', instr_c_lui,  execute_c_lui<I>,  OUT_ARITHM, ImmediateType::C_LUI,  Imm::LOGIC, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
     // Jumps and branches
     {'I', instr_c_jal,  execute_c_jal<I>,  OUT_BRANCH, ImmediateType::C_JAL,  Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_j,    execute_c_j<I>,    OUT_BRANCH, ImmediateType::C_J,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_jr,   execute_c_jr<I>,   OUT_BRANCH, ImmediateType::NONE,   Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
+    {'I', instr_c_jalr, execute_c_jalr<I>, OUT_BRANCH, ImmediateType::NONE,   Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_beqz, execute_c_beqz<I>, OUT_BRANCH, ImmediateType::C_BEQZ, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0},
     {'I', instr_c_bnez, execute_c_bnez<I>, OUT_BRANCH, ImmediateType::C_BNEZ, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0},
     // Loads and stores
@@ -278,7 +279,10 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_c_sub,  execute_c_sub<I>,  OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
     {'I', instr_c_addw, execute_c_addw<I>, OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
     {'I', instr_c_subw, execute_c_subw<I>, OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
+    /* If Src2 == 0 for instr_c_mv, then it is instr_c_jr */
     {'I', instr_c_mv,   execute_c_mv<I>,   OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0},
+    /* if Src2 == 0 && Dst == 0 for instr_c_add, then it is instr_c_ebreak */
+    /* if Src2 == 0 for instr_c_add, then it is instr_c_jalr */
     {'I', instr_c_add,  execute_c_add<I>,  OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0},
     // Register-register logic and comparison
     {'I', instr_c_xor,  execute_c_xor<I>,  OUT_ARITHM, ' ',                   Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0},
