@@ -26,7 +26,7 @@ class GDBSim
 {
     std::shared_ptr<class Simulator> cpu = nullptr;
     std::shared_ptr<class FuncMemory> memory = nullptr;
-    Trap trap = Trap::NO_TRAP;
+    Trap trap = Trap(Trap::NO_TRAP);
 public:
     explicit GDBSim( const std::string& isa);
 
