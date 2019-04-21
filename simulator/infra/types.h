@@ -47,9 +47,17 @@ using uint128 = unsigned __int128;
 
 static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
-    if ((out.flags() & std::ios::hex) != 0)
-        return out << narrow_cast<uint64>( value >> 64ULL) << narrow_cast<uint64>( value);
-    return out << "..." << narrow_cast<uint64>( value);
+    if (value <= UINT64_MAX)
+    {
+        uint64 value64 = value;
+        return out << value64;
+    }
+    else
+    {
+        uint128 leading  = value / 10000000000000000000u; //19 zeroes
+        uint64  trailing = value % 10000000000000000000u;
+        return out << leading <<trailing;
+    }
 }
 
 #pragma GCC diagnostic pop

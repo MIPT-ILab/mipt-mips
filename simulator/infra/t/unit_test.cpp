@@ -208,3 +208,11 @@ TEST_CASE("Find first set")
     auto val = std::make_unique<unsigned>( 0);
     CHECK( find_first_set( *val) == bitwidth<unsigned> );
 }
+
+TEST_CASE("Test uint128 printing")
+{
+     uint128 test_value = narrow_cast<uint128>(UINT64_MAX) + 1;
+     std::ostringstream out;
+     out << test_value;
+     CHECK( out.str() == "18446744073709551616");
+}
