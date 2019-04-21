@@ -69,7 +69,7 @@ static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 /* Unsigned 128-bit integer type */
 using uint128 = boost::multiprecision::uint128_t;
 
-/* Unsigned 128-bit integer type */
+/* Signed 128-bit integer type */
 using int128 = boost::multiprecision::int128_t;
 
 #endif // __SIZEOF_INT128__
@@ -101,15 +101,15 @@ template<typename T> using sign_t = typename sign<T>::type;
 
 /* Convert type to 2x type */
 template<typename> struct doubled;
-template<> struct doubled<uint8>  { using type = uint16; };
-template<> struct doubled<uint16> { using type = uint32; };
-template<> struct doubled<uint32> { using type = uint64; };
-template<> struct doubled<uint64> { using type = uint128; };
+template<> struct doubled<uint8>   { using type = uint16; };
+template<> struct doubled<uint16>  { using type = uint32; };
+template<> struct doubled<uint32>  { using type = uint64; };
+template<> struct doubled<uint64>  { using type = uint128; };
 
-template<> struct doubled<int8>   { using type = int16;  };
-template<> struct doubled<int16>  { using type = int32;  };
-template<> struct doubled<int32>  { using type = int64;  };
-template<> struct doubled<int64>  { using type = int128;  };
+template<> struct doubled<int8>    { using type = int16;  };
+template<> struct doubled<int16>   { using type = int32;  };
+template<> struct doubled<int32>   { using type = int64;  };
+template<> struct doubled<int64>   { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
