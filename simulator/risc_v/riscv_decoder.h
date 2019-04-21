@@ -81,13 +81,13 @@ struct RISCVInstrDecoder
     const uint32 csr_imm;
     const uint32 csr;
     const uint32 bytes;
-    const uint32 Compr_imm12;   // 1-bit immediate for Compressed ISA subset
-    const uint32 Compr_imm6_5;
-    const uint32 Compr_imm12_10;
-    const uint32 Compr_imm6_2;
-    const uint32 Compr_imm12_7;
-    const uint32 Compr_imm12_5;
-    const uint32 Compr_imm12_2;
+    const uint32 CI_imm_1;   // 1st immediate of CI-format instruction
+    const uint32 CI_imm_2;
+    const uint32 CSS_imm;
+    const uint32 CIW_imm;
+    const uint32 CL_imm_1;
+    const uint32 CL_imm_2;
+    const uint32 CJ_imm;
 
     constexpr uint32 get_B_immediate() const noexcept
     {
@@ -122,68 +122,68 @@ struct RISCVInstrDecoder
     uint32 get_compressed_immediate_value( char subset) const noexcept
     {
         switch (subset) {
-            case C_LWSP: return ( apply_mask( Compr_imm12, 0b1) << 5U)
-                              | ( apply_mask( Compr_imm6_2, 0b11100) << 2U)
-                              | ( apply_mask( Compr_imm6_2, 0b00011) << 6U);
+            case C_LWSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
+                              | ( apply_mask( CI_imm_2, 0b11100) << 2U)
+                              | ( apply_mask( CI_imm_2, 0b00011) << 6U);
 
-            case C_LDSP: return ( apply_mask( Compr_imm12, 0b1) << 5U)
-                              | ( apply_mask( Compr_imm6_2, 0b11000) << 3U)
-                              | ( apply_mask( Compr_imm6_2, 0b00111) << 6U);
+            case C_LDSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
+                              | ( apply_mask( CI_imm_2, 0b11000) << 3U)
+                              | ( apply_mask( CI_imm_2, 0b00111) << 6U);
 
-            case C_LQSP: return ( apply_mask( Compr_imm12, 0b1) << 5U)
-                              | ( apply_mask( Compr_imm6_2, 0b10000) << 4U)
-                              | ( apply_mask( Compr_imm6_2, 0b01111) << 6U);
+            case C_LQSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
+                              | ( apply_mask( CI_imm_2, 0b10000) << 4U)
+                              | ( apply_mask( CI_imm_2, 0b01111) << 6U);
 
-            case C_SWSP: return ( apply_mask( Compr_imm12_7, 0b111100) << 2U)
-                              | ( apply_mask( Compr_imm12_7, 0b000011) << 6U);
+            case C_SWSP: return ( apply_mask( CSS_imm, 0b111100) << 2U)
+                              | ( apply_mask( CSS_imm, 0b000011) << 6U);
 
-            case C_SDSP: return ( apply_mask( Compr_imm12_7, 0b111000) << 3U)
-                              | ( apply_mask( Compr_imm12_7, 0b000111) << 6U);
+            case C_SDSP: return ( apply_mask( CSS_imm, 0b111000) << 3U)
+                              | ( apply_mask( CSS_imm, 0b000111) << 6U);
 
-            case C_SQSP: return ( apply_mask( Compr_imm12_7, 0b110000) << 4U)
-                              | ( apply_mask( Compr_imm12_7, 0b001111) << 6U);
+            case C_SQSP: return ( apply_mask( CSS_imm, 0b110000) << 4U)
+                              | ( apply_mask( CSS_imm, 0b001111) << 6U);
 
-            case C_LW:   return ( apply_mask( Compr_imm6_5, 0b10) << 2U)
-                              | ( apply_mask( Compr_imm6_5, 0b01) << 6U)
-                              | ( apply_mask( Compr_imm12_10, 0b111) << 3U);
+            case C_LW:   return ( apply_mask( CL_imm_2, 0b10) << 2U)
+                              | ( apply_mask( CL_imm_2, 0b01) << 6U)
+                              | ( apply_mask( CL_imm_1, 0b111) << 3U);
 
-            case C_LD:   return ( apply_mask( Compr_imm12_10, 0b111) << 3U)
-                              | ( apply_mask( Compr_imm6_5, 0b11) << 6U);
+            case C_LD:   return ( apply_mask( CL_imm_1, 0b111) << 3U)
+                              | ( apply_mask( CL_imm_2, 0b11) << 6U);
 
-            case C_ADDI: return sign_extension<6>( ( apply_mask( Compr_imm12, 0b1) << 5U)
-                                                 | ( apply_mask( Compr_imm6_2, 0b11111)));
+            case C_ADDI: return sign_extension<6>( ( apply_mask( CI_imm_1, 0b1) << 5U)
+                                                 | ( apply_mask( CI_imm_2, 0b11111)));
 
-            case C_J:    return sign_extension<12>( ( apply_mask( Compr_imm12_2, 0b10000000000) << 11U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b01000000000) << 4U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00110000000) << 8U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00001000000) << 10U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00000100000) << 6U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00000010000) << 7U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00000001110) << 1U)
-                                                  | ( apply_mask( Compr_imm12_2, 0b00000000001) << 5U));
+            case C_J:    return sign_extension<12>( ( apply_mask( CJ_imm, 0b10000000000) << 11U)
+                                                  | ( apply_mask( CJ_imm, 0b01000000000) << 4U)
+                                                  | ( apply_mask( CJ_imm, 0b00110000000) << 8U)
+                                                  | ( apply_mask( CJ_imm, 0b00001000000) << 10U)
+                                                  | ( apply_mask( CJ_imm, 0b00000100000) << 6U)
+                                                  | ( apply_mask( CJ_imm, 0b00000010000) << 7U)
+                                                  | ( apply_mask( CJ_imm, 0b00000001110) << 1U)
+                                                  | ( apply_mask( CJ_imm, 0b00000000001) << 5U));
 
-            case C_LUI:  return ( apply_mask( Compr_imm12, 0b1) * 0xfffe0)
-                                | apply_mask( Compr_imm6_2, 0b11111);
+            case C_LUI:  return ( apply_mask( CI_imm_1, 0b1) * 0xfffe0)
+                                | apply_mask( CI_imm_2, 0b11111);
 
-            case C_SRLI: return ( apply_mask( Compr_imm12, 0b1) << 5U)
-                              | ( apply_mask( Compr_imm6_2, 0b11111));
+            case C_SRLI: return ( apply_mask( CI_imm_1, 0b1) << 5U)
+                              | ( apply_mask( CI_imm_2, 0b11111));
 
-            case C_BEQZ: return sign_extension<9>( ( apply_mask( Compr_imm12_10, 0b100) << 8U)
-                                                 | ( apply_mask( Compr_imm12_10, 0b011) << 3U)
-                                                 | ( apply_mask( Compr_imm6_2, 0b11000) << 6U)
-                                                 | ( apply_mask( Compr_imm6_2, 0b00110) << 1U)
-                                                 | ( apply_mask( Compr_imm6_2, 0b00001) << 5U));
+            case C_BEQZ: return sign_extension<9>( ( apply_mask( CL_imm_1, 0b100) << 8U)
+                                                 | ( apply_mask( CL_imm_1, 0b011) << 3U)
+                                                 | ( apply_mask( CI_imm_2, 0b11000) << 6U)
+                                                 | ( apply_mask( CI_imm_2, 0b00110) << 1U)
+                                                 | ( apply_mask( CI_imm_2, 0b00001) << 5U));
 
-            case C_ADDI4SPN: return ( apply_mask( Compr_imm12_5, 0b11000000) << 4U)
-                                  | ( apply_mask( Compr_imm12_5, 0b00111100) << 6U)
-                                  | ( apply_mask( Compr_imm12_5, 0b00000010) << 2U)
-                                  | ( apply_mask( Compr_imm12_5, 0b00000001) << 3U);
+            case C_ADDI4SPN: return ( apply_mask( CIW_imm, 0b11000000) << 4U)
+                                  | ( apply_mask( CIW_imm, 0b00111100) << 6U)
+                                  | ( apply_mask( CIW_imm, 0b00000010) << 2U)
+                                  | ( apply_mask( CIW_imm, 0b00000001) << 3U);
 
-            case C_ADDI16SP: return sign_extension<10>( ( apply_mask( Compr_imm12, 0b1) << 9U)
-                                                      | ( apply_mask( Compr_imm6_2, 0b10000) << 4U)
-                                                      | ( apply_mask( Compr_imm6_2, 0b01000) << 6U)
-                                                      | ( apply_mask( Compr_imm6_2, 0b00110) << 7U)
-                                                      | ( apply_mask( Compr_imm6_2, 0b00001) << 5U));
+            case C_ADDI16SP: return sign_extension<10>( ( apply_mask( CI_imm_1, 0b1) << 9U)
+                                                      | ( apply_mask( CI_imm_2, 0b10000) << 4U)
+                                                      | ( apply_mask( CI_imm_2, 0b01000) << 6U)
+                                                      | ( apply_mask( CI_imm_2, 0b00110) << 7U)
+                                                      | ( apply_mask( CI_imm_2, 0b00001) << 5U));
 
             default:     assert(0); return 0;
         }
@@ -228,36 +228,36 @@ struct RISCVInstrDecoder
     }
 
     explicit constexpr RISCVInstrDecoder(uint32 raw) noexcept
-        : sz             ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
-        , rd             ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , rs1            ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , rs2            ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
-        , rs2_compr      ( apply_mask( raw, 0b00000000'01111100))
-        , rd_3_bits      ( apply_mask( raw, 0b00000000'00011100))
-        , rs1_3_bits     ( apply_mask( raw, 0b00000011'10000000))
-        , rs2_3_bits     ( apply_mask( raw, 0b00000000'00011100))
-        , I_imm          ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , S_imm4_0       ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , S_imm11_5      ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
-        , B_imm11        ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
-        , B_imm4_1       ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
-        , B_imm10_5      ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
-        , B_imm12        ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , U_imm          ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
-        , J_imm19_12     ( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
-        , J_imm11        ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
-        , J_imm10_1      ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
-        , J_imm20        ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , csr_imm        ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , csr            ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , bytes          ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
-        , Compr_imm12    ( apply_mask( raw, 0b00010000'00000000))
-        , Compr_imm6_5   ( apply_mask( raw, 0b00000000'01100000))
-        , Compr_imm12_10 ( apply_mask( raw, 0b00011100'00000000))
-        , Compr_imm6_2   ( apply_mask( raw, 0b00000000'01111100))
-        , Compr_imm12_7  ( apply_mask( raw, 0b00011111'10000000))
-        , Compr_imm12_5  ( apply_mask( raw, 0b00011111'11100000))
-        , Compr_imm12_2  ( apply_mask( raw, 0b00011111'11111100))
+        : sz         ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
+        , rd         ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
+        , rs1        ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , rs2        ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
+        , rs2_compr  ( apply_mask( raw, 0b00000000'01111100))
+        , rd_3_bits  ( apply_mask( raw, 0b00000000'00011100))
+        , rs1_3_bits ( apply_mask( raw, 0b00000011'10000000))
+        , rs2_3_bits ( apply_mask( raw, 0b00000000'00011100))
+        , I_imm      ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
+        , S_imm4_0   ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
+        , S_imm11_5  ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
+        , B_imm11    ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
+        , B_imm4_1   ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
+        , B_imm10_5  ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
+        , B_imm12    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
+        , U_imm      ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
+        , J_imm19_12 ( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
+        , J_imm11    ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
+        , J_imm10_1  ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
+        , J_imm20    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
+        , csr_imm    ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
+        , csr        ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
+        , bytes      ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , CI_imm_1   ( apply_mask( raw, 0b00010000'00000000))
+        , CI_imm_2   ( apply_mask( raw, 0b00000000'01111100))
+        , CSS_imm    ( apply_mask( raw, 0b00011111'10000000))
+        , CIW_imm    ( apply_mask( raw, 0b00011111'11100000))
+        , CL_imm_1   ( apply_mask( raw, 0b00011100'00000000))
+        , CL_imm_2   ( apply_mask( raw, 0b00000000'01100000))
+        , CJ_imm     ( apply_mask( raw, 0b00011111'11111100))
     { }
 };
 
