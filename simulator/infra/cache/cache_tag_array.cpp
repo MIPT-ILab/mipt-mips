@@ -79,9 +79,15 @@ CacheTagArray::CacheTagArray(
     uint32 addr_size_in_bits)
     : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
     , tags( sets, std::vector<Tag>( ways))
-    , lookup_helper( sets, std::unordered_map<Addr, uint32>( ways))
+    , lookup_helper( sets, google::dense_hash_map<Addr, uint32>( ways))
     , replacement_module( sets, ways)
-{ }
+{
+    //theese are spicial dense_hash_map requirements
+    for (uint32 i = 0; i < sets; i++) {
+        lookup_helper[i].set_empty_key( impossible_key);
+        lookup_helper[i].set_deleted_key( impossible_key - 1);
+    }
+}
 
 std::pair<bool, uint32> CacheTagArray::read( Addr addr)
 {
