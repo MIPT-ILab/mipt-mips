@@ -213,8 +213,7 @@ TEST_CASE("Test hexadecimal printing")
 {
     uint128 test_value = 0xABCDEF;
     std::ostringstream out;
-    out.flags ( std::ios::hex);
-    out << test_value;
+    out << std::hex << test_value;
     CHECK( out.str() == "0abcdef");
 }
 
