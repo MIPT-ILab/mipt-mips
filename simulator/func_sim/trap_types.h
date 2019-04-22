@@ -8,7 +8,7 @@
 
 // MIPT-MIPS modules
 #include <infra/types.h>
-#include "riscv.opcode.gen.h"
+#include <riscv.opcode.gen.h>
 
 #include <array>
 #include <string_view>
@@ -63,7 +63,7 @@ namespace std
             return trap.get_hash();
         }
     };
-}
+} // namespace std
 
 
 #endif // TRAP_TYPES_H
