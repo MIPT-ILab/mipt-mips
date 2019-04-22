@@ -7,8 +7,8 @@
 #define INSTRCACHE_H
 
 #include <infra/arena.h>
-#include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
+#include <infra/types.h>
 
 #include <memory>
 #include <unordered_map>
