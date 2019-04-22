@@ -4,6 +4,35 @@
 * Copyright 2014-2019 MIPT-MIPS
 */
 
+#include <infra/macro.h>
+#include <infra/types.h>
+
+template<typename T>
+auto mips_multiplication(T x, T y) {
+    using UT = unsign_t<T>;
+    using T2 = doubled_t<T>;
+    using UT2 = unsign_t<T2>;
+    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
+    // With Boost < 1.68.0, result of narrowing cast of uint128 is undefined
+    // if the value does not fit to the built-in target type (e.g. uint64)
+    // To workaround that, we mask the value with full-ones mask first.
+    auto lo = narrow_cast<UT>( value & all_ones<UT>());
+    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
+    return std::make_pair( lo, hi);
+}
+
+template<typename T>
+auto mips_division(T x, T y) {
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    if ( y == 0)
+        return ReturnType{};
+
+    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
+        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
+            return ReturnType{};
+
+    return ReturnType(x / y, x % y);
+}
 
 template<typename T>
 auto riscv_multiplication_low(T x, T y) {
