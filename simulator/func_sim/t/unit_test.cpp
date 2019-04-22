@@ -15,6 +15,9 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
+#include "../trap_types.h"
+#include "../trap_types_internal.h"
+
 #include <sstream>
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
@@ -175,4 +178,19 @@ TEST_CASE( "Torture_Test: integration")
     CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
+}
+
+TEST_CASE( "Trap: check from/to GDB/RISCV formats conversions ")
+{
+    Trap trap = Trap(Trap::SYSCALL);
+    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
+
+    trap.set_from_riscv_format(CAUSE_MISALIGNED_FETCH);
+    CHECK( trap == Trap(Trap::UNALIGNED_ADDRESS));
+
+    trap = Trap(Trap::UNKNOWN_INSTRUCTION);
+    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
+
+    trap.set_from_gdb_format(GDB_SIGNAL_TRAP);
+    CHECK( trap == Trap(Trap::Trap::BREAKPOINT));
 }
