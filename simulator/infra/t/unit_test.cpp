@@ -238,6 +238,5 @@ TEST_CASE("Test uint128 decimal printing number over uint64_max")
 
 TEST_CASE("Test uint128 decimal printing number over 10^39")
 {
-    CHECK( uint128_to_string( (narrow_cast<uint128>(UINT64_MAX) + 1) * ( narrow_cast<uint128>(UINT64_MAX) + 1) - 1) ==
-    "340282366920938463463374607431768211455"); //2^128 - 1;
+    CHECK( uint128_to_string( all_ones<uint128>()) == "340282366920938463463374607431768211455"); //2^128 - 1;
 }
