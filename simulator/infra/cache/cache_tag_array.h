@@ -8,7 +8,6 @@
 #define CACHE_TAG_ARRAY_H
 
 #include <list>
-#include <unordered_map>
 #include <utility>
 #include <memory>
 #include <vector>

@@ -10,7 +10,6 @@
 #include <tree.h>
 
 #include <list>
-#include <unordered_map>
 #include <cassert>
 #include <cmath>
 #include <bitset>
