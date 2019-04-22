@@ -234,7 +234,7 @@ TEST_CASE("Test uint128 decimal printing")
 {
     CHECK( uint128_to_dec_string( 1) == "1");
     CHECK( uint128_to_dec_string( narrow_cast<uint128>(UINT64_MAX) + 1)     == "18446744073709551616");
-    CHECK( uint128_to_dec_string( uint128{ 10'000'000'000'000'000'000} * 2) == "20000000000000000000");
+    CHECK( uint128_to_dec_string( uint128{ 10'000'000'000'000'000'000ULL} * 2) == "20000000000000000000");
     CHECK( uint128_to_dec_string( all_ones<uint128>()) == "340282366920938463463374607431768211455");
 }
 
