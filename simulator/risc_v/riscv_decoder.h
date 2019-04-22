@@ -105,87 +105,140 @@ struct RISCVInstrDecoder
             |  (J_imm20    << 20U);
     }
 
+    constexpr uint32 get_C_LWSP_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 5U)
+             | ( apply_mask( CI_imm_2, 0b11100) << 2U)
+             | ( apply_mask( CI_imm_2, 0b00011) << 6U);
+    }
+
+    constexpr uint32 get_C_LDSP_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 5U)
+             | ( apply_mask( CI_imm_2, 0b11000) << 3U)
+             | ( apply_mask( CI_imm_2, 0b00111) << 6U);
+    }
+
+    constexpr uint32 get_C_LQSP_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 5U)
+             | ( apply_mask( CI_imm_2, 0b10000) << 4U)
+             | ( apply_mask( CI_imm_2, 0b01111) << 6U);
+    }
+
+    constexpr uint32 get_C_SWSP_immediate() const noexcept
+    {
+        return ( apply_mask( CSS_imm, 0b111100) << 2U)
+             | ( apply_mask( CSS_imm, 0b000011) << 6U);
+    }
+
+    constexpr uint32 get_C_SDSP_immediate() const noexcept
+    {
+        return ( apply_mask( CSS_imm, 0b111000) << 3U)
+             | ( apply_mask( CSS_imm, 0b000111) << 6U);
+    }
+
+    constexpr uint32 get_C_SQSP_immediate() const noexcept
+    {
+        return ( apply_mask( CSS_imm, 0b110000) << 4U)
+             | ( apply_mask( CSS_imm, 0b001111) << 6U);
+    }
+
+    constexpr uint32 get_C_LW_immediate() const noexcept
+    {
+        return ( apply_mask( CL_imm_2, 0b10) << 2U)
+             | ( apply_mask( CL_imm_2, 0b01) << 6U)
+             | ( apply_mask( CL_imm_1, 0b111) << 3U);
+    }
+
+    constexpr uint32 get_C_LD_immediate() const noexcept
+    {
+        return ( apply_mask( CL_imm_1, 0b111) << 3U)
+             | ( apply_mask( CL_imm_2, 0b11) << 6U);
+    }
+
+    constexpr uint32 get_C_ADDI_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 5U)
+             | ( apply_mask( CI_imm_2, 0b11111));
+    }
+
+    constexpr uint32 get_C_J_immediate() const noexcept
+    {
+        return ( apply_mask( CJ_imm, 0b10000000000) << 11U)
+             | ( apply_mask( CJ_imm, 0b01000000000) << 4U)
+             | ( apply_mask( CJ_imm, 0b00110000000) << 8U)
+             | ( apply_mask( CJ_imm, 0b00001000000) << 10U)
+             | ( apply_mask( CJ_imm, 0b00000100000) << 6U)
+             | ( apply_mask( CJ_imm, 0b00000010000) << 7U)
+             | ( apply_mask( CJ_imm, 0b00000001110) << 1U)
+             | ( apply_mask( CJ_imm, 0b00000000001) << 5U);
+    }
+
+    constexpr uint32 get_C_LUI_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) * 0xfffe0)
+             | ( apply_mask( CI_imm_2, 0b11111));
+    }
+
+    constexpr uint32 get_C_SRLI_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 5U)
+             | ( apply_mask( CI_imm_2, 0b11111));
+    }
+
+    constexpr uint32 get_C_BEQZ_immediate() const noexcept
+    {
+        return ( apply_mask( CL_imm_1, 0b100) << 8U)
+             | ( apply_mask( CL_imm_1, 0b011) << 3U)
+             | ( apply_mask( CI_imm_2, 0b11000) << 6U)
+             | ( apply_mask( CI_imm_2, 0b00110) << 1U)
+             | ( apply_mask( CI_imm_2, 0b00001) << 5U);
+    }
+
+    constexpr uint32 get_C_ADDI4SPN_immediate() const noexcept
+    {
+        return ( apply_mask( CIW_imm, 0b11000000) << 4U)
+             | ( apply_mask( CIW_imm, 0b00111100) << 6U)
+             | ( apply_mask( CIW_imm, 0b00000010) << 2U)
+             | ( apply_mask( CIW_imm, 0b00000001) << 3U);
+    }
+
+    constexpr uint32 get_C_ADDI16SP_immediate() const noexcept
+    {
+        return ( apply_mask( CI_imm_1, 0b1) << 9U)
+             | ( apply_mask( CI_imm_2, 0b10000) << 4U)
+             | ( apply_mask( CI_imm_2, 0b01000) << 6U)
+             | ( apply_mask( CI_imm_2, 0b00110) << 7U)
+             | ( apply_mask( CI_imm_2, 0b00001) << 5U);
+    }
+
     uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
-        case 'I': return I_imm;
-        case 'B': return get_B_immediate();
-        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
-        case 'U': return U_imm;
-        case 'J': return get_J_immediate();
-        case 'C': return csr_imm;
-        case ' ': return 0;
-        default: return get_compressed_immediate_value( subset);
-        }
-    }
-
-    uint32 get_compressed_immediate_value( char subset) const noexcept
-    {
-        switch (subset) {
-            case C_LWSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
-                              | ( apply_mask( CI_imm_2, 0b11100) << 2U)
-                              | ( apply_mask( CI_imm_2, 0b00011) << 6U);
-
-            case C_LDSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
-                              | ( apply_mask( CI_imm_2, 0b11000) << 3U)
-                              | ( apply_mask( CI_imm_2, 0b00111) << 6U);
-
-            case C_LQSP: return ( apply_mask( CI_imm_1, 0b1) << 5U)
-                              | ( apply_mask( CI_imm_2, 0b10000) << 4U)
-                              | ( apply_mask( CI_imm_2, 0b01111) << 6U);
-
-            case C_SWSP: return ( apply_mask( CSS_imm, 0b111100) << 2U)
-                              | ( apply_mask( CSS_imm, 0b000011) << 6U);
-
-            case C_SDSP: return ( apply_mask( CSS_imm, 0b111000) << 3U)
-                              | ( apply_mask( CSS_imm, 0b000111) << 6U);
-
-            case C_SQSP: return ( apply_mask( CSS_imm, 0b110000) << 4U)
-                              | ( apply_mask( CSS_imm, 0b001111) << 6U);
-
-            case C_LW:   return ( apply_mask( CL_imm_2, 0b10) << 2U)
-                              | ( apply_mask( CL_imm_2, 0b01) << 6U)
-                              | ( apply_mask( CL_imm_1, 0b111) << 3U);
-
-            case C_LD:   return ( apply_mask( CL_imm_1, 0b111) << 3U)
-                              | ( apply_mask( CL_imm_2, 0b11) << 6U);
-
-            case C_ADDI: return sign_extension<6>( ( apply_mask( CI_imm_1, 0b1) << 5U)
-                                                 | ( apply_mask( CI_imm_2, 0b11111)));
-
-            case C_J:    return sign_extension<12>( ( apply_mask( CJ_imm, 0b10000000000) << 11U)
-                                                  | ( apply_mask( CJ_imm, 0b01000000000) << 4U)
-                                                  | ( apply_mask( CJ_imm, 0b00110000000) << 8U)
-                                                  | ( apply_mask( CJ_imm, 0b00001000000) << 10U)
-                                                  | ( apply_mask( CJ_imm, 0b00000100000) << 6U)
-                                                  | ( apply_mask( CJ_imm, 0b00000010000) << 7U)
-                                                  | ( apply_mask( CJ_imm, 0b00000001110) << 1U)
-                                                  | ( apply_mask( CJ_imm, 0b00000000001) << 5U));
-
-            case C_LUI:  return ( apply_mask( CI_imm_1, 0b1) * 0xfffe0)
-                                | apply_mask( CI_imm_2, 0b11111);
-
-            case C_SRLI: return ( apply_mask( CI_imm_1, 0b1) << 5U)
-                              | ( apply_mask( CI_imm_2, 0b11111));
-
-            case C_BEQZ: return sign_extension<9>( ( apply_mask( CL_imm_1, 0b100) << 8U)
-                                                 | ( apply_mask( CL_imm_1, 0b011) << 3U)
-                                                 | ( apply_mask( CI_imm_2, 0b11000) << 6U)
-                                                 | ( apply_mask( CI_imm_2, 0b00110) << 1U)
-                                                 | ( apply_mask( CI_imm_2, 0b00001) << 5U));
-
-            case C_ADDI4SPN: return ( apply_mask( CIW_imm, 0b11000000) << 4U)
-                                  | ( apply_mask( CIW_imm, 0b00111100) << 6U)
-                                  | ( apply_mask( CIW_imm, 0b00000010) << 2U)
-                                  | ( apply_mask( CIW_imm, 0b00000001) << 3U);
-
-            case C_ADDI16SP: return sign_extension<10>( ( apply_mask( CI_imm_1, 0b1) << 9U)
-                                                      | ( apply_mask( CI_imm_2, 0b10000) << 4U)
-                                                      | ( apply_mask( CI_imm_2, 0b01000) << 6U)
-                                                      | ( apply_mask( CI_imm_2, 0b00110) << 7U)
-                                                      | ( apply_mask( CI_imm_2, 0b00001) << 5U));
-
-            default:     assert(0); return 0;
+        case 'I':    return I_imm;
+        case 'B':    return get_B_immediate();
+        case 'S':    return S_imm4_0 | (S_imm11_5 << 5U);
+        case 'U':    return U_imm;
+        case 'J':    return get_J_immediate();
+        case 'C':    return csr_imm;
+        case ' ':    return 0;
+        case C_LWSP: return get_C_LWSP_immediate();
+        case C_LDSP: return get_C_LDSP_immediate();
+        case C_LQSP: return get_C_LQSP_immediate();
+        case C_SWSP: return get_C_SWSP_immediate();
+        case C_SDSP: return get_C_SDSP_immediate();
+        case C_SQSP: return get_C_SQSP_immediate();
+        case C_LW:   return get_C_LW_immediate();
+        case C_LD:   return get_C_LD_immediate();
+        case C_ADDI: return get_C_ADDI_immediate();
+        case C_J:    return get_C_J_immediate();
+        case C_LUI:  return get_C_LUI_immediate();
+        case C_SRLI: return get_C_SRLI_immediate();
+        case C_BEQZ: return get_C_BEQZ_immediate();
+        case C_ADDI4SPN: return get_C_ADDI4SPN_immediate();
+        case C_ADDI16SP: return get_C_ADDI16SP_immediate();
+        default:     assert(0); return 0;
         }
     }
 
@@ -195,10 +248,14 @@ struct RISCVInstrDecoder
         switch (subset) {
         case I:
         case B:
-        case S: return sign_extension<12, R>( value);
+        case S:          return sign_extension<12, R>( value);
         case U:
-        case J: return sign_extension<20, R>( value);
-        default:  return value;
+        case J:          return sign_extension<20, R>( value);
+        case C_ADDI:     return sign_extension<6, R>( value);
+        case C_J:        return sign_extension<12, R>( value);
+        case C_BEQZ:     return sign_extension<9, R>( value);
+        case C_ADDI16SP: return sign_extension<10, R>( value);
+        default:         return value;
         }
     }
 
