@@ -4,12 +4,12 @@
  * @author Oleg Ladin, Denis Los, Andrey Agrachev
  */
 
+#include <sparsehash/dense_hash_map.h>
 #include "infra/replacement/cache_replacement.h"
 #include "infra/macro.h"
 #include <tree.h>
 
 #include <list>
-#include <unordered_map>
 #include <cassert>
 #include <cmath>
 #include <bitset>
@@ -26,16 +26,15 @@ class LRUCacheInfo : public CacheReplacementInterface
 
     private:
         std::list<std::size_t> lru_list{};
-        std::unordered_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
         const std::size_t ways;
+        const std::size_t impossible_key = SIZE_MAX;
+        google::dense_hash_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
 };
 
 LRUCacheInfo::LRUCacheInfo( std::size_t ways)
-    : ways( ways)
+    : ways( ways), lru_hash( ways)
 {
-    assert( ways != 0u);
-    lru_hash.reserve( ways);
-
+    lru_hash.set_empty_key( impossible_key); //special dense_hash_map requirement
     for ( std::size_t i = 0; i < ways; i++)
     {
         lru_list.push_front( i);
@@ -66,7 +65,7 @@ std::size_t LRUCacheInfo::update()
 
     // put it to the head
     auto ptr = lru_list.insert( lru_list.begin(), lru_elem);
-    lru_hash.insert_or_assign( lru_elem, ptr);
+    lru_hash[ lru_elem] = ptr;
 
     return lru_elem;
 }
