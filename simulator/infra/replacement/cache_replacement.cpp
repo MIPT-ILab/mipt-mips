@@ -65,7 +65,7 @@ std::size_t LRUCacheInfo::update()
     lru_list.pop_back();
 
     // put it to the head
-    auto ptr = lru_list.insert( lru_list.begin(), lru_elem); //insert_or_assign
+    auto ptr = lru_list.insert( lru_list.begin(), lru_elem);
     lru_hash[ lru_elem] = ptr;
 
     return lru_elem;

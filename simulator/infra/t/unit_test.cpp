@@ -209,10 +209,35 @@ TEST_CASE("Find first set")
     CHECK( find_first_set( *val) == bitwidth<unsigned> );
 }
 
-TEST_CASE("Test uint128 printing")
+
+TEST_CASE("Test uint128 printing value less than uint64_max")
 {
-     uint128 test_value = narrow_cast<uint128>(UINT64_MAX) + 1;
+     uint128 test_value = 1;
      std::ostringstream out;
      out << test_value;
-     CHECK( out.str() == "18446744073709551616");
+     CHECK( out.str() == "1");
+}
+
+std::string uint128_to_string(uint128 number)
+{
+     std::ostringstream out;
+     out << number;
+     return out.str();
+}
+
+TEST_CASE("Test uint128 printing number under uint64_max")
+{
+    CHECK( uint128_to_string( 1) == "1");
+}
+
+
+TEST_CASE("Test uint128 printing number over uint64_max")
+{
+    CHECK( uint128_to_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "18446744073709551616");
+}
+
+TEST_CASE("Test uint128 printing number over 10^39")
+{
+    CHECK( uint128_to_string( (narrow_cast<uint128>(UINT64_MAX) + 1) * ( narrow_cast<uint128>(UINT64_MAX) + 1) - 1) ==
+    "340282366920938463463374607431768211455"); //2^128 - 1;
 }

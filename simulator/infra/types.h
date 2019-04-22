@@ -47,17 +47,13 @@ using uint128 = unsigned __int128;
 
 static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
+    static const uint128 separator = 10'000'000'000'000'000'000u;
+
     if (value <= UINT64_MAX)
-    {
-        uint64 value64 = value;
-        return out << value64;
-    }
-    else
-    {
-        uint128 leading  = value / 10000000000000000000u; //19 zeroes
-        uint64  trailing = value % 10000000000000000000u;
-        return out << leading <<trailing;
-    }
+        return out << narrow_cast<uint64>( value);
+    uint128 leading  = value / separator;
+    uint64  trailing = value % separator;
+    return out << leading << trailing;
 }
 
 #pragma GCC diagnostic pop
