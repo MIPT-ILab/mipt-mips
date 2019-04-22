@@ -51,9 +51,7 @@ std::ostream& operator<<( std::ostream& out, uint128 value)
         return decimal_dump_of_uint128( out, value);
     if (( out.flags() & std::ios::hex) != 0)    
         return hexadecimal_dump_of_uint128( out, value);
-    if (( out.flags() & std::ios::oct) != 0)    
-        return octal_dump_of_uint128( out, value);
-    return out;
+    return octal_dump_of_uint128( out, value);
 }
 
 #endif
