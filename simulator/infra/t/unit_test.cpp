@@ -208,34 +208,3 @@ TEST_CASE("Find first set")
     auto val = std::make_unique<unsigned>( 0);
     CHECK( find_first_set( *val) == bitwidth<unsigned> );
 }
-
-TEST_CASE("Test hexadecimal printing")
-{
-    uint128 test_value = 0xABCDEF;
-    std::ostringstream out;
-    out << std::hex << test_value;
-    CHECK(( out.str() == "0abcdef" || out.str() == "ABCDEF"));
-}
-
-std::string uint128_to_string(uint128 number)
-{
-     std::ostringstream out;
-     out << number;
-     return out.str();
-}
-
-TEST_CASE("Test uint128 decimal printing number under uint64_max")
-{
-    CHECK( uint128_to_string( 1) == "1");
-}
-
-
-TEST_CASE("Test uint128 decimal printing number over uint64_max")
-{
-    CHECK( uint128_to_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "18446744073709551616");
-}
-
-TEST_CASE("Test uint128 decimal printing number over 10^39")
-{
-    CHECK( uint128_to_string( all_ones<uint128>()) == "340282366920938463463374607431768211455"); //2^128 - 1;
-}
