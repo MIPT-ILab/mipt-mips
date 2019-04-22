@@ -4,7 +4,7 @@
  * @author Oleg Ladin, Denis Los, Andrey Agrachev
  */
 
-#include "infra/cache/cache_tag_array.h"
+#include <sparsehash/dense_hash_map.h>
 #include "infra/replacement/cache_replacement.h"
 #include "infra/macro.h"
 #include <tree.h>
