@@ -49,6 +49,9 @@ static inline std::ostream& operator<<(std::ostream& out, uint128 value)
 {
     static const uint128 separator = 10'000'000'000'000'000'000u;
 
+     if ((out.flags() & std::ios::hex) != 0)
+        return out << narrow_cast<uint64>( value >> 64ULL) << narrow_cast<uint64>( value);
+
     if (value <= UINT64_MAX)
         return out << narrow_cast<uint64>( value);
     uint128 leading  = value / separator;
