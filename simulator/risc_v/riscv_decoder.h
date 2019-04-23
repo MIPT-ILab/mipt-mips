@@ -216,13 +216,20 @@ struct RISCVInstrDecoder
     uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
-        case 'I':    return I_imm;
-        case 'B':    return get_B_immediate();
-        case 'S':    return S_imm4_0 | (S_imm11_5 << 5U);
-        case 'U':    return U_imm;
-        case 'J':    return get_J_immediate();
-        case 'C':    return csr_imm;
-        case ' ':    return 0;
+        case 'I': return I_imm;
+        case 'B': return get_B_immediate();
+        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
+        case 'U': return U_imm;
+        case 'J': return get_J_immediate();
+        case 'C': return csr_imm;
+        case ' ': return 0;
+        default:  return get_compressed_immediate_value( subset);
+        }
+    }
+
+    uint32 get_compressed_immediate_value( char subset) const noexcept
+    {
+        switch (subset) {
         case C_LWSP: return get_C_LWSP_immediate();
         case C_LDSP: return get_C_LDSP_immediate();
         case C_LQSP: return get_C_LQSP_immediate();
