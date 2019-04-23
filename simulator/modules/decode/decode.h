@@ -55,6 +55,7 @@ class Decode : public Log
         explicit Decode( bool log);
         void clock( Cycle cycle);
         void set_RF( RF<FuncInstr>* value) { rf = value;}
+        void set_wb_bandwidth( uint32 wb_bandwidth) { bypassing_unit->set_bandwidth( wb_bandwidth);}
 };
 
 

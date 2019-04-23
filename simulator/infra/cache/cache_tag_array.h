@@ -8,16 +8,18 @@
 #define CACHE_TAG_ARRAY_H
 
 #include <list>
-#include <unordered_map>
 #include <utility>
 #include <memory>
 #include <vector>
+#include <unordered_map>
+#include <utility>
 
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
+#include <sparsehash/dense_hash_map.h>
 
 // Replacement algorithm modules (LRU)
 
@@ -110,7 +112,8 @@ class CacheTagArray : public CacheTagArraySize
         std::vector<std::vector<Tag>> tags;
 
         // hash tabe to lookup tags in O(1)
-        std::vector<std::unordered_map<Addr, Way>> lookup_helper;
+        std::vector<google::dense_hash_map<Addr, Way>> lookup_helper;
+        const uint32 impossible_key = INT32_MAX;
         ReplacementModule replacement_module; // LRU algorithm module
 };
 

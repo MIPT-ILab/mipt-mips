@@ -17,33 +17,6 @@
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
-template<typename T>
-auto mips_multiplication(T x, T y) {
-    using UT = unsign_t<T>;
-    using T2 = doubled_t<T>;
-    using UT2 = unsign_t<T2>;
-    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    // With Boost < 1.68.0, result of narrowing cast of uint128 is undefined
-    // if the value does not fit to the built-in target type (e.g. uint64)
-    // To workaround that, we mask the value with full-ones mask first.
-    auto lo = narrow_cast<UT>( value & all_ones<UT>());
-    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
-    return std::make_pair( lo, hi);
-}
-
-template<typename T>
-auto mips_division(T x, T y) {
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    if ( y == 0)
-        return ReturnType{};
-
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
-            return ReturnType{};
-
-    return ReturnType(x / y, x % y);
-}
-
 struct ALU
 {
     // Generic  
@@ -161,24 +134,29 @@ struct ALU
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
-        addition<I, T>( instr);
-//      if ( add_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
+        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
     }
+
+    template<typename I, typename T> static
+    void addition_overflow_imm( I* instr)
+    {
+        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
+    }
+
 
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
         subtraction<I, T>( instr);
 //      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
-    }
-
-    template<typename I, typename T> static
-    void addition_overflow_imm( I* instr)
-    {
-        addition_imm<I, T>( instr);
-//      if ( add_overflow( x, y))
 //          instr->trap = Trap::INTEGER_OVERFLOW;
     }
 

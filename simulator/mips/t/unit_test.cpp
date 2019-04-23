@@ -229,16 +229,16 @@ TEST_CASE ( "MIPS32_instr: add 1 and -1")
     CHECK( instr.get_v_dst() == 0);
 }
 
-/*     Overflow exception isn't implemented (#130)
+
 TEST_CASE ( "MIPS32_instr: add overflow")
 {
     MIPS32Instr instr( "add");
     instr.set_v_src( 0x7fffffff, 0);
     instr.set_v_src( 0x7fffffff, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.get_v_dst() == NO_VAL32);
     CHECK( instr.trap_type() != Trap::NO_TRAP);
-} */
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: addi two zeroes")
@@ -267,16 +267,15 @@ TEST_CASE( "MIPS32_instr: addi 1 and -1")
     instr.execute();
     CHECK( instr.get_v_dst() == 0);
 }
-    
-/*      Overflow exception isn't implemented (#130)
+
 TEST_CASE( "MIPS32_instr: addi overflow")
 {
     MIPS32Instr instr( "addi", 1);
     instr.set_v_src( 0x7fffffff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.get_v_dst() == NO_VAL32);
     CHECK( instr.trap_type() != Trap::NO_TRAP);
-}*/
+}
 
 ////////////////////////////////////////////////////////////////////////////////
     
@@ -3607,16 +3606,16 @@ TEST_CASE ( "MIPS64_instr: dadd 1 and -1")
     CHECK( instr.get_v_dst() == 0);
 }
 
-/*     Overflow exception isn't implemented (#130)
+
 TEST_CASE ( "MIPS64_instr: dadd overflow")
 {
     MIPS64Instr instr( "dadd");
     instr.set_v_src( 0x7fffffffffffffff, 0);
     instr.set_v_src( 0x7fffffffffffffff, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.get_v_dst() == NO_VAL32);
     CHECK( instr.trap_type() != Trap::NO_TRAP);
-} */
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS64_instr: daddi two zeroes")
@@ -3647,15 +3646,15 @@ TEST_CASE( "MIPS64_instr: daddi 1 and -1")
     CHECK( instr.get_v_dst() == 0);
 }
     
-/*      Overflow exception isn't implemented (#130)
+
 TEST_CASE( "MIPS64_instr: daddi overflow")
 {
     MIPS64Instr instr( "daddi", 1);
     instr.set_v_src( 0x7fffffffffffffff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
+    CHECK( instr.get_v_dst() == NO_VAL32);
     CHECK( instr.trap_type() != Trap::NO_TRAP);
-}*/
+}
 ////////////////////////////////////////////////////////////////////////////////
     
 TEST_CASE( "MIPS64_instr: daddiu two zeroes")
@@ -3686,15 +3685,15 @@ TEST_CASE( "MIPS64_instr: daddiu 1 and -1")
     CHECK( instr.get_v_dst() == 0);
 }
 
-/*      Overflow exception isn't implemented (#130)
+
 TEST_CASE( "MIPS64_instr: daddiu overflow")
 {
     MIPS64Instr instr( "daddiu", 1);
     instr.set_v_src( 0x7fffffffffffffff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xfee1dead);
-    CHECK( instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK( instr.get_v_dst() == 0x8000000000000000);
+    CHECK( instr.trap_type() == Trap::NO_TRAP);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE ( "MIPS64_instr: daddu two zeroes")
