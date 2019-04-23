@@ -283,8 +283,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     // Breakpoint
     {'C', instr_c_ebreak,   execute_c_ebreak<I>,   OUT_BREAK,  ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     // Jumps and branches
-    {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, RV32},
-    {'C', instr_c_j,        execute_c_j<I>,        OUT_BRANCH, ImmediateType::C_J,        Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
+    {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0, RV32},
+    {'C', instr_c_j,        execute_c_j<I>,        OUT_BRANCH, ImmediateType::C_J,        Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0},
     {'C', instr_c_jr,       execute_c_jr<I>,       OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
     {'C', instr_c_jalr,     execute_c_jalr<I>,     OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0},
     {'C', instr_c_beqz,     execute_c_beqz<I>,     OUT_BRANCH, ImmediateType::C_BEQZ,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0},
