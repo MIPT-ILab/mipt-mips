@@ -4,9 +4,10 @@
  * @author Oleg Ladin, Denis Los, Andrey Agrachev
  */
 
-#include <sparsehash/dense_hash_map.h>
 #include "infra/replacement/cache_replacement.h"
 #include "infra/macro.h"
+
+#include <sparsehash/dense_hash_map.h>
 #include <tree.h>
 
 #include <list>
@@ -89,7 +90,7 @@ class PseudoLRU : public CacheReplacement
     public:
         explicit Pseudo_LRUCacheInfo( std::size_t ways);
         void touch( std::size_t way) override;
-        void set_to_erase( std::size_t ) override;
+        void set_to_erase( std::size_t /* unused */) override;
         std::size_t update() override;
         std::size_t get_ways() const override { return ways; }
 
@@ -99,7 +100,6 @@ class PseudoLRU : public CacheReplacement
         core::tree<LRU_tree_node> lru_tree;
         void construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth);
         void construct_leaf_layer();
-        std::size_t calculate_depth() const;
         std::size_t which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it);
         static Flags reverse_flag( Flags flag) { return flag == Left ? Right : Left; }
 
@@ -111,15 +111,10 @@ class PseudoLRU : public CacheReplacement
 PseudoLRU::PseudoLRU( std::size_t ways)
     : ways( ways)
 {
-    lru_tree.data( LRU_tree_node(LRU_tree_node_iterator));
-    construct_tree( lru_tree.get_tree_iterator(), calculate_depth());
-}
-
-std::size_t PseudoLRU::calculate_depth() const
-{
-    if (is_power_of_two( ways) ==  false)
+    if (!is_power_of_two( ways))
         throw CacheReplacementException("Number of ways must be the power of 2!");
-    return 32 - count_leading_zeroes<uint32>( narrow_cast<uint32>( ways)) - 1;
+    lru_tree.data( LRU_tree_node(LRU_tree_node_iterator));
+    construct_tree( lru_tree.get_tree_iterator(), find_first_set(ways));
 }
 
 void PseudoLRU::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth)
