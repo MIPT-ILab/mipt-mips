@@ -14,7 +14,7 @@
 #include <cmath>
 #include <bitset>
 
-class LRUCacheInfo : public CacheReplacementInterface
+class LRUCacheInfo : public CacheReplacement
 {
     public:
         explicit LRUCacheInfo( std::size_t ways);
@@ -84,7 +84,7 @@ struct LRU_tree_node
     bool operator< (const LRU_tree_node &rhs) { return way_number < rhs.way_number; }
 };
 
-class Pseudo_LRUCacheInfo : public CacheReplacementInterface
+class Pseudo_LRUCacheInfo : public CacheReplacement
 {
     public:
         explicit Pseudo_LRUCacheInfo( std::size_t ways);
@@ -94,14 +94,14 @@ class Pseudo_LRUCacheInfo : public CacheReplacementInterface
         std::size_t get_ways() const override { return ways; }
 
     private:
-        enum Flags { Left = 0, Right = 1};
+        enum Flags { Left, Right};
 
         core::tree<LRU_tree_node> lru_tree;
         void construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth);
         void construct_leaf_layer();
         std::size_t calculate_depth() const;
         std::size_t which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it);
-        std::size_t reverse_flag( enum Flags Flag);
+        static Flags reverse_flag( Flags flag) { return flag == Left ? Right : Left; }
 
         const std::size_t ways;
         int leaf_iterator = 0;
@@ -139,11 +139,6 @@ void Pseudo_LRUCacheInfo::construct_tree( core::tree<LRU_tree_node>::iterator LR
             LRU_tree_node_it.insert( LRU_tree_node(leaf_iterator++));
         }
     }
-}
-
-std::size_t Pseudo_LRUCacheInfo::reverse_flag( enum Flags Flag) //more readable than multiplying on -1
-{
-    return Flag == Left ? Right : Left;
 }
 
 std::size_t Pseudo_LRUCacheInfo::which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it) //tree container doesnt provide such an option
