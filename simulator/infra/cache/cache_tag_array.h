@@ -24,9 +24,7 @@
 class ReplacementModule
 {
     public:
-        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy = "LRU");
-        ~ReplacementModule() { replacement_info.clear(); }
-
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy = "LRU");
         void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
         auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 

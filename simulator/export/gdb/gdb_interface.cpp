@@ -19,7 +19,6 @@
 #include <infra/byte.h>
 
 #include <tuple>
-#include <unordered_map>
 
 #include "gdb_wrapper.h"
 #include "sim-main.h"
