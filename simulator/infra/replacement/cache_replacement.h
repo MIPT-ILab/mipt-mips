@@ -14,13 +14,19 @@
 struct CacheReplacementException final : Exception
 {
     explicit CacheReplacementException( const std::string& msg)
-        : Exception( msg)
+        : Exception( "Invalid cache replacement configuration", msg)
     { }
 };
 
-struct CacheReplacementInterface
+class CacheReplacementInterface
 {
+public:
     virtual ~CacheReplacementInterface() = default;
+    CacheReplacementInterface( const CacheReplacementInterface&) = delete;
+    CacheReplacementInterface( CacheReplacementInterface&&) = delete;
+    CacheReplacementInterface& operator=( const CacheReplacement&) = delete;
+    CacheReplacementInterface& operator=( CacheReplacement&&) = delete;
+
     virtual void touch( std::size_t) = 0;
     virtual void set_to_erase( std::size_t) = 0;
     virtual std::size_t update() = 0;
