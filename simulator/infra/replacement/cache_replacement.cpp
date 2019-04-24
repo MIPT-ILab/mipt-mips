@@ -100,7 +100,6 @@ class Pseudo_LRUCacheInfo : public CacheReplacementInterface
         core::tree<LRU_tree_node> lru_tree;
         void construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth);
         void construct_leaf_layer();
-        std::size_t calculate_depth() const noexcept;
         std::size_t which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it);
         std::size_t reverse_flag( enum Flags Flag);
 
@@ -115,12 +114,7 @@ Pseudo_LRUCacheInfo::Pseudo_LRUCacheInfo( std::size_t ways)
     if (!is_power_of_two( ways))
         throw CacheReplacementException("Number of ways must be the power of 2!");
     lru_tree.data( LRU_tree_node(LRU_tree_node_iterator));
-    construct_tree( lru_tree.get_tree_iterator(), calculate_depth());
-}
-
-std::size_t Pseudo_LRUCacheInfo::calculate_depth() const noexcept
-{
-    return 32 - count_leading_zeroes<uint32>( narrow_cast<uint32>( ways)) - 1;
+    construct_tree( lru_tree.get_tree_iterator(), find_first_set(ways));
 }
 
 void Pseudo_LRUCacheInfo::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth)
