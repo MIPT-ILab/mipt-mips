@@ -58,6 +58,7 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint64>    (0x9d31).get_disasm() == "c_addw $a0, $a2");
     CHECK( RISCVInstr<uint64>    (0x9e99).get_disasm() == "c_subw $a3, $a4");
     CHECK( RISCVInstr<uint32>    (0x9002).get_disasm() == "c_ebreak");
+    CHECK( RISCVInstr<uint32>    (0x0001).get_disasm() == "c_nop");
 }
 
 TEST_CASE("RISCV invalid instruction")
