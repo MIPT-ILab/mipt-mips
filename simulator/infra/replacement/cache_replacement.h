@@ -21,6 +21,7 @@ struct CacheReplacementException final : Exception
 class CacheReplacement
 {
 public:
+    CacheReplacement() = default;
     virtual ~CacheReplacement() = default;
     CacheReplacement( const CacheReplacement&) = delete;
     CacheReplacement( CacheReplacement&&) = delete;
