@@ -138,8 +138,9 @@ uint32 CacheTagArray::write( Addr addr)
     return way;
 }
 
-ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy)
+ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy)
+    : replacement_info( number_of_sets)
 {
-    for ( std::size_t i = 0; i < number_of_sets; i++)
-        replacement_info.emplace_back( create_cache_replacement( replacement_policy, number_of_ways));
+    for (auto& e : replacement_info)
+        e = create_cache_replacement( replacement_policy, number_of_ways);
 }
