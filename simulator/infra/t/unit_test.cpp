@@ -114,6 +114,9 @@ static_assert(find_first_set<uint64>(3) == 0);
 static_assert(find_first_set<uint64>(0xFFFF000) == 12);
 static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
 
+static_assert(log2_exact(0x8) == 3);
+static_assert(log2_exact(0x10) == 4);
+
 static_assert(log_bitwidth<uint32> == 5);
 static_assert(log_bitwidth<uint64> == 6);
 
