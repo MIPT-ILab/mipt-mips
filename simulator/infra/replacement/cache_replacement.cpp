@@ -88,7 +88,7 @@ struct LRU_tree_node
 class PseudoLRU : public CacheReplacement
 {
     public:
-        explicit Pseudo_LRUCacheInfo( std::size_t ways);
+        explicit PseudoLRU( std::size_t ways);
         void touch( std::size_t way) override;
         void set_to_erase( std::size_t /* unused */) override;
         std::size_t update() override;
