@@ -8,6 +8,15 @@
 #include <infra/types.h>
 
 template<typename T>
+constexpr bool is_signed_division_overflow(T x, T y)
+{
+    if constexpr ( std::is_same_v<T, unsign_t<T>>)
+        return false;
+    else
+        return y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
+}
+
+template<typename T>
 auto mips_multiplication(T x, T y) {
     using UT = unsign_t<T>;
     using T2 = doubled_t<T>;
@@ -24,12 +33,8 @@ auto mips_multiplication(T x, T y) {
 template<typename T>
 auto mips_division(T x, T y) {
     using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    if ( y == 0)
+    if ( y == 0 || is_signed_division_overflow(x, y))
         return ReturnType{};
-
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
-            return ReturnType{};
 
     return ReturnType(x / y, x % y);
 }
@@ -111,9 +116,8 @@ auto riscv_division(T x, T y) {
     if ( y == 0)
         return narrow_cast<UT>( all_ones<UT>());
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return narrow_cast<UT>( UT{1} << ( bitwidth<T> - 1));
+    if ( is_signed_division_overflow(x, y))
+        return narrow_cast<UT>( msb_set<UT>());
 
     return narrow_cast<UT>( x / y);
 }
@@ -124,9 +128,8 @@ auto riscv_remainder(T x, T y) {
     if ( y == 0)
         return narrow_cast<UT>( x);
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return narrow_cast<UT>( 0);
+    if ( is_signed_division_overflow(x, y))
+        return narrow_cast<UT>( 0);
 
     return narrow_cast<UT>( x % y);
 }
