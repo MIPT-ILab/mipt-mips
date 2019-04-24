@@ -98,7 +98,7 @@ class InstrCache
         std::vector<Key> keys{};
         std::unordered_map<Key, size_t> pointers{};
         Arena<Value> storage{};
-        std::unique_ptr<CacheReplacementInterface> lru_module;
+        std::unique_ptr<CacheReplacement> lru_module;
 };
 
 #endif // INSTRCACHE_H
