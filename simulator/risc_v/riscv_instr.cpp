@@ -124,6 +124,7 @@ template<typename I> auto execute_c_sub = do_nothing<I>;
 template<typename I> auto execute_c_addw = do_nothing<I>;
 template<typename I> auto execute_c_subw = do_nothing<I>;
 template<typename I> auto execute_c_ebreak = do_nothing<I>;
+template<typename I> auto execute_c_nop = do_nothing<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -286,6 +287,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     /*-------------- C --------------*/
     // Breakpoint
     {'C', instr_c_ebreak,   execute_c_ebreak<I>,   OUT_BREAK,  ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
+    // NOP
+    {'C', instr_c_nop,      execute_c_nop<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0},
     // Jumps and branches
     {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0, RV32},
     {'C', instr_c_j,        execute_c_j<I>,        OUT_BRANCH, ImmediateType::C_J,        Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0},
