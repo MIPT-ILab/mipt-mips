@@ -61,7 +61,7 @@ private:
 
     static void* allocate_memory( std::size_t capacity)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
         return std::malloc( get_space( capacity) + sizeof(T));
     }
 
@@ -69,7 +69,7 @@ private:
     {
         void operator()(void *p)
         {
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
             std::free(p);
         }
     };
