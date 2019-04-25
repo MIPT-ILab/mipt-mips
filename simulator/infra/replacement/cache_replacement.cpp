@@ -29,8 +29,7 @@ class LRU : public CacheReplacement
         google::dense_hash_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
 };
 
-LRU::LRU( std::size_t ways)
-    : CacheReplacement(), ways( ways), lru_hash( ways)
+LRU::LRU( std::size_t ways) : ways( ways), lru_hash( ways)
 {
     lru_hash.set_empty_key( impossible_key); //special dense_hash_map requirement
     for ( std::size_t i = 0; i < ways; i++)
@@ -105,8 +104,7 @@ class PseudoLRU : public CacheReplacement
         int LRU_tree_node_iterator = INT8_MIN; //make shure it is less than 0
 };
 
-PseudoLRU::PseudoLRU( std::size_t ways)
-    : ways( ways)
+PseudoLRU::PseudoLRU( std::size_t ways) : ways( ways)
 {
     if (!is_power_of_two( ways))
         throw CacheReplacementException("Number of ways must be the power of 2!");
