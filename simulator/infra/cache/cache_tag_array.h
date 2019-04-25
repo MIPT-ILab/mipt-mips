@@ -7,19 +7,17 @@
 #ifndef CACHE_TAG_ARRAY_H
 #define CACHE_TAG_ARRAY_H
 
-#include <list>
-#include <utility>
-#include <memory>
-#include <vector>
-#include <unordered_map>
-#include <utility>
-
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
 #include <sparsehash/dense_hash_map.h>
+
+#include <list>
+#include <memory>
+#include <utility>
+#include <vector>
 
 // Replacement algorithm modules (LRU)
 
