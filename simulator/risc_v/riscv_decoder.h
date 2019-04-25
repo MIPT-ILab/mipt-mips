@@ -40,20 +40,22 @@ enum ImmediateType
     C_SW       = 39,
     C_LD       = 40,
     C_SD       = 40,
-    C_ADDI     = 41,
-    C_LI       = 41,
-    C_ANDI     = 41,
-    C_ADDIW    = 41,
-    C_J        = 42,
-    C_JAL      = 42,
-    C_LUI      = 43,
-    C_SRLI     = 44,
-    C_SRAI     = 44,
-    C_SLLI     = 44,
-    C_BEQZ     = 45,
-    C_BNEZ     = 45,
-    C_ADDI4SPN = 46,
-    C_ADDI16SP = 47
+    C_LQ       = 41,
+    C_SQ       = 41,
+    C_ADDI     = 42,
+    C_LI       = 42,
+    C_ANDI     = 42,
+    C_ADDIW    = 42,
+    C_J        = 43,
+    C_JAL      = 43,
+    C_LUI      = 44,
+    C_SRLI     = 45,
+    C_SRAI     = 45,
+    C_SLLI     = 45,
+    C_BEQZ     = 46,
+    C_BNEZ     = 46,
+    C_ADDI4SPN = 47,
+    C_ADDI16SP = 48
 };
 
 struct RISCVInstrDecoder
@@ -157,6 +159,13 @@ struct RISCVInstrDecoder
              | ( apply_mask( CL_imm_2, 0b11) << 6U);
     }
 
+    constexpr uint32 get_C_LQ_immediate() const noexcept
+    {
+        return ( apply_mask( CL_imm_1, 0b110) << 4U)
+             | ( apply_mask( CL_imm_1, 0b001) << 8U)
+             | ( apply_mask( CL_imm_2, 0b11) << 6U);
+    }
+
     constexpr uint32 get_C_ADDI_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
@@ -238,6 +247,7 @@ struct RISCVInstrDecoder
         case C_SQSP: return get_C_SQSP_immediate();
         case C_LW:   return get_C_LW_immediate();
         case C_LD:   return get_C_LD_immediate();
+        case C_LQ:   return get_C_LQ_immediate();
         case C_ADDI: return get_C_ADDI_immediate();
         case C_J:    return get_C_J_immediate();
         case C_LUI:  return get_C_LUI_immediate();
