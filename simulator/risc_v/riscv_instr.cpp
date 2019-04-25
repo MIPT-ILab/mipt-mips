@@ -32,10 +32,12 @@ template<typename I> auto execute_lbu = ALU::addr<I>;
 template<typename I> auto execute_lhu = ALU::addr<I>;
 template<typename I> auto execute_lwu = ALU::addr<I>;
 template<typename I> auto execute_ld = ALU::addr<I>;
+template<typename I> auto execute_lq = ALU::addr<I>;
 template<typename I> auto execute_sb = ALU::store_addr<I>;
 template<typename I> auto execute_sh = ALU::store_addr<I>;
 template<typename I> auto execute_sw = ALU::store_addr<I>;
 template<typename I> auto execute_sd = ALU::store_addr<I>;
+template<typename I> auto execute_sq = ALU::store_addr<I>;
 template<typename I> auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
 template<typename I> auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
 template<typename I> auto execute_slti = ALU::set<I, ALU::lti<I>>;
@@ -217,6 +219,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_lh,     execute_lh<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
     {'I', instr_lw,     execute_lw<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
     {'I', instr_ld,     execute_ld<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   8,      64 | 128},
+    {'I', instr_lq,     execute_lq<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   16,          128},
     {'I', instr_lbu,    execute_lbu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   1, 32 | 64 | 128},
     {'I', instr_lhu,    execute_lhu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
     {'I', instr_lwu,    execute_lwu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
@@ -224,6 +227,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sh,     execute_sh<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 2, 32 | 64 | 128},
     {'I', instr_sw,     execute_sw<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 4, 32 | 64 | 128},
     {'I', instr_sd,     execute_sd<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 8,      64 | 128},
+    {'I', instr_sq,     execute_sq<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 16,          128},
     // Immediate arithmetics
     {'I', instr_addi,   execute_addi<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128},
     {'I', instr_slli,   execute_slli<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128},
