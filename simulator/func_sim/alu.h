@@ -11,6 +11,7 @@
 #include "trap_types.h"
 
 #include <infra/macro.h>
+#include <tuple>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
