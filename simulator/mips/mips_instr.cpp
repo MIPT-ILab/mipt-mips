@@ -692,7 +692,7 @@ MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
         return get_table_entry( isaMapMOVCI<I>, instr.ft);
@@ -700,7 +700,7 @@ MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
@@ -708,7 +708,7 @@ MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
@@ -716,7 +716,7 @@ MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
