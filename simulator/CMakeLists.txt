@@ -25,6 +25,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS
+    infra/print128.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
