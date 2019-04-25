@@ -163,7 +163,10 @@ std::size_t PseudoLRU::update()
     return LRU_tree_node_it.data().way_number;
 }
 
-void PseudoLRU::set_to_erase( std::size_t ) { throw CacheReplacementException( "Set_to_erase method is not supposed to be used in perfomance simulation"); }
+void PseudoLRU::set_to_erase( std::size_t /* way */)
+{
+    throw CacheReplacementException( "PLRU does not support inverted access");
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 
