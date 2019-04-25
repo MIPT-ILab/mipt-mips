@@ -97,6 +97,7 @@ template<typename I> auto execute_c_sqsp = do_nothing<I>;
 template<typename I> auto execute_c_lw = do_nothing<I>;
 template<typename I> auto execute_c_ld = do_nothing<I>;
 template<typename I> auto execute_c_lq = do_nothing<I>;
+template<typename I> auto execute_c_sq = do_nothing<I>;
 template<typename I> auto execute_c_sw = do_nothing<I>;
 template<typename I> auto execute_c_sd = do_nothing<I>;
 template<typename I> auto execute_c_j = do_nothing<I>;
@@ -298,11 +299,13 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_swsp,     execute_c_swsp<I>,     OUT_STORE,  ImmediateType::C_SWSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       4},
     {'C', instr_c_sw,       execute_c_sw<I>,       OUT_STORE,  ImmediateType::C_SW,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       4},
     {'C', instr_c_ldsp,     execute_c_ldsp<I>,     OUT_LOAD,   ImmediateType::C_LDSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         8, RV64_RV128},
-    {'C', instr_c_sdsp,     execute_c_sdsp<I>,     OUT_STORE,  ImmediateType::C_SDSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       8, RV64_RV128},
     {'C', instr_c_ld,       execute_c_ld<I>,       OUT_LOAD,   ImmediateType::C_LD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  8, RV64_RV128},
+    {'C', instr_c_sdsp,     execute_c_sdsp<I>,     OUT_STORE,  ImmediateType::C_SDSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       8, RV64_RV128},
     {'C', instr_c_sd,       execute_c_sd<I>,       OUT_STORE,  ImmediateType::C_SD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       8, RV64_RV128},
     {'C', instr_c_lqsp,     execute_c_lqsp<I>,     OUT_LOAD,   ImmediateType::C_LQSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         16, RV128},
+    {'C', instr_c_lq,       execute_c_lq<I>,       OUT_LOAD,   ImmediateType::C_LQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  16, RV128},
     {'C', instr_c_sqsp,     execute_c_sqsp<I>,     OUT_STORE,  ImmediateType::C_SQSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       16, RV128},
+    {'C', instr_c_sq,       execute_c_sq<I>,       OUT_STORE,  ImmediateType::C_SQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       16, RV128},
     // Immediate arithmetics
     {'C', instr_c_addi16sp, execute_c_addi16sp<I>, OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::SP,         0},
     {'C', instr_c_addi,     execute_c_addi<I>,     OUT_ARITHM, ImmediateType::C_ADDI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0},
