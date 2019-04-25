@@ -10,8 +10,8 @@
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
-#include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
+#include <infra/types.h>
 #include <sparsehash/dense_hash_map.h>
 
 #include <list>
