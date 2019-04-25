@@ -11,9 +11,6 @@
 #include <tree.h>
 
 #include <list>
-#include <cassert>
-#include <cmath>
-#include <bitset>
 
 class LRU : public CacheReplacement
 {
