@@ -43,19 +43,18 @@ void ElfLoader::load_to( WriteableMemory *memory) const
 
 Addr ElfLoader::get_startPC() const
 {
-    using namespace ELFIO;
     for ( const auto& section : reader->sections) {
         if ( section->get_type() != SHT_SYMTAB)
             continue;
 
-        symbol_section_accessor symbols(*reader, section);
-        for ( unsigned int j = 0; j < symbols.get_symbols_num(); ++j ) {
+        ELFIO::symbol_section_accessor symbols(*reader, section);
+        for ( ELFIO::Elf_Xword j = 0; j < symbols.get_symbols_num(); ++j ) {
             std::string name;
-            Elf64_Addr value = 0;
-            Elf_Xword size;
+            ELFIO::Elf64_Addr value = 0;
+            ELFIO::Elf_Xword size;
             unsigned char bind;
             unsigned char type;
-            Elf_Half section_index;
+            ELFIO::Elf_Half section_index;
             unsigned char other;
             symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
             if ( name == "_start")
