@@ -12,14 +12,14 @@ enum GDB_TrapType : uint8
 
 /* Source: The MIPS64 and microMIPS64 Privileged Resource Architecture v5.04 */
 enum MIPS_TrapType : uint8
-{
+{                                /* Implementation comments */
     MIPS_EXC_INT           =  0,
     MIPS_EXC_MOD           =  1,
     MIPS_EXC_TLBL          =  2,
     MIPS_EXC_TLBS          =  3,
-    MIPS_EXC_ADEL          =  4, /* Loads, jr, jalr etc. */
+    MIPS_EXC_ADEL          =  4, /* Loads, instruction fetch */
     MIPS_EXC_ADES          =  5, /* Stores */
-    MIPS_EXC_IBE           =  6, /* Instruction fetch error*/
+    MIPS_EXC_IBE           =  6,
     MIPS_EXC_DBE           =  7,
     MIPS_EXC_SYS           =  8, /* Syscall */
     MIPS_EXC_BP            =  9, /* Breakpoint */

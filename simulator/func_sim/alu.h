@@ -45,7 +45,7 @@ struct ALU
     void load_addr_aligned( I* instr) {
         load_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_LOAD;
     }
 
     template<typename I> static
@@ -83,7 +83,7 @@ struct ALU
     void store_addr_aligned( I* instr) {
         store_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_STORE;
     }
 
     template<typename I> static
@@ -233,7 +233,7 @@ struct ALU
     template<typename I> static
     void jr( I* instr) {
         if (instr->v_src1 % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_FETCH;
         jump( instr, align_up<2>(instr->v_src1));
     }
 

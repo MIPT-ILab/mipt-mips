@@ -1632,7 +1632,7 @@ TEST_CASE( "MIPS32_instr: lh unaligned address trap")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_mem_addr() == 1);
-    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_LOAD);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1667,7 +1667,7 @@ TEST_CASE( "MIPS32_instr: lhu unaligned address trap")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_mem_addr() == 1);
-    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_LOAD);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
