@@ -10,7 +10,7 @@
 template<typename T>
 constexpr bool is_signed_division_overflow(T x, T y)
 {
-    return std::is_same_v<T, sign_t<T>> && y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
+    return !std::is_same_v<T, unsign_t<T>> && y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
 }
 
 template<typename T>
