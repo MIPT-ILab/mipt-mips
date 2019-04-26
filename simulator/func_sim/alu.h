@@ -258,6 +258,7 @@ struct ALU
 
     // Traps
     template<typename I> static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+    template<typename I> static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
     template<typename I> static void halt( I* instr)   { instr->trap = Trap::HALT; }
     template<typename I, Predicate<I> p> static void trap( I* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
     template<typename I> static void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }

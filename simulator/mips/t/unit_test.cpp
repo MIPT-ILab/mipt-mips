@@ -3149,8 +3149,7 @@ TEST_CASE( "MIPS32_instr: syscall")
     
     MIPS32Instr instr( "syscall");
     instr.execute();
-    CHECK( instr.trap_type() == Trap::NO_TRAP);
-    CHECK( instr.is_syscall());
+    CHECK( instr.trap_type() == Trap::SYSCALL);
 }
 ////////////////////////////////////////////////////////////////////////////////
 

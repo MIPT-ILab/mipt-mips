@@ -17,7 +17,7 @@ enum MIPS_TrapType : uint8
     MIPS_EXC_MOD           =  1,
     MIPS_EXC_TLBL          =  2,
     MIPS_EXC_TLBS          =  3,
-    MIPS_EXC_ADEL          =  4, /* Loads, instruction fetch */
+    MIPS_EXC_ADEL          =  4, /* Loads, instruction fetch (UNALIGNED_FETCH and UNKNOWN_INSTRUCTION)*/
     MIPS_EXC_ADES          =  5, /* Stores */
     MIPS_EXC_IBE           =  6,
     MIPS_EXC_DBE           =  7,
