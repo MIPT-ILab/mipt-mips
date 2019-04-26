@@ -7,14 +7,14 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
-template<typename T>
-constexpr bool is_signed_division_overflow(sign_t<T> x, sign_t<T> y)
+template<typename T, typename = std::enable_if_t<std::is_same_v<T, sign_t<T>>>>
+constexpr bool is_signed_division_overflow(T x, T y)
 {
     return y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
 }
 
-template<typename T>
-constexpr bool is_signed_division_overflow(unsign_t<T> /* x */, unsign_t<T> /* y */)
+template<typename T, typename = std::enable_if_t<std::is_same_v<T, unsign_t<T>>>>
+constexpr bool is_signed_division_overflow(T /* x */, T /* y */)
 {
     return false;
 }
