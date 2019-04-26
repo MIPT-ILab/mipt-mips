@@ -73,7 +73,7 @@ TEST_CASE("Sequence id print")
     CHECK( oss.str() == "{50}	sdr $s1, 0xfb2e($t1)	 [ ]" );
 }
 
-TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
+TEST_CASE ( "MIPS32_instr: disasm CP1 instructions a-c")
 {
     CHECK(MIPS32Instr(0x462008c5).get_disasm() == "abs.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008c5).get_disasm() == "abs.s $f3, $f1");
@@ -135,6 +135,10 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x468008e0).get_disasm() == "cvt.s.w $f3, $f1");
     CHECK(MIPS32Instr(0x462008e4).get_disasm() == "cvt.w.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008e4).get_disasm() == "cvt.w.s $f3, $f1");
+}
+
+TEST_CASE ( "MIPS32_instr: disasm CP1 instructions d-t")
+{
     CHECK(MIPS32Instr(0x462208c3).get_disasm() == "div.d $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c3).get_disasm() == "div.s $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x44290800).get_disasm() == "dmfc1 $t1, $f1");

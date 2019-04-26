@@ -25,6 +25,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS
+    infra/print128.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
@@ -89,7 +90,7 @@ add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc > ${RISCV_DIR}/riscv.opcode.gen.h
+    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse-opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
 )
 

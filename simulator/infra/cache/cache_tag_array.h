@@ -7,26 +7,24 @@
 #ifndef CACHE_TAG_ARRAY_H
 #define CACHE_TAG_ARRAY_H
 
-#include <list>
-#include <unordered_map>
-#include <utility>
-#include <memory>
-#include <vector>
-
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
-#include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
+#include <infra/types.h>
+#include <sparsehash/dense_hash_map.h>
+
+#include <list>
+#include <memory>
+#include <utility>
+#include <vector>
 
 // Replacement algorithm modules (LRU)
 
 class ReplacementModule
 {
     public:
-        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, std::string replacement_policy = "LRU");
-        ~ReplacementModule() { replacement_info.clear(); }
-
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy = "LRU");
         void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
         auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
@@ -110,7 +108,8 @@ class CacheTagArray : public CacheTagArraySize
         std::vector<std::vector<Tag>> tags;
 
         // hash tabe to lookup tags in O(1)
-        std::vector<std::unordered_map<Addr, Way>> lookup_helper;
+        std::vector<google::dense_hash_map<Addr, Way>> lookup_helper;
+        const uint32 impossible_key = INT32_MAX;
         ReplacementModule replacement_module; // LRU algorithm module
 };
 
