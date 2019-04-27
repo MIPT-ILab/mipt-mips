@@ -101,9 +101,6 @@ Trap FuncSim<ISA>::step_system()
     if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
         throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
 
-    if ( instr.is_syscall())
-        return handle_syscall();
-
     return instr.trap_type();
 }
 
@@ -113,6 +110,8 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
+        if ( trap == Trap::SYSCALL)
+            trap = handle_syscall();
         if ( trap == Trap::HALT)
             return Trap(Trap::HALT);
     }
@@ -125,6 +124,8 @@ Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
+        if ( trap == Trap::SYSCALL)
+            trap = handle_syscall();
         if ( trap != Trap::NO_TRAP)
             return trap;
     }
@@ -135,6 +136,8 @@ template <typename ISA>
 Trap FuncSim<ISA>::run_single_step()
 {
     auto trap = step_system();
+    if ( trap == Trap::SYSCALL)
+        trap = handle_syscall();
     return trap == Trap(Trap::NO_TRAP) ? Trap(Trap::BREAKPOINT) : trap;
 }
 
