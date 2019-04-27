@@ -41,10 +41,10 @@ struct ALU
         instr->mask = bitmask<typename I::RegisterUInt>(instr->mem_size * 8);
     }
 
-    template<typename I> static
+    template<typename I, typename T> static
     void load_addr_aligned( I* instr) {
         load_addr( instr);
-        if ( instr->mem_addr % 4 != 0)
+        if ( instr->mem_addr % sizeof(T) != 0)
             instr->trap = Trap::UNALIGNED_LOAD;
     }
 
@@ -79,10 +79,10 @@ struct ALU
     }
 
     // store functions done by analogy with loads
-    template<typename I> static
+    template<typename I, typename T> static
     void store_addr_aligned( I* instr) {
         store_addr( instr);
-        if ( instr->mem_addr % 4 != 0)
+        if ( instr->mem_addr % sizeof(T) != 0)
             instr->trap = Trap::UNALIGNED_STORE;
     }
 
