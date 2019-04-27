@@ -101,7 +101,6 @@ public:
     bool is_divmult() const { return operation == OUT_DIVMULT || get_accumulation_type() != 0; }
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
-    bool is_syscall() const { return operation == OUT_SYSCALL; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
     bool is_store() const { return operation == OUT_STORE; }
 

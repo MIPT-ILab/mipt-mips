@@ -45,7 +45,7 @@ struct ALU
     void load_addr_aligned( I* instr) {
         load_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_LOAD;
     }
 
     template<typename I> static
@@ -83,7 +83,7 @@ struct ALU
     void store_addr_aligned( I* instr) {
         store_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_STORE;
     }
 
     template<typename I> static
@@ -154,9 +154,11 @@ struct ALU
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
-        subtraction<I, T>( instr);
-//      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
+        auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
     }
 
     // RISCV mul/div
@@ -231,7 +233,7 @@ struct ALU
     template<typename I> static
     void jr( I* instr) {
         if (instr->v_src1 % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_FETCH;
         jump( instr, align_up<2>(instr->v_src1));
     }
 
@@ -256,6 +258,7 @@ struct ALU
 
     // Traps
     template<typename I> static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+    template<typename I> static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
     template<typename I> static void halt( I* instr)   { instr->trap = Trap::HALT; }
     template<typename I, Predicate<I> p> static void trap( I* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
     template<typename I> static void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
