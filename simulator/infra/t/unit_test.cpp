@@ -216,6 +216,13 @@ static std::string uint128_to_hex_string(uint128 number)
     return out.str();
 }
 
+static std::string uint128_to_hex_showbase_string(uint128 number)
+{
+    std::ostringstream out;
+    out << std::hex << std::showbase << std::uppercase << number;
+    return out.str();
+}
+
 static std::string uint128_to_dec_string(uint128 number)
 {
      std::ostringstream out;
@@ -234,6 +241,7 @@ TEST_CASE("Test uint128 decimal printing")
 {
     CHECK( uint128_to_dec_string( 1) == "1");
     CHECK( uint128_to_dec_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "18446744073709551616");
+    CHECK( uint128_to_dec_string( uint128{ 10'000'000'000'000'000'000ULL} * 2) == "20000000000000000000");
     CHECK( uint128_to_dec_string( all_ones<uint128>()) == "340282366920938463463374607431768211455");
 }
 
@@ -243,6 +251,7 @@ TEST_CASE("Test uint128 hexadecimal printing")
     CHECK( uint128_to_hex_string( 0xABCDEF) == "ABCDEF");
     CHECK( uint128_to_hex_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "10000000000000000");
     CHECK( uint128_to_hex_string( all_ones<uint128>()) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+    CHECK( uint128_to_hex_showbase_string( all_ones<uint128>()) == "0XFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 }
 
 TEST_CASE("Test uint128 octal printing")
