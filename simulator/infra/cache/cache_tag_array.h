@@ -29,7 +29,7 @@ class ReplacementModule
         auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
     private:
-        std::vector<std::unique_ptr<CacheReplacementInterface>> replacement_info;
+        std::vector<std::unique_ptr<CacheReplacement>> replacement_info;
 };
 
 struct CacheTagArrayInvalidSizeException final : Exception
