@@ -11,14 +11,11 @@
 #include <tree.h>
 
 #include <list>
-#include <cassert>
-#include <cmath>
-#include <bitset>
 
-class LRUCacheInfo : public CacheReplacementInterface
+class LRU : public CacheReplacement
 {
     public:
-        explicit LRUCacheInfo( std::size_t ways);
+        explicit LRU( std::size_t ways);
 
         void touch( std::size_t way) override ;
         void set_to_erase( std::size_t way) override ;
@@ -32,8 +29,7 @@ class LRUCacheInfo : public CacheReplacementInterface
         google::dense_hash_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
 };
 
-LRUCacheInfo::LRUCacheInfo( std::size_t ways)
-    : ways( ways), lru_hash( ways)
+LRU::LRU( std::size_t ways) : ways( ways), lru_hash( ways)
 {
     lru_hash.set_empty_key( impossible_key); //special dense_hash_map requirement
     for ( std::size_t i = 0; i < ways; i++)
@@ -43,7 +39,7 @@ LRUCacheInfo::LRUCacheInfo( std::size_t ways)
     }
 }
 
-void LRUCacheInfo::touch( std::size_t way)
+void LRU::touch( std::size_t way)
 {
     const auto lru_it = lru_hash.find( way);
     assert( lru_it != lru_hash.end());
@@ -51,14 +47,14 @@ void LRUCacheInfo::touch( std::size_t way)
     lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
 }
 
-void LRUCacheInfo::set_to_erase( std::size_t way)
+void LRU::set_to_erase( std::size_t way)
 {
     const auto lru_it = lru_hash.find( way);
     assert( lru_it != lru_hash.end());
     lru_list.splice( lru_list.end(), lru_list, lru_it->second);
 }
 
-std::size_t LRUCacheInfo::update()
+std::size_t LRU::update()
 {
     // remove the least recently used element from the tail
     std::size_t lru_elem = lru_list.back();
@@ -85,31 +81,30 @@ struct LRU_tree_node
     bool operator< (const LRU_tree_node &rhs) { return way_number < rhs.way_number; }
 };
 
-class Pseudo_LRUCacheInfo : public CacheReplacementInterface
+class PseudoLRU : public CacheReplacement
 {
     public:
-        explicit Pseudo_LRUCacheInfo( std::size_t ways);
+        explicit PseudoLRU( std::size_t ways);
         void touch( std::size_t way) override;
         void set_to_erase( std::size_t /* unused */) override;
         std::size_t update() override;
         std::size_t get_ways() const override { return ways; }
 
     private:
-        enum Flags { Left = 0, Right = 1};
+        enum Flags { Left, Right};
 
         core::tree<LRU_tree_node> lru_tree;
         void construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth);
         void construct_leaf_layer();
         std::size_t which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it);
-        std::size_t reverse_flag( enum Flags Flag);
+        static Flags reverse_flag( Flags flag) { return flag == Left ? Right : Left; }
 
         const std::size_t ways;
         int leaf_iterator = 0;
         int LRU_tree_node_iterator = INT8_MIN; //make shure it is less than 0
 };
 
-Pseudo_LRUCacheInfo::Pseudo_LRUCacheInfo( std::size_t ways)
-    : ways( ways)
+PseudoLRU::PseudoLRU( std::size_t ways) : ways( ways)
 {
     if (!is_power_of_two( ways))
         throw CacheReplacementException("Number of ways must be the power of 2!");
@@ -117,7 +112,7 @@ Pseudo_LRUCacheInfo::Pseudo_LRUCacheInfo( std::size_t ways)
     construct_tree( lru_tree.get_tree_iterator(), find_first_set(ways));
 }
 
-void Pseudo_LRUCacheInfo::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth)
+void PseudoLRU::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_node_it, std::size_t max_depth)
 {
     if ( LRU_tree_node_it.level() < max_depth)
     {
@@ -136,17 +131,12 @@ void Pseudo_LRUCacheInfo::construct_tree( core::tree<LRU_tree_node>::iterator LR
     }
 }
 
-std::size_t Pseudo_LRUCacheInfo::reverse_flag( enum Flags Flag) //more readable than multiplying on -1
-{
-    return Flag == Left ? Right : Left;
-}
-
-std::size_t Pseudo_LRUCacheInfo::which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it) //tree container doesnt provide such an option
+std::size_t PseudoLRU::which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it) //tree container doesnt provide such an option
 {
     return LRU_tree_node_it.data().way_number % 2 == 0 ? Left : Right;
 }
 
-void Pseudo_LRUCacheInfo::touch( std::size_t way)
+void PseudoLRU::touch( std::size_t way)
 {
     auto found_it = lru_tree.tree_find_depth( LRU_tree_node( static_cast<int>(way)));
     for ( auto i = found_it; i != lru_tree.get_tree_iterator(); i = i.out())
@@ -154,7 +144,7 @@ void Pseudo_LRUCacheInfo::touch( std::size_t way)
             i.out().data().lru_branch_ptr = reverse_flag(static_cast<enum Flags>(i.out().data().lru_branch_ptr));
 }
 
-std::size_t Pseudo_LRUCacheInfo::update()
+std::size_t PseudoLRU::update()
 {
     auto LRU_tree_node_it = lru_tree.get_tree_iterator();
     while ( LRU_tree_node_it.size() != 0)
@@ -168,17 +158,20 @@ std::size_t Pseudo_LRUCacheInfo::update()
     return LRU_tree_node_it.data().way_number;
 }
 
-void Pseudo_LRUCacheInfo::set_to_erase( std::size_t ) { throw CacheReplacementException( "Set_to_erase method is not supposed to be used in perfomance simulation"); }
+void PseudoLRU::set_to_erase( std::size_t /* way */)
+{
+    throw CacheReplacementException( "PLRU does not support inverted access");
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-std::unique_ptr<CacheReplacementInterface> create_cache_replacement( const std::string& name, std::size_t ways)
+std::unique_ptr<CacheReplacement> create_cache_replacement( const std::string& name, std::size_t ways)
 {
     if (name == "LRU")
-        return std::make_unique<LRUCacheInfo>( ways);
+        return std::make_unique<LRU>( ways);
 
     if (name == "Pseudo-LRU")
-        return std::make_unique<Pseudo_LRUCacheInfo>( ways);
+        return std::make_unique<PseudoLRU>( ways);
 
     throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
 }
