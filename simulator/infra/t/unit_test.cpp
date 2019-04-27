@@ -251,7 +251,8 @@ TEST_CASE("Test uint128 hexadecimal printing")
     CHECK( uint128_to_hex_string( 0xABCDEF) == "ABCDEF");
     CHECK( uint128_to_hex_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "10000000000000000");
     CHECK( uint128_to_hex_string( all_ones<uint128>()) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-    CHECK( uint128_to_hex_showbase_string( all_ones<uint128>()) == "0XFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" || all_ones<uint128>()) == "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+    CHECK(( uint128_to_hex_showbase_string( all_ones<uint128>()) == "0XFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" ||
+    uint128_to_hex_showbase_string( all_ones<uint128>()) == "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
 }
 
 TEST_CASE("Test uint128 octal printing")
