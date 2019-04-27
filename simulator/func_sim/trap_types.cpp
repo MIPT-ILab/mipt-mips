@@ -6,7 +6,7 @@
 std::array<std::string_view, Trap::MAX_TRAP_TYPE> Trap::TrapStrTable =
 {{
     //NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-    #define TRAP(name) #name
+    #define TRAP(name) #name,
     #include "trap_types.def"
     #undef TRAP
 }};

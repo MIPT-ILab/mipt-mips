@@ -50,6 +50,15 @@ class FuncSim : public Simulator
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
+        enum class HandleTrapMode : uint8
+        {
+            STOP,
+            STOP_ON_HALT,
+            NOTHING,
+        } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+        bool handle_trap_critical = false;
+        bool handle_trap_verbose = true;
+
     public:
         explicit FuncSim( Endian endian, bool log = false);
 
@@ -57,6 +66,7 @@ class FuncSim : public Simulator
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void init_checker() final { };
         FuncInstr step();
+        Trap handle_trap( Trap trap);
         Trap run( uint64 instrs_to_run) final;
         Trap run_single_step() final;
         Trap run_until_trap( uint64 instrs_to_run) final;

@@ -5,6 +5,9 @@
  
 #include "func_sim.h"
 #include <kernel/kernel.h>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
@@ -105,15 +108,46 @@ Trap FuncSim<ISA>::step_system()
 }
 
 template <typename ISA>
+Trap FuncSim<ISA>::handle_trap( Trap trap)
+{
+    if ( trap == Trap::SYSCALL)
+        trap = handle_syscall();
+    if ( trap == Trap::NO_TRAP)
+        return trap;
+
+    if ( handle_trap_verbose)
+        std::cout << "\tFuncSim trap: " << trap << std::endl;
+
+    if ( handle_trap_critical)
+        throw std::runtime_error( "critical trap");
+
+    switch ( handle_trap_mode)
+    {
+    case HandleTrapMode::STOP:
+        return trap;
+
+    case HandleTrapMode::STOP_ON_HALT:
+        if ( trap == Trap::HALT)
+            return trap;
+        return Trap(Trap::NO_TRAP);
+
+    case HandleTrapMode::NOTHING:
+        return Trap(Trap::NO_TRAP);
+    }
+
+    return trap;
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
-        if ( trap == Trap::SYSCALL)
-            trap = handle_syscall();
-        if ( trap == Trap::HALT)
-            return Trap(Trap::HALT);
+        if (trap != Trap::NO_TRAP)
+            trap = handle_trap(trap);
+        if ( trap != Trap::NO_TRAP)
+            return trap;
     }
     return Trap(Trap::NO_TRAP);
 }
