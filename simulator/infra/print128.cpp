@@ -25,6 +25,16 @@ struct Separator
         for (value = 1; value * base <= UINT64_MAX; value *= base)
             ++power;
     }
+
+    uint128 get_lo_part(uint128 v) const noexcept
+    {
+        return v % value;
+    }
+
+    uint128 get_hi_part(uint128 v) const noexcept
+    {
+        return v / value;
+    }
 };
 
 // RAII wrapper to restore std::ostream flags
@@ -33,6 +43,10 @@ class FlagsKeeper
 public:
     explicit FlagsKeeper( std::ostream& out) : out( out), flags( out.flags()) { }
     ~FlagsKeeper() { out.flags( flags); }
+    FlagsKeeper( const FlagsKeeper&) = delete;
+    FlagsKeeper( FlagsKeeper&&) = delete;
+    FlagsKeeper& operator=( const FlagsKeeper&) = delete;
+    FlagsKeeper& operator=( FlagsKeeper&&) = delete;
 private:
     std::ostream& out;
     const std::ios_base::fmtflags flags;
@@ -46,8 +60,9 @@ static std::ostream& dump(std::ostream& out, uint128 value)
         return out << narrow_cast<uint64>( value);
 
     FlagsKeeper flags_keeper( out);
-    dump<BASE>(out, value / separator.value);
-    return out << std::setfill('0') << std::setw(separator.power) << std::noshowbase << (value % separator.value);
+    return dump<BASE>(out, separator.get_hi_part( value))
+        << std::setfill('0') << std::setw(separator.power) << std::noshowbase
+        << separator.get_lo_part( value);
 }
 
 std::ostream& operator<<( std::ostream& out, uint128 value)
