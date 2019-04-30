@@ -13,17 +13,12 @@ struct InvalidArgs : std::invalid_argument
             invalid_argument( msg) { }
 };
 
-struct ArgvLoaderError : Exception
-{
-    explicit ArgvLoaderError(const std::string& msg) :
-            Exception("Error while loading arguments to guest memory", msg) { }
-};
-
 ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         : argc( count_argc( argv))
         , argv( argv)
         , envp( envp)
-        , envp_shift( 0)
+        , offset( 0)
+        , envp_offset( 0)
 {
     if ( !argc)
         throw InvalidArgs( "argc == 0");
@@ -34,18 +29,31 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
 
 void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
 {
-    std::shared_ptr<FuncMemory> plain_mem = mem -> create_plain_memory();
+    const std::shared_ptr<FuncMemory> plain_mem = mem -> create_plain_memory();
 
-    try { plain_mem -> memcpy_host_to_guest( addr, byte_cast( &argc), 4); }
+    try { offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), 4); }
     catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argc") + e.what()); }
 
-    try { plain_mem -> memcpy_host_to_guest( addr + 4, byte_cast( argv), argc * 4); }
+    try { offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), argc * 8); }
     catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argv") + e.what()); }
 
-    while ( envp + envp_shift)
+    offset += place_nullptr( plain_mem, addr + offset);
+
+    if ( envp)
     {
-        try { plain_mem -> memcpy_host_to_guest( addr + ( 1 + argc) * 4 + envp_shift, byte_cast( envp + envp_shift), 4); }
-        catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "envp") + e.what()); }
-        envp_shift += 4;
+        while ( *( envp + envp_offset))
+        {
+            try {
+                Addr size = plain_mem->memcpy_host_to_guest(addr + offset, byte_cast(envp + envp_offset), 8);
+                offset += size;
+                envp_offset += size;
+            }
+            catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp") + e.what()); }
+        }
+
+        offset += place_nullptr( plain_mem, addr + offset);
     }
+
+    try { load_argv_contents( plain_memory, addr); }
+    catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "argv contents") + e.what()); }
 }

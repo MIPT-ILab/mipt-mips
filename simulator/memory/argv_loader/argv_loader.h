@@ -12,6 +12,12 @@
 #include <infra/argv.h>
 #include <infra/byte.h>
 
+struct ArgvLoaderError : Exception
+{
+    explicit ArgvLoaderError(const std::string& msg) :
+            Exception("Error while loading arguments to guest memory", msg) { }
+};
+
 class ArgvLoader
 {
 public:
@@ -29,7 +35,17 @@ private:
     const int argc;
     const char* const* argv;
     const char* const* envp;
-    int envp_shift;
+    Addr offset;
+    Addr envp_offset;
+
+    size_t place_nullptr( const std::shared_ptr<FuncMemory> plain_mem, Addr addr)
+    {
+        const char* null = nullptr;
+        try {
+            return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), 8);
+        }
+        catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "can't place nullptr") + e.what()); }
+    }
 };
 
 #endif // ARGV_LOADER_H
