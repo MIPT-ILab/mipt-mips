@@ -34,6 +34,7 @@ set(CPPS
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
+    memory/argv_loader/argv_loader.cpp
     func_sim/func_sim.cpp
     func_sim/trap_types.cpp
     mips/mips_instr.cpp
@@ -68,6 +69,7 @@ set(TESTS_CPPS
     infra/ports/t/example_test.cpp
     kernel/t/unit_test.cpp
     kernel/mars/t/unit_test.cpp
+    memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
     memory/t/unit_test.cpp
