@@ -170,8 +170,19 @@ struct ALU
     template<typename I, typename T> static void riscv_rem( I* instr) { instr->v_dst = riscv_remainder <T>(instr->v_src1, instr->v_src2); }
 
     // MIPS mul/div
-    template<typename I, typename T> static void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void division( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_division<T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void multiplication( I* instr)
+    {
+        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
+
+    template<typename I, typename T> static void division( I* instr)
+    {
+        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
 
     // Shifts
     template<typename I, typename T> static void sll( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) << shamt_imm( instr)); }
