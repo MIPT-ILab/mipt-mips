@@ -29,6 +29,7 @@ private:
     const int argc;
     const char* const* argv;
     const char* const* envp;
+    int envp_shift;
 };
 
 #endif // ARGV_LOADER_H
