@@ -39,4 +39,16 @@ static inline const Byte* byte_cast( const uint8* b)
     return reinterpret_cast<const Byte*>( b);
 }
 
+static inline Byte* byte_cast( int* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<Byte*>( b);
+}
+
+static inline const Byte* byte_cast( const int* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const Byte*>( b);
+}
+
 #endif // INFRA_BYTE_H
