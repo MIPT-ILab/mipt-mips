@@ -70,7 +70,7 @@ get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint32 bw = PORT_BW, Late
 TEST_CASE("Ports: simple transmission")
 {
     auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
+    const auto& [rp, wp] = get_pair_of_ports( pm);
     wp->write( 11, 0_cl);
     CHECK( !rp->is_ready( 0_cl));
     CHECK( rp->is_ready( 1_cl));
@@ -79,7 +79,7 @@ TEST_CASE("Ports: simple transmission")
 
 TEST_CASE("Ports: throw if not ready")
 {
-    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
+    const auto& [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
     wp->write( 1, 0_cl);
     CHECK_THROWS_AS( rp->read( 0_cl), PortError);
 }
@@ -87,7 +87,7 @@ TEST_CASE("Ports: throw if not ready")
 TEST_CASE("Ports: read once")
 {
     auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
+    const auto& [rp, wp] = get_pair_of_ports( pm);
     wp->write( 11, 0_cl);
     rp->read( 1_cl);
     CHECK( !rp->is_ready( 1_cl));
@@ -95,7 +95,7 @@ TEST_CASE("Ports: read once")
 
 TEST_CASE("Ports: overload bandwidth")
 {
-    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
+    const auto& [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
     (void)rp;
     wp->write( 11, 0_cl);
     CHECK_THROWS_AS( wp->write( 12, 0_cl), PortError);
@@ -104,7 +104,7 @@ TEST_CASE("Ports: overload bandwidth")
 TEST_CASE("Ports: sequential read")
 {
     auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
+    const auto& [rp, wp] = get_pair_of_ports( pm);
 
     wp->write( 10, 0_cl);
     wp->write( 11, 1_cl);
@@ -117,7 +117,7 @@ TEST_CASE("Ports: sequential read")
 TEST_CASE("Ports: non-regular read")
 {
     auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
+    const auto& [rp, wp] = get_pair_of_ports( pm);
     wp->write( 10, 0_cl);
     wp->write( 11, 1_cl);
     CHECK( rp->is_ready( 1_cl));
