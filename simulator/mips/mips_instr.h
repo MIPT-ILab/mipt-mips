@@ -23,7 +23,7 @@
 template<typename I>
 struct MIPSTableEntry;
 
-template <typename Key, typename Value, size_t CAPACITY>
+template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY>
 class InstrCache;
 
 template<typename R>
@@ -62,7 +62,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         }
     private:
         using MyDatapath = typename BaseInstruction<R, MIPSRegister>::MyDatapath;
-        using DisasmCache = InstrCache<uint32, std::string, 8192>;
+        using DisasmCache = InstrCache<uint32, std::string, 8192, all_ones<uint32>()>;
 
         const uint32 raw;
         const bool raw_valid = false;
