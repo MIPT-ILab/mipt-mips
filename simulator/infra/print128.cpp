@@ -20,21 +20,14 @@ struct Separator
 {
     std::size_t power = 0;
     uint128 value = 1;
-    explicit constexpr Separator(std::size_t base)
+    explicit constexpr Separator( std::size_t base)
     {
         for (value = 1; value * base <= UINT64_MAX; value *= base)
             ++power;
     }
 
-    uint128 get_lo_part(uint128 v) const noexcept
-    {
-        return v % value;
-    }
-
-    uint128 get_hi_part(uint128 v) const noexcept
-    {
-        return v / value;
-    }
+    auto get_lo_part( uint128 v) const noexcept { return narrow_cast<uint64>( v % value); }
+    auto get_hi_part( uint128 v) const noexcept { return v / value; }
 };
 
 // RAII wrapper to restore std::ostream flags
@@ -53,15 +46,15 @@ private:
 };
 
 template<size_t BASE>
-static std::ostream& dump(std::ostream& out, uint128 value)
+static std::ostream& dump( std::ostream& out, uint128 value)
 {
-    static const constexpr auto separator = Separator(BASE);
-    if (value <= UINT64_MAX)
+    static const constexpr Separator separator( BASE);
+    if ( value <= UINT64_MAX)
         return out << narrow_cast<uint64>( value);
 
     FlagsKeeper flags_keeper( out);
-    return dump<BASE>(out, separator.get_hi_part( value))
-        << std::setfill('0') << std::setw(separator.power) << std::noshowbase
+    return dump<BASE>( out, separator.get_hi_part( value))
+        << std::setfill( '0') << std::setw( separator.power) << std::noshowbase
         << separator.get_lo_part( value);
 }
 
