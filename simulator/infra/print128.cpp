@@ -13,45 +13,50 @@
 
 #ifdef USE_GNUC_INT128
 
-static inline std::ostream& decimal_dump_of_uint128(std::ostream& out, uint128 value)
+// Contains the most possible power of output base to be stored in uint64
+// To print 128 number, you have to divide it by uint64, print the result
+// and print the remainder afterwards.
+struct Separator
 {
+    std::size_t power = 0;
+    uint128 value = 1;
+    explicit constexpr Separator(std::size_t base)
+    {
+        for (value = 1; value * base <= UINT64_MAX; value *= base)
+            ++power;
+    }
+};
+
+// RAII wrapper to restore std::ostream flags
+class FlagsKeeper
+{
+public:
+    explicit FlagsKeeper( std::ostream& out) : out( out), flags( out.flags()) { }
+    ~FlagsKeeper() { out.flags( flags); }
+private:
+    std::ostream& out;
+    const std::ios_base::fmtflags flags;
+};
+
+template<size_t BASE>
+static std::ostream& dump(std::ostream& out, uint128 value)
+{
+    static const constexpr auto separator = Separator(BASE);
     if (value <= UINT64_MAX)
         return out << narrow_cast<uint64>( value);
 
-    static const uint128 separator{ 10'000'000'000'000'000'000u};
-    const uint64 trailing = value % separator;
-    return decimal_dump_of_uint128(out, value / separator) << trailing;
-}
-
-static inline std::ostream& hexadecimal_dump_of_uint128(std::ostream& out, uint128 value)
-{
-    if ( value <= UINT64_MAX)
-        return out << narrow_cast<uint64>( value);
-
-    std::ios_base::fmtflags flags( out.flags() );
-    out << narrow_cast<uint64>( value >> 64ULL) << std::setfill( '0') << std::setw( 16) << narrow_cast<uint64>( value);
-    out.flags( flags);
-    return out;
-}
-
-static inline std::ostream& octal_dump_of_uint128(std::ostream& out, uint128 value)
-{
-    if ( value <= bitmask<uint64>( 63))
-        return out << narrow_cast<uint64>( value);
-
-    std::ios_base::fmtflags flags( out.flags() );
-    octal_dump_of_uint128( out, value >> 63ULL) << std::setfill( '0') << std::setw( 21) << (value & bitmask<uint64>( 63));
-    out.flags( flags);
-    return out;
+    FlagsKeeper flags_keeper( out);
+    dump<BASE>(out, value / separator.value);
+    return out << std::setfill('0') << std::setw(separator.power) << std::noshowbase << (value % separator.value);
 }
 
 std::ostream& operator<<( std::ostream& out, uint128 value)
 {
     if (( out.flags() & std::ios::dec) != 0)
-        return decimal_dump_of_uint128( out, value);
+        return dump<10>( out, value);
     if (( out.flags() & std::ios::hex) != 0)    
-        return hexadecimal_dump_of_uint128( out, value);
-    return octal_dump_of_uint128( out, value);
+        return dump<16>( out, value);
+    return dump<8>( out, value);
 }
 
 #endif

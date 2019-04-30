@@ -186,7 +186,7 @@ TEST_CASE( "Trap: check from/to GDB/RISCV formats conversions ")
     CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
 
     trap.set_from_riscv_format(CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap(Trap::UNALIGNED_ADDRESS));
+    CHECK( trap == Trap(Trap::UNALIGNED_FETCH));
 
     trap = Trap(Trap::UNKNOWN_INSTRUCTION);
     CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
