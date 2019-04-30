@@ -3,9 +3,10 @@
  * Copyright (C) MIPT-MIPS 2017-2019
  */
 
-#include <catch.hpp>
 #include "../mips.h"
 #include "../mips_instr.h"
+
+#include <catch.hpp>
 #include <memory/memory.h>
 
 class MIPS32Instr : public BaseMIPSInstr<uint32>
