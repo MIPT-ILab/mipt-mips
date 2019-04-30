@@ -172,14 +172,14 @@ struct ALU
     // MIPS mul/div
     template<typename I, typename T> static void multiplication( I* instr)
     {
-        const auto& resukt = mips_multiplication<T>( instr->v_src1, instr->v_src2);
+        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
         instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
         instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
     }
 
     template<typename I, typename T> static void division( I* instr)
     {
-        const auto& resukt = mips_division<T>( instr->v_src1, instr->v_src2);
+        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
         instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
         instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
     }
