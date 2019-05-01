@@ -89,5 +89,5 @@ void Trap::set_from_riscv_format(uint8 id)
         { CAUSE_STORE_PAGE_FAULT,    Trap::NO_TRAP             },
     };
 
-    return from_riscv_conv.at( id);
+    value = from_riscv_conv.at( id);
 }
