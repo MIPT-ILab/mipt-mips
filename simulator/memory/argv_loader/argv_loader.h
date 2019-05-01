@@ -48,6 +48,7 @@ private:
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr);
+    void load_envp_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr);
 };
 
 #endif // ARGV_LOADER_H

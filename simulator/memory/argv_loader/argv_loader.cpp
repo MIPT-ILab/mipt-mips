@@ -57,6 +57,9 @@ void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
 
     try { load_argv_contents( plain_mem, addr); }
     catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "argv contents") + e.what()); }
+
+    try { load_envp_contents( plain_mem, addr); }
+    catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp contents") + e.what()); }
 }
 
 void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
@@ -70,4 +73,10 @@ void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& plain_me
 
         offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]));
     }
+}
+
+void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
+{
+    for ( int content_offset = 0; envp[content_offset] != nullptr; content_offset++)
+        offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( envp[content_offset]), strlen( envp[content_offset]));
 }
