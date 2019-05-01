@@ -38,7 +38,7 @@ private:
     Addr offset;
     Addr envp_offset;
 
-    size_t place_nullptr( const std::shared_ptr<FuncMemory> plain_mem, Addr addr)
+    size_t place_nullptr( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
     {
         const char* null = nullptr;
         try {
@@ -46,6 +46,8 @@ private:
         }
         catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "can't place nullptr") + e.what()); }
     }
+
+    void load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr);
 };
 
 #endif // ARGV_LOADER_H

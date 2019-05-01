@@ -6,6 +6,7 @@
 
 #include "argv_loader.h"
 #include <infra/exception.h>
+#include <cstring>
 
 struct InvalidArgs : std::invalid_argument
 {
@@ -44,7 +45,7 @@ void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
         while ( *( envp + envp_offset))
         {
             try {
-                Addr size = plain_mem->memcpy_host_to_guest(addr + offset, byte_cast(envp + envp_offset), 8);
+                Addr size = plain_mem->memcpy_host_to_guest(addr + offset, byte_cast( envp + envp_offset), 8);
                 offset += size;
                 envp_offset += size;
             }
@@ -54,6 +55,19 @@ void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
         offset += place_nullptr( plain_mem, addr + offset);
     }
 
-    try { load_argv_contents( plain_memory, addr); }
+    try { load_argv_contents( plain_mem, addr); }
     catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "argv contents") + e.what()); }
+}
+
+void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
+{
+    for ( int content_offset = 0; content_offset < argc; content_offset++)
+    {
+        if ( !argv[content_offset])
+            throw ArgvLoaderError( std::string( "argv [")
+                                 + std::to_string( content_offset)
+                                 + std::string( "] == nullptr"));
+
+        offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]));
+    }
 }
