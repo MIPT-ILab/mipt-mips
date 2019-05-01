@@ -42,3 +42,26 @@ TEST_CASE( "ArgvLoader: load of argc and argv[]")
     CHECK( ( mem -> read<uint16, Endian::little>( 38)) == 'b');
     CHECK( ( mem -> read<uint16, Endian::little>( 40)) == 'c');
 }
+
+TEST_CASE( "ArgvLoader: load of argc, argv[] and envp[]")
+{
+    const char* argv[4] = { "a", "b", "c"};
+    const char* envp[3] = { "d", "e"};
+    auto argv_loader = ArgvLoader( argv, envp);
+    auto mem = FuncMemory::create_plain_memory( 20);
+    CHECK( argv_loader.load_argv_to( mem, 0) == 70);
+    CHECK( ( mem -> read<int, Endian::little>( 0)) == 3);
+    CHECK( ( mem -> read<uint64, Endian::little>( 4))  == uint64( argv[0]));
+    CHECK( ( mem -> read<uint64, Endian::little>( 12)) == uint64( argv[1]));
+    CHECK( ( mem -> read<uint64, Endian::little>( 20)) == uint64( argv[2]));
+    CHECK( ( mem -> read<uint64, Endian::little>( 28)) == 0);
+    CHECK( ( mem -> read<uint64, Endian::little>( 36)) == uint64( envp[0]));
+    CHECK( ( mem -> read<uint64, Endian::little>( 44)) == uint64( envp[1]));
+    CHECK( ( mem -> read<uint64, Endian::little>( 52)) == 0);
+    CHECK( ( mem -> read<uint16, Endian::little>( 60)) == 'a');
+    CHECK( ( mem -> read<uint16, Endian::little>( 62)) == 'b');
+    CHECK( ( mem -> read<uint16, Endian::little>( 64)) == 'c');
+    CHECK( ( mem -> read<uint16, Endian::little>( 66)) == 'd');
+    CHECK( ( mem -> read<uint16, Endian::little>( 68)) == 'e');
+    CHECK( ( mem -> read<uint16, Endian::little>( 70)) == 0);
+}
