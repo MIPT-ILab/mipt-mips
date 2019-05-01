@@ -28,10 +28,7 @@ uint8 Trap::to_gdb_format()
         { Trap::UNKNOWN_INSTRUCTION, GDB_SIGNAL_ILL  },  // Not implemented in gdb_interface
     };
 
-    auto it = to_gdb_conv.find( value);
-    if ( it == to_gdb_conv.end())
-        return GDB_SIGNAL_0;
-    return it->second;
+    return to_gdb_conv.at( value);
 }
 
 uint8 Trap::to_riscv_format()
@@ -51,10 +48,7 @@ uint8 Trap::to_riscv_format()
         { Trap::UNKNOWN_INSTRUCTION, CAUSE_ILLEGAL_INSTRUCTION },
     };
 
-    auto it = to_riscv_conv.find( value);
-    if ( it == to_riscv_conv.end())
-        return 0;
-    return it->second;
+    return to_riscv_conv.at( value);
 }
 
 void Trap::set_from_gdb_format(uint8 id)
@@ -95,8 +89,5 @@ void Trap::set_from_riscv_format(uint8 id)
         { CAUSE_STORE_PAGE_FAULT,    Trap::NO_TRAP             },
     };
 
-    auto it = from_riscv_conv.find( id);
-    if ( it == from_riscv_conv.end())
-        value = Trap::NO_TRAP;
-    value = it->second;
+    return from_riscv_conv.at( id);
 }
