@@ -27,19 +27,15 @@ size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr ad
     try { offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), 4); }
     catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argc") + e.what()); }
 
-    try { offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), argc * 8); }
+    try { offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * 8); }
     catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argv") + e.what()); }
-
-    offset += place_nullptr( mem, addr + offset);
 
     if ( envp)
     {
-        while ( *( envp + envp_offset))
+        while ( envp[ envp_offset])
         {
             try {
-                Addr size = mem->memcpy_host_to_guest(addr + offset, byte_cast( envp + envp_offset), 8);
-                offset += size;
-                envp_offset += size;
+                offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), 8);
             }
             catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp") + e.what()); }
         }
