@@ -36,7 +36,7 @@ public:
     ArgvLoader& operator=( const ArgvLoader&) = delete;
     ArgvLoader& operator=( ArgvLoader&&) = delete;
 
-    void load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
+    size_t load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 private:
     const int argc;
     const char* const* argv;
@@ -53,8 +53,8 @@ private:
         catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "can't place nullptr") + e.what()); }
     }
 
-    void load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr);
-    void load_envp_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr);
+    void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
+    void load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 };
 
 #endif // ARGV_LOADER_H
