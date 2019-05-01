@@ -10,8 +10,8 @@
 #include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
-#include <infra/macro.h>
 #include <infra/log.h>
+#include <infra/macro.h>
 
 #include <cctype>
 #include <memory>
