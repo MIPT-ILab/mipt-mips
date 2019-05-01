@@ -18,6 +18,12 @@ struct ArgvLoaderError : Exception
             Exception("Error while loading arguments to guest memory", msg) { }
 };
 
+struct InvalidArgs : std::invalid_argument
+{
+    explicit InvalidArgs(const std::string& msg) :
+            invalid_argument( msg) { }
+};
+
 class ArgvLoader
 {
 public:
@@ -30,7 +36,7 @@ public:
     ArgvLoader& operator=( const ArgvLoader&) = delete;
     ArgvLoader& operator=( ArgvLoader&&) = delete;
 
-    void load_argv_to( FuncMemory* mem, Addr addr);
+    void load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 private:
     const int argc;
     const char* const* argv;
