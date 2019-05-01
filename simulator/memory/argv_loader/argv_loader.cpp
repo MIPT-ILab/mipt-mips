@@ -8,14 +8,8 @@
 #include <infra/exception.h>
 #include <cstring>
 
-struct InvalidArgs : std::invalid_argument
-{
-    explicit InvalidArgs(const std::string& msg) :
-            invalid_argument( msg) { }
-};
-
 ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
-        : argc( count_argc( argv))
+        : argc( argv ? count_argc( argv) : 0)
         , argv( argv)
         , envp( envp)
         , offset( 0)
@@ -28,7 +22,7 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         throw InvalidArgs( "argv == nullptr");
 }
 
-void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
+void ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     const std::shared_ptr<FuncMemory> plain_mem = mem -> create_plain_memory();
 
@@ -58,8 +52,11 @@ void ArgvLoader::load_argv_to( FuncMemory* mem, Addr addr)
     try { load_argv_contents( plain_mem, addr); }
     catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "argv contents") + e.what()); }
 
-    try { load_envp_contents( plain_mem, addr); }
-    catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp contents") + e.what()); }
+    if ( envp)
+    {
+        try { load_envp_contents( plain_mem, addr); }
+        catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp contents") + e.what()); }
+    }
 }
 
 void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
@@ -80,3 +77,5 @@ void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& plain_me
     for ( int content_offset = 0; envp[content_offset] != nullptr; content_offset++)
         offset += plain_mem -> memcpy_host_to_guest( addr + offset, byte_cast( envp[content_offset]), strlen( envp[content_offset]));
 }
+
+ArgvLoader::~ArgvLoader() = default;
