@@ -17,7 +17,7 @@ class ArgvLoader
 public:
     explicit ArgvLoader( const char* const* argv, const char* const* envp = nullptr);
 
-    size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
+    size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr = 0);
 private:
     const int argc;
     const char* const* argv;
