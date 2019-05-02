@@ -75,3 +75,6 @@ void ArgvLoader<endian>::load_envp_contents( const std::shared_ptr<FuncMemory>& 
         offset += bytewidth<char>;
     }
 }
+
+template class ArgvLoader<Endian::little>;
+template class ArgvLoader<Endian::big>;
