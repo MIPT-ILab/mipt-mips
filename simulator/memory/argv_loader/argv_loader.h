@@ -12,6 +12,7 @@
 #include <infra/types.h>
 #include <memory/memory.h>
 
+template <Endian endian>
 class ArgvLoader
 {
 public:
@@ -26,12 +27,12 @@ private:
 
     void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<Addr, Endian::little>( 0, addr);
+        mem->write<Addr, endian>( 0, addr);
     }
 
     void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<char, Endian::little>( 0, addr);
+        mem->write<char, endian>( 0, addr);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);

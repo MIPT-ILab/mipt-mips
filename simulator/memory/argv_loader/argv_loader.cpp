@@ -9,16 +9,18 @@
 #include <cstring>
 #include <infra/exception.h>
 
-ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
+template <Endian endian>
+ArgvLoader<endian>::ArgvLoader( const char* const* argv, const char* const* envp)
         : argc( argv ? count_argc( argv) : 0)
         , argv( argv)
         , envp( envp)
         , offset( 0)
 {}
 
-size_t ArgvLoader::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
+template <Endian endian>
+size_t ArgvLoader<endian>::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    mem->write<int, Endian::little>( argc, addr + offset);
+    mem->write<int, endian>( argc, addr + offset);
     offset += bytewidth<int>;
 
     offset += argc * bytewidth<Addr>; //reserved space for argv[]
@@ -42,11 +44,12 @@ size_t ArgvLoader::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     return offset;
 }
 
-void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
+template<Endian endian>
+void ArgvLoader<endian>::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int contents_offset = 0; contents_offset < argc; contents_offset++)
     {
-        mem->write<Addr, Endian::little>( offset, addr + bytewidth<int> + contents_offset * bytewidth<Addr>);
+        mem->write<Addr, endian>( offset, addr + bytewidth<int> + contents_offset * bytewidth<Addr>);
 
         std::string content( argv[contents_offset]);
         mem->write_string( content,  addr + offset);
@@ -57,11 +60,12 @@ void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Add
     }
 }
 
-void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
+template<Endian endian>
+void ArgvLoader<endian>::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int contents_offset = 0; envp[contents_offset] != nullptr; contents_offset++)
     {
-        mem->write<Addr, Endian::little>( offset, addr + bytewidth<int> + ( argc + 1 + contents_offset) * bytewidth<Addr>);
+        mem->write<Addr, endian>( offset, addr + bytewidth<int> + ( argc + 1 + contents_offset) * bytewidth<Addr>);
 
         std::string content( envp[contents_offset]);
         mem->write_string( content,  addr + offset);
