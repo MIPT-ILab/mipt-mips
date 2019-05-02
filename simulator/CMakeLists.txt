@@ -74,7 +74,8 @@ set(TESTS_CPPS
     memory/t/check_coherency.cpp
     memory/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
-    mips/t/unit_test.cpp
+    mips/t/mips32_test.cpp
+    mips/t/mips32_memory_test.cpp
     mips/t/mips64_test.cpp
     func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
