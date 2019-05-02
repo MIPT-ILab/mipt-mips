@@ -25,6 +25,8 @@ private:
     const char* const* envp;
     Addr offset;
 
+    static const constexpr size_t GUEST_WORD_SIZE = bytewidth<T>;
+
     void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
         mem->write<Addr, endian>( 0, addr);

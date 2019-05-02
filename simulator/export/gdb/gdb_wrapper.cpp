@@ -43,7 +43,13 @@ catch (...) {
 bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const try
 {
     Addr sp = cpu->read_gdb_register( 29);
-    sp += ArgvLoader<int, Endian::native>( argv, envp).load_to( memory, sp);
+
+    if ( cpu->sizeof_register() == bytewidth<uint32>)
+        sp += ArgvLoader<uint32, Endian::native>( argv, envp).load_to( memory, sp);
+
+    if ( cpu->sizeof_register() == bytewidth<uint64>)
+        sp += ArgvLoader<uint64, Endian::native>( argv, envp).load_to( memory, sp);
+
     cpu->write_gdb_register( 29, sp);
     std::cout << "MIPT-MIPS: arguments loaded" << std::endl;
 

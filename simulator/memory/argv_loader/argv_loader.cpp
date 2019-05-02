@@ -20,8 +20,8 @@ ArgvLoader<T, endian>::ArgvLoader( const char* const* argv, const char* const* e
 template <typename T, Endian endian>
 size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    mem->write<T, endian>( static_cast<T>( argc), addr + offset);
-    offset += bytewidth<T>;
+    mem->write<T, endian>( narrow_cast<T>( argc), addr + offset);
+    offset += GUEST_WORD_SIZE;
 
     offset += argc * bytewidth<Addr>; //reserved space for argv[]
 
@@ -49,7 +49,7 @@ void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory
 {
     for ( int contents_offset = 0; contents_offset < argc; contents_offset++)
     {
-        mem->write<Addr, endian>( offset, addr + bytewidth<T> + contents_offset * bytewidth<Addr>);
+        mem->write<Addr, endian>( offset, addr + GUEST_WORD_SIZE + contents_offset * bytewidth<Addr>);
 
         std::string content( argv[contents_offset]);
         mem->write_string( content,  addr + offset);
@@ -65,7 +65,7 @@ void ArgvLoader<T, endian>::load_envp_contents( const std::shared_ptr<FuncMemory
 {
     for ( int contents_offset = 0; envp[contents_offset] != nullptr; contents_offset++)
     {
-        mem->write<Addr, endian>( offset, addr + bytewidth<T> + ( argc + 1 + contents_offset) * bytewidth<Addr>);
+        mem->write<Addr, endian>( offset, addr + GUEST_WORD_SIZE + ( argc + 1 + contents_offset) * bytewidth<Addr>);
 
         std::string content( envp[contents_offset]);
         mem->write_string( content,  addr + offset);
