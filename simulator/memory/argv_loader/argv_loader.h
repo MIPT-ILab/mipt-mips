@@ -29,7 +29,7 @@ private:
 
     void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<Addr, endian>( 0, addr);
+        mem->write<T, endian>( 0, addr);
     }
 
     void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)

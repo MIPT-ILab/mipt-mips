@@ -23,17 +23,17 @@ size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, A
     mem->write<T, endian>( narrow_cast<T>( argc), addr + offset);
     offset += GUEST_WORD_SIZE;
 
-    offset += argc * bytewidth<Addr>; //reserved space for argv[]
+    offset += argc * GUEST_WORD_SIZE; // reserved space for argv[]
 
     place_nullptr( mem, addr + offset);
-    offset += bytewidth<Addr>;
+    offset += GUEST_WORD_SIZE;
 
     if ( envp)
     {
-        offset += count_argc( envp) * bytewidth<Addr>;
+        offset += count_argc( envp) * GUEST_WORD_SIZE; // reserved space for envp[]
 
         place_nullptr( mem, addr + offset);
-        offset += bytewidth<Addr>;
+        offset += GUEST_WORD_SIZE;
     }
 
     load_argv_contents( mem, addr);
@@ -49,7 +49,7 @@ void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory
 {
     for ( int contents_offset = 0; contents_offset < argc; contents_offset++)
     {
-        mem->write<Addr, endian>( addr + offset, addr + GUEST_WORD_SIZE + contents_offset * bytewidth<Addr>);
+        mem->write<T, endian>( narrow_cast<T>( addr + offset), addr + ( 1 + contents_offset) * GUEST_WORD_SIZE);
 
         std::string content( argv[contents_offset]);
         mem->write_string( content,  addr + offset);
@@ -65,7 +65,7 @@ void ArgvLoader<T, endian>::load_envp_contents( const std::shared_ptr<FuncMemory
 {
     for ( int contents_offset = 0; envp[contents_offset] != nullptr; contents_offset++)
     {
-        mem->write<Addr, endian>( addr + offset, addr + GUEST_WORD_SIZE + ( argc + 1 + contents_offset) * bytewidth<Addr>);
+        mem->write<T, endian>( narrow_cast<T>( addr + offset), addr + ( 1 + argc + 1 + contents_offset) * GUEST_WORD_SIZE);
 
         std::string content( envp[contents_offset]);
         mem->write_string( content,  addr + offset);
