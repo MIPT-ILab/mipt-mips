@@ -78,6 +78,7 @@ set(TESTS_CPPS
     mips/t/mips32_divmult_test.cpp
     mips/t/mips32_branch_test.cpp
     mips/t/mips32_memory_test.cpp
+    mips/t/mips32_traps_test.cpp
     mips/t/mips64_test.cpp
     func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
