@@ -45,14 +45,7 @@ size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr ad
 void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int content_offset = 0; content_offset < argc; content_offset++)
-    {
-        if ( !argv[content_offset])
-            throw ArgvLoaderError( std::string( "argv [")
-                                 + std::to_string( content_offset)
-                                 + std::string( "] == nullptr"));
-
         offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]) + 1);
-    }
 }
 
 void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)

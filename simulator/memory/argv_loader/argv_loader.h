@@ -12,18 +12,6 @@
 #include <infra/types.h>
 #include <memory/memory.h>
 
-struct ArgvLoaderError : Exception
-{
-    explicit ArgvLoaderError(const std::string& msg) :
-            Exception("Error while loading arguments to guest memory", msg) { }
-};
-
-struct InvalidArgs : std::invalid_argument
-{
-    explicit InvalidArgs(const std::string& msg) :
-            invalid_argument( msg) { }
-};
-
 class ArgvLoader
 {
 public:
