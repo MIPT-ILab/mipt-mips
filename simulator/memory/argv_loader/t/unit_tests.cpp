@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS iLab project
  */
 
-#include <catch.hpp>
 #include "../argv_loader.h"
+#include <catch.hpp>
 
 TEST_CASE( "ArgvLoader: argv[2] = nullptr while argc >= 3")
 {

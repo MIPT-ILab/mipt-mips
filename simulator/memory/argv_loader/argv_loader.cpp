@@ -5,8 +5,8 @@
  */
 
 #include "argv_loader.h"
-#include <infra/exception.h>
 #include <cstring>
+#include <infra/exception.h>
 
 ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         : argc( argv ? count_argc( argv) : 0)

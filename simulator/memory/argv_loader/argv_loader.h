@@ -7,10 +7,10 @@
 #ifndef ARGV_LOADER_H
 #define ARGV_LOADER_H
 
-#include <infra/types.h>
-#include <memory/memory.h>
 #include <infra/argv.h>
 #include <infra/byte.h>
+#include <infra/types.h>
+#include <memory/memory.h>
 
 struct ArgvLoaderError : Exception
 {
