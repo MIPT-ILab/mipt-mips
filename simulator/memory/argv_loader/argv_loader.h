@@ -47,10 +47,7 @@ private:
     size_t place_nullptr( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
     {
         const char* null = nullptr;
-        try {
-            return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), 8);
-        }
-        catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "can't place nullptr") + e.what()); }
+        return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), bytewidth<char*>);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);

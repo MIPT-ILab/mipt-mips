@@ -18,15 +18,15 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
 
 size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), 4);
+    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), bytewidth<int>);
 
-    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * 8);
+    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * bytewidth<char*>);
 
     if ( envp)
     {
         while ( envp[ envp_offset])
         {
-            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), 8);
+            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), bytewidth<char*>);
         }
 
         offset += place_nullptr( mem, addr + offset);
