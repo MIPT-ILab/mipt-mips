@@ -24,32 +24,25 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
 
 size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    try { offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), 4); }
-    catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argc") + e.what()); }
+    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), 4);
 
-    try { offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * 8); }
-    catch( FuncMemoryOutOfRange const& e) { throw ArgvLoaderError( std::string( "argv") + e.what()); }
+    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * 8);
 
     if ( envp)
     {
         while ( envp[ envp_offset])
         {
-            try {
-                offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), 8);
-            }
-            catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp") + e.what()); }
+            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), 8);
         }
 
         offset += place_nullptr( mem, addr + offset);
     }
 
-    try { load_argv_contents( mem, addr); }
-    catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "argv contents") + e.what()); }
+    load_argv_contents( mem, addr);
 
     if ( envp)
     {
-        try { load_envp_contents( mem, addr); }
-        catch( FuncMemoryOutOfRange const &e) { throw ArgvLoaderError( std::string( "envp contents") + e.what()); }
+        load_envp_contents( mem, addr);
     }
 
     return offset;
