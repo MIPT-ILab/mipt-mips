@@ -18,8 +18,7 @@
 // and print the remainder afterwards.
 struct Separator
 {
-    std::size_t power = 0;
-    uint128 value = 1;
+public:
     explicit constexpr Separator( std::size_t base)
     {
         for (value = 1; value * base <= UINT64_MAX; value *= base)
@@ -28,6 +27,10 @@ struct Separator
 
     auto get_lo_part( uint128 v) const noexcept { return narrow_cast<uint64>( v % value); }
     auto get_hi_part( uint128 v) const noexcept { return v / value; }
+    constexpr auto get_power() const noexcept { return power; }
+private:
+    std::size_t power = 0;
+    uint128 value = 1;
 };
 
 template<size_t BASE>
@@ -47,7 +50,7 @@ public:
             return out << narrow_cast<uint64>( value);
 
         return this->operator()( separator.get_hi_part( value))
-            << std::setfill( '0') << std::setw( separator.power) << std::noshowbase
+            << std::setfill( '0') << std::setw( separator.get_power()) << std::noshowbase
             << separator.get_lo_part( value);
     }
 
