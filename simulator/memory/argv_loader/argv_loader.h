@@ -30,6 +30,12 @@ private:
         mem->write<Addr, Endian::little>( null, addr);
     }
 
+    void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)
+    {
+        char null = 0;
+        mem->write<char, Endian::little>( null, addr);
+    }
+
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
     void load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 };

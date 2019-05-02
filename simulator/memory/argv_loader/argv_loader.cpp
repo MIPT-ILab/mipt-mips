@@ -58,6 +58,9 @@ void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Add
         std::string content( argv[contents_offset]);
         mem->write_string( content,  addr + offset);
         offset += content.size();
+
+        place_nullterminator( mem, addr + offset);
+        offset += bytewidth<char>;
     }
 }
 
@@ -70,5 +73,8 @@ void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Add
         std::string content( envp[contents_offset]);
         mem->write_string( content,  addr + offset);
         offset += content.size();
+
+        place_nullterminator( mem, addr + offset);
+        offset += bytewidth<char>;
     }
 }
