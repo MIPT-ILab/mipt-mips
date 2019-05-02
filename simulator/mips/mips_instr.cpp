@@ -122,7 +122,7 @@ template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
 template<typename I> auto mips_swr     = ALU::store_addr_right32<I>;
-template<typename I> auto mips_syscall = do_nothing<I>;
+template<typename I> auto mips_syscall = ALU::syscall<I>;
 template<typename I> auto mips_teq     = ALU::trap<I, ALU::eq<I>>;
 template<typename I> auto mips_teqi    = ALU::trap<I, ALU::eqi<I>>;
 template<typename I> auto mips_tge     = ALU::trap<I, ALU::ge<I>>;
@@ -692,7 +692,7 @@ MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
         return get_table_entry( isaMapMOVCI<I>, instr.ft);
@@ -700,7 +700,7 @@ MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
@@ -708,7 +708,7 @@ MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
@@ -716,7 +716,7 @@ MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {

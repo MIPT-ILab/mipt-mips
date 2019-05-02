@@ -25,6 +25,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CPPS
+    infra/print128.cpp
     infra/config/config.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
@@ -33,6 +34,7 @@ set(CPPS
     memory/hierarchied_memory.cpp
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
+    memory/argv_loader/argv_loader.cpp
     func_sim/func_sim.cpp
     func_sim/trap_types.cpp
     mips/mips_instr.cpp
@@ -67,6 +69,7 @@ set(TESTS_CPPS
     infra/ports/t/example_test.cpp
     kernel/t/unit_test.cpp
     kernel/mars/t/unit_test.cpp
+    memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
     memory/t/unit_test.cpp
@@ -89,7 +92,7 @@ add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc > ${RISCV_DIR}/riscv.opcode.gen.h
+    COMMAND python ${RISCV_DIR}/parse-opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse-opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
 )
 

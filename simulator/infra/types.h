@@ -39,18 +39,15 @@ using float64 = double;
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
 #if defined(__GNUC__) && defined(__SIZEOF_INT128__)
 
+#define USE_GNUC_INT128
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 
 using int128 = __int128;
 using uint128 = unsigned __int128;
 
-static inline std::ostream& operator<<(std::ostream& out, uint128 value)
-{
-    if ((out.flags() & std::ios::hex) != 0)
-        return out << narrow_cast<uint64>( value >> 64ULL) << narrow_cast<uint64>( value);
-    return out << "..." << narrow_cast<uint64>( value);
-}
+std::ostream& operator<<(std::ostream& out, uint128 value);
 
 #pragma GCC diagnostic pop
 

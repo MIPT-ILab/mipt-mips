@@ -7,27 +7,28 @@
 #define INSTRCACHE_H
 
 #include <infra/arena.h>
-#include <infra/types.h>
 #include <infra/replacement/cache_replacement.h>
+#include <infra/types.h>
+
+#include <sparsehash/dense_hash_map.h>
 
 #include <memory>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
-template <typename Key, typename Value, size_t CAPACITY>
+template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY = 0>
 class InstrCache
 {
     public:
-        InstrCache()
+        InstrCache() : pointers( CAPACITY)
         {
+            pointers.set_empty_key( INVALID_KEY);
             lru_module = create_cache_replacement( "LRU", CAPACITY);
             // Touch everything to initialize order
             for (size_t i = 0; i < CAPACITY; ++i)
                 lru_module->touch( i);
 
             keys.resize( CAPACITY);
-            pointers.reserve( CAPACITY);
             storage.allocate( CAPACITY);
         }
 
@@ -96,9 +97,9 @@ class InstrCache
         }
 
         std::vector<Key> keys{};
-        std::unordered_map<Key, size_t> pointers{};
+        google::dense_hash_map<Key, size_t> pointers{};
         Arena<Value> storage{};
-        std::unique_ptr<CacheReplacementInterface> lru_module;
+        std::unique_ptr<CacheReplacement> lru_module;
 };
 
 #endif // INSTRCACHE_H

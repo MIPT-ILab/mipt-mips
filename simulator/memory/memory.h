@@ -123,7 +123,9 @@ private:
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually
-class FuncMemory : public ReadableMemory, public WriteableMemory
+class ReadableAndWritableMemory : public ReadableMemory, public WriteableMemory { };
+
+class FuncMemory : public ReadableAndWritableMemory
 {
 public:
     static std::shared_ptr<FuncMemory>

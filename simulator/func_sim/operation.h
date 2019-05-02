@@ -39,7 +39,7 @@ enum class Imm : uint8
 {
     NO, SHIFT,
     LOGIC, ARITH, TRAP, ADDR,
-    JUMP
+    JUMP, JUMP_RELATIVE
 };
 
 template<typename T>
@@ -48,13 +48,14 @@ std::string print_immediate( Imm type, T value)
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:  oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
-    case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
-    case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
-    case Imm::ARITH: oss << ", "   << std::dec << narrow_cast<int16>(value); break;
-    case Imm::SHIFT: oss << ", "   << std::dec << value; break;
-    case Imm::NO:    break;
+    case Imm::ADDR:          oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
+    case Imm::LOGIC:         oss << ", 0x" << std::hex << value << std::dec; break;
+    case Imm::JUMP:          oss <<  " 0x" << std::hex << value << std::dec; break;
+    case Imm::JUMP_RELATIVE: oss <<    " " << std::dec << narrow_cast<int16>(value); break;
+    case Imm::TRAP:          oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
+    case Imm::ARITH:         oss << ", "   << std::dec << narrow_cast<int16>(value); break;
+    case Imm::SHIFT:         oss << ", "   << std::dec << value; break;
+    case Imm::NO:            break;
     }
     return oss.str();
 }
@@ -100,7 +101,6 @@ public:
     bool is_divmult() const { return operation == OUT_DIVMULT || get_accumulation_type() != 0; }
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
-    bool is_syscall() const { return operation == OUT_SYSCALL; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
     bool is_store() const { return operation == OUT_STORE; }
 

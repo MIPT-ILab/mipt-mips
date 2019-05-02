@@ -4,12 +4,48 @@
 * Copyright 2014-2019 MIPT-MIPS
 */
 
+#include <infra/macro.h>
+#include <infra/types.h>
+
+template<typename T>
+constexpr bool is_signed_division_overflow(T x, T y)
+{
+    if constexpr (std::is_same_v<T, unsign_t<T>>) {
+        (void)x; (void)y;
+        return false;
+    }
+    else {
+        return y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
+    }
+}
+
+template<typename T>
+auto mips_multiplication(T x, T y) {
+    using UT = unsign_t<T>;
+    using T2 = doubled_t<T>;
+    using UT2 = unsign_t<T2>;
+    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
+    // With Boost < 1.68.0, result of narrowing cast of uint128 is undefined
+    // if the value does not fit to the built-in target type (e.g. uint64)
+    // To workaround that, we mask the value with full-ones mask first.
+    auto lo = narrow_cast<UT>( value & all_ones<UT>());
+    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
+    return std::make_pair( lo, hi);
+}
+
+template<typename T>
+auto mips_division(T x, T y) {
+    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    if ( y == 0 || is_signed_division_overflow(x, y))
+        return ReturnType{};
+
+    return ReturnType(x / y, x % y);
+}
 
 template<typename T>
 auto riscv_multiplication_low(T x, T y) {
     using UT = unsign_t<T>;
-    auto lo = narrow_cast<UT>( x * y & all_ones<UT>());
-    return lo;
+    return narrow_cast<UT>( x * y & all_ones<UT>());
 }
 
 // For RISCV-128bit result of multiplication is 256 bit type,
@@ -66,14 +102,12 @@ auto riscv_multiplication_high_su(T x, T y) {
     auto hi_abs = riscv_multiplication_high_uu( UT{ x_abs}, UT{ y});
     auto lo_abs = riscv_multiplication_low( UT{ x_abs}, UT{ y});
     auto result = UT{ hi_abs}; 
-    if( x_is_neg)
-        result = ( lo_abs == 0)
+    if ( x_is_neg)
+        return ( lo_abs == 0)
                  ? narrow_cast<UT>( ~result + 1)
                  : narrow_cast<UT>( ~result);
-    else
-        result = narrow_cast<UT>( hi_abs);
-        
-    return result;
+
+    return narrow_cast<UT>( hi_abs);
 }
 
 template<typename T>
@@ -82,9 +116,8 @@ auto riscv_division(T x, T y) {
     if ( y == 0)
         return narrow_cast<UT>( all_ones<UT>());
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return narrow_cast<UT>( UT{1} << ( bitwidth<T> - 1));
+    if ( is_signed_division_overflow(x, y))
+        return narrow_cast<UT>( msb_set<UT>());
 
     return narrow_cast<UT>( x / y);
 }
@@ -95,9 +128,8 @@ auto riscv_remainder(T x, T y) {
     if ( y == 0)
         return narrow_cast<UT>( x);
 
-    if constexpr( !std::is_same_v<T, unsign_t<T>>)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>()))
-            return narrow_cast<UT>( 0);
+    if ( is_signed_division_overflow(x, y))
+        return narrow_cast<UT>( 0);
 
     return narrow_cast<UT>( x % y);
 }

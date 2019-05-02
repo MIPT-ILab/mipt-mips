@@ -7,42 +7,14 @@
 #ifndef ALU_H
 #define ALU_H
 
-#include "trap_types.h"
 #include "multiplication.h"
+#include "trap_types.h"
 
 #include <infra/macro.h>
-
 #include <tuple>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
-
-template<typename T>
-auto mips_multiplication(T x, T y) {
-    using UT = unsign_t<T>;
-    using T2 = doubled_t<T>;
-    using UT2 = unsign_t<T2>;
-    auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
-    // With Boost < 1.68.0, result of narrowing cast of uint128 is undefined
-    // if the value does not fit to the built-in target type (e.g. uint64)
-    // To workaround that, we mask the value with full-ones mask first.
-    auto lo = narrow_cast<UT>( value & all_ones<UT>());
-    auto hi = narrow_cast<UT>( value >> bitwidth<T>);
-    return std::make_pair( lo, hi);
-}
-
-template<typename T>
-auto mips_division(T x, T y) {
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
-    if ( y == 0)
-        return ReturnType{};
-
-    if constexpr( !std::is_same_v<T, unsign_t<T>>) // signed type NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-        if ( y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>())) // x86 has an exception here
-            return ReturnType{};
-
-    return ReturnType(x / y, x % y);
-}
 
 struct ALU
 {
@@ -73,7 +45,7 @@ struct ALU
     void load_addr_aligned( I* instr) {
         load_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_LOAD;
     }
 
     template<typename I> static
@@ -111,7 +83,7 @@ struct ALU
     void store_addr_aligned( I* instr) {
         store_addr( instr);
         if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_STORE;
     }
 
     template<typename I> static
@@ -182,9 +154,11 @@ struct ALU
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
-        subtraction<I, T>( instr);
-//      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
+        auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
     }
 
     // RISCV mul/div
@@ -196,8 +170,19 @@ struct ALU
     template<typename I, typename T> static void riscv_rem( I* instr) { instr->v_dst = riscv_remainder <T>(instr->v_src1, instr->v_src2); }
 
     // MIPS mul/div
-    template<typename I, typename T> static void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void division( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_division<T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void multiplication( I* instr)
+    {
+        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
+
+    template<typename I, typename T> static void division( I* instr)
+    {
+        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
 
     // Shifts
     template<typename I, typename T> static void sll( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) << shamt_imm( instr)); }
@@ -259,7 +244,7 @@ struct ALU
     template<typename I> static
     void jr( I* instr) {
         if (instr->v_src1 % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_FETCH;
         jump( instr, align_up<2>(instr->v_src1));
     }
 
@@ -284,6 +269,7 @@ struct ALU
 
     // Traps
     template<typename I> static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+    template<typename I> static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
     template<typename I> static void halt( I* instr)   { instr->trap = Trap::HALT; }
     template<typename I, Predicate<I> p> static void trap( I* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
     template<typename I> static void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }

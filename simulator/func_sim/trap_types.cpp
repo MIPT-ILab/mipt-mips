@@ -22,14 +22,13 @@ uint8 Trap::to_gdb_format()
         { Trap::SYSCALL,             GDB_SIGNAL_0    },
         { Trap::INTEGER_OVERFLOW,    GDB_SIGNAL_0    },
         { Trap::UNSUPPORTED_SYSCALL, GDB_SIGNAL_SYS  },  // Not implemented in gdb_interface
-        { Trap::UNALIGNED_ADDRESS,   GDB_SIGNAL_BUS  },
+        { Trap::UNALIGNED_LOAD,      GDB_SIGNAL_BUS  },
+        { Trap::UNALIGNED_STORE,     GDB_SIGNAL_BUS  },
+        { Trap::UNALIGNED_FETCH,     GDB_SIGNAL_BUS  },
         { Trap::UNKNOWN_INSTRUCTION, GDB_SIGNAL_ILL  },  // Not implemented in gdb_interface
     };
 
-    auto it = to_gdb_conv.find( value);
-    if ( it == to_gdb_conv.end())
-        return GDB_SIGNAL_0;
-    return it->second;
+    return to_gdb_conv.at( value);
 }
 
 uint8 Trap::to_riscv_format()
@@ -43,14 +42,13 @@ uint8 Trap::to_riscv_format()
         { Trap::SYSCALL,             CAUSE_USER_ECALL          },
         { Trap::INTEGER_OVERFLOW,    0                         },
         { Trap::UNSUPPORTED_SYSCALL, 0                         },
-        { Trap::UNALIGNED_ADDRESS,   CAUSE_MISALIGNED_LOAD     }, // _STORE, _FETCH
+        { Trap::UNALIGNED_LOAD,      CAUSE_MISALIGNED_LOAD     },
+        { Trap::UNALIGNED_STORE,     CAUSE_MISALIGNED_STORE    },
+        { Trap::UNALIGNED_FETCH,     CAUSE_MISALIGNED_FETCH    },
         { Trap::UNKNOWN_INSTRUCTION, CAUSE_ILLEGAL_INSTRUCTION },
     };
 
-    auto it = to_riscv_conv.find( value);
-    if ( it == to_riscv_conv.end())
-        return 0;
-    return it->second;
+    return to_riscv_conv.at( value);
 }
 
 void Trap::set_from_gdb_format(uint8 id)
@@ -60,7 +58,7 @@ void Trap::set_from_gdb_format(uint8 id)
         { GDB_SIGNAL_0,    Trap::NO_TRAP             },
         { GDB_SIGNAL_TRAP, Trap::BREAKPOINT          },
         { GDB_SIGNAL_SYS,  Trap::UNSUPPORTED_SYSCALL },  // Not implemented in gdb_interface
-        { GDB_SIGNAL_BUS,  Trap::UNALIGNED_ADDRESS   },
+        { GDB_SIGNAL_BUS,  Trap::UNALIGNED_LOAD      },
         { GDB_SIGNAL_ILL,  Trap::UNKNOWN_INSTRUCTION },  // Not implemented in gdb_interface
     };
 
@@ -74,13 +72,13 @@ void Trap::set_from_riscv_format(uint8 id)
 {
     static const std::unordered_map<uint8, TrapType> from_riscv_conv =
     {
-        { CAUSE_MISALIGNED_FETCH,    Trap::UNALIGNED_ADDRESS   },
+        { CAUSE_MISALIGNED_FETCH,    Trap::UNALIGNED_FETCH     },
         { CAUSE_FETCH_ACCESS,        Trap::NO_TRAP             },
         { CAUSE_ILLEGAL_INSTRUCTION, Trap::UNKNOWN_INSTRUCTION },
         { CAUSE_BREAKPOINT,          Trap::BREAKPOINT          },
-        { CAUSE_MISALIGNED_LOAD,     Trap::UNALIGNED_ADDRESS   },
+        { CAUSE_MISALIGNED_LOAD,     Trap::UNALIGNED_LOAD      },
         { CAUSE_LOAD_ACCESS,         Trap::NO_TRAP             },
-        { CAUSE_MISALIGNED_STORE,    Trap::UNALIGNED_ADDRESS   },
+        { CAUSE_MISALIGNED_STORE,    Trap::UNALIGNED_STORE     },
         { CAUSE_STORE_ACCESS,        Trap::NO_TRAP             },
         { CAUSE_USER_ECALL,          Trap::SYSCALL             },
         { CAUSE_SUPERVISOR_ECALL,    Trap::SYSCALL             },
@@ -91,8 +89,5 @@ void Trap::set_from_riscv_format(uint8 id)
         { CAUSE_STORE_PAGE_FAULT,    Trap::NO_TRAP             },
     };
 
-    auto it = from_riscv_conv.find( id);
-    if ( it == from_riscv_conv.end())
-        value = Trap::NO_TRAP;
-    value = it->second;
+    value = from_riscv_conv.at( id);
 }

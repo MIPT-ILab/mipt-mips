@@ -3,9 +3,10 @@
  * Copyright (C) MIPT-MIPS 2017-2019
  */
 
-#include <catch.hpp>
 #include "../mips.h"
 #include "../mips_instr.h"
+
+#include <catch.hpp>
 #include <memory/memory.h>
 
 class MIPS32Instr : public BaseMIPSInstr<uint32>
@@ -73,7 +74,7 @@ TEST_CASE("Sequence id print")
     CHECK( oss.str() == "{50}	sdr $s1, 0xfb2e($t1)	 [ ]" );
 }
 
-TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
+TEST_CASE ( "MIPS32_instr: disasm CP1 instructions a-c")
 {
     CHECK(MIPS32Instr(0x462008c5).get_disasm() == "abs.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008c5).get_disasm() == "abs.s $f3, $f1");
@@ -135,6 +136,10 @@ TEST_CASE ( "MIPS32_instr: disasm CP1 instructions")
     CHECK(MIPS32Instr(0x468008e0).get_disasm() == "cvt.s.w $f3, $f1");
     CHECK(MIPS32Instr(0x462008e4).get_disasm() == "cvt.w.d $f3, $f1");
     CHECK(MIPS32Instr(0x460008e4).get_disasm() == "cvt.w.s $f3, $f1");
+}
+
+TEST_CASE ( "MIPS32_instr: disasm CP1 instructions d-t")
+{
     CHECK(MIPS32Instr(0x462208c3).get_disasm() == "div.d $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x460208c3).get_disasm() == "div.s $f3, $f1, $f2");
     CHECK(MIPS32Instr(0x44290800).get_disasm() == "dmfc1 $t1, $f1");
@@ -1628,7 +1633,7 @@ TEST_CASE( "MIPS32_instr: lh unaligned address trap")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_mem_addr() == 1);
-    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_LOAD);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1663,7 +1668,7 @@ TEST_CASE( "MIPS32_instr: lhu unaligned address trap")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_mem_addr() == 1);
-    CHECK( instr.trap_type() == Trap::UNALIGNED_ADDRESS);
+    CHECK( instr.trap_type() == Trap::UNALIGNED_LOAD);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3098,17 +3103,16 @@ TEST_CASE( "MIPS32_instr: sub 0 from 1")
     instr.execute();
     CHECK(instr.get_v_dst() == 1);
 }
-    
-/*  Overflow exception is not implemented (#130)
+
 TEST_CASE( "MIPS32_instr: sub overflow")
 {
-    instr.get_v_dst( 0xfee1dead);
+    MIPS32Instr instr( "sub");
     instr.set_v_src( 0x80000000, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 0xfee1dead);
-    CHECK(instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK(instr.get_v_dst() == NO_VAL32);
+    CHECK(instr.trap_type() == Trap::INTEGER_OVERFLOW);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: subu 1 from 1")
@@ -3146,8 +3150,7 @@ TEST_CASE( "MIPS32_instr: syscall")
     
     MIPS32Instr instr( "syscall");
     instr.execute();
-    CHECK( instr.trap_type() == Trap::NO_TRAP);
-    CHECK( instr.is_syscall());
+    CHECK( instr.trap_type() == Trap::SYSCALL);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4282,17 +4285,16 @@ TEST_CASE( "MIPS64_instr: dsub 0 from 1")
     instr.execute();
     CHECK(instr.get_v_dst() == 1);
 }
-    
-/*  Overflow exception is not implemented (#130)
+
 TEST_CASE( "MIPS64_instr: dsub overflow")
 {
-    instr.get_v_dst( 0xfee1dead);
+    MIPS64Instr instr( "dsub");
     instr.set_v_src( 0x8000000000000000, 0);
     instr.set_v_src( 1, 1);
     instr.execute();
-    CHECK(instr.get_v_dst() == 0xfee1dead);
-    CHECK(instr.trap_type() != Trap::NO_TRAP);
-}*/
+    CHECK(instr.get_v_dst() == NO_VAL32);
+    CHECK(instr.trap_type() == Trap::INTEGER_OVERFLOW);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS64_instr: dsubu 1 from 1")

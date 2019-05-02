@@ -9,6 +9,7 @@
 #include <infra/argv.h>
 #include <infra/config/config.h>
 #include <kernel/kernel.h>
+#include <memory/argv_loader/argv_loader.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
@@ -39,11 +40,30 @@ catch (...) {
     return false;
 }
 
-bool GDBSim::create_inferior( Addr start_addr) const
+bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const try
 {
+    Addr sp = cpu->read_gdb_register( 29);
+
+    if ( cpu->sizeof_register() == bytewidth<uint32>)
+        sp += ArgvLoader<uint32, Endian::native>( argv, envp).load_to( memory, sp);
+
+    if ( cpu->sizeof_register() == bytewidth<uint64>)
+        sp += ArgvLoader<uint64, Endian::native>( argv, envp).load_to( memory, sp);
+
+    cpu->write_gdb_register( 29, sp);
+    std::cout << "MIPT-MIPS: arguments loaded" << std::endl;
+
     cpu->set_pc( start_addr);
     std::cout << "MIPT-MIPS: prepared to run" << std::endl;
     return true;
+}
+catch (const std::exception& e) {
+    std::cerr << "MIPT-MIPS: failed to load arguments:\n\t" << e.what() << std::endl;
+    return false;
+}
+catch (...) {
+    std::cerr << "MIPT-MIPS: failed to load arguments due to unknown exception" << std::endl;
+    return false;
 }
 
 void GDBSim::shutdown()
