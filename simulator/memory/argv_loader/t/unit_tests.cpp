@@ -12,15 +12,15 @@ TEST_CASE( "ArgvLoader: load of argc and argv[]")
 {
     const char* argv[4] = { "a", "b", "c"};
     auto mem = FuncMemory::create_plain_memory( 20);
-    CHECK( ArgvLoader<int, Endian::little>( argv).load_to( mem, 0) == 42);
-    CHECK( ( mem->read<int,    Endian::little>( 0)) == 3);
-    CHECK( ( mem->read<uint64, Endian::little>( 4))  == 36);
-    CHECK( ( mem->read<uint64, Endian::little>( 12)) == 38);
-    CHECK( ( mem->read<uint64, Endian::little>( 20)) == 40);
-    CHECK( ( mem->read<uint64, Endian::little>( 28)) == 0);
-    CHECK( ( mem->read<uint16, Endian::little>( 36)) == 'a');
-    CHECK( ( mem->read<uint16, Endian::little>( 38)) == 'b');
-    CHECK( ( mem->read<uint16, Endian::little>( 40)) == 'c');
+    CHECK( ArgvLoader<uint64,  Endian::little>( argv).load_to( mem, 0) == 46);
+    CHECK( ( mem->read<uint64, Endian::little>( 0)) == 3);
+    CHECK( ( mem->read<uint64, Endian::little>( 8))  == 40);
+    CHECK( ( mem->read<uint64, Endian::little>( 16)) == 42);
+    CHECK( ( mem->read<uint64, Endian::little>( 24)) == 44);
+    CHECK( ( mem->read<uint64, Endian::little>( 32)) == 0);
+    CHECK( ( mem->read<uint16, Endian::little>( 40)) == 'a');
+    CHECK( ( mem->read<uint16, Endian::little>( 42)) == 'b');
+    CHECK( ( mem->read<uint16, Endian::little>( 44)) == 'c');
 }
 
 TEST_CASE( "ArgvLoader: load of argc, argv[] and envp[]")
@@ -28,19 +28,19 @@ TEST_CASE( "ArgvLoader: load of argc, argv[] and envp[]")
     const char* argv[4] = { "a", "b", "c"};
     const char* envp[3] = { "d", "e"};
     auto mem = FuncMemory::create_plain_memory( 20);
-    CHECK( ArgvLoader<int, Endian::little>( argv, envp).load_to( mem, 0) == 70);
-    CHECK( ( mem->read<int,    Endian::little>( 0)) == 3);
-    CHECK( ( mem->read<uint64, Endian::little>( 4))  == 60);
-    CHECK( ( mem->read<uint64, Endian::little>( 12)) == 62);
-    CHECK( ( mem->read<uint64, Endian::little>( 20)) == 64);
-    CHECK( ( mem->read<uint64, Endian::little>( 28)) == 0);
-    CHECK( ( mem->read<uint64, Endian::little>( 36)) == 66);
-    CHECK( ( mem->read<uint64, Endian::little>( 44)) == 68);
-    CHECK( ( mem->read<uint64, Endian::little>( 52)) == 0);
-    CHECK( ( mem->read<uint16, Endian::little>( 60)) == 'a');
-    CHECK( ( mem->read<uint16, Endian::little>( 62)) == 'b');
-    CHECK( ( mem->read<uint16, Endian::little>( 64)) == 'c');
-    CHECK( ( mem->read<uint16, Endian::little>( 66)) == 'd');
-    CHECK( ( mem->read<uint16, Endian::little>( 68)) == 'e');
-    CHECK( ( mem->read<uint16, Endian::little>( 70)) == 0);
+    CHECK( ArgvLoader<uint64,  Endian::little>( argv, envp).load_to( mem, 0) == 74);
+    CHECK( ( mem->read<uint64, Endian::little>( 0)) == 3);
+    CHECK( ( mem->read<uint64, Endian::little>( 8))  == 64);
+    CHECK( ( mem->read<uint64, Endian::little>( 16)) == 66);
+    CHECK( ( mem->read<uint64, Endian::little>( 24)) == 68);
+    CHECK( ( mem->read<uint64, Endian::little>( 32)) == 0);
+    CHECK( ( mem->read<uint64, Endian::little>( 40)) == 70);
+    CHECK( ( mem->read<uint64, Endian::little>( 48)) == 72);
+    CHECK( ( mem->read<uint64, Endian::little>( 56)) == 0);
+    CHECK( ( mem->read<uint16, Endian::little>( 64)) == 'a');
+    CHECK( ( mem->read<uint16, Endian::little>( 66)) == 'b');
+    CHECK( ( mem->read<uint16, Endian::little>( 68)) == 'c');
+    CHECK( ( mem->read<uint16, Endian::little>( 70)) == 'd');
+    CHECK( ( mem->read<uint16, Endian::little>( 72)) == 'e');
+    CHECK( ( mem->read<uint16, Endian::little>( 74)) == 0);
 }
