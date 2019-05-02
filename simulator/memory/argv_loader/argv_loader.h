@@ -26,14 +26,12 @@ private:
 
     void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        Addr null = 0;
-        mem->write<Addr, Endian::little>( null, addr);
+        mem->write<Addr, Endian::little>( 0, addr);
     }
 
     void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        char null = 0;
-        mem->write<char, Endian::little>( null, addr);
+        mem->write<char, Endian::little>( 0, addr);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);

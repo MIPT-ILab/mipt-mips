@@ -37,9 +37,7 @@ size_t ArgvLoader::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     load_argv_contents( mem, addr);
 
     if ( envp)
-    {
         load_envp_contents( mem, addr);
-    }
 
     return offset;
 }
