@@ -18,12 +18,6 @@ public:
     explicit ArgvLoader( const char* const* argv, const char* const* envp = nullptr);
     ~ArgvLoader();
 
-    // We delete everything explicitly
-    ArgvLoader( const ArgvLoader&) = delete;
-    ArgvLoader( ArgvLoader&&) = delete;
-    ArgvLoader& operator=( const ArgvLoader&) = delete;
-    ArgvLoader& operator=( ArgvLoader&&) = delete;
-
     size_t load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 private:
     const int argc;
