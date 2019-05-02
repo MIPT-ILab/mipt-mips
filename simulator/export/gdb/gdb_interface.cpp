@@ -84,9 +84,9 @@ SIM_RC sim_load( SIM_DESC sd, const char * prog_name, struct bfd * /* abfd */, i
     return get_sim( sd).load( prog_name) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
-SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, const char *const *argv, const char *const *envp )
+SIM_RC sim_create_inferior( SIM_DESC sd, struct bfd * abfd, char *const *argv, char *const *env)
 {
-    return get_sim( sd).create_inferior( bfd_get_start_address( abfd), argv, envp) ? SIM_RC_OK : SIM_RC_FAIL;
+    return get_sim( sd).create_inferior( bfd_get_start_address( abfd), argv, env) ? SIM_RC_OK : SIM_RC_FAIL;
 }
 
 int sim_read( SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)

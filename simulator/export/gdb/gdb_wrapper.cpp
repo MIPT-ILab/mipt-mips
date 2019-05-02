@@ -42,7 +42,9 @@ catch (...) {
 
 bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const try
 {
-    ArgvLoader( argv, envp).load_to( memory);
+    Addr sp = cpu->read_gdb_register( 29);
+    sp += ArgvLoader( argv, envp).load_to( memory, sp);
+    cpu->write_gdb_register( 29, sp);
     std::cout << "MIPT-MIPS: arguments loaded" << std::endl;
 
     cpu->set_pc( start_addr);
