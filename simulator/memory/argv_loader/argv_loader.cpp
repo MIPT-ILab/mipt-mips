@@ -19,15 +19,15 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
 
 size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( &argc), bytewidth<int>);
+    offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( &argc), bytewidth<int>);
 
-    offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * bytewidth<char*>);
+    offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * bytewidth<Addr>);
 
     if ( envp)
     {
         while ( envp[ envp_offset])
         {
-            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), bytewidth<char*>);
+            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), bytewidth<Addr>);
         }
 
         offset += place_nullptr( mem, addr + offset);
@@ -46,13 +46,11 @@ size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr ad
 void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int content_offset = 0; content_offset < argc; content_offset++)
-        offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]) + 1);
+        offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]) + 1);
 }
 
 void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int content_offset = 0; envp[content_offset] != nullptr; content_offset++)
-        offset += mem -> memcpy_host_to_guest( addr + offset, byte_cast( envp[content_offset]), strlen( envp[content_offset]) + 1);
+        offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( envp[content_offset]), strlen( envp[content_offset]) + 1);
 }
-
-ArgvLoader::~ArgvLoader() = default;

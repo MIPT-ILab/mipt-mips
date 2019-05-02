@@ -16,7 +16,6 @@ class ArgvLoader
 {
 public:
     explicit ArgvLoader( const char* const* argv, const char* const* envp = nullptr);
-    ~ArgvLoader();
 
     size_t load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 private:
@@ -29,7 +28,7 @@ private:
     size_t place_nullptr( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
     {
         const char* null = nullptr;
-        return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), bytewidth<char*>);
+        return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), bytewidth<Addr>);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
