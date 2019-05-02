@@ -75,6 +75,7 @@ set(TESTS_CPPS
     memory/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
     mips/t/mips32_test.cpp
+    mips/t/mips32_cp1_test.cpp
     mips/t/mips32_divmult_test.cpp
     mips/t/mips32_branch_test.cpp
     mips/t/mips32_memory_test.cpp
