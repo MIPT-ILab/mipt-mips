@@ -18,7 +18,7 @@ class ArgvLoader
 public:
     explicit ArgvLoader( const char* const* argv, const char* const* envp = nullptr);
 
-    size_t load_to( const std::shared_ptr<FuncMemory>& mem, T addr = 0);
+    size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr = 0);
 private:
     const int argc;
     const char* const* argv;
@@ -27,18 +27,18 @@ private:
 
     static const constexpr size_t GUEST_WORD_SIZE = bytewidth<T>;
 
-    void place_nullptr( const std::shared_ptr<FuncMemory>& mem, T addr)
+    void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<T, endian>( 0, addr);
+        mem->write<Addr, endian>( 0, addr);
     }
 
-    void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, T addr)
+    void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
         mem->write<char, endian>( 0, addr);
     }
 
-    void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, T addr);
-    void load_envp_contents( const std::shared_ptr<FuncMemory>& mem, T addr);
+    void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
+    void load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);
 };
 
 #endif // ARGV_LOADER_H
