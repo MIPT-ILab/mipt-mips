@@ -28,14 +28,14 @@ TEST_CASE( "Trap: check to GDB/RISCV formats conversions ")
 
 TEST_CASE( "Trap: check RISC-V initialization")
 {
-    Trap trap;
+    Trap trap( Trap::NO_TRAP);
     trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
     CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
 }
 
 TEST_CASE( "Trap: check RISC-V initialization")
 {
-    Trap trap;
+    Trap trap( Trap::NO_TRAP);
     trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
     CHECK( trap == Trap( Trap::Trap::BREAKPOINT));
 }
