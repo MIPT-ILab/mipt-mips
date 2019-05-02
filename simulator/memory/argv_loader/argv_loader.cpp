@@ -16,7 +16,7 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         , offset( 0)
 {}
 
-size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
+size_t ArgvLoader::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     mem->write<int, Endian::little>( argc, addr + offset);
     offset += bytewidth<int>;

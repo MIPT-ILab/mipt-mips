@@ -30,7 +30,7 @@ TEST_CASE( "ArgvLoader: load of argc, argv[] and envp[]")
     const char* envp[3] = { "d", "e"};
     auto argv_loader = ArgvLoader( argv, envp);
     auto mem = FuncMemory::create_plain_memory( 20);
-    CHECK( argv_loader.load_argv_to( mem, 0) == 70);
+    CHECK( argv_loader.load_to( mem, 0) == 70);
     CHECK( ( mem->read<int,    Endian::little>( 0)) == 3);
     CHECK( ( mem->read<uint64, Endian::little>( 4))  == 60);
     CHECK( ( mem->read<uint64, Endian::little>( 12)) == 62);
