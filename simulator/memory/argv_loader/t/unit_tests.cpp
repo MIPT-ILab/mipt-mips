@@ -5,6 +5,7 @@
  */
 
 #include "../argv_loader.h"
+
 #include <catch.hpp>
 
 TEST_CASE( "ArgvLoader: load of argc and argv[]")
