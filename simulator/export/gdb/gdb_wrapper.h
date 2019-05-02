@@ -33,7 +33,7 @@ public:
     bool load( const std::string& filename) const;
     void shutdown();
     void resume( uint64 step);
-    bool create_inferior( Addr start_addr) const;
+    bool create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const;
 
     // Not implemented yet
     int  stop() { return 0; }
