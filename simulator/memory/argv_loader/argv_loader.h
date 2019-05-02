@@ -23,12 +23,11 @@ private:
     const char* const* argv;
     const char* const* envp;
     Addr offset;
-    Addr envp_offset;
 
-    size_t place_nullptr( const std::shared_ptr<FuncMemory>& plain_mem, Addr addr)
+    void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        const char* null = nullptr;
-        return plain_mem -> memcpy_host_to_guest( addr, byte_cast( &null), bytewidth<Addr>);
+        Addr null = 0;
+        mem->write<Addr, Endian::little>( null, addr);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);

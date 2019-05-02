@@ -14,23 +14,29 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         , argv( argv)
         , envp( envp)
         , offset( 0)
-        , envp_offset( 0)
 {}
 
 size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( &argc), bytewidth<int>);
+    mem->write<int, Endian::little>( argc, addr + offset);
+    offset += bytewidth<int>;
 
-    offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( argv), ( argc + 1) * bytewidth<Addr>);
+    offset += argc * bytewidth<Addr>; //reserved space for argv[]
+
+    place_nullptr( mem, addr + offset);
+    offset += bytewidth<Addr>;
 
     if ( envp)
     {
-        while ( envp[ envp_offset])
+        int contents_offset = 0;
+
+        while ( envp[ contents_offset++])
         {
-            offset += mem->memcpy_host_to_guest(addr + offset, byte_cast( &( envp[ envp_offset++])), bytewidth<Addr>);
+            offset += bytewidth<Addr>;
         }
 
-        offset += place_nullptr( mem, addr + offset);
+        place_nullptr( mem, addr + offset);
+        offset += bytewidth<Addr>;
     }
 
     load_argv_contents( mem, addr);
@@ -45,12 +51,24 @@ size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr ad
 
 void ArgvLoader::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    for ( int content_offset = 0; content_offset < argc; content_offset++)
-        offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( argv[content_offset]), strlen( argv[content_offset]) + 1);
+    for ( int contents_offset = 0; contents_offset < argc; contents_offset++)
+    {
+        mem->write<Addr, Endian::little>( offset, addr + bytewidth<int> + contents_offset * bytewidth<Addr>);
+
+        std::string content( argv[contents_offset]);
+        mem->write_string( content,  addr + offset);
+        offset += content.size();
+    }
 }
 
 void ArgvLoader::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    for ( int content_offset = 0; envp[content_offset] != nullptr; content_offset++)
-        offset += mem->memcpy_host_to_guest( addr + offset, byte_cast( envp[content_offset]), strlen( envp[content_offset]) + 1);
+    for ( int contents_offset = 0; envp[contents_offset] != nullptr; contents_offset++)
+    {
+        mem->write<Addr, Endian::little>( offset, addr + bytewidth<int> + ( argc + 1 + contents_offset) * bytewidth<Addr>);
+
+        std::string content( envp[contents_offset]);
+        mem->write_string( content,  addr + offset);
+        offset += content.size();
+    }
 }
