@@ -33,7 +33,7 @@ TEST_CASE( "Trap: check RISC-V initialization")
     CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
 }
 
-TEST_CASE( "Trap: check RISC-V initialization")
+TEST_CASE( "Trap: check GDB initialization")
 {
     Trap trap( Trap::NO_TRAP);
     trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
