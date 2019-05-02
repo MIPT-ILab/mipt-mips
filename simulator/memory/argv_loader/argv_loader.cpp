@@ -14,13 +14,7 @@ ArgvLoader::ArgvLoader( const char* const* argv, const char* const* envp)
         , envp( envp)
         , offset( 0)
         , envp_offset( 0)
-{
-    if ( !argc)
-        throw InvalidArgs( "argc == 0");
-
-    if ( !argv)
-        throw InvalidArgs( "argv == nullptr");
-}
+{}
 
 size_t ArgvLoader::load_argv_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
