@@ -28,12 +28,7 @@ size_t ArgvLoader::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 
     if ( envp)
     {
-        int contents_offset = 0;
-
-        while ( envp[ contents_offset++])
-        {
-            offset += bytewidth<Addr>;
-        }
+        offset += count_argc( envp) * bytewidth<Addr>;
 
         place_nullptr( mem, addr + offset);
         offset += bytewidth<Addr>;
