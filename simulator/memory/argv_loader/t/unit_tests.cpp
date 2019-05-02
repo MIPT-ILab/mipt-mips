@@ -7,17 +7,6 @@
 #include <catch.hpp>
 #include "../argv_loader.h"
 
-TEST_CASE( "ArgvLoader: argc = 0")
-{
-    const char* argv[1] = {nullptr};
-    CHECK_THROWS_AS( ArgvLoader( argv), InvalidArgs);
-}
-
-TEST_CASE( "ArgvLoader: argv = nullptr")
-{
-    CHECK_THROWS_AS( ArgvLoader( nullptr), InvalidArgs);
-}
-
 TEST_CASE( "ArgvLoader: argv[2] = nullptr while argc >= 3")
 {
     const char* argv[4] = { "a", "b", "c"};
