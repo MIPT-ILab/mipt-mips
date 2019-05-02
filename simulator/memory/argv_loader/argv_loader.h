@@ -12,7 +12,7 @@
 #include <infra/types.h>
 #include <memory/memory.h>
 
-template <Endian endian>
+template <typename T, Endian endian>
 class ArgvLoader
 {
 public:
