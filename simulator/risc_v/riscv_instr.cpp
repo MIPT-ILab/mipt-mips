@@ -380,7 +380,7 @@ RISCVInstr<T>::RISCVInstr( std::string_view name, uint32 immediate, Addr PC)
 template<typename T>
 void RISCVInstr<T>::init_target()
 {
-    if ( this->is_branch())
+    if (this->is_common_branch())
         this->target = this->PC + sign_extension<12>( narrow_cast<Addr>( this->v_imm));
     else if ( this->is_direct_jump())
         this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));

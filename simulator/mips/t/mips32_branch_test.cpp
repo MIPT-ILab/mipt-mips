@@ -19,7 +19,7 @@ TEST_CASE( "MIPS32_instr: bgez 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -69,7 +69,7 @@ TEST_CASE( "MIPS32_instr: bgezal 0, 1 instruction ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -123,7 +123,7 @@ TEST_CASE( "MIPS32_instr: bgezall 0, 1 instruction ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -176,7 +176,7 @@ TEST_CASE( "MIPS32_instr: bgezl 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -225,7 +225,7 @@ TEST_CASE( "MIPS32_instr: bgtz 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK (instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -274,7 +274,7 @@ TEST_CASE( "MIPS32_instr: blez 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -323,7 +323,7 @@ TEST_CASE( "MIPS32_instr: bltz 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -373,7 +373,7 @@ TEST_CASE( "MIPS32_instr: bltzal 0, 1 instruction ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 4);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -426,7 +426,7 @@ TEST_CASE( "MIPS32_instr: bltzl 0, 1 instruction ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -476,7 +476,7 @@ TEST_CASE( "MIPS32_instr: bltzall 0, 1 instruction ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 4);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -530,7 +530,7 @@ TEST_CASE( "MIPS32_instr: beq two zeroes, one instr ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -585,7 +585,7 @@ TEST_CASE( "MIPS32_instr: bne two zeroes, 1024 instr ahead")
     // Not taken
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
 
-    CHECK( instr.is_branch() );
+    CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -608,11 +608,6 @@ TEST_CASE( "MIPS32_instr: bne -1 and 1, 1024 instr ahead")
     instr.set_v_src( 1, 1);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
-    
-    CHECK( instr.is_branch() );
-    CHECK( !instr.is_direct_jump() );
-    CHECK( !instr.is_indirect_jump() );
-    CHECK( !instr.is_likely_branch() );
 }
 
 TEST_CASE( "MIPS32_instr: bnel -4 and 1, 1024 instr ahead")
@@ -624,7 +619,7 @@ TEST_CASE( "MIPS32_instr: bnel -4 and 1, 1024 instr ahead")
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
 
     CHECK( instr.is_likely_branch() );
-    CHECK( !instr.is_branch() );
+    CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
 }
@@ -652,7 +647,7 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     CHECK( instr.get_new_PC() == 0xfff * 4);
     CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 
-    CHECK( !instr.is_branch() );
+    CHECK( !instr.is_common_branch() );
     CHECK( instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -669,7 +664,7 @@ TEST_CASE( "MIPS32_instr: jalr to 1024th byte")
     CHECK( instr.get_new_PC() == 1024);
     CHECK( instr.get_v_dst() == instr.get_PC() + 8);
 
-    CHECK( !instr.is_branch() );
+    CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -682,11 +677,6 @@ TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
     CHECK( instr.get_v_dst() == instr.get_PC() + 8);
-
-    CHECK( !instr.is_branch() );
-    CHECK( !instr.is_direct_jump() );
-    CHECK( instr.is_indirect_jump() );
-    CHECK( !instr.is_likely_branch() );
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -699,7 +689,7 @@ TEST_CASE( "MIPS32_instr: jr to 0xfffffff4-th byte")
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfffffff4);
 
-    CHECK( !instr.is_branch() );
+    CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
     CHECK( instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );
@@ -711,11 +701,6 @@ TEST_CASE( "MIPS32_instr: jr to 2nd byte (round up to 4th)")
     instr.set_v_src( 2, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
-
-    CHECK( !instr.is_branch() );
-    CHECK( !instr.is_direct_jump() );
-    CHECK( instr.is_indirect_jump() );
-    CHECK( !instr.is_likely_branch() );
 }
 
 TEST_CASE( "MIPS32_instr: j to 4th instr")
@@ -727,7 +712,7 @@ TEST_CASE( "MIPS32_instr: j to 4th instr")
     instr.execute();
     CHECK( instr.get_new_PC() == 16);
 
-    CHECK( !instr.is_branch() );
+    CHECK( !instr.is_common_branch() );
     CHECK( instr.is_direct_jump() );
     CHECK( !instr.is_indirect_jump() );
     CHECK( !instr.is_likely_branch() );

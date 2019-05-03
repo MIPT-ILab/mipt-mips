@@ -52,7 +52,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
      
     bool is_misprediction = false;
 
-    if ( instr.is_branch() || instr.is_indirect_jump())
+    if ( instr.is_common_branch() || instr.is_indirect_jump())
     {
         num_branches++;
         is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
