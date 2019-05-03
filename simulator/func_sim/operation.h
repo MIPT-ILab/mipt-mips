@@ -86,6 +86,12 @@ public:
         return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
     }
 
+    bool is_misprediction( const BPInterface& bp_data) const
+    {
+	    return ( is_direct_jump() && ( !bp_data.is_taken || bp_data.target != get_decoded_target()))
+              || is_likely_branch();
+    }
+
     bool is_partial_load() const
     {
         return operation == OUT_PARTIAL_LOAD;

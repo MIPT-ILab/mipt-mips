@@ -99,12 +99,8 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
-    bool is_misprediction =
-        ( instr.is_direct_jump() && ( !instr.get_bp_data().is_taken || instr.get_bp_data().target != instr.get_decoded_target()))
-       || instr.is_likely_branch();
-
     /* handle misprediction */
-    if ( is_misprediction)
+    if ( instr.is_misprediction( instr.get_bp_data()))
     {
         // flushing fetch stage, instr fetch will appear at decode stage next clock,
         // so we send flush signal to decode
