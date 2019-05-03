@@ -359,8 +359,8 @@ static const Table<I> isaMapRI =
     // Branches
     {0x0,  { "bltz",  mips_bltz<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
     {0x1,  { "bgez",  mips_bgez<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
-    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
-    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     // Conditional traps
     {0x8,  { "tgei",  mips_tgei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     {0x9,  { "tgeiu", mips_tgeiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
@@ -371,8 +371,8 @@ static const Table<I> isaMapRI =
     // Linking branches
     {0x10, { "bltzal",  mips_bltzal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
     {0x11, { "bgezal",  mips_bgezal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
-    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
-    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
+    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
+    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
