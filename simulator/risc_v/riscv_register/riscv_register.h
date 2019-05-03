@@ -72,7 +72,7 @@ private:
 };
 
 constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }
-constexpr inline RISCVRegister RISCVRegister::return_address() noexcept { return RISCVRegister( RISCV_REG_rs); }
+constexpr inline RISCVRegister RISCVRegister::return_address() noexcept { return RISCVRegister( RISCV_REG_ra); }
 constexpr inline RISCVRegister RISCVRegister::mips_hi() noexcept { return RISCVRegister( MAX_VAL_RegNum); }
 constexpr inline RISCVRegister RISCVRegister::mips_lo() noexcept { return RISCVRegister( MAX_VAL_RegNum); }
 constexpr inline RISCVRegister RISCVRegister::cause() noexcept { return RISCVRegister( MAX_VAL_RegNum); }

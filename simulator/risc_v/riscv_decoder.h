@@ -18,7 +18,7 @@ enum class Reg : uint8
     RS1, RS2, RS2_COMPR, RD,
     RS1_3_BITS, RS2_3_BITS, RD_3_BITS,
     CSR, SEPC, MEPC,
-    ZERO, RA, SP
+    ZERO, SP
 };
 
 enum ImmediateType
@@ -280,7 +280,6 @@ struct RISCVInstrDecoder
     {
         switch ( type) {
         case Reg::ZERO:           return RISCVRegister::zero();
-        case Reg::RA:             return RISCVRegister::return_address();
         case Reg::SP:             return RISCVRegister::from_cpu_index( 2);
         case Reg::RS1:            return RISCVRegister::from_cpu_index( rs1);
         case Reg::RS2:            return RISCVRegister::from_cpu_index( rs2);
