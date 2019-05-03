@@ -48,9 +48,6 @@ class Decode : public Log
         std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
         std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
         std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
-
-        /* port for transmitting target for likely branches */
-        std::unique_ptr<WritePort<Target>> wp_target_likely = nullptr;
         
         Instr read_instr( Cycle cycle);
 
