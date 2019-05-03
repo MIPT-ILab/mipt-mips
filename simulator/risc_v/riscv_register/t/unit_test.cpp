@@ -97,3 +97,8 @@ TEST_CASE( "RISCV_registers: CSR by invalid name")
     auto reg = RISCVRegister::from_csr_name( "balalaika");
     CHECK( !reg.is_valid());
 }
+
+TEST_CASE( "RISCV_registers: GDB interface")
+{
+    CHECK( RISCVRegister::from_gdb_index( 2).dump() == "sp");
+}
