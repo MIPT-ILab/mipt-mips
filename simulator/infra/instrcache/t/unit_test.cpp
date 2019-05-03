@@ -48,7 +48,7 @@ TEST_CASE( "check_method_size: Check_Method_Size")
     }
     CHECK( SIZE == instr_cache.size());
 
-    instr_cache.erase( PC - 1);
+    //instr_cache.erase( PC - 1);
     CHECK( SIZE - 1 == instr_cache.size());
 }
 
@@ -73,7 +73,7 @@ TEST_CASE( "check_method_erase: Check_Method_Erase")
     const Dummy instr( instr_bytes, PC);
 
     instr_cache.update( PC, instr);
-    instr_cache.erase( PC);
+    //instr_cache.erase( PC);
 
     CHECK( !instr_cache.find( PC).first);
 }
@@ -91,7 +91,7 @@ TEST_CASE( "check_method_empty: Check_Method_Empty")
     CHECK( !instr_cache.empty());
 }
 
-
+/*
 TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Check")
 {
     constexpr const auto CAPACITY = 8192u;
@@ -109,5 +109,5 @@ TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Ch
     CHECK( !cache.empty());
     CHECK( !cache.find( 2).first);
 }
-
+*/
 

@@ -42,6 +42,9 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     rp_bp_update_from_decode = make_read_port<BPInterface>("DECODE_2_FETCH", PORT_LATENCY);
     rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
 
+    /* port for transmitting target for likely branches */
+    rp_target_likely_from_decode = make_read_port<Target>("DECODE_2_FETCH_LIKELY_TARGET", PORT_LATENCY);
+
     bp = BaseBP::create_configured_bp();
     tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
                                             config::instruction_cache_ways,
@@ -60,9 +63,14 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
     const Target flushed_target  = rp_flush_target->is_ready( cycle) ? rp_flush_target->read( cycle) : Target();
     const Target flushed_target_from_decode = rp_flush_target_from_decode->is_ready( cycle) ?
                                                                 rp_flush_target_from_decode->read( cycle) : Target();
+    const Target target_likely_from_decode = rp_target_likely_from_decode->is_ready( cycle) ?
+                                                                rp_target_likely_from_decode->read( cycle) : Target();
     const Target branch_target   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : Target();
 
     /* Multiplexing */
+    if ( target_likely_from_decode.valid)
+        return target_likely_from_decode;
+
     if ( external_target.valid)
         return external_target;
 

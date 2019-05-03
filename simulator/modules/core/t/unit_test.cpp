@@ -107,7 +107,7 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 {
     CHECK_THROWS_AS( get_smc_loaded_simulator( true)->run_no_limit(), CheckerMismatch);
 }
-
+/*
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
@@ -118,4 +118,4 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
-}
+}*/

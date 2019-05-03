@@ -399,10 +399,10 @@ static const Table<I> isaMapIJ =
     {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, { }, Dst::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
-    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
     // Doubleword unaligned loads
     {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
     {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
@@ -821,7 +821,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
 template<typename R>
 void BaseMIPSInstr<R>::init_target()
 {
-    if ( this->is_branch())
+    if ( this->is_branch() || this->is_likely_branch())
         this->target = this->PC + 4 + ( sign_extension<bitwidth<R>, Addr>( this->v_imm) << 2U);
     else if ( this->is_direct_jump())
         this->target = ( this->PC & 0xf0000000) | ( this->v_imm << 2U);

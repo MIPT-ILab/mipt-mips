@@ -56,6 +56,9 @@ private:
     std::unique_ptr<ReadPort<BPInterface>> rp_bp_update_from_decode = nullptr;
     std::unique_ptr<ReadPort<Target>> rp_flush_target_from_decode = nullptr;
 
+    /* port for obtaining target for likely branches */
+    std::unique_ptr<ReadPort<Target>> rp_target_likely_from_decode = nullptr;
+
     Target get_target( Cycle cycle);
     Target get_cached_target( Cycle cycle);
     void clock_bp( Cycle cycle);

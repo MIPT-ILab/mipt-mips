@@ -44,6 +44,9 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
     rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", PORT_LATENCY);
     wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
+
+    /* port for transmitting target for likely branches */
+    wp_target_likely = make_write_port<Target>("DECODE_2_FETCH_LIKELY_TARGET", PORT_BW, PORT_FANOUT);
 }
 
 
@@ -113,6 +116,9 @@ void Decode<FuncInstr>::clock( Cycle cycle)
         wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
         sout << "\nmisprediction on ";
     }
+
+    if ( instr.is_likely_branch())
+        wp_target_likely->write( instr.get_actual_decoded_target(), cycle);
 
     if ( bypassing_unit->is_stall( instr))
     {
