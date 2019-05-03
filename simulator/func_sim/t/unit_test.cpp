@@ -20,6 +20,34 @@
 
 #include <sstream>
 
+TEST_CASE( "Trap: check to GDB/RISCV formats conversions ")
+{
+    CHECK( Trap(Trap::SYSCALL).to_riscv_format() == CAUSE_USER_ECALL);
+    CHECK( Trap(Trap::UNKNOWN_INSTRUCTION).to_gdb_format() == GDB_SIGNAL_ILL);
+}
+
+TEST_CASE( "Trap: check RISC-V initialization")
+{
+    Trap trap( Trap::NO_TRAP);
+    trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
+    CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
+}
+
+TEST_CASE( "Trap: check GDB initialization")
+{
+    Trap trap( Trap::NO_TRAP);
+    trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
+    CHECK( trap == Trap( Trap::Trap::BREAKPOINT));
+}
+
+TEST_CASE( "Trap: print")
+{
+    Trap trap( Trap::UNKNOWN_INSTRUCTION);
+    std::ostringstream oss;
+    oss << trap;
+    CHECK( oss.str() == "UNKNOWN_INSTRUCTION");
+}
+
 static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
@@ -178,19 +206,4 @@ TEST_CASE( "Torture_Test: integration")
     CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
-}
-
-TEST_CASE( "Trap: check from/to GDB/RISCV formats conversions ")
-{
-    Trap trap = Trap(Trap::SYSCALL);
-    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
-
-    trap.set_from_riscv_format(CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap(Trap::UNALIGNED_FETCH));
-
-    trap = Trap(Trap::UNKNOWN_INSTRUCTION);
-    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
-
-    trap.set_from_gdb_format(GDB_SIGNAL_TRAP);
-    CHECK( trap == Trap(Trap::Trap::BREAKPOINT));
 }
