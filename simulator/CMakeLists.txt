@@ -8,7 +8,6 @@ cmake_minimum_required(VERSION 3.9)
 
 project(mipt-mips)
 enable_testing()
-set(BOOST_ROOT /home/parallels/boost_1_70_0)
 find_package(Boost REQUIRED)
 
 # Options
