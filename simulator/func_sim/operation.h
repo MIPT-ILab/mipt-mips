@@ -68,11 +68,13 @@ public:
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
-	//target is known at ID stage; likely to be taken
-	bool is_likely_branch() const { return operation == OUT_BRANCH_LIKELY; }
-
 	//target is known at ID stage but if branch is taken or not is known only at EXE stage
 	bool is_common_branch() const { return operation == OUT_BRANCH; }
+
+	//target is known at ID stage; likely to be taken
+    bool is_likely_branch() const { return operation == OUT_BRANCH_LIKELY; }
+
+    bool is_branch() const { return is_common_branch() || is_likely_branch(); }
 
 	// target is known only at EXE stage
 	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }

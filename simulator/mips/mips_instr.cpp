@@ -821,7 +821,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
 template<typename R>
 void BaseMIPSInstr<R>::init_target()
 {
-    if (this->is_common_branch() || this->is_likely_branch())
+    if (this->is_branch())
         this->target = this->PC + 4 + ( sign_extension<bitwidth<R>, Addr>( this->v_imm) << 2U);
     else if ( this->is_direct_jump())
         this->target = ( this->PC & 0xf0000000) | ( this->v_imm << 2U);
