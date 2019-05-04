@@ -100,7 +100,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
     /* handle misprediction */
-    if ( instr.is_misprediction( instr.get_bp_data()))
+    if ( is_misprediction( instr, instr.get_bp_data()))
     {
         // flushing fetch stage, instr fetch will appear at decode stage next clock,
         // so we send flush signal to decode

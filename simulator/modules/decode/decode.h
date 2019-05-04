@@ -56,6 +56,13 @@ class Decode : public Log
         void clock( Cycle cycle);
         void set_RF( RF<FuncInstr>* value) { rf = value;}
         void set_wb_bandwidth( uint32 wb_bandwidth) { bypassing_unit->set_bandwidth( wb_bandwidth);}
+
+        template<typename Instr>
+        bool is_misprediction( const Instr& instr, const BPInterface& bp_data)
+        {
+            return ( instr.is_direct_jump() || instr.is_likely_branch())
+                   && ( !bp_data.is_taken || bp_data.target != instr.get_decoded_target());
+        }
 };
 
 

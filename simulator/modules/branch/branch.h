@@ -45,6 +45,22 @@ class Branch : public Log
         auto get_mispredict_rate() const { return ( num_branches != 0) 
                                                   ? num_mispredictions / num_branches * 100
                                                   : 0; }
+        template<typename Instr>
+        bool is_misprediction( const Instr& instr, const BPInterface& bp_data)
+        {
+            bool is_misprediction = false;
+
+            if ( instr.is_indirect_jump())
+                is_misprediction |= bp_data.target != instr.get_new_PC();
+
+            if ( instr.is_common_branch())
+                is_misprediction |= instr.is_taken();
+
+            if ( instr.is_likely_branch())
+                is_misprediction |= !instr.is_taken() || instr.get_decoded_target() != instr.get_new_PC();
+
+            return is_misprediction;
+        }
 };
 
 #endif // BRANCH_H
