@@ -80,8 +80,7 @@ public:
 	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
 	bool is_jump() const { return this->is_direct_jump()
-	                           || this->is_common_branch()
-	                           || this->is_likely_branch()
+	                           || this->is_branch()
 	                           || this->is_indirect_jump(); }
 
     bool is_taken() const
