@@ -22,8 +22,7 @@ class Decode : public Log
 
     private:
         uint64  num_jumps       = 0;
-        float64 num_target_mispredictions = 0;
-        float64 num_direction_mispredictions = 0;
+        float64 num_mispredictions = 0;
 
         RF<FuncInstr>* rf = nullptr;
         std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
@@ -60,28 +59,18 @@ class Decode : public Log
         void clock( Cycle cycle);
         void set_RF( RF<FuncInstr>* value) { rf = value;}
         void set_wb_bandwidth( uint32 wb_bandwidth) { bypassing_unit->set_bandwidth( wb_bandwidth);}
-        auto get_target_mispredictions_num() const { return num_target_mispredictions; }
-        auto get_direction_mispredictions_num() const { return num_direction_mispredictions; }
-        auto get_mispredictions_num() const { return num_target_mispredictions + num_direction_mispredictions; }
+        auto get_mispredictions_num() const { return num_mispredictions; }
         auto get_jumps_num() const { return num_jumps; }
 
-        bool is_misprediction( const Instr& instr, const BPInterface& bp_data)
+        bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
+            // predicted as not taken 'likely' branches are purposely considered as mispredictions
             if ( ( instr.is_direct_jump() || instr.is_indirect_jump() || instr.is_likely_branch()) && !bp_data.is_taken)
-            {
-                num_direction_mispredictions++;
                 return true;
-            }
 
-            if ( ( instr.is_direct_jump() || instr.is_branch())
+            return ( ( instr.is_direct_jump() || instr.is_branch())
                 && bp_data.target != instr.get_decoded_target()
-                && bp_data.is_taken)
-            {
-                num_target_mispredictions++;
-                return true;
-            }
-
-                return false;
+                && bp_data.is_taken);
         }
 };
 

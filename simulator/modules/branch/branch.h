@@ -20,8 +20,7 @@ class Branch : public Log
         using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
-        float64 num_target_mispredictions = 0;
-        float64 num_direction_mispredictions = 0;
+        float64 num_mispredictions = 0;
 
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -42,36 +41,17 @@ class Branch : public Log
     public:
         explicit Branch( bool log);
         void clock( Cycle cycle);
-        auto get_target_mispredictions_num() const { return num_target_mispredictions; }
-        auto get_direction_mispredictions_num() const { return num_direction_mispredictions; }
-        auto get_mispredictions_num() const { return num_direction_mispredictions + num_target_mispredictions; }
+        auto get_mispredictions_num() const { return num_mispredictions; }
 
-        bool is_misprediction( const Instr& instr, const BPInterface& bp_data)
+        bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
             bool is_misprediction = false;
 
-            if ( !bp_data.is_taken)
-            {
-                num_direction_mispredictions++;
+            is_misprediction |= ( bp_data.is_taken != instr.is_taken()) && !instr.is_likely_branch();
 
-                if ( ( instr.is_common_branch() && instr.is_taken())
-                  || ( instr.is_likely_branch() && !instr.is_taken()))
-                {
-                    num_direction_mispredictions++;
-                    is_misprediction |= true;
-                }
-            }
+            is_misprediction |= bp_data.is_taken && ( bp_data.target != instr.get_new_PC());
 
-            else
-            {
-                num_target_mispredictions++;
-                if ( bp_data.target != instr.get_new_PC())
-                {
-                    num_target_mispredictions++;
-
-                    is_misprediction |= true;
-                }
-            }
+            is_misprediction |= !bp_data.is_taken && !instr.is_taken() && instr.is_likely_branch();
 
             return is_misprediction;
         }

@@ -53,6 +53,8 @@ void Branch<FuncInstr>::clock( Cycle cycle)
     /* handle misprediction */
     if ( is_misprediction( instr, instr.get_bp_data()))
     {
+        num_mispredictions++;
+
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
           

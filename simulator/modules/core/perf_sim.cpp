@@ -112,13 +112,8 @@ void PerfSim<ISA>::dump_statistics() const
     auto frequency = double{ curr_cycle} / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / double{ curr_cycle};
     auto simips = executed_instrs / time;
-    auto mispredict_rate = 1.0 * get_mispredict_rate( decode.get_jumps_num(), decode.get_mispredictions_num() + branch.get_mispredictions_num());
-
-    auto direction_mispredict_rate = 1.0 * get_mispredict_rate( decode.get_mispredictions_num() + branch.get_mispredictions_num(),
-                                                                decode.get_direction_mispredictions_num() + branch.get_direction_mispredictions_num());
-
-    auto target_mispredict_rate = 1.0 * get_mispredict_rate( decode.get_mispredictions_num() + branch.get_mispredictions_num(),
-                                                             decode.get_target_mispredictions_num() + branch.get_target_mispredictions_num());
+    auto decode_mispredict_rate = 1.0 * get_mispredict_rate( decode.get_jumps_num(), decode.get_mispredictions_num());
+    auto branch_mispredict_rate = 1.0 * get_mispredict_rate( decode.get_jumps_num(), branch.get_mispredictions_num());
     
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
@@ -127,9 +122,8 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
-              << std::endl << "mispredict: " << mispredict_rate << "%"
-              << std::endl << "            " << target_mispredict_rate << "% - wrong target"
-              << std::endl << "            " << direction_mispredict_rate << "% - wrong direction"
+              << std::endl << "mispredict: detected on decode stage - " << decode_mispredict_rate << "%"
+              << std::endl << "            detected on branch stage - " << branch_mispredict_rate << "%"
               << std::endl << "****************************"
               << std::endl;
 }
