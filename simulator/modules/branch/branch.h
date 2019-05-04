@@ -20,7 +20,7 @@ class Branch : public Log
         using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
-        float64 num_mispredictions = 0;
+        uint64 num_mispredictions = 0;
 
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;

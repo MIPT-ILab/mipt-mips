@@ -21,8 +21,8 @@ class Decode : public Log
     using BypassingUnit = DataBypass<FuncInstr>;
 
     private:
-        uint64  num_jumps       = 0;
-        float64 num_mispredictions = 0;
+        uint64 num_jumps          = 0;
+        uint64 num_mispredictions = 0;
 
         RF<FuncInstr>* rf = nullptr;
         std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
