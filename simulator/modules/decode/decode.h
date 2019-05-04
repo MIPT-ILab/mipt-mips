@@ -64,8 +64,11 @@ class Decode : public Log
 
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
-            // predicted as not taken 'likely' branches are purposely considered as mispredictions
-            if ( ( instr.is_direct_jump() || instr.is_indirect_jump() || instr.is_likely_branch()) && !bp_data.is_taken)
+            if ( ( instr.is_direct_jump() || instr.is_indirect_jump()) && !bp_data.is_taken)
+                return true;
+
+            // 'likely' branches, which are not in BTB, are purposely considered as mispredictions
+            if ( instr.is_likely_branch() && !bp_data.is_hit)
                 return true;
 
             return ( ( instr.is_direct_jump() || instr.is_branch())

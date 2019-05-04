@@ -47,11 +47,10 @@ class Branch : public Log
         {
             bool is_misprediction = false;
 
-            is_misprediction |= ( bp_data.is_taken != instr.is_taken()) && !instr.is_likely_branch();
+            if ( bp_data.is_hit)
+                is_misprediction |= ( bp_data.is_taken != instr.is_taken());
 
             is_misprediction |= bp_data.is_taken && ( bp_data.target != instr.get_new_PC());
-
-            is_misprediction |= !bp_data.is_taken && !instr.is_taken() && instr.is_likely_branch();
 
             return is_misprediction;
         }
