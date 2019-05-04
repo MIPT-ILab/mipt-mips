@@ -54,16 +54,23 @@ class Branch : public Log
             {
                 num_direction_mispredictions++;
 
-                is_misprediction |= instr.is_common_branch() && instr.is_taken();
-
-                is_misprediction |= instr.is_likely_branch() && !instr.is_taken();
+                if ( ( instr.is_common_branch() && instr.is_taken())
+                  || ( instr.is_likely_branch() && !instr.is_taken()))
+                {
+                    num_direction_mispredictions++;
+                    is_misprediction |= true;
+                }
             }
 
             else
             {
                 num_target_mispredictions++;
+                if ( bp_data.target != instr.get_new_PC())
+                {
+                    num_target_mispredictions++;
 
-                is_misprediction |= bp_data.target != instr.get_new_PC();
+                    is_misprediction |= true;
+                }
             }
 
             return is_misprediction;
