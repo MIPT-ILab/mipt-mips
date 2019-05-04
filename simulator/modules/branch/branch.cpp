@@ -60,6 +60,12 @@ void Branch<FuncInstr>::clock( Cycle cycle)
             is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
     }
 
+    if ( instr.is_likely_branch())
+    {
+        num_branches++;
+        is_misprediction |= !instr.is_taken() || instr.get_decoded_target() != instr.get_new_PC();
+    }
+
     /* handle misprediction */
     if ( is_misprediction )
     {

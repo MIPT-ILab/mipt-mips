@@ -91,8 +91,8 @@ public:
 
     bool is_misprediction( const BPInterface& bp_data) const
     {
-	    return ( is_direct_jump() && ( !bp_data.is_taken || bp_data.target != get_decoded_target()))
-              || is_likely_branch();
+        return ( is_direct_jump() || is_likely_branch())
+            && ( !bp_data.is_taken || bp_data.target != get_decoded_target());
     }
 
     bool is_partial_load() const
