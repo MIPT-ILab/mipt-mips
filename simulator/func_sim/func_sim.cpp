@@ -9,11 +9,22 @@
 #include <sstream>
 #include <stdexcept>
 
+
 template <typename ISA>
-FuncSim<ISA>::FuncSim( Endian endian, bool log)
+typename FuncSim<ISA>::HandleTrapStrMap FuncSim<ISA>::handle_trap_str_map = {
+    { "stop",         HandleTrapMode::STOP         },
+    { "stop_on_halt", HandleTrapMode::STOP_ON_HALT },
+    { "nothing",      HandleTrapMode::NOTHING      },
+};
+
+template <typename ISA>
+FuncSim<ISA>::FuncSim( Endian endian, bool log, const std::string &trap_mode, bool trap_critical, bool trap_verbose)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
+    , handle_trap_mode(handle_trap_str_map.at(trap_mode))
+    , handle_trap_critical(trap_critical)
+    , handle_trap_verbose(trap_verbose)
 { }
 
 template <typename ISA>

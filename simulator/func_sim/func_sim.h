@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 struct UnknownInstruction final : Exception
 {
@@ -56,11 +57,15 @@ class FuncSim : public Simulator
             STOP_ON_HALT,
             NOTHING,
         } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+
+        using HandleTrapStrMap = std::map<std::string, HandleTrapMode>;
+        static HandleTrapStrMap handle_trap_str_map;
         bool handle_trap_critical = false;
         bool handle_trap_verbose = true;
 
     public:
-        explicit FuncSim( Endian endian, bool log = false);
+        explicit FuncSim( Endian endian, bool log = false,
+            const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
