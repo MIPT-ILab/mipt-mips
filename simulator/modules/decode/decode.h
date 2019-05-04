@@ -64,8 +64,8 @@ class Decode : public Log
 
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
-            return ( instr.is_direct_jump() || instr.is_likely_branch())
-                   && ( !bp_data.is_taken || bp_data.target != instr.get_decoded_target());
+            return ( instr.is_direct_jump() &&  ( !bp_data.is_taken || bp_data.target != instr.get_decoded_target()))
+                || ( instr.is_likely_branch() && ( bp_data.target != instr.get_decoded_target()));
         }
 };
 
