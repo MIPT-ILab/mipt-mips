@@ -66,23 +66,6 @@ void Branch<FuncInstr>::clock( Cycle cycle)
         sout << "misprediction on ";
     }
 
-    /* case of BTB miss */
-    if ( !instr.get_bp_data().is_hit)
-    {
-        if ( ( instr.is_common_branch() && instr.is_taken())
-          || ( instr.is_likely_branch() && !instr.is_taken()))
-        {
-            /* flushing the pipeline */
-            wp_flush_all->write( true, cycle);
-
-            /* notify bypassing unit about misprediction */
-            wp_bypassing_unit_flush_notify->write( true, cycle);
-
-            /* sending valid PC to fetch stage */
-            wp_flush_target->write( instr.get_actual_target(), cycle);
-        }
-    }
-
     /* log */
     sout << instr << std::endl;
 

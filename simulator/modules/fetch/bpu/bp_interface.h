@@ -19,7 +19,7 @@ struct BPInterface {
 
     BPInterface() = default;
 
-    BPInterface( Addr pc, bool is_taken, Addr target, bool is_hit = true)
+    BPInterface( Addr pc, bool is_taken, Addr target, bool is_hit)
         : pc( pc)
         , is_taken( is_taken)
         , target( target)

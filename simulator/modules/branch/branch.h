@@ -45,14 +45,14 @@ class Branch : public Log
 
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
-            bool is_misprediction = false;
+            if ( !bp_data.is_hit)
+                if ( ( instr.is_common_branch() && instr.is_taken()) || ( instr.is_likely_branch() && !instr.is_taken()))
+                    return true;
 
-            if ( bp_data.is_hit)
-                is_misprediction |= ( bp_data.is_taken != instr.is_taken());
+            if ( bp_data.is_hit && ( bp_data.is_taken != instr.is_taken()))
+                return true;
 
-            is_misprediction |= bp_data.is_taken && ( bp_data.target != instr.get_new_PC());
-
-            return is_misprediction;
+            return bp_data.is_taken && ( bp_data.target != instr.get_new_PC());
         }
 };
 
