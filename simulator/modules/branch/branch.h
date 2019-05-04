@@ -47,15 +47,13 @@ class Branch : public Log
         {
             bool is_misprediction = false;
 
-            if ( instr.is_indirect_jump())
+            if ( bp_data.is_taken)
                 is_misprediction |= bp_data.target != instr.get_new_PC();
 
-            if ( instr.is_common_branch())
-                is_misprediction |= instr.is_taken();
+            is_misprediction |= instr.is_likely_branch() && !instr.is_taken();
 
-            if ( instr.is_likely_branch())
-                is_misprediction |= !instr.is_taken() || instr.get_decoded_target() != instr.get_new_PC();
-
+            is_misprediction |= instr.is_common_branch() && instr.is_taken();
+            
             return is_misprediction;
         }
 };
