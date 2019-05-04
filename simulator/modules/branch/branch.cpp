@@ -50,6 +50,9 @@ void Branch<FuncInstr>::clock( Cycle cycle)
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
+    if ( instr.is_jump())
+        num_jumps++;
+
     /* handle misprediction */
     if ( is_misprediction( instr, instr.get_bp_data()))
     {

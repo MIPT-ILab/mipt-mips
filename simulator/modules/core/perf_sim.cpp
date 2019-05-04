@@ -118,7 +118,7 @@ void PerfSim<ISA>::dump_statistics() const
     auto ipc = 1.0 * executed_instrs / double{ curr_cycle};
     auto simips = executed_instrs / time;
     auto decode_mispredict_rate = 1.0 * get_rate( decode.get_jumps_num(), decode.get_mispredictions_num());
-    auto branch_mispredict_rate = 1.0 * get_rate( decode.get_jumps_num(), branch.get_mispredictions_num());
+    auto branch_mispredict_rate = 1.0 * get_rate( branch.get_jumps_num(), branch.get_mispredictions_num());
     
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs

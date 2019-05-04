@@ -21,6 +21,7 @@ class Branch : public Log
 
     private:
         uint64 num_mispredictions = 0;
+        uint64 num_jumps          = 0;
 
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
@@ -42,6 +43,7 @@ class Branch : public Log
         explicit Branch( bool log);
         void clock( Cycle cycle);
         auto get_mispredictions_num() const { return num_mispredictions; }
+        auto get_jumps_num() const { return num_jumps; }
 
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
