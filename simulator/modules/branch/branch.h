@@ -43,7 +43,6 @@ class Branch : public Log
         void clock( Cycle cycle);
         auto get_mispredictions_num() const { return num_mispredictions; }
 
-        template<typename Instr>
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
             bool is_misprediction = false;

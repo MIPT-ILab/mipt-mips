@@ -62,7 +62,6 @@ class Decode : public Log
         auto get_mispredictions_num() const { return num_mispredictions; }
         auto get_jumps_num() const { return num_jumps; }
 
-        template<typename Instr>
         bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
         {
             return ( instr.is_direct_jump() || instr.is_likely_branch())

@@ -10,7 +10,6 @@
 #include <func_sim/trap_types.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
-#include <modules/fetch/bpu/bp_interface.h>
 
 #include <sstream>
 
