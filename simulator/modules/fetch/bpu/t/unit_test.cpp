@@ -22,9 +22,9 @@ TEST_CASE( "Static, all branches not taken")
     Addr PC = 28;
     Addr target = 12;
 
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target, false));
+    bp->update( BPInterface( PC, true, target, true));
+    bp->update( BPInterface( PC, true, target, true));
 
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
@@ -37,7 +37,7 @@ TEST_CASE( "Static, all branches taken")
     Addr PC = 28;
     Addr target = 12;
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 }
@@ -49,7 +49,7 @@ TEST_CASE( "Backward only branches taken")
     Addr PC = 28;
     Addr target = 12;
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 }
@@ -61,7 +61,7 @@ TEST_CASE( "Backward only branches taken in case of forward jump")
     Addr PC = 28;
     Addr target = 36;
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
 }
@@ -73,7 +73,7 @@ TEST_CASE( "One bit predictor")
     Addr PC = 28;
     Addr target = 12;
     
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 }
@@ -86,10 +86,10 @@ TEST_CASE( "One bit predictor in case of changed target")
     Addr target = 12;
  
     //learn   
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     //change the target
     target = 16;
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->get_target(PC) == target);
 }
 
@@ -100,7 +100,7 @@ TEST_CASE( "Two bit predictor, basic")
     Addr PC = 28;
     Addr target = 12;
     
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 }
@@ -113,48 +113,48 @@ TEST_CASE( "Two bit predictor, advanced")
     Addr target = 28;
 
     // Learn
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 
     // "Over" - learning
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 
     // Moderate "Un" - learning
-    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == NO_VAL32);
 
     // Strong "un" - learning
-    bp->update( BPInterface( PC, false, NO_VAL32));
-    bp->update( BPInterface( PC, false, NO_VAL32));
-    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
     CHECK_FALSE(bp->is_taken(PC));
 
-    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
     CHECK_FALSE(bp->is_taken(PC));
 
-    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
     CHECK_FALSE(bp->is_taken(PC));
 
-    bp->update( BPInterface( PC, false, NO_VAL32));
+    bp->update( BPInterface( PC, false, NO_VAL32, true));
     CHECK_FALSE(bp->is_taken(PC));
 
     // Learn again
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK_FALSE(bp->is_taken(PC));
 
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 }
@@ -164,17 +164,17 @@ static auto get_trained_adaptive_two_level_predictor( Addr PC, Addr target)
     auto bp = BaseBP::create_bp( "adaptive_two_levels", 128, 16);
 
     // Learn in sequence 001001001
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target, false));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, true, target, true));
 
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, true, target, true));
 
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, true, target, true));
 
     return bp;
 }
@@ -186,20 +186,20 @@ TEST_CASE( "Adaptive two bit prediction")
     auto bp = get_trained_adaptive_two_level_predictor( PC, target);
 
     //check prediction on 00 sequence
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target, false));
+    bp->update( BPInterface( PC, false, target, true));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
 
     //check prediction on 01 sequence
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, true, target, true));
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
 
     //check prediction on 10 sequence
-    bp->update( BPInterface( PC, true, target));
-    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, true, target, true));
+    bp->update( BPInterface( PC, false, target, true));
     CHECK_FALSE( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == PC + 4);
 }
@@ -212,11 +212,11 @@ TEST_CASE( "Adaptive two bit prediction in case of changed target")
 
     // use different target
     target = 24;
-    bp->update( BPInterface( PC, true, target));
+    bp->update( BPInterface( PC, true, target, false));
 
     //check if the target was updated
-    bp->update( BPInterface( PC, false, target));
-    bp->update( BPInterface( PC, false, target));
+    bp->update( BPInterface( PC, false, target, true));
+    bp->update( BPInterface( PC, false, target, true));
     CHECK( bp->get_target(PC) == target);
 }
 
@@ -226,16 +226,16 @@ TEST_CASE( "Cache Miss")
 
     // Check default cache miss behaviour
     Addr PC = 12;
-    CHECK_FALSE(bp->is_taken(PC));
+    CHECK_FALSE(bp->is_hit(PC));
 
     PC = 16;
-    CHECK_FALSE(bp->is_taken(PC));
+    CHECK_FALSE(bp->is_hit(PC));
 
     PC = 20;
-    CHECK_FALSE(bp->is_taken(PC));
+    CHECK_FALSE(bp->is_hit(PC));
 
     PC = 12;
-    CHECK_FALSE(bp->is_taken(PC));
+    CHECK_FALSE(bp->is_hit(PC));
 }
 
 TEST_CASE( "Overload: LRU")
@@ -248,9 +248,9 @@ TEST_CASE( "Overload: LRU")
     // Trying to make it forget the PCconst
     for ( int i = 0; i < 1000; i++)
     {
-        bp->update( BPInterface( i, false, NO_VAL32));
+        bp->update( BPInterface( i, false, NO_VAL32, false));
         if ( i % 50 == 0)
-            bp->update( BPInterface( PCconst, true, target));
+            bp->update( BPInterface( PCconst, true, target, bp->is_hit( PCconst)));
     }
 
     // Checking some random PC and PCConst
