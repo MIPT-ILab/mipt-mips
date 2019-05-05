@@ -48,16 +48,12 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
 
 
 template <typename FuncInstr>
-typename Decode<FuncInstr>::Instr Decode<FuncInstr>::read_instr( Cycle cycle, bool& from_stall)
+std::pair<typename Decode<FuncInstr>::Instr, bool> Decode<FuncInstr>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
-    {
-        from_stall = true;
-        return rp_stall_datapath->read( cycle);
-    }
+        return std::pair<typename Decode<FuncInstr>::Instr, bool>( rp_stall_datapath->read( cycle), true);
 
-    from_stall = false;
-    return rp_datapath->read( cycle);
+    return std::pair<typename Decode<FuncInstr>::Instr, bool>( rp_datapath->read( cycle), false);
 }
 
 
@@ -98,8 +94,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
-    bool from_stall;
-    auto instr = read_instr( cycle, from_stall);
+    auto[instr, from_stall] = read_instr( cycle);
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);

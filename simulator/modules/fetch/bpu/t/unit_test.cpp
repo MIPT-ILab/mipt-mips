@@ -226,16 +226,16 @@ TEST_CASE( "Cache Miss")
 
     // Check default cache miss behaviour
     Addr PC = 12;
-    CHECK_FALSE(bp->is_hit(PC));
+    CHECK_FALSE( ( bp->is_hit( PC) && bp->is_taken( PC)));
 
     PC = 16;
-    CHECK_FALSE(bp->is_hit(PC));
+    CHECK_FALSE( ( bp->is_hit( PC) && bp->is_taken( PC)));
 
     PC = 20;
-    CHECK_FALSE(bp->is_hit(PC));
+    CHECK_FALSE( ( bp->is_hit( PC) && bp->is_taken( PC)));
 
     PC = 12;
-    CHECK_FALSE(bp->is_hit(PC));
+    CHECK_FALSE( ( bp->is_hit( PC) && bp->is_taken( PC)));
 }
 
 TEST_CASE( "Overload: LRU")

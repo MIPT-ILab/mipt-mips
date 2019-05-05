@@ -51,8 +51,8 @@ class Decode : public Log
         std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
         std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
         std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
-        
-        Instr read_instr( Cycle cycle, bool& from_stall);
+
+        std::pair<typename Decode<FuncInstr>::Instr, bool> read_instr( Cycle cycle);
 
     public:
         explicit Decode( bool log);
