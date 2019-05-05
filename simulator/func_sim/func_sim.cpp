@@ -14,7 +14,7 @@ template <typename ISA>
 typename FuncSim<ISA>::HandleTrapStrMap FuncSim<ISA>::handle_trap_str_map = {
     { "stop",         HandleTrapMode::STOP         },
     { "stop_on_halt", HandleTrapMode::STOP_ON_HALT },
-    { "nothing",      HandleTrapMode::NOTHING      },
+    { "ignore",       HandleTrapMode::IGNORE       },
 };
 
 template <typename ISA>
@@ -142,7 +142,7 @@ Trap FuncSim<ISA>::handle_trap( Trap trap)
             return trap;
         return Trap(Trap::NO_TRAP);
 
-    case HandleTrapMode::NOTHING:
+    case HandleTrapMode::IGNORE:
         return Trap(Trap::NO_TRAP);
     }
 

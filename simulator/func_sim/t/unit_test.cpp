@@ -20,10 +20,28 @@
 
 #include <sstream>
 
-TEST_CASE( "Trap: check to GDB/RISCV formats conversions ")
+TEST_CASE( "Trap: check conversion to RISC-V ")
 {
-    CHECK( Trap(Trap::SYSCALL).to_riscv_format() == CAUSE_USER_ECALL);
-    CHECK( Trap(Trap::UNKNOWN_INSTRUCTION).to_gdb_format() == GDB_SIGNAL_ILL);
+    Trap trap( Trap::SYSCALL);
+    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
+}
+
+TEST_CASE( "Trap: check conversion to GDB ")
+{
+    Trap trap( Trap::UNKNOWN_INSTRUCTION);
+    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
+}
+
+TEST_CASE( "Trap: check conversion to MIPS ")
+{
+    Trap trap( Trap::FP_DIV_BY_ZERO);
+    CHECK( trap.to_mips_format() == MIPS_EXC_FPE);
+}
+
+TEST_CASE( "Trap: check bad conversion to MIPS ")
+{
+    Trap trap( Trap::NO_TRAP);
+    CHECK_THROWS_AS( trap.to_mips_format(), std::out_of_range);
 }
 
 TEST_CASE( "Trap: check RISC-V initialization")
@@ -37,7 +55,14 @@ TEST_CASE( "Trap: check GDB initialization")
 {
     Trap trap( Trap::NO_TRAP);
     trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
-    CHECK( trap == Trap( Trap::Trap::BREAKPOINT));
+    CHECK( trap == Trap( Trap::BREAKPOINT));
+}
+
+TEST_CASE( "Trap: check MIPS initialization")
+{
+    Trap trap( Trap::NO_TRAP);
+    trap.set_from_mips_format( MIPS_EXC_FPOVF);
+    CHECK( trap == Trap( Trap::FP_OVERFLOW));
 }
 
 TEST_CASE( "Trap: print")
@@ -200,6 +225,22 @@ TEST_CASE( "Torture_Test: Stop on trap")
     auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
+}
+
+TEST_CASE( "Torture_Test: Stop on halt")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000);
+    CHECK( trap == Trap::HALT );
+}
+
+TEST_CASE( "Torture_Test: Ignore traps ")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1) == Trap::NO_TRAP );
+    auto trap_stop   = get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10);
+    auto trap_ignore = get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10);
+    CHECK( trap_stop   != Trap::NO_TRAP );
+    CHECK( trap_ignore == Trap::NO_TRAP );
 }
 
 TEST_CASE( "Torture_Test: integration")

@@ -55,7 +55,7 @@ class FuncSim : public Simulator
         {
             STOP,
             STOP_ON_HALT,
-            NOTHING,
+            IGNORE,
         } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
 
         using HandleTrapStrMap = std::map<std::string, HandleTrapMode>;
