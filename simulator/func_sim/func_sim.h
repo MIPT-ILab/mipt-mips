@@ -74,7 +74,6 @@ class FuncSim : public Simulator
         Trap handle_trap( Trap trap);
         Trap run( uint64 instrs_to_run) final;
         Trap run_single_step() final;
-        Trap run_until_trap( uint64 instrs_to_run) final;
 
         void set_target(const Target& target) final {
             pc[0] = target.address;

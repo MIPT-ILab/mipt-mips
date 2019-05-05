@@ -34,7 +34,6 @@ public:
 
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual Trap run_single_step() = 0;
-    virtual Trap run_until_trap( uint64 instrs_to_run) = 0;
     virtual void set_target( const Target& target) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
@@ -44,12 +43,14 @@ public:
     void set_pc( Addr pc) { set_target( Target( pc, 0)); }
     virtual Addr get_pc() const = 0;
 
-    static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
+    static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log,
+        const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true);
     static std::shared_ptr<Simulator> create_configured_simulator();
     static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa);
-    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log = false)
+    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log = false,
+        const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true)
     {
-        return create_simulator( isa, true, log);
+        return create_simulator( isa, true, log, trap_mode, trap_critical, trap_verbose);
     }
 
     virtual size_t sizeof_register() const = 0;

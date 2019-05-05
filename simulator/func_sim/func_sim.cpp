@@ -2,7 +2,7 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
+
 #include "func_sim.h"
 #include <kernel/kernel.h>
 #include <iostream>
@@ -155,22 +155,8 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
-        if (trap != Trap::NO_TRAP)
-            trap = handle_trap(trap);
         if ( trap != Trap::NO_TRAP)
-            return trap;
-    }
-    return Trap(Trap::NO_TRAP);
-}
-
-template <typename ISA>
-Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
-{
-    nops_in_a_row = 0;
-    for ( uint64 i = 0; i < instrs_to_run; ++i) {
-        auto trap = step_system();
-        if ( trap == Trap::SYSCALL)
-            trap = handle_syscall();
+            trap = handle_trap(trap);
         if ( trap != Trap::NO_TRAP)
             return trap;
     }

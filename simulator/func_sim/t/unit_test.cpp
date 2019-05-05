@@ -174,9 +174,11 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     CHECK_NOTHROW( sim->run_no_limit() );
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test)
+static auto get_simulator_with_test( const std::string& isa, const std::string& test,
+    const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true)
 {
-    auto sim = Simulator::create_functional_simulator(isa);
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator(isa, log, trap_mode, trap_critical, trap_verbose);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -194,8 +196,8 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
-    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
