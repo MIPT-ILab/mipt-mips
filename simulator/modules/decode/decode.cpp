@@ -47,7 +47,7 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
 }
 
 template <typename FuncInstr>
-auto Decode<FuncInstr>::read_instr( Cycle cycle) -> std::pair<Instr, bool>
+auto Decode<FuncInstr>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
         return std::make_pair( rp_stall_datapath->read( cycle), true);
