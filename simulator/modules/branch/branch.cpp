@@ -49,21 +49,15 @@ void Branch<FuncInstr>::clock( Cycle cycle)
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
-     
-    bool is_misprediction = false;
 
-    if ( instr.is_branch() || instr.is_indirect_jump())
-    {
-        num_branches++;
-        is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
-        if ( instr.is_taken())
-            is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
-    }
+    if ( instr.is_jump())
+        num_jumps++;
 
     /* handle misprediction */
-    if ( is_misprediction )
+    if ( is_misprediction( instr, instr.get_bp_data()))
     {
         num_mispredictions++;
+
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
           
