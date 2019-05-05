@@ -51,9 +51,9 @@ template <typename FuncInstr>
 std::pair<typename Decode<FuncInstr>::Instr, bool> Decode<FuncInstr>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
-        return std::pair<typename Decode<FuncInstr>::Instr, bool>( rp_stall_datapath->read( cycle), true);
+        return std::pair<Instr, bool>( rp_stall_datapath->read( cycle), true);
 
-    return std::pair<typename Decode<FuncInstr>::Instr, bool>( rp_datapath->read( cycle), false);
+    return std::pair<Instr, bool>( rp_datapath->read( cycle), false);
 }
 
 
