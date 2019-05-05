@@ -48,11 +48,15 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
 
 
 template <typename FuncInstr>
-typename Decode<FuncInstr>::Instr Decode<FuncInstr>::read_instr( Cycle cycle)
+typename Decode<FuncInstr>::Instr Decode<FuncInstr>::read_instr( Cycle cycle, bool& from_stall)
 {
     if ( rp_stall_datapath->is_ready( cycle))
+    {
+        from_stall = true;
         return rp_stall_datapath->read( cycle);
+    }
 
+    from_stall = false;
     return rp_datapath->read( cycle);
 }
 
@@ -94,7 +98,8 @@ void Decode<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
-    auto instr = read_instr( cycle);
+    bool from_stall;
+    auto instr = read_instr( cycle, from_stall);
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
@@ -109,11 +114,15 @@ void Decode<FuncInstr>::clock( Cycle cycle)
 
         // flushing fetch stage, instr fetch will appear at decode stage next clock,
         // so we send flush signal to decode
-        wp_flush_fetch->write( true, cycle);
+        if ( !bypassing_unit->is_stall( instr))
+            wp_flush_fetch->write( true, cycle);
 
         /* sending valid PC to fetch stage */
-        wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
-        sout << "\nmisprediction on ";
+        if ( !from_stall)
+        {
+            wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
+            sout << "\nmisprediction on ";
+        }
     }
 
     if ( bypassing_unit->is_stall( instr))
