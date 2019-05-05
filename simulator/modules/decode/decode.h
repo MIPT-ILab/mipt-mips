@@ -21,6 +21,9 @@ class Decode : public Log
     using BypassingUnit = DataBypass<FuncInstr>;
 
     private:
+        uint64 num_jumps          = 0;
+        uint64 num_mispredictions = 0;
+
         RF<FuncInstr>* rf = nullptr;
         std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
 
@@ -48,14 +51,30 @@ class Decode : public Log
         std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
         std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
         std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
-        
-        Instr read_instr( Cycle cycle);
+
+        std::pair<Instr, bool> read_instr( Cycle cycle);
 
     public:
         explicit Decode( bool log);
         void clock( Cycle cycle);
         void set_RF( RF<FuncInstr>* value) { rf = value;}
         void set_wb_bandwidth( uint32 wb_bandwidth) { bypassing_unit->set_bandwidth( wb_bandwidth);}
+        auto get_mispredictions_num() const { return num_mispredictions; }
+        auto get_jumps_num() const { return num_jumps; }
+
+        bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
+        {
+            if ( ( instr.is_direct_jump() || instr.is_indirect_jump()) && !bp_data.is_taken)
+                return true;
+
+            // 'likely' branches, which are not in BTB, are purposely considered as mispredictions
+            if ( instr.is_likely_branch() && !bp_data.is_hit)
+                return true;
+
+            return ( ( instr.is_direct_jump() || instr.is_branch())
+                && bp_data.target != instr.get_decoded_target()
+                && bp_data.is_taken);
+        }
 };
 
 

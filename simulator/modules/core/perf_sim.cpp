@@ -103,6 +103,11 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     sout << "******************\n";
 }
 
+auto get_rate( int total, float64 piece)
+{
+    return total != 0 ? ( piece / total * 100) : 0;
+}
+
 template<typename ISA>
 void PerfSim<ISA>::dump_statistics() const
 {
@@ -112,7 +117,8 @@ void PerfSim<ISA>::dump_statistics() const
     auto frequency = double{ curr_cycle} / time; // cycles per millisecond = kHz
     auto ipc = 1.0 * executed_instrs / double{ curr_cycle};
     auto simips = executed_instrs / time;
-    auto mispredict_rate = 1.0 * branch.get_mispredict_rate();
+    auto decode_mispredict_rate = 1.0 * get_rate( decode.get_jumps_num(), decode.get_mispredictions_num());
+    auto branch_mispredict_rate = 1.0 * get_rate( branch.get_jumps_num(), branch.get_mispredictions_num());
     
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
@@ -121,7 +127,8 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "sim freq:   " << frequency << " kHz"
               << std::endl << "sim IPS:    " << simips    << " kips"
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
-              << std::endl << "mispredict: " << mispredict_rate << "%"
+              << std::endl << "mispredict: detected on decode stage - " << decode_mispredict_rate << "%"
+              << std::endl << "            detected on branch stage - " << branch_mispredict_rate << "%"
               << std::endl << "****************************"
               << std::endl;
 }

@@ -1,5 +1,5 @@
 REGISTER(zero),
-REGISTER(rs),
+REGISTER(ra),
 REGISTER(sp),
 REGISTER(gp),
 REGISTER(tp),
