@@ -243,6 +243,12 @@ TEST_CASE( "Torture_Test: Ignore traps ")
     CHECK( trap_ignore == Trap::NO_TRAP );
 }
 
+TEST_CASE( "Torture_Test: Critical traps ")
+{
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop", true)->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop", true)->run( 10000), std::runtime_error);
+}
+
 TEST_CASE( "Torture_Test: integration")
 {
     CHECK( get_simulator_with_test("mars",    valid_elf_file)->run_no_limit() == Trap::HALT );
