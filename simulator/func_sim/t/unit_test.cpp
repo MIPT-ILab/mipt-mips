@@ -200,7 +200,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
 }
 
 static auto get_simulator_with_test( const std::string& isa, const std::string& test,
-    const std::string &trap_options = "stop_on_halt verbose")
+    const std::string& trap_options)
 {
     bool log = false;
     auto sim = Simulator::create_functional_simulator(isa, log, trap_options);
@@ -242,8 +242,8 @@ TEST_CASE( "Torture_Test: Ignore traps ")
 
 TEST_CASE( "Torture_Test: Critical traps ")
 {
-    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop critical")->run( 1) );
-    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop critical")->run( 10000), std::runtime_error);
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 10000), std::runtime_error);
 }
 
 TEST_CASE( "Torture_Test: integration")

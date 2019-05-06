@@ -14,6 +14,7 @@
 namespace config {
     static AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
     static AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
+    static Value<std::string> trap_mode = { "trap_mode",  "stop_on_halt", "trap handler mode"};
 } // namespace config
 
 int main( int argc, const char* argv[]) try {
@@ -22,7 +23,7 @@ int main( int argc, const char* argv[]) try {
     auto memory = FuncMemory::create_hierarchied_memory();
     elf.load_to( memory.get());
 
-    auto sim = Simulator::create_configured_simulator();
+    auto sim = Simulator::create_configured_simulator( trap_mode);
     sim->set_memory( memory);
     sim->init_checker();
     sim->set_pc( elf.get_startPC());

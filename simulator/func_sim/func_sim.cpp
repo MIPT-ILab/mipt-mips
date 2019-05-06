@@ -13,25 +13,24 @@
 
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( Endian endian, bool log, const std::string &trap_options)
+FuncSim<ISA>::FuncSim( Endian endian, bool log, const std::string& trap_options)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
 {
-    boost::char_separator sepr(" ");
+    boost::char_separator sepr(",");
     boost::tokenizer tokens(trap_options, sepr);
-    for ( auto it = tokens.begin(); it != tokens.end(); ++it) {
-             if ( *it == "stop")
+    for ( const auto& e : tokens)
+        if ( e == "stop")
             handle_trap_mode = HandleTrapMode::STOP;
-        else if ( *it == "stop_on_halt")
+        else if ( e == "stop_on_halt")
             handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
-        else if ( *it == "ignore")
+        else if ( e == "ignore")
             handle_trap_mode = HandleTrapMode::IGNORE;
-        else if ( *it == "critical")
+        else if ( e == "critical")
             handle_trap_critical = true;
-        else if ( *it == "verbose")
+        else if ( e == "verbose")
             handle_trap_verbose = true;
-    }
 }
 
 template <typename ISA>
@@ -130,6 +129,7 @@ Trap FuncSim<ISA>::handle_trap( Trap trap)
 {
     if ( trap == Trap::SYSCALL)
         trap = handle_syscall();
+
     if ( trap == Trap::NO_TRAP)
         return trap;
 
@@ -141,16 +141,9 @@ Trap FuncSim<ISA>::handle_trap( Trap trap)
 
     switch ( handle_trap_mode)
     {
-    case HandleTrapMode::STOP:
-        return trap;
-
-    case HandleTrapMode::STOP_ON_HALT:
-        if ( trap == Trap::HALT)
-            return trap;
-        return Trap(Trap::NO_TRAP);
-
-    case HandleTrapMode::IGNORE:
-        return Trap(Trap::NO_TRAP);
+    case HandleTrapMode::STOP:         return trap;
+    case HandleTrapMode::STOP_ON_HALT: return trap == Trap::HALT ? trap : Trap(Trap::NO_TRAP);
+    case HandleTrapMode::IGNORE:       return Trap(Trap::NO_TRAP);
     }
 
     return trap;

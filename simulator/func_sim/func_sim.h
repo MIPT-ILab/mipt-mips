@@ -58,12 +58,10 @@ class FuncSim : public Simulator
         } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
 
         bool handle_trap_critical = false;
-        bool handle_trap_verbose = true;
+        bool handle_trap_verbose = false;
 
     public:
-        explicit FuncSim( Endian endian, bool log = false,
-            const std::string &trap_options = "stop_on_halt verbose");
-
+        explicit FuncSim( Endian endian, bool log = false, const std::string& trap_options = "stop_on_halt,verbose");
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void init_checker() final { };

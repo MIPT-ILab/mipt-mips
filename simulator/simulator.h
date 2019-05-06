@@ -44,12 +44,11 @@ public:
     virtual Addr get_pc() const = 0;
 
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log,
-        const std::string &trap_options = "stop_on_halt verbose");
-    static std::shared_ptr<Simulator> create_configured_simulator();
-    static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa);
-    static std::shared_ptr<Simulator> create_configured_debugger_isa_simulator( const std::string& isa);
+        const std::string& trap_options = "stop_on_halt,verbose");
+    static std::shared_ptr<Simulator> create_configured_simulator( const std::string& trap_options);
+    static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa, const std::string& trap_options);
     static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log = false,
-        const std::string &trap_options = "stop_on_halt verbose")
+        const std::string& trap_options = "stop_on_halt,verbose")
     {
         return create_simulator( isa, true, log, trap_options);
     }
