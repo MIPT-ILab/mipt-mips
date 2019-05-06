@@ -59,7 +59,6 @@ class FuncSim : public Simulator
         } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
 
         using HandleTrapStrMap = std::map<std::string, HandleTrapMode>;
-        static HandleTrapStrMap handle_trap_str_map;
         bool handle_trap_critical = false;
         bool handle_trap_verbose = true;
 
