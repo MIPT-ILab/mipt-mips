@@ -75,13 +75,6 @@ TEST_CASE("RISCV bytes dump")
     CHECK( RISCVInstr<uint32>(0x204002b7).bytes_dump() == "Bytes: 0xb7 0x02 0x40 0x20");
 }
 
-TEST_CASE("RISCV ostream")
-{
-    std::ostringstream oss;
-    oss << RISCVInstr<uint32>(0x00f70463);
-    CHECK( oss.str() == "beq $a4, $a5, 8");
-}
-
 TEST_CASE("RISCV add")
 {
     CHECK( RISCVInstr<uint32>(0x00b505b3).get_disasm() == "add $a1, $a0, $a1");
@@ -141,4 +134,8 @@ TEST_CASE("RISCV sub print")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
     CHECK( instr.string_dump() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]" );
+
+    std::ostringstream oss;
+    oss << instr;
+    CHECK( oss.str() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]");
 }
