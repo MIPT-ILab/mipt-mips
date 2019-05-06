@@ -18,14 +18,29 @@
 #include "simulator.h"
 
 namespace config {
-    static AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
-    static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
-    static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
+    static AliasedValue<std::string> isa             = { "I",            "isa",             "mars",         "modeled ISA"};
+    static AliasedSwitch             disassembly_on  = { "d",            "disassembly",                     "print disassembly"};
+    static AliasedSwitch             functional_only = { "f",            "functional-only",                 "run functional simulation only"};
+
+    static Value<std::string>        trap_mode       = { "trap_mode",                       "stop_on_halt", "trap handler mode"};
+    static Switch                    trap_critical   = { "trap_critical",                                   "throw exception if trap occurs"};
+    static Switch                    trap_verbose    = { "trap_verbose",                                    "print message if trap occurs"};
 } // namespace config
+
+static std::string get_config_trap_options()
+{
+    std::string str = config::trap_mode;
+    if ( config::trap_critical)
+        str.append(" critical");
+    if ( config::trap_verbose)
+        str.append(" verbose");
+    return str;
+}
 
 class SimulatorFactory {
     struct Builder {
-        virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;
+        virtual std::unique_ptr<Simulator> get_funcsim( bool log,
+            const std::string &trap_options) = 0;
         virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) = 0;
         Builder() = default;
         virtual ~Builder() = default;
@@ -38,7 +53,11 @@ class SimulatorFactory {
     template<typename T, Endian e>
     struct TBuilder : public Builder {
         TBuilder() = default;
-        std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log); }
+        std::unique_ptr<Simulator> get_funcsim( bool log,
+            const std::string &trap_options = "stop_on_halt verbose") final
+        {
+            return std::make_unique<FuncSim<T>>( e, log, trap_options);
+        }
         std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) final { return std::make_unique<PerfSim<T>>( e, log); }
     };
 
@@ -96,9 +115,10 @@ class SimulatorFactory {
 public:
     SimulatorFactory() : map( generate_map()) { }
 
-    auto get_funcsim( const std::string& name, bool log) const
+    auto get_funcsim( const std::string& name, bool log,
+        const std::string &trap_options = "stop_on_halt verbose") const
     {
-        return get_factory( name)->get_funcsim( log);
+        return get_factory( name)->get_funcsim( log, trap_options);
     }
 
     auto get_perfsim( const std::string& name, bool log) const
@@ -111,26 +131,36 @@ public:
         return sf;
     }
 };
-    
+
 std::shared_ptr<Simulator>
-Simulator::create_simulator( const std::string& isa, bool functional_only, bool log)
+Simulator::create_simulator( const std::string& isa, bool functional_only, bool log,
+    const std::string &trap_options)
 {
     if ( functional_only)
-        return SimulatorFactory::get_instance().get_funcsim( isa, log);
+        return SimulatorFactory::get_instance().get_funcsim( isa, log, trap_options);
 
-    return CycleAccurateSimulator::create_simulator( isa, log);
+    return CycleAccurateSimulator::create_simulator( isa, log); // Trap modes are not implemented in PerfSim
 }
 
 std::shared_ptr<Simulator>
 Simulator::create_configured_simulator()
 {
-    return create_simulator( config::isa, config::functional_only, config::disassembly_on);
+    return create_simulator( config::isa, config::functional_only, config::disassembly_on,
+        get_config_trap_options());
 }
 
 std::shared_ptr<Simulator>
 Simulator::create_configured_isa_simulator( const std::string& isa)
 {
-    return create_simulator( isa, config::functional_only, config::disassembly_on);
+    return create_simulator( isa, config::functional_only, config::disassembly_on,
+        get_config_trap_options());
+}
+
+std::shared_ptr<Simulator>
+Simulator::create_configured_debugger_isa_simulator( const std::string& isa)
+{
+    return create_simulator( isa, config::functional_only, config::disassembly_on,
+        "stop");
 }
 
 std::shared_ptr<CycleAccurateSimulator>

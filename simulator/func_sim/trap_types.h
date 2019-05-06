@@ -43,6 +43,9 @@ class Trap {
         void set_from_riscv_format(uint8 id);
         uint8 to_riscv_format();
 
+        void set_from_mips_format(uint8 id);
+        uint8 to_mips_format();
+
         friend std::ostream& operator<<( std::ostream& out, const Trap& trap)
         {
             return out << TrapStrTable.at( trap.value);
