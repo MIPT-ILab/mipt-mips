@@ -17,6 +17,7 @@
 GDBSim::GDBSim( const std::string& isa)
 {
     cpu = Simulator::create_configured_isa_simulator( isa);
+    cpu->setup_trap_handler( "stop");
     memory = FuncMemory::create_hierarchied_memory();
     auto kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);
@@ -79,7 +80,7 @@ void GDBSim::resume( uint64 step) try
     if (instrs_to_run == 1)
         trap = cpu->run_single_step ();
     else
-        trap = cpu->run_until_trap( instrs_to_run);
+        trap = cpu->run( instrs_to_run);
 }
 catch (const BearingLost &e) {
     trap = Trap::HALT;

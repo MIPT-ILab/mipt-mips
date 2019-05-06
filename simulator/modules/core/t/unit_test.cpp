@@ -20,6 +20,11 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     CHECK_NOTHROW(sim->set_memory( mem));
 }
 
+TEST_CASE( "Perf_Sim_init: Ignore trap handling")
+{
+    CHECK_NOTHROW( CycleAccurateSimulator::create_simulator( "mips32", false)->setup_trap_handler("ignore_me"));
+}
+
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
