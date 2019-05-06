@@ -46,11 +46,12 @@ class Decode : public Log
 
         std::unique_ptr<ReadPort<bool>> rp_bypassing_unit_flush_notify = nullptr;
 
+        std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
+
         /* ports that are needed to handle flush at decode stage */
         std::unique_ptr<WritePort<bool>> wp_flush_fetch = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
         std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
-        std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
 
         auto read_instr( Cycle cycle);
 

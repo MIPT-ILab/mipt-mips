@@ -87,7 +87,7 @@ void Fetch<FuncInstr>::clock_bp( Cycle cycle)
     /* Process BP updates */
     if ( rp_bp_update->is_ready( cycle))
         bp->update( rp_bp_update->read( cycle));
-    else if ( rp_bp_update_from_decode->is_ready( cycle))
+    if ( rp_bp_update_from_decode->is_ready( cycle))
         bp->update( rp_bp_update_from_decode->read(cycle));
 }
 
