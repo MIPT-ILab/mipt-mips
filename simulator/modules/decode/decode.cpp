@@ -46,14 +46,13 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
     wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
 }
 
-
 template <typename FuncInstr>
-std::pair<typename Decode<FuncInstr>::Instr, bool> Decode<FuncInstr>::read_instr( Cycle cycle)
+auto Decode<FuncInstr>::read_instr( Cycle cycle)
 {
     if ( rp_stall_datapath->is_ready( cycle))
-        return std::pair<Instr, bool>( rp_stall_datapath->read( cycle), true);
+        return std::make_pair( rp_stall_datapath->read( cycle), true);
 
-    return std::pair<Instr, bool>( rp_datapath->read( cycle), false);
+    return std::make_pair( rp_datapath->read( cycle), false);
 }
 
 
