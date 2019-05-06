@@ -37,6 +37,7 @@ private:
 
     /* Input signals - BP */
     std::unique_ptr<ReadPort<BPInterface>> rp_bp_update = nullptr;
+    std::unique_ptr<ReadPort<BPInterface>> rp_bp_update_from_decode = nullptr;
     
     /* Input signals - PC values */
     std::unique_ptr<ReadPort<Target>> rp_flush_target = nullptr;
@@ -53,7 +54,6 @@ private:
     std::unique_ptr<WritePort<bool>> wp_hit_or_miss = nullptr;
 
     /* port needed for habdling misprediction at decode stage */
-    std::unique_ptr<ReadPort<BPInterface>> rp_bp_update_from_decode = nullptr;
     std::unique_ptr<ReadPort<Target>> rp_flush_target_from_decode = nullptr;
 
     Target get_target( Cycle cycle);
