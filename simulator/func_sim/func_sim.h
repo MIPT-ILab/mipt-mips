@@ -14,7 +14,6 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
-#include <map>
 #include <memory>
 #include <string>
 
@@ -58,7 +57,6 @@ class FuncSim : public Simulator
             IGNORE,
         } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
 
-        using HandleTrapStrMap = std::map<std::string, HandleTrapMode>;
         bool handle_trap_critical = false;
         bool handle_trap_verbose = true;
 
