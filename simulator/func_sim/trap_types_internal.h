@@ -4,10 +4,12 @@
 enum GDB_TrapType : uint8
 {
     GDB_SIGNAL_0    = 0,
-    GDB_SIGNAL_TRAP = 5,
-    GDB_SIGNAL_SYS  = 12,
-    GDB_SIGNAL_BUS  = 10,
+    GDB_SIGNAL_INT  = 2,
     GDB_SIGNAL_ILL  = 4,
+    GDB_SIGNAL_TRAP = 5,
+    GDB_SIGNAL_FPE  = 8,
+    GDB_SIGNAL_BUS  = 10,
+    GDB_SIGNAL_SYS  = 12,
 };
 
 /* Source: The MIPS64 and microMIPS64 Privileged Resource Architecture v5.04 */
@@ -28,7 +30,7 @@ enum MIPS_TrapType : uint8
     MIPS_EXC_OV            = 12, /* Arithmetic overflow */
     MIPS_EXC_TR            = 13, /* Explicit trap */
     MIPS_EXC_MSAFPE        = 14,
-    MIPS_EXC_FPE           = 15,
+    MIPS_EXC_FPE           = 15, /* Division by zero */
     MIPS_EXC_FPOVF         = 16, /* Free implementation, following MARS */
     MIPS_EXC_FPUNDF        = 17, /* Free implementation, following MARS */
     MIPS_EXC_C2E           = 18,
