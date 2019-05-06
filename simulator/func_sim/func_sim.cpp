@@ -6,12 +6,37 @@
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
+#include <boost/tokenizer.hpp>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
-{ }
+{
+    setup_trap_handler( "stop_on_halt,verbose");
+}
+
+template <typename ISA> void
+FuncSim<ISA>::setup_trap_handler(const std::string& mode)
+{
+    boost::char_separator sepr(",");
+    boost::tokenizer tokens( mode, sepr);
+    for ( const auto& e : tokens)
+        if ( e == "stop")
+            handle_trap_mode = HandleTrapMode::STOP;
+        else if ( e == "stop_on_halt")
+            handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+        else if ( e == "ignore")
+            handle_trap_mode = HandleTrapMode::IGNORE;
+        else if ( e == "critical")
+            handle_trap_critical = true;
+        else if ( e == "verbose")
+            handle_trap_verbose = true;
+}
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -105,27 +130,35 @@ Trap FuncSim<ISA>::step_system()
 }
 
 template <typename ISA>
+Trap FuncSim<ISA>::handle_trap( Trap trap)
+{
+    if ( trap == Trap::SYSCALL)
+        trap = handle_syscall();
+
+    if ( trap == Trap::NO_TRAP)
+        return trap;
+
+    if ( handle_trap_verbose)
+        std::cout << "\tFuncSim trap: " << trap << std::endl;
+
+    if ( handle_trap_critical)
+        throw std::runtime_error( "critical trap");
+
+    switch ( handle_trap_mode)
+    {
+    case HandleTrapMode::STOP_ON_HALT: return trap == Trap::HALT ? trap : Trap(Trap::NO_TRAP);
+    case HandleTrapMode::IGNORE: return Trap(Trap::NO_TRAP);
+    default: return trap;
+    }
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto trap = step_system();
-        if ( trap == Trap::SYSCALL)
-            trap = handle_syscall();
-        if ( trap == Trap::HALT)
-            return Trap(Trap::HALT);
-    }
-    return Trap(Trap::NO_TRAP);
-}
-
-template <typename ISA>
-Trap FuncSim<ISA>::run_until_trap( uint64 instrs_to_run)
-{
-    nops_in_a_row = 0;
-    for ( uint64 i = 0; i < instrs_to_run; ++i) {
-        auto trap = step_system();
-        if ( trap == Trap::SYSCALL)
-            trap = handle_syscall();
+        trap = handle_trap(trap);
         if ( trap != Trap::NO_TRAP)
             return trap;
     }

@@ -34,10 +34,10 @@ public:
 
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual Trap run_single_step() = 0;
-    virtual Trap run_until_trap( uint64 instrs_to_run) = 0;
     virtual void set_target( const Target& target) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
+    virtual void setup_trap_handler( const std::string& mode) = 0;
     virtual void init_checker() = 0;
 
     Trap run_no_limit() { return run( MAX_VAL64); }
@@ -69,6 +69,7 @@ protected:
 class CycleAccurateSimulator : public Simulator {
 public:
     explicit CycleAccurateSimulator( bool log = false) : Simulator( log) {}
+    void setup_trap_handler( const std::string& /* mode */) final { }
     virtual void clock() = 0;
     virtual void halt() = 0;
     static std::shared_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa, bool log);

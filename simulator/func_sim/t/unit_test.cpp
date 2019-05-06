@@ -199,11 +199,13 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     CHECK_NOTHROW( sim->run_no_limit() );
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test)
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, const std::string& trap_options)
 {
-    auto sim = Simulator::create_functional_simulator(isa);
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator(isa, log);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
+    sim->setup_trap_handler( trap_options);
 
     ElfLoader elf( test);
     elf.load_to( mem.get());
@@ -219,16 +221,35 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
-    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
+TEST_CASE( "Torture_Test: Stop on halt")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1)     == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000) == Trap::HALT );
+}
+
+TEST_CASE( "Torture_Test: Ignore traps ")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1)  == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10) != Trap::NO_TRAP);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10) == Trap::NO_TRAP);
+}
+
+TEST_CASE( "Torture_Test: Critical traps ")
+{
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 10000), std::runtime_error);
+}
+
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    valid_elf_file)->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars",    valid_elf_file, "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out", "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
 }
