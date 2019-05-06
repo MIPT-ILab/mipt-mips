@@ -23,9 +23,7 @@ FuncSim<ISA>::FuncSim( Endian endian, bool log)
 template <typename ISA> void
 FuncSim<ISA>::setup_trap_handler(const std::string& mode)
 {
-    boost::char_separator sepr(",");
-    boost::tokenizer tokens( mode, sepr);
-    for ( const auto& e : tokens)
+    for ( const auto& e : boost::tokenizer( mode, boost::char_separator(",")))
         if ( e == "stop")
             handle_trap_mode = HandleTrapMode::STOP;
         else if ( e == "stop_on_halt")
@@ -60,7 +58,7 @@ void FuncSim<ISA>::update_and_check_nop_counter( const FuncInstr& instr)
 template <typename ISA>
 typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
 {
-    FuncInstr instr = imem.fetch_instr( pc[0]);;
+    FuncInstr instr = imem.fetch_instr( pc[0]);
     instr.set_sequence_id(sequence_id);
     sequence_id++;
     rf.read_sources( &instr);
@@ -117,18 +115,6 @@ Trap FuncSim<ISA>::handle_syscall()
     return Trap(Trap::NO_TRAP);
 }
 
-template<typename ISA>
-Trap FuncSim<ISA>::step_system()
-{
-    const auto& instr = step();
-    sout << instr << std::endl;
-
-    if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
-        throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
-
-    return instr.trap_type();
-}
-
 template <typename ISA>
 Trap FuncSim<ISA>::handle_trap( Trap trap)
 {
@@ -157,21 +143,13 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
-        auto trap = step_system();
-        trap = handle_trap(trap);
+        const auto& instr = step();
+        sout << instr << std::endl;
+        auto trap = handle_trap(instr.trap_type());
         if ( trap != Trap::NO_TRAP)
             return trap;
     }
     return Trap(Trap::NO_TRAP);
-}
-
-template <typename ISA>
-Trap FuncSim<ISA>::run_single_step()
-{
-    auto trap = step_system();
-    if ( trap == Trap::SYSCALL)
-        trap = handle_syscall();
-    return trap == Trap(Trap::NO_TRAP) ? Trap(Trap::BREAKPOINT) : trap;
 }
 
 template <typename ISA>

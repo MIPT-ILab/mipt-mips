@@ -77,10 +77,7 @@ void GDBSim::resume( uint64 step) try
 {
     std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
     uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
-    if (instrs_to_run == 1)
-        trap = cpu->run_single_step ();
-    else
-        trap = cpu->run( instrs_to_run);
+    trap = cpu->run( instrs_to_run);
 }
 catch (const BearingLost &e) {
     trap = Trap::HALT;

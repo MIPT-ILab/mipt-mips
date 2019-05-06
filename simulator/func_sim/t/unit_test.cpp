@@ -86,15 +86,16 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 static auto run_over_empty_memory( const std::string& isa)
 {
     auto sim = Simulator::create_functional_simulator( isa);
+    sim->setup_trap_handler( "stop");
     sim->set_memory( FuncMemory::create_hierarchied_memory());
-    return sim->run_no_limit();
+    return sim->run( 30);
 }
 
 TEST_CASE( "FuncSim: create empty memory and get lost")
 {
     CHECK_THROWS_AS( run_over_empty_memory("mips32"), BearingLost);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv32"), UnknownInstruction);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv128"), UnknownInstruction);
+    CHECK( run_over_empty_memory("riscv32") == Trap::UNKNOWN_INSTRUCTION);
+    CHECK( run_over_empty_memory("riscv128") == Trap::UNKNOWN_INSTRUCTION);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")
@@ -130,18 +131,6 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     CHECK( sim->get_pc() == elf.get_startPC());
     sim->run( 1);
     CHECK( sim->get_pc() == elf.get_startPC() + 4);
-}
-
-TEST_CASE( "FuncSim: make a system-level step")
-{
-    auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
-
-    CHECK( sim->run_single_step() == Trap::BREAKPOINT);
 }
 
 TEST_CASE( "Run one instruction: Func_Sim")

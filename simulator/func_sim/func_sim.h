@@ -17,13 +17,6 @@
 #include <memory>
 #include <string>
 
-struct UnknownInstruction final : Exception
-{
-    explicit UnknownInstruction(const std::string& msg)
-        : Exception("Unknown instruction is an unhandled trap", msg)
-    { }
-};
-
 template <typename ISA>
 class FuncSim : public Simulator
 {
@@ -46,7 +39,6 @@ class FuncSim : public Simulator
         void update_and_check_nop_counter( const FuncInstr& instr);
         Trap handle_trap( Trap trap);
         Trap handle_syscall();
-        Trap step_system();
 
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
@@ -70,7 +62,6 @@ class FuncSim : public Simulator
         void init_checker() final { };
         FuncInstr step();
         Trap run( uint64 instrs_to_run) final;
-        Trap run_single_step() final;
 
         void set_target(const Target& target) final {
             pc[0] = target.address;
