@@ -15,13 +15,15 @@ struct BPInterface {
     Addr pc = NO_VAL32;
     bool is_taken = false;
     Addr target = NO_VAL32;
+    bool is_hit = true;
 
     BPInterface() = default;
 
-    BPInterface( Addr pc, bool is_taken, Addr target)
+    BPInterface( Addr pc, bool is_taken, Addr target, bool is_hit)
         : pc( pc)
         , is_taken( is_taken)
         , target( target)
+        , is_hit( is_hit)
     { }
 };
 

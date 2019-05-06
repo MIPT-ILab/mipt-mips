@@ -359,8 +359,8 @@ static const Table<I> isaMapRI =
     // Branches
     {0x0,  { "bltz",  mips_bltz<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
     {0x1,  { "bgez",  mips_bgez<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
-    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
-    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     // Conditional traps
     {0x8,  { "tgei",  mips_tgei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     {0x9,  { "tgeiu", mips_tgeiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
@@ -371,8 +371,8 @@ static const Table<I> isaMapRI =
     // Linking branches
     {0x10, { "bltzal",  mips_bltzal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
     {0x11, { "bgezal",  mips_bgezal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
-    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
-    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
+    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
+    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -399,10 +399,10 @@ static const Table<I> isaMapIJ =
     {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, { }, Dst::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
-    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
     // Doubleword unaligned loads
     {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
     {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },

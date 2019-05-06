@@ -46,14 +46,13 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
     wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
 }
 
-
 template <typename FuncInstr>
-typename Decode<FuncInstr>::Instr Decode<FuncInstr>::read_instr( Cycle cycle)
+auto Decode<FuncInstr>::read_instr( Cycle cycle) -> std::pair<Instr, bool>
 {
     if ( rp_stall_datapath->is_ready( cycle))
-        return rp_stall_datapath->read( cycle);
+        return std::make_pair( rp_stall_datapath->read( cycle), true);
 
-    return rp_datapath->read( cycle);
+    return std::make_pair( rp_datapath->read( cycle), false);
 }
 
 
@@ -94,24 +93,30 @@ void Decode<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
-    auto instr = read_instr( cycle);
+    auto[instr, from_stall] = read_instr( cycle);
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
 
-    bool is_misprediction = instr.is_direct_jump() &&
-    ( !instr.get_bp_data().is_taken || instr.get_bp_data().target != instr.get_decoded_target());
+    if ( instr.is_jump())
+        num_jumps++;
 
     /* handle misprediction */
-    if ( is_misprediction)
+    if ( is_misprediction( instr, instr.get_bp_data()))
     {
+        num_mispredictions++;
+
         // flushing fetch stage, instr fetch will appear at decode stage next clock,
         // so we send flush signal to decode
-        wp_flush_fetch->write( true, cycle);
+        if ( !bypassing_unit->is_stall( instr))
+            wp_flush_fetch->write( true, cycle);
 
         /* sending valid PC to fetch stage */
-        wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
-        sout << "\nmisprediction on ";
+        if ( !from_stall)
+        {
+            wp_flush_target->write( instr.get_actual_decoded_target(), cycle);
+            sout << "\nmisprediction on ";
+        }
     }
 
     if ( bypassing_unit->is_stall( instr))

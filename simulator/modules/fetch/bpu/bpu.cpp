@@ -59,6 +59,13 @@ public:
         return is_hit && is_way_taken( way, PC, targets[ way][ tags.set(PC)]);
     }
 
+    bool is_hit( Addr PC) const final
+    {
+        // do not update LRU information on this check,
+        // so "no_touch" version of "tags.read" is used:
+        return tags.read_no_touch( PC).first;
+    }
+
     Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
