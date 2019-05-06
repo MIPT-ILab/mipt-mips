@@ -5,27 +5,34 @@
 
 #include "func_sim.h"
 #include <kernel/kernel.h>
+
+#include <boost/tokenizer.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 
 
 template <typename ISA>
-typename FuncSim<ISA>::HandleTrapStrMap FuncSim<ISA>::handle_trap_str_map = {
-    { "stop",         HandleTrapMode::STOP         },
-    { "stop_on_halt", HandleTrapMode::STOP_ON_HALT },
-    { "ignore",       HandleTrapMode::IGNORE       },
-};
-
-template <typename ISA>
-FuncSim<ISA>::FuncSim( Endian endian, bool log, const std::string &trap_mode, bool trap_critical, bool trap_verbose)
+FuncSim<ISA>::FuncSim( Endian endian, bool log, const std::string &trap_options)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
-    , handle_trap_mode(handle_trap_str_map.at(trap_mode))
-    , handle_trap_critical(trap_critical)
-    , handle_trap_verbose(trap_verbose)
-{ }
+{
+    boost::char_separator sepr(" ");
+    boost::tokenizer tokens(trap_options, sepr);
+    for ( auto it = tokens.begin(); it != tokens.end(); ++it) {
+             if ( *it == "stop")
+            handle_trap_mode = HandleTrapMode::STOP;
+        else if ( *it == "stop_on_halt")
+            handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+        else if ( *it == "ignore")
+            handle_trap_mode = HandleTrapMode::IGNORE;
+        else if ( *it == "critical")
+            handle_trap_critical = true;
+        else if ( *it == "verbose")
+            handle_trap_verbose = true;
+    }
+}
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)

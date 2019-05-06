@@ -200,10 +200,10 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
 }
 
 static auto get_simulator_with_test( const std::string& isa, const std::string& test,
-    const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true)
+    const std::string &trap_options = "stop_on_halt verbose")
 {
     bool log = false;
-    auto sim = Simulator::create_functional_simulator(isa, log, trap_mode, trap_critical, trap_verbose);
+    auto sim = Simulator::create_functional_simulator(isa, log, trap_options);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -229,24 +229,21 @@ TEST_CASE( "Torture_Test: Stop on trap")
 
 TEST_CASE( "Torture_Test: Stop on halt")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1) == Trap::NO_TRAP );
-    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000);
-    CHECK( trap == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1)     == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000) == Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: Ignore traps ")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1) == Trap::NO_TRAP );
-    auto trap_stop   = get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10);
-    auto trap_ignore = get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10);
-    CHECK( trap_stop   != Trap::NO_TRAP );
-    CHECK( trap_ignore == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1)  == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10) != Trap::NO_TRAP);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10) == Trap::NO_TRAP);
 }
 
 TEST_CASE( "Torture_Test: Critical traps ")
 {
-    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop", true)->run( 1) );
-    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop", true)->run( 10000), std::runtime_error);
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop critical")->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop critical")->run( 10000), std::runtime_error);
 }
 
 TEST_CASE( "Torture_Test: integration")

@@ -16,7 +16,7 @@
 
 GDBSim::GDBSim( const std::string& isa)
 {
-    cpu = Simulator::create_configured_isa_simulator( isa);
+    cpu = Simulator::create_configured_debugger_isa_simulator( isa);
     memory = FuncMemory::create_hierarchied_memory();
     auto kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);

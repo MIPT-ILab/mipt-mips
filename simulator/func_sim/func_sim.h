@@ -14,9 +14,9 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
 
 struct UnknownInstruction final : Exception
 {
@@ -65,7 +65,7 @@ class FuncSim : public Simulator
 
     public:
         explicit FuncSim( Endian endian, bool log = false,
-            const std::string &trap_mode = "stop_on_halt", bool trap_critical = false, bool trap_verbose = true);
+            const std::string &trap_options = "stop_on_halt verbose");
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
