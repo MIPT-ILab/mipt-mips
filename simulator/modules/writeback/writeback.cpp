@@ -79,9 +79,6 @@ void Writeback<ISA>::writeback_bubble( Cycle cycle)
 template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
-    if ( instr.trap_type() == Trap::UNKNOWN_INSTRUCTION)
-        throw UnknownInstruction( instr.string_dump() + ' ' + instr.bytes_dump());
-
     rf->write_dst( instr);
     wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
 
