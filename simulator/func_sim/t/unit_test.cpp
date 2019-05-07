@@ -15,64 +15,6 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
-#include "../trap_types.h"
-#include "../trap_types_internal.h"
-
-#include <sstream>
-
-TEST_CASE( "Trap: check conversion to RISC-V ")
-{
-    Trap trap( Trap::SYSCALL);
-    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
-}
-
-TEST_CASE( "Trap: check conversion to GDB ")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
-}
-
-TEST_CASE( "Trap: check conversion to MIPS ")
-{
-    Trap trap( Trap::FP_DIV_BY_ZERO);
-    CHECK( trap.to_mips_format() == MIPS_EXC_FPE);
-}
-
-TEST_CASE( "Trap: check bad conversion to MIPS ")
-{
-    Trap trap( Trap::NO_TRAP);
-    CHECK_THROWS_AS( trap.to_mips_format(), std::out_of_range);
-}
-
-TEST_CASE( "Trap: check RISC-V initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
-}
-
-TEST_CASE( "Trap: check GDB initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
-    CHECK( trap == Trap( Trap::BREAKPOINT));
-}
-
-TEST_CASE( "Trap: check MIPS initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_mips_format( MIPS_EXC_FPOVF);
-    CHECK( trap == Trap( Trap::FP_OVERFLOW));
-}
-
-TEST_CASE( "Trap: print")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    std::ostringstream oss;
-    oss << trap;
-    CHECK( oss.str() == "UNKNOWN_INSTRUCTION");
-}
-
 static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
 
