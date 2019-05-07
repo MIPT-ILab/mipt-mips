@@ -76,12 +76,15 @@ CacheTagArray::CacheTagArray(
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
-    uint32 addr_size_in_bits)
+    uint32 addr_size_in_bits,
+    bool replacement_module_generation)
     : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
     , tags( sets, std::vector<Tag>( ways))
     , lookup_helper( sets, google::dense_hash_map<Addr, uint32>( ways))
-    , replacement_module( sets, ways)
 {
+    //infinite cache doesn't need the replacement module
+    if ( replacement_module_generation)
+        replacement_module = std::make_unique<ReplacementModule>( sets, ways);
     //theese are spicial dense_hash_map requirements
     for (uint32 i = 0; i < sets; i++) {
         lookup_helper[i].set_empty_key( impossible_key);
@@ -97,7 +100,7 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module.touch( num_set, way);
+        replacement_module->touch( num_set, way);
     }
 
     return lookup_result;
@@ -120,7 +123,7 @@ uint32 CacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = narrow_cast<uint32>( replacement_module.update( num_set));
+    const auto way = narrow_cast<uint32>( replacement_module->update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
@@ -136,6 +139,73 @@ uint32 CacheTagArray::write( Addr addr)
     entry.is_valid = true;
 
     return way;
+}
+
+AlwaysHitCacheTagArray::AlwaysHitCacheTagArray(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits)
+    : CacheTagArray( size_in_bytes, ways, line_size, addr_size_in_bits)
+{ }
+
+InfiniteCacheTagArray::InfiniteCacheTagArray(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits)
+    : CacheTagArray( size_in_bytes, ways, line_size, addr_size_in_bits, false), way_counter( sets, 0)
+{ }
+
+void InfiniteCacheTagArray::double_size()
+{
+    ways *= 2;
+    size_in_bytes *= 2;
+    for ( uint32 i = 0; i < sets; i++)
+    {
+        tags[i].resize( ways);
+        lookup_helper[i].resize( ways);
+    }
+}
+
+uint32 InfiniteCacheTagArray::write( Addr addr)
+{
+    const Addr new_tag = tag( addr);
+    const uint32 num_set = set( addr);
+
+    if ( way_counter[num_set] == ways)
+        double_size();
+
+    const auto way = way_counter[num_set]++;
+
+    // get an old tag
+    auto& entry = tags[ num_set][ way];
+    const Addr old_tag = entry.tag;
+
+    // Remove old tag from lookup helper and add a new tag
+    if ( entry.is_valid)
+        lookup_helper[ num_set].erase( old_tag);
+    lookup_helper[ num_set].emplace( new_tag, way);
+
+    // Update tag array
+    entry.tag = new_tag;
+    entry.is_valid = true;
+
+    return way;
+}
+
+std::unique_ptr<CacheTagArray> create_cache_tag_array(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits,
+    const std::string& cache_tag_array_type)
+{
+    if ( cache_tag_array_type == "always_hit")
+        return std::make_unique<AlwaysHitCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits);
+    if ( cache_tag_array_type == "infinite" )
+        return std::make_unique<InfiniteCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits);
+    return std::make_unique<CacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits);
 }
 
 ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy)

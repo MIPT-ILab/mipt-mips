@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-// Replacement algorithm modules (LRU)
+// Replacement algorithm module (LRU)
 
 class ReplacementModule
 {
@@ -50,8 +50,8 @@ class CacheTagArraySizeCheck : public Log
             uint32 addr_size_in_bits
         );
 
-        const uint32 size_in_bytes;
-        const uint32 ways;
+        uint32 size_in_bytes;
+        uint32 ways;
         const uint32 line_size;
         const uint32 addr_size_in_bits;
 };
@@ -67,7 +67,7 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
         );
         const size_t line_bits;
     public:
-        const uint32 sets;
+        uint32 sets;
         const size_t set_bits;
         const Addr   addr_mask;
 
@@ -86,18 +86,19 @@ class CacheTagArray : public CacheTagArraySize
             uint32 size_in_bytes,
             uint32 ways,
             uint32 line_size,
-            uint32 addr_size_in_bits = 32
+            uint32 addr_size_in_bits = 32,
+            bool replacement_module_generation = true
         );
 
         // hit or not
-        bool lookup( Addr addr) { return read( addr).first; }
+        virtual bool lookup( Addr addr) { return read( addr).first; }
+        // create new entry in cache
+        virtual Way write( Addr addr);
         // lookup the cache and update LRU info
-        std::pair<bool, Way> read( Addr addr);
+        virtual std::pair<bool, Way> read( Addr addr);
         // find in the cache but do not update LRU info
         std::pair<bool, Way> read_no_touch( Addr addr) const;
-        // create new entry in cache
-        Way write( Addr addr);
-    private:
+    protected:
         struct Tag
         {
             bool is_valid = false;
@@ -110,7 +111,46 @@ class CacheTagArray : public CacheTagArraySize
         // hash tabe to lookup tags in O(1)
         std::vector<google::dense_hash_map<Addr, Way>> lookup_helper;
         const uint32 impossible_key = INT32_MAX;
-        ReplacementModule replacement_module; // LRU algorithm module
+        std::unique_ptr<ReplacementModule> replacement_module = nullptr;
 };
+
+class AlwaysHitCacheTagArray : public CacheTagArray
+{
+    public:
+        AlwaysHitCacheTagArray(
+                uint32 size_in_bytes,
+                uint32 ways,
+                uint32 line_size,
+                uint32 addr_size_in_bits = 32
+        );
+
+        bool lookup( Addr /* unused */) override { return true; }
+};
+
+class InfiniteCacheTagArray : public CacheTagArray
+{
+    public:
+        InfiniteCacheTagArray(
+                uint32 size_in_bytes,
+                uint32 ways,
+                uint32 line_size,
+                uint32 addr_size_in_bits = 32
+        );
+
+        Way write( Addr addr) override;
+        // Since it's not permitted to these interfaces, we have to keep both methods
+        // even thow touch concept is pointless in the infinite cache model
+        std::pair<bool, Way> read( Addr addr) override { return read_no_touch( addr); }
+    private:
+        void double_size();
+        std::vector<Way> way_counter;
+};
+
+std::unique_ptr<CacheTagArray> create_cache_tag_array(
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits = 32,
+    const std::string& cache_tag_array_type = "default"); //should be default for normal behaviour
 
 #endif // CACHE_TAG_ARRAY_H
