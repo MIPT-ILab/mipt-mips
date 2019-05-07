@@ -131,7 +131,7 @@ void PseudoLRU::construct_tree( core::tree<LRU_tree_node>::iterator LRU_tree_nod
     }
 }
 
-std::size_t PseudoLRU::which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it) //tree container doesnt provide such an option
+std::size_t PseudoLRU::which_sibling( core::tree<LRU_tree_node>::iterator LRU_tree_node_it) //tree container doesnt provide such option
 {
     return LRU_tree_node_it.data().way_number % 2 == 0 ? Left : Right;
 }
