@@ -56,6 +56,11 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
+* `--trap_mode <mode>` — procedure to process traps in functional simulation. Supported modes are:
+    * `stop` — stop simulation on any interrupt
+    * `ignore` — do not stop simulation on any interrupt
+    * `stop_on_halt` — stop simulation only on system halt interrupt/system call
+    * Additionally, if `,verbose` is appended, trap information will appear in log
 
 ### ISA and system-level options:
 
