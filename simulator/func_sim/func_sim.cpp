@@ -108,11 +108,9 @@ Trap FuncSim<ISA>::handle_syscall()
     switch ( result.type) {
     case SyscallResult::HALT:        exit_code = result.code; return Trap(Trap::HALT);
     case SyscallResult::IGNORED:     return Trap(Trap::SYSCALL);
-    case SyscallResult::SUCCESS:     return Trap(Trap::NO_TRAP);
     case SyscallResult::UNSUPPORTED: return Trap(Trap::UNSUPPORTED_SYSCALL);
-    default: assert( 0);
+    default: return Trap(Trap::NO_TRAP);
     }
-    return Trap(Trap::NO_TRAP);
 }
 
 template <typename ISA>
