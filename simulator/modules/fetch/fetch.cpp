@@ -43,9 +43,7 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
 
     bp = BaseBP::create_configured_bp();
-    tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
-                                            config::instruction_cache_ways,
-                                            config::instruction_cache_line_size);
+    tags = create_cache_tag_array( config::instruction_cache_size, config::instruction_cache_ways, config::instruction_cache_line_size);
 }
 
 template <typename FuncInstr>
