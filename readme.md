@@ -4,6 +4,8 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
 
+[![CodeCov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/icicle.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
+
 # MIPT-MIPS / MIPT-V
 
 MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
@@ -113,4 +115,3 @@ The main goal of the project is to teach the students the computer architecture 
 ### May I contribute?
 
 Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
-
