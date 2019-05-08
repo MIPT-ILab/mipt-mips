@@ -7,7 +7,7 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
 

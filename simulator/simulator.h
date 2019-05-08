@@ -6,7 +6,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/target.h>

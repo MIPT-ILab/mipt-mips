@@ -8,7 +8,7 @@
 #define ALU_H
 
 #include "multiplication.h"
-#include "trap_types.h"
+#include "traps/trap.h"
 
 #include <infra/macro.h>
 #include <tuple>

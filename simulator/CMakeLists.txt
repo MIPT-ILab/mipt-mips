@@ -36,7 +36,7 @@ set(CPPS
     memory/elf/elf_loader.cpp
     memory/argv_loader/argv_loader.cpp
     func_sim/func_sim.cpp
-    func_sim/trap_types.cpp
+    func_sim/traps/trap.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
@@ -81,12 +81,13 @@ set(TESTS_CPPS
     mips/t/mips32_memory_test.cpp
     mips/t/mips32_traps_test.cpp
     mips/t/mips64_test.cpp
-    func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
-    modules/fetch/bpu/t/unit_test.cpp
+    func_sim/rf/t/unit_test.cpp
+    func_sim/traps/t/unit_test.cpp
     func_sim/t/unit_test.cpp
+    modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
 )

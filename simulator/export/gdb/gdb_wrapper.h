@@ -15,7 +15,7 @@
 #ifndef GDB_WRAPPER_H
 #define GDB_WRAPPER_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
 #include <infra/byte.h>
 
 #include <memory>

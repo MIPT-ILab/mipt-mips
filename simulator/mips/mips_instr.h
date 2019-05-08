@@ -12,7 +12,6 @@
 #include "mips_version.h"
 
 #include <func_sim/operation.h>
-#include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/string_view.h>
