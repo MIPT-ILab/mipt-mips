@@ -46,11 +46,9 @@ static constexpr const uint8 MIPS_EXC_MCHECK        = 24;
 static constexpr const uint8 MIPS_EXC_THREAD        = 25;
 static constexpr const uint8 MIPS_EXC_DSPDIS        = 26;
 static constexpr const uint8 MIPS_EXC_GE            = 27;
-static constexpr const uint8 MIPS_EXC_RESERVED28    = 28;
-static constexpr const uint8 MIPS_EXC_RESERVED29    = 29;
 static constexpr const uint8 MIPS_EXC_CACHEERR      = 30;
-static constexpr const uint8 MIPS_EXC_RESERVED31    = 31;
 
+#if 0
 static constexpr const uint8 ADDRESS_EXCEPTION_LOAD         =  4;
 static constexpr const uint8 ADDRESS_EXCEPTION_STORE        =  5;
 static constexpr const uint8 SYSCALL_EXCEPTION              =  8;
@@ -61,6 +59,7 @@ static constexpr const uint8 TRAP_EXCEPTION                 = 13;
 static constexpr const uint8 DIVIDE_BY_ZERO_EXCEPTION       = 15; /* Only FP-div */
 static constexpr const uint8 FLOATING_POINT_OVERFLOW        = 16;
 static constexpr const uint8 FLOATING_POINT_UNDERFLOW       = 17;
+#endif
 
 std::array<std::string_view, Trap::MAX_TRAP_TYPE> Trap::TrapStrTable =
 {{
