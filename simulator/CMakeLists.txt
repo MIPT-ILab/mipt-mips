@@ -35,6 +35,7 @@ set(CPPS
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
     memory/argv_loader/argv_loader.cpp
+    func_sim/driver.cpp
     func_sim/func_sim.cpp
     func_sim/traps/trap.cpp
     mips/mips_instr.cpp
