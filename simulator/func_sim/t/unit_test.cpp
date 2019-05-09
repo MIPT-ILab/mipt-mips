@@ -12,6 +12,7 @@
 #include <kernel/mars/mars_kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
+#include <mips/mips_register/mips_register.h>
 #include <simulator.h>
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
@@ -179,6 +180,18 @@ TEST_CASE( "Torture_Test: Critical traps ")
 {
     CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 1) );
     CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 10000), std::runtime_error);
+}
+
+TEST_CASE( "Torture_Test: MIPS32 calls ")
+{
+    auto sim = get_simulator_with_test("mips32", valid_elf_file, "mips32");
+    auto start_pc = sim->get_pc();
+    CHECK_THROWS_AS( sim->run( 10000), BearingLost);
+    CHECK( sim->get_pc() >= 0x8'0000'0180);
+    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
+    auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
+    CHECK( epc > start_pc);
+    CHECK( epc < start_pc + 0x1000'000);
 }
 
 TEST_CASE( "Torture_Test: integration")
