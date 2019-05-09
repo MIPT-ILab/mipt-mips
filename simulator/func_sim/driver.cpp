@@ -8,7 +8,24 @@
 
 #include <boost/tokenizer.hpp>
 
-Driver::Driver( const std::string& mode, Simulator* /* sim */)
+class DriverImpl : public Driver
+{
+public:
+    DriverImpl( const std::string& mode);
+    Trap handle_trap( Trap trap) const final;
+private:
+    enum class HandleTrapMode : uint8
+    {
+        STOP,
+        STOP_ON_HALT,
+        IGNORE,
+    } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+
+    bool handle_trap_critical = false;
+    bool handle_trap_verbose = false;
+};
+
+DriverImpl::DriverImpl( const std::string& mode)
 {
     for ( const auto& e : boost::tokenizer( mode, boost::char_separator(",")))
         if ( e == "stop")
@@ -23,7 +40,12 @@ Driver::Driver( const std::string& mode, Simulator* /* sim */)
             handle_trap_verbose = true;
 }
 
-Trap Driver::handle_trap( Trap trap) const
+std::unique_ptr<Driver> Driver::construct( const std::string& mode, Simulator* /* sim */)
+{
+    return std::make_unique<DriverImpl>( mode);
+}
+
+Trap DriverImpl::handle_trap( Trap trap) const
 {
     if ( trap == Trap::NO_TRAP)
         return trap;

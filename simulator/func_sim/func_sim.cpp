@@ -135,7 +135,7 @@ void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
 template <typename ISA>
 void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
 {
-    driver = std::make_shared<Driver>( mode, this);
+    driver = Driver::construct( mode, this);
 }
 
 #include <mips/mips.h>

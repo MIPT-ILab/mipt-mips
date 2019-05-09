@@ -31,7 +31,7 @@ class FuncSim : public Simulator
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
-        std::shared_ptr<Driver> driver;
+        std::unique_ptr<Driver> driver;
 
         std::array<Addr, 8> pc = {};
         size_t delayed_slots = 0;
