@@ -7,6 +7,7 @@
 #ifndef FUNC_SIM_H
 #define FUNC_SIM_H
 
+#include "driver.h"
 #include "instr_memory.h"
 #include "rf/rf.h"
 
@@ -30,6 +31,7 @@ class FuncSim : public Simulator
         std::shared_ptr<FuncMemory> mem;
         InstrMemoryCached<ISA> imem;
         std::shared_ptr<Kernel> kernel;
+        std::shared_ptr<Driver> driver;
 
         std::array<Addr, 8> pc = {};
         size_t delayed_slots = 0;
@@ -37,21 +39,10 @@ class FuncSim : public Simulator
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
-        Trap handle_trap( Trap trap);
         Trap handle_syscall();
 
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
-
-        enum class HandleTrapMode : uint8
-        {
-            STOP,
-            STOP_ON_HALT,
-            IGNORE,
-        } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
-
-        bool handle_trap_critical = false;
-        bool handle_trap_verbose = false;
 
     public:
         explicit FuncSim( Endian endian, bool log = false);
