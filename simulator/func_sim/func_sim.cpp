@@ -17,7 +17,7 @@ FuncSim<ISA>::FuncSim( Endian endian, bool log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
 {
-    setup_trap_handler( "stop_on_halt,verbose");
+    setup_trap_handler( "stop_on_halt");
 }
 
 template <typename ISA>
@@ -107,7 +107,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         auto trap = instr.trap_type();
         if ( trap == Trap::SYSCALL)
             trap = handle_syscall();
-        trap = driver->handle_trap(trap);
+        trap = driver->handle_trap( trap, instr.get_PC());
         if ( trap != Trap::NO_TRAP)
             return trap;
     }

@@ -5,10 +5,9 @@
 
 #include "../func_sim.h"
 
-// Catch2
+
 #include <catch.hpp>
 
-// Module
 #include <kernel/kernel.h>
 #include <kernel/mars/mars_kernel.h>
 #include <memory/elf/elf_loader.h>
@@ -23,6 +22,11 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
     // Just call a constructor
     CHECK_NOTHROW( Simulator::create_functional_simulator("mips32") );
     CHECK_THROWS_AS( Simulator::create_functional_simulator("pdp11"), InvalidISA);
+}
+
+TEST_CASE( "Bad driver")
+{
+    CHECK_THROWS_AS( Simulator::create_functional_simulator("mips32")->setup_trap_handler("abracadabra"), IncorrectDriver);
 }
 
 static auto run_over_empty_memory( const std::string& isa)
@@ -173,8 +177,8 @@ TEST_CASE( "Torture_Test: Ignore traps ")
 
 TEST_CASE( "Torture_Test: Critical traps ")
 {
-    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 1) );
-    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 10000), std::runtime_error);
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 10000), std::runtime_error);
 }
 
 TEST_CASE( "Torture_Test: integration")
