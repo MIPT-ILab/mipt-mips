@@ -13,43 +13,43 @@
 #include <vector>
 
 static constexpr const uint8 GDB_SIGNAL_0    = 0;
-static constexpr const uint8 GDB_SIGNAL_INT  = 2;
+// static constexpr const uint8 GDB_SIGNAL_INT  = 2;
 static constexpr const uint8 GDB_SIGNAL_ILL  = 4;
 static constexpr const uint8 GDB_SIGNAL_TRAP = 5;
-static constexpr const uint8 GDB_SIGNAL_FPE  = 8;
+// static constexpr const uint8 GDB_SIGNAL_FPE  = 8;
 static constexpr const uint8 GDB_SIGNAL_BUS  = 10;
 static constexpr const uint8 GDB_SIGNAL_SYS  = 12;
 
 /* Source: The MIPS64 and microMIPS64 Privileged Resource Architecture v5.04 */
-static constexpr const uint8 MIPS_EXC_INT           =  0;
-static constexpr const uint8 MIPS_EXC_MOD           =  1;
-static constexpr const uint8 MIPS_EXC_TLBL          =  2;
-static constexpr const uint8 MIPS_EXC_TLBS          =  3;
+// static constexpr const uint8 MIPS_EXC_INT           =  0;
+// static constexpr const uint8 MIPS_EXC_MOD           =  1;
+// static constexpr const uint8 MIPS_EXC_TLBL          =  2;
+// static constexpr const uint8 MIPS_EXC_TLBS          =  3;
 static constexpr const uint8 MIPS_EXC_ADEL          =  4; /* Loads; instruction fetch (UNALIGNED_FETCH and UNKNOWN_INSTRUCTION)*/
 static constexpr const uint8 MIPS_EXC_ADES          =  5; /* Stores */
-static constexpr const uint8 MIPS_EXC_IBE           =  6;
-static constexpr const uint8 MIPS_EXC_DBE           =  7;
+// static constexpr const uint8 MIPS_EXC_IBE           =  6;
+// static constexpr const uint8 MIPS_EXC_DBE           =  7;
 static constexpr const uint8 MIPS_EXC_SYS           =  8; /* Syscall */
 static constexpr const uint8 MIPS_EXC_BP            =  9; /* Breakpoint */
 static constexpr const uint8 MIPS_EXC_RI            = 10; /* Reserved instr */
 static constexpr const uint8 MIPS_EXC_CPU           = 11; /* Coprocessor unusable */
 static constexpr const uint8 MIPS_EXC_OV            = 12; /* Arithmetic overflow */
 static constexpr const uint8 MIPS_EXC_TR            = 13; /* Explicit trap */
-static constexpr const uint8 MIPS_EXC_MSAFPE        = 14;
+// static constexpr const uint8 MIPS_EXC_MSAFPE        = 14;
 static constexpr const uint8 MIPS_EXC_FPE           = 15; /* Division by zero */
 static constexpr const uint8 MIPS_EXC_FPOVF         = 16; /* Free implementation; following MARS */
 static constexpr const uint8 MIPS_EXC_FPUNDF        = 17; /* Free implementation; following MARS */
-static constexpr const uint8 MIPS_EXC_C2E           = 18;
-static constexpr const uint8 MIPS_EXC_TLBRI         = 19;
-static constexpr const uint8 MIPS_EXC_TLBXI         = 20;
-static constexpr const uint8 MIPS_EXC_MSADis        = 21;
-static constexpr const uint8 MIPS_EXC_MDMX          = 22;
-static constexpr const uint8 MIPS_EXC_WATCH         = 23;
-static constexpr const uint8 MIPS_EXC_MCHECK        = 24;
-static constexpr const uint8 MIPS_EXC_THREAD        = 25;
-static constexpr const uint8 MIPS_EXC_DSPDIS        = 26;
-static constexpr const uint8 MIPS_EXC_GE            = 27;
-static constexpr const uint8 MIPS_EXC_CACHEERR      = 30;
+// static constexpr const uint8 MIPS_EXC_C2E           = 18;
+// static constexpr const uint8 MIPS_EXC_TLBRI         = 19;
+// static constexpr const uint8 MIPS_EXC_TLBXI         = 20;
+// static constexpr const uint8 MIPS_EXC_MSADis        = 21;
+// static constexpr const uint8 MIPS_EXC_MDMX          = 22;
+// static constexpr const uint8 MIPS_EXC_WATCH         = 23;
+// static constexpr const uint8 MIPS_EXC_MCHECK        = 24;
+// static constexpr const uint8 MIPS_EXC_THREAD        = 25;
+// static constexpr const uint8 MIPS_EXC_DSPDIS        = 26;
+// static constexpr const uint8 MIPS_EXC_GE            = 27;
+// static constexpr const uint8 MIPS_EXC_CACHEERR      = 30;
 
 #if 0
 static constexpr const uint8 ADDRESS_EXCEPTION_LOAD         =  4;
