@@ -38,7 +38,7 @@ public:
     static std::shared_ptr<Kernel> create_dummy_kernel();
 
     void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
-    void set_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
+    virtual void connect_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
 
     virtual SyscallResult execute() = 0;
 
