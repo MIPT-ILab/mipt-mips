@@ -9,6 +9,7 @@
 
 #include "traps/trap.h"
 
+#include <memory>
 #include <string>
 
 class Simulator;
@@ -16,18 +17,15 @@ class Simulator;
 class Driver
 {
 public:
-    Driver( const std::string& mode, Simulator* sim);
-    Trap handle_trap( Trap trap) const;
-private:
-    enum class HandleTrapMode : uint8
-    {
-        STOP,
-        STOP_ON_HALT,
-        IGNORE,
-    } handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
+    static std::unique_ptr<Driver> construct( const std::string& mode, Simulator* sim);
+    virtual Trap handle_trap( Trap trap) const = 0;
 
-    bool handle_trap_critical = false;
-    bool handle_trap_verbose = false;
+    Driver() = default;
+    virtual ~Driver() = default;
+    Driver( const Driver&) = delete;
+    Driver( Driver&&) = delete;
+    Driver& operator=( const Driver&) = delete;
+    Driver& operator=( Driver&&) = delete;
 };
 
 #endif
