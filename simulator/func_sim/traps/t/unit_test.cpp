@@ -9,49 +9,34 @@
 #include <riscv.opcode.gen.h>
 #include <sstream>
 
-TEST_CASE( "Trap: check conversion to RISC-V ")
+TEST_CASE( "Trap: invalid trap")
 {
-    Trap trap( Trap::SYSCALL);
-    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
+    Trap trap( Trap::INVALID_TRAP);
+    CHECK_THROWS_AS( trap.to_riscv_format(), InvalidTrapConversion);
+    CHECK_THROWS_AS( trap.to_gdb_format(), InvalidTrapConversion);
+    CHECK_THROWS_AS( trap.to_mips_format(), InvalidTrapConversion);
 }
 
-TEST_CASE( "Trap: check conversion to GDB ")
+TEST_CASE( "Trap: check conversion")
 {
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    CHECK( trap.to_gdb_format() == 4);
+    CHECK( Trap( Trap::SYSCALL).to_riscv_format() == CAUSE_USER_ECALL);
+    CHECK( Trap( Trap::UNKNOWN_INSTRUCTION).to_gdb_format() == 4);
+    CHECK( Trap( Trap::FP_DIV_BY_ZERO).to_mips_format() == 15);
+    CHECK( Trap( Trap::NO_TRAP).to_mips_format() == 0);
 }
 
-TEST_CASE( "Trap: check conversion to MIPS ")
+TEST_CASE( "Trap: check initialization")
 {
-    Trap trap( Trap::FP_DIV_BY_ZERO);
-    CHECK( trap.to_mips_format() == 15);
+    CHECK( Trap::from_riscv_format( CAUSE_MISALIGNED_FETCH) == Trap::UNALIGNED_FETCH);
+    CHECK( Trap::from_gdb_format( 5) == Trap::BREAKPOINT);
+    CHECK( Trap::from_mips_format( 16) == Trap::FP_OVERFLOW);
 }
 
-TEST_CASE( "Trap: check bad conversion to MIPS ")
+TEST_CASE( "Trap: check bad initialization")
 {
-    Trap trap( Trap::NO_TRAP);
-    CHECK_THROWS_AS( trap.to_mips_format(), std::out_of_range);
-}
-
-TEST_CASE( "Trap: check RISC-V initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
-}
-
-TEST_CASE( "Trap: check GDB initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_gdb_format( 5);
-    CHECK( trap == Trap( Trap::BREAKPOINT));
-}
-
-TEST_CASE( "Trap: check MIPS initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_mips_format( 16);
-    CHECK( trap == Trap( Trap::FP_OVERFLOW));
+    CHECK_THROWS_AS( Trap::from_riscv_format( 255), InvalidTrapConversion);
+    CHECK_THROWS_AS( Trap::from_gdb_format( 255), InvalidTrapConversion);
+    CHECK_THROWS_AS( Trap::from_mips_format( 255), InvalidTrapConversion);
 }
 
 TEST_CASE( "Trap: print")

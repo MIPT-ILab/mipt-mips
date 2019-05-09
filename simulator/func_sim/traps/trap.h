@@ -6,20 +6,24 @@
 #ifndef TRAP_TYPES_H
 #define TRAP_TYPES_H
 
-// MIPT-MIPS modules
+#include <infra/exception.h>
 #include <infra/types.h>
 
-#include <array>
-#include <string_view>
+struct InvalidTrapConversion : Exception
+{
+    explicit InvalidTrapConversion( const std::string& msg)
+        : Exception("Invalid trap conversion", msg)
+    { }
+};
 
 class Trap {
     public:
         enum TrapType : uint8
         {
-            #define TRAP(name) name ,
+            #define TRAP(name, gdb, riscv, mips) name ,
             #include "trap.def"
             #undef TRAP
-            MAX_TRAP_TYPE
+            INVALID_TRAP
         };
 
         explicit constexpr Trap( TrapType id) : value(id) { }
@@ -33,25 +37,18 @@ class Trap {
 
         std::size_t get_hash() const noexcept { return std::hash<std::uint8_t>{}(value); }
 
+        static Trap from_gdb_format(uint8 id);
+        static Trap from_riscv_format(uint8 id);
+        static Trap from_mips_format(uint8 id);
 
-        void set_from_gdb_format(uint8 id);
-        uint8 to_gdb_format();
+        uint8 to_gdb_format() const;
+        uint8 to_riscv_format() const;
+        uint8 to_mips_format() const;
 
-        void set_from_riscv_format(uint8 id);
-        uint8 to_riscv_format();
-
-        void set_from_mips_format(uint8 id);
-        uint8 to_mips_format();
-
-        friend std::ostream& operator<<( std::ostream& out, const Trap& trap)
-        {
-            return out << TrapStrTable.at( trap.value);
-        }
+        friend std::ostream& operator<<( std::ostream& out, const Trap& trap);
 
     private:
         TrapType value = Trap::NO_TRAP;
-
-        static std::array<std::string_view, MAX_TRAP_TYPE> TrapStrTable;
 };
 
 namespace std
