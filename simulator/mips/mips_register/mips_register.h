@@ -17,7 +17,7 @@
 #include <utility>
 
 class MIPSRegister {
-    enum RegNum : uint8
+    enum RegNum : size_t
     {
 #define REGISTER(X) MIPS_REG_ ## X
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
@@ -46,22 +46,22 @@ public:
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }
     bool is_mips_lo()    const { return value == MIPS_REG_lo; }
 
-    static constexpr MIPSRegister from_cpu_index( uint8 id) noexcept
+    static constexpr MIPSRegister from_cpu_index( size_t id) noexcept
     {
         return MIPSRegister( RegNum{ id});
     }
 
-    static constexpr MIPSRegister from_cp0_index( uint8 id) noexcept
+    static constexpr MIPSRegister from_cp0_index( size_t id) noexcept
     {
-        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP0_REG_Context0 + id)});
+        return MIPSRegister( RegNum{ narrow_cast<size_t>( MIPS_CP0_REG_Context0 + id)});
     }
 
     static constexpr MIPSRegister from_cp1_index( uint8 id) noexcept
     {
-        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP1_REG_f0 + id)});
+        return MIPSRegister( RegNum{ narrow_cast<size_t>( MIPS_CP1_REG_f0 + id)});
     }
 
-    static MIPSRegister from_gdb_index( uint8 id)
+    static MIPSRegister from_gdb_index( size_t id)
     {
         if (id < 32u)
             return from_cpu_index( id);

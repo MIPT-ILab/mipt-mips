@@ -115,7 +115,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 }
 
 template <typename ISA>
-uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
+uint64 FuncSim<ISA>::read_gdb_register( size_t regno) const
 {
     if ( regno == Register::get_gdb_pc_index())
         return get_pc();
@@ -124,7 +124,7 @@ uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
 }
 
 template <typename ISA>
-void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
 {
     if ( regno == Register::get_gdb_pc_index())
         set_pc( value);
