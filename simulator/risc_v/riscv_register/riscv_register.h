@@ -17,25 +17,23 @@
 #include <utility>
 
 class RISCVRegister {
-    enum RegNum : uint16
+    enum RegNum : size_t
     {
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) RISCV_REG_ ## X
 #include "riscv_register.def"
 #undef REGISTER
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define DECLARE_CSR(X, Y) , RISCV_ ## Y
 #include <riscv.opcode.gen.h>
 #undef DECLARE_CSR
         , MAX_VAL_RegNum
     };
 
-    static RegNum get_csr_regnum( uint16 val);
+    static RegNum get_csr_regnum( size_t val);
     static RegNum get_csr_regnum( std::string_view name);
 
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
-    static const uint8 popular_reg_shift = uint8( RISCV_REG_s0);
+    static const size_t popular_reg_shift = size_t( RISCV_REG_s0);
 
     friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
     {
@@ -46,11 +44,11 @@ public:
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     constexpr bool is_mips_hi()    const { return false; }
     constexpr bool is_mips_lo()    const { return false; }
-    static auto from_cpu_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
-    static auto from_gdb_index( uint8 id) { return RISCVRegister( RegNum{ id}); }
-    static auto from_csr_index( uint16 id) { return RISCVRegister( get_csr_regnum( id)); }
+    static auto from_cpu_index( size_t id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_gdb_index( size_t id) { return RISCVRegister( RegNum{ id}); }
+    static auto from_csr_index( size_t id) { return RISCVRegister( get_csr_regnum( id)); }
     static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
-    static auto from_cpu_popular_index( uint8 id) {  id += popular_reg_shift; return RISCVRegister( RegNum{ id}); }
+    static auto from_cpu_popular_index( size_t id) {  id += popular_reg_shift; return RISCVRegister( RegNum{ id}); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     size_t to_rf_index()           const { return value; }
 
