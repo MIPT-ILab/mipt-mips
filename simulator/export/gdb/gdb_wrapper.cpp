@@ -23,7 +23,7 @@ GDBSim::GDBSim( const std::string& isa)
     cpu->set_memory( memory);
     cpu->set_kernel( kernel);
     kernel->set_simulator( cpu);
-    kernel->set_memory( memory);
+    kernel->connect_memory( memory);
 }
 
 bool GDBSim::load( const std::string& filename) const try

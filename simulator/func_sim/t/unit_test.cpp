@@ -146,7 +146,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     elf.load_to( mem.get());
 
     auto kernel = create_mars_kernel();
-    kernel->set_memory( mem);
+    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
 
