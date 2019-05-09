@@ -207,6 +207,7 @@ void Datapath<T>::load( const T& value)
     {
         switch ( get_mem_size())
         {
+            case 0: break; // e.g. fences
             case 1: v_dst = sign_extension<8>( value); break;
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
