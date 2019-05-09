@@ -16,13 +16,14 @@
 #include <utility>
 #include <vector>
 
-template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY = 0>
+template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY, Key DELETED_KEY>
 class InstrCache
 {
     public:
         InstrCache() : pointers( CAPACITY)
         {
             pointers.set_empty_key( INVALID_KEY);
+            pointers.set_deleted_key( DELETED_KEY);
             lru_module = create_cache_replacement( "LRU", CAPACITY);
             // Touch everything to initialize order
             for (size_t i = 0; i < CAPACITY; ++i)

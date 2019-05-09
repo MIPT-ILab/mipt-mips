@@ -54,7 +54,7 @@ template<typename ISA>
 class InstrMemoryCached : public InstrMemory<ISA>
 {
     using Instr = typename ISA::FuncInstr;
-    InstrCache<Addr, Instr, INSTR_CACHE_CAPACITY, 0x0> instr_cache{};
+    InstrCache<Addr, Instr, INSTR_CACHE_CAPACITY, 0x0, all_ones<Addr>()> instr_cache{};
 public:
     explicit InstrMemoryCached( Endian endian) : InstrMemory<ISA>( endian) { }
     Instr fetch_instr( Addr PC) final
@@ -68,7 +68,8 @@ public:
             instr_cache.erase( PC);
 
         auto instr = InstrMemory<ISA>::fetch_instr( PC);
-        instr_cache.update( PC, instr);
+        if ( PC != 0)
+            instr_cache.update( PC, instr);
         return instr;
     }
 };
