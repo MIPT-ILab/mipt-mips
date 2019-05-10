@@ -37,7 +37,7 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
 }
 
 template <typename FuncInstr>
-auto Decode<FuncInstr>::read_instr( Cycle cycle)
+auto Decode<FuncInstr>::read_instr( Cycle cycle) const
 {
     if ( rp_stall_datapath->is_ready( cycle))
         return std::make_pair( rp_stall_datapath->read( cycle), true);
@@ -60,16 +60,20 @@ bool Decode<FuncInstr>::is_misprediction( const Instr& instr, const BPInterface&
         && bp_data.is_taken);
 }
 
+template<typename FuncInstr>
+bool Decode<FuncInstr>::is_flush( Cycle cycle) const
+{
+    return ( rp_flush->is_ready( cycle) && rp_flush->read( cycle))
+        || ( rp_flush_fetch->is_ready( cycle) && rp_flush_fetch->read( cycle));
+}
+
 template <typename FuncInstr>
 void Decode<FuncInstr>::clock( Cycle cycle)
 {
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
-    /* receive flush signal */
-    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle)) ||
-                    ( rp_flush_fetch->is_ready( cycle) && rp_flush_fetch->read( cycle));
+    const bool has_flush = is_flush( cycle);
 
-    /* update bypassing unit */
     bypassing_unit->update();
 
     /* trace new instruction if needed */
@@ -83,8 +87,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     if ( rp_bypassing_unit_flush_notify->is_ready( cycle))
         bypassing_unit->handle_flush();
 
-    /* branch misprediction */
-    if ( is_flush)
+    if ( has_flush)
     {
         sout << "flush\n";
         return;
