@@ -301,6 +301,12 @@ TEST_CASE( "Func_memory: String length")
     CHECK( mem->read_string_limited( 0x10, 5) == "Hello");
 }
 
+TEST_CASE( "Func_memory: String length, empty memory")
+{
+    auto mem = FuncMemory::create_hierarchied_memory( 24);
+    CHECK( mem->strlen( 0x10) == 0);
+}
+
 TEST_CASE( "Func_memory: String length, plain memory")
 {
     const std::string hw("Hello World!");
