@@ -13,32 +13,32 @@ class DriverNoOp : public Driver
 {
 public:
     explicit DriverNoOp( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( Trap trap, Addr /* pc */) const final { return trap; }
+    Trap handle_trap_impl( const Operation& instr) const final { return instr.trap_type(); }
 };
 
 class DriverHaltOnly : public Driver
 {
 public:
     explicit DriverHaltOnly( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( Trap trap, Addr /* pc */) const final { return trap == Trap::HALT ? trap : Trap(Trap::NO_TRAP); }
+    Trap handle_trap_impl( const Operation& instr) const final { return instr.trap_type() == Trap::HALT ? instr.trap_type() : Trap(Trap::NO_TRAP); }
 };
 
 class DriverIgnore : public Driver
 {
 public:
     explicit DriverIgnore( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( Trap /* trap */, Addr /* pc */) const final { return Trap(Trap::NO_TRAP); }
+    Trap handle_trap_impl( const Operation& /* instr */) const final { return Trap(Trap::NO_TRAP); }
 };
 
 class DriverCritical : public Driver
 {
 public:
     explicit DriverCritical( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( Trap trap, Addr /* pc */) const final
+    Trap handle_trap_impl( const Operation& instr) const final
     {
-        if ( trap != Trap::NO_TRAP)
+        if ( instr.trap_type() != Trap::NO_TRAP)
             throw std::runtime_error( "critical trap");
-        return trap;
+        return instr.trap_type();
     }
 };
 
@@ -46,8 +46,9 @@ class DriverMIPS32 : public Driver
 {
 public:
     explicit DriverMIPS32( bool verbose, Simulator* sim) : Driver( verbose), cpu( sim) { }
-    Trap handle_trap_impl( Trap trap, Addr pc) const final
+    Trap handle_trap_impl( const Operation& instr) const final
     {
+        auto trap = instr.trap_type();
         if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
             return trap;
 
@@ -57,7 +58,7 @@ public:
         cause = (cause & ~(bitmask<uint64>(4) << 2)) | ((trap.to_mips_format() & bitmask<uint64>(4)) << 2);
         cpu->write_cpu_register( MIPSRegister::status().to_rf_index(), status);
         cpu->write_cpu_register( MIPSRegister::cause().to_rf_index(), cause);
-        cpu->write_cpu_register( MIPSRegister::epc().to_rf_index(), pc);
+        cpu->write_cpu_register( MIPSRegister::epc().to_rf_index(), instr.get_PC());
         cpu->set_pc( 0x8'0000'0180);
         return Trap( Trap::NO_TRAP);
     }

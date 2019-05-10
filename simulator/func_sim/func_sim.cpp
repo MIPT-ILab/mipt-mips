@@ -86,14 +86,14 @@ static SyscallResult execute_syscall( Kernel* kernel)
 }
 
 template <typename ISA>
-Trap FuncSim<ISA>::handle_syscall()
+void FuncSim<ISA>::handle_syscall( FuncInstr* instr)
 {
     auto result = execute_syscall( kernel.get());
     switch ( result.type) {
-    case SyscallResult::HALT:        exit_code = result.code; return Trap(Trap::HALT);
-    case SyscallResult::IGNORED:     return Trap(Trap::SYSCALL);
-    case SyscallResult::UNSUPPORTED: return Trap(Trap::UNSUPPORTED_SYSCALL);
-    default: return Trap(Trap::NO_TRAP);
+    case SyscallResult::HALT:        exit_code = result.code; instr->set_trap( Trap( Trap::HALT)); break;
+    case SyscallResult::IGNORED:     instr->set_trap( Trap( Trap::SYSCALL)); break;
+    case SyscallResult::UNSUPPORTED: instr->set_trap( Trap( Trap::UNSUPPORTED_SYSCALL)); break;
+    default: instr->set_trap( Trap( Trap::NO_TRAP));
     }
 }
 
@@ -102,12 +102,12 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
-        const auto& instr = step();
+        auto instr = step();
         sout << instr << std::endl;
-        auto trap = instr.trap_type();
-        if ( trap == Trap::SYSCALL)
-            trap = handle_syscall();
-        trap = driver->handle_trap( trap, instr.get_PC());
+        if ( instr.trap_type() == Trap::SYSCALL)
+            handle_syscall( &instr);
+
+        auto trap = driver->handle_trap( instr);
         if ( trap != Trap::NO_TRAP)
             return trap;
     }
