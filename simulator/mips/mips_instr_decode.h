@@ -15,7 +15,7 @@
 enum class Reg : uint8
 {
     RS, RT, RD,
-    CP0_RT, CP0_RD, SR, EPC,
+    CP0_RD, SR, EPC,
     FR, FT, FS, FD, FCSR,
     ZERO, RA,
     HI, LO, HI_LO
@@ -28,7 +28,6 @@ static inline bool is_explicit_register( Reg type)
     return type == Reg::RS
         || type == Reg::RT
         || type == Reg::RD
-        || type == Reg::CP0_RT
         || type == Reg::CP0_RD
         || type == Reg::FR
         || type == Reg::FT
@@ -93,7 +92,6 @@ struct MIPSInstrDecoder
         case Reg::RS:     return MIPSRegister::from_cpu_index( rs);
         case Reg::RT:     return MIPSRegister::from_cpu_index( rt);
         case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
-        case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
         case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
         case Reg::SR:     return MIPSRegister::status();
         case Reg::EPC:    return MIPSRegister::epc();
