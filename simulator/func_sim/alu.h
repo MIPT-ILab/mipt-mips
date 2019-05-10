@@ -267,6 +267,14 @@ struct ALU
         }
     }
 
+    template<typename I> static
+    void eret( I* instr)
+    {
+        // FIXME(pikryukov): That should behave differently for ErrorEPC
+        jump( instr, instr->v_src1);
+        instr->v_dst &= instr->v_src2 & ~(1 << 2);
+    }
+
     // Traps
     template<typename I> static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
     template<typename I> static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
