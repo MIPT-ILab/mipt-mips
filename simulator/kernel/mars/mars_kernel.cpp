@@ -6,6 +6,8 @@
 
 #include "mars_kernel.h"
 
+#include <memory/elf/elf_loader.h>
+
 #include <fstream>
 #include <string>
 #include <unordered_map>
@@ -38,6 +40,7 @@ class MARSKernel : public Kernel {
 
 public:
     SyscallResult execute() final;
+    void connect_memory( std::shared_ptr<FuncMemory> m) final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
       : instream( instream), outstream( outstream), errstream( errstream) {}
@@ -235,4 +238,11 @@ void MARSKernel::read_from_file() {
     auto chars_read = file->tellg() - current_pos;
     cpu->write_cpu_register( v0, chars_read);
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
+}
+
+void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
+{
+    Kernel::connect_memory( m);
+    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin", 0x8'0000'0180 - 0x470);
+    elf_loader.load_to( mem.get());
 }

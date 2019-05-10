@@ -135,6 +135,27 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     CHECK_NOTHROW( sim->run_no_limit() );
 }
 
+TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
+{
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator("mips32", log);
+    auto mem = FuncMemory::create_hierarchied_memory( 36);
+    sim->set_memory( mem);
+    sim->setup_trap_handler( "mips32");
+
+    ElfLoader elf( valid_elf_file);
+    elf.load_to( mem.get());
+    auto start_pc = elf.get_startPC();
+    sim->set_pc( start_pc);
+
+    CHECK_THROWS_AS( sim->run( 10000), BearingLost);
+    CHECK( sim->get_pc() >= 0x8'0000'0180);
+    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
+    auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
+    CHECK( epc > start_pc);
+    CHECK( epc < start_pc + 0x1000'000);
+}
+
 static auto get_simulator_with_test( const std::string& isa, const std::string& test, const std::string& trap_options)
 {
     bool log = false;
@@ -184,14 +205,7 @@ TEST_CASE( "Torture_Test: Critical traps ")
 
 TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    auto sim = get_simulator_with_test("mips32", valid_elf_file, "mips32");
-    auto start_pc = sim->get_pc();
-    CHECK_THROWS_AS( sim->run( 10000), BearingLost);
-    CHECK( sim->get_pc() >= 0x8'0000'0180);
-    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
-    auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
-    CHECK( epc > start_pc);
-    CHECK( epc < start_pc + 0x1000'000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "mips32")->run( 10000) == Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: integration")
