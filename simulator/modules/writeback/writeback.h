@@ -6,20 +6,11 @@
 #ifndef WRITEBACK_H
 #define WRITEBACK_H
 
-#include <func_sim/func_sim.h>
+#include "checker/checker.h"
+
 #include <infra/exception.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
-
-struct CheckerMismatch final : Exception
-{
-    explicit CheckerMismatch(const std::string& msg)
-        : Exception("Performance simulator and functional simulator executed different instructions\n"
-                    "Usually it indicates a bug in performance simulator\n"
-                    "The different instructions are\n"
-                    , msg)
-    { }
-};
 
 struct Deadlock final : Exception
 {
@@ -43,15 +34,7 @@ private:
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
     const Endian endian;
-
-    class Checker {
-        std::shared_ptr<FuncSim<ISA>> sim;
-        bool active = false;
-    public:
-        void check( const FuncInstr& instr);
-        void init( Endian endian, const FuncMemory& mem);
-        void set_target( const Target& value);
-    } checker;
+    Checker<ISA> checker;
 
     /* Simulator internals */
     RF<FuncInstr>* rf = nullptr;
