@@ -28,7 +28,7 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW);
     rp_hold_pc = make_read_port<Target>("HOLD_PC", PORT_LATENCY);
 
-    rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_LATENCY);
 
     rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
 
@@ -119,6 +119,8 @@ void Fetch<FuncInstr>::save_flush( Cycle cycle)
         wp_target->write( rp_flush_target_from_decode->read( cycle), cycle);
     else if( rp_target->is_ready( cycle))
         wp_target->write( rp_target->read( cycle), cycle);
+    else if( rp_external_target->is_ready( cycle))
+        wp_target->write( rp_external_target->read( cycle), cycle);
 }
 
 template <typename FuncInstr>

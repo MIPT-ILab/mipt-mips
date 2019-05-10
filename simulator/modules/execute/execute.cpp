@@ -20,6 +20,7 @@ Execute<FuncInstr>::Execute( bool log)
     wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW );
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
     if (config::long_alu_latency < 2)
         throw Exception("Wrong argument! Latency of long arithmetic logic unit should be greater than 1");
@@ -52,15 +53,15 @@ Execute<FuncInstr>::Execute( bool log)
 
     rps_bypass[0].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_bypass[1].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
-}    
+}
 
 template <typename FuncInstr>
 void Execute<FuncInstr>::clock( Cycle cycle)
 {
     sout << "execute cycle " << std::dec << cycle << ": ";
 
-    /* receive flush signal */
-    const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle))
+                       || ( rp_trap->is_ready( cycle) && rp_trap->read( cycle));
 
     /* update information about mispredictions */
     clock_saved_flush();

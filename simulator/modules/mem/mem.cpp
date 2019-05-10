@@ -11,6 +11,7 @@ Mem<FuncInstr>::Mem( bool log) : Log( log)
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW);
     rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
@@ -22,8 +23,8 @@ void Mem<FuncInstr>::clock( Cycle cycle)
 {
     sout << "memory  cycle " << std::dec << cycle << ": ";
 
-    /* receieve flush signal */
-    const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle))
+                       || ( rp_trap->is_ready( cycle) && rp_trap->read( cycle));
 
     /* branch misprediction */
     if ( is_flush)

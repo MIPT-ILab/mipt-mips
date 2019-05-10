@@ -47,6 +47,7 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_bypassing_unit_notify = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_bypassing_unit_flush_notify = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
+    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
 
     /* Outputs */
     std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;

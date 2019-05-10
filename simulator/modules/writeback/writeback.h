@@ -47,17 +47,20 @@ private:
     std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
     std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
+    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
 
     /* Output */
     std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
     std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
+    std::unique_ptr<WritePort<bool>> wp_trap = nullptr;
+    std::unique_ptr<WritePort<Target>> wp_target = nullptr;
 
 public:
     explicit Writeback( Endian endian, bool log);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
-    void set_target( const Target& value);
+    void set_target( const Target& value, Cycle cycle);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
