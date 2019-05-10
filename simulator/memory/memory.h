@@ -130,7 +130,7 @@ class FuncMemory : public ReadableAndWritableMemory
 {
 public:
     static std::shared_ptr<FuncMemory>
-        create_hierarchied_memory( uint32 addr_bits = 32,
+        create_hierarchied_memory( uint32 addr_bits = 36,
 				 uint32 page_bits = 10,
 				 uint32 offset_bits = 12);
 
