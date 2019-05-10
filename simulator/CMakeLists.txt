@@ -41,6 +41,7 @@ set(CPPS
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
+    mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
     risc_v/riscv_instr.cpp
     export/gdb/gdb_wrapper.cpp

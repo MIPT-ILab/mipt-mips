@@ -14,7 +14,7 @@
 namespace config {
     static AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
     static AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
-    static Value<std::string> trap_mode = { "trap_mode",  "stop_on_halt", "trap handler mode"};
+    static Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
 } // namespace config
 
 int main( int argc, const char* argv[]) try {

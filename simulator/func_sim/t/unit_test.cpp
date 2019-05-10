@@ -128,6 +128,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
+    sim->setup_trap_handler( "stop_on_halt");
     ElfLoader elf( smc_code);
     elf.load_to( mem.get());
     sim->set_pc( elf.get_startPC());
@@ -141,7 +142,6 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     auto sim = Simulator::create_functional_simulator("mips32", log);
     auto mem = FuncMemory::create_hierarchied_memory( 36);
     sim->set_memory( mem);
-    sim->setup_trap_handler( "mips32");
 
     ElfLoader elf( valid_elf_file);
     elf.load_to( mem.get());
@@ -205,7 +205,7 @@ TEST_CASE( "Torture_Test: Critical traps ")
 
 TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "mips32")->run( 10000) == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "")->run( 10000) == Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: integration")
