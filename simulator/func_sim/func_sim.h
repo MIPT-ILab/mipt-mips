@@ -39,7 +39,7 @@ class FuncSim : public Simulator
 
         uint64 nops_in_a_row = 0;
         void update_and_check_nop_counter( const FuncInstr& instr);
-        Trap handle_syscall();
+        void handle_syscall( FuncInstr* instr);
 
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }

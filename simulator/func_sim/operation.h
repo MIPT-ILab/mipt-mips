@@ -8,9 +8,11 @@
 #define OPERATION_H
 
 #include <func_sim/traps/trap.h>
+#include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
 
+#include <cassert>
 #include <sstream>
 
 enum OperationType : uint8
@@ -108,6 +110,7 @@ public:
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+    void set_trap( Trap value) { trap = value; }
     bool is_store() const { return operation == OUT_STORE; }
 
     auto get_mem_addr() const { return mem_addr; }

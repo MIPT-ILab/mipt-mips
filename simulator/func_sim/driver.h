@@ -7,6 +7,7 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
+#include "operation.h"
 #include "traps/trap.h"
 
 #include <infra/exception.h>
@@ -29,13 +30,13 @@ class Driver : public Log
 public:
     explicit Driver( bool verbose) : Log( verbose) { }
     static std::unique_ptr<Driver> construct( const std::string& mode, Simulator* sim, bool verbose);
-    Trap handle_trap( Trap trap, Addr pc) const
+    Trap handle_trap( const Operation& instr) const
     {
-        sout << "trap: " << trap << std::endl;
-        return handle_trap_impl( trap, pc);
+        sout << "trap: " << instr.trap_type() << std::endl;
+        return handle_trap_impl( instr);
     }
 private:
-    virtual Trap handle_trap_impl( Trap trap, Addr pc) const = 0;
+    virtual Trap handle_trap_impl( const Operation& instr) const = 0;
 };
 
 #endif
