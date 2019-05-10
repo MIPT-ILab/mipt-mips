@@ -362,11 +362,9 @@ static void check_move( std::string_view name)
     CHECK( instr.get_v_dst() == 0x12345678);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 TEST_CASE( "MIPS32_instr: mfc0 0x12345678")
 {
-    CHECK(MIPS32Instr(0x408d2000).get_disasm() == "mfc0 $a0, $Cause");
+    CHECK(MIPS32Instr(0x40046800).get_disasm() == "mfc0 $a0, $Cause");
     check_move( "mfc0");
 }
 
@@ -467,15 +465,11 @@ TEST_CASE( "MIPS32_instr: movz 3 if 0 is equal to 0")
     CHECK( instr.get_mask() == all_ones<uint32>());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 TEST_CASE( "MIPS32_instr: mtc0 0x12345678")
 {
-    CHECK(MIPS32Instr(0x40046800).get_disasm() == "mtc0 $Cause, $a0");
+    CHECK(MIPS32Instr(0x408d2000).get_disasm() == "mtc0 $Context1, $t5");
     check_move( "mtc0");
 }
-
-////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE( "MIPS32_instr: mthi 0x12345678")
 {

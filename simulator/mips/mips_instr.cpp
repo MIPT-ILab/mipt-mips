@@ -458,8 +458,8 @@ static const Table<I> isaMapMIPS32 =
 template<typename I>
 static const Table<I> isaMapCOP0_rs =
 {
-    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
-    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RT }, Dst::RD, MIPS_I_Instr} },
+    {0x00, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RD }, Dst::RT, MIPS_I_Instr} },
+    {0x04, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
 };
 
 template<typename I>
