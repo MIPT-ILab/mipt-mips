@@ -30,7 +30,8 @@ public:
     auto get_jumps_num() const { return num_jumps; }
 
 private:
-    auto read_instr( Cycle cycle);
+    auto read_instr( Cycle cycle) const;
+    bool is_flush( Cycle cycle) const;
     static bool is_misprediction( const Instr& instr, const BPInterface& bp_data);
 
     uint64 num_jumps          = 0;
