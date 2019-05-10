@@ -16,32 +16,22 @@ namespace config {
 template <typename FuncInstr>
 Decode<FuncInstr>::Decode( bool log) : Log( log)
 {
-    wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
-    rp_datapath = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
-
-    wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
-    rp_stall_datapath = make_read_port<Instr>("DECODE_2_DECODE", PORT_LATENCY);
-
-    wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
-
-    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
-
-    wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND",
-                                                                            PORT_BW, PORT_FANOUT);
-    wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND",
-                                                                            PORT_BW, PORT_FANOUT);
-
-    wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
-    rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
-    
-    rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY",
-                                                           PORT_LATENCY);
-
     bypassing_unit = std::make_unique<BypassingUnit>( config::long_alu_latency);
 
-    /*ports for handling mispredict at decode stage*/
-    wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    rp_datapath = make_read_port<Instr>("FETCH_2_DECODE", PORT_LATENCY);
+    rp_stall_datapath = make_read_port<Instr>("DECODE_2_DECODE", PORT_LATENCY);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
+    rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
+    rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_LATENCY);
     rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", PORT_LATENCY);
+
+    wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
+    wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
+    wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
+    wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_BW, PORT_FANOUT);
+    wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_BW, PORT_FANOUT);
+    wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
+    wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
     wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
     wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
 }
@@ -55,6 +45,20 @@ auto Decode<FuncInstr>::read_instr( Cycle cycle)
     return std::make_pair( rp_datapath->read( cycle), false);
 }
 
+template <typename FuncInstr>
+bool Decode<FuncInstr>::is_misprediction( const Instr& instr, const BPInterface& bp_data)
+{
+    if ( ( instr.is_direct_jump() || instr.is_indirect_jump()) && !bp_data.is_taken)
+        return true;
+
+    // 'likely' branches, which are not in BTB, are purposely considered as mispredictions
+    if ( instr.is_likely_branch() && !bp_data.is_hit)
+        return true;
+
+    return ( ( instr.is_direct_jump() || instr.is_branch())
+        && bp_data.target != instr.get_decoded_target()
+        && bp_data.is_taken);
+}
 
 template <typename FuncInstr>
 void Decode<FuncInstr>::clock( Cycle cycle)
