@@ -57,6 +57,7 @@ set(CPPS
     modules/branch/branch.cpp
     modules/core/perf_sim.cpp
     modules/writeback/writeback.cpp
+    modules/writeback/checker/checker.cpp
     simulator.cpp
 )
 

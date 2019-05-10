@@ -14,23 +14,6 @@ Writeback<ISA>::Writeback( Endian endian, bool log) : Log( log), endian( endian)
     wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW, PORT_FANOUT);
 }
 
-template <typename ISA>
-void Writeback<ISA>::Checker::init( Endian endian, const FuncMemory& outer_mem)
-{
-    auto memory = FuncMemory::create_hierarchied_memory();
-    sim = std::make_shared<FuncSim<ISA>>( endian);
-    outer_mem.duplicate_to( memory);
-    sim->set_memory( std::move( memory));
-    active = true;
-}
-
-template <typename ISA>
-void Writeback<ISA>::Checker::set_target( const Target& value)
-{
-    if ( active)
-        sim->set_target( value);
-}
-
 template<typename ISA>
 void Writeback<ISA>::set_target( const Target& value)
 {
@@ -90,24 +73,6 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     next_PC = instr.get_actual_target().address;
     if ( executed_instrs >= instrs_to_run || instr.is_halt())
         wp_halt->write( true, cycle);
-}
-
-template <typename ISA>
-void Writeback<ISA>::Checker::check( const FuncInstr& instr)
-{
-    if (!active)
-        return;
-
-    const auto func_dump = sim->step();
-
-    if ( func_dump.is_same_checker(instr))
-        return;
-    
-    std::ostringstream oss;
-    oss << "Checker output: " << func_dump << std::endl
-        << "PerfSim output: " << instr     << std::endl;
-
-    throw CheckerMismatch(oss.str());
 }
 
 #include <mips/mips.h>
