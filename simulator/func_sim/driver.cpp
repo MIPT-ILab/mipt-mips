@@ -6,9 +6,6 @@
 
 #include "driver.h"
 
-#include <mips/mips_register/mips_register.h>
-#include <simulator.h>
-
 class DriverNoOp : public Driver
 {
 public:
@@ -42,31 +39,7 @@ public:
     }
 };
 
-class DriverMIPS32 : public Driver
-{
-public:
-    explicit DriverMIPS32( bool verbose, Simulator* sim) : Driver( verbose), cpu( sim) { }
-    Trap handle_trap_impl( const Operation& instr) const final
-    {
-        auto trap = instr.trap_type();
-        if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
-            return trap;
-
-        auto status = cpu->read_cpu_register( MIPSRegister::status().to_rf_index());
-        auto cause  = cpu->read_cpu_register( MIPSRegister::cause().to_rf_index());
-        status |= 0x2;
-        cause = (cause & ~(bitmask<uint64>(4) << 2)) | ((trap.to_mips_format() & bitmask<uint64>(4)) << 2);
-        cpu->write_cpu_register( MIPSRegister::status().to_rf_index(), status);
-        cpu->write_cpu_register( MIPSRegister::cause().to_rf_index(), cause);
-        cpu->write_cpu_register( MIPSRegister::epc().to_rf_index(), instr.get_PC());
-        cpu->set_pc( 0x8'0000'0180);
-        return Trap( Trap::NO_TRAP);
-    }
-private:
-    Simulator* cpu = nullptr;
-};
-
-std::unique_ptr<Driver> Driver::construct( const std::string& mode, Simulator* sim, bool log)
+std::unique_ptr<Driver> Driver::construct( const std::string& mode, Simulator* /* sim */, bool log)
 {
     if ( mode == "stop")
         return std::make_unique<DriverNoOp>( log);
@@ -76,7 +49,5 @@ std::unique_ptr<Driver> Driver::construct( const std::string& mode, Simulator* s
         return std::make_unique<DriverIgnore>( log);
     if ( mode == "critical")
         return std::make_unique<DriverCritical>( log);
-    if ( mode == "mips32")
-        return std::make_unique<DriverMIPS32>( log, sim);
     throw IncorrectDriver( mode);
 }
