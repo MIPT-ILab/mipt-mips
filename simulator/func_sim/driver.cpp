@@ -48,7 +48,7 @@ public:
     explicit DriverMIPS32( bool verbose, Simulator* sim) : Driver( verbose), cpu( sim) { }
     Trap handle_trap_impl( Trap trap, Addr pc) const final
     {
-        if ( trap == Trap::NO_TRAP)
+        if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
             return trap;
 
         auto status = cpu->read_cpu_register( MIPSRegister::status().to_rf_index());
