@@ -16,8 +16,10 @@ FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
     , kernel( Kernel::create_dummy_kernel())
+    , driver( ISA::create_driver( log, this))
 {
-    setup_trap_handler( "stop_on_halt");
+    if ( driver == nullptr)
+        setup_trap_handler( "stop_on_halt");
 }
 
 template <typename ISA>
@@ -135,7 +137,8 @@ void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
 template <typename ISA>
 void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
 {
-    driver = Driver::construct( mode, this, false);
+    if ( !mode.empty())
+        driver = Driver::construct( mode, this, false);
 }
 
 #include <mips/mips.h>
