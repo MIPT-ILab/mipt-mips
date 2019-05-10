@@ -15,7 +15,7 @@
 enum class Reg : uint8
 {
     RS, RT, RD,
-    CP0_RT, CP0_RD,
+    CP0_RT, CP0_RD, SR, EPC,
     FR, FT, FS, FD, FCSR,
     ZERO, RA,
     HI, LO, HI_LO
@@ -95,6 +95,8 @@ struct MIPSInstrDecoder
         case Reg::RD:     return MIPSRegister::from_cpu_index( rd);
         case Reg::CP0_RT: return MIPSRegister::from_cp0_index( rt);
         case Reg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
+        case Reg::SR:     return MIPSRegister::status();
+        case Reg::EPC:    return MIPSRegister::epc();
         case Reg::FD:     return MIPSRegister::from_cp1_index( fd);
         case Reg::FS:     return MIPSRegister::from_cp1_index( fs);
         case Reg::FT:     return MIPSRegister::from_cp1_index( ft);
