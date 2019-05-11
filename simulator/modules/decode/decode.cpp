@@ -133,7 +133,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
         return;
     }
 
-    for ( uint8 src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
+    for ( size_t src_index = 0; src_index < SRC_REGISTERS_NUM; src_index++)
     {
         if ( bypassing_unit->is_in_RF( instr, src_index))
         {
