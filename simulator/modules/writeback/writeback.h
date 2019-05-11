@@ -39,8 +39,6 @@ private:
     /* Simulator internals */
     RF<FuncInstr>* rf = nullptr;
 
-    static constexpr const uint8 SRC_REGISTERS_NUM = 2;
-
     auto read_instructions( Cycle cycle);
     void writeback_instruction( const Instr& instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);

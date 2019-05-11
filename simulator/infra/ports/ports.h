@@ -95,7 +95,7 @@ public:
     auto get_bandwidth() const noexcept { return initialized_bandwidth; }
 
 protected:
-    BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout);
+    BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth);
     void base_init( const std::vector<BasicReadPort*>& readers);
 
     void increment_write_counter( Cycle cycle)
@@ -112,8 +112,8 @@ private:
 
     uint32 write_counter = 0;
     uint32 initialized_bandwidth = 0;
-
-    const uint32 _fanout = 0;
+    std::size_t _fanout = 0;
+    
     const uint32 installed_bandwidth = 0;
 };
 
@@ -122,8 +122,8 @@ template<class T> class ReadPort;
 template<class T> class WritePort : public BasicWritePort
 {
 public:
-    WritePort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout)
-        : BasicWritePort( port_map, key, bandwidth, fanout)
+    WritePort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth)
+        : BasicWritePort( port_map, key, bandwidth)
     { }
 
     void write( T&& what, Cycle cycle)

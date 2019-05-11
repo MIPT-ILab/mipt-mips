@@ -7,8 +7,6 @@
 
 #include "decode.h"
 
-static constexpr const uint32 FLUSHED_STAGES_NUM = 1;
-
 namespace config {
     extern Value<uint64> long_alu_latency;
 } // namespace config
@@ -25,15 +23,15 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
     rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_LATENCY);
     rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", PORT_LATENCY);
 
-    wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW, PORT_FANOUT);
-    wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW, PORT_FANOUT);
-    wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW, PORT_FANOUT);
-    wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_BW, PORT_FANOUT);
-    wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_BW, PORT_FANOUT);
-    wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW, PORT_FANOUT);
-    wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
-    wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW, PORT_FANOUT);
+    wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW);
+    wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW);
+    wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", PORT_BW);
+    wps_command[0] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_BW);
+    wps_command[1] = make_write_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_BW);
+    wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_BW);
+    wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", PORT_BW);
+    wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", PORT_BW);
+    wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", PORT_BW);
 }
 
 template <typename FuncInstr>

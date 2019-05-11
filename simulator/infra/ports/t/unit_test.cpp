@@ -18,7 +18,7 @@ TEST_CASE("Ports: no write port")
 TEST_CASE("Ports: no read port")
 {
     auto pm = PortMap::create_port_map();
-    WritePort<int> output( pm, "Yek", PORT_BW, PORT_FANOUT);
+    WritePort<int> output( pm, "Yek", PORT_BW);
     CHECK_THROWS_AS( pm->init(), PortError);
 }
 
@@ -26,32 +26,15 @@ TEST_CASE("Ports: two write ports")
 {
     auto pm = PortMap::create_port_map();
     ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT);
-    CHECK_THROWS_AS( WritePort<int>( pm, "Key", PORT_BW, PORT_FANOUT), PortError);
-}
-
-TEST_CASE("Ports: fanout overload")
-{
-    auto pm = PortMap::create_port_map();
-    ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT);
-    ReadPort<int> input2( pm, "Key", PORT_LATENCY);
-    CHECK_THROWS_AS( pm->init(), PortError);
-}
-
-TEST_CASE("Ports: fanout underload")
-{
-    auto pm = PortMap::create_port_map();
-    ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<int> output( pm, "Key", PORT_BW, PORT_FANOUT * 2);
-    CHECK_THROWS_AS( pm->init(), PortError);
+    WritePort<int> output( pm, "Key", PORT_BW);
+    CHECK_THROWS_AS( WritePort<int>( pm, "Key", PORT_BW), PortError);
 }
 
 TEST_CASE("Ports: type mismatch")
 {
     auto pm = PortMap::create_port_map();
     ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<std::string> output( pm, "Key", PORT_BW, PORT_FANOUT);
+    WritePort<std::string> output( pm, "Key", PORT_BW);
     CHECK_THROWS_AS( pm->init(), PortError);
 }
 
@@ -62,7 +45,7 @@ get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint32 bw = PORT_BW, Late
 {
     PairOfPorts pop;
     pop.first = std::make_unique<ReadPort<int>>( pm, "Key", lat);
-    pop.second = std::make_unique<WritePort<int>>( pm, "Key", bw, PORT_FANOUT);
+    pop.second = std::make_unique<WritePort<int>>( pm, "Key", bw);
     pm->init();
     return pop;
 }
