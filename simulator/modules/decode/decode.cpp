@@ -7,8 +7,6 @@
 
 #include "decode.h"
 
-static constexpr const uint32 FLUSHED_STAGES_NUM = 1;
-
 namespace config {
     extern Value<uint64> long_alu_latency;
 } // namespace config
