@@ -31,7 +31,7 @@ struct SyscallResult {
 
 class Kernel {
 protected:
-    std::weak_ptr<Simulator> sim;
+    std::weak_ptr<CPUModel> sim;
     std::shared_ptr<FuncMemory> mem;
 public:
     static std::shared_ptr<Kernel> create_configured_kernel();
