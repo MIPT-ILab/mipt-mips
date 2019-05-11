@@ -22,6 +22,7 @@ Decode<FuncInstr>::Decode( bool log) : Log( log)
     rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", PORT_LATENCY);
     rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_LATENCY);
     rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", PORT_LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
     wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", PORT_BW);
     wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", PORT_BW);
@@ -70,6 +71,7 @@ void Decode<FuncInstr>::clock( Cycle cycle)
 {
     sout << "decode  cycle " << std::dec << cycle << ": ";
 
+    const bool has_trap = rp_trap->is_ready( cycle) && rp_trap->read( cycle);
     const bool has_flush = is_flush( cycle);
 
     bypassing_unit->update();
@@ -82,10 +84,10 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     }
 
     /* update bypassing unit because of misprediction */
-    if ( rp_bypassing_unit_flush_notify->is_ready( cycle))
+    if ( rp_bypassing_unit_flush_notify->is_ready( cycle) || has_trap)
         bypassing_unit->handle_flush();
 
-    if ( has_flush)
+    if ( has_flush || has_trap)
     {
         sout << "flush\n";
         return;

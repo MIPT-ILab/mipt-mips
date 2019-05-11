@@ -80,7 +80,6 @@ private:
     Writeback<ISA> writeback;
 
     /* ports */
-    std::unique_ptr<WritePort<Target>> wp_core_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
     void clock_tree( Cycle cycle);

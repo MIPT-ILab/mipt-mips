@@ -11,6 +11,7 @@ Branch<FuncInstr>::Branch( bool log) : Log( log)
 {
     wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW);
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
     wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW);
     wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW);
@@ -26,20 +27,14 @@ Branch<FuncInstr>::Branch( bool log) : Log( log)
 template <typename FuncInstr>
 void Branch<FuncInstr>::clock( Cycle cycle)
 {
-    /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
-    {
         return;
-    }
 
-    /* receieve flush signal */
-    const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle))
+                       || ( rp_trap->is_ready( cycle) && rp_trap->read( cycle));
 
-    /* branch misprediction */
     if ( is_flush)
-    {
         return;
-    }
 
     sout << "branch  cycle " << std::dec << cycle << ": ";
     auto instr = rp_datapath->read( cycle);

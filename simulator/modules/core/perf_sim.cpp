@@ -21,7 +21,6 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     branch( log),
     writeback( endian, log)
 {
-    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
@@ -51,8 +50,7 @@ void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 template <typename ISA>
 void PerfSim<ISA>::set_target( const Target& target)
 {
-    wp_core_2_fetch_target->write( target, curr_cycle);
-    writeback.set_target( target);
+    writeback.set_target( target, curr_cycle);
 }
 
 template<typename ISA>
