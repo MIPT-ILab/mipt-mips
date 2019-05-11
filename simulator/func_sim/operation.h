@@ -307,7 +307,7 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)
-        out << "\t trap";
+        out << "\t " << this->trap;
 
     out << std::dec;
     return out;

@@ -32,7 +32,6 @@ public:
     static std::unique_ptr<Driver> construct( const std::string& mode, Simulator* sim, bool verbose);
     Trap handle_trap( const Operation& instr) const
     {
-        sout << "trap: " << instr.trap_type() << std::endl;
         return handle_trap_impl( instr);
     }
 private:
