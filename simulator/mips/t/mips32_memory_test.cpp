@@ -301,6 +301,23 @@ TEST_CASE( "MIPS32_instr: sw 0xfee1'dead")
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+TEST_CASE( "MIPS32_instr: sw be 0xfee1'dead")
+{
+    CHECK(MIPS32Instr(0xad3104d2).get_disasm() == "sw $s1, 0x4d2($t1)");
+    CHECK(MIPS32Instr(0xad31fb2e).get_disasm() == "sw $s1, 0xfb2e($t1)");
+
+    MIPS32BEInstr instr( "sw", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xfee1'dead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint32, Endian::big>( 0x1000);
+    CHECK( value == 0xfee1'dead);
+}
+
 TEST_CASE( "MIPS32_instr: swl (instr->mem_addr % 4 = 2)")
 {
     CHECK(MIPS32Instr(0xa93104d2).get_disasm() == "swl $s1, 0x4d2($t1)");
