@@ -30,15 +30,12 @@ struct SyscallResult {
 };
 
 class Kernel {
-protected:
-    std::weak_ptr<CPUModel> sim;
-    std::shared_ptr<FuncMemory> mem;
 public:
     static std::shared_ptr<Kernel> create_configured_kernel();
     static std::shared_ptr<Kernel> create_dummy_kernel();
 
-    void set_simulator( const std::shared_ptr<Simulator>& s) { sim = s; }
-    virtual void connect_memory( std::shared_ptr<FuncMemory> m) { mem = std::move( m); }
+    virtual void set_simulator( const std::shared_ptr<Simulator>& s) = 0;
+    virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
 
     virtual SyscallResult execute() = 0;
 

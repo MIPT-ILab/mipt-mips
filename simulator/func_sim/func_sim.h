@@ -65,10 +65,10 @@ class FuncSim : public Simulator
 
         uint64 read_cpu_register( size_t regno) const final { return read_register( Register::from_cpu_index( regno)); }
         uint64 read_gdb_register( size_t regno) const final;
+        uint64 read_csr_register( std::string_view name) const final { return read_register( Register::from_csr_name( name)); }
 
         void write_cpu_register( size_t regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
         void write_gdb_register( size_t regno, uint64 value) final;
-
         void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 };
 

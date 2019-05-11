@@ -74,6 +74,7 @@ set(TESTS_CPPS
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
     memory/t/unit_test.cpp
+    kernel/t/replicant_test.cpp
     kernel/t/unit_test.cpp
     kernel/mars/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
