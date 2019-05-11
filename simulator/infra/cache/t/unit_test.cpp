@@ -109,6 +109,3 @@ TEST_CASE( "Check infinite CacheTagArray model with multiple sets")
     CHECK( test_tags->size_in_bytes == cache_size * 4 * 2);
     CHECK( test_tags->ways == 2 * cache_ways);
 }
-
-
-
