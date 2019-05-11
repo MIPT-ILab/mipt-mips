@@ -16,11 +16,10 @@
 
 static const uint32 LINE_SIZE = 4; // why not 32?
 
-static const uint32 cache_size = 16;
-static const uint32 cache_ways = 16;
+static const uint32 cache_size = 4;
+static const uint32 cache_ways = 4;
 static const uint32 cache_line_size = 1;
 static const uint32 addr_size_in_bits = 32;
-//static const uint32 sets = cache_size / ( cache_ways * cache_line_size);
 
 TEST_CASE( "pass_wrong_arguments: Pass_Wrong_Arguments_To_CacheTagArraySizeCheck")
 {
@@ -78,15 +77,38 @@ TEST_CASE( "Check always_hit CacheTagArrayCache model")
     CHECK( test_tags->lookup( 1) == true);
 }
 
-TEST_CASE( "Check infinite CacheTagArrayCache model")
+TEST_CASE( "Check infinite CacheTagArrayCache model ( fully-associative)")
 {
     std::unique_ptr<CacheTagArray> test_tags = create_cache_tag_array( cache_size, cache_ways, cache_line_size, addr_size_in_bits, "infinite");
 
     //make sure that the only set will overflow so cache size will double up
     for ( uint32 i = 0; i < cache_ways + 1; i++)
         test_tags->write( i);
+    //make sure that there was no replacement
+    for ( uint32 i = 0; i < cache_ways + 1; i++)
+        CHECK( test_tags->lookup( i) == true);
 
     CHECK( test_tags->size_in_bytes == 2 * cache_size);
     CHECK( test_tags->ways == 2 * cache_ways);
 }
+
+TEST_CASE( "Check infinite CacheTagArray model with multiple sets")
+{
+    std::unique_ptr<CacheTagArray> test_tags = create_cache_tag_array( cache_size * 4, cache_ways, cache_line_size, addr_size_in_bits, "infinite");
+
+    //make sure that addresses have same sets
+    for ( uint32 i = 0; i < cache_ways + 1; i++)
+    {
+        CHECK ( test_tags->set( i * 0x10000000) == 0);
+        test_tags->write( i * 0x10000000);
+    }
+    //make sure that there was no replacement
+    for ( uint32 i = 0; i < cache_ways + 1; i++)
+        CHECK( test_tags->lookup( i * 0x10000000) == true);
+
+    CHECK( test_tags->size_in_bytes == cache_size * 4 * 2);
+    CHECK( test_tags->ways == 2 * cache_ways);
+}
+
+
 
