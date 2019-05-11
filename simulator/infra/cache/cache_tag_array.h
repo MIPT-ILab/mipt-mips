@@ -151,6 +151,6 @@ std::unique_ptr<CacheTagArray> create_cache_tag_array(
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits = 32,
-    const std::string& cache_tag_array_type = "always_hit"); //should be default for normal behaviour
+    const std::string& cache_tag_array_type = "default"); //should be default for normal behaviour
 
 #endif // CACHE_TAG_ARRAY_H
