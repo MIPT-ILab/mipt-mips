@@ -72,6 +72,13 @@ TEST_CASE( "Perf_Sim: GDB Register R/W")
     CHECK( sim->get_pc() == 100500);
 }
 
+TEST_CASE( "Perf_Sim: csr Register R/W")
+{
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
+    sim->write_csr_register( "mscratch", 333);
+    CHECK( sim->read_csr_register( "mscratch") == 333 );
+}
+
 TEST_CASE( "Perf_Sim: Register size")
 {
     CHECK( CycleAccurateSimulator::create_simulator( "mips32", false)->sizeof_register() == bytewidth<uint32>);

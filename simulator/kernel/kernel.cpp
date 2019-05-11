@@ -4,7 +4,7 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "kernel.h"
+#include "base_kernel.h"
 #include "mars/mars_kernel.h"
 
 #include <infra/config/config.h>
@@ -13,7 +13,7 @@ namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
 } // namespace config
 
-class DummyKernel : public Kernel
+class DummyKernel : public BaseKernel
 {
 public:
     SyscallResult execute() final { return {SyscallResult::IGNORED, 0}; }
