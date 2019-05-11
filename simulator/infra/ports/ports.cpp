@@ -65,8 +65,8 @@ BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const st
     get_port_map()->add_port( this);
 }
 
-BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( port_map, key), _fanout(fanout), installed_bandwidth(bandwidth)
+BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth) :
+    Port( port_map, key), installed_bandwidth(bandwidth)
 {
     get_port_map()->add_port( this);
 }
@@ -75,10 +75,7 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
 {
     if ( readers.empty())
         throw PortError( get_key() + " has no ReadPorts");
-    if ( readers.size() > _fanout)
-        throw PortError( get_key() + " WritePort is overloaded by fanout");
-    if ( readers.size() != _fanout)
-        throw PortError( get_key() + " WritePort is underloaded by fanout");
+    _fanout = readers.size();
 
     initialized_bandwidth = installed_bandwidth;
 }

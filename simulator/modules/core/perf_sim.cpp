@@ -21,7 +21,7 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     branch( log),
     writeback( endian, log)
 {
-    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
+    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW);
     rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);

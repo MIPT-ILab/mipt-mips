@@ -16,9 +16,9 @@ Execute<FuncInstr>::Execute( bool log)
     : Log( log)
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
-    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW , PORT_FANOUT);
-    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW , PORT_FANOUT);
-    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW, PORT_FANOUT);
+    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW );
+    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW );
+    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
 
     if (config::long_alu_latency < 2)
@@ -27,18 +27,16 @@ Execute<FuncInstr>::Execute( bool log)
     if (config::long_alu_latency > 64)
         throw Exception("Wrong argument! Latency of long arithmetic logic unit should be less than 64");
 
-    wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW, PORT_FANOUT);
-    rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY",
-                                                           last_execution_stage_latency);
+    wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW);
+    rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", last_execution_stage_latency);
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
 
     rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
 
-    wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
-    wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS",
-                                                               PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW);
+    wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_BW);
 
     rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
     rps_bypass[1].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);

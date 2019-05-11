@@ -18,7 +18,7 @@ class Execute : public Log
     using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
-    private:   
+    private:
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
         const Latency last_execution_stage_latency;
 
