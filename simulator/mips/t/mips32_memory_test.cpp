@@ -378,5 +378,5 @@ TEST_CASE( "MIPS32_instr: load dump with trap")
     instr.set_v_src( 0x1, 0);
     instr.set_sequence_id( 0);
     instr.execute();
-    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4d1 ]\t trap");
+    CHECK( instr.string_dump() == "{0}\tlw $s1, 0x4d0($t1)\t [ $ma = 0x4d1 ]\t UNALIGNED_LOAD");
 }

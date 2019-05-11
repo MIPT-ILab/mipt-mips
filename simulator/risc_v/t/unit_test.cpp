@@ -134,4 +134,8 @@ TEST_CASE("RISCV sub print")
     instr.execute();
     CHECK( instr.get_v_dst() == 1);
     CHECK( instr.string_dump() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]" );
+
+    std::ostringstream oss;
+    oss << instr;
+    CHECK( oss.str() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]");
 }

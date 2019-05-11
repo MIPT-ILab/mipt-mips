@@ -17,13 +17,10 @@
 #include <utility>
 
 class MIPSRegister {
-    enum RegNum : uint8
+    enum RegNum : size_t
     {
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define REGISTER(X) MIPS_REG_ ## X
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP0_REGISTER(X) MIPS_CP0_REG_ ## X
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define CP1_REGISTER(X) MIPS_CP1_REG_ ## X
 #include "mips_register.def"
 #undef REGISTER
@@ -35,31 +32,36 @@ class MIPSRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
+    auto dump() const
+    {
+        return regTable.at( value);
+    }
+
     friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
     {
-        return out << regTable.at( rhs.value);
+        return out << rhs.dump();
     }
 
     bool is_zero()       const { return value == MIPS_REG_zero; }
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }
     bool is_mips_lo()    const { return value == MIPS_REG_lo; }
 
-    static constexpr MIPSRegister from_cpu_index( uint8 id) noexcept
+    static constexpr MIPSRegister from_cpu_index( size_t id) noexcept
     {
         return MIPSRegister( RegNum{ id});
     }
 
-    static constexpr MIPSRegister from_cp0_index( uint8 id) noexcept
+    static constexpr MIPSRegister from_cp0_index( size_t id) noexcept
     {
-        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP0_REG_Context0 + id)});
+        return MIPSRegister( RegNum{ narrow_cast<size_t>( MIPS_CP0_REG_Context0 + id)});
     }
 
     static constexpr MIPSRegister from_cp1_index( uint8 id) noexcept
     {
-        return MIPSRegister( RegNum{ narrow_cast<uint8>( MIPS_CP1_REG_f0 + id)});
+        return MIPSRegister( RegNum{ narrow_cast<size_t>( MIPS_CP1_REG_f0 + id)});
     }
 
-    static MIPSRegister from_gdb_index( uint8 id)
+    static MIPSRegister from_gdb_index( size_t id)
     {
         if (id < 32u)
             return from_cpu_index( id);
@@ -84,6 +86,8 @@ public:
     static constexpr MIPSRegister zero() noexcept;
     static constexpr MIPSRegister return_address() noexcept;
     static constexpr MIPSRegister cause() noexcept;
+    static constexpr MIPSRegister status() noexcept;
+    static constexpr MIPSRegister epc() noexcept;
 
     bool operator==( const MIPSRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const MIPSRegister& rhs) const { return !operator==(rhs); }
@@ -101,5 +105,7 @@ inline constexpr MIPSRegister MIPSRegister::mips_fcsr() noexcept { return MIPSRe
 inline constexpr MIPSRegister MIPSRegister::zero() noexcept { return MIPSRegister( MIPS_REG_zero); }
 inline constexpr MIPSRegister MIPSRegister::return_address() noexcept { return MIPSRegister( MIPS_REG_ra); }
 inline constexpr MIPSRegister MIPSRegister::cause() noexcept { return MIPSRegister( MIPS_CP0_REG_Cause); }
+inline constexpr MIPSRegister MIPSRegister::status() noexcept { return MIPSRegister( MIPS_CP0_REG_SR); }
+inline constexpr MIPSRegister MIPSRegister::epc() noexcept { return MIPSRegister( MIPS_CP0_REG_EPC); }
 
 #endif

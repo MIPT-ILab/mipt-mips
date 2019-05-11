@@ -35,11 +35,13 @@ set(CPPS
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
     memory/argv_loader/argv_loader.cpp
+    func_sim/driver.cpp
     func_sim/func_sim.cpp
-    func_sim/trap_types.cpp
+    func_sim/traps/trap.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
+    mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
     risc_v/riscv_instr.cpp
     export/gdb/gdb_wrapper.cpp
@@ -55,6 +57,7 @@ set(CPPS
     modules/branch/branch.cpp
     modules/core/perf_sim.cpp
     modules/writeback/writeback.cpp
+    modules/writeback/checker/checker.cpp
     simulator.cpp
 )
 
@@ -67,12 +70,13 @@ set(TESTS_CPPS
     infra/ports/port_queue/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     infra/ports/t/example_test.cpp
-    kernel/t/unit_test.cpp
-    kernel/mars/t/unit_test.cpp
     memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
     memory/t/unit_test.cpp
+    kernel/t/replicant_test.cpp
+    kernel/t/unit_test.cpp
+    kernel/mars/t/unit_test.cpp
     mips/mips_register/t/unit_test.cpp
     mips/t/mips32_test.cpp
     mips/t/mips32_cp1_test.cpp
@@ -81,12 +85,13 @@ set(TESTS_CPPS
     mips/t/mips32_memory_test.cpp
     mips/t/mips32_traps_test.cpp
     mips/t/mips64_test.cpp
-    func_sim/rf/t/unit_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
-    modules/fetch/bpu/t/unit_test.cpp
+    func_sim/rf/t/unit_test.cpp
+    func_sim/traps/t/unit_test.cpp
     func_sim/t/unit_test.cpp
+    modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
 )
@@ -94,6 +99,7 @@ set(TESTS_CPPS
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../mips-tests\")
 add_definitions(-DRISCV_TEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../riscv-tests\")
 add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
+add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(

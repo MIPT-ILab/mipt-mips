@@ -66,6 +66,7 @@ template<typename I> auto mips_dsrl32  = ALU::dsrl32<I>;
 template<typename I> auto mips_dsrlv   = ALU::srlv<I, uint64>;
 template<typename I> auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
 template<typename I> auto mips_dsubu   = ALU::subtraction<I, uint64>;
+template<typename I> auto mips_eret    = ALU::eret<I>;
 template<typename I> auto mips_j       = ALU::j<I>;
 template<typename I> auto mips_jal     = ALU::jump_and_link<I, ALU::j<I>>;
 template<typename I> auto mips_jalr    = ALU::jump_and_link<I, ALU::jr<I>>;
@@ -455,10 +456,16 @@ static const Table<I> isaMapMIPS32 =
 };
 
 template<typename I>
-static const Table<I> isaMapCOP0 =
+static const Table<I> isaMapCOP0_rs =
 {
-    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
-    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RT }, Dst::RD, MIPS_I_Instr} },
+    {0x00, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RD }, Dst::RT, MIPS_I_Instr} },
+    {0x04, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP0_funct =
+{
+    {0x18, { "eret",  mips_eret<I>, OUT_R_JUMP, 0, 'N', Imm::NO, { Reg::EPC, Reg::SR }, Dst::SR, MIPS_I_Instr} },
 };
 
 template<typename I>
@@ -663,7 +670,8 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapRI<I>,
     &isaMapMIPS32<I>,
     &isaMapIJ<I>,
-    &isaMapCOP0<I>,
+    &isaMapCOP0_rs<I>,
+    &isaMapCOP0_funct<I>,
     &isaMapCOP1<I>,
     &isaMapCOP1X<I>,
     &isaMapCOP1_s<I>,
@@ -716,6 +724,16 @@ MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
+MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
+{
+    switch ( instr.funct)
+    {
+        case 0x0:  return get_table_entry( isaMapCOP0_rs<I>,    instr.rs);
+        default:   return get_table_entry( isaMapCOP0_funct<I>, instr.funct);
+    }
+}
+
+template<typename I>
 MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
@@ -741,7 +759,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
     {
         case 0x0:  return get_opcode_special_entry<I>( instr);
         case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
-        case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
+        case 0x10: return get_cp0_entry<I>( instr);
         case 0x11: return get_cp1_entry<I>( instr);
         case 0x13: return get_table_entry( isaMapCOP1X<I>,  instr.funct);
         case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);
@@ -841,7 +859,10 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->print_src2 =  entry.sources.size() > 1 && is_explicit_register( entry.sources[1]);
     this->print_src3 =  entry.sources.size() > 2 && is_explicit_register( entry.sources[2]);
 
-    bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
+    bool has_delayed_slot = this->is_jump()
+        && version != MIPSVersion::mars
+        && version != MIPSVersion::mars64
+        && (entry.sources.empty() || entry.sources[0] != Reg::EPC);
     this->delayed_slots = has_delayed_slot ? 1 : 0;
 }
 

@@ -26,10 +26,9 @@ class Mem : public Log
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
 
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
 
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
-
-        static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
     public:
         explicit Mem( bool log);

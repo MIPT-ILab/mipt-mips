@@ -632,10 +632,19 @@ TEST_CASE( "MIPS32_instr: bne 1 and -1, 0 instr ahead")
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4);
 }
-////////////////////////////////////////////////////////////////////////////////
 
+TEST_CASE( "MIPS32_instr: eret")
+{
+    CHECK(MIPS32Instr(0x42000018).get_disasm() == "eret");
 
-////////////////////////////////////////////////////////////////////////////////
+    MIPS32Instr instr( "eret");
+    instr.set_v_src( 0x200, 0);
+    instr.set_v_src( 0b1111, 1);
+    instr.execute();
+    CHECK( instr.get_new_PC() == 0x200);
+    CHECK( instr.get_v_dst() == 0b1011);
+    CHECK( instr.get_delayed_slots() == 0);
+}
 
 TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
 {

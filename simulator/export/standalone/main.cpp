@@ -14,6 +14,7 @@
 namespace config {
     static AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
     static AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
+    static Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
 } // namespace config
 
 int main( int argc, const char* argv[]) try {
@@ -23,13 +24,14 @@ int main( int argc, const char* argv[]) try {
     elf.load_to( memory.get());
 
     auto sim = Simulator::create_configured_simulator();
+    sim->setup_trap_handler( config::trap_mode);
     sim->set_memory( memory);
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
     sim->write_csr_register( "mscratch", 0x400'0000);
 
     auto kernel = Kernel::create_configured_kernel();
-    kernel->set_memory( memory);
+    kernel->connect_memory( memory);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
 

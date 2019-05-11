@@ -6,7 +6,15 @@
 
 #include "memory.h"
 
+#include <sstream>
 #include <vector>
+
+std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
+{
+    std::ostringstream oss;
+    oss <<  "address: 0x" << std::hex << addr << "; max address: 0x" << mask;
+    return oss.str();
+}
 
 std::string ReadableMemory::read_string( Addr addr) const
 {

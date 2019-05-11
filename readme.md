@@ -4,6 +4,8 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
 
+[![CodeCov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/icicle.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
+
 # MIPT-MIPS / MIPT-V
 
 MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
@@ -54,6 +56,11 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
+* `--trap_mode <mode>` — procedure to process traps in functional simulation. Supported modes are:
+    * `stop` — stop simulation on any interrupt
+    * `ignore` — do not stop simulation on any interrupt
+    * `stop_on_halt` — stop simulation only on system halt interrupt/system call
+    * Additionally, if `,verbose` is appended, trap information will appear in log
 
 ### ISA and system-level options:
 
@@ -113,4 +120,3 @@ The main goal of the project is to teach the students the computer architecture 
 ### May I contribute?
 
 Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
-

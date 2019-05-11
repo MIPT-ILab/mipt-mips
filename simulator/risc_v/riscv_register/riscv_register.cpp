@@ -15,7 +15,7 @@ std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
 #undef DECLARE_CSR
 }};
 
-RISCVRegister::RegNum RISCVRegister::get_csr_regnum( uint16 val)
+RISCVRegister::RegNum RISCVRegister::get_csr_regnum( size_t val)
 {
     switch (val) {
 #define DECLARE_CSR(X, Y) case Y: return RegNum::RISCV_ ## Y;

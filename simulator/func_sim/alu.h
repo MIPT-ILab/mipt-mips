@@ -8,7 +8,7 @@
 #define ALU_H
 
 #include "multiplication.h"
-#include "trap_types.h"
+#include "traps/trap.h"
 
 #include <infra/macro.h>
 #include <tuple>
@@ -265,6 +265,14 @@ struct ALU
             instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
+    }
+
+    template<typename I> static
+    void eret( I* instr)
+    {
+        // FIXME(pikryukov): That should behave differently for ErrorEPC
+        jump( instr, instr->v_src1);
+        instr->v_dst &= instr->v_src2 & ~(1 << 2);
     }
 
     // Traps

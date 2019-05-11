@@ -43,11 +43,11 @@ struct System
     explicit System( KernelArgs&&... args)
         : sim( Simulator::create_simulator( "mips64", true, false))
         , mars_kernel( create_mars_kernel(std::forward<KernelArgs>(args)...))
-        , mem( FuncMemory::create_plain_memory( 24))
+        , mem( FuncMemory::create_hierarchied_memory())
     {
         mars_kernel->set_simulator( sim);
         sim->set_memory( mem);
-        mars_kernel->set_memory( mem);
+        mars_kernel->connect_memory( mem);
     }
 };
 

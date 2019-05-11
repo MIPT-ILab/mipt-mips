@@ -30,9 +30,10 @@ struct FuncMemoryBadMapping final : Exception
 struct FuncMemoryOutOfRange final : Exception
 {
     explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
-        : Exception( "Out of memory range",
-            std::string( "address: ") + std::to_string(addr) + "; max address: " + std::to_string(mask))
+        : Exception( "Out of memory range", generate_string( addr, mask))
     { }
+private:
+    static std::string generate_string( Addr addr, Addr mask);
 };
 
 class DestructableMemory
@@ -129,7 +130,7 @@ class FuncMemory : public ReadableAndWritableMemory
 {
 public:
     static std::shared_ptr<FuncMemory>
-        create_hierarchied_memory( uint32 addr_bits = 32,
+        create_hierarchied_memory( uint32 addr_bits = 36,
 				 uint32 page_bits = 10,
 				 uint32 offset_bits = 12);
 

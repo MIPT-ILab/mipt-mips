@@ -50,9 +50,9 @@ template<typename T> class BypassCommand;
 #undef PORT_TOKEN
 
 template<typename T>
-auto make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
+auto make_write_port( std::string key, uint32 bandwidth) 
 {
-    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth, fanout);
+    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth);
 }
 
 template<typename T>

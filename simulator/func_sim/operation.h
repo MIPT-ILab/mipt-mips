@@ -7,10 +7,12 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
+#include <infra/macro.h>
 #include <infra/string_view.h>
 #include <infra/types.h>
 
+#include <cassert>
 #include <sstream>
 
 enum OperationType : uint8
@@ -108,6 +110,7 @@ public:
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+    void set_trap( Trap value) { trap = value; }
     bool is_store() const { return operation == OUT_STORE; }
 
     auto get_mem_addr() const { return mem_addr; }
@@ -160,7 +163,7 @@ public:
     using RegisterUInt = T;
     using RegisterSInt = sign_t<RegisterUInt>;
 
-    void set_v_src( const T& value, uint8 index)
+    void set_v_src( const T& value, size_t index)
     {
         if ( index == 0)
             v_src1 = value;
@@ -204,6 +207,7 @@ void Datapath<T>::load( const T& value)
     {
         switch ( get_mem_size())
         {
+            case 0: break; // e.g. fences
             case 1: v_dst = sign_extension<8>( value); break;
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
@@ -228,7 +232,7 @@ public:
     using MyDatapath = Datapath<T>;
     using Register = R;
     using RegisterUInt = T;
-    R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
+    R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }
 
@@ -303,7 +307,7 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)
-        out << "\t trap";
+        out << "\t " << this->trap;
 
     out << std::dec;
     return out;

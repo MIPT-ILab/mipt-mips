@@ -5,73 +5,15 @@
 
 #include "../func_sim.h"
 
-// Catch2
+
 #include <catch.hpp>
 
-// Module
 #include <kernel/kernel.h>
 #include <kernel/mars/mars_kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
+#include <mips/mips_register/mips_register.h>
 #include <simulator.h>
-
-#include "../trap_types.h"
-#include "../trap_types_internal.h"
-
-#include <sstream>
-
-TEST_CASE( "Trap: check conversion to RISC-V ")
-{
-    Trap trap( Trap::SYSCALL);
-    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
-}
-
-TEST_CASE( "Trap: check conversion to GDB ")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
-}
-
-TEST_CASE( "Trap: check conversion to MIPS ")
-{
-    Trap trap( Trap::FP_DIV_BY_ZERO);
-    CHECK( trap.to_mips_format() == MIPS_EXC_FPE);
-}
-
-TEST_CASE( "Trap: check bad conversion to MIPS ")
-{
-    Trap trap( Trap::NO_TRAP);
-    CHECK_THROWS_AS( trap.to_mips_format(), std::out_of_range);
-}
-
-TEST_CASE( "Trap: check RISC-V initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
-}
-
-TEST_CASE( "Trap: check GDB initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
-    CHECK( trap == Trap( Trap::BREAKPOINT));
-}
-
-TEST_CASE( "Trap: check MIPS initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_mips_format( MIPS_EXC_FPOVF);
-    CHECK( trap == Trap( Trap::FP_OVERFLOW));
-}
-
-TEST_CASE( "Trap: print")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    std::ostringstream oss;
-    oss << trap;
-    CHECK( oss.str() == "UNKNOWN_INSTRUCTION");
-}
 
 static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
 static const std::string smc_code = TEST_PATH "/smc.out";
@@ -83,18 +25,24 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
     CHECK_THROWS_AS( Simulator::create_functional_simulator("pdp11"), InvalidISA);
 }
 
+TEST_CASE( "Bad driver")
+{
+    CHECK_THROWS_AS( Simulator::create_functional_simulator("mips32")->setup_trap_handler("abracadabra"), IncorrectDriver);
+}
+
 static auto run_over_empty_memory( const std::string& isa)
 {
     auto sim = Simulator::create_functional_simulator( isa);
+    sim->setup_trap_handler( "stop");
     sim->set_memory( FuncMemory::create_hierarchied_memory());
-    return sim->run_no_limit();
+    return sim->run( 30);
 }
 
 TEST_CASE( "FuncSim: create empty memory and get lost")
 {
     CHECK_THROWS_AS( run_over_empty_memory("mips32"), BearingLost);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv32"), UnknownInstruction);
-    CHECK_THROWS_AS( run_over_empty_memory("riscv128"), UnknownInstruction);
+    CHECK( run_over_empty_memory("riscv32") == Trap::UNKNOWN_INSTRUCTION);
+    CHECK( run_over_empty_memory("riscv128") == Trap::UNKNOWN_INSTRUCTION);
 }
 
 TEST_CASE( "FuncSim: get lost without pc")
@@ -130,18 +78,6 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     CHECK( sim->get_pc() == elf.get_startPC());
     sim->run( 1);
     CHECK( sim->get_pc() == elf.get_startPC() + 4);
-}
-
-TEST_CASE( "FuncSim: make a system-level step")
-{
-    auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
-    sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
-
-    CHECK( sim->run_single_step() == Trap::BREAKPOINT);
 }
 
 TEST_CASE( "Run one instruction: Func_Sim")
@@ -192,6 +128,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
+    sim->setup_trap_handler( "stop_on_halt");
     ElfLoader elf( smc_code);
     elf.load_to( mem.get());
     sim->set_pc( elf.get_startPC());
@@ -199,17 +136,39 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     CHECK_NOTHROW( sim->run_no_limit() );
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test)
+TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
 {
-    auto sim = Simulator::create_functional_simulator(isa);
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator("mips32", log);
+    auto mem = FuncMemory::create_hierarchied_memory( 36);
+    sim->set_memory( mem);
+
+    ElfLoader elf( valid_elf_file);
+    elf.load_to( mem.get());
+    auto start_pc = elf.get_startPC();
+    sim->set_pc( start_pc);
+
+    CHECK_THROWS_AS( sim->run( 10000), BearingLost);
+    CHECK( sim->get_pc() >= 0x8'0000'0180);
+    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
+    auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
+    CHECK( epc > start_pc);
+    CHECK( epc < start_pc + 0x1000'000);
+}
+
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, const std::string& trap_options)
+{
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator(isa, log);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
+    sim->setup_trap_handler( trap_options);
 
     ElfLoader elf( test);
     elf.load_to( mem.get());
 
     auto kernel = create_mars_kernel();
-    kernel->set_memory( mem);
+    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
 
@@ -219,16 +178,40 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 1) == Trap::NO_TRAP );
-    auto trap = get_simulator_with_test("mips32", valid_elf_file)->run_until_trap( 10000);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 1) == Trap::NO_TRAP );
+    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
+TEST_CASE( "Torture_Test: Stop on halt")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1)     == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000) == Trap::HALT );
+}
+
+TEST_CASE( "Torture_Test: Ignore traps ")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1)  == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10) != Trap::NO_TRAP);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10) == Trap::NO_TRAP);
+}
+
+TEST_CASE( "Torture_Test: Critical traps ")
+{
+    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 1) );
+    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "critical")->run( 10000), std::runtime_error);
+}
+
+TEST_CASE( "Torture_Test: MIPS32 calls ")
+{
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "")->run( 10000) == Trap::HALT );
+}
+
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    valid_elf_file)->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars",    valid_elf_file, "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out", "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
 }

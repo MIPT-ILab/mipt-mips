@@ -20,6 +20,11 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     CHECK_NOTHROW(sim->set_memory( mem));
 }
 
+TEST_CASE( "Perf_Sim_init: Ignore trap handling")
+{
+    CHECK_NOTHROW( CycleAccurateSimulator::create_simulator( "mips32", false)->setup_trap_handler("ignore_me"));
+}
+
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
@@ -65,6 +70,13 @@ TEST_CASE( "Perf_Sim: GDB Register R/W")
     sim->write_gdb_register( 37, 100500);
     CHECK( sim->read_gdb_register( 37) == 100500);
     CHECK( sim->get_pc() == 100500);
+}
+
+TEST_CASE( "Perf_Sim: csr Register R/W")
+{
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
+    sim->write_csr_register( "mscratch", 333);
+    CHECK( sim->read_csr_register( "mscratch") == 333 );
 }
 
 TEST_CASE( "Perf_Sim: Register size")

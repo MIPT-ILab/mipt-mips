@@ -17,25 +17,25 @@ namespace config {
 template <typename FuncInstr>
 Fetch<FuncInstr>::Fetch(bool log) : Log( log)
 {
-    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
     rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", PORT_LATENCY);
 
-    wp_target = make_write_port<Target>("TARGET", PORT_BW, PORT_FANOUT);
+    wp_target = make_write_port<Target>("TARGET", PORT_BW);
     rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
 
-    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW, PORT_FANOUT);
+    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW);
     rp_hold_pc = make_read_port<Target>("HOLD_PC", PORT_LATENCY);
 
-    rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_LATENCY);
 
     rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
 
-    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
+    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW);
     rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
 
-    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
+    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW);
     rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
 
     /* port needed for handling misprediction at decode stage */
@@ -87,7 +87,7 @@ void Fetch<FuncInstr>::clock_bp( Cycle cycle)
     /* Process BP updates */
     if ( rp_bp_update->is_ready( cycle))
         bp->update( rp_bp_update->read( cycle));
-    else if ( rp_bp_update_from_decode->is_ready( cycle))
+    if ( rp_bp_update_from_decode->is_ready( cycle))
         bp->update( rp_bp_update_from_decode->read(cycle));
 }
 
@@ -119,6 +119,8 @@ void Fetch<FuncInstr>::save_flush( Cycle cycle)
         wp_target->write( rp_flush_target_from_decode->read( cycle), cycle);
     else if( rp_target->is_ready( cycle))
         wp_target->write( rp_target->read( cycle), cycle);
+    else if( rp_external_target->is_ready( cycle))
+        wp_target->write( rp_external_target->read( cycle), cycle);
 }
 
 template <typename FuncInstr>

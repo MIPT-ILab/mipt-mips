@@ -219,7 +219,7 @@ inline void HierarchiedMemory::write_byte( Addr addr, Byte value)
 size_t HierarchiedMemory::strlen( Addr addr) const
 {
     for (size_t i = 0; i <= addr_mask; ++i)
-        if ( read_byte( addr + i) == Byte{})
+        if ( check_and_read_byte( addr + i) == Byte{})
             return i;
 
     return addr_mask + 1;

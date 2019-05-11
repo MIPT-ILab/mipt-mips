@@ -33,8 +33,6 @@ public:
     explicit PerfSim( Endian endian, bool log);
     ~PerfSim() override;
     Trap run( uint64 instrs_to_run) final;
-    Trap run_single_step() final { return Trap(Trap::HALT); }
-    Trap run_until_trap( uint64 /* instrs_to_run */) final { return Trap(Trap::HALT); }
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
@@ -46,12 +44,13 @@ public:
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
     Addr get_pc() const final;
     
-    uint64 read_cpu_register( uint8 regno) const final { return read_register( Register::from_cpu_index( regno)); }
-    uint64 read_gdb_register( uint8 regno) const final;
+    uint64 read_cpu_register( size_t regno) const final { return read_register( Register::from_cpu_index( regno)); }
+    uint64 read_gdb_register( size_t regno) const final;
     uint64 read_cause_register() const { return read_register( Register::cause()); }
+    uint64 read_csr_register( std::string_view name) const final { return read_register( Register::from_csr_name( name)); }
 
-    void write_cpu_register( uint8 regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
-    void write_gdb_register( uint8 regno, uint64 value) final;
+    void write_cpu_register( size_t regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
+    void write_gdb_register( size_t regno, uint64 value) final;
     void write_cause_register( uint64 value) { write_register( Register::cause(), value); }
     void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
 
@@ -82,7 +81,6 @@ private:
     Writeback<ISA> writeback;
 
     /* ports */
-    std::unique_ptr<WritePort<Target>> wp_core_2_fetch_target = nullptr;
     std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
 
     void clock_tree( Cycle cycle);
