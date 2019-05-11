@@ -112,7 +112,7 @@ private:
 
     uint32 write_counter = 0;
     uint32 initialized_bandwidth = 0;
-    uint32 _fanout = 0;
+    std::size_t _fanout = 0;
     
     const uint32 installed_bandwidth = 0;
 };
