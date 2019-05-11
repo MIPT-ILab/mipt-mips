@@ -26,14 +26,14 @@ class DataBypass
         { }
 
         // checks whether a source register of an instruction is in the RF
-        auto is_in_RF( const Instr& instr, uint8 src_index) const
+        auto is_in_RF( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether a source register of an instruction is bypassible
-        auto is_bypassible( const Instr& instr, uint8 src_index) const
+        auto is_bypassible( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).is_bypassible;
@@ -53,7 +53,7 @@ class DataBypass
 
         // returns a bypass command for a source register of an instruction
         // in accordance with a current state of the scoreboard
-        auto get_bypass_command( const Instr& instr, uint8 src_index) const
+        auto get_bypass_command( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
