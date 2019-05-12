@@ -26,3 +26,15 @@ std::shared_ptr<Kernel> Kernel::create_dummy_kernel() {
 std::shared_ptr<Kernel> Kernel::create_configured_kernel() {
     return config::use_mars ? create_mars_kernel() : Kernel::create_dummy_kernel();
 }
+
+Trap Kernel::execute_interactive()
+{
+    do try {
+        return execute();
+    }
+    catch (const BadInputValue& e) {
+        std::cerr << e.what();
+    } while (true);
+
+    return Trap( Trap::UNSUPPORTED_SYSCALL);
+}
