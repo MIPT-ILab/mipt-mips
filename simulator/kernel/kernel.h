@@ -19,6 +19,8 @@ struct BadInputValue final : Exception {
     explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
 };
 
+class Operation;
+
 class Kernel {
 public:
     static std::shared_ptr<Kernel> create_configured_kernel();
@@ -29,6 +31,7 @@ public:
 
     virtual Trap execute() = 0;
     Trap execute_interactive();
+    void handle_instruction( Operation* instr);
 
     Kernel() = default;
     virtual ~Kernel() = default;

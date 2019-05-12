@@ -53,6 +53,7 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     rf.write_dst( instr);
     update_pc( instr);
     update_and_check_nop_counter( instr);
+    kernel->handle_instruction( &instr);
     return instr;
 }
 
@@ -82,11 +83,6 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto instr = step();
         sout << instr << std::endl;
-        if ( instr.trap_type() == Trap::SYSCALL) {
-            auto result = kernel->execute_interactive();
-            instr.set_trap( result);
-        }
-
         auto trap = driver->handle_trap( instr);
         if ( trap != Trap::NO_TRAP)
             return trap;
