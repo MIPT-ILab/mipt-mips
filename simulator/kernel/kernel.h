@@ -28,6 +28,7 @@ public:
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
 
     virtual Trap execute() = 0;
+    Trap execute_interactive();
 
     Kernel() = default;
     virtual ~Kernel() = default;

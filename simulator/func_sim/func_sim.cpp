@@ -75,18 +75,6 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
     }
 }
 
-static auto execute_syscall( Kernel* kernel)
-{
-    do try {
-        return kernel->execute();
-    }
-    catch (const BadInputValue& e) {
-        std::cerr << e.what();
-    } while (true);
-
-    return Trap( Trap::UNSUPPORTED_SYSCALL);
-}
-
 template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
@@ -95,7 +83,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         auto instr = step();
         sout << instr << std::endl;
         if ( instr.trap_type() == Trap::SYSCALL) {
-            auto result = execute_syscall( kernel.get());
+            auto result = kernel->execute_interactive();
             instr.set_trap( result);
         }
 
