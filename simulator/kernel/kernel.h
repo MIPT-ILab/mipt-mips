@@ -7,23 +7,16 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-/* Simulator modules */
+#include <func_sim/traps/trap.h>
 #include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
-/* Generic C++ */
+
 #include <iostream>
 #include <memory>
 
 struct BadInputValue final : Exception {
     explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
-};
-
-enum class SyscallResult {
-    HALT,
-    UNSUPPORTED,
-    SUCCESS,
-    IGNORED,
 };
 
 class Kernel {
@@ -34,7 +27,7 @@ public:
     virtual void set_simulator( const std::shared_ptr<Simulator>& s) = 0;
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
 
-    virtual SyscallResult execute() = 0;
+    virtual Trap execute() = 0;
 
     Kernel() = default;
     virtual ~Kernel() = default;

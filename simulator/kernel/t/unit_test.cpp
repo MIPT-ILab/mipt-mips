@@ -10,6 +10,6 @@
 
 TEST_CASE( "Kernel: Execute nothing")
 {
-    CHECK( Kernel::create_dummy_kernel()->execute() == SyscallResult::IGNORED);
-    CHECK( Kernel::create_configured_kernel()->execute() == SyscallResult::IGNORED);
+    CHECK( Kernel::create_dummy_kernel()->execute() == Trap::SYSCALL);
+    CHECK( Kernel::create_configured_kernel()->execute() == Trap::SYSCALL);
 }
