@@ -51,6 +51,7 @@ class FuncSim : public Simulator
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void setup_trap_handler( const std::string& mode) final;
         void init_checker() final { };
+        int get_exit_code() const noexcept final;
         FuncInstr step();
         Trap run( uint64 instrs_to_run) final;
 

@@ -83,6 +83,12 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
         set_target( instr.get_actual_target(), cycle);
 }
 
+template <typename ISA>
+int Writeback<ISA>::get_exit_code() const noexcept
+{
+    return 0;
+}
+
 #include <mips/mips.h>
 #include <risc_v/risc_v.h>
 

@@ -63,17 +63,17 @@ SyscallResult MARSKernel::execute () {
         case 4: print_string (); break;
         case 5: read_integer (); break;
         case 8: read_string(); break;
-        case 10: return { SyscallResult::HALT, 0};
+        case 10: exit_code = 0; return SyscallResult::HALT;
         case 11: print_character(); break;
         case 12: read_character(); break;
         case 13: open_file(); break;
         case 14: read_from_file(); break;
         case 15: write_to_file(); break;
         case 16: close_file(); break;
-        case 17: return { SyscallResult::HALT, sim->read_cpu_register( a0)};
-        default: return { SyscallResult::UNSUPPORTED, 0};
+        case 17: exit_code = sim->read_cpu_register( a0); return SyscallResult::HALT;
+        default: return SyscallResult::UNSUPPORTED;
     }
-    return { SyscallResult::SUCCESS, 0};
+    return SyscallResult::SUCCESS;
 }
 
 void MARSKernel::print_integer() {

@@ -84,15 +84,15 @@ static SyscallResult execute_syscall( Kernel* kernel)
         std::cerr << e.what();
     } while (true);
 
-    return {SyscallResult::UNSUPPORTED, 0};
+    return SyscallResult::UNSUPPORTED;
 }
 
 template <typename ISA>
 void FuncSim<ISA>::handle_syscall( FuncInstr* instr)
 {
     auto result = execute_syscall( kernel.get());
-    switch ( result.type) {
-    case SyscallResult::HALT:        exit_code = result.code; instr->set_trap( Trap( Trap::HALT)); break;
+    switch ( result) {
+    case SyscallResult::HALT:        instr->set_trap( Trap( Trap::HALT)); break;
     case SyscallResult::IGNORED:     instr->set_trap( Trap( Trap::SYSCALL)); break;
     case SyscallResult::UNSUPPORTED: instr->set_trap( Trap( Trap::UNSUPPORTED_SYSCALL)); break;
     default: instr->set_trap( Trap( Trap::NO_TRAP));
@@ -139,6 +139,11 @@ void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
 {
     if ( !mode.empty())
         driver = Driver::construct( mode, this, false);
+}
+template <typename ISA>
+int FuncSim<ISA>::get_exit_code() const noexcept
+{
+    return kernel->get_exit_code();
 }
 
 #include <mips/mips.h>

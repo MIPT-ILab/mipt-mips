@@ -57,6 +57,7 @@ public:
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
     virtual void setup_trap_handler( const std::string& mode) = 0;
     virtual void init_checker() = 0;
+    virtual int get_exit_code() const noexcept = 0;
 
     Trap run_no_limit() { return run( MAX_VAL64); }
 
@@ -67,11 +68,6 @@ public:
     {
         return create_simulator( isa, true, log);
     }
-
-    int get_exit_code() const { return exit_code; }
-
-protected:
-    int exit_code = 0;
 };
 
 class CycleAccurateSimulator : public Simulator {

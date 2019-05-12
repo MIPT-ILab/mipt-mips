@@ -64,6 +64,7 @@ public:
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
+    int get_exit_code() const noexcept;
 };
 
 #endif

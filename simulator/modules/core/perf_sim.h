@@ -40,6 +40,7 @@ public:
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
     void set_writeback_bandwidth( uint32 wb_bandwidth) { decode.set_wb_bandwidth( wb_bandwidth);}
+    int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
     Addr get_pc() const final;

@@ -19,14 +19,11 @@ struct BadInputValue final : Exception {
     explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
 };
 
-struct SyscallResult {
-    enum {
-        HALT,
-        UNSUPPORTED,
-        SUCCESS,
-        IGNORED,
-    } type;
-    uint64 code;
+enum class SyscallResult {
+    HALT,
+    UNSUPPORTED,
+    SUCCESS,
+    IGNORED,
 };
 
 class Kernel {
@@ -45,6 +42,10 @@ public:
     Kernel( Kernel&&) = delete;
     Kernel& operator=( const Kernel&) = delete;
     Kernel& operator=( Kernel&&) = delete;
+
+    int get_exit_code() const { return exit_code; }
+protected:
+    int exit_code = 0;
 };
 
 #endif //KERNEL_H
