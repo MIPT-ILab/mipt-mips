@@ -35,12 +35,13 @@ private:
     Addr next_PC = 0;
     const Endian endian;
     Checker<ISA> checker;
+    std::shared_ptr<Kernel> kernel;
 
     /* Simulator internals */
     RF<FuncInstr>* rf = nullptr;
 
     auto read_instructions( Cycle cycle);
-    void writeback_instruction( const Instr& instr, Cycle cycle);
+    void writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);
 
     /* Input */
@@ -59,12 +60,13 @@ public:
     explicit Writeback( Endian endian, bool log);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
-    void init_checker( const FuncMemory& mem) { checker.init( endian, mem); }
+    void init_checker( const FuncMemory& mem) { checker.init( endian, mem, kernel.get()); }
     void set_target( const Target& value, Cycle cycle);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
     int get_exit_code() const noexcept;
+    void set_kernel( std::shared_ptr<Kernel> k) { kernel = std::move( k); }
 };
 
 #endif

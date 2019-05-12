@@ -21,7 +21,7 @@ class Checker {
     using FuncInstr = typename ISA::FuncInstr;
 public:
     void check( const FuncInstr& instr);
-    void init( Endian endian, const FuncMemory& mem);
+    void init( Endian endian, const FuncMemory& mem, Kernel* kernel);
     void set_target( const Target& value);
 private:
     std::shared_ptr<FuncSim<ISA>> sim;

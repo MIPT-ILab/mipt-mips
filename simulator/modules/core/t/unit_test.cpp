@@ -5,10 +5,9 @@
 
 #include "../perf_sim.h"
 
-// Catch2
 #include <catch.hpp>
 
-// Module
+#include <kernel/kernel.h>
 #include <memory/elf/elf_loader.h>
 #include <modules/writeback/writeback.h>
 
@@ -98,6 +97,12 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     sim->set_memory( mem);
     ElfLoader elf( TEST_PATH "/tt.core.universal.out");
     elf.load_to( mem.get());
+
+    auto kernel = Kernel::create_configured_kernel();
+    kernel->connect_memory( mem);
+    kernel->set_simulator( sim);
+    sim->set_kernel( kernel);
+
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
