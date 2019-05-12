@@ -307,7 +307,6 @@ TEST_CASE( "MARS: close error")
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
 }
 
-
 TEST_CASE( "MARS: exit with code") 
 {
     auto sim = Simulator::create_simulator ("mips64", true, false);
@@ -318,4 +317,14 @@ TEST_CASE( "MARS: exit with code")
     sim->write_cpu_register( a0, 21u); // exit code
     CHECK( mars_kernel->execute() == Trap::HALT);
     CHECK( mars_kernel->get_exit_code() == 21u);
+}
+
+TEST_CASE( "MARS: unsupported syscall") 
+{
+    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto mars_kernel = create_mars_kernel( );
+    mars_kernel->set_simulator(sim);
+
+    sim->write_cpu_register( v0, 666u);
+    CHECK( mars_kernel->execute() == Trap::UNSUPPORTED_SYSCALL);
 }

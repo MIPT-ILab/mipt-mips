@@ -52,6 +52,7 @@ TEST_CASE( "FuncSim: get lost without pc")
     sim->set_memory( m);
     ElfLoader( valid_elf_file).load_to( m.get());
     CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
@@ -63,6 +64,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
     ElfLoader elf( valid_elf_file);
     elf.load_to( mem.get());
     CHECK_NOTHROW( sim->set_pc( elf.get_startPC()) );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Make_A_Step: Func_Sim")
@@ -78,6 +80,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     CHECK( sim->get_pc() == elf.get_startPC());
     sim->run( 1);
     CHECK( sim->get_pc() == elf.get_startPC() + 4);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Run one instruction: Func_Sim")
@@ -90,6 +93,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
     sim->set_pc( elf.get_startPC());
 
     CHECK( sim->run( 1) == Trap::NO_TRAP);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: Register R/W")
@@ -102,6 +106,7 @@ TEST_CASE( "FuncSim: Register R/W")
     /* Unsigned */
     sim->write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim->read_cpu_register( 1) == MAX_VAL32 );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: GDB Register R/W")
@@ -115,6 +120,7 @@ TEST_CASE( "FuncSim: GDB Register R/W")
     sim->write_gdb_register( 37, 100500);
     CHECK( sim->read_gdb_register( 37) == 100500);
     CHECK( sim->get_pc() == 100500);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: Register size")
@@ -134,6 +140,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     sim->set_pc( elf.get_startPC());
 
     CHECK_NOTHROW( sim->run_no_limit() );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
@@ -154,6 +161,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
     CHECK( epc > start_pc);
     CHECK( epc < start_pc + 0x1000'000);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 static auto get_simulator_with_test( const std::string& isa, const std::string& test, const std::string& trap_options)

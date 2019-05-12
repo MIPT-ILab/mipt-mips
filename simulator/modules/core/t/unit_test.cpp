@@ -18,6 +18,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     CHECK_NOTHROW(sim->set_memory( mem));
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Perf_Sim_init: Ignore trap handling")
@@ -36,6 +37,7 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     CHECK_NOTHROW( sim->get_pc() == 0x10);
     CHECK_NOTHROW( sim->run( 1) );
     CHECK_NOTHROW( sim->get_pc() == 0x14);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "PerfSim: create empty memory and get lost")
@@ -51,6 +53,7 @@ TEST_CASE( "Perf_Sim: unsigned register R/W")
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
     sim->write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim->read_cpu_register( 1) == MAX_VAL32 );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Perf_Sim: signed register R/W")
@@ -58,6 +61,7 @@ TEST_CASE( "Perf_Sim: signed register R/W")
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
     sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
     CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Perf_Sim: GDB Register R/W")
@@ -70,6 +74,7 @@ TEST_CASE( "Perf_Sim: GDB Register R/W")
     sim->write_gdb_register( 37, 100500);
     CHECK( sim->read_gdb_register( 37) == 100500);
     CHECK( sim->get_pc() == 100500);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Perf_Sim: csr Register R/W")
@@ -77,6 +82,7 @@ TEST_CASE( "Perf_Sim: csr Register R/W")
     auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
     sim->write_csr_register( "mscratch", 333);
     CHECK( sim->read_csr_register( "mscratch") == 333 );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Perf_Sim: Register size")
@@ -95,6 +101,7 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 static auto get_smc_loaded_simulator( bool init_checker)
@@ -130,4 +137,5 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     sim->init_checker();
     sim->set_pc( elf.get_startPC());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
+    CHECK( sim->get_exit_code() == 0);
 }
