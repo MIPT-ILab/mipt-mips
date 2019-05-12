@@ -16,7 +16,7 @@ namespace config {
 class DummyKernel : public BaseKernel
 {
 public:
-    SyscallResult execute() final { return {SyscallResult::IGNORED, 0}; }
+    SyscallResult execute() final { return SyscallResult::IGNORED; }
 };
 
 std::shared_ptr<Kernel> Kernel::create_dummy_kernel() {
