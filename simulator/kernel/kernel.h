@@ -34,8 +34,10 @@ public:
     static std::shared_ptr<Kernel> create_configured_kernel();
     static std::shared_ptr<Kernel> create_dummy_kernel();
 
-    virtual void set_simulator( const std::shared_ptr<Simulator>& s) = 0;
+    virtual void set_simulator( const std::shared_ptr<CPUModel>& s) = 0;
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
+    virtual void add_replica_simulator( const std::shared_ptr<CPUModel>& s) = 0;
+    virtual void add_replica_memory( const std::shared_ptr<FuncMemory>& s) = 0;
 
     virtual SyscallResult execute() = 0;
 
