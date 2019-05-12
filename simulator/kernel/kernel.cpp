@@ -8,6 +8,7 @@
 #include "mars/mars_kernel.h"
 
 #include <infra/config/config.h>
+#include <func_sim/operation.h>
 
 namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
@@ -37,4 +38,13 @@ Trap Kernel::execute_interactive()
     } while (true);
 
     return Trap( Trap::UNSUPPORTED_SYSCALL);
+}
+
+void Kernel::handle_instruction( Operation* instr)
+{
+    if ( instr->trap_type() != Trap::SYSCALL)
+        return;
+
+    auto result = execute_interactive();
+    instr->set_trap( result);
 }
