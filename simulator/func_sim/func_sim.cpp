@@ -130,6 +130,7 @@ void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
     if ( !mode.empty())
         driver = Driver::construct( mode, this, false);
 }
+
 template <typename ISA>
 int FuncSim<ISA>::get_exit_code() const noexcept
 {
