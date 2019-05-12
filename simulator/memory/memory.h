@@ -19,6 +19,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct FuncMemoryBadMapping final : Exception
 {
@@ -177,5 +178,43 @@ void FuncMemory::load_store(Instr* instr)
     else if ( instr->is_store())
         store( *instr);
 }
+
+class FuncMemoryReplicant : public FuncMemory
+{
+public:
+    explicit FuncMemoryReplicant( const std::shared_ptr<FuncMemory>& memory) : primary( memory) { }
+    void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
+
+    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
+    {
+        return primary->memcpy_guest_to_host( dst, src, size);
+    }
+
+    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final
+    {
+        auto result = primary->memcpy_host_to_guest( dst, src, size);
+        for ( auto& e : replicas)
+            e->memcpy_host_to_guest( dst, src, size);
+        return result;
+    }
+
+    void duplicate_to( std::shared_ptr<WriteableMemory> target) const final
+    {
+        primary->duplicate_to( target);
+    }
+
+    std::string dump() const final
+    {
+        return primary->dump();
+    }
+
+    size_t strlen( Addr addr) const final
+    {
+        return primary->strlen( addr);
+    }
+private:
+    std::shared_ptr<FuncMemory> primary;
+    std::vector<std::shared_ptr<FuncMemory>> replicas;
+};
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
