@@ -364,3 +364,8 @@ TEST_CASE( "Func_memory Replicant: read and write")
     CHECK( mem3->read_string( 0x20) == "Hello World");
     CHECK( mem12.dump() == mem1->dump());
 }
+
+TEST_CASE( "Func_memory: Plain memory overcommitment")
+{
+    CHECK_THROWS_AS( FuncMemory::create_plain_memory( 63), FuncMemoryBadMapping);
+}
