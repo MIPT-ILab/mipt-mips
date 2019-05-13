@@ -1,10 +1,15 @@
 #include "writeback.h"
 
+#include <kernel/kernel.h>
+
 #include <cassert>
 #include <sstream>
 
 template <typename ISA>
-Writeback<ISA>::Writeback( Endian endian, bool log) : Log( log), endian( endian)
+Writeback<ISA>::Writeback( Endian endian, bool log)
+    : Log( log)
+    , endian( endian)
+    , kernel( Kernel::create_dummy_kernel())
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
@@ -52,8 +57,21 @@ void Writeback<ISA>::clock( Cycle cycle)
 
     if ( instrs.empty())
         writeback_bubble( cycle);
-    else for ( const auto& i : instrs)
-        writeback_instruction( i, cycle);
+    else for ( auto& instr : instrs)
+        writeback_instruction_system( &instr, cycle);
+}
+
+template <typename ISA>
+void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle)
+{
+    writeback_instruction( *instr, cycle);
+    kernel->handle_instruction( instr);
+    auto result_trap = driver->handle_trap( *instr);
+    checker.driver_step( *instr);
+    if ( executed_instrs >= instrs_to_run || instr->is_halt())
+        wp_halt->write( true, cycle);
+    if ( result_trap != Trap::NO_TRAP)
+        set_target( instr->get_actual_target(), cycle);
 }
 
 template <typename ISA>
@@ -76,11 +94,12 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     ++executed_instrs;
     last_writeback_cycle = cycle;
     next_PC = instr.get_actual_target().address;
-    if ( executed_instrs >= instrs_to_run || instr.is_halt())
-        wp_halt->write( true, cycle);
+}
 
-    if ( instr.has_trap())
-        set_target( instr.get_actual_target(), cycle);
+template <typename ISA>
+int Writeback<ISA>::get_exit_code() const noexcept
+{
+    return 0;
 }
 
 #include <mips/mips.h>

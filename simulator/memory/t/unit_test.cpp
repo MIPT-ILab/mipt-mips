@@ -346,3 +346,21 @@ TEST_CASE( "Func_memory: Write to 0")
     auto mem = FuncMemory::create_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);
 }
+
+TEST_CASE( "Func_memory Replicant: read and write")
+{
+    auto mem1 = FuncMemory::create_plain_memory();
+    auto mem2 = FuncMemory::create_plain_memory();
+    auto mem3 = FuncMemory::create_plain_memory();
+    FuncMemoryReplicant mem12( mem1);
+    mem12.add_replica( mem2);
+
+    mem12.write_string( "Hello World", 0x20);
+    CHECK( mem1->read_string( 0x20) == "Hello World");
+    CHECK( mem2->read_string( 0x20) == "Hello World");
+    CHECK( mem12.read_string( 0x20) == "Hello World");
+
+    mem12.duplicate_to( mem3);
+    CHECK( mem3->read_string( 0x20) == "Hello World");
+    CHECK( mem12.dump() == mem1->dump());
+}

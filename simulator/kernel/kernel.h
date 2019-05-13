@@ -7,11 +7,11 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-/* Simulator modules */
+#include <func_sim/traps/trap.h>
 #include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
-/* Generic C++ */
+
 #include <iostream>
 #include <memory>
 
@@ -19,25 +19,22 @@ struct BadInputValue final : Exception {
     explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
 };
 
-struct SyscallResult {
-    enum {
-        HALT,
-        UNSUPPORTED,
-        SUCCESS,
-        IGNORED,
-    } type;
-    uint64 code;
-};
+class Operation;
 
 class Kernel {
 public:
     static std::shared_ptr<Kernel> create_configured_kernel();
     static std::shared_ptr<Kernel> create_dummy_kernel();
+    static std::shared_ptr<Kernel> create_mars_kernel();
 
-    virtual void set_simulator( const std::shared_ptr<Simulator>& s) = 0;
+    virtual void set_simulator( const std::shared_ptr<CPUModel>& s) = 0;
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
+    virtual void add_replica_simulator( const std::shared_ptr<CPUModel>& s) = 0;
+    virtual void add_replica_memory( const std::shared_ptr<FuncMemory>& s) = 0;
 
-    virtual SyscallResult execute() = 0;
+    virtual Trap execute() = 0;
+    Trap execute_interactive();
+    void handle_instruction( Operation* instr);
 
     Kernel() = default;
     virtual ~Kernel() = default;
@@ -45,6 +42,11 @@ public:
     Kernel( Kernel&&) = delete;
     Kernel& operator=( const Kernel&) = delete;
     Kernel& operator=( Kernel&&) = delete;
+
+    int get_exit_code() const { return exit_code; }
+
+protected:
+    int exit_code = 0;
 };
 
 #endif //KERNEL_H

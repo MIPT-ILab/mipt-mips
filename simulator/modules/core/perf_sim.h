@@ -35,11 +35,12 @@ public:
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
-    void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
+    void set_kernel( std::shared_ptr<Kernel> k) final { writeback.set_kernel( k); }
     void clock() final;
     void halt() final { force_halt = true; }
     void init_checker() final { writeback.init_checker( *memory); }
     void set_writeback_bandwidth( uint32 wb_bandwidth) { decode.set_wb_bandwidth( wb_bandwidth);}
+    int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
     Addr get_pc() const final;
@@ -70,7 +71,6 @@ private:
     /* simulator units */
     RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
-    std::shared_ptr<Kernel> kernel;
     const Endian endian;
 
     Fetch<FuncInstr> fetch;

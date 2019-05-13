@@ -75,28 +75,10 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
     }
 }
 
-static SyscallResult execute_syscall( Kernel* kernel)
-{
-    do try {
-        return kernel->execute();
-    }
-    catch (const BadInputValue& e) {
-        std::cerr << e.what();
-    } while (true);
-
-    return {SyscallResult::UNSUPPORTED, 0};
-}
-
 template <typename ISA>
-void FuncSim<ISA>::handle_syscall( FuncInstr* instr)
+Trap FuncSim<ISA>::driver_step( const Operation& instr)
 {
-    auto result = execute_syscall( kernel.get());
-    switch ( result.type) {
-    case SyscallResult::HALT:        exit_code = result.code; instr->set_trap( Trap( Trap::HALT)); break;
-    case SyscallResult::IGNORED:     instr->set_trap( Trap( Trap::SYSCALL)); break;
-    case SyscallResult::UNSUPPORTED: instr->set_trap( Trap( Trap::UNSUPPORTED_SYSCALL)); break;
-    default: instr->set_trap( Trap( Trap::NO_TRAP));
-    }
+    return driver->handle_trap( instr);
 }
 
 template <typename ISA>
@@ -106,12 +88,10 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto instr = step();
         sout << instr << std::endl;
-        if ( instr.trap_type() == Trap::SYSCALL)
-            handle_syscall( &instr);
-
-        auto trap = driver->handle_trap( instr);
-        if ( trap != Trap::NO_TRAP)
-            return trap;
+        kernel->handle_instruction( &instr);
+        auto result_trap = driver_step( instr);
+        if ( result_trap != Trap::NO_TRAP)
+            return result_trap;
     }
     return Trap(Trap::NO_TRAP);
 }
@@ -139,6 +119,12 @@ void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
 {
     if ( !mode.empty())
         driver = Driver::construct( mode, this, false);
+}
+
+template <typename ISA>
+int FuncSim<ISA>::get_exit_code() const noexcept
+{
+    return kernel->get_exit_code();
 }
 
 #include <mips/mips.h>

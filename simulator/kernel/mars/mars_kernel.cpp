@@ -40,7 +40,7 @@ class MARSKernel : public BaseKernel {
     uint64 next_descriptor = first_user_descriptor;
 
 public:
-    SyscallResult execute() final;
+    Trap execute() final;
     void connect_memory( std::shared_ptr<FuncMemory> m) final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
@@ -56,24 +56,24 @@ static const constexpr uint8 a0 = 4;
 static const constexpr uint8 a1 = 5;
 static const constexpr uint8 a2 = 6;
 
-SyscallResult MARSKernel::execute () {
+Trap MARSKernel::execute () {
     uint64 syscall_code = sim->read_cpu_register( v0);
     switch (syscall_code) {
         case 1: print_integer(); break;
         case 4: print_string (); break;
         case 5: read_integer (); break;
         case 8: read_string(); break;
-        case 10: return { SyscallResult::HALT, 0};
+        case 10: exit_code = 0; return Trap( Trap::HALT);
         case 11: print_character(); break;
         case 12: read_character(); break;
         case 13: open_file(); break;
         case 14: read_from_file(); break;
         case 15: write_to_file(); break;
         case 16: close_file(); break;
-        case 17: return { SyscallResult::HALT, sim->read_cpu_register( a0)};
-        default: return { SyscallResult::UNSUPPORTED, 0};
+        case 17: exit_code = sim->read_cpu_register( a0); return Trap( Trap::HALT);
+        default: return Trap( Trap::UNSUPPORTED_SYSCALL);
     }
-    return { SyscallResult::SUCCESS, 0};
+    return Trap( Trap::NO_TRAP);
 }
 
 void MARSKernel::print_integer() {

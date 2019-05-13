@@ -5,14 +5,17 @@
  */
 
 #include "checker.h"
+#include <kernel/kernel.h>
 
 template <typename ISA>
-void Checker<ISA>::init( Endian endian, const FuncMemory& outer_mem)
+void Checker<ISA>::init( Endian endian, const FuncMemory& outer_mem, Kernel* kernel)
 {
     auto memory = FuncMemory::create_hierarchied_memory();
     sim = std::make_shared<FuncSim<ISA>>( endian);
     outer_mem.duplicate_to( memory);
     sim->set_memory( std::move( memory));
+    kernel->add_replica_simulator( sim);
+    kernel->add_replica_memory( memory);
     active = true;
 }
 
@@ -21,6 +24,13 @@ void Checker<ISA>::set_target( const Target& value)
 {
     if ( active)
         sim->set_target( value);
+}
+
+template <typename ISA>
+void Checker<ISA>::driver_step( const FuncInstr& instr)
+{
+    if ( active)
+        sim->driver_step( instr);
 }
 
 template <typename ISA>

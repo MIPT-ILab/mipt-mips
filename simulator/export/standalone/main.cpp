@@ -26,8 +26,6 @@ int main( int argc, const char* argv[]) try {
     auto sim = Simulator::create_configured_simulator();
     sim->setup_trap_handler( config::trap_mode);
     sim->set_memory( memory);
-    sim->init_checker();
-    sim->set_pc( elf.get_startPC());
     sim->write_csr_register( "mscratch", 0x400'0000);
 
     auto kernel = Kernel::create_configured_kernel();
@@ -35,6 +33,8 @@ int main( int argc, const char* argv[]) try {
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
 
+    sim->init_checker();
+    sim->set_pc( elf.get_startPC());
     sim->run( config::num_steps);
     return sim->get_exit_code();
 }
