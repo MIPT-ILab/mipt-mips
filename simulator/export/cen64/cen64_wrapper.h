@@ -20,6 +20,10 @@ struct vr4300 : private PerfSim<MIPS64>
         NUM_MI_REGISTERS,
     };
     std::array<uint32, NUM_MI_REGISTERS> mi_regs = {};
+    static const constexpr auto cause_index = MIPSRegister::cause().to_rf_index();
+
+    auto read_cause_register() const { return read_cpu_register( cause_index); }
+    void write_cause_register( uint64 value) { return write_cpu_register( cause_index, value); }
 
 public:
     explicit vr4300( bool log) : PerfSim<MIPS64>( Endian::big, log) { }
@@ -43,9 +47,6 @@ public:
     using PerfSim<MIPS64>::clock;
     using PerfSim<MIPS64>::read_cpu_register;
     using PerfSim<MIPS64>::get_pc;
-    
-    void read_cause_register( uint64 value) const { return read_cpu_register( MIPSRegister::cause().to_rf_index()); }
-    uint64 write_cause_register() { return write_cpu_register(); ]
 };
 
 #endif
