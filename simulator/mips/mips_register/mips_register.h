@@ -78,7 +78,7 @@ public:
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     static auto from_csr_name( std::string_view /* unused */) { return zero(); }
 
-    size_t to_rf_index() const { return value; }
+    constexpr size_t to_rf_index() const { return value; }
 
     static constexpr MIPSRegister mips_hi() noexcept;
     static constexpr MIPSRegister mips_lo() noexcept;
