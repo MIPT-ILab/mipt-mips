@@ -36,12 +36,14 @@ private:
     const Endian endian;
     Checker<ISA> checker;
     std::shared_ptr<Kernel> kernel;
+    std::unique_ptr<Driver> driver;
 
     /* Simulator internals */
     RF<FuncInstr>* rf = nullptr;
 
     auto read_instructions( Cycle cycle);
     void writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle);
+    void writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);
 
     /* Input */
@@ -67,6 +69,7 @@ public:
     Addr get_next_PC() const { return next_PC; }
     int get_exit_code() const noexcept;
     void set_kernel( std::shared_ptr<Kernel> k) { kernel = std::move( k); }
+    void set_driver( std::unique_ptr<Driver> d) { driver = std::move( d); }
 };
 
 #endif

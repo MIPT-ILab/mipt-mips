@@ -52,6 +52,7 @@ class FuncSim : public Simulator
         void init_checker() final { };
         int get_exit_code() const noexcept final;
         FuncInstr step();
+        Trap driver_step( const Operation& instr);
         Trap run( uint64 instrs_to_run) final;
 
         void set_target(const Target& target) final {

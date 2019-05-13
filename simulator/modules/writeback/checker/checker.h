@@ -23,6 +23,7 @@ public:
     void check( const FuncInstr& instr);
     void init( Endian endian, const FuncMemory& mem, Kernel* kernel);
     void set_target( const Target& value);
+    void driver_step( const FuncInstr& instr);
 private:
     std::shared_ptr<FuncSim<ISA>> sim;
     bool active = false;

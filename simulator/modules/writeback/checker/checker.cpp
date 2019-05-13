@@ -27,6 +27,13 @@ void Checker<ISA>::set_target( const Target& value)
 }
 
 template <typename ISA>
+void Checker<ISA>::driver_step( const FuncInstr& instr)
+{
+    if ( active)
+        sim->driver_step( instr);
+}
+
+template <typename ISA>
 void Checker<ISA>::check( const FuncInstr& instr)
 {
     if (!active)
