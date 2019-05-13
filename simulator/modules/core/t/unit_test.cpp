@@ -98,7 +98,7 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     ElfLoader elf( TEST_PATH "/tt.core.universal.out");
     elf.load_to( mem.get());
 
-    auto kernel = Kernel::create_configured_kernel();
+    auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
