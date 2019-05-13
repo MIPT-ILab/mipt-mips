@@ -9,6 +9,7 @@
 
 #include <kernel/kernel.h>
 #include <memory/elf/elf_loader.h>
+#include <mips/mips_register/mips_register.h>
 #include <modules/writeback/writeback.h>
 
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
@@ -82,6 +83,14 @@ TEST_CASE( "Perf_Sim: csr Register R/W")
     sim->write_csr_register( "mscratch", 333);
     CHECK( sim->read_csr_register( "mscratch") == 333 );
     CHECK( sim->get_exit_code() == 0);
+}
+
+TEST_CASE( "Perf_Sim: cause register R/W")
+{
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    sim->write_cause_register( 13);
+    CHECK( sim->read_cause_register() == 13);
+    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) == 13);
 }
 
 TEST_CASE( "Perf_Sim: Register size")
