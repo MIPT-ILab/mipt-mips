@@ -25,6 +25,7 @@ class Kernel {
 public:
     static std::shared_ptr<Kernel> create_configured_kernel();
     static std::shared_ptr<Kernel> create_dummy_kernel();
+    static std::shared_ptr<Kernel> create_mars_kernel();
 
     virtual void set_simulator( const std::shared_ptr<CPUModel>& s) = 0;
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
@@ -43,6 +44,7 @@ public:
     Kernel& operator=( Kernel&&) = delete;
 
     int get_exit_code() const { return exit_code; }
+
 protected:
     int exit_code = 0;
 };
