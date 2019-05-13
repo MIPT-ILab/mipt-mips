@@ -116,6 +116,12 @@ static auto get_smc_loaded_simulator( bool init_checker)
     sim->set_memory( mem);
     ElfLoader elf( TEST_PATH "/smc.out");
     elf.load_to( mem.get());
+
+    auto kernel = Kernel::create_mars_kernel();
+    kernel->connect_memory( mem);
+    kernel->set_simulator( sim);
+    sim->set_kernel( kernel);
+
     if ( init_checker)
         sim->init_checker();
     sim->set_pc( elf.get_startPC());

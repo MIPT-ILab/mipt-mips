@@ -25,6 +25,10 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
+    auto driver = ISA::create_driver( log, this);
+    if ( driver == nullptr)
+        driver = Driver::construct( "stop_on_halt", this, log);
+    writeback.set_driver( std::move( driver));
 
     set_writeback_bandwidth( PORT_BW);
 

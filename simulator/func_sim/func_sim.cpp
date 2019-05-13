@@ -53,7 +53,6 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     rf.write_dst( instr);
     update_pc( instr);
     update_and_check_nop_counter( instr);
-    kernel->handle_instruction( &instr);
     return instr;
 }
 
@@ -77,15 +76,22 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
 }
 
 template <typename ISA>
+Trap FuncSim<ISA>::driver_step( const Operation& instr)
+{
+    return driver->handle_trap( instr);
+}
+
+template <typename ISA>
 Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
         auto instr = step();
         sout << instr << std::endl;
-        auto trap = driver->handle_trap( instr);
-        if ( trap != Trap::NO_TRAP)
-            return trap;
+        kernel->handle_instruction( &instr);
+        auto result_trap = driver_step( instr);
+        if ( result_trap != Trap::NO_TRAP)
+            return result_trap;
     }
     return Trap(Trap::NO_TRAP);
 }
