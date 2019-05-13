@@ -43,6 +43,9 @@ public:
     using PerfSim<MIPS64>::clock;
     using PerfSim<MIPS64>::read_cpu_register;
     using PerfSim<MIPS64>::get_pc;
+    
+    void read_cause_register( uint64 value) const { return read_cpu_register( MIPSRegister::cause().to_rf_index()); }
+    uint64 write_cause_register() { return write_cpu_register(); ]
 };
 
 #endif
