@@ -14,7 +14,7 @@
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 {
     // Just call a constructor
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = Simulator::create_simulator( "mips32", false, false);
     auto mem = FuncMemory::create_hierarchied_memory();
     CHECK_NOTHROW(sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
