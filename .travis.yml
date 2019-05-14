@@ -56,25 +56,26 @@ install:
         sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
     fi
 # Download GDB
-  - git clone --depth=1 https://github.com/bminor/binutils-gdb.git --single-branch --branch gdb-8.3-branch
+  - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
+  - tar -xzf gdb-8.3.tar.gz
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/mips-tests        && make tt
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
 # Prepare for GDB build
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure && make libdecnumber.a
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/readline     && ./configure && make libreadline.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/libdecnumber && ./configure && make libdecnumber.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/readline     && ./configure && make libreadline.a
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/mips-tests/fib.out -n 1000000 --mars
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/mips-tests/tt.core.universal_reorder.out
 
