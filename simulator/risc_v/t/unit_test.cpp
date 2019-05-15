@@ -153,5 +153,5 @@ TEST_CASE( "RISCV lq/sq")
     }
     memory->load_store( &store);
     memory->load_store( &load);
-    CHECK( load.get_v_dst() == 0xf);
+    CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
