@@ -31,6 +31,7 @@ public:
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void add_replica_simulator( const std::shared_ptr<CPUModel>& s) = 0;
     virtual void add_replica_memory( const std::shared_ptr<FuncMemory>& s) = 0;
+    virtual void load_file( const std::string& name) = 0;
 
     virtual Trap execute() = 0;
     Trap execute_interactive();
@@ -44,9 +45,11 @@ public:
     Kernel& operator=( Kernel&&) = delete;
 
     int get_exit_code() const { return exit_code; }
+    Addr get_start_pc() const { return start_pc; }
 
 protected:
     int exit_code = 0;
+    Addr start_pc = 0;
 };
 
 #endif //KERNEL_H

@@ -19,4 +19,5 @@ public:
     void connect_memory( std::shared_ptr<FuncMemory> m) override { mem = std::make_unique<FuncMemoryReplicant>( m); }
     void add_replica_simulator( const std::shared_ptr<CPUModel>& s) override { sim->add_replica( s); }
     void add_replica_memory( const std::shared_ptr<FuncMemory>& s) override { mem->add_replica( s); }
+    void load_file( const std::string& name) override;
 };
