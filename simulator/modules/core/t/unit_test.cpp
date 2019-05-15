@@ -104,7 +104,7 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
-    kernel->load_file( TEST_PATH "/tt.core.universal.out");
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
     sim->init_checker();
@@ -122,7 +122,7 @@ static auto get_smc_loaded_simulator( bool init_checker)
     auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
-    kernel->load_file( TEST_PATH "/smc.out");
+    kernel->load_file( TEST_PATH "/mips-smc.bin");
     sim->set_kernel( kernel);
 
     if ( init_checker)
@@ -149,7 +149,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
-    kernel->load_file( RISCV_TEST_PATH "/isa/rv32ui-p-simple");
+    kernel->load_file( TEST_PATH "/rv32ui-p-simple");
     sim->set_kernel( kernel);
     sim->init_checker();
     sim->set_pc( kernel->get_start_pc());

@@ -44,23 +44,11 @@ install:
         sudo apt-get install g++-7
         CXX=g++-7
     fi
-# Download and build binutils on OS X
-  - |
-    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        ./mips-tests/.get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
-        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
-    fi
-# Download binutils on Linux
-  - |
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
-    fi
 # Download GDB
   - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
   - tar -xzf gdb-8.3.tar.gz
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/mips-tests        && make tt
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
 # Prepare for GDB build
@@ -74,10 +62,10 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/mips-tests/fib.out -n 1000000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.out -n 1000000 --mars
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/mips-tests/tt.core.universal_reorder.out
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.out
 
 after_success:
   - |
