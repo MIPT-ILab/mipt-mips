@@ -27,6 +27,12 @@ struct InvalidEntryPoint final : Exception
     { }
 };
 
+struct InvalidElfSection : Exception
+{
+    explicit InvalidElfSection(const std::string& section_name) :
+        Exception("Malformed ELF section", section_name) { }
+};
+
 class WriteableMemory;
 
 namespace ELFIO {

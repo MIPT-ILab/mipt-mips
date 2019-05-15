@@ -58,6 +58,12 @@ TEST_CASE( "Func_memory: StartPC Invalid")
     CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "nop.bin").get_startPC(), InvalidEntryPoint);
 }
 
+TEST_CASE( "Func_memory: Bad section")
+{
+    auto ptr = FuncMemory::create_hierarchied_memory();
+    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "empty.bin").load_to( ptr.get()), InvalidElfSection);
+}
+
 TEST_CASE( "Plain memory: out of range")
 {
     std::array<Byte, 16> arr{};
