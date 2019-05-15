@@ -212,6 +212,7 @@ void Datapath<T>::load( const T& value)
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
             case 8: v_dst = sign_extension<64>( value); break;
+            case 16: v_dst = sign_extension<128>( value); break;
             default: assert( false);
         }
     }
