@@ -31,14 +31,7 @@ FuncMemory::create_plain_memory( uint32 addr_bits)
     return std::make_shared<PlainMemory>( addr_bits);
 }
 
-PlainMemory::PlainMemory( uint32 addr_bits) try
-    : arena( 1ull << addr_bits)
-{
-}
-catch (const std::bad_alloc&)
-{
-    throw FuncMemoryBadMapping("Too many address guest address bits");
-}
+PlainMemory::PlainMemory( uint32 addr_bits) : arena( 1ull << addr_bits) { }
 
 void PlainMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
