@@ -237,6 +237,6 @@ void MARSKernel::read_from_file() {
 void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
 {
     BaseKernel::connect_memory( m);
-    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin", 0x8'0000'0180 - 0x470);
-    elf_loader.load_to( mem.get());
+    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin");
+    elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
 }
