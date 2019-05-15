@@ -3,10 +3,11 @@
  * Author pavel.kryukov@phystech.edu
  * Copyright 2019 MIPT-MIPS
  */
- 
+
 #include "../riscv_instr.h"
  
 #include <catch.hpp>
+#include <memory/memory.h>
 
 TEST_CASE("RISCV disassembly")
 {
@@ -138,4 +139,19 @@ TEST_CASE("RISCV sub print")
     std::ostringstream oss;
     oss << instr;
     CHECK( oss.str() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]");
+}
+
+TEST_CASE( "RISCV lq/sq")
+{
+    RISCVInstr<uint128> load( "c_lq", 0x1008);
+    RISCVInstr<uint128> store( "c_sq", 0x1000);
+    store.set_v_src( bitmask<uint128>( 68), 1);
+    auto memory = FuncMemory::create_hierarchied_memory();
+    for (auto* instr : { &load, &store }) {
+        instr->set_v_src( 0x1000, 0);
+        instr->execute();
+    }
+    memory->load_store( &store);
+    memory->load_store( &load);
+    CHECK( load.get_v_dst() == 0xf);
 }
