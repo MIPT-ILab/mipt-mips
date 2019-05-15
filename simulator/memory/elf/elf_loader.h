@@ -20,6 +20,13 @@ struct InvalidElfFile final : Exception
     { }
 };
 
+struct InvalidEntryPoint final : Exception
+{
+    explicit InvalidEntryPoint()
+        : Exception("No _start or __start label found")
+    { }
+};
+
 class WriteableMemory;
 
 namespace ELFIO {

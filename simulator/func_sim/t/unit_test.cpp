@@ -159,8 +159,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     CHECK( sim->get_pc() >= 0x8'0000'0180);
     CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
     auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
-    CHECK( epc > start_pc);
-    CHECK( epc < start_pc + 0x1000'000);
+    CHECK( epc < start_pc);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -201,7 +200,7 @@ TEST_CASE( "Torture_Test: Stop on halt")
 TEST_CASE( "Torture_Test: Ignore traps ")
 {
     CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1)  == Trap::NO_TRAP );
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10) != Trap::NO_TRAP);
+    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 20) != Trap::NO_TRAP);
     CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10) == Trap::NO_TRAP);
 }
 

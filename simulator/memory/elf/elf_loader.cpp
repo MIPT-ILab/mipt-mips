@@ -57,18 +57,12 @@ Addr ElfLoader::get_startPC() const
             ELFIO::Elf_Half section_index;
             unsigned char other;
             symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
-            if ( name == "_start")
+            if ( name == "__start" || name == "_start")
                 return offset + value;
         }
     }
 
-    if ( reader->sections[ ".text"] != nullptr) {
-        std::cout << "Warning: no _start label found, defaulting to '.text' section\n";
-        return offset + reader->sections[ ".text"]->get_address();
-    }
-
-    std::cout << "Warning: no entry point found, returning 0x0\n";
-    return offset;
+    throw InvalidEntryPoint();
 }
 
 ElfLoader::~ElfLoader() = default;

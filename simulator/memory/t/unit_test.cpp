@@ -50,7 +50,12 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the ".text" section*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the "__start" label*/);
+}
+
+TEST_CASE( "Func_memory: StartPC Invalid")
+{
+    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "nop.bin").get_startPC(), InvalidEntryPoint);
 }
 
 TEST_CASE( "Plain memory: out of range")
