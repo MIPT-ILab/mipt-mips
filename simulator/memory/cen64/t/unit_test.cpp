@@ -82,7 +82,7 @@ TEST_CASE( "CEN64Memory" )
     bus_controller bus;
     auto cen64_memory = create_cen64_memory(&bus);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( golden_memory.get());
+    ElfLoader( valid_elf_file).load_to( golden_memory.get(), -0x400000);
     golden_memory->duplicate_to( bus.memory);
     
     check_coherency( golden_memory.get(), cen64_memory.get(), dataSectAddr - 0x400000);

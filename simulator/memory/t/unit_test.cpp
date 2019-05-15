@@ -62,6 +62,7 @@ TEST_CASE( "Func_memory: Bad section")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
     CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "empty.bin").load_to( ptr.get()), InvalidElfSection);
+    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "empty.bin").get_startPC(), InvalidEntryPoint);
 }
 
 TEST_CASE( "Plain memory: out of range")
@@ -250,7 +251,7 @@ TEST_CASE( "Func_memory: Duplicate")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());
@@ -262,7 +263,7 @@ TEST_CASE( "Func_memory: Plain Memory")
     auto mem1 = FuncMemory::create_hierarchied_memory();
     auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());
@@ -274,7 +275,7 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     auto mem1 = FuncMemory::create_plain_memory( 24);
     auto mem2 = FuncMemory::create_hierarchied_memory();
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());

@@ -20,19 +20,23 @@ static void load_elf_section( WriteableMemory* memory, const ELFIO::section& sec
     memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
 }
 
-ElfLoader::ElfLoader( const std::string& filename, AddrDiff offset)
+ElfLoader::ElfLoader( const std::string& filename)
     : reader( std::make_unique<ELFIO::elfio>())
-    , offset( offset)
 {
     if ( !reader->load( filename))
         throw InvalidElfFile( filename);
 }
 
-void ElfLoader::load_to( WriteableMemory *memory) const
+void ElfLoader::load_to( WriteableMemory *memory, AddrDiff offset) const
 {
     for ( const auto& section : reader->sections)
         if ( ( section->get_flags() & SHF_ALLOC) != 0)
             load_elf_section( memory, *section, offset);
+}
+
+Addr ElfLoader::get_text_section_addr() const
+{
+    return reader->sections[ ".text"] != nullptr ? reader->sections[ ".text"]->get_address() : 0;
 }
 
 Addr ElfLoader::get_startPC() const
@@ -52,7 +56,7 @@ Addr ElfLoader::get_startPC() const
             unsigned char other;
             symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
             if ( name == "__start" || name == "_start")
-                return offset + value;
+                return value;
         }
     }
 
