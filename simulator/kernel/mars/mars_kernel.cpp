@@ -205,10 +205,8 @@ void MARSKernel::write_to_file() {
     auto data = mem->read_string_limited( buffer_ptr, chars_to_write);
     auto current_pos = file->tellp();
     file->write( data.c_str(), data.size());
-    if ( !file->bad())
-        sim->write_cpu_register( v0, file->tellp() - current_pos);
-    else
-        io_failure();
+    assert( !file->bad()); // FIXME(pikryukov): How to test the opposite?
+    sim->write_cpu_register( v0, file->tellp() - current_pos);
 }
 
 void MARSKernel::read_from_file() {
@@ -224,11 +222,7 @@ void MARSKernel::read_from_file() {
     std::vector<char> buffer( chars_to_read);
     auto current_pos = file->tellg();
     file->read( buffer.data(), chars_to_read);
-    if ( file->bad()) {
-        io_failure();
-        return;
-    }
-
+    assert( !file->bad()); // FIXME(pikryukov): How to test the opposite?
     auto chars_read = file->tellg() - current_pos;
     sim->write_cpu_register( v0, chars_read);
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
