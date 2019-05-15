@@ -10,7 +10,6 @@
 
 #include <kernel/kernel.h>
 #include <kernel/mars/mars_kernel.h>
-#include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <mips/mips_register/mips_register.h>
 #include <simulator.h>
@@ -34,7 +33,13 @@ static auto run_over_empty_memory( const std::string& isa)
 {
     auto sim = Simulator::create_functional_simulator( isa);
     sim->setup_trap_handler( "stop");
-    sim->set_memory( FuncMemory::create_hierarchied_memory());
+    auto m = FuncMemory::create_hierarchied_memory();
+    sim->set_memory( m);
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( m);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
     return sim->run( 30);
 }
 
@@ -50,7 +55,11 @@ TEST_CASE( "FuncSim: get lost without pc")
     auto m   = FuncMemory::create_hierarchied_memory();
     auto sim = Simulator::create_functional_simulator("mips32");
     sim->set_memory( m);
-    ElfLoader( valid_elf_file).load_to( m.get());
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( m);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
     CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
     CHECK( sim->get_exit_code() == 0);
 }
@@ -61,9 +70,12 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    CHECK_NOTHROW( sim->set_pc( elf.get_startPC()) );
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
+    CHECK_NOTHROW( sim->set_pc( kernel->get_start_pc()) );
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -72,14 +84,18 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
     sim->init_checker();
 
-    CHECK( sim->get_pc() == elf.get_startPC());
+    CHECK( sim->get_pc() == kernel->get_start_pc());
     sim->run( 1);
-    CHECK( sim->get_pc() == elf.get_startPC() + 4);
+    CHECK( sim->get_pc() == kernel->get_start_pc() + 4);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -88,9 +104,14 @@ TEST_CASE( "Run one instruction: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( smc_code);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
+
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
 
     CHECK( sim->run( 1) == Trap::NO_TRAP);
     CHECK( sim->get_exit_code() == 0);
@@ -106,7 +127,6 @@ TEST_CASE( "FuncSim: Register R/W")
     /* Unsigned */
     sim->write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim->read_cpu_register( 1) == MAX_VAL32 );
-    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: GDB Register R/W")
@@ -120,7 +140,6 @@ TEST_CASE( "FuncSim: GDB Register R/W")
     sim->write_gdb_register( 37, 100500);
     CHECK( sim->read_gdb_register( 37) == 100500);
     CHECK( sim->get_pc() == 100500);
-    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: Register size")
@@ -135,9 +154,14 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
     sim->setup_trap_handler( "stop_on_halt");
-    ElfLoader elf( smc_code);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
+
+    auto kernel = Kernel::create_mars_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
 
     CHECK_NOTHROW( sim->run_no_limit() );
     CHECK( sim->get_exit_code() == 0);
@@ -150,9 +174,13 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     auto mem = FuncMemory::create_hierarchied_memory( 36);
     sim->set_memory( mem);
 
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    auto start_pc = elf.get_startPC();
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( valid_elf_file);
+    sim->set_kernel( kernel);
+
+    auto start_pc = kernel->get_start_pc();
     sim->set_pc( start_pc);
 
     CHECK_THROWS_AS( sim->run( 10000), BearingLost);
@@ -171,15 +199,13 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     sim->set_memory( mem);
     sim->setup_trap_handler( trap_options);
 
-    ElfLoader elf( test);
-    elf.load_to( mem.get());
-
     auto kernel = create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
+    kernel->load_file( test);
 
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     return sim;
 }
 

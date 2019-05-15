@@ -15,7 +15,6 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
-    , kernel( Kernel::create_dummy_kernel())
     , driver( ISA::create_driver( log, this))
 {
     if ( driver == nullptr)

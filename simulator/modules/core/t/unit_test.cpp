@@ -8,7 +8,6 @@
 #include <catch.hpp>
 
 #include <kernel/kernel.h>
-#include <memory/elf/elf_loader.h>
 #include <modules/writeback/writeback.h>
 
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
@@ -16,7 +15,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     // Just call a constructor
     auto sim = Simulator::create_simulator( "mips32", false, false);
     auto mem = FuncMemory::create_hierarchied_memory();
-    CHECK_NOTHROW(sim->set_memory( mem));
+    CHECK_NOTHROW( sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -30,6 +29,12 @@ TEST_CASE( "Perf_Sim_init: push a nop")
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
+
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    sim->set_kernel( kernel);
+
     sim->init_checker();
     sim->set_pc( 0x10);
 
@@ -95,16 +100,15 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( TEST_PATH "/tt.core.universal.out");
-    elf.load_to( mem.get());
 
     auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->load_file( TEST_PATH "/tt.core.universal.out");
     sim->set_kernel( kernel);
 
     sim->init_checker();
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
     CHECK( sim->get_exit_code() == 0);
 }
@@ -114,17 +118,16 @@ static auto get_smc_loaded_simulator( bool init_checker)
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( TEST_PATH "/smc.out");
-    elf.load_to( mem.get());
-
+    
     auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->load_file( TEST_PATH "/smc.out");
     sim->set_kernel( kernel);
 
     if ( init_checker)
         sim->init_checker();
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     return sim;
 }
 
@@ -143,10 +146,13 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( RISCV_TEST_PATH "/isa/rv32ui-p-simple");
-    elf.load_to( mem.get());
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->connect_memory( mem);
+    kernel->set_simulator( sim);
+    kernel->load_file( RISCV_TEST_PATH "/isa/rv32ui-p-simple");
+    sim->set_kernel( kernel);
     sim->init_checker();
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     CHECK( sim->run_no_limit() == Trap::NO_TRAP);
     CHECK( sim->get_exit_code() == 0);
 }
