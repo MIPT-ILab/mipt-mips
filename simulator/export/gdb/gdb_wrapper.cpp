@@ -50,6 +50,8 @@ bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const ch
     if ( cpu->sizeof_register() == bytewidth<uint64>)
         sp += ArgvLoader<uint64, Endian::native>( argv, envp).load_to( memory, sp);
 
+    while ( sp % 4 != 0) ++sp;
+
     cpu->write_gdb_register( 29, sp);
     std::cout << "MIPT-MIPS: arguments loaded" << std::endl;
 
