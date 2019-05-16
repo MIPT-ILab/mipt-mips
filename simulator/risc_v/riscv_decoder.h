@@ -61,6 +61,7 @@ enum ImmediateType
 
 struct RISCVInstrDecoder
 {
+    const uint32 bytes;
     const uint32 sz;
     const uint32 rd;
     const uint32 rs1;
@@ -83,7 +84,6 @@ struct RISCVInstrDecoder
     const uint32 rs2_3_bits;
     const uint32 csr_imm;
     const uint32 csr;
-    const uint32 bytes;
     const uint32 CI_imm_1;   // 1st immediate of CI-format instruction
     const uint32 CI_imm_2;
     const uint32 CSS_imm;
@@ -322,6 +322,7 @@ struct RISCVInstrDecoder
         , J_imm20    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
         , csr_imm    ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
         , csr        ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
+        // Compressed
         , rs2_compr  ( apply_mask( raw, 0b00000000'01111100))
         , rd_3_bits  ( apply_mask( raw, 0b00000000'00011100))
         , rs1_3_bits ( apply_mask( raw, 0b00000011'10000000))
