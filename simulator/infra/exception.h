@@ -7,10 +7,9 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
-#include <infra/string_view.h>
-
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 struct Exception : std::runtime_error
 {

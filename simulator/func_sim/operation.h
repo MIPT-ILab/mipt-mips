@@ -9,11 +9,11 @@
 
 #include <func_sim/traps/trap.h>
 #include <infra/macro.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <cassert>
 #include <sstream>
+#include <string_view>
 
 enum OperationType : uint8
 {
