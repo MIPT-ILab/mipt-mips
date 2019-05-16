@@ -92,7 +92,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         if ( result_trap != Trap::NO_TRAP)
             return result_trap;
     }
-    return Trap(Trap::NO_TRAP);
+    return Trap(Trap::BREAKPOINT);
 }
 
 template <typename ISA>
