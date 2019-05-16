@@ -44,7 +44,6 @@ install:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install clang-tidy-8
-        CXX=clang-tidy-8
     fi
 # Download GDB
   - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
