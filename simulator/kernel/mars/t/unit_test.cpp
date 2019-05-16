@@ -297,6 +297,31 @@ TEST_CASE( "MARS: open, write, read and close a file")
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
 }
 
+TEST_CASE( "MARS: open file with invalid mode")
+{
+    std::string filename("tempfile");
+    std::ostringstream output;
+    System sys( std::cin, output);
+    sys.mem->write_string( filename, 0x1000);
+
+    sys.sim->write_cpu_register( v0, 13u); // open file
+    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( a1, 1); // write
+    auto descriptor = sys.sim->read_cpu_register( v0);
+    sys.mars_kernel->execute();
+
+    sys.sim->write_cpu_register( v0, 16u); // close file
+    sys.sim->write_cpu_register( a0, descriptor);
+    sys.mars_kernel->execute();
+
+    sys.sim->write_cpu_register( v0, 13u); // open file
+    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( a1, 131); // INVALID MODE!
+
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
+}
+
 TEST_CASE( "MARS: close stdout")
 {
     auto sim = Simulator::create_simulator( "mips64", true, false);
