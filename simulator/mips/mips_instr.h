@@ -14,10 +14,10 @@
 #include <func_sim/operation.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <sstream>
+#include <string_view>
 
 template<typename I>
 struct MIPSTableEntry;

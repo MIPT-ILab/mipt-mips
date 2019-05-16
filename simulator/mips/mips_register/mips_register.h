@@ -6,13 +6,12 @@
 #ifndef MIPS_REG_H
 #define MIPS_REG_H
 
-// MIPT-MIPS modules
 #include <infra/macro.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <array>
 #include <cassert>
+#include <string_view>
 #include <iostream>
 #include <utility>
 
