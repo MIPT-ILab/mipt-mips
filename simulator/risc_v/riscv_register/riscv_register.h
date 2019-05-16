@@ -66,6 +66,8 @@ private:
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
+    constexpr RISCVRegister() noexcept : RISCVRegister( RISCV_REG_zero) {}
+    friend struct RISCVInstrDecoder;
 };
 
 constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }

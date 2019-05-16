@@ -1,4 +1,4 @@
-/*
+    /*
  * riscv_instr.cpp - instruction parser for risc_v
  * Copyright 2018 MIPT-MIPS
  */
@@ -167,22 +167,22 @@ struct RISCVTableEntry
     OperationType type;
     char immediate_type;
     Imm immediate_print_type;
-    Src1 src1;
-    Src2 src2;
-    Dst  dst;
+    Src1::Type src1;
+    Src2::Type src2;
+    Dst::Type dst;
     uint32 mem_size;
     uint32 bit_width;
 
     RISCVTableEntry() = delete;
 
-    static bool check_print_dst( Reg reg)
+    static bool check_print_dst( Reg::Type reg)
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::MEPC)
             && ( reg != Reg::SEPC);
     }
 
-    static bool check_print_src( Reg reg)
+    static bool check_print_src( Reg::Type reg)
     {
         return ( reg != Reg::ZERO)
             && ( reg != Reg::SEPC)
