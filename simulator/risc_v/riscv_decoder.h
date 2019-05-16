@@ -1,6 +1,7 @@
 /**
  * riscv_decoder.h - instruction decoder for risc-v
  * @author Pavel Kryukov pavel.kryukov@phystech.edu
+ * @author Rustem Yunusov
  * Copyright 2019 MIPT-MIPS
  */
  
@@ -64,10 +65,6 @@ struct RISCVInstrDecoder
     const uint32 rd;
     const uint32 rs1;
     const uint32 rs2;
-    const uint32 rs2_compr; // rs2 is in another place for 16-bit instrs
-    const uint32 rd_3_bits;
-    const uint32 rs1_3_bits;
-    const uint32 rs2_3_bits;
     const uint32 I_imm;
     const uint32 S_imm4_0;
     const uint32 S_imm11_5;
@@ -80,6 +77,10 @@ struct RISCVInstrDecoder
     const uint32 J_imm11;
     const uint32 J_imm10_1;
     const uint32 J_imm20;
+    const uint32 rs2_compr; // rs2 is in another place for 16-bit instrs
+    const uint32 rd_3_bits;
+    const uint32 rs1_3_bits;
+    const uint32 rs2_3_bits;
     const uint32 csr_imm;
     const uint32 csr;
     const uint32 bytes;
@@ -279,20 +280,21 @@ struct RISCVInstrDecoder
     RISCVRegister get_register( Reg type) const noexcept
     {
         switch ( type) {
-        case Reg::ZERO:           return RISCVRegister::zero();
-        case Reg::SP:             return RISCVRegister::from_cpu_index( 2);
-        case Reg::RS1:            return RISCVRegister::from_cpu_index( rs1);
-        case Reg::RS2:            return RISCVRegister::from_cpu_index( rs2);
-        case Reg::RS2_COMPR:      return RISCVRegister::from_cpu_index( rs2_compr);
-        case Reg::RD:             return RISCVRegister::from_cpu_index( rd);
-        case Reg::RS1_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs1_3_bits);
-        case Reg::RS2_3_BITS:     return RISCVRegister::from_cpu_popular_index( rs2_3_bits);
-        case Reg::RD_3_BITS:      return RISCVRegister::from_cpu_popular_index( rd_3_bits);
-        case Reg::CSR:            return RISCVRegister::from_csr_index( csr);
-        case Reg::SEPC:           return RISCVRegister::from_csr_index( 0x141);
-        case Reg::MEPC:           return RISCVRegister::from_csr_index( 0x341);
-        default:       assert(0); return RISCVRegister::zero();
+        case Reg::ZERO:       break;
+        case Reg::SP:         return RISCVRegister::from_cpu_index( 2);
+        case Reg::RS1:        return RISCVRegister::from_cpu_index( rs1);
+        case Reg::RS2:        return RISCVRegister::from_cpu_index( rs2);
+        case Reg::RS2_COMPR:  return RISCVRegister::from_cpu_index( rs2_compr);
+        case Reg::RD:         return RISCVRegister::from_cpu_index( rd);
+        case Reg::RS1_3_BITS: return RISCVRegister::from_cpu_popular_index( rs1_3_bits);
+        case Reg::RS2_3_BITS: return RISCVRegister::from_cpu_popular_index( rs2_3_bits);
+        case Reg::RD_3_BITS:  return RISCVRegister::from_cpu_popular_index( rd_3_bits);
+        case Reg::CSR:        return RISCVRegister::from_csr_index( csr);
+        case Reg::SEPC:       return RISCVRegister::from_csr_index( 0x141);
+        case Reg::MEPC:       return RISCVRegister::from_csr_index( 0x341);
+        default: assert(0);
         }
+        return RISCVRegister::zero();
     }
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
@@ -301,14 +303,11 @@ struct RISCVInstrDecoder
     }
 
     explicit constexpr RISCVInstrDecoder(uint32 raw) noexcept
-        : sz         ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
+        : bytes      ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , sz         ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
         , rd         ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , rs1        ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
         , rs2        ( apply_mask( raw, 0b00000001'11110000'00000000'00000000))
-        , rs2_compr  ( apply_mask( raw, 0b00000000'01111100))
-        , rd_3_bits  ( apply_mask( raw, 0b00000000'00011100))
-        , rs1_3_bits ( apply_mask( raw, 0b00000011'10000000))
-        , rs2_3_bits ( apply_mask( raw, 0b00000000'00011100))
         , I_imm      ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
         , S_imm4_0   ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
         , S_imm11_5  ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
@@ -323,7 +322,10 @@ struct RISCVInstrDecoder
         , J_imm20    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
         , csr_imm    ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
         , csr        ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , bytes      ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
+        , rs2_compr  ( apply_mask( raw, 0b00000000'01111100))
+        , rd_3_bits  ( apply_mask( raw, 0b00000000'00011100))
+        , rs1_3_bits ( apply_mask( raw, 0b00000011'10000000))
+        , rs2_3_bits ( apply_mask( raw, 0b00000000'00011100))
         , CI_imm_1   ( apply_mask( raw, 0b00010000'00000000))
         , CI_imm_2   ( apply_mask( raw, 0b00000000'01111100))
         , CSS_imm    ( apply_mask( raw, 0b00011111'10000000))
