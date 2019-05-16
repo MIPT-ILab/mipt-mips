@@ -1,7 +1,7 @@
 /**
- * string_view.h - definition of string_view
+ * string_view.h - definition of string_view for old libc++
  * @author Pavel Kryukov
- * Copyright 2017 MIPT-MIPS team
+ * Copyright 2017-2019 MIPT-MIPS team
  */
 
 #ifndef STRING_VIEW_H
@@ -16,8 +16,8 @@
 namespace std {
     using string_view = std::experimental::string_view;
 
-    template<typename T, typename Traits = std::char_traits<CharT>>
-    using basic_string_view = std::experimental::basic_string_view<T, Traits>;
+    template<typename CharT, typename Traits = std::char_traits<CharT>>
+    using basic_string_view = std::experimental::basic_string_view<CharT, Traits>;
 
     std::ostream& operator<<(std::ostream&, const std::experimental::string_view&);
 }
