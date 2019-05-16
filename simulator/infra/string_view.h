@@ -15,7 +15,10 @@
 #include <experimental/string_view>
 namespace std {
     using string_view = std::experimental::string_view;
-    using basic_string_view = std::experimental::basic_string_view;
+
+    template<typename T, typename Traits = std::char_traits<CharT>>
+    using basic_string_view = std::experimental::basic_string_view<T, Traits>;
+
     std::ostream& operator<<(std::ostream&, const std::experimental::string_view&);
 }
 #endif
