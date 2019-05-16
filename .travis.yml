@@ -43,7 +43,7 @@ install:
     fi
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-8
+        sudo apt-get install libstdc++-7-dev
     fi
 # Download GDB
   - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
@@ -71,6 +71,7 @@ script:
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install clang-tidy-8
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
         run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
