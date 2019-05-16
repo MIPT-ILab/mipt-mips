@@ -78,12 +78,12 @@ struct RISCVInstrDecoder
     const uint32 J_imm11;
     const uint32 J_imm10_1;
     const uint32 J_imm20;
+    const uint32 csr_imm;
+    const uint32 csr;
     const uint32 rs2_compr; // rs2 is in another place for 16-bit instrs
     const uint32 rd_3_bits;
     const uint32 rs1_3_bits;
     const uint32 rs2_3_bits;
-    const uint32 csr_imm;
-    const uint32 csr;
     const uint32 CI_imm_1;   // 1st immediate of CI-format instruction
     const uint32 CI_imm_2;
     const uint32 CSS_imm;
