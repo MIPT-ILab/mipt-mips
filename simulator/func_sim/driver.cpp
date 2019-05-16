@@ -10,28 +10,28 @@ class DriverNoOp : public Driver
 {
 public:
     explicit DriverNoOp( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( const Operation& instr) const final { return instr.trap_type(); }
+    Trap handle_trap( const Operation& instr) const final { return instr.trap_type(); }
 };
 
 class DriverHaltOnly : public Driver
 {
 public:
     explicit DriverHaltOnly( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( const Operation& instr) const final { return instr.trap_type() == Trap::HALT ? instr.trap_type() : Trap(Trap::NO_TRAP); }
+    Trap handle_trap( const Operation& instr) const final { return instr.trap_type() == Trap::HALT ? instr.trap_type() : Trap(Trap::NO_TRAP); }
 };
 
 class DriverIgnore : public Driver
 {
 public:
     explicit DriverIgnore( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( const Operation& /* instr */) const final { return Trap(Trap::NO_TRAP); }
+    Trap handle_trap( const Operation& /* instr */) const final { return Trap(Trap::NO_TRAP); }
 };
 
 class DriverCritical : public Driver
 {
 public:
     explicit DriverCritical( bool verbose) : Driver( verbose) { }
-    Trap handle_trap_impl( const Operation& instr) const final
+    Trap handle_trap( const Operation& instr) const final
     {
         if ( instr.trap_type() != Trap::NO_TRAP)
             throw std::runtime_error( "critical trap");

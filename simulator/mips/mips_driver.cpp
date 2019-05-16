@@ -14,7 +14,7 @@ class DriverMIPS32 : public Driver
 {
 public:
     explicit DriverMIPS32( bool verbose, Simulator* sim) : Driver( verbose), cpu( sim) { }
-    Trap handle_trap_impl( const Operation& instr) const final
+    Trap handle_trap( const Operation& instr) const final
     {
         auto trap = instr.trap_type();
         if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
