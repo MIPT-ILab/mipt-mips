@@ -12,7 +12,7 @@
 #include "../memory.h"
 #include "check_coherency.h"
 
-static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
+static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
 static const uint64 dataSectAddrShifted = 0x100c0;
@@ -55,14 +55,14 @@ TEST_CASE( "Func_memory: StartPC_Method_Test")
 
 TEST_CASE( "Func_memory: StartPC Invalid")
 {
-    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "nop.bin").get_startPC(), InvalidEntryPoint);
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/nop.bin").get_startPC(), InvalidEntryPoint);
 }
 
 TEST_CASE( "Func_memory: Bad section")
 {
     auto ptr = FuncMemory::create_hierarchied_memory();
-    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "empty.bin").load_to( ptr.get()), InvalidElfSection);
-    CHECK_THROWS_AS( ElfLoader( TEST_DATA_PATH "empty.bin").get_startPC(), InvalidEntryPoint);
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/empty.bin").load_to( ptr.get()), InvalidElfSection);
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/empty.bin").get_startPC(), InvalidEntryPoint);
 }
 
 TEST_CASE( "Plain memory: out of range")

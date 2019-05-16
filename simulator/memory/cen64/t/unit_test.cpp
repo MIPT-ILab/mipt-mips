@@ -75,7 +75,7 @@ TEST_CASE( "CEN64Memory: write byte" )
 
 TEST_CASE( "CEN64Memory" )
 {
-    static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
+    static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
     static const uint64 dataSectAddr = 0x4100c0;
 
     auto golden_memory = FuncMemory::create_hierarchied_memory();

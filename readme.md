@@ -4,8 +4,6 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
 
-[![CodeCov](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/icicle.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
-
 # MIPT-MIPS / MIPT-V
 
 MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
@@ -18,15 +16,15 @@ MIPT-MIPS can be used for different purposes:
 * Performance control of **software optimizations**: you may check IPC boosts of your programs
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
 * **Performance control** of developed or produced hardware
-* **Education**: simulator is a nice experimental frog to study CPU internals
+* **Education**: simulator is a nice experimental frog to study CPU internals and software development process
 
 Key system-level features:
-* Compatibility with [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls convention
+* Compatibility with interactive [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls.
 * Interactive simulation with [GDB](https://github.com/MIPT-ILab/mipt-mips/wiki/Interactive-simulation-with-GDB)
 
 Key microarchitecture features:
 * Configurable [branch prediction unit](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model) with 5 prediction algorithms
-* Configurable instruction cache with true-LRU policy
+* Configurable instruction cache
 * Interstage data bypassing
 
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
@@ -42,6 +40,8 @@ We use C++17 features and Boost 1.61. Thus, you have to [use compilers](https://
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
+
+To work with RISC-V traces, you need to install RISC-V toolchain. Please follow [the official instruction](https://github.com/riscv/riscv-gnu-toolchain/blob/master/README.md).
 
 Our build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
@@ -101,10 +101,8 @@ To build simulator faster, we recommend to install Ninja.
   1. Run `ninja` to get the `mipt-mips` binary file
   1. If you changed some source code files, just type `ninja` to rebuild project
 #### Run
-  1. Now you can run simulation: `./mipt-mips -b /path/to/mips/binary`
+  1. Now you can run simulation: `./mipt-mips -b /path/to/binary`
   1. See more command line options in the paragraph below
-#### Test
-  1. Go to `mipt-tests` subdirectory and build MIPS traces just by typing `make`
   1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
 ## About MIPT-MIPS / MIPT-V
@@ -119,4 +117,4 @@ The main goal of the project is to teach the students the computer architecture 
 
 ### May I contribute?
 
-Yes, if you attend MIPT-MIPS lectures. See our [contributing.md](contributing.md) file for details.
+Yes, if you attend lectures on Computer Architecture. See our [contributing.md](contributing.md) file for details.
