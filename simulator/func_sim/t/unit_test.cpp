@@ -110,7 +110,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
 
     sim->set_pc( kernel->get_start_pc());
 
-    CHECK( sim->run( 1) == Trap::NO_TRAP);
+    CHECK( sim->run( 1) == Trap::BREAKPOINT);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -208,7 +208,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop")->run( 1) == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop")->run( 1) == Trap::BREAKPOINT );
     auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop")->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
@@ -216,15 +216,15 @@ TEST_CASE( "Torture_Test: Stop on trap")
 
 TEST_CASE( "Torture_Test: Stop on halt")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop_on_halt")->run( 1)     == Trap::NO_TRAP );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop_on_halt")->run( 1)     == Trap::BREAKPOINT );
     CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop_on_halt")->run( 10000) == Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: Ignore traps ")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "ignore")->run( 1)  == Trap::NO_TRAP );
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop"  )->run( 20) != Trap::NO_TRAP);
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "ignore")->run( 10) == Trap::NO_TRAP);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "ignore")->run( 1)  == Trap::BREAKPOINT);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "stop"  )->run( 20) != Trap::BREAKPOINT);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", "ignore")->run( 10) == Trap::BREAKPOINT);
 }
 
 TEST_CASE( "Torture_Test: Critical traps ")
