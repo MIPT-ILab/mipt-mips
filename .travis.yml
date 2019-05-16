@@ -65,7 +65,7 @@ script:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.out
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
 
 after_success:
   - |
