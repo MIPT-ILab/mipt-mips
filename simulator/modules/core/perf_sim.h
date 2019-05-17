@@ -37,7 +37,7 @@ public:
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void set_kernel( std::shared_ptr<Kernel> k) final { writeback.set_kernel( k); }
     void clock() final;
-    void halt() final { force_halt = true; }
+    void enable_driver_hooks() final { writeback.enable_driver_hooks(); }
     void init_checker() final { writeback.init_checker( *memory); }
     void set_writeback_bandwidth( uint32 wb_bandwidth) { decode.set_wb_bandwidth( wb_bandwidth);}
     int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
@@ -64,7 +64,6 @@ private:
 
     Cycle curr_cycle = 0_cl;
     decltype( std::chrono::high_resolution_clock::now()) start_time = {};
-    bool force_halt = false;
 
     /* simulator units */
     RF<FuncInstr> rf;
@@ -79,11 +78,11 @@ private:
     Writeback<ISA> writeback;
 
     /* ports */
-    std::unique_ptr<ReadPort<bool>> rp_halt = nullptr;
+    std::unique_ptr<ReadPort<Trap>> rp_halt = nullptr;
 
     void clock_tree( Cycle cycle);
     void dump_statistics() const;
-    bool is_halt() const;
+    Trap current_trap = Trap(Trap::NO_TRAP);
 
     uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
     void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }

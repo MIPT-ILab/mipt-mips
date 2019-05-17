@@ -16,7 +16,7 @@
 GDBSim::GDBSim( const std::string& isa)
 {
     cpu = Simulator::create_configured_isa_simulator( isa);
-    cpu->setup_trap_handler( "stop");
+    cpu->enable_driver_hooks();
     memory = FuncMemory::create_hierarchied_memory();
     kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);

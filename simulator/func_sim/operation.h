@@ -66,6 +66,8 @@ std::string print_immediate( Imm type, T value)
 class Operation
 {
 public:
+    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
+
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
@@ -125,8 +127,6 @@ public:
     auto get_new_PC() const { return new_PC; }
 
 protected:
-    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
-
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
     Trap trap = Trap(Trap::NO_TRAP);

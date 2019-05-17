@@ -9,8 +9,9 @@
 
 #include "mips_instr.h"
 
-#include <func_sim/driver.h>
+#include <memory>
 
+class Driver;
 class Simulator;
 
 std::unique_ptr<Driver> create_mips32_driver( bool verbose, Simulator* sim);
