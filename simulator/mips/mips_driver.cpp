@@ -7,7 +7,7 @@
 #include "mips.h"
 #include "mips_register/mips_register.h"
 
-#include <func_sim/driver.h>
+#include <func_sim/driver/driver.h>
 #include <simulator.h>
 
 class DriverMIPS32 : public Driver
@@ -30,8 +30,10 @@ public:
         cpu->set_pc( 0x8'0000'0180);
         return Trap( Trap::NO_TRAP);
     }
+    std::unique_ptr<Driver> clone() const final { return std::make_unique<DriverMIPS32>( verbose, cpu); }
 private:
-    Simulator* cpu = nullptr;
+    Simulator* const cpu = nullptr;
+    const bool verbose = false;
 };
 
 std::unique_ptr<Driver> create_mips32_driver( bool verbose, Simulator* sim)

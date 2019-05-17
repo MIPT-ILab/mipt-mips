@@ -54,7 +54,7 @@ private:
 
     /* Output */
     std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
-    std::unique_ptr<WritePort<bool>> wp_halt = nullptr;
+    std::unique_ptr<WritePort<Trap>> wp_halt = nullptr;
     std::unique_ptr<WritePort<bool>> wp_trap = nullptr;
     std::unique_ptr<WritePort<Target>> wp_target = nullptr;
 
@@ -70,6 +70,7 @@ public:
     int get_exit_code() const noexcept;
     void set_kernel( std::shared_ptr<Kernel> k) { kernel = std::move( k); }
     void set_driver( std::unique_ptr<Driver> d) { driver = std::move( d); }
+    void enable_driver_hooks();
 };
 
 #endif

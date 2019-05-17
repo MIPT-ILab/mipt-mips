@@ -21,14 +21,11 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     branch( log),
     writeback( endian, log)
 {
-    rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
+    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
-    auto driver = ISA::create_driver( log, this);
-    if ( driver == nullptr)
-        driver = Driver::construct( "stop_on_halt", this, log);
-    writeback.set_driver( std::move( driver));
+    writeback.set_driver( ISA::create_driver( log, this));
 
     set_writeback_bandwidth( PORT_BW);
 
@@ -66,24 +63,18 @@ Addr PerfSim<ISA>::get_pc() const
 template<typename ISA>
 Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 {
-    force_halt = false;
+    current_trap = Trap( Trap::NO_TRAP);
 
     writeback.set_instrs_to_run( instrs_to_run);
 
     start_time = std::chrono::high_resolution_clock::now();
 
-    while (!is_halt())
+    while (current_trap == Trap::NO_TRAP)
         clock();
 
     dump_statistics();
 
-    return Trap(Trap::NO_TRAP);
-}
-
-template<typename ISA>
-bool PerfSim<ISA>::is_halt() const
-{
-    return rp_halt->is_ready( curr_cycle) || force_halt;
+    return current_trap;
 }
 
 template<typename ISA>
@@ -102,6 +93,8 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     mem.clock( cycle);
     branch.clock( cycle);
     writeback.clock( cycle);
+    if ( rp_halt->is_ready( cycle))
+        current_trap = rp_halt->read( cycle);
     sout << "******************\n";
 }
 

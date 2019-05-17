@@ -21,7 +21,6 @@ int main( int argc, const char* argv[]) try {
     auto memory = FuncMemory::create_hierarchied_memory();
 
     auto sim = Simulator::create_configured_simulator();
-    sim->setup_trap_handler( config::trap_mode);
     sim->set_memory( memory);
     sim->write_csr_register( "mscratch", 0x400'0000);
 

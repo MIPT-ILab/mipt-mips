@@ -19,11 +19,6 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     CHECK( sim->get_exit_code() == 0);
 }
 
-TEST_CASE( "Perf_Sim_init: Ignore trap handling")
-{
-    CHECK_NOTHROW( CycleAccurateSimulator::create_simulator( "mips32", false)->setup_trap_handler("ignore_me"));
-}
-
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
@@ -95,7 +90,7 @@ TEST_CASE( "Perf_Sim: Register size")
     CHECK( CycleAccurateSimulator::create_simulator( "mips64", false)->sizeof_register() == bytewidth<uint64>);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
+static auto get_mars32_tt_simulator( bool has_hooks)
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
     auto mem = FuncMemory::create_hierarchied_memory();
@@ -106,10 +101,27 @@ TEST_CASE( "Torture_Test: Perf_Sim , MARS 32, Core Universal")
     kernel->set_simulator( sim);
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
+    if ( has_hooks)
+        sim->enable_driver_hooks();
 
     sim->init_checker();
     sim->set_pc( kernel->get_start_pc());
-    CHECK( sim->run_no_limit() == Trap::NO_TRAP);
+    return sim;
+}
+
+TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal")
+{
+    auto sim = get_mars32_tt_simulator( false);
+    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( sim->get_exit_code() == 0);
+}
+
+TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
+{
+    auto sim = get_mars32_tt_simulator( true);
+    auto trap = sim->run_no_limit();
+    CHECK_FALSE( trap == Trap::NO_TRAP);
+    CHECK_FALSE( trap == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -118,7 +130,7 @@ static auto get_smc_loaded_simulator( bool init_checker)
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    
+
     auto kernel = Kernel::create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
@@ -133,7 +145,7 @@ static auto get_smc_loaded_simulator( bool init_checker)
 
 TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
 {
-    CHECK( get_smc_loaded_simulator( false)->run_no_limit() == Trap::NO_TRAP);
+    CHECK( get_smc_loaded_simulator( false)->run_no_limit() == Trap::HALT);
 }
 
 TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
@@ -153,6 +165,6 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     sim->set_kernel( kernel);
     sim->init_checker();
     sim->set_pc( kernel->get_start_pc());
-    CHECK( sim->run_no_limit() == Trap::NO_TRAP);
+    CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
