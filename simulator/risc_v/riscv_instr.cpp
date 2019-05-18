@@ -25,17 +25,8 @@ template<typename I> auto execute_blt = ALU::branch<I, ALU::lt<I>>;
 template<typename I> auto execute_bge = ALU::branch<I, ALU::ge<I>>;
 template<typename I> auto execute_bltu = ALU::branch<I, ALU::ltu<I>>;
 template<typename I> auto execute_bgeu = ALU::branch<I, ALU::geu<I>>;
-template<typename I> auto execute_lb = ALU::addr<I>;
-template<typename I> auto execute_lh = ALU::addr<I>;
-template<typename I> auto execute_lw = ALU::addr<I>;
-template<typename I> auto execute_lbu = ALU::addr<I>;
-template<typename I> auto execute_lhu = ALU::addr<I>;
-template<typename I> auto execute_lwu = ALU::addr<I>;
-template<typename I> auto execute_ld = ALU::addr<I>;
-template<typename I> auto execute_sb = ALU::store_addr<I>;
-template<typename I> auto execute_sh = ALU::store_addr<I>;
-template<typename I> auto execute_sw = ALU::store_addr<I>;
-template<typename I> auto execute_sd = ALU::store_addr<I>;
+template<typename I> auto execute_load = ALU::addr<I>;
+template<typename I> auto execute_store = ALU::store_addr<I>;
 template<typename I> auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
 template<typename I> auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
 template<typename I> auto execute_slti = ALU::set<I, ALU::lti<I>>;
@@ -87,45 +78,6 @@ template<typename I> auto execute_div = ALU::riscv_div<I, sign_t<typename I::Reg
 template<typename I> auto execute_divu = ALU::riscv_div<I, typename I::RegisterUInt>;
 template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::RegisterUInt>>;
 template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
-// Compressed
-template<typename I> auto execute_c_lwsp = ALU::addr<I>;
-template<typename I> auto execute_c_ldsp = ALU::addr<I>;
-template<typename I> auto execute_c_lqsp = ALU::addr<I>;
-template<typename I> auto execute_c_swsp = ALU::store_addr<I>;
-template<typename I> auto execute_c_sdsp = ALU::store_addr<I>;
-template<typename I> auto execute_c_sqsp = ALU::store_addr<I>;
-template<typename I> auto execute_c_lw = ALU::addr<I>;
-template<typename I> auto execute_c_ld = ALU::addr<I>;
-template<typename I> auto execute_c_lq = ALU::addr<I>;
-template<typename I> auto execute_c_sq = ALU::store_addr<I>;
-template<typename I> auto execute_c_sw = ALU::store_addr<I>;
-template<typename I> auto execute_c_sd = ALU::store_addr<I>;
-template<typename I> auto execute_c_j = ALU::jump_and_link<I, ALU::j<I>>;
-template<typename I> auto execute_c_jal = ALU::jump_and_link<I, ALU::j<I>>;
-template<typename I> auto execute_c_jr = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_c_jalr = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_c_beqz = ALU::branch<I, ALU::eq<I>>;
-template<typename I> auto execute_c_bnez = ALU::branch<I, ALU::ne<I>>;
-template<typename I> auto execute_c_li = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_lui = ALU::upper_immediate<I, 12>;
-template<typename I> auto execute_c_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_addiw = ALU::riscv_addition_imm<I, uint32>;
-template<typename I> auto execute_c_addi16sp = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_addi4spn = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_slli = ALU::sll<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_srli = ALU::srl<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_srai = ALU::sra<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_andi = ALU::andi<I>;
-template<typename I> auto execute_c_mv = ALU::move<I>;
-template<typename I> auto execute_c_add = ALU::riscv_addition<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_and = ALU::andv<I>;
-template<typename I> auto execute_c_or = ALU::orv<I>;
-template<typename I> auto execute_c_xor = ALU::xorv<I>;
-template<typename I> auto execute_c_sub = ALU::riscv_subtraction<I, typename I::RegisterUInt>;
-template<typename I> auto execute_c_addw = ALU::riscv_addition<I, uint32>;
-template<typename I> auto execute_c_subw = ALU::riscv_subtraction<I, uint32>;
-template<typename I> auto execute_c_ebreak = do_nothing<I>;
-template<typename I> auto execute_c_nop = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -216,18 +168,20 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_bge,    execute_bge<I>,    OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO, 0, 32 | 64 | 128},
     {'I', instr_bltu,   execute_bltu<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO, 0, 32 | 64 | 128},
     {'I', instr_bgeu,   execute_bgeu<I>,   OUT_BRANCH, 'B', Imm::ARITH, Src1::RS1,  Src2::RS2,  Dst::ZERO, 0, 32 | 64 | 128},
-    // Loads and stores
-    {'I', instr_lb,     execute_lb<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   1, 32 | 64 | 128},
-    {'I', instr_lh,     execute_lh<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
-    {'I', instr_lw,     execute_lw<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
-    {'I', instr_ld,     execute_ld<I>,     OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   8,      64 | 128},
-    {'I', instr_lbu,    execute_lbu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   1, 32 | 64 | 128},
-    {'I', instr_lhu,    execute_lhu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
-    {'I', instr_lwu,    execute_lwu<I>,    OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
-    {'I', instr_sb,     execute_sb<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 1, 32 | 64 | 128},
-    {'I', instr_sh,     execute_sh<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 2, 32 | 64 | 128},
-    {'I', instr_sw,     execute_sw<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 4, 32 | 64 | 128},
-    {'I', instr_sd,     execute_sd<I>,     OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 8,      64 | 128},
+    // Loads
+    {'I', instr_lb,     execute_load<I>,   OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   1, 32 | 64 | 128},
+    {'I', instr_lh,     execute_load<I>,   OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
+    {'I', instr_lw,     execute_load<I>,   OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
+    {'I', instr_ld,     execute_load<I>,   OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   8,      64 | 128},
+    // Unsigned loads
+    {'I', instr_lbu,    execute_load<I>,   OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   1, 32 | 64 | 128},
+    {'I', instr_lhu,    execute_load<I>,   OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   2, 32 | 64 | 128},
+    {'I', instr_lwu,    execute_load<I>,   OUT_LOADU,  'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::RD,   4, 32 | 64 | 128},
+    // Stores
+    {'I', instr_sb,     execute_store<I>,  OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 1, 32 | 64 | 128},
+    {'I', instr_sh,     execute_store<I>,  OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 2, 32 | 64 | 128},
+    {'I', instr_sw,     execute_store<I>,  OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 4, 32 | 64 | 128},
+    {'I', instr_sd,     execute_store<I>,  OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 8,      64 | 128},
     // Immediate arithmetics
     {'I', instr_addi,   execute_addi<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128},
     {'I', instr_slli,   execute_slli<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128},
@@ -280,56 +234,53 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'M', instr_remu,   execute_remu<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128},
     /*-------------- C --------------*/
     // Breakpoint
-    {'C', instr_c_ebreak,   execute_c_ebreak<I>,   OUT_BREAK,  ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
+    {'C', instr_c_ebreak,   execute_ebreak<I>, OUT_BREAK,  ' ',                     Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
     // NOP
-    {'C', instr_c_nop,      execute_c_nop<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
+    {'C', instr_c_nop,      execute_nop<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
     // Jumps and branches
-    {'C', instr_c_j,        execute_c_j<I>,        OUT_BRANCH, ImmediateType::C_J,        Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0, 32 | 64 | 128},
-    {'C', instr_c_jal,      execute_c_jal<I>,      OUT_BRANCH, ImmediateType::C_JAL,      Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::RA,         0, 32           },
-    {'C', instr_c_jr,       execute_c_jr<I>,       OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
-    {'C', instr_c_jalr,     execute_c_jalr<I>,     OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::RA,         0, 32 | 64 | 128},
-    {'C', instr_c_beqz,     execute_c_beqz<I>,     OUT_BRANCH, ImmediateType::C_BEQZ,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
-    {'C', instr_c_bnez,     execute_c_bnez<I>,     OUT_BRANCH, ImmediateType::C_BNEZ,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
-    // Loads and stores
-    {'C', instr_c_lwsp,     execute_c_lwsp<I>,     OUT_LOAD,   ImmediateType::C_LWSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         4, 32 | 64 | 128},
-    {'C', instr_c_lw,       execute_c_lw<I>,       OUT_LOAD,   ImmediateType::C_LW,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  4, 32 | 64 | 128},
-    {'C', instr_c_swsp,     execute_c_swsp<I>,     OUT_STORE,  ImmediateType::C_SWSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       4, 32 | 64 | 128},
-    {'C', instr_c_sw,       execute_c_sw<I>,       OUT_STORE,  ImmediateType::C_SW,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       4, 32 | 64 | 128},
-    {'C', instr_c_ldsp,     execute_c_ldsp<I>,     OUT_LOAD,   ImmediateType::C_LDSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         8,      64 | 128},
-    {'C', instr_c_ld,       execute_c_ld<I>,       OUT_LOAD,   ImmediateType::C_LD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  8,      64 | 128},
-    {'C', instr_c_sdsp,     execute_c_sdsp<I>,     OUT_STORE,  ImmediateType::C_SDSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       8,      64 | 128},
-    {'C', instr_c_sd,       execute_c_sd<I>,       OUT_STORE,  ImmediateType::C_SD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       8,      64 | 128},
-    {'C', instr_c_lqsp,     execute_c_lqsp<I>,     OUT_LOAD,   ImmediateType::C_LQSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         16,          128},
-    {'C', instr_c_lq,       execute_c_lq<I>,       OUT_LOAD,   ImmediateType::C_LQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  16,          128},
-    {'C', instr_c_sqsp,     execute_c_sqsp<I>,     OUT_STORE,  ImmediateType::C_SQSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       16,          128},
-    {'C', instr_c_sq,       execute_c_sq<I>,       OUT_STORE,  ImmediateType::C_SQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       16,          128},
+    {'C', instr_c_j,        execute_jal<I>,  OUT_BRANCH, ImmediateType::C_J,        Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::ZERO,       0, 32 | 64 | 128},
+    {'C', instr_c_jal,      execute_jal<I>,  OUT_BRANCH, ImmediateType::C_J,        Imm::JUMP_RELATIVE, Src1::ZERO, Src2::ZERO,     Dst::RA,         0, 32           },
+    {'C', instr_c_jr,       execute_jalr<I>, OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
+    {'C', instr_c_jalr,     execute_jalr<I>, OUT_BRANCH, ' ',                       Imm::NO,    Src1::RD,         Src2::ZERO,       Dst::RA,         0, 32 | 64 | 128},
+    {'C', instr_c_beqz,     execute_beqz<I>, OUT_BRANCH, ImmediateType::C_B, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
+    {'C', instr_c_bnez,     execute_bnez<I>, OUT_BRANCH, ImmediateType::C_B, Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::ZERO,       0, 32 | 64 | 128},
+    // Loads
+    {'C', instr_c_lwsp,     execute_load<I>,  OUT_LOAD,   ImmediateType::C_LWSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         4, 32 | 64 | 128},
+    {'C', instr_c_ldsp,     execute_load<I>,  OUT_LOAD,   ImmediateType::C_LDSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         8,      64 | 128},
+    {'C', instr_c_lqsp,     execute_load<I>,  OUT_LOAD,   ImmediateType::C_LQSP,     Imm::ADDR,  Src1::SP,         Src2::ZERO,       Dst::RD,         16,          128},
+    {'C', instr_c_lw,       execute_load<I>,  OUT_LOAD,   ImmediateType::C_LW,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  4, 32 | 64 | 128},
+    {'C', instr_c_ld,       execute_load<I>,  OUT_LOAD,   ImmediateType::C_LD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  8,      64 | 128},
+    {'C', instr_c_lq,       execute_load<I>,  OUT_LOAD,   ImmediateType::C_LQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::ZERO,       Dst::RD_3_BITS,  16,          128},
+    // Stores
+    {'C', instr_c_swsp,     execute_store<I>, OUT_STORE,  ImmediateType::C_SWSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       4, 32 | 64 | 128},
+    {'C', instr_c_sdsp,     execute_store<I>, OUT_STORE,  ImmediateType::C_SDSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       8,      64 | 128},
+    {'C', instr_c_sqsp,     execute_store<I>, OUT_STORE,  ImmediateType::C_SQSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       16,          128},
+    {'C', instr_c_sw,       execute_store<I>, OUT_STORE,  ImmediateType::C_LW,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       4, 32 | 64 | 128},
+    {'C', instr_c_sd,       execute_store<I>, OUT_STORE,  ImmediateType::C_LD,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       8,      64 | 128},
+    {'C', instr_c_sq,       execute_atore<I>, OUT_STORE,  ImmediateType::C_LQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       16,          128},
     // Immediate arithmetics
-    {'C', instr_c_addi16sp, execute_c_addi16sp<I>, OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::SP,         0, 32 | 64 | 128},
-    {'C', instr_c_addi,     execute_c_addi<I>,     OUT_ARITHM, ImmediateType::C_ADDI,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
-    {'C', instr_c_srli,     execute_c_srli<I>,     OUT_ARITHM, ImmediateType::C_SRLI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_srai,     execute_c_srai<I>,     OUT_ARITHM, ImmediateType::C_SRAI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_slli,     execute_c_slli<I>,     OUT_ARITHM, ImmediateType::C_SLLI,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
-    {'C', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0, 32 | 64      },
-    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0,      64 | 128},
+    {'C', instr_c_addi16sp, execute_addi<I>,  OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::SP,         0, 32 | 64 | 128},
+    {'C', instr_c_addi,     execute_addi<I>,  OUT_ARITHM, ImmediateType::C_I,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_srli,     execute_srli<I>,  OUT_ARITHM, ImmediateType::C_S,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_srai,     execute_srai<I>,  OUT_ARITHM, ImmediateType::C_S,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_slli,     execute_slli<I>,  OUT_ARITHM, ImmediateType::C_S,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_addi4spn, execute_addi<I>,  OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0, 32 | 64      },
+    {'C', instr_c_addiw,    execute_addiw<I>, OUT_ARITHM, ImmediateType::C_I,    Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0,      64 | 128},
     // Constant-Generation
-    {'C', instr_c_li,       execute_c_li<I>,       OUT_ARITHM, ImmediateType::C_LI,       Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
-        /* If Dst == 2 for instr_c_lui, then it is instr_c_addi16sp */
-    {'C', instr_c_lui,      execute_c_lui<I>,      OUT_ARITHM, ImmediateType::C_LUI,      Imm::LOGIC, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_li,       execute_li<I>,   OUT_ARITHM, ImmediateType::C_I,      Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_lui,      execute_lui<I>,  OUT_ARITHM, ImmediateType::C_I,      Imm::LOGIC, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
     // Immediate logic and comparison
-    {'C', instr_c_andi,     execute_c_andi<I>,     OUT_ARITHM, ImmediateType::C_ANDI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_andi,     execute_andi<I>, OUT_ARITHM, ImmediateType::C_I,        Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     // Register-register arithmetics
-    {'C', instr_c_sub,      execute_c_sub<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_addw,     execute_c_addw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
-    {'C', instr_c_subw,     execute_c_subw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
-        /* If Src2 == 0 for instr_c_mv, then it is instr_c_jr */
-    {'C', instr_c_mv,       execute_c_mv<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
-        /* if Src2 == 0 && Dst == 0 for instr_c_add, then it is instr_c_ebreak */
-        /* if Src2 == 0 for instr_c_add, then it is instr_c_jalr */
-    {'C', instr_c_add,      execute_c_add<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_sub,      execute_sub<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_addw,     execute_addw<I>, OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
+    {'C', instr_c_subw,     execute_subw<I>, OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
+    {'C', instr_c_mv,       execute_mv<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_add,      execute_add<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
     // Register-register logic and comparison
-    {'C', instr_c_xor,      execute_c_xor<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_or,       execute_c_or<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_and,      execute_c_and<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_xor,      execute_xor<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_or,       execute_or<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_and,      execute_and<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
 };
 
 template<typename I>
