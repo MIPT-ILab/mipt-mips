@@ -389,6 +389,9 @@ void RISCVInstr<T>::init_target()
 template<typename T>
 void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
 {
+    if (entry.subset == 'C')
+        this->new_PC = this->PC + 2;
+
     this->imm_print_type = entry.immediate_print_type;
     this->mem_size  = entry.mem_size;
     this->operation = entry.type;
