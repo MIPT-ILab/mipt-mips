@@ -89,7 +89,7 @@ TEST_CASE( "MIPS32_instr: bgezal -1, 1 instruction ahead")
     MIPS32Instr instr( "bgezal", 1);
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 }
 
@@ -143,7 +143,7 @@ TEST_CASE( "MIPS32_instr: bgezall -1, 1 instruction ahead")
     MIPS32Instr instr( "bgezall", 1);
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 }
 
@@ -370,7 +370,7 @@ TEST_CASE( "MIPS32_instr: bltzal 0, 1 instruction ahead")
     MIPS32Instr instr( "bltzal", 1);
     instr.set_v_src( 0, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
     CHECK( instr.is_common_branch() );
@@ -384,7 +384,7 @@ TEST_CASE( "MIPS32_instr: bltzal 1, 1 instruction ahead")
     MIPS32Instr instr( "bltzal", 1);
     instr.set_v_src( 1, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 }
 
@@ -473,7 +473,7 @@ TEST_CASE( "MIPS32_instr: bltzall 0, 1 instruction ahead")
     MIPS32Instr instr( "bltzall", 1);
     instr.set_v_src( 0, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 
     CHECK( !instr.is_common_branch() );
@@ -487,7 +487,7 @@ TEST_CASE( "MIPS32_instr: bltzall 1, 1 instruction ahead")
     MIPS32Instr instr( "bltzall", 1);
     instr.set_v_src( 1, 0);
     instr.execute();
-    CHECK( instr.get_new_PC() == instr.get_PC() + 4);
+    CHECK( instr.get_new_PC() == instr.get_PC() + 8);
     CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
 }
 
