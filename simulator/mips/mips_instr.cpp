@@ -864,6 +864,7 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
         && version != MIPSVersion::mars64
         && (entry.sources.empty() || entry.sources[0] != Reg::EPC);
     this->delayed_slots = has_delayed_slot ? 1 : 0;
+    this->new_PC += this->delayed_slots * 4;
 }
 
 template<typename R>
