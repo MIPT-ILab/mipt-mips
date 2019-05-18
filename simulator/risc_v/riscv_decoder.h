@@ -20,7 +20,7 @@ struct Reg
         RS1, RS2, RS2_COMPR, RD,
         RS1_3_BITS, RS2_3_BITS, RD_3_BITS,
         CSR, SEPC, MEPC,
-        ZERO, SP,
+        ZERO, SP, RA,
         MAX_REG
     };
 };
@@ -269,6 +269,7 @@ struct RISCVInstrDecoder
         case C_J:        return sign_extension<12, R>( value);
         case C_BEQZ:     return sign_extension<9, R>( value);
         case C_ADDI16SP: return sign_extension<10, R>( value);
+        case C_LUI:      return sign_extension<17, R>( value);
         default:         return value;
         }
     }
@@ -309,6 +310,7 @@ struct RISCVInstrDecoder
     {
         registers[Reg::ZERO] = RISCVRegister::zero();
         registers[Reg::SP]   = RISCVRegister::from_cpu_index( 2);
+        registers[Reg::RA]   = RISCVRegister::from_cpu_index( 1);
         registers[Reg::SEPC] = RISCVRegister::from_csr_index( 0x141);
         registers[Reg::MEPC] = RISCVRegister::from_csr_index( 0x341);
         registers[Reg::RD]   = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000000'00000000'00001111'10000000));
