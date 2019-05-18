@@ -183,12 +183,15 @@ struct RISCVTableEntry
             && reg != Reg::RA;
     }
 
-    static bool check_print_src( Reg::Type reg)
+    bool check_print_src( Reg::Type reg) const
     {
-        return ( reg != Reg::ZERO)
-            && ( reg != Reg::SEPC)
-            && ( reg != Reg::MEPC)
-            && ( reg != Reg::CSR);
+        if ( subset == 'C' && reg == dst)
+            return false;
+
+        return reg != Reg::ZERO
+            && reg != Reg::SEPC
+            && reg != Reg::MEPC
+            && reg != Reg::CSR;
     }
 
     bool check_mask_and_type( uint32 bytes) const noexcept
@@ -301,32 +304,32 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_sqsp,     execute_c_sqsp<I>,     OUT_STORE,  ImmediateType::C_SQSP,     Imm::ADDR,  Src1::SP,         Src2::RS2_COMPR,  Dst::ZERO,       16,          128},
     {'C', instr_c_sq,       execute_c_sq<I>,       OUT_STORE,  ImmediateType::C_SQ,       Imm::ADDR,  Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::ZERO,       16,          128},
     // Immediate arithmetics
-    {'C', instr_c_addi16sp, execute_c_addi16sp<I>, OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::SP,         0, 32 | 64 | 128},
-    {'C', instr_c_addi,     execute_c_addi<I>,     OUT_ARITHM, ImmediateType::C_ADDI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
-    {'C', instr_c_srli,     execute_c_srli<I>,     OUT_ARITHM, ImmediateType::C_SRLI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_srai,     execute_c_srai<I>,     OUT_ARITHM, ImmediateType::C_SRAI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_slli,     execute_c_slli<I>,     OUT_ARITHM, ImmediateType::C_SLLI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_addi16sp, execute_c_addi16sp<I>, OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::SP,         0, 32 | 64 | 128},
+    {'C', instr_c_addi,     execute_c_addi<I>,     OUT_ARITHM, ImmediateType::C_ADDI,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_srli,     execute_c_srli<I>,     OUT_ARITHM, ImmediateType::C_SRLI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_srai,     execute_c_srai<I>,     OUT_ARITHM, ImmediateType::C_SRAI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_slli,     execute_c_slli<I>,     OUT_ARITHM, ImmediateType::C_SLLI,     Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
     {'C', instr_c_addi4spn, execute_c_addi4spn<I>, OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, Src1::SP,         Src2::ZERO,       Dst::RD_3_BITS,  0, 32 | 64      },
-    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0,      64 | 128},
+    {'C', instr_c_addiw,    execute_c_addiw<I>,    OUT_ARITHM, ImmediateType::C_ADDIW,    Imm::ARITH, Src1::RD,         Src2::ZERO,       Dst::RD,         0,      64 | 128},
     // Constant-Generation
     {'C', instr_c_li,       execute_c_li<I>,       OUT_ARITHM, ImmediateType::C_LI,       Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
         /* If Dst == 2 for instr_c_lui, then it is instr_c_addi16sp */
     {'C', instr_c_lui,      execute_c_lui<I>,      OUT_ARITHM, ImmediateType::C_LUI,      Imm::LOGIC, Src1::ZERO,       Src2::ZERO,       Dst::RD,         0, 32 | 64 | 128},
     // Immediate logic and comparison
-    {'C', instr_c_andi,     execute_c_andi<I>,     OUT_ARITHM, ImmediateType::C_ANDI,     Imm::ARITH, Src1::ZERO,       Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_andi,     execute_c_andi<I>,     OUT_ARITHM, ImmediateType::C_ANDI,     Imm::ARITH, Src1::RS1_3_BITS, Src2::ZERO,       Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     // Register-register arithmetics
-    {'C', instr_c_sub,      execute_c_sub<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_addw,     execute_c_addw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
-    {'C', instr_c_subw,     execute_c_subw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
+    {'C', instr_c_sub,      execute_c_sub<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_addw,     execute_c_addw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
+    {'C', instr_c_subw,     execute_c_subw<I>,     OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
         /* If Src2 == 0 for instr_c_mv, then it is instr_c_jr */
-    {'C', instr_c_mv,       execute_c_mv<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_mv,       execute_c_mv<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
         /* if Src2 == 0 && Dst == 0 for instr_c_add, then it is instr_c_ebreak */
         /* if Src2 == 0 for instr_c_add, then it is instr_c_jalr */
-    {'C', instr_c_add,      execute_c_add<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_add,      execute_c_add<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
     // Register-register logic and comparison
-    {'C', instr_c_xor,      execute_c_xor<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_or,       execute_c_or<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
-    {'C', instr_c_and,      execute_c_and<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_xor,      execute_c_xor<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_or,       execute_c_or<I>,       OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
+    {'C', instr_c_and,      execute_c_and<I>,      OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
 };
 
 template<typename I>
