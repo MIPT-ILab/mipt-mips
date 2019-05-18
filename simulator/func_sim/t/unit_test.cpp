@@ -220,4 +220,5 @@ TEST_CASE( "Torture_Test: integration")
     CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv32", TEST_PATH "/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("riscv64", TEST_PATH "/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("riscv64", TEST_PATH "/rv64uc-p-rvc")->run_no_limit() == Trap::HALT );
 }
