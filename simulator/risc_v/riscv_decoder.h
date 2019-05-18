@@ -269,6 +269,7 @@ struct RISCVInstrDecoder
         case C_J:        return sign_extension<12, R>( value);
         case C_BEQZ:     return sign_extension<9, R>( value);
         case C_ADDI16SP: return sign_extension<10, R>( value);
+        case C_LUI:      return sign_extension<17, R>( value);
         default:         return value;
         }
     }
