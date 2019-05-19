@@ -228,5 +228,4 @@ TEST_CASE( "Torture_Test: integration")
     CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
-    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
 }
