@@ -41,23 +41,12 @@ enum ImmediateType
     C_SDSP     = 37,
     C_SQSP     = 38,
     C_LW       = 39,  // C_LW and C_SW are similar
-    C_SW       = 39,
     C_LD       = 40,
-    C_SD       = 40,
     C_LQ       = 41,
-    C_SQ       = 41,
-    C_ADDI     = 42,
-    C_LI       = 42,
-    C_ANDI     = 42,
-    C_ADDIW    = 42,
+    C_I        = 42,
     C_J        = 43,
-    C_JAL      = 43,
-    C_LUI      = 44,
-    C_SRLI     = 45,
-    C_SRAI     = 45,
-    C_SLLI     = 45,
-    C_BEQZ     = 46,
-    C_BNEZ     = 46,
+    C_S        = 45,
+    C_B        = 46,
     C_ADDI4SPN = 47,
     C_ADDI16SP = 48
 };
@@ -163,7 +152,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CL_imm_2, 0b11) << 6U);
     }
 
-    constexpr uint32 get_C_ADDI_immediate() const noexcept
+    constexpr uint32 get_C_I_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
              | ( apply_mask( CI_imm_2, 0b11111));
@@ -181,19 +170,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CJ_imm, 0b00000000001) << 5U);
     }
 
-    constexpr uint32 get_C_LUI_immediate() const noexcept
-    {
-        return ( apply_mask( CI_imm_1, 0b1) * 0xfffe0)
-             | ( apply_mask( CI_imm_2, 0b11111));
-    }
-
-    constexpr uint32 get_C_SRLI_immediate() const noexcept
-    {
-        return ( apply_mask( CI_imm_1, 0b1) << 5U)
-             | ( apply_mask( CI_imm_2, 0b11111));
-    }
-
-    constexpr uint32 get_C_BEQZ_immediate() const noexcept
+    constexpr uint32 get_C_B_immediate() const noexcept
     {
         return ( apply_mask( CL_imm_1, 0b100) << 8U)
              | ( apply_mask( CL_imm_1, 0b011) << 3U)
@@ -245,11 +222,10 @@ struct RISCVInstrDecoder
         case C_LW:   return get_C_LW_immediate();
         case C_LD:   return get_C_LD_immediate();
         case C_LQ:   return get_C_LQ_immediate();
-        case C_ADDI: return get_C_ADDI_immediate();
+        case C_S:
+        case C_I:    return get_C_I_immediate();
         case C_J:    return get_C_J_immediate();
-        case C_LUI:  return get_C_LUI_immediate();
-        case C_SRLI: return get_C_SRLI_immediate();
-        case C_BEQZ: return get_C_BEQZ_immediate();
+        case C_B:    return get_C_B_immediate();
         case C_ADDI4SPN: return get_C_ADDI4SPN_immediate();
         case C_ADDI16SP: return get_C_ADDI16SP_immediate();
         default:     assert(0); return 0;
@@ -265,11 +241,10 @@ struct RISCVInstrDecoder
         case S:          return sign_extension<12, R>( value);
         case U:
         case J:          return sign_extension<20, R>( value);
-        case C_ADDI:     return sign_extension<6, R>( value);
+        case C_I:        return sign_extension<6, R>( value);
         case C_J:        return sign_extension<12, R>( value);
-        case C_BEQZ:     return sign_extension<9, R>( value);
+        case C_B:        return sign_extension<9, R>( value);
         case C_ADDI16SP: return sign_extension<10, R>( value);
-        case C_LUI:      return sign_extension<17, R>( value);
         default:         return value;
         }
     }
