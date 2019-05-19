@@ -214,11 +214,19 @@ TEST_CASE( "Torture_Test: MIPS32 calls ")
     CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin")->run( 10000) == Trap::HALT );
 }
 
+static bool riscv_tt( const std::string& isa, const std::string& name)
+{
+    auto sim = get_simulator_with_test( isa, name);
+    auto trap = sim->run_no_limit();
+    return trap == Trap::HALT && sim->read_cpu_register( 3) == 1;
+}
+
 TEST_CASE( "Torture_Test: integration")
 {
     CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin")->run_no_limit() == Trap::HALT );
     CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv32", TEST_PATH "/rv32ui-p-simple")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv64", TEST_PATH "/rv64ui-p-simple")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv64", TEST_PATH "/rv64uc-p-rvc")->run_no_limit() == Trap::HALT );
+    CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple"));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple"));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
 }
