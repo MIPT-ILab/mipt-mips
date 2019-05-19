@@ -275,7 +275,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_sub,      execute_sub<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     {'C', instr_c_addw,     execute_addw<I>, OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
     {'C', instr_c_subw,     execute_subw<I>, OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0,      64 | 128},
-    {'C', instr_c_mv,       execute_or<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
+    {'C', instr_c_mv,       execute_or<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::ZERO,       Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
     {'C', instr_c_add,      execute_add<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RD,         Src2::RS2_COMPR,  Dst::RD,         0, 32 | 64 | 128},
     // Register-register logic and comparison
     {'C', instr_c_xor,      execute_xor<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
