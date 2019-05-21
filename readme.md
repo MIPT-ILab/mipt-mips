@@ -11,6 +11,7 @@ MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measure
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed even to unfeasible modes.
 * **Simplicity**. Our source files are much more readable than RTL and independent on SDK and synthesis flow.
 * **Speed**. Megaherz simulation frequency on i5-7300U.
+* **Scalability**. Modularized structure allows integration of more microarchitecture configurations.
 
 MIPT-MIPS / MIPT-V can be used for different purposes:
 * Performance control of **software optimizations**: you may check what and why happened to IPC.
