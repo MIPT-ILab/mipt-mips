@@ -7,16 +7,17 @@
 # MIPT-MIPS / MIPT-V
 
 MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
-* **Precision**. We provide cycle-accurate models of branch prediction unit and pipeline behavior.
-* **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed.
-* **Simplicity**. Our source files are much more readable than RTL.
-* **Speed**. Up to 1.0 MHz simulation frequency on i5-7300U.
+* **Precision**. We provide cycle-accurate models of branch prediction unit, pipeline, and other hardware internals.
+* **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed even to unfeasible modes.
+* **Simplicity**. Our source files are much more readable than RTL and independent on SDK and synthesis flow.
+* **Speed**. Megaherz simulation frequency on i5-7300U.
 
-MIPT-MIPS can be used for different purposes:
-* Performance control of **software optimizations**: you may check IPC boosts of your programs
-* Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model
-* **Performance control** of developed or produced hardware
-* **Education**: simulator is a nice experimental frog to study CPU internals and software development process
+MIPT-MIPS / MIPT-V can be used for different purposes:
+* Performance control of **software optimizations**: you may check what and why happened to IPC.
+* Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model.
+* **Comparison** of hardware solutions from different vendors.
+* **Performance control** of developed or produced hardware.
+* **Education**: simulator is a nice experimental frog to study CPU internals and software development process.
 
 Key system-level features:
 * Compatibility with interactive [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls.
@@ -56,18 +57,13 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 * `-b <filename>` — provide path to ELF binary file to execute.
 * `-n <number>` — number of instructions to run. If omitted, simulation continues until halting system call or jump to `null` is executed.
-* `--trap_mode <mode>` — procedure to process traps in functional simulation. Supported modes are:
-    * `stop` — stop simulation on any interrupt
-    * `ignore` — do not stop simulation on any interrupt
-    * `stop_on_halt` — stop simulation only on system halt interrupt/system call
-    * Additionally, if `,verbose` is appended, trap information will appear in log
 
 ### ISA and system-level options:
 
 * `-I` — modeled ISA. Default version is `mars`.
     * `mips32`, `mips64` — state-of-the-art MIPS
     * `riscv32`, `riscv64`, `riscv128` — RISC-V with all instructions
-    * `mars`, `mars64` — simplified MIPS without delayed branches
+    * `spim`, `spim64` — simplified MIPS without delayed branches
     * `mipsI`, `mipsII`, `mipsIII`, `mipsIV` — legacy MIPS versions
 * `-f` — enables functional simulation only
 * `--mars` — enables MARS-compatible mode of system calls
