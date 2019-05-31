@@ -8,7 +8,7 @@
 #define ALU_H
 
 #include "multiplication.h"
-#include "trap_types.h"
+#include "traps/trap.h"
 
 #include <infra/macro.h>
 #include <tuple>
@@ -225,9 +225,6 @@ struct ALU
             instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
-        else {
-            instr->new_PC = instr->PC + 4 * (1 + instr->get_delayed_slots());
-        }
     }
 
     template<typename I> static
@@ -251,7 +248,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots()); // link
+        instr->v_dst = instr->new_PC; // link
         j( instr);   // jump
     }
 
@@ -259,12 +256,20 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
+        instr->v_dst = instr->new_PC;
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
+    }
+
+    template<typename I> static
+    void eret( I* instr)
+    {
+        // FIXME(pikryukov): That should behave differently for ErrorEPC
+        jump( instr, instr->v_src1);
+        instr->v_dst &= instr->v_src2 & ~(1 << 2);
     }
 
     // Traps

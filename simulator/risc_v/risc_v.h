@@ -9,7 +9,10 @@
 
 #include "riscv_instr.h"
 
+#include <func_sim/driver/driver.h>
 #include <infra/types.h>
+
+class Simulator;
 
 template <typename T>
 struct RISCV
@@ -19,6 +22,9 @@ struct RISCV
     using RegisterUInt = T;
     static auto create_instr( uint32 bytes, Endian /* little */, Addr PC) {
         return FuncInstr( bytes, PC);
+    }
+    static std::unique_ptr<Driver> create_driver( bool /* verbose */, Simulator* /* sim */) {
+        return Driver::create_default_driver();
     }
 };
 

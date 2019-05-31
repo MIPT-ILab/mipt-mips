@@ -6,12 +6,15 @@
 
 #include "mars_kernel.h"
 
+#include <memory/elf/elf_loader.h>
+#include <kernel/base_kernel.h>
+
 #include <fstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-class MARSKernel : public Kernel {
+class MARSKernel : public BaseKernel {
     void print_integer();
     void read_integer();
     void print_character();
@@ -37,7 +40,8 @@ class MARSKernel : public Kernel {
     uint64 next_descriptor = first_user_descriptor;
 
 public:
-    SyscallResult execute() final;
+    Trap execute() final;
+    void connect_memory( std::shared_ptr<FuncMemory> m) final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
       : instream( instream), outstream( outstream), errstream( errstream) {}
@@ -52,29 +56,28 @@ static const constexpr uint8 a0 = 4;
 static const constexpr uint8 a1 = 5;
 static const constexpr uint8 a2 = 6;
 
-SyscallResult MARSKernel::execute () {
-    auto cpu = sim.lock();
-    uint64 syscall_code = sim.lock()->read_cpu_register( v0);
+Trap MARSKernel::execute () {
+    uint64 syscall_code = sim->read_cpu_register( v0);
     switch (syscall_code) {
         case 1: print_integer(); break;
         case 4: print_string (); break;
         case 5: read_integer (); break;
         case 8: read_string(); break;
-        case 10: return { SyscallResult::HALT, 0};
+        case 10: exit_code = 0; return Trap( Trap::HALT);
         case 11: print_character(); break;
         case 12: read_character(); break;
         case 13: open_file(); break;
         case 14: read_from_file(); break;
         case 15: write_to_file(); break;
         case 16: close_file(); break;
-        case 17: return { SyscallResult::HALT, cpu->read_cpu_register( a0)};
-        default: return { SyscallResult::UNSUPPORTED, 0};
+        case 17: exit_code = sim->read_cpu_register( a0); return Trap( Trap::HALT);
+        default: return Trap( Trap::UNSUPPORTED_SYSCALL);
     }
-    return { SyscallResult::SUCCESS, 0};
+    return Trap( Trap::NO_TRAP);
 }
 
 void MARSKernel::print_integer() {
-    auto value = narrow_cast<int64>( sim.lock()->read_cpu_register( a0));
+    auto value = narrow_cast<int64>( sim->read_cpu_register( a0));
     outstream << value;
 }
 
@@ -96,12 +99,11 @@ void MARSKernel::read_integer() {
 
     if ( pos != input.length())
         throw BadInputValue( "Unknown error.");
-    sim.lock()->write_cpu_register( v0, value);
+    sim->write_cpu_register( v0, value);
 }
 
 void MARSKernel::print_character() {
-    auto value = static_cast<char>( sim.lock()->read_cpu_register( a0));
-    outstream << value;
+    outstream << narrow_cast<char>( sim->read_cpu_register( a0));
 }
 
 void MARSKernel::read_character() {
@@ -109,17 +111,16 @@ void MARSKernel::read_character() {
     instream >> input;
     if (input.length() != 1)
         throw BadInputValue( "More than one character is entered");
-    sim.lock()->write_cpu_register( v0, narrow_cast<uint64>( input.at(0)));
+    sim->write_cpu_register( v0, narrow_cast<uint64>( input.at(0)));
 }
 
 void MARSKernel::print_string() {
-    outstream << mem->read_string( sim.lock()->read_cpu_register( a0));
+    outstream << mem->read_string( sim->read_cpu_register( a0));
 }
 
 void MARSKernel::read_string() {
-    auto cpu = sim.lock();
-    uint64 buffer_ptr = cpu->read_cpu_register( a0);
-    uint64 chars_to_read = cpu->read_cpu_register( a1);
+    uint64 buffer_ptr = sim->read_cpu_register( a0);
+    uint64 chars_to_read = sim->read_cpu_register( a1);
 
     std::string input;
     instream >> input;
@@ -138,13 +139,12 @@ static auto get_openmode( uint64 value) {
 
 void MARSKernel::io_failure()
 {
-    sim.lock()->write_cpu_register( v0, all_ones<uint64>());
+    sim->write_cpu_register( v0, all_ones<uint64>());
 }
 
 void MARSKernel::open_file() {
-    auto cpu = sim.lock();
-    uint64 filename_ptr = cpu->read_cpu_register( a0);
-    uint64 flags = cpu->read_cpu_register( a1);
+    uint64 filename_ptr = sim->read_cpu_register( a0);
+    uint64 flags = sim->read_cpu_register( a1);
     auto filename = mem->read_string( filename_ptr);
     std::fstream file( filename, get_openmode( flags));
     if ( !file.is_open()) {
@@ -153,13 +153,12 @@ void MARSKernel::open_file() {
     }
 
     files.emplace( next_descriptor, std::move( file));
-    cpu->write_cpu_register( v0, next_descriptor);
+    sim->write_cpu_register( v0, next_descriptor);
     ++next_descriptor;
 }
 
 void MARSKernel::close_file() {
-    auto cpu = sim.lock();
-    uint64 descriptor = cpu->read_cpu_register( a0);
+    uint64 descriptor = sim->read_cpu_register( a0);
     if ( descriptor < first_user_descriptor)
         return;
 
@@ -194,10 +193,9 @@ std::ostream* MARSKernel::find_out_file_by_descriptor(uint64 descriptor) {
 }
 
 void MARSKernel::write_to_file() {
-    auto cpu = sim.lock();
-    uint64 descriptor = cpu->read_cpu_register( a0);
-    uint64 buffer_ptr = cpu->read_cpu_register( a1);
-    uint64 chars_to_write = cpu->read_cpu_register( a2);
+    uint64 descriptor = sim->read_cpu_register( a0);
+    uint64 buffer_ptr = sim->read_cpu_register( a1);
+    uint64 chars_to_write = sim->read_cpu_register( a2);
     auto file = find_out_file_by_descriptor( descriptor);
     if (file == nullptr) {
         io_failure();
@@ -207,17 +205,14 @@ void MARSKernel::write_to_file() {
     auto data = mem->read_string_limited( buffer_ptr, chars_to_write);
     auto current_pos = file->tellp();
     file->write( data.c_str(), data.size());
-    if ( !file->bad())
-        cpu->write_cpu_register( v0, file->tellp() - current_pos);
-    else
-        io_failure();
+    assert( !file->bad()); // FIXME(pikryukov): How to test the opposite?
+    sim->write_cpu_register( v0, file->tellp() - current_pos);
 }
 
 void MARSKernel::read_from_file() {
-    auto cpu = sim.lock();
-    uint64 descriptor = cpu->read_cpu_register( a0);
-    uint64 buffer_ptr = cpu->read_cpu_register( a1);
-    uint64 chars_to_read = cpu->read_cpu_register( a2);
+    uint64 descriptor = sim->read_cpu_register( a0);
+    uint64 buffer_ptr = sim->read_cpu_register( a1);
+    uint64 chars_to_read = sim->read_cpu_register( a2);
     auto file = find_in_file_by_descriptor( descriptor);
     if (file == nullptr) {
         io_failure();
@@ -227,12 +222,15 @@ void MARSKernel::read_from_file() {
     std::vector<char> buffer( chars_to_read);
     auto current_pos = file->tellg();
     file->read( buffer.data(), chars_to_read);
-    if ( file->bad()) {
-        io_failure();
-        return;
-    }
-
+    assert( !file->bad()); // FIXME(pikryukov): How to test the opposite?
     auto chars_read = file->tellg() - current_pos;
-    cpu->write_cpu_register( v0, chars_read);
+    sim->write_cpu_register( v0, chars_read);
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
+}
+
+void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
+{
+    BaseKernel::connect_memory( m);
+    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin");
+    elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
 }

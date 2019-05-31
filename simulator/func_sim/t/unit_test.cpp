@@ -5,76 +5,14 @@
 
 #include "../func_sim.h"
 
-// Catch2
+
 #include <catch.hpp>
 
-// Module
 #include <kernel/kernel.h>
 #include <kernel/mars/mars_kernel.h>
-#include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
+#include <mips/mips_register/mips_register.h>
 #include <simulator.h>
-
-#include "../trap_types.h"
-#include "../trap_types_internal.h"
-
-#include <sstream>
-
-TEST_CASE( "Trap: check conversion to RISC-V ")
-{
-    Trap trap( Trap::SYSCALL);
-    CHECK( trap.to_riscv_format() == CAUSE_USER_ECALL);
-}
-
-TEST_CASE( "Trap: check conversion to GDB ")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    CHECK( trap.to_gdb_format() == GDB_SIGNAL_ILL);
-}
-
-TEST_CASE( "Trap: check conversion to MIPS ")
-{
-    Trap trap( Trap::FP_DIV_BY_ZERO);
-    CHECK( trap.to_mips_format() == MIPS_EXC_FPE);
-}
-
-TEST_CASE( "Trap: check bad conversion to MIPS ")
-{
-    Trap trap( Trap::NO_TRAP);
-    CHECK_THROWS_AS( trap.to_mips_format(), std::out_of_range);
-}
-
-TEST_CASE( "Trap: check RISC-V initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_riscv_format( CAUSE_MISALIGNED_FETCH);
-    CHECK( trap == Trap( Trap::UNALIGNED_FETCH));
-}
-
-TEST_CASE( "Trap: check GDB initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_gdb_format( GDB_SIGNAL_TRAP);
-    CHECK( trap == Trap( Trap::BREAKPOINT));
-}
-
-TEST_CASE( "Trap: check MIPS initialization")
-{
-    Trap trap( Trap::NO_TRAP);
-    trap.set_from_mips_format( MIPS_EXC_FPOVF);
-    CHECK( trap == Trap( Trap::FP_OVERFLOW));
-}
-
-TEST_CASE( "Trap: print")
-{
-    Trap trap( Trap::UNKNOWN_INSTRUCTION);
-    std::ostringstream oss;
-    oss << trap;
-    CHECK( oss.str() == "UNKNOWN_INSTRUCTION");
-}
-
-static const std::string valid_elf_file = TEST_PATH "/tt.core.universal.out";
-static const std::string smc_code = TEST_PATH "/smc.out";
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 {
@@ -86,8 +24,14 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 static auto run_over_empty_memory( const std::string& isa)
 {
     auto sim = Simulator::create_functional_simulator( isa);
-    sim->setup_trap_handler( "stop");
-    sim->set_memory( FuncMemory::create_hierarchied_memory());
+    sim->enable_driver_hooks();
+    auto m = FuncMemory::create_hierarchied_memory();
+    sim->set_memory( m);
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( m);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
     return sim->run( 30);
 }
 
@@ -103,8 +47,13 @@ TEST_CASE( "FuncSim: get lost without pc")
     auto m   = FuncMemory::create_hierarchied_memory();
     auto sim = Simulator::create_functional_simulator("mips32");
     sim->set_memory( m);
-    ElfLoader( valid_elf_file).load_to( m.get());
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( m);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
     CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
@@ -113,9 +62,13 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    CHECK_NOTHROW( sim->set_pc( elf.get_startPC()) );
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
+    CHECK_NOTHROW( sim->set_pc( kernel->get_start_pc()) );
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Make_A_Step: Func_Sim")
@@ -123,14 +76,19 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( valid_elf_file);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
     sim->init_checker();
 
-    CHECK( sim->get_pc() == elf.get_startPC());
+    CHECK( sim->get_pc() == kernel->get_start_pc());
     sim->run( 1);
-    CHECK( sim->get_pc() == elf.get_startPC() + 4);
+    CHECK( sim->get_pc() == kernel->get_start_pc() + 4);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Run one instruction: Func_Sim")
@@ -138,11 +96,17 @@ TEST_CASE( "Run one instruction: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( smc_code);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
 
-    CHECK( sim->run( 1) == Trap::NO_TRAP);
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
+
+    CHECK( sim->run( 1) == Trap::BREAKPOINT);
+    CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "FuncSim: Register R/W")
@@ -181,64 +145,87 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    ElfLoader elf( smc_code);
-    elf.load_to( mem.get());
-    sim->set_pc( elf.get_startPC());
+
+    auto kernel = Kernel::create_mars_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
+
+    sim->set_pc( kernel->get_start_pc());
 
     CHECK_NOTHROW( sim->run_no_limit() );
+    CHECK( sim->get_exit_code() == 0);
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test, const std::string& trap_options)
+TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
+{
+    bool log = false;
+    auto sim = Simulator::create_functional_simulator("mips32", log);
+    auto mem = FuncMemory::create_hierarchied_memory( 36);
+    sim->set_memory( mem);
+
+    auto kernel = Kernel::create_dummy_kernel();
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    sim->set_kernel( kernel);
+
+    auto start_pc = kernel->get_start_pc();
+    sim->set_pc( start_pc);
+
+    CHECK_THROWS_AS( sim->run( 10000), BearingLost);
+    CHECK( sim->get_pc() >= 0x8'0000'0180);
+    CHECK( sim->read_cpu_register( MIPSRegister::cause().to_rf_index()) != 0);
+    auto epc = sim->read_cpu_register( MIPSRegister::epc().to_rf_index());
+    CHECK( epc < start_pc);
+    CHECK( sim->get_exit_code() == 0);
+}
+
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks = false)
 {
     bool log = false;
     auto sim = Simulator::create_functional_simulator(isa, log);
     auto mem = FuncMemory::create_hierarchied_memory();
     sim->set_memory( mem);
-    sim->setup_trap_handler( trap_options);
-
-    ElfLoader elf( test);
-    elf.load_to( mem.get());
+    if ( enable_hooks)
+        sim->enable_driver_hooks();
 
     auto kernel = create_mars_kernel();
-    kernel->set_memory( mem);
+    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);
+    kernel->load_file( test);
 
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     return sim;
 }
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 1) == Trap::NO_TRAP );
-    auto trap = get_simulator_with_test("mips32", valid_elf_file, "stop")->run( 10000);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true)->run( 1) == Trap::BREAKPOINT );
+    auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true)->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
-TEST_CASE( "Torture_Test: Stop on halt")
+TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 1)     == Trap::NO_TRAP );
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop_on_halt")->run( 10000) == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin")->run( 10000) == Trap::HALT );
 }
 
-TEST_CASE( "Torture_Test: Ignore traps ")
+static bool riscv_tt( const std::string& isa, const std::string& name)
 {
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 1)  == Trap::NO_TRAP );
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "stop"  )->run( 10) != Trap::NO_TRAP);
-    CHECK( get_simulator_with_test("mips32", valid_elf_file, "ignore")->run( 10) == Trap::NO_TRAP);
-}
-
-TEST_CASE( "Torture_Test: Critical traps ")
-{
-    CHECK_NOTHROW( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 1) );
-    CHECK_THROWS_AS( get_simulator_with_test("mips32", valid_elf_file, "stop,critical")->run( 10000), std::runtime_error);
+    auto sim = get_simulator_with_test( isa, name);
+    auto trap = sim->run_no_limit();
+    return trap == Trap::HALT && sim->read_cpu_register( 3) == 1;
 }
 
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    valid_elf_file, "stop_on_halt")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/tt.core.universal_reorder.out", "stop_on_halt")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv32", RISCV_TEST_PATH "/isa/rv32ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("riscv64", RISCV_TEST_PATH "/isa/rv64ui-p-simple", "stop_on_halt")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin")->run_no_limit() == Trap::HALT );
+    CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple"));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple"));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
 }

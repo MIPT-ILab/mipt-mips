@@ -15,7 +15,7 @@
 #ifndef GDB_WRAPPER_H
 #define GDB_WRAPPER_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
 #include <infra/byte.h>
 
 #include <memory>
@@ -26,6 +26,7 @@ class GDBSim
 {
     std::shared_ptr<class Simulator> cpu = nullptr;
     std::shared_ptr<class FuncMemory> memory = nullptr;
+    std::shared_ptr<class Kernel> kernel = nullptr;
     Trap trap = Trap(Trap::NO_TRAP);
 public:
     explicit GDBSim( const std::string& isa);

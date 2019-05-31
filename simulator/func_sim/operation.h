@@ -7,11 +7,13 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <func_sim/trap_types.h>
-#include <infra/string_view.h>
+#include <func_sim/traps/trap.h>
+#include <infra/macro.h>
 #include <infra/types.h>
 
+#include <cassert>
 #include <sstream>
+#include <string_view>
 
 enum OperationType : uint8
 {
@@ -64,6 +66,8 @@ std::string print_immediate( Imm type, T value)
 class Operation
 {
 public:
+    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
+
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
@@ -108,6 +112,7 @@ public:
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+    void set_trap( Trap value) { trap = value; }
     bool is_store() const { return operation == OUT_STORE; }
 
     auto get_mem_addr() const { return mem_addr; }
@@ -122,8 +127,6 @@ public:
     auto get_new_PC() const { return new_PC; }
 
 protected:
-    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
-
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
     Trap trap = Trap(Trap::NO_TRAP);
@@ -160,7 +163,7 @@ public:
     using RegisterUInt = T;
     using RegisterSInt = sign_t<RegisterUInt>;
 
-    void set_v_src( const T& value, uint8 index)
+    void set_v_src( const T& value, size_t index)
     {
         if ( index == 0)
             v_src1 = value;
@@ -204,10 +207,12 @@ void Datapath<T>::load( const T& value)
     {
         switch ( get_mem_size())
         {
+            case 0: break; // e.g. fences
             case 1: v_dst = sign_extension<8>( value); break;
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
             case 8: v_dst = sign_extension<64>( value); break;
+            case 16: v_dst = sign_extension<128>( value); break;
             default: assert( false);
         }
     }
@@ -228,7 +233,7 @@ public:
     using MyDatapath = Datapath<T>;
     using Register = R;
     using RegisterUInt = T;
-    R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
+    R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }
 
@@ -303,7 +308,7 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)
-        out << "\t trap";
+        out << "\t " << this->trap;
 
     out << std::dec;
     return out;

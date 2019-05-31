@@ -50,10 +50,10 @@ class A
 {
 public:
     explicit A( const std::shared_ptr<PortMap>& map)
-        : to_B( map, "A_to_B", PORT_BW, PORT_FANOUT)
+        : to_B( map, "A_to_B", PORT_BW)
         , from_B( map, "B_to_A", PORT_LATENCY)
         , init( map, "init_A", PORT_LATENCY)
-        , stop( map, "stop", PORT_BW, PORT_FANOUT)
+        , stop( map, "stop", PORT_BW)
     { }
 
     void clock( Cycle cycle)
@@ -94,7 +94,7 @@ class B
 {
 public:
     explicit B( const std::shared_ptr<PortMap>& map)
-        : to_A( map, "B_to_A", PORT_BW, PORT_FANOUT)
+        : to_A( map, "B_to_A", PORT_BW)
         , from_A( map, "A_to_B", PORT_LATENCY)
     { };
 
@@ -127,7 +127,7 @@ TEST_CASE( "test_ports: Test_Ports_A_B")
     A a( map);
     B b( map);
 
-    WritePort<int> init( map, "init_A", PORT_BW, PORT_FANOUT);
+    WritePort<int> init( map, "init_A", PORT_BW);
     ReadPort<bool> stop( map, "stop", PORT_LATENCY);
 
     map->init();

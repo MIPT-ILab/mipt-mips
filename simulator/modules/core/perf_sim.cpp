@@ -21,11 +21,11 @@ PerfSim<ISA>::PerfSim( Endian endian, bool log) :
     branch( log),
     writeback( endian, log)
 {
-    wp_core_2_fetch_target = make_write_port<Target>("CORE_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    rp_halt = make_read_port<bool>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
+    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
+    writeback.set_driver( ISA::create_driver( log, this));
 
     set_writeback_bandwidth( PORT_BW);
 
@@ -51,8 +51,7 @@ void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
 template <typename ISA>
 void PerfSim<ISA>::set_target( const Target& target)
 {
-    wp_core_2_fetch_target->write( target, curr_cycle);
-    writeback.set_target( target);
+    writeback.set_target( target, curr_cycle);
 }
 
 template<typename ISA>
@@ -64,24 +63,18 @@ Addr PerfSim<ISA>::get_pc() const
 template<typename ISA>
 Trap PerfSim<ISA>::run( uint64 instrs_to_run)
 {
-    force_halt = false;
+    current_trap = Trap( Trap::NO_TRAP);
 
     writeback.set_instrs_to_run( instrs_to_run);
 
     start_time = std::chrono::high_resolution_clock::now();
 
-    while (!is_halt())
+    while (current_trap == Trap::NO_TRAP)
         clock();
 
     dump_statistics();
 
-    return Trap(Trap::NO_TRAP);
-}
-
-template<typename ISA>
-bool PerfSim<ISA>::is_halt() const
-{
-    return rp_halt->is_ready( curr_cycle) || force_halt;
+    return current_trap;
 }
 
 template<typename ISA>
@@ -100,6 +93,8 @@ void PerfSim<ISA>::clock_tree( Cycle cycle)
     mem.clock( cycle);
     branch.clock( cycle);
     writeback.clock( cycle);
+    if ( rp_halt->is_ready( cycle))
+        current_trap = rp_halt->read( cycle);
     sout << "******************\n";
 }
 
@@ -134,7 +129,7 @@ void PerfSim<ISA>::dump_statistics() const
 }
 
 template <typename ISA>
-uint64 PerfSim<ISA>::read_gdb_register( uint8 regno) const
+uint64 PerfSim<ISA>::read_gdb_register( size_t regno) const
 {
     if ( regno == Register::get_gdb_pc_index())
         return get_pc();
@@ -143,7 +138,7 @@ uint64 PerfSim<ISA>::read_gdb_register( uint8 regno) const
 }
 
 template <typename ISA>
-void PerfSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+void PerfSim<ISA>::write_gdb_register( size_t regno, uint64 value)
 {
     if ( regno == Register::get_gdb_pc_index())
         set_pc( value);

@@ -3,10 +3,11 @@
  * Author pavel.kryukov@phystech.edu
  * Copyright 2019 MIPT-MIPS
  */
- 
+
 #include "../riscv_instr.h"
  
 #include <catch.hpp>
+#include <memory/memory.h>
 
 TEST_CASE("RISCV disassembly")
 {
@@ -41,8 +42,8 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>    (0x48fd).get_disasm() == "c_li $a7, 31");
     CHECK( RISCVInstr<uint32>    (0x6405).get_disasm() == "c_lui $s0, 0x1");
     CHECK( RISCVInstr<uint32>    (0x647d).get_disasm() == "c_lui $s0, 0x1f");
-    CHECK( RISCVInstr<uint32>    (0x7401).get_disasm() == "c_lui $s0, 0xfffe0");
-    CHECK( RISCVInstr<uint32>    (0x747d).get_disasm() == "c_lui $s0, 0xfffff");
+    CHECK( RISCVInstr<uint32>    (0x7401).get_disasm() == "c_lui $s0, 0xffffffe0");
+    CHECK( RISCVInstr<uint32>    (0x747d).get_disasm() == "c_lui $s0, 0xffffffff");
     CHECK( RISCVInstr<uint32>    (0x1681).get_disasm() == "c_addi $a3, -32");
     CHECK( RISCVInstr<uint64>    (0x3681).get_disasm() == "c_addiw $a3, -32");
     CHECK( RISCVInstr<uint32>    (0x7101).get_disasm() == "c_addi16sp $sp, -512");
@@ -138,4 +139,19 @@ TEST_CASE("RISCV sub print")
     std::ostringstream oss;
     oss << instr;
     CHECK( oss.str() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]");
+}
+
+TEST_CASE( "RISCV lq/sq")
+{
+    RISCVInstr<uint128> load( "c_lq", 0x1008);
+    RISCVInstr<uint128> store( "c_sq", 0x1000);
+    store.set_v_src( bitmask<uint128>( 68), 1);
+    auto memory = FuncMemory::create_hierarchied_memory();
+    for (auto* instr : { &load, &store }) {
+        instr->set_v_src( 0x1000, 0);
+        instr->execute();
+    }
+    memory->load_store( &store);
+    memory->load_store( &load);
+    CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }

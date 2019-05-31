@@ -3,22 +3,22 @@
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
- * Copyright 2012-2018 uArchSim iLab project
+ * Copyright 2012-2019 uArchSim iLab project
  */
 
 #ifndef FUNC_MEMORY__FUNC_MEMORY_H
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
-// uArchSim modules
 #include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
-// Generic C++
 #include <array>
+#include <cassert>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct FuncMemoryBadMapping final : Exception
 {
@@ -30,9 +30,10 @@ struct FuncMemoryBadMapping final : Exception
 struct FuncMemoryOutOfRange final : Exception
 {
     explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
-        : Exception( "Out of memory range",
-            std::string( "address: ") + std::to_string(addr) + "; max address: " + std::to_string(mask))
+        : Exception( "Out of memory range", generate_string( addr, mask))
     { }
+private:
+    static std::string generate_string( Addr addr, Addr mask);
 };
 
 class DestructableMemory
@@ -129,7 +130,7 @@ class FuncMemory : public ReadableAndWritableMemory
 {
 public:
     static std::shared_ptr<FuncMemory>
-        create_hierarchied_memory( uint32 addr_bits = 32,
+        create_hierarchied_memory( uint32 addr_bits = 36,
 				 uint32 page_bits = 10,
 				 uint32 offset_bits = 12);
 
@@ -144,37 +145,81 @@ public:
 
     template<typename Instr> void load_store( Instr* instr);
 private:
-    template<typename Instr> void store( const Instr& instr);
+    template<typename Instr, Endian endian> void store( const Instr& instr);
+    template<typename Instr, Endian endian> void masked_store( const Instr& instr);
 };
 
-template<typename Instr>
+template<typename Instr, Endian endian>
 void FuncMemory::store( const Instr& instr)
 {
-    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    using SrcType = decltype( std::declval<Instr>().get_v_src2());
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is a cricital error");
 
-    if ( ~instr.get_mask() == 0) {
-        if ( instr.get_endian() == Endian::little)
-            write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr());
-        else
-            write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr());
+    auto full_mask = bitmask<SrcType>( instr.get_mem_size() * CHAR_BIT);
+    if ( ( instr.get_mask() & full_mask) == full_mask) switch ( instr.get_mem_size()) {
+        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src2()), instr.get_mem_addr()); break;
+        default: assert( false);
     }
     else {
-        if ( instr.get_endian() == Endian::little)
-            masked_write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
-        else
-            masked_write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<SrcType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
     }
 }
 
 template<typename Instr>
-void FuncMemory::load_store(Instr* instr)
+void FuncMemory::load_store( Instr* instr)
 {
-    if ( instr->is_load())
+    if ( instr->is_load()) {
         load( instr);
-    else if ( instr->is_store())
-        store( *instr);
+    }
+    else if ( instr->is_store()) {
+        if ( instr->get_endian() == Endian::little)
+            store<Instr, Endian::little>( *instr);
+        else
+            store<Instr, Endian::big>( *instr);
+    }
 }
+
+class FuncMemoryReplicant : public FuncMemory
+{
+public:
+    explicit FuncMemoryReplicant( const std::shared_ptr<FuncMemory>& memory) : primary( memory) { }
+    void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
+
+    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
+    {
+        return primary->memcpy_guest_to_host( dst, src, size);
+    }
+
+    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final
+    {
+        auto result = primary->memcpy_host_to_guest( dst, src, size);
+        for ( auto& e : replicas)
+            e->memcpy_host_to_guest( dst, src, size);
+        return result;
+    }
+
+    void duplicate_to( std::shared_ptr<WriteableMemory> target) const final
+    {
+        primary->duplicate_to( target);
+    }
+
+    std::string dump() const final
+    {
+        return primary->dump();
+    }
+
+    size_t strlen( Addr addr) const final
+    {
+        return primary->strlen( addr);
+    }
+private:
+    std::shared_ptr<FuncMemory> primary;
+    std::vector<std::shared_ptr<FuncMemory>> replicas;
+};
 
 #endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H

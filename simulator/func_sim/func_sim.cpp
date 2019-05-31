@@ -2,11 +2,11 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
+
+#include "driver/driver.h"
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
-#include <boost/tokenizer.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -15,26 +15,8 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
-    , kernel( Kernel::create_dummy_kernel())
-{
-    setup_trap_handler( "stop_on_halt,verbose");
-}
-
-template <typename ISA> void
-FuncSim<ISA>::setup_trap_handler(const std::string& mode)
-{
-    for ( const auto& e : boost::tokenizer( mode, boost::char_separator(",")))
-        if ( e == "stop")
-            handle_trap_mode = HandleTrapMode::STOP;
-        else if ( e == "stop_on_halt")
-            handle_trap_mode = HandleTrapMode::STOP_ON_HALT;
-        else if ( e == "ignore")
-            handle_trap_mode = HandleTrapMode::IGNORE;
-        else if ( e == "critical")
-            handle_trap_critical = true;
-        else if ( e == "verbose")
-            handle_trap_verbose = true;
-}
+    , driver( ISA::create_driver( log, this))
+{ }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -89,53 +71,10 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
     }
 }
 
-static SyscallResult execute_syscall( Kernel* kernel)
-{
-    do try {
-        return kernel->execute();
-    }
-    catch (const BadInputValue& e) {
-        std::cerr << e.what();
-    } while (true);
-
-    return {SyscallResult::UNSUPPORTED, 0};
-}
-
 template <typename ISA>
-Trap FuncSim<ISA>::handle_syscall()
+Trap FuncSim<ISA>::driver_step( const Operation& instr)
 {
-    auto result = execute_syscall( kernel.get());
-    switch ( result.type) {
-    case SyscallResult::HALT:        exit_code = result.code; return Trap(Trap::HALT);
-    case SyscallResult::IGNORED:     return Trap(Trap::SYSCALL);
-    case SyscallResult::SUCCESS:     return Trap(Trap::NO_TRAP);
-    case SyscallResult::UNSUPPORTED: return Trap(Trap::UNSUPPORTED_SYSCALL);
-    default: assert( 0);
-    }
-    return Trap(Trap::NO_TRAP);
-}
-
-template <typename ISA>
-Trap FuncSim<ISA>::handle_trap( Trap trap)
-{
-    if ( trap == Trap::SYSCALL)
-        trap = handle_syscall();
-
-    if ( trap == Trap::NO_TRAP)
-        return trap;
-
-    if ( handle_trap_verbose)
-        std::cout << "\tFuncSim trap: " << trap << std::endl;
-
-    if ( handle_trap_critical)
-        throw std::runtime_error( "critical trap");
-
-    switch ( handle_trap_mode)
-    {
-    case HandleTrapMode::STOP_ON_HALT: return trap == Trap::HALT ? trap : Trap(Trap::NO_TRAP);
-    case HandleTrapMode::IGNORE: return Trap(Trap::NO_TRAP);
-    default: return trap;
-    }
+    return driver->handle_trap( instr);
 }
 
 template <typename ISA>
@@ -143,17 +82,18 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
-        const auto& instr = step();
+        auto instr = step();
         sout << instr << std::endl;
-        auto trap = handle_trap(instr.trap_type());
-        if ( trap != Trap::NO_TRAP)
-            return trap;
+        kernel->handle_instruction( &instr);
+        auto result_trap = driver_step( instr);
+        if ( result_trap != Trap::NO_TRAP)
+            return result_trap;
     }
-    return Trap(Trap::NO_TRAP);
+    return Trap(Trap::BREAKPOINT);
 }
 
 template <typename ISA>
-uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
+uint64 FuncSim<ISA>::read_gdb_register( size_t regno) const
 {
     if ( regno == Register::get_gdb_pc_index())
         return get_pc();
@@ -162,12 +102,24 @@ uint64 FuncSim<ISA>::read_gdb_register( uint8 regno) const
 }
 
 template <typename ISA>
-void FuncSim<ISA>::write_gdb_register( uint8 regno, uint64 value)
+void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
 {
     if ( regno == Register::get_gdb_pc_index())
         set_pc( value);
     else
         write_register( Register::from_gdb_index( regno), value);
+}
+
+template <typename ISA>
+int FuncSim<ISA>::get_exit_code() const noexcept
+{
+    return kernel->get_exit_code();
+}
+
+template <typename ISA>
+void FuncSim<ISA>::enable_driver_hooks()
+{
+    driver = Driver::create_hooked_driver( driver.get());
 }
 
 #include <mips/mips.h>

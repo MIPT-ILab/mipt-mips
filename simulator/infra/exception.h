@@ -9,6 +9,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 struct Exception : std::runtime_error
 {
