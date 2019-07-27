@@ -33,6 +33,7 @@ addons:
   homebrew:
     packages:
     - ninja
+    update: true
 
 install:
   - pip install --user future
