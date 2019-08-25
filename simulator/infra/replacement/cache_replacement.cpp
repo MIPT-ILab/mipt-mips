@@ -10,6 +10,7 @@
 #include <sparsehash/dense_hash_map.h>
 
 #include <list>
+#include <vector>
 
 class LRU : public CacheReplacement
 {
