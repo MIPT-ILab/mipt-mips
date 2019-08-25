@@ -78,6 +78,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 * `--bp-ways` — # of ways in branch prediction cache
 
 #### Instruction cache
+* `--icache-type` — instruction cache type: _default_, _always-hit_, or _infinite_
 * `--icache-size` — instruction cache size in bytes
 * `--icache-ways` — # of ways in instruction cache
 * `--icache-line-size` — line size of instruction cache
