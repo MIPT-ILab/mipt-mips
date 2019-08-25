@@ -25,7 +25,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-8
+    - llvm-toolchain-xenial-9
     update: true
     packages:
     - libboost-dev
@@ -72,10 +72,10 @@ script:
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-8
+        sudo apt-get install clang-tidy-9
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
+        run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
