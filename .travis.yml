@@ -25,7 +25,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - sourceline: deb http://apt.llvm.org/trusty/ llvm-toolchain-xenial-9 main
+    - sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main
     update: true
     packages:
     - libboost-dev
