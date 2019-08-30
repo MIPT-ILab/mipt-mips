@@ -105,7 +105,7 @@ TEST_CASE( "Pseudo-LRU: Check_update_method_to_initiate_a_touch_method")
 
 TEST_CASE( "Pseudo-LRU: Check_touch_method_2")
 {
-    auto test_lru_module = create_cache_replacement( "LRU", 4);
+    auto test_lru_module = create_cache_replacement( "Pseudo-LRU", 4);
     test_lru_module->touch( 0);
     test_lru_module->touch( 1);
     test_lru_module->touch( 2);
@@ -115,13 +115,13 @@ TEST_CASE( "Pseudo-LRU: Check_touch_method_2")
 
 TEST_CASE( "Pseudo-LRU: Check_touch_method_3")
 {
-    auto test_lru_module = create_cache_replacement( "LRU", 4);
+    auto test_lru_module = create_cache_replacement( "Pseudo-LRU", 4);
     test_lru_module->touch( 0);
     test_lru_module->touch( 1);
     test_lru_module->touch( 2);
     test_lru_module->touch( 3);
     test_lru_module->touch( 0);
-    CHECK( test_lru_module->update() == 1);
+    CHECK( test_lru_module->update() == 2);
 }
 
 TEST_CASE ( "Pseudo-LRU: Check_touch_method_with_big_number_of elements")
