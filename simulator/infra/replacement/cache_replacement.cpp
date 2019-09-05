@@ -28,10 +28,7 @@ class LRU : public CacheReplacement
 LRU::LRU( std::size_t ways) : lru_hash( ways)
 {
     for ( std::size_t i = 0; i < lru_hash.size(); i++)
-    {
-        lru_list.push_front( i);
-        lru_hash[i] = ( lru_list.begin());
-    }
+        lru_hash[i] = lru_list.insert( lru_list.begin(), i);
 }
 
 void LRU::touch( std::size_t way)
