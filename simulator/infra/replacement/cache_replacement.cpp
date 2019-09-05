@@ -7,8 +7,6 @@
 #include "infra/replacement/cache_replacement.h"
 #include "infra/macro.h"
 
-#include <sparsehash/dense_hash_map.h>
-
 #include <list>
 #include <vector>
 
@@ -26,32 +24,27 @@ class LRU : public CacheReplacement
         std::list<std::size_t> lru_list{};
         const std::size_t ways;
         const std::size_t impossible_key = SIZE_MAX;
-        google::dense_hash_map<std::size_t, decltype(lru_list.cbegin())> lru_hash{};
+        std::vector<decltype(lru_list.cbegin())> lru_hash{};
 };
 
 LRU::LRU( std::size_t ways) : ways( ways), lru_hash( ways)
 {
-    lru_hash.set_empty_key( impossible_key); //special dense_hash_map requirement
     for ( std::size_t i = 0; i < ways; i++)
     {
         lru_list.push_front( i);
-        lru_hash.emplace( i, lru_list.begin());
+        lru_hash[i] = ( lru_list.begin());
     }
 }
 
 void LRU::touch( std::size_t way)
 {
-    const auto lru_it = lru_hash.find( way);
-    assert( lru_it != lru_hash.end());
     // Put the way to the head of the list
-    lru_list.splice( lru_list.begin(), lru_list, lru_it->second);
+    lru_list.splice( lru_list.begin(), lru_list, lru_hash[way]);
 }
 
 void LRU::set_to_erase( std::size_t way)
 {
-    const auto lru_it = lru_hash.find( way);
-    assert( lru_it != lru_hash.end());
-    lru_list.splice( lru_list.end(), lru_list, lru_it->second);
+    lru_list.splice( lru_list.end(), lru_list, lru_hash[way]);
 }
 
 std::size_t LRU::update()
