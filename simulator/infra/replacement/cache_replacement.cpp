@@ -46,12 +46,7 @@ std::size_t LRU::update()
 {
     // remove the least recently used element from the tail
     std::size_t lru_elem = lru_list.back();
-    lru_list.pop_back();
-
-    // put it to the head
-    auto ptr = lru_list.insert( lru_list.begin(), lru_elem);
-    lru_hash[ lru_elem] = ptr;
-
+    touch( lru_elem);
     return lru_elem;
 }
 
