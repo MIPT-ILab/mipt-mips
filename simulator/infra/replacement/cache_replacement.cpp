@@ -18,18 +18,16 @@ class LRU : public CacheReplacement
         void touch( std::size_t way) override ;
         void set_to_erase( std::size_t way) override ;
         std::size_t update() override ;
-        std::size_t get_ways() const override { return ways; }
+        std::size_t get_ways() const override { return lru_hash.size(); }
 
     private:
         std::list<std::size_t> lru_list{};
-        const std::size_t ways;
-        const std::size_t impossible_key = SIZE_MAX;
         std::vector<decltype(lru_list.cbegin())> lru_hash{};
 };
 
-LRU::LRU( std::size_t ways) : ways( ways), lru_hash( ways)
+LRU::LRU( std::size_t ways) : lru_hash( ways)
 {
-    for ( std::size_t i = 0; i < ways; i++)
+    for ( std::size_t i = 0; i < lru_hash.size(); i++)
     {
         lru_list.push_front( i);
         lru_hash[i] = ( lru_list.begin());
