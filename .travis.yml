@@ -63,7 +63,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/mips-tests/fib.out -n 10000000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 10000000 --mars
   - gprof ./mipt-mips gmon.out -p | head -100
   - gprof ./mipt-mips gmon.out -q
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
