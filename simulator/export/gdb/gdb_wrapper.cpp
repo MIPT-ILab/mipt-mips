@@ -104,9 +104,9 @@ int GDBSim::memory_write( Addr dst, const Byte* src, size_t length) const
 int GDBSim::read_register(int regno, Byte* buf, int length) const
 {
     if ( length == 8)
-        put_value_to_pointer<uint64, Endian::native>( buf, cpu->read_gdb_register( regno));
+        put_value_to_pointer<uint64, Endian::native>( buf, cpu->read_gdb_register( regno), 8);
     else if ( length == 4)
-        put_value_to_pointer<uint32, Endian::native>( buf, cpu->read_gdb_register( regno));
+        put_value_to_pointer<uint32, Endian::native>( buf, cpu->read_gdb_register( regno), 4);
     else
         return 0;
 
@@ -116,9 +116,9 @@ int GDBSim::read_register(int regno, Byte* buf, int length) const
 int GDBSim::write_register(int regno, const Byte* buf, int length) const
 {
     if ( length == 8)
-        cpu->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( buf));
+        cpu->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( buf, 8));
     else if ( length == 4)
-        cpu->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( buf));
+        cpu->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( buf, 4));
     else
         return 0;
 

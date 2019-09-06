@@ -135,14 +135,14 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data()) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data()) == 0x7856);
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
 
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
     std::array<Byte, 2> res{};
-    put_value_to_pointer<uint16, e>( res.data(), 0x3456);
+    put_value_to_pointer<uint16, e>( res.data(), 0x3456, 2);
     return res;
 }
 
