@@ -73,8 +73,8 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 ### Performance mode options
 
 #### Branch prediction
-* `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model).
-* `--bp-mode` — prediction replacement policy: _LRU_, _pseudo-LRU_, or _infinite_
+* `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model)
+* `--bp-lru` — prediction replacement policy: _LRU_, _pseudo-LRU_, or _infinite_
 * `--bp-size` — branch prediction cache size (amount of tracked branch instructions)
 * `--bp-ways` — # of ways in branch prediction cache
 
