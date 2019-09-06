@@ -35,8 +35,8 @@ set(CPPS
     memory/plain_memory.cpp
     memory/elf/elf_loader.cpp
     memory/argv_loader/argv_loader.cpp
-    func_sim/driver.cpp
     func_sim/func_sim.cpp
+    func_sim/driver/driver.cpp
     func_sim/traps/trap.cpp
     mips/mips_instr.cpp
     mips/mips_version.cpp
@@ -90,15 +90,14 @@ set(TESTS_CPPS
     risc_v/t/riscv64_test.cpp
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
+    func_sim/driver/t/unit_test.cpp
     func_sim/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
 )
 
-add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../mips-tests\")
-add_definitions(-DRISCV_TEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../riscv-tests\")
-add_definitions(-DTEST_DATA_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests/\")
+add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests\")
 add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)

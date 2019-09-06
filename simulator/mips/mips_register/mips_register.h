@@ -6,13 +6,12 @@
 #ifndef MIPS_REG_H
 #define MIPS_REG_H
 
-// MIPT-MIPS modules
 #include <infra/macro.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <array>
 #include <cassert>
+#include <string_view>
 #include <iostream>
 #include <utility>
 
@@ -78,7 +77,7 @@ public:
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     static auto from_csr_name( std::string_view /* unused */) { return zero(); }
 
-    size_t to_rf_index() const { return value; }
+    constexpr size_t to_rf_index() const { return value; }
 
     static constexpr MIPSRegister mips_hi() noexcept;
     static constexpr MIPSRegister mips_lo() noexcept;

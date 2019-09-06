@@ -9,11 +9,11 @@
 
 #include <func_sim/traps/trap.h>
 #include <infra/macro.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <cassert>
 #include <sstream>
+#include <string_view>
 
 enum OperationType : uint8
 {
@@ -66,6 +66,8 @@ std::string print_immediate( Imm type, T value)
 class Operation
 {
 public:
+    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
+
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
@@ -125,8 +127,6 @@ public:
     auto get_new_PC() const { return new_PC; }
 
 protected:
-    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
-
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
     Trap trap = Trap(Trap::NO_TRAP);
@@ -212,6 +212,7 @@ void Datapath<T>::load( const T& value)
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
             case 8: v_dst = sign_extension<64>( value); break;
+            case 16: v_dst = sign_extension<128>( value); break;
             default: assert( false);
         }
     }

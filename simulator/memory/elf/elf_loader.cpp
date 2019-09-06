@@ -11,12 +11,6 @@
 
 #include <string>
 
-struct InvalidElfSection : Exception
-{
-    explicit InvalidElfSection(const std::string& section_name) :
-        Exception("Malformed ELF section", section_name) { }
-};
-
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     using namespace std::literals::string_literals;
@@ -26,19 +20,23 @@ static void load_elf_section( WriteableMemory* memory, const ELFIO::section& sec
     memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
 }
 
-ElfLoader::ElfLoader( const std::string& filename, AddrDiff offset)
+ElfLoader::ElfLoader( const std::string& filename)
     : reader( std::make_unique<ELFIO::elfio>())
-    , offset( offset)
 {
     if ( !reader->load( filename))
         throw InvalidElfFile( filename);
 }
 
-void ElfLoader::load_to( WriteableMemory *memory) const
+void ElfLoader::load_to( WriteableMemory *memory, AddrDiff offset) const
 {
     for ( const auto& section : reader->sections)
         if ( ( section->get_flags() & SHF_ALLOC) != 0)
             load_elf_section( memory, *section, offset);
+}
+
+Addr ElfLoader::get_text_section_addr() const
+{
+    return reader->sections[ ".text"] != nullptr ? reader->sections[ ".text"]->get_address() : 0;
 }
 
 Addr ElfLoader::get_startPC() const
@@ -57,18 +55,12 @@ Addr ElfLoader::get_startPC() const
             ELFIO::Elf_Half section_index;
             unsigned char other;
             symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
-            if ( name == "_start")
-                return offset + value;
+            if ( name == "__start" || name == "_start")
+                return value;
         }
     }
 
-    if ( reader->sections[ ".text"] != nullptr) {
-        std::cout << "Warning: no _start label found, defaulting to '.text' section\n";
-        return offset + reader->sections[ ".text"]->get_address();
-    }
-
-    std::cout << "Warning: no entry point found, returning 0x0\n";
-    return offset;
+    throw InvalidEntryPoint();
 }
 
 ElfLoader::~ElfLoader() = default;

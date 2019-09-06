@@ -63,25 +63,24 @@ TEST_CASE( "MARS: print string")
     CHECK( output.str() == "Hello World!");
 }
 
-TEST_CASE( "MARS: read integer") {
-    std::istringstream input( "1337\n");
+static uint64 read_integer( const std::string& str)
+{
+    std::istringstream input( str);
     auto sim = Simulator::create_simulator( "mips64", true, false);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
     sim->write_cpu_register( v0, 5u); // read integer
-    CHECK( mars_kernel->execute() == Trap::NO_TRAP);
-    CHECK( sim->read_cpu_register( v0) == 1337);
+    mars_kernel->execute();
+    return sim->read_cpu_register( v0);
 }
 
-TEST_CASE( "MARS: read bad integer") {
-    std::istringstream input( "133q\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
-    auto mars_kernel = create_mars_kernel( input);
-    mars_kernel->set_simulator( sim);
-
-    sim->write_cpu_register( v0, 5u); // read integer
-    CHECK_THROWS_AS( mars_kernel->execute(), BadInputValue);
+TEST_CASE( "MARS: read integer")
+{
+    CHECK( read_integer("1337") == 1337);
+    CHECK_THROWS_AS( read_integer("133q"), BadInputValue);
+    CHECK_THROWS_AS( read_integer("q133"), BadInputValue);
+    CHECK_THROWS_AS( read_integer("13333333333333333333333333333333333333333333333333333"), BadInputValue);
 }
 
 TEST_CASE( "MARS: read bad integer ang fix") {
@@ -296,6 +295,31 @@ TEST_CASE( "MARS: open, write, read and close a file")
     sys.sim->write_cpu_register( v0, 16u); // close file
     sys.sim->write_cpu_register( a0, descriptor);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+}
+
+TEST_CASE( "MARS: open file with invalid mode")
+{
+    std::string filename("tempfile");
+    std::ostringstream output;
+    System sys( std::cin, output);
+    sys.mem->write_string( filename, 0x1000);
+
+    sys.sim->write_cpu_register( v0, 13u); // open file
+    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( a1, 1); // write
+    auto descriptor = sys.sim->read_cpu_register( v0);
+    sys.mars_kernel->execute();
+
+    sys.sim->write_cpu_register( v0, 16u); // close file
+    sys.sim->write_cpu_register( a0, descriptor);
+    sys.mars_kernel->execute();
+
+    sys.sim->write_cpu_register( v0, 13u); // open file
+    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( a1, 131); // INVALID MODE!
+
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
 }
 
 TEST_CASE( "MARS: close stdout")

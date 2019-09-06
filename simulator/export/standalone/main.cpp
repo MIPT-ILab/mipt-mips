@@ -7,7 +7,6 @@
 /* Simulator modules. */
 #include <infra/config/config.h>
 #include <kernel/kernel.h>
-#include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
 
@@ -19,22 +18,20 @@ namespace config {
 
 int main( int argc, const char* argv[]) try {
     config::handleArgs( argc, argv, 1);
-    ElfLoader elf( config::binary_filename);
     auto memory = FuncMemory::create_hierarchied_memory();
-    elf.load_to( memory.get());
 
     auto sim = Simulator::create_configured_simulator();
-    sim->setup_trap_handler( config::trap_mode);
     sim->set_memory( memory);
     sim->write_csr_register( "mscratch", 0x400'0000);
 
     auto kernel = Kernel::create_configured_kernel();
     kernel->connect_memory( memory);
     kernel->set_simulator( sim);
+    kernel->load_file( config::binary_filename);
     sim->set_kernel( kernel);
 
     sim->init_checker();
-    sim->set_pc( elf.get_startPC());
+    sim->set_pc( kernel->get_start_pc());
     sim->run( config::num_steps);
     return sim->get_exit_code();
 }

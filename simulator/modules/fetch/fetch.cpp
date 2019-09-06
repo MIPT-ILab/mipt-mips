@@ -9,6 +9,7 @@
 
 namespace config {
     /* Cache parameters */
+    static Value<std::string> instruction_cache_type = { "icache-type", "default", "Type of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_size = { "icache-size", 2048, "Size of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_ways = { "icache-ways", 4, "Amount of ways in instruction level 1 cache"};
     static Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
@@ -43,9 +44,13 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
 
     bp = BaseBP::create_configured_bp();
-    tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
-                                            config::instruction_cache_ways,
-                                            config::instruction_cache_line_size);
+    tags = CacheTagArray::create( log,
+        config::instruction_cache_type,
+        config::instruction_cache_size,
+        config::instruction_cache_ways,
+        config::instruction_cache_line_size,
+        32
+    );
 }
 
 template <typename FuncInstr>

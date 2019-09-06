@@ -27,24 +27,21 @@ class BP final: public BaseBP
 {
     std::vector<std::vector<T>> directions;
     std::vector<std::vector<Addr>> targets;
-    CacheTagArray tags;
+    std::unique_ptr<CacheTagArray> tags = nullptr;
 
     bool is_way_taken( size_t way, Addr PC, Addr target) const
     {
-        return directions[ way][ tags.set(PC)].is_taken( PC, target);
+        return directions[ way][ tags->set(PC)].is_taken( PC, target);
     }
 public:
     BP( uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
         : directions( ways, std::vector<T>( size_in_entries / ways))
         , targets( ways, std::vector<Addr>( size_in_entries / ways))
-        , tags( size_in_entries,
-            ways,
-            // we're reusing existing CacheTagArray functionality,
-            // but here we don't split memory in blocks, storing
-            // IP's only, so hardcoding here the granularity of 4 bytes:
-            4,
-            branch_ip_size_in_bits)
     {
+        // we're reusing existing CacheTagArray functionality,
+        // but here we don't split memory in blocks, storing
+        // IP's only, so hardcoding here the granularity of 4 bytes:
+        tags = CacheTagArray::create( false, "default", size_in_entries, ways, 4, branch_ip_size_in_bits);
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
         throw BPInvalidMode(e.what());
@@ -54,27 +51,27 @@ public:
     bool is_taken( Addr PC) const final
     {
         // do not update LRU information on prediction,
-        // so "no_touch" version of "tags.read" is used:
-        const auto[ is_hit, way] = tags.read_no_touch( PC);
-        return is_hit && is_way_taken( way, PC, targets[ way][ tags.set(PC)]);
+        // so "no_touch" version of "tags->read" is used:
+        const auto[ is_hit, way] = tags->read_no_touch( PC);
+        return is_hit && is_way_taken( way, PC, targets[ way][ tags->set(PC)]);
     }
 
     bool is_hit( Addr PC) const final
     {
         // do not update LRU information on this check,
-        // so "no_touch" version of "tags.read" is used:
-        return tags.read_no_touch( PC).first;
+        // so "no_touch" version of "tags->read" is used:
+        return tags->read_no_touch( PC).first;
     }
 
     Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
-        // so "no_touch" version of "tags.read" is used:
-        const auto[ is_hit, way] = tags.read_no_touch( PC);
+        // so "no_touch" version of "tags->read" is used:
+        const auto[ is_hit, way] = tags->read_no_touch( PC);
 
         // return saved target only in case it is predicted taken
-        if ( is_hit && is_way_taken( way, PC, targets[ way][ tags.set(PC)]))
-            return targets[ way][ tags.set(PC)];
+        if ( is_hit && is_way_taken( way, PC, targets[ way][ tags->set(PC)]))
+            return targets[ way][ tags->set(PC)];
 
         return PC + 4;
     }
@@ -82,11 +79,11 @@ public:
     /* update */
     void update( const BPInterface& bp_upd) final
     {
-        const auto set = tags.set( bp_upd.pc);
-        auto[ is_hit, way] = tags.read( bp_upd.pc);
+        const auto set = tags->set( bp_upd.pc);
+        auto[ is_hit, way] = tags->read( bp_upd.pc);
 
         if ( !is_hit) { // miss
-            way = tags.write( bp_upd.pc); // add new entry to cache
+            way = tags->write( bp_upd.pc); // add new entry to cache
             auto& entry = directions[ way][ set];
             entry.reset();
         }

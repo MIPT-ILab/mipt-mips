@@ -9,9 +9,9 @@
 
 #include "riscv_instr.h"
 
+#include <func_sim/driver/driver.h>
 #include <infra/types.h>
 
-class Driver;
 class Simulator;
 
 template <typename T>
@@ -24,7 +24,7 @@ struct RISCV
         return FuncInstr( bytes, PC);
     }
     static std::unique_ptr<Driver> create_driver( bool /* verbose */, Simulator* /* sim */) {
-        return nullptr;
+        return Driver::create_default_driver();
     }
 };
 

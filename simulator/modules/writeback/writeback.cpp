@@ -1,15 +1,12 @@
 #include "writeback.h"
 
+#include <func_sim/driver/driver.h>
 #include <kernel/kernel.h>
-
-#include <cassert>
-#include <sstream>
 
 template <typename ISA>
 Writeback<ISA>::Writeback( Endian endian, bool log)
     : Log( log)
     , endian( endian)
-    , kernel( Kernel::create_dummy_kernel())
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
@@ -17,7 +14,7 @@ Writeback<ISA>::Writeback( Endian endian, bool log)
     rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
     wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW);
-    wp_halt = make_write_port<bool>("WRITEBACK_2_CORE_HALT", PORT_BW);
+    wp_halt = make_write_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_BW);
     wp_trap = make_write_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_BW);
     wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_BW);
 }
@@ -68,8 +65,10 @@ void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr,
     kernel->handle_instruction( instr);
     auto result_trap = driver->handle_trap( *instr);
     checker.driver_step( *instr);
-    if ( executed_instrs >= instrs_to_run || instr->is_halt())
-        wp_halt->write( true, cycle);
+    if ( executed_instrs >= instrs_to_run)
+        wp_halt->write( Trap( Trap::BREAKPOINT), cycle);     
+    else
+        wp_halt->write( result_trap, cycle);
     if ( result_trap != Trap::NO_TRAP)
         set_target( instr->get_actual_target(), cycle);
 }
@@ -100,6 +99,12 @@ template <typename ISA>
 int Writeback<ISA>::get_exit_code() const noexcept
 {
     return 0;
+}
+
+template <typename ISA>
+void Writeback<ISA>::enable_driver_hooks()
+{
+    driver = Driver::create_hooked_driver( driver.get());
 }
 
 #include <mips/mips.h>

@@ -6,13 +6,12 @@
 #ifndef RISCV_REG_H
 #define RISCV_REG_H
 
-// MIPT-MIPS modules
 #include <infra/macro.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <array>
 #include <cassert>
+#include <string_view>
 #include <iostream>
 #include <utility>
 
@@ -67,6 +66,8 @@ private:
     static std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
+    constexpr RISCVRegister() noexcept : RISCVRegister( RISCV_REG_zero) {}
+    friend struct RISCVInstrDecoder;
 };
 
 constexpr inline RISCVRegister RISCVRegister::zero() noexcept { return RISCVRegister( RISCV_REG_zero); }

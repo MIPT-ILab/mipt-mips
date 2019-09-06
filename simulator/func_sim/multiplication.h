@@ -10,7 +10,7 @@
 template<typename T>
 constexpr bool is_signed_division_overflow(T x, T y)
 {
-    if constexpr (std::is_same_v<T, unsign_t<T>>) {
+    if constexpr (std::is_same<T, unsign_t<T>>()) {
         (void)x; (void)y;
         return false;
     }

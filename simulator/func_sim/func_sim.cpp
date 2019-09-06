@@ -2,8 +2,8 @@
  * func_sim.cpp - extremely simple simulator
  * Copyright 2018 MIPT-MIPS
  */
- 
-#include "driver.h"
+
+#include "driver/driver.h"
 #include "func_sim.h"
 #include <kernel/kernel.h>
 
@@ -15,12 +15,8 @@ template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
     : Simulator( log)
     , imem( endian)
-    , kernel( Kernel::create_dummy_kernel())
     , driver( ISA::create_driver( log, this))
-{
-    if ( driver == nullptr)
-        setup_trap_handler( "stop_on_halt");
-}
+{ }
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
@@ -93,7 +89,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         if ( result_trap != Trap::NO_TRAP)
             return result_trap;
     }
-    return Trap(Trap::NO_TRAP);
+    return Trap(Trap::BREAKPOINT);
 }
 
 template <typename ISA>
@@ -115,16 +111,15 @@ void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
 }
 
 template <typename ISA>
-void FuncSim<ISA>::setup_trap_handler( const std::string& mode)
-{
-    if ( !mode.empty())
-        driver = Driver::construct( mode, this, false);
-}
-
-template <typename ISA>
 int FuncSim<ISA>::get_exit_code() const noexcept
 {
     return kernel->get_exit_code();
+}
+
+template <typename ISA>
+void FuncSim<ISA>::enable_driver_hooks()
+{
+    driver = Driver::create_hooked_driver( driver.get());
 }
 
 #include <mips/mips.h>

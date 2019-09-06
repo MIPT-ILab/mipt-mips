@@ -281,7 +281,20 @@ TEST_CASE( "MIPS32_instr: sh 0xdead")
     auto value = memory->read<uint16, Endian::little>( 0x1000);
     CHECK( value == 0xdead);
 }
-////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE( "MIPS32_instr: sh be 0xdead")
+{
+    MIPS32BEInstr instr( "sh", 0x1000);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0xdead, 1);
+    instr.execute();
+    CHECK( instr.get_mem_addr() == 0x1000);
+
+    auto memory = get_plain_memory_with_data();
+    memory->load_store( &instr);
+    auto value = memory->read<uint16, Endian::big>( 0x1000);
+    CHECK( value == 0xdead);
+}
 
 TEST_CASE( "MIPS32_instr: sw 0xfee1'dead")
 {

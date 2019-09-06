@@ -7,6 +7,8 @@
 #include "checker.h"
 #include <kernel/kernel.h>
 
+#include <sstream>
+
 template <typename ISA>
 void Checker<ISA>::init( Endian endian, const FuncMemory& outer_mem, Kernel* kernel)
 {

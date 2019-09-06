@@ -3,20 +3,19 @@
  * programer-visible memory space accesing via memory address.
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
- * Copyright 2012-2018 uArchSim iLab project
+ * Copyright 2012-2019 uArchSim iLab project
  */
 
 #ifndef FUNC_MEMORY__FUNC_MEMORY_H
 #define FUNC_MEMORY__FUNC_MEMORY_H
 
-// uArchSim modules
 #include <infra/endian.h>
 #include <infra/exception.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
-// Generic C++
 #include <array>
+#include <cassert>
 #include <memory>
 #include <string>
 #include <vector>
@@ -146,37 +145,43 @@ public:
 
     template<typename Instr> void load_store( Instr* instr);
 private:
-    template<typename Instr> void store( const Instr& instr);
+    template<typename Instr, Endian endian> void store( const Instr& instr);
+    template<typename Instr, Endian endian> void masked_store( const Instr& instr);
 };
 
-template<typename Instr>
+template<typename Instr, Endian endian>
 void FuncMemory::store( const Instr& instr)
 {
-    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    using SrcType = decltype( std::declval<Instr>().get_v_src2());
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is a cricital error");
 
-    if ( ~instr.get_mask() == 0) {
-        if ( instr.get_endian() == Endian::little)
-            write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr());
-        else
-            write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr());
+    auto full_mask = bitmask<SrcType>( instr.get_mem_size() * CHAR_BIT);
+    if ( ( instr.get_mask() & full_mask) == full_mask) switch ( instr.get_mem_size()) {
+        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src2()), instr.get_mem_addr()); break;
+        default: assert( false);
     }
     else {
-        if ( instr.get_endian() == Endian::little)
-            masked_write<DstType, Endian::little>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
-        else
-            masked_write<DstType, Endian::big>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<SrcType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
     }
 }
 
 template<typename Instr>
-void FuncMemory::load_store(Instr* instr)
+void FuncMemory::load_store( Instr* instr)
 {
-    if ( instr->is_load())
+    if ( instr->is_load()) {
         load( instr);
-    else if ( instr->is_store())
-        store( *instr);
+    }
+    else if ( instr->is_store()) {
+        if ( instr->get_endian() == Endian::little)
+            store<Instr, Endian::little>( *instr);
+        else
+            store<Instr, Endian::big>( *instr);
+    }
 }
 
 class FuncMemoryReplicant : public FuncMemory

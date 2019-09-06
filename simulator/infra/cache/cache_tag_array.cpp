@@ -1,21 +1,98 @@
 /**
  * cache_tag_array.cpp
  * Implementation of the cache tag array model.
- * @author Oleg Ladin, Denis Los
- * Copyright 2014-2017 MIPT-MIPS
+ * @author Oleg Ladin, Denis Los, Andrey Agrachev, Pavel Kryukov
+ * Copyright 2014-2019 MIPT-MIPS
  */
 
-#include <cassert>
-
-// MIPT-MIPS includes
 #include "infra/cache/cache_tag_array.h"
+#include "infra/macro.h"
+#include "infra/replacement/cache_replacement.h"
+
+#include <sparsehash/dense_hash_map.h>
+
+#include <utility>
+#include <vector>
+
+class AlwaysHitCacheTagArray : public CacheTagArray
+{
+    public:
+        explicit AlwaysHitCacheTagArray( bool log) : CacheTagArray( log) { }
+
+        uint32 set( Addr /* unused */) const final { return 0; }
+        Addr tag( Addr addr) const final { return addr; }
+        int32 write( Addr /* unused */) { return -1; }
+        std::pair<bool, int32> read( Addr addr) final { return read_no_touch( addr); }
+        std::pair<bool, int32> read_no_touch( Addr /* unused */) const final { return {true, -1}; }
+};
+
+class InfiniteCacheTagArray : public CacheTagArray
+{
+    public:
+        explicit InfiniteCacheTagArray( bool log) : CacheTagArray( log) {
+            lookup_helper.set_empty_key( impossible_key);
+            lookup_helper.set_deleted_key( impossible_key - 1);
+        }
+
+        uint32 set( Addr /* unused */) const final { return 0; }
+        Addr tag( Addr addr) const final { return addr; }
+        int32 write( Addr addr) final;
+        std::pair<bool, int32> read( Addr addr) final { return read_no_touch( addr); }
+        std::pair<bool, int32> read_no_touch( Addr addr) const final;
+    private:
+        std::vector<Addr> tags;
+
+        // hash tabe to lookup tags in O(1)
+        google::dense_hash_map<Addr, int32> lookup_helper;
+        const int32 impossible_key = INT32_MAX;
+};
+
+std::pair<bool, int32> InfiniteCacheTagArray::read_no_touch( Addr addr) const
+{
+    auto res = lookup_helper.find( addr);
+    return res == lookup_helper.end()
+        ? std::pair{ false, -1 }
+        : std::pair{ true, res->second };
+}
+
+int32 InfiniteCacheTagArray::write( Addr addr)
+{
+    auto result = read_no_touch( addr);
+    if ( result.first)
+        return result.second;
+
+    int32 way = narrow_cast<int32>( tags.size());
+    tags.emplace_back( addr);
+    lookup_helper.emplace( addr, way);
+
+    return way;
+}
+
+// Cache tag array module implementation
+class CacheTagArraySizeCheck : public CacheTagArray
+{
+    public:
+        CacheTagArraySizeCheck(
+            bool log,
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        );
+
+        uint32 size_in_bytes;
+        uint32 ways;
+        const uint32 line_size;
+        const uint32 addr_size_in_bits;
+};
 
 CacheTagArraySizeCheck::CacheTagArraySizeCheck(
+    bool log,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
-    : Log( false)
+    : CacheTagArray( log)
     , size_in_bytes( size_in_bytes)
     , ways( ways)
     , line_size( line_size)
@@ -50,38 +127,93 @@ CacheTagArraySizeCheck::CacheTagArraySizeCheck(
         throw CacheTagArrayInvalidSizeException("Cache size should be multiple of");
 }
 
-CacheTagArraySize::CacheTagArraySize(
+class CacheTagArraySize : public CacheTagArraySizeCheck
+{
+    protected:
+        CacheTagArraySize(
+            bool log,
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits
+        )
+            : CacheTagArraySizeCheck( log, size_in_bytes, ways, line_size, addr_size_in_bits)
+            , line_bits( find_first_set( line_size))
+            , sets( size_in_bytes / ( ways * line_size))
+            , set_bits( find_first_set( sets) + line_bits)
+            , addr_mask( bitmask<Addr>( addr_size_in_bits))
+        { }
+
+        const size_t line_bits;
+    public:
+        uint32 sets;
+        const size_t set_bits;
+        const Addr   addr_mask;
+
+        uint32 set( Addr addr) const final { return ( ( addr & addr_mask) >> line_bits) & (sets - 1); }
+        Addr tag( Addr addr) const final { return ( addr & addr_mask) >> set_bits; }
+};
+
+class ReplacementModule
+{
+    public:
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy = "LRU");
+        void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
+        auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
+
+    private:
+        std::vector<std::unique_ptr<CacheReplacement>> replacement_info;
+};
+
+ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy)
+    : replacement_info( number_of_sets)
+{
+    for (auto& e : replacement_info)
+        e = create_cache_replacement( replacement_policy, number_of_ways);
+}
+
+class SimpleCacheTagArray : public CacheTagArraySize
+{
+    public:
+        SimpleCacheTagArray(
+            bool log,
+            uint32 size_in_bytes,
+            uint32 ways,
+            uint32 line_size,
+            uint32 addr_size_in_bits = 32
+        );
+
+        int32 write( Addr addr) final;
+        std::pair<bool, int32> read( Addr addr) final;
+        std::pair<bool, int32> read_no_touch( Addr addr) const final;
+    protected:
+        struct Tag
+        {
+            bool is_valid = false;
+            Addr tag = 0u;
+        };
+
+        // tags storage
+        std::vector<std::vector<Tag>> tags;
+
+        // hash tabe to lookup tags in O(1)
+        std::vector<google::dense_hash_map<Addr, int32>> lookup_helper;
+        const int32 impossible_key = INT32_MAX;
+        std::unique_ptr<ReplacementModule> replacement_module = nullptr;
+};
+
+SimpleCacheTagArray::SimpleCacheTagArray(
+    bool log,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
-    : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-    , line_bits( find_first_set( line_size))
-    , sets( size_in_bytes / ( ways * line_size))
-    , set_bits( find_first_set( sets) + line_bits)
-    , addr_mask( bitmask<Addr>( addr_size_in_bits))
-{ }
-
-uint32 CacheTagArraySize::set( Addr addr) const
+        : CacheTagArraySize( log, size_in_bytes, ways, line_size, addr_size_in_bits)
+        , tags( sets, std::vector<Tag>( ways))
+        , lookup_helper( sets, google::dense_hash_map<Addr, int32>( ways))
 {
-    return ( ( addr & addr_mask) >> line_bits) & (sets - 1);
-}
+    replacement_module = std::make_unique<ReplacementModule>( sets, ways);
 
-Addr CacheTagArraySize::tag( Addr addr) const
-{
-    return ( addr & addr_mask) >> set_bits;
-}
-
-CacheTagArray::CacheTagArray(
-    uint32 size_in_bytes,
-    uint32 ways,
-    uint32 line_size,
-    uint32 addr_size_in_bits)
-    : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
-    , tags( sets, std::vector<Tag>( ways))
-    , lookup_helper( sets, google::dense_hash_map<Addr, uint32>( ways))
-    , replacement_module( sets, ways)
-{
     //theese are spicial dense_hash_map requirements
     for (uint32 i = 0; i < sets; i++) {
         lookup_helper[i].set_empty_key( impossible_key);
@@ -89,7 +221,7 @@ CacheTagArray::CacheTagArray(
     }
 }
 
-std::pair<bool, uint32> CacheTagArray::read( Addr addr)
+std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
 {
     const auto lookup_result = read_no_touch( addr);
     const auto&[ is_hit, way] = lookup_result;
@@ -97,13 +229,13 @@ std::pair<bool, uint32> CacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module.touch( num_set, way);
+        replacement_module->touch( num_set, way);
     }
 
     return lookup_result;
 }
 
-std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
+std::pair<bool, int32> SimpleCacheTagArray::read_no_touch( Addr addr) const
 {
     const uint32 num_set = set( addr);
     const Addr   num_tag = tag( addr);
@@ -111,16 +243,16 @@ std::pair<bool, uint32> CacheTagArray::read_no_touch( Addr addr) const
     const auto& result = lookup_helper[ num_set].find( num_tag);
     return ( result != lookup_helper[ num_set].end())
            ? std::make_pair( true, result->second)
-           : std::make_pair( false, NO_VAL32);
+           : std::make_pair( false, -1);
 }
 
-uint32 CacheTagArray::write( Addr addr)
+int32 SimpleCacheTagArray::write( Addr addr)
 {
     const Addr new_tag = tag( addr);
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = narrow_cast<uint32>( replacement_module.update( num_set));
+    const auto way = narrow_cast<int32>( replacement_module->update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
@@ -138,9 +270,21 @@ uint32 CacheTagArray::write( Addr addr)
     return way;
 }
 
-ReplacementModule::ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy)
-    : replacement_info( number_of_sets)
+std::unique_ptr<CacheTagArray> CacheTagArray::create(
+    bool log,
+    const std::string& type,
+    uint32 size_in_bytes,
+    uint32 ways,
+    uint32 line_size,
+    uint32 addr_size_in_bits)
 {
-    for (auto& e : replacement_info)
-        e = create_cache_replacement( replacement_policy, number_of_ways);
+    if ( type == "always_hit")
+        return std::make_unique<AlwaysHitCacheTagArray>( log);
+    if ( type == "infinite")
+        return std::make_unique<InfiniteCacheTagArray>( log);
+    if ( type == "default")
+        return std::make_unique<SimpleCacheTagArray>( log, size_in_bytes, ways, line_size, addr_size_in_bits);
+
+    throw CacheTagArrayInvalidSizeException(std::string("Unsupported mode (") + type + ")");
 }
+

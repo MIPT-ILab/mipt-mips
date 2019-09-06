@@ -39,6 +39,7 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
     CHECK( MIPSRegister::from_gdb_index(34) == MIPSRegister::mips_hi());
     CHECK( MIPSRegister::from_gdb_index(35) == MIPSRegister::from_cp0_index( 8));  // BadVAddr
     CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::cause());
+    CHECK( MIPSRegister::from_gdb_index(1000) == MIPSRegister::zero());
 }
 
 TEST_CASE( "MIPS_registers: CP1_ID_converter")

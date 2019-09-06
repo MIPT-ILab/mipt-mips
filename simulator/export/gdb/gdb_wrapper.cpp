@@ -10,16 +10,15 @@
 #include <infra/config/config.h>
 #include <kernel/kernel.h>
 #include <memory/argv_loader/argv_loader.h>
-#include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
 
 GDBSim::GDBSim( const std::string& isa)
 {
     cpu = Simulator::create_configured_isa_simulator( isa);
-    cpu->setup_trap_handler( "stop");
+    cpu->enable_driver_hooks();
     memory = FuncMemory::create_hierarchied_memory();
-    auto kernel = Kernel::create_configured_kernel();
+    kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);
     cpu->set_kernel( kernel);
     kernel->set_simulator( cpu);
@@ -28,7 +27,7 @@ GDBSim::GDBSim( const std::string& isa)
 
 bool GDBSim::load( const std::string& filename) const try
 {
-    ElfLoader( filename).load_to( memory.get());
+    kernel->load_file( filename);
     std::cout << "MIPT-MIPS: Binary file " << filename << " loaded" << std::endl;
     return true;
 }
@@ -50,6 +49,8 @@ bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const ch
 
     if ( cpu->sizeof_register() == bytewidth<uint64>)
         sp += ArgvLoader<uint64, Endian::native>( argv, envp).load_to( memory, sp);
+
+    while ( sp % 4 != 0) ++sp;
 
     cpu->write_gdb_register( 29, sp);
     std::cout << "MIPT-MIPS: arguments loaded" << std::endl;

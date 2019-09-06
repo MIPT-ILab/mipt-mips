@@ -8,20 +8,24 @@
 #include "mars/mars_kernel.h"
 
 #include <infra/config/config.h>
+#include <memory/elf/elf_loader.h>
 #include <func_sim/operation.h>
 
 namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
 } // namespace config
 
-class DummyKernel : public Kernel
+void BaseKernel::load_file( const std::string& name)
+{
+    ElfLoader loader( name);
+    loader.load_to( mem.get());
+    start_pc = loader.get_startPC();
+}
+
+class DummyKernel : public BaseKernel
 {
 public:
     Trap execute() final { return Trap( Trap::SYSCALL); }
-    void set_simulator( const std::shared_ptr<CPUModel>&) final { };
-    void connect_memory( std::shared_ptr<FuncMemory>) final { };
-    void add_replica_simulator( const std::shared_ptr<CPUModel>&) final { };
-    void add_replica_memory( const std::shared_ptr<FuncMemory>&) final { };
 };
 
 std::shared_ptr<Kernel> Kernel::create_dummy_kernel() {

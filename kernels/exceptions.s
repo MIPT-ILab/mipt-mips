@@ -76,6 +76,8 @@ s2:	.word 0
 # This is the exception vector address for MIPS-1 (R2000):
 #	.ktext 0x80000080
 # This is the exception vector address for MIPS32:
+	.globl __start
+__start:
 	.text 0x80000180
 # Select the appropriate one for the mode in which SPIM is compiled.
 	.set noat

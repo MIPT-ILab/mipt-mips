@@ -72,7 +72,7 @@ TEST_CASE( "One bit predictor")
 
     Addr PC = 28;
     Addr target = 12;
-    
+
     bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);
@@ -84,8 +84,8 @@ TEST_CASE( "One bit predictor in case of changed target")
 
     Addr PC = 28;
     Addr target = 12;
- 
-    //learn   
+
+    //learn
     bp->update( BPInterface( PC, true, target, false));
     //change the target
     target = 16;
@@ -99,7 +99,7 @@ TEST_CASE( "Two bit predictor, basic")
 
     Addr PC = 28;
     Addr target = 12;
-    
+
     bp->update( BPInterface( PC, true, target, false));
     CHECK( bp->is_taken(PC) );
     CHECK( bp->get_target(PC) == target);

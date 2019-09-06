@@ -7,7 +7,6 @@
 #ifndef FUNC_SIM_H
 #define FUNC_SIM_H
 
-#include "driver.h"
 #include "instr_memory.h"
 #include "rf/rf.h"
 
@@ -17,6 +16,9 @@
 
 #include <memory>
 #include <string>
+
+class Driver;
+class Operation;
 
 template <typename ISA>
 class FuncSim : public Simulator
@@ -48,7 +50,7 @@ class FuncSim : public Simulator
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
-        void setup_trap_handler( const std::string& mode) final;
+        void enable_driver_hooks() final;
         void init_checker() final { };
         int get_exit_code() const noexcept final;
         FuncInstr step();
