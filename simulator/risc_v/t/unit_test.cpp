@@ -146,7 +146,7 @@ TEST_CASE( "RISCV lq/sq")
     RISCVInstr<uint128> load( "c_lq", 0x1008);
     RISCVInstr<uint128> store( "c_sq", 0x1000);
     store.set_v_src( bitmask<uint128>( 68), 1);
-    auto memory = FuncMemory::create_hierarchied_memory();
+    auto memory = FuncMemory::create_default_hierarchied_memory();
     for (auto* instr : { &load, &store }) {
         instr->set_v_src( 0x1000, 0);
         instr->execute();

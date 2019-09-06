@@ -25,7 +25,7 @@ static auto run_over_empty_memory( const std::string& isa)
 {
     auto sim = Simulator::create_functional_simulator( isa);
     sim->enable_driver_hooks();
-    auto m = FuncMemory::create_hierarchied_memory();
+    auto m = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( m);
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
@@ -44,7 +44,7 @@ TEST_CASE( "FuncSim: create empty memory and get lost")
 
 TEST_CASE( "FuncSim: get lost without pc")
 {
-    auto m   = FuncMemory::create_hierarchied_memory();
+    auto m   = FuncMemory::create_default_hierarchied_memory();
     auto sim = Simulator::create_functional_simulator("mips32");
     sim->set_memory( m);
     auto kernel = Kernel::create_dummy_kernel();
@@ -60,7 +60,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
 {
     // Call constructor and init
     auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
@@ -74,7 +74,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
 TEST_CASE( "Make_A_Step: Func_Sim")
 {
     auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
@@ -94,7 +94,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
 TEST_CASE( "Run one instruction: Func_Sim")
 {
     auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_dummy_kernel();
@@ -143,7 +143,7 @@ TEST_CASE( "FuncSim: Register size")
 TEST_CASE( "Run_SMC_trace: Func_Sim")
 {
     auto sim = Simulator::create_functional_simulator("mips32");
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_mars_kernel();
@@ -162,7 +162,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
 {
     bool log = false;
     auto sim = Simulator::create_functional_simulator("mips32", log);
-    auto mem = FuncMemory::create_hierarchied_memory( 36);
+    auto mem = FuncMemory::create_hierarchied_memory( 36, 10, 12);
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_dummy_kernel();
@@ -186,7 +186,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 {
     bool log = false;
     auto sim = Simulator::create_functional_simulator(isa, log);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     if ( enable_hooks)
         sim->enable_driver_hooks();
