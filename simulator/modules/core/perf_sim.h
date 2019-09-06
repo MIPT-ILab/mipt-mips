@@ -30,8 +30,7 @@ public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
 
-    explicit PerfSim( Endian endian, bool log);
-    ~PerfSim() override;
+    PerfSim( Endian endian);
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
@@ -47,11 +46,11 @@ public:
     
     uint64 read_cpu_register( size_t regno) const final { return read_register( Register::from_cpu_index( regno)); }
     uint64 read_gdb_register( size_t regno) const final;
-    uint64 read_csr_register( std::string_view name) const final { return read_register( Register::from_csr_name( name)); }
+    uint64 read_csr_register( std::string_view reg_name) const final { return read_register( Register::from_csr_name( reg_name)); }
 
     void write_cpu_register( size_t regno, uint64 value) final { write_register( Register::from_cpu_index( regno), value); }
     void write_gdb_register( size_t regno, uint64 value) final;
-    void write_csr_register( std::string_view name, uint64 value) final { write_register( Register::from_csr_name( name), value); }
+    void write_csr_register( std::string_view reg_name, uint64 value) final { write_register( Register::from_csr_name( reg_name), value); }
 
     // Rule of five
     PerfSim( const PerfSim&) = delete;

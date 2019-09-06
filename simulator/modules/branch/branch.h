@@ -13,11 +13,11 @@
 class FuncMemory;
 
 template <typename FuncInstr>
-class Branch : public Log
+class Branch : public Module
 {
-        using Instr = PerfInstr<FuncInstr>;
-        using RegisterUInt = typename FuncInstr::RegisterUInt;
-        using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
+    using Instr = PerfInstr<FuncInstr>;
+    using RegisterUInt = typename FuncInstr::RegisterUInt;
+    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
     private:
         uint64 num_mispredictions = 0;
@@ -38,8 +38,9 @@ class Branch : public Log
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
 
         std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
+
     public:
-        explicit Branch( bool log);
+        explicit Branch( Module* parent);
         void clock( Cycle cycle);
         auto get_mispredictions_num() const { return num_mispredictions; }
         auto get_jumps_num() const { return num_jumps; }

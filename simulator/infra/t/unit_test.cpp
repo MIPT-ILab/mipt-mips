@@ -193,14 +193,19 @@ TEST_CASE("Exception")
 TEST_CASE("Logging enabled")
 {
     std::ostringstream oss;
-    LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str() == "Hello World! 14\n" );
 }
 
 TEST_CASE("Logging disabled")
 {
     std::ostringstream oss;
-    LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls.disable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str().empty() );
 }
 

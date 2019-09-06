@@ -14,7 +14,7 @@
 #include <modules/ports_instance.h>
 
 template <typename FuncInstr>
-class Decode : public Log
+class Decode : public Module
 {
     using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
@@ -22,7 +22,7 @@ class Decode : public Log
     static constexpr const uint8 SRC_REGISTERS_NUM = 2;
 
 public:
-    explicit Decode( bool log);
+    explicit Decode( Module* parent);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value;}
     void set_wb_bandwidth( uint32 wb_bandwidth) { bypassing_unit->set_bandwidth( wb_bandwidth);}

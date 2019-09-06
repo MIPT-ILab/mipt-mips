@@ -26,7 +26,7 @@ namespace config {
 class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;
-        virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) = 0;
+        virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim() = 0;
         Builder() = default;
         virtual ~Builder() = default;
         Builder( const Builder&) = delete;
@@ -39,7 +39,7 @@ class SimulatorFactory {
     struct TBuilder : public Builder {
         TBuilder() = default;
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log); }
-        std::unique_ptr<CycleAccurateSimulator> get_perfsim( bool log) final { return std::make_unique<PerfSim<T>>( e, log); }
+        std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e); }
     };
 
     using Map = std::map<std::string, std::unique_ptr<Builder>>;
@@ -101,9 +101,9 @@ public:
         return get_factory( name)->get_funcsim( log);
     }
 
-    auto get_perfsim( const std::string& name, bool log) const
+    auto get_perfsim( const std::string& name) const
     {
-        return get_factory( name)->get_perfsim( log);
+        return get_factory( name)->get_perfsim();
     }
     
     static SimulatorFactory& get_instance() {
@@ -118,7 +118,13 @@ Simulator::create_simulator( const std::string& isa, bool functional_only, bool 
     if ( functional_only)
         return SimulatorFactory::get_instance().get_funcsim( isa, log);
 
-    return CycleAccurateSimulator::create_simulator( isa, log);
+    return CycleAccurateSimulator::create_simulator( isa);
+}
+
+std::shared_ptr<Simulator>
+Simulator::create_simulator( const std::string& isa, bool functional_only)
+{
+    return create_simulator( isa, functional_only, false);
 }
 
 std::shared_ptr<Simulator>
@@ -134,8 +140,8 @@ Simulator::create_configured_isa_simulator( const std::string& isa)
 }
 
 std::shared_ptr<CycleAccurateSimulator>
-CycleAccurateSimulator::create_simulator( const std::string& isa, bool log)
+CycleAccurateSimulator::create_simulator( const std::string& isa)
 {
-    return SimulatorFactory::get_instance().get_perfsim( isa, log);
+    return SimulatorFactory::get_instance().get_perfsim( isa);
 }
 

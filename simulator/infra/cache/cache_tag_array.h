@@ -31,14 +31,11 @@ class CacheTagArray : public Log
         bool lookup( Addr addr) { return read( addr).first; }; // hit or not
 
         static std::unique_ptr<CacheTagArray> create(
-            bool log,
             const std::string& type,
             uint32 size_in_bytes,
             uint32 ways,
             uint32 line_size,
             uint32 addr_size_in_bits);
-    protected:
-        explicit CacheTagArray( bool log) : Log( log) { }
 };
 
 #endif // CACHE_TAG_ARRAY_H

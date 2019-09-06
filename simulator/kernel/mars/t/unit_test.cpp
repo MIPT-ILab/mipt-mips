@@ -23,7 +23,7 @@ TEST_CASE( "MARS: construct kernel") {
 
 TEST_CASE( "MARS: print integer") {
     std::ostringstream output;
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
@@ -41,7 +41,7 @@ struct System
     
     template<typename ... KernelArgs>
     explicit System( KernelArgs&&... args)
-        : sim( Simulator::create_simulator( "mips64", true, false))
+        : sim( Simulator::create_simulator( "mips64", true))
         , mars_kernel( create_mars_kernel(std::forward<KernelArgs>(args)...))
         , mem( FuncMemory::create_default_hierarchied_memory())
     {
@@ -66,7 +66,7 @@ TEST_CASE( "MARS: print string")
 static uint64 read_integer( const std::string& str)
 {
     std::istringstream input( str);
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -85,7 +85,7 @@ TEST_CASE( "MARS: read integer")
 
 TEST_CASE( "MARS: read bad integer ang fix") {
     std::istringstream input( "133q\n133\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -106,7 +106,7 @@ TEST_CASE( "MARS: read string")
 }
 
 TEST_CASE( "MARS: exit") {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator (sim);
 
@@ -117,7 +117,7 @@ TEST_CASE( "MARS: exit") {
 
 TEST_CASE( "MARS: print character") {
     std::ostringstream output;
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
@@ -129,7 +129,7 @@ TEST_CASE( "MARS: print character") {
 
 TEST_CASE( "MARS: read character") {
     std::istringstream input( "z\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -140,7 +140,7 @@ TEST_CASE( "MARS: read character") {
 
 TEST_CASE( "MARS: read bad character") {
     std::istringstream input( "zz\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -324,7 +324,7 @@ TEST_CASE( "MARS: open file with invalid mode")
 
 TEST_CASE( "MARS: close stdout")
 {
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel();
     mars_kernel->set_simulator( sim);
     sim->write_cpu_register( v0, 16u); // close file
@@ -334,7 +334,7 @@ TEST_CASE( "MARS: close stdout")
 
 TEST_CASE( "MARS: close error")
 {
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel();
     mars_kernel->set_simulator( sim);
     sim->write_cpu_register( v0, 16u); // close file
@@ -344,7 +344,7 @@ TEST_CASE( "MARS: close error")
 
 TEST_CASE( "MARS: exit with code") 
 {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator(sim);
 
@@ -356,7 +356,7 @@ TEST_CASE( "MARS: exit with code")
 
 TEST_CASE( "MARS: unsupported syscall") 
 {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator(sim);
 

@@ -27,6 +27,7 @@ endif()
 set(CPPS
     infra/print128.cpp
     infra/config/config.cpp
+    infra/ports/module.cpp
     infra/ports/ports.cpp
     infra/cache/cache_tag_array.cpp
     infra/replacement/cache_replacement.cpp

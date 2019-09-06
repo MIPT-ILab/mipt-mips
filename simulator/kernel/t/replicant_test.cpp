@@ -9,8 +9,8 @@
 
 TEST_CASE( "Replicant: set_target + get_pc")
 {
-    auto sim1 = Simulator::create_functional_simulator( "mips32", false);
-    auto sim2 = Simulator::create_functional_simulator( "mips32", false);
+    auto sim1 = Simulator::create_functional_simulator( "mips32");
+    auto sim2 = Simulator::create_functional_simulator( "mips32");
     CPUReplicant sim12( sim1);
     sim12.add_replica( sim2);
 
@@ -25,8 +25,8 @@ TEST_CASE( "Replicant: set_target + get_pc")
 
 TEST_CASE( "Replicant: cpu register")
 {
-    auto sim1 = Simulator::create_functional_simulator( "mips32", false);
-    auto sim2 = Simulator::create_functional_simulator( "mips32", false);
+    auto sim1 = Simulator::create_functional_simulator( "mips32");
+    auto sim2 = Simulator::create_functional_simulator( "mips32");
     CPUReplicant sim12( sim1);
     sim12.add_replica( sim2);
 
@@ -39,8 +39,8 @@ TEST_CASE( "Replicant: cpu register")
 
 TEST_CASE( "Replicant: gdb register")
 {
-    auto sim1 = Simulator::create_functional_simulator( "mips32", false);
-    auto sim2 = Simulator::create_functional_simulator( "mips32", false);
+    auto sim1 = Simulator::create_functional_simulator( "mips32");
+    auto sim2 = Simulator::create_functional_simulator( "mips32");
     CPUReplicant sim12( sim1);
     sim12.add_replica( sim2);
 
@@ -53,8 +53,8 @@ TEST_CASE( "Replicant: gdb register")
 
 TEST_CASE( "Replicant: csr register")
 {
-    auto sim1 = Simulator::create_functional_simulator( "riscv32", false);
-    auto sim2 = Simulator::create_functional_simulator( "riscv32", false);
+    auto sim1 = Simulator::create_functional_simulator( "riscv32");
+    auto sim2 = Simulator::create_functional_simulator( "riscv32");
     CPUReplicant sim12( sim1);
     sim12.add_replica( sim2);
 

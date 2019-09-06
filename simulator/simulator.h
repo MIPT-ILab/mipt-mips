@@ -9,6 +9,7 @@
 #include <func_sim/traps/trap.h>
 #include <infra/exception.h>
 #include <infra/log.h>
+#include <infra/ports/module.h>
 #include <infra/target.h>
 #include <infra/types.h>
 
@@ -25,10 +26,11 @@ struct InvalidISA final : Exception
     { }
 };
 
-class CPUModel : public Log
+class CPUModel
 {
 public:
-    explicit CPUModel( bool log = false) : Log( log) {}
+    CPUModel() = default;
+    virtual ~CPUModel() = default;
 
     void set_pc( Addr pc) { set_target( Target( pc, 0)); }
     virtual void set_target( const Target& target) = 0;
@@ -50,8 +52,6 @@ class Kernel;
 class Simulator : public CPUModel
 {
 public:
-    explicit Simulator( bool log = false) : CPUModel( log) {}
-
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
@@ -62,19 +62,25 @@ public:
     Trap run_no_limit() { return run( MAX_VAL64); }
 
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
+    static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only);
     static std::shared_ptr<Simulator> create_configured_simulator();
     static std::shared_ptr<Simulator> create_configured_isa_simulator( const std::string& isa);
-    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log = false)
+    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa, bool log)
     {
         return create_simulator( isa, true, log);
     }
+    static std::shared_ptr<Simulator> create_functional_simulator( const std::string& isa)
+    {
+        return create_functional_simulator( isa, false);
+    }
 };
 
-class CycleAccurateSimulator : public Simulator {
+class CycleAccurateSimulator : public Simulator, public Root
+{
 public:
-    explicit CycleAccurateSimulator( bool log = false) : Simulator( log) {}
+    CycleAccurateSimulator() : Root( "cpu") { }
     virtual void clock() = 0;
-    static std::shared_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa, bool log);
+    static std::shared_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa);
 };
 
 #endif // SIMULATOR_H

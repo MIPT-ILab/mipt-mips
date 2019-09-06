@@ -13,10 +13,13 @@
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
-    : Simulator( log)
+    : Simulator()
     , imem( endian)
-    , driver( ISA::create_driver( log, this))
-{ }
+    , driver( ISA::create_driver( this))
+{
+    if ( log)
+        sout.enable();
+}
 
 template <typename ISA>
 void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)

@@ -68,7 +68,12 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
     * `mipsI`, `mipsII`, `mipsIII`, `mipsIV` — legacy MIPS versions
 * `-f` — enables functional simulation only
 * `--mars` — enables MARS-compatible mode of system calls
-* `-d` — enables detailed output of each cycle
+
+### Outputs
+* `-l` — enables per-module output, for instance:
+    * `-l fetch,decode` — prints only fetch and decode stages
+    * `-l cpu` —  prints all stages
+* `-d` — enables output of functional simulator
 
 ### Performance mode options
 

@@ -13,7 +13,7 @@
 class FuncMemory;
 
 template <typename FuncInstr>
-class Mem : public Log
+class Mem : public Module
 {
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename FuncInstr::RegisterUInt;
@@ -31,7 +31,7 @@ class Mem : public Log
         std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
 
     public:
-        explicit Mem( bool log);
+        explicit Mem( Module* parent);
         void clock( Cycle cycle);
         void set_memory( const std::shared_ptr<FuncMemory>& mem) { memory = mem; }
 };

@@ -12,23 +12,6 @@ std::shared_ptr<PortMap> PortMap::create_port_map()
     return std::make_shared<PortMapHack>();
 }
 
-std::shared_ptr<PortMap> PortMap::instance = nullptr;
-
-std::shared_ptr<PortMap> PortMap::get_instance()
-{
-    if ( instance == nullptr)
-        reset_instance();
-
-    return instance;
-}
-
-void PortMap::reset_instance()
-{
-    instance = create_port_map();
-}
-
-PortMap::PortMap() noexcept : Log( false) { }
-
 void PortMap::init() const
 {
     for ( const auto& cluster : map)
@@ -56,7 +39,7 @@ void PortMap::add_port( BasicReadPort* port)
 }
 
 Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
-    : Log( false), pm( std::move( port_map)), k( std::move( key))
+    : pm( std::move( port_map)), k( std::move( key))
 { }
 
 BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)

@@ -13,7 +13,7 @@
 class DriverMIPS32 : public Driver
 {
 public:
-    explicit DriverMIPS32( bool verbose, Simulator* sim) : Driver( verbose), cpu( sim) { }
+    explicit DriverMIPS32( Simulator* sim) : cpu( sim) { }
     Trap handle_trap( const Operation& instr) const final
     {
         auto trap = instr.trap_type();
@@ -30,13 +30,12 @@ public:
         cpu->set_pc( 0x8'0000'0180);
         return Trap( Trap::NO_TRAP);
     }
-    std::unique_ptr<Driver> clone() const final { return std::make_unique<DriverMIPS32>( verbose, cpu); }
+    std::unique_ptr<Driver> clone() const final { return std::make_unique<DriverMIPS32>( cpu); }
 private:
     Simulator* const cpu = nullptr;
-    const bool verbose = false;
 };
 
-std::unique_ptr<Driver> create_mips32_driver( bool verbose, Simulator* sim)
+std::unique_ptr<Driver> create_mips32_driver( Simulator* sim)
 {
-    return std::make_unique<DriverMIPS32>( verbose, sim);
+    return std::make_unique<DriverMIPS32>( sim);
 }

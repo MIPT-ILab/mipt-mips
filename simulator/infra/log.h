@@ -13,21 +13,22 @@
 
 class LogOstream
 {
-    const bool enable;
-    std::ostream& stream;
-
 public:
-    LogOstream(bool value, std::ostream& _out) : enable(value), stream(_out) { }
+    explicit LogOstream(std::ostream& _out) : stream(_out) { }
+
+    void enable() noexcept  { is_enabled = true;  }
+    void disable() noexcept { is_enabled = false; }
+    bool enabled() const noexcept { return is_enabled; }
 
     LogOstream& operator<<(std::ostream& (*F)(std::ostream&)) {
-        if ( enable)
+        if ( is_enabled)
             F(stream);
         return *this;
     }
 
     template<typename T>
     LogOstream& operator<<(const T& v) {
-        if ( enable)
+        if ( is_enabled)
             stream << v;
 
         return *this;
@@ -37,6 +38,10 @@ public:
     LogOstream& operator<<(const char (&array)[N]) {
         return *this << static_cast<const char*>( array);
     }
+
+private:
+    bool is_enabled = false;
+    std::ostream& stream;
 };
 
 class Log
@@ -45,7 +50,7 @@ public:
     mutable LogOstream sout;
     mutable LogOstream serr;
 
-    explicit Log(bool value) : sout(value, std::cout), serr(true, std::cerr) { }
+    Log() : sout( std::cout), serr( std::cerr) { }
 
     // Rule of five
     virtual ~Log() = default;

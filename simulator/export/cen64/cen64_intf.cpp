@@ -11,7 +11,7 @@
 struct vr4300* vr4300_alloc()
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) CEN64 owns memory itself, and we fully trust it
-    return new vr4300( true);
+    return new vr4300();
 }
 
 void vr4300_free(struct vr4300* ptr)

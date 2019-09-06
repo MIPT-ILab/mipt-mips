@@ -12,8 +12,7 @@ namespace config {
 } // namespace config
 
 template <typename FuncInstr>
-Execute<FuncInstr>::Execute( bool log) 
-    : Log( log)
+Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
     wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW );
