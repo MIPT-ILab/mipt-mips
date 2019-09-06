@@ -92,7 +92,7 @@ struct HelpOption : Exception
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-void handleArgs( int argc, const char* const argv[], int start_index = 1);
+void handleArgs( int argc, const char* const argv[], int start_index);
 
 } // namespace config
 
