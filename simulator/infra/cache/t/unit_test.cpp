@@ -8,6 +8,7 @@
 // Module
 #include "../cache_tag_array.h"
 
+#include <infra/replacement/cache_replacement.h>
 #include <infra/types.h>
 
 #include <fstream>
@@ -27,51 +28,51 @@ TEST_CASE( "pass_wrong_arguments: Pass_Wrong_Arguments_To_CacheTagArraySizeCheck
     // ways = 0
     // line_size = 4
     // addr_size_in_bits = 32
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 128, 0, 4, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 128, 0, 4, 32), CacheTagArrayInvalidSizeException);
 
     // size_in_bytes = 0
     // ways = 16
     // line_size = 4
     // addr_size_in_bits = 32
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 0, 16, 4, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 0, 16, 4, 32), CacheTagArrayInvalidSizeException);
 
     // size_in_bytes = 128
     // ways = 16
     // line_size = 0
     // addr_size_in_bits = 32
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 128, 16, 0, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 128, 16, 0, 32), CacheTagArrayInvalidSizeException);
 
     // size_in_bytes = 128
     // ways = 16
     // line_size = 4
     // addr_size_in_bits = 0
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 128, 16, 4, 0), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 128, 16, 4, 0), CacheTagArrayInvalidSizeException);
 
     // size_in_bytes = 0
     // ways = 0
     // line_size = 0
     // addr_size_in_bits = 0
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 0, 0, 0, 0), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 0, 0, 0, 0), CacheTagArrayInvalidSizeException);
 
     // size_in_bytes is power of 2,
     // but the number of ways is not
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 64, 9, 4, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 64, 9, 4, 32), CacheTagArrayInvalidSizeException);
 
     // the number of ways is power of 2,
     // but size_in_bytes is not
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 500, 16, 4, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 500, 16, 4, 32), CacheTagArrayInvalidSizeException);
 
     // line_size is not power of 2
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 512, 16, 12, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 512, 16, 12, 32), CacheTagArrayInvalidSizeException);
 
     // address is 48 bits
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 128, 4, 4, 48), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 128, 4, 4, 48), CacheTagArrayInvalidSizeException);
 
     // too small cache
-    CHECK_THROWS_AS( CacheTagArray::create( false, "default", 8, 4, 4, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "LRU", 8, 4, 4, 32), CacheTagArrayInvalidSizeException);
 
     // wrong mode
-    CHECK_THROWS_AS( CacheTagArray::create( false, "abracadabra", 4096, 16, 64, 32), CacheTagArrayInvalidSizeException);
+    CHECK_THROWS_AS( CacheTagArray::create( false, "abracadabra", 4096, 16, 64, 32), CacheReplacementException);
 }
 
 TEST_CASE( "Check always_hit CacheTagArrayCache model")

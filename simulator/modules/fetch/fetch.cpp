@@ -9,7 +9,7 @@
 
 namespace config {
     /* Cache parameters */
-    static Value<std::string> instruction_cache_type = { "icache-type", "default", "Type of instruction level 1 cache (in bytes)"};
+    static Value<std::string> instruction_cache_type = { "icache-type", "LRU", "Type of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_size = { "icache-size", 2048, "Size of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_ways = { "icache-ways", 4, "Amount of ways in instruction level 1 cache"};
     static Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};

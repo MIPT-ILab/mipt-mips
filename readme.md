@@ -74,11 +74,12 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 
 #### Branch prediction
 * `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model).
+* `--bp-mode` — prediction replacement policy: _LRU_, _pseudo-LRU_, or _infinite_
 * `--bp-size` — branch prediction cache size (amount of tracked branch instructions)
 * `--bp-ways` — # of ways in branch prediction cache
 
 #### Instruction cache
-* `--icache-type` — instruction cache type: _default_, _always-hit_, or _infinite_
+* `--icache-type` — instruction cache type: _LRU_, _pseudo-LRU_, _always-hit_, or _infinite_
 * `--icache-size` — instruction cache size in bytes
 * `--icache-ways` — # of ways in instruction cache
 * `--icache-line-size` — line size of instruction cache

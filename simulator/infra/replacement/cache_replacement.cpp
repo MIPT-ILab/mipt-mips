@@ -120,7 +120,7 @@ std::unique_ptr<CacheReplacement> create_cache_replacement( const std::string& n
     if (name == "LRU")
         return std::make_unique<LRU>( ways);
 
-    if (name == "Pseudo-LRU")
+    if (name == "pseudo-LRU")
         return std::make_unique<PseudoLRU>( ways);
 
     throw CacheReplacementException("\"" + name + "\" replacement policy is not defined, supported polices are:\nLRU\npseudo-LRU\n");
