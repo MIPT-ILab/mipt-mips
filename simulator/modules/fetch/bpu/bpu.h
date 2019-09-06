@@ -52,8 +52,8 @@ public:
     BaseBP& operator=( const BaseBP&) = default;
     BaseBP& operator=( BaseBP&&) = default;
     
-    static std::unique_ptr<BaseBP> create_bp(
-        const std::string& name, uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits = 32);
+    static std::unique_ptr<BaseBP> create_bp(const std::string& name, const std::string& lru,
+                uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits);
     static std::unique_ptr<BaseBP> create_configured_bp();
 };
 
