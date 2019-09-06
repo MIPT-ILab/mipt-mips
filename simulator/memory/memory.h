@@ -191,7 +191,7 @@ void FuncMemory::load_store( Instr* instr)
 class FuncMemoryReplicant : public FuncMemory
 {
 public:
-    explicit FuncMemoryReplicant( const std::shared_ptr<FuncMemory>& memory) : primary( memory) { }
+    explicit FuncMemoryReplicant( std::shared_ptr<FuncMemory> memory) : primary( std::move( memory)) { }
     void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
 
     size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
