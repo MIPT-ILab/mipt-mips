@@ -14,7 +14,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 {
     // Just call a constructor
     auto sim = Simulator::create_simulator( "mips32", false, false);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     CHECK_NOTHROW( sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
 }
@@ -22,7 +22,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_dummy_kernel();
@@ -41,7 +41,7 @@ TEST_CASE( "Perf_Sim_init: push a nop")
 
 TEST_CASE( "PerfSim: create empty memory and get lost")
 {
-    auto m = FuncMemory::create_hierarchied_memory();
+    auto m = FuncMemory::create_default_hierarchied_memory();
     auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
     sim->set_memory( m);
     CHECK_THROWS_AS( sim->run_no_limit(), Deadlock);
@@ -93,7 +93,7 @@ TEST_CASE( "Perf_Sim: Register size")
 static auto get_mars32_tt_simulator( bool has_hooks)
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_mars_kernel();
@@ -128,7 +128,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
 static auto get_smc_loaded_simulator( bool init_checker)
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_mars_kernel();
@@ -156,7 +156,7 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
-    auto mem = FuncMemory::create_hierarchied_memory();
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     auto kernel = Kernel::create_dummy_kernel();
     kernel->connect_memory( mem);
