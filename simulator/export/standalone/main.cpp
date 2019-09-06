@@ -18,7 +18,7 @@ namespace config {
 
 int main( int argc, const char* argv[]) try {
     config::handleArgs( argc, argv, 1);
-    auto memory = FuncMemory::create_hierarchied_memory();
+    auto memory = FuncMemory::create_default_hierarchied_memory();
 
     auto sim = Simulator::create_configured_simulator();
     sim->set_memory( memory);
