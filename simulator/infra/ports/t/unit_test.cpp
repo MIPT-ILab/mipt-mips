@@ -208,3 +208,14 @@ TEST_CASE("Module: dump subtrees")
     CHECK( h.e->check_if_dumps());
     CHECK_FALSE( h.f->check_if_dumps());
 }
+
+TEST_CASE("Module: exclusion")
+{
+    SomeHiearchy h( "test-root,!D,!C,F");
+    CHECK( h.a->check_if_dumps());
+    CHECK( h.b->check_if_dumps());
+    CHECK_FALSE( h.c->check_if_dumps());
+    CHECK_FALSE( h.d->check_if_dumps());
+    CHECK_FALSE( h.e->check_if_dumps());
+    CHECK( h.f->check_if_dumps());
+}

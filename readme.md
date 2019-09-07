@@ -73,6 +73,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
 * `-l` — enables per-module output, for instance:
     * `-l fetch,decode` — prints only fetch and decode stages
     * `-l cpu` —  prints all stages
+    * `-l cpu,!mem` —  print all except mem stage
 * `-d` — enables output of functional simulator
 
 ### Performance mode options

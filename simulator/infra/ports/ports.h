@@ -51,10 +51,11 @@ class Port : public Log
 {
 public:
     const std::string& get_key() const noexcept { return k; }
-    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
 
 protected:
     Port( std::shared_ptr<PortMap> port_map, std::string key);
+    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
+
     Cycle get_last_cycle() const noexcept { return last_cycle; }
     void update_last_cycle( Cycle cycle) noexcept
     {
