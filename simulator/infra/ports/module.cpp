@@ -23,11 +23,21 @@ void Module::force_enable_logging()
         c->force_enable_logging();
 }
 
+void Module::force_disable_logging()
+{  
+    sout.disable();
+    for (const auto& c : children)
+        c->force_disable_logging();
+}
+
 void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
 {
     if ( names.count( name) != 0)
         force_enable_logging();
-    else for ( const auto& c : children)
+    else if ( names.count( '!' + name) != 0)
+        force_disable_logging();;
+
+    for ( const auto& c : children)
         c->enable_logging_impl( names);
 }
 
