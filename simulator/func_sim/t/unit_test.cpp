@@ -5,7 +5,6 @@
 
 #include "../func_sim.h"
 
-
 #include <catch.hpp>
 
 #include <kernel/kernel.h>
@@ -18,6 +17,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 {
     // Just call a constructor
     CHECK_NOTHROW( Simulator::create_functional_simulator("mips32") );
+    CHECK_NOTHROW( Simulator::create_functional_simulator("mips32", true) );
     CHECK_THROWS_AS( Simulator::create_functional_simulator("pdp11"), InvalidISA);
 }
 
@@ -160,8 +160,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
 
 TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
 {
-    bool log = false;
-    auto sim = Simulator::create_functional_simulator("mips32", log);
+    auto sim = Simulator::create_functional_simulator("mips32");
     auto mem = FuncMemory::create_hierarchied_memory( 36, 10, 12);
     sim->set_memory( mem);
 
@@ -184,8 +183,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
 
 static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks = false)
 {
-    bool log = false;
-    auto sim = Simulator::create_functional_simulator(isa, log);
+    auto sim = Simulator::create_functional_simulator(isa);
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     if ( enable_hooks)

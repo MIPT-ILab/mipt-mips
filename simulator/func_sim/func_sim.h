@@ -10,6 +10,7 @@
 #include "instr_memory.h"
 #include "rf/rf.h"
 
+#include <infra/config/config.h>
 #include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
@@ -21,7 +22,7 @@ class Driver;
 class Operation;
 
 template <typename ISA>
-class FuncSim : public Simulator
+class FuncSim : public Simulator, public Log
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
@@ -46,7 +47,7 @@ class FuncSim : public Simulator
         void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
     public:
-        explicit FuncSim( Endian endian, bool log = false);
+        FuncSim( Endian endian, bool log);
 
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }

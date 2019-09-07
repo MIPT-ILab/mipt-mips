@@ -27,19 +27,14 @@ struct PortError final : Exception {
 
 class PortMap : public Log
 {
-public:
-    static std::shared_ptr<PortMap> create_port_map();
-
-    static std::shared_ptr<PortMap> get_instance();
-    static void reset_instance();
-
-    void init() const;
-
 private:
-    PortMap() noexcept;
+    static std::shared_ptr<PortMap> create_port_map();
+    void init() const;
 
     friend class BasicWritePort;
     friend class BasicReadPort;
+    friend class Root;
+
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
 
@@ -50,7 +45,6 @@ private:
     };
 
     std::unordered_map<std::string, Cluster> map = { };
-    static std::shared_ptr<PortMap> instance;
 };
 
 class Port : public Log

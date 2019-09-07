@@ -10,32 +10,25 @@
 #include <chrono>
 #include <iostream>
 
+namespace config {
+    static AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
+} // namespace config
+
 template <typename ISA>
-PerfSim<ISA>::PerfSim( Endian endian, bool log) :
-    CycleAccurateSimulator( log),
-    endian( endian),
-    fetch( log),
-    decode( log),
-    execute( log),
-    mem( log),
-    branch( log),
-    writeback( endian, log)
+PerfSim<ISA>::PerfSim( Endian endian)
+    : endian( endian)
+    , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)
 {
     rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
-    writeback.set_driver( ISA::create_driver( log, this));
+    writeback.set_driver( ISA::create_driver( this));
 
     set_writeback_bandwidth( PORT_BW);
 
-    PortMap::get_instance()->init();
-}
-
-template <typename ISA>
-PerfSim<ISA>::~PerfSim<ISA>()
-{
-    PortMap::reset_instance();
+    init_portmap();
+    enable_logging( config::units_to_log);
 }
 
 template <typename ISA>

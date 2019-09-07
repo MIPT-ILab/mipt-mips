@@ -42,7 +42,7 @@ public:
         // we're reusing existing CacheTagArray functionality,
         // but here we don't split memory in blocks, storing
         // IP's only, so hardcoding here the granularity of 4 bytes:
-        tags = CacheTagArray::create( false, lru, size_in_entries, ways, 4, branch_ip_size_in_bits);
+        tags = CacheTagArray::create( lru, size_in_entries, ways, 4, branch_ip_size_in_bits);
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
         throw BPInvalidMode(e.what());

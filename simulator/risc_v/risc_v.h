@@ -23,7 +23,7 @@ struct RISCV
     static auto create_instr( uint32 bytes, Endian /* little */, Addr PC) {
         return FuncInstr( bytes, PC);
     }
-    static std::unique_ptr<Driver> create_driver( bool /* verbose */, Simulator* /* sim */) {
+    static std::unique_ptr<Driver> create_driver( Simulator* /* sim */) {
         return Driver::create_default_driver();
     }
 };

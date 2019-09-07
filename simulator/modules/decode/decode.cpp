@@ -12,7 +12,7 @@ namespace config {
 } // namespace config
 
 template <typename FuncInstr>
-Decode<FuncInstr>::Decode( bool log) : Log( log)
+Decode<FuncInstr>::Decode( Module* parent) : Module( parent, "decode")
 {
     bypassing_unit = std::make_unique<BypassingUnit>( config::long_alu_latency);
 

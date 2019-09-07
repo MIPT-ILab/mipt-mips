@@ -13,7 +13,7 @@ template <typename ISA>
 void Checker<ISA>::init( Endian endian, const FuncMemory& outer_mem, Kernel* kernel)
 {
     auto memory = FuncMemory::create_default_hierarchied_memory();
-    sim = std::make_shared<FuncSim<ISA>>( endian);
+    sim = std::make_shared<FuncSim<ISA>>( endian, false);
     outer_mem.duplicate_to( memory);
     sim->set_memory( std::move( memory));
     kernel->add_replica_simulator( sim);

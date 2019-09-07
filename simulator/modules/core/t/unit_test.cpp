@@ -13,7 +13,7 @@
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 {
     // Just call a constructor
-    auto sim = Simulator::create_simulator( "mips32", false, false);
+    auto sim = Simulator::create_simulator( "mips32", false);
     auto mem = FuncMemory::create_default_hierarchied_memory();
     CHECK_NOTHROW( sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
@@ -21,7 +21,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -42,14 +42,14 @@ TEST_CASE( "Perf_Sim_init: push a nop")
 TEST_CASE( "PerfSim: create empty memory and get lost")
 {
     auto m = FuncMemory::create_default_hierarchied_memory();
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     sim->set_memory( m);
     CHECK_THROWS_AS( sim->run_no_limit(), Deadlock);
 }
 
 TEST_CASE( "Perf_Sim: unsigned register R/W")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     sim->write_cpu_register( 1, uint64{ MAX_VAL32});
     CHECK( sim->read_cpu_register( 1) == MAX_VAL32 );
     CHECK( sim->get_exit_code() == 0);
@@ -57,7 +57,7 @@ TEST_CASE( "Perf_Sim: unsigned register R/W")
 
 TEST_CASE( "Perf_Sim: signed register R/W")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
     CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
     CHECK( sim->get_exit_code() == 0);
@@ -65,7 +65,7 @@ TEST_CASE( "Perf_Sim: signed register R/W")
 
 TEST_CASE( "Perf_Sim: GDB Register R/W")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     sim->write_gdb_register( 1, uint64{ MAX_VAL32});
     CHECK( sim->read_gdb_register( 1) == MAX_VAL32 );
     CHECK( sim->read_gdb_register( 0) == 0 );
@@ -78,7 +78,7 @@ TEST_CASE( "Perf_Sim: GDB Register R/W")
 
 TEST_CASE( "Perf_Sim: csr Register R/W")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32");
     sim->write_csr_register( "mscratch", 333);
     CHECK( sim->read_csr_register( "mscratch") == 333 );
     CHECK( sim->get_exit_code() == 0);
@@ -86,13 +86,13 @@ TEST_CASE( "Perf_Sim: csr Register R/W")
 
 TEST_CASE( "Perf_Sim: Register size")
 {
-    CHECK( CycleAccurateSimulator::create_simulator( "mips32", false)->sizeof_register() == bytewidth<uint32>);
-    CHECK( CycleAccurateSimulator::create_simulator( "mips64", false)->sizeof_register() == bytewidth<uint64>);
+    CHECK( CycleAccurateSimulator::create_simulator( "mips32")->sizeof_register() == bytewidth<uint32>);
+    CHECK( CycleAccurateSimulator::create_simulator( "mips64")->sizeof_register() == bytewidth<uint64>);
 }
 
 static auto get_mars32_tt_simulator( bool has_hooks)
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mars");
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -127,7 +127,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
 
 static auto get_smc_loaded_simulator( bool init_checker)
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mars", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "mars");
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
@@ -155,7 +155,7 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "riscv32", false);
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32");
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     auto kernel = Kernel::create_dummy_kernel();

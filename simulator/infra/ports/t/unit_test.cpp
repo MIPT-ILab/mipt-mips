@@ -4,106 +4,207 @@
  * Copyright 2019 MIPT-MIPS team
  */
 
-#include "../ports.h"
+#include "../module.h"
 #include <catch.hpp>
 #include <map>
- 
+
+TEST_CASE( "Latency to string")
+{
+    CHECK( (5_cl).to_string() == "5");
+    CHECK( (2_lt).to_string() == "2");
+}
+
+struct BaseTestRoot : public Root
+{
+    BaseTestRoot() : Root( "test-root") { }
+};
+
 TEST_CASE("Ports: no write port")
 {
-    auto pm = PortMap::create_port_map();
-    ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    CHECK_THROWS_AS( pm->init(), PortError);
+    struct TestRoot : public BaseTestRoot
+    {
+        TestRoot()
+        {
+            auto input = make_read_port<int>( "Key", PORT_LATENCY);
+            CHECK_THROWS_AS( init_portmap(), PortError);
+        }
+    } tr;
 }
 
 TEST_CASE("Ports: no read port")
 {
-    auto pm = PortMap::create_port_map();
-    WritePort<int> output( pm, "Yek", PORT_BW);
-    CHECK_THROWS_AS( pm->init(), PortError);
+    struct TestRoot : public BaseTestRoot
+    {
+        TestRoot()
+        {
+            auto output = make_write_port<int>( "Yek", PORT_BW);
+            CHECK_THROWS_AS( init_portmap(), PortError);
+        }
+    } tr;
 }
 
 TEST_CASE("Ports: two write ports")
 {
-    auto pm = PortMap::create_port_map();
-    ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<int> output( pm, "Key", PORT_BW);
-    CHECK_THROWS_AS( WritePort<int>( pm, "Key", PORT_BW), PortError);
+    struct TestRoot : public BaseTestRoot
+    {
+        TestRoot()
+        {
+            auto input = make_read_port<int>( "Key", PORT_LATENCY);
+            auto output = make_write_port<int>( "Key", PORT_BW);
+            CHECK_THROWS_AS( make_write_port<int>( "Key", PORT_BW), PortError);
+        }
+    } tr;
 }
 
 TEST_CASE("Ports: type mismatch")
 {
-    auto pm = PortMap::create_port_map();
-    ReadPort<int> input( pm, "Key", PORT_LATENCY);
-    WritePort<std::string> output( pm, "Key", PORT_BW);
-    CHECK_THROWS_AS( pm->init(), PortError);
+    struct TestRoot : public BaseTestRoot
+    {
+        TestRoot()
+        {
+            auto input = make_read_port<int>( "Key", PORT_LATENCY);
+            auto output = make_write_port<std::string>( "Key", PORT_BW);
+            CHECK_THROWS_AS( init_portmap(), PortError);
+        }
+    } tr;
 }
 
-using PairOfPorts = std::pair<std::unique_ptr<ReadPort<int>>, std::unique_ptr<WritePort<int>>>;
-
-static PairOfPorts
-get_pair_of_ports( const std::shared_ptr<PortMap>& pm, uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
+struct PairOfPorts : public BaseTestRoot
 {
-    PairOfPorts pop;
-    pop.first = std::make_unique<ReadPort<int>>( pm, "Key", lat);
-    pop.second = std::make_unique<WritePort<int>>( pm, "Key", bw);
-    pm->init();
-    return pop;
-}
+    std::unique_ptr<ReadPort<int>> rp;
+    std::unique_ptr<WritePort<int>> wp;
+
+    explicit PairOfPorts( uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
+    {
+        rp = make_read_port<int>( "Key", lat);
+        wp = make_write_port<int>( "Key", bw);
+        init_portmap();
+    }
+};
 
 TEST_CASE("Ports: simple transmission")
 {
-    auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
-    wp->write( 11, 0_cl);
-    CHECK( !rp->is_ready( 0_cl));
-    CHECK( rp->is_ready( 1_cl));
-    CHECK( rp->read( 1_cl) == 11);
+    PairOfPorts pop;
+    pop.wp->write( 11, 0_cl);
+    CHECK( !pop.rp->is_ready( 0_cl));
+    CHECK( pop.rp->is_ready( 1_cl));
+    CHECK( pop.rp->read( 1_cl) == 11);
 }
 
 TEST_CASE("Ports: throw if not ready")
 {
-    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
-    wp->write( 1, 0_cl);
-    CHECK_THROWS_AS( rp->read( 0_cl), PortError);
+    PairOfPorts pop;
+    pop.wp->write( 1, 0_cl);
+    CHECK_THROWS_AS( pop.rp->read( 0_cl), PortError);
 }
 
 TEST_CASE("Ports: read once")
 {
-    auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
-    wp->write( 11, 0_cl);
-    rp->read( 1_cl);
-    CHECK( !rp->is_ready( 1_cl));
+    PairOfPorts pop;
+    pop.wp->write( 11, 0_cl);
+    pop.rp->read( 1_cl);
+    CHECK( !pop.rp->is_ready( 1_cl));
 }
 
 TEST_CASE("Ports: overload bandwidth")
 {
-    const auto [rp, wp] = get_pair_of_ports( PortMap::create_port_map());
-    (void)rp;
-    wp->write( 11, 0_cl);
-    CHECK_THROWS_AS( wp->write( 12, 0_cl), PortError);
+    PairOfPorts pop;
+    pop.wp->write( 11, 0_cl);
+    CHECK_THROWS_AS( pop.wp->write( 12, 0_cl), PortError);
 }
 
 TEST_CASE("Ports: sequential read")
 {
-    auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
+    PairOfPorts pop;
 
-    wp->write( 10, 0_cl);
-    wp->write( 11, 1_cl);
-    CHECK( rp->is_ready( 1_cl));
-    CHECK( rp->read( 1_cl) == 10);
-    CHECK( !rp->is_ready( 1_cl));
-    CHECK( rp->read( 2_cl) == 11);
+    pop.wp->write( 10, 0_cl);
+    pop.wp->write( 11, 1_cl);
+    CHECK( pop.rp->is_ready( 1_cl));
+    CHECK( pop.rp->read( 1_cl) == 10);
+    CHECK( !pop.rp->is_ready( 1_cl));
+    CHECK( pop.rp->read( 2_cl) == 11);
 }
 
 TEST_CASE("Ports: non-regular read")
 {
-    auto pm = PortMap::create_port_map();
-    const auto [rp, wp] = get_pair_of_ports( pm);
-    wp->write( 10, 0_cl);
-    wp->write( 11, 1_cl);
-    CHECK( rp->is_ready( 1_cl));
-    CHECK( rp->is_ready( 2_cl));
-    CHECK( rp->read( 2_cl) == 11);
+    PairOfPorts pop;
+
+    pop.wp->write( 10, 0_cl);
+    pop.wp->write( 11, 1_cl);
+    CHECK( pop.rp->is_ready( 1_cl));
+    CHECK( pop.rp->is_ready( 2_cl));
+    CHECK( pop.rp->read( 2_cl) == 11);
+}
+
+struct SomeHiearchy : public BaseTestRoot
+{
+    struct DumpCheckingModule : public Module
+    {
+        bool check_if_dumps() const { return sout.enabled(); }
+        using Module::Module;
+    };
+
+    std::unique_ptr<DumpCheckingModule> a, b, c, d, e, f;
+    explicit SomeHiearchy( const std::string& dump_string)
+    {
+        /* Root
+         * | \
+         * A  D
+         * |  | \
+         * B  E  F
+         * |
+         * C
+         */
+        a = std::make_unique<DumpCheckingModule>( this, "A");
+        b = std::make_unique<DumpCheckingModule>( a.get(), "B");
+        c = std::make_unique<DumpCheckingModule>( b.get(), "C");
+        d = std::make_unique<DumpCheckingModule>( this, "D");
+        e = std::make_unique<DumpCheckingModule>( d.get(), "E");
+        f = std::make_unique<DumpCheckingModule>( d.get(), "F");
+        enable_logging( dump_string);
+    }
+};
+
+TEST_CASE("Module: dump nothing")
+{
+    SomeHiearchy h( "");
+    CHECK_FALSE( h.a->check_if_dumps());
+    CHECK_FALSE( h.b->check_if_dumps());
+    CHECK_FALSE( h.c->check_if_dumps());
+    CHECK_FALSE( h.d->check_if_dumps());
+    CHECK_FALSE( h.e->check_if_dumps());
+    CHECK_FALSE( h.f->check_if_dumps());
+}
+
+TEST_CASE("Module: dump all")
+{
+    SomeHiearchy h( "test-root");
+    CHECK( h.a->check_if_dumps());
+    CHECK( h.b->check_if_dumps());
+    CHECK( h.c->check_if_dumps());
+    CHECK( h.d->check_if_dumps());
+    CHECK( h.e->check_if_dumps());
+    CHECK( h.f->check_if_dumps());
+}
+
+TEST_CASE("Module: dump subtree")
+{
+    SomeHiearchy h( "A");
+    CHECK( h.a->check_if_dumps());
+    CHECK( h.b->check_if_dumps());
+    CHECK( h.c->check_if_dumps());
+    CHECK_FALSE( h.d->check_if_dumps());
+    CHECK_FALSE( h.e->check_if_dumps());
+    CHECK_FALSE( h.f->check_if_dumps());
+}
+
+TEST_CASE("Module: dump subtrees")
+{
+    SomeHiearchy h( "B,E");
+    CHECK_FALSE( h.a->check_if_dumps());
+    CHECK( h.b->check_if_dumps());
+    CHECK( h.c->check_if_dumps());
+    CHECK_FALSE( h.d->check_if_dumps());
+    CHECK( h.e->check_if_dumps());
+    CHECK_FALSE( h.f->check_if_dumps());
 }
