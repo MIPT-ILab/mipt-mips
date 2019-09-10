@@ -4,15 +4,19 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 The project is being developed by a group of students under the guidance of Intel employees.
 Additionally, it is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
+## Computer Architecture
+
 Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building**.
 
-## Computer Architecture
+Date | Event name
+:----: | ----------------------------
+09 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true)
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
-## Software Development (2018/2019)
+## Software Development _2018/2019_
 
 Date | Event name
 :----: | ----------------------------
