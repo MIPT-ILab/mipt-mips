@@ -11,7 +11,8 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 Date | Event name
 :----: | ----------------------------
 09 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true)
-16 Sep | **Layers of Computer Science, ISA and uArch**
+16 Sep | **Layers of Computer Science. ISA and uArch**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx), [audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch%20AUDIO.pptx)
+23 Sep | **Integrated Circuits. CMOS**
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
