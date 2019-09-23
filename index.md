@@ -12,7 +12,8 @@ Date | Event name
 :----: | ----------------------------
 09 Sep | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true)
 16 Sep | **Course introduction**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Course%20Introduction.pptx?raw=true)<br/> **Layers of Computer Science. ISA and uArch**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true), [audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch%20AUDIO.pptx?raw=true)
-23 Sep | **Integrated Circuits. CMOS**
+23 Sep | **Integrated Circuits. CMOS**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L2/Lecture%202%20-%20Integrated%20Circuits.%20CMOS.pptx?raw=true)
+30 Sep | **Combinational and sequential circuits**
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
