@@ -19,7 +19,7 @@ public:
 
     void inc() { value = value + 1_lt; }
 
-    static constexpr const uint8 BYPASSING_STAGES_NUMBER = 5;
+    static constexpr const size_t BYPASSING_STAGES_NUMBER = 5;
 
     void set_to_stage( Latency v) { value = v; }
     void set_to_first_execution_stage() { set_to_stage( 0_lt); 
@@ -41,7 +41,7 @@ public:
     auto get_bypass_direction_value() const{ return bypass_direction; }
 
 private:
-    uint8 bypass_direction = 0;
+    size_t bypass_direction = 0;
     Latency value = IN_RF_STAGE;
     
     // EXECUTE_0  - 0                              | Bypassing stage
@@ -68,16 +68,11 @@ public:
     { }
 
     // returns an index of the port where bypassed data should be get from
-    auto get_bypass_direction() const
+    size_t get_bypass_direction() const
     {
-        uint8 bypass_direction = 0;
-
         if ( bypassing_stage.is_same_stage( last_execution_stage))
-            bypass_direction = 1;
-        else 
-            bypass_direction = bypassing_stage.get_bypass_direction_value();
-        
-        return bypass_direction;
+            return 1;
+        return bypassing_stage.get_bypass_direction_value();
     }
 
 private:

@@ -12,7 +12,7 @@
 #include "../memory.h"
 #include "check_coherency.h"
 
-static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
+static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
 static const uint64 dataSectAddrShifted = 0x100c0;
@@ -23,7 +23,7 @@ static const uint64 dataSectAddrShifted = 0x100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( )); // check memory initialization with default parameters
+    CHECK_NOTHROW( FuncMemory::create_default_hierarchied_memory( )); // check memory initialization with default parameters
     CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
@@ -32,7 +32,7 @@ TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
-    auto ptr = FuncMemory::create_hierarchied_memory();
+    auto ptr = FuncMemory::create_default_hierarchied_memory();
     CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
@@ -50,7 +50,19 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the ".text" section*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the "__start" label*/);
+}
+
+TEST_CASE( "Func_memory: StartPC Invalid")
+{
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/nop.bin").get_startPC(), InvalidEntryPoint);
+}
+
+TEST_CASE( "Func_memory: Bad section")
+{
+    auto ptr = FuncMemory::create_default_hierarchied_memory();
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/empty.bin").load_to( ptr.get()), InvalidElfSection);
+    CHECK_THROWS_AS( ElfLoader( TEST_PATH "/empty.bin").get_startPC(), InvalidEntryPoint);
 }
 
 TEST_CASE( "Plain memory: out of range")
@@ -75,7 +87,7 @@ TEST_CASE( "Hierarchied memory: out of range")
 
 TEST_CASE( "Func_memory: Read_Method_Test")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // read 4 bytes from the func_mem start addr
@@ -101,7 +113,7 @@ TEST_CASE( "Func_memory: Read_Method_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // write 1 into the byte pointed by dataSectAddr
@@ -122,7 +134,7 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     uint64 write_addr = 0x3FFFFE;
@@ -141,7 +153,7 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
     // Single byte
     const Byte write_data_1{ 0xA5};
@@ -158,7 +170,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
     // 8 bytes
     const constexpr size_t size = 8;
@@ -180,7 +192,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
     // 1 KByte
     const  constexpr size_t size = 1024;
@@ -202,7 +214,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
 TEST_CASE( "Func_memory: Dump")
 {
-    auto func_mem = FuncMemory::create_hierarchied_memory();
+    auto func_mem = FuncMemory::create_default_hierarchied_memory();
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     CHECK( func_mem->dump() ==
@@ -236,10 +248,10 @@ TEST_CASE( "Func_memory: Dump")
 
 TEST_CASE( "Func_memory: Duplicate")
 {
-    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem1 = FuncMemory::create_default_hierarchied_memory();
     auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());
@@ -248,10 +260,10 @@ TEST_CASE( "Func_memory: Duplicate")
 
 TEST_CASE( "Func_memory: Plain Memory")
 {
-    auto mem1 = FuncMemory::create_hierarchied_memory();
+    auto mem1 = FuncMemory::create_default_hierarchied_memory();
     auto mem2 = FuncMemory::create_plain_memory( 24);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());
@@ -261,9 +273,9 @@ TEST_CASE( "Func_memory: Plain Memory")
 TEST_CASE( "Func_memory: Duplicate Plain Memory")
 {
     auto mem1 = FuncMemory::create_plain_memory( 24);
-    auto mem2 = FuncMemory::create_hierarchied_memory();
+    auto mem2 = FuncMemory::create_default_hierarchied_memory();
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( mem1.get());
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
 
     CHECK( mem1->dump() == mem2->dump());
@@ -291,7 +303,7 @@ TEST_CASE( "Func_memory: String length, no zero bytes")
 TEST_CASE( "Func_memory: String length")
 {
     const std::string hw("Hello World!");
-    auto mem = FuncMemory::create_hierarchied_memory( 24);
+    auto mem = FuncMemory::create_default_hierarchied_memory();
     mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
     CHECK( mem->strlen( 0x10) == 12);
     CHECK( mem->strlen( 0x12) == 10);
@@ -301,24 +313,30 @@ TEST_CASE( "Func_memory: String length")
     CHECK( mem->read_string_limited( 0x10, 5) == "Hello");
 }
 
+TEST_CASE( "Func_memory: String length, empty memory")
+{
+    auto mem = FuncMemory::create_default_hierarchied_memory();
+    CHECK( mem->strlen( 0x10) == 0);
+}
+
 TEST_CASE( "Func_memory: String length, plain memory")
 {
     const std::string hw("Hello World!");
-    auto mem = FuncMemory::create_plain_memory();
+    auto mem = FuncMemory::create_4M_plain_memory();
     mem->memcpy_host_to_guest( 0x10, byte_cast( hw.c_str()), hw.size());
     CHECK( mem->strlen( 0x10) == 12);
 }
 
 TEST_CASE( "Func_memory: Write string")
 {
-    auto mem = FuncMemory::create_plain_memory();
+    auto mem = FuncMemory::create_4M_plain_memory();
     mem->write_string( "MIPT-MIPS is cool", 0x20); 
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS is cool");
 }
 
 TEST_CASE( "Func_memory: Write string limited")
 {
-    auto mem = FuncMemory::create_plain_memory();
+    auto mem = FuncMemory::create_4M_plain_memory();
     mem->write_string_limited( "MIPT-MIPS is cool", 0x20, 9);
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
 }
@@ -337,6 +355,24 @@ TEST_CASE( "Func_memory: Write to 0")
         uint64 get_v_dst() const { return 0; }
         void load(uint64 /* unused */) { }
     } store;
-    auto mem = FuncMemory::create_plain_memory();
+    auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);
+}
+
+TEST_CASE( "Func_memory Replicant: read and write")
+{
+    auto mem1 = FuncMemory::create_4M_plain_memory();
+    auto mem2 = FuncMemory::create_4M_plain_memory();
+    auto mem3 = FuncMemory::create_4M_plain_memory();
+    FuncMemoryReplicant mem12( mem1);
+    mem12.add_replica( mem2);
+
+    mem12.write_string( "Hello World", 0x20);
+    CHECK( mem1->read_string( 0x20) == "Hello World");
+    CHECK( mem2->read_string( 0x20) == "Hello World");
+    CHECK( mem12.read_string( 0x20) == "Hello World");
+
+    mem12.duplicate_to( mem3);
+    CHECK( mem3->read_string( 0x20) == "Hello World");
+    CHECK( mem12.dump() == mem1->dump());
 }

@@ -12,18 +12,17 @@
 #include "mips_version.h"
 
 #include <func_sim/operation.h>
-#include <func_sim/trap_types.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
-#include <infra/string_view.h>
 #include <infra/types.h>
 
 #include <sstream>
+#include <string_view>
 
 template<typename I>
 struct MIPSTableEntry;
 
-template <typename Key, typename Value, size_t CAPACITY>
+template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY, Key DELETED_KEY>
 class InstrCache;
 
 template<typename R>
@@ -62,7 +61,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         }
     private:
         using MyDatapath = typename BaseInstruction<R, MIPSRegister>::MyDatapath;
-        using DisasmCache = InstrCache<uint32, std::string, 8192>;
+        using DisasmCache = InstrCache<uint32, std::string, 8192, all_ones<uint32>(), all_ones<uint32>() - 1>;
 
         const uint32 raw;
         const bool raw_valid = false;

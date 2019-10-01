@@ -13,7 +13,7 @@
 // Mock CEN64 with our casual FuncMemory implementation
 struct bus_controller
 {
-    bus_controller() : memory( FuncMemory::create_hierarchied_memory()) {}
+    bus_controller() : memory( FuncMemory::create_default_hierarchied_memory()) {}
     const std::shared_ptr<FuncMemory> memory;
 };
 
@@ -53,7 +53,7 @@ TEST_CASE( "CEN64Memory: unsupported" )
     bus_controller bus;
     auto cen64_memory = create_cen64_memory(&bus);
     CHECK_THROWS_AS( cen64_memory->dump(), CEN64MemoryUnsupportedInterface);
-    CHECK_THROWS_AS( cen64_memory->duplicate_to( FuncMemory::create_plain_memory()), CEN64MemoryUnsupportedInterface);
+    CHECK_THROWS_AS( cen64_memory->duplicate_to( FuncMemory::create_4M_plain_memory()), CEN64MemoryUnsupportedInterface);
     CHECK_THROWS_AS( cen64_memory->strlen( 0x0), CEN64MemoryUnsupportedInterface);
 }
 
@@ -75,14 +75,14 @@ TEST_CASE( "CEN64Memory: write byte" )
 
 TEST_CASE( "CEN64Memory" )
 {
-    static const std::string valid_elf_file = TEST_DATA_PATH "mips_bin_exmpl.out";
+    static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
     static const uint64 dataSectAddr = 0x4100c0;
 
-    auto golden_memory = FuncMemory::create_hierarchied_memory();
+    auto golden_memory = FuncMemory::create_default_hierarchied_memory();
     bus_controller bus;
     auto cen64_memory = create_cen64_memory(&bus);
 
-    ElfLoader( valid_elf_file, -0x400000).load_to( golden_memory.get());
+    ElfLoader( valid_elf_file).load_to( golden_memory.get(), -0x400000);
     golden_memory->duplicate_to( bus.memory);
     
     check_coherency( golden_memory.get(), cen64_memory.get(), dataSectAddr - 0x400000);

@@ -61,7 +61,7 @@ public:
         get_value( num) |= val & mask; // Set new bits
     }
 
-    inline void read_source( FuncInstr* instr, uint8 index) const
+    inline void read_source( FuncInstr* instr, size_t index) const
     {
         instr->set_v_src( read( instr->get_src_num( index)), index);
     }

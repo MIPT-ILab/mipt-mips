@@ -20,6 +20,19 @@ struct InvalidElfFile final : Exception
     { }
 };
 
+struct InvalidEntryPoint final : Exception
+{
+    explicit InvalidEntryPoint()
+        : Exception("No _start or __start label found")
+    { }
+};
+
+struct InvalidElfSection : Exception
+{
+    explicit InvalidElfSection(const std::string& section_name) :
+        Exception("Malformed ELF section", section_name) { }
+};
+
 class WriteableMemory;
 
 namespace ELFIO {
@@ -29,7 +42,7 @@ namespace ELFIO {
 class ElfLoader
 {
 public:
-    explicit ElfLoader( const std::string& filename, AddrDiff offset = 0);
+    explicit ElfLoader( const std::string& filename);
     ~ElfLoader();
 
     // Regardless of 'const std::unique_ptr', we delete everything explicitly
@@ -38,11 +51,11 @@ public:
     ElfLoader& operator=( const ElfLoader&) = delete;
     ElfLoader& operator=( ElfLoader&&) = delete;
 
-    void load_to( WriteableMemory *memory) const;
+    void load_to( WriteableMemory *memory, AddrDiff offset = 0) const;
     Addr get_startPC() const;
+    Addr get_text_section_addr() const;
 private:
     const std::unique_ptr<ELFIO::elfio> reader;
-    AddrDiff offset;
 };
    
 #endif

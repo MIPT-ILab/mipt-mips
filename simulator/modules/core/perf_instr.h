@@ -39,7 +39,7 @@ public:
     }
 
     
-    BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_taken(), this->get_new_PC()); }
+    BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_taken(), this->get_new_PC(), true); }
 
     bool is_bypassible() const { return !this->is_conditional_move() &&
                                         !this->is_partial_load()     &&

@@ -10,9 +10,10 @@
 #include <infra/argv.h>
 #include <infra/endian.h>
 #include <infra/exception.h>
-#include <infra/macro.h>
 #include <infra/log.h>
+#include <infra/macro.h>
 
+#include <cctype>
 #include <memory>
 #include <sstream>
 
@@ -134,14 +135,14 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data()) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data()) == 0x7856);
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
 
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
     std::array<Byte, 2> res{};
-    put_value_to_pointer<uint16, e>( res.data(), 0x3456);
+    put_value_to_pointer<uint16, e>( res.data(), 0x3456, 2);
     return res;
 }
 
@@ -192,14 +193,19 @@ TEST_CASE("Exception")
 TEST_CASE("Logging enabled")
 {
     std::ostringstream oss;
-    LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str() == "Hello World! 14\n" );
 }
 
 TEST_CASE("Logging disabled")
 {
     std::ostringstream oss;
-    LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls.disable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str().empty() );
 }
 
@@ -213,6 +219,13 @@ static std::string uint128_to_hex_string(uint128 number)
 {
     std::ostringstream out;
     out << std::hex << std::uppercase << number;
+    return out.str();
+}
+
+static std::string uint128_to_hex_showbase_string(uint128 number)
+{
+    std::ostringstream out;
+    out << std::showbase << std::hex << std::uppercase << number;
     return out.str();
 }
 
@@ -230,10 +243,18 @@ static std::string uint128_to_oct_string(uint128 number)
      return out.str();
 }
 
+static std::string str_toupper(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), 
+                   [](unsigned char c){ return std::toupper(c); }
+                  );
+    return s;
+}
+
 TEST_CASE("Test uint128 decimal printing")
 {
     CHECK( uint128_to_dec_string( 1) == "1");
     CHECK( uint128_to_dec_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "18446744073709551616");
+    CHECK( uint128_to_dec_string( uint128{ 10'000'000'000'000'000'000ULL} * 2) == "20000000000000000000");
     CHECK( uint128_to_dec_string( all_ones<uint128>()) == "340282366920938463463374607431768211455");
 }
 
@@ -243,6 +264,8 @@ TEST_CASE("Test uint128 hexadecimal printing")
     CHECK( uint128_to_hex_string( 0xABCDEF) == "ABCDEF");
     CHECK( uint128_to_hex_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "10000000000000000");
     CHECK( uint128_to_hex_string( all_ones<uint128>()) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+    // Boost bug: https://github.com/boostorg/multiprecision/issues/129
+    CHECK( str_toupper( uint128_to_hex_showbase_string( all_ones<uint128>())) == "0XFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 }
 
 TEST_CASE("Test uint128 octal printing")

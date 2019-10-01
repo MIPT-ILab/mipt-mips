@@ -6,64 +6,50 @@
 
 #include "branch.h"
 
-static constexpr const uint32 FLUSHED_STAGES_NUM = 4;
-
 template <typename FuncInstr>
-Branch<FuncInstr>::Branch( bool log) : Log( log)
+Branch<FuncInstr>::Branch( Module* parent) : Module( parent, "branch")
 {
-    wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW, FLUSHED_STAGES_NUM);
+    wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW);
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
-    wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW, PORT_FANOUT);
-    wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW, PORT_FANOUT);
+    wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", PORT_BW);
+    wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", PORT_BW);
 
     rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", PORT_LATENCY);
-    wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , PORT_BW , PORT_FANOUT);    
+    wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , PORT_BW );    
 
-    wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_BW, SRC_REGISTERS_NUM);
+    wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_BW);
 
-    wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", 
-                                                                PORT_BW, PORT_FANOUT);
+    wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", PORT_BW);
 }
 
 template <typename FuncInstr>
 void Branch<FuncInstr>::clock( Cycle cycle)
 {
-    /* check if there is something to process */
     if ( !rp_datapath->is_ready( cycle))
-    {
         return;
-    }
 
-    /* receieve flush signal */
-    const bool is_flush = rp_flush->is_ready( cycle) && rp_flush->read( cycle);
+    const bool is_flush = ( rp_flush->is_ready( cycle) && rp_flush->read( cycle))
+                       || ( rp_trap->is_ready( cycle) && rp_trap->read( cycle));
 
-    /* branch misprediction */
     if ( is_flush)
-    {
         return;
-    }
 
     sout << "branch  cycle " << std::dec << cycle << ": ";
     auto instr = rp_datapath->read( cycle);
 
     /* acquiring real information for BPU */
     wp_bp_update->write( instr.get_bp_upd(), cycle);
-     
-    bool is_misprediction = false;
 
-    if ( instr.is_branch() || instr.is_indirect_jump())
-    {
-        num_branches++;
-        is_misprediction =  instr.get_bp_data().is_taken != instr.is_taken();
-        if ( instr.is_taken())
-            is_misprediction |= instr.get_bp_data().target != instr.get_new_PC();
-    }
+    if ( instr.is_jump())
+        num_jumps++;
 
     /* handle misprediction */
-    if ( is_misprediction )
+    if ( is_misprediction( instr, instr.get_bp_data()))
     {
         num_mispredictions++;
+
         /* flushing the pipeline */
         wp_flush_all->write( true, cycle);
           

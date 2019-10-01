@@ -5,15 +5,19 @@
  */
 
 #include "../kernel.h"
-// Catch2
 #include <catch.hpp>
 
 TEST_CASE( "Kernel: Execute nothing")
 {
-    CHECK( Kernel::create_dummy_kernel()->execute().type == SyscallResult::IGNORED);
+    CHECK( Kernel::create_dummy_kernel()->execute() == Trap::SYSCALL);
+    CHECK( Kernel::create_configured_kernel()->execute() == Trap::SYSCALL);
 }
 
-TEST_CASE( "Kernel: Default kernel is empty")
+TEST_CASE( "Kernel: Dummy kernel")
 {
-    CHECK( Kernel::create_configured_kernel()->execute().type == SyscallResult::IGNORED);
+    auto k =  Kernel::create_dummy_kernel();
+    CHECK_NOTHROW( k->set_simulator( nullptr));
+    CHECK_NOTHROW( k->connect_memory( nullptr));
+    CHECK_NOTHROW( k->add_replica_simulator( nullptr));
+    CHECK_NOTHROW( k->add_replica_memory( nullptr));
 }

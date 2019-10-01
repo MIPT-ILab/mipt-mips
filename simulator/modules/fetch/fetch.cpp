@@ -9,33 +9,34 @@
 
 namespace config {
     /* Cache parameters */
+    static Value<std::string> instruction_cache_type = { "icache-type", "LRU", "Type of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_size = { "icache-size", 2048, "Size of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_ways = { "icache-ways", 4, "Amount of ways in instruction level 1 cache"};
     static Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
 template <typename FuncInstr>
-Fetch<FuncInstr>::Fetch(bool log) : Log( log)
+Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
 {
-    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW, PORT_FANOUT);
+    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
 
     rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", PORT_LATENCY);
 
-    wp_target = make_write_port<Target>("TARGET", PORT_BW, PORT_FANOUT);
+    wp_target = make_write_port<Target>("TARGET", PORT_BW);
     rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
 
-    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW, PORT_FANOUT);
+    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW);
     rp_hold_pc = make_read_port<Target>("HOLD_PC", PORT_LATENCY);
 
-    rp_external_target = make_read_port<Target>("CORE_2_FETCH_TARGET", PORT_LATENCY);
+    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_LATENCY);
 
     rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
 
-    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW, PORT_FANOUT);
+    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW);
     rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
 
-    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW, PORT_FANOUT);
+    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW);
     rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
 
     /* port needed for handling misprediction at decode stage */
@@ -43,9 +44,13 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
 
     bp = BaseBP::create_configured_bp();
-    tags = std::make_unique<CacheTagArray>( config::instruction_cache_size,
-                                            config::instruction_cache_ways,
-                                            config::instruction_cache_line_size);
+    tags = CacheTagArray::create(
+        config::instruction_cache_type,
+        config::instruction_cache_size,
+        config::instruction_cache_ways,
+        config::instruction_cache_line_size,
+        32
+    );
 }
 
 template <typename FuncInstr>
@@ -87,7 +92,7 @@ void Fetch<FuncInstr>::clock_bp( Cycle cycle)
     /* Process BP updates */
     if ( rp_bp_update->is_ready( cycle))
         bp->update( rp_bp_update->read( cycle));
-    else if ( rp_bp_update_from_decode->is_ready( cycle))
+    if ( rp_bp_update_from_decode->is_ready( cycle))
         bp->update( rp_bp_update_from_decode->read(cycle));
 }
 
@@ -119,6 +124,8 @@ void Fetch<FuncInstr>::save_flush( Cycle cycle)
         wp_target->write( rp_flush_target_from_decode->read( cycle), cycle);
     else if( rp_target->is_ready( cycle))
         wp_target->write( rp_target->read( cycle), cycle);
+    else if( rp_external_target->is_ready( cycle))
+        wp_target->write( rp_external_target->read( cycle), cycle);
 }
 
 template <typename FuncInstr>

@@ -44,7 +44,7 @@ public:
     
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
-        if constexpr (std::is_same_v<T, bool>)
+        if constexpr (std::is_same<T, bool>())
             out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(bugprone-suspicious-semicolon)
         else
             out << std::dec << rhs.value;
@@ -92,7 +92,7 @@ struct HelpOption : Exception
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-void handleArgs( int argc, const char* const argv[], int start_index = 1);
+void handleArgs( int argc, const char* const argv[], int start_index);
 
 } // namespace config
 

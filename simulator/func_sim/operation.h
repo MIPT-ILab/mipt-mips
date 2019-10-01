@@ -7,11 +7,13 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <func_sim/trap_types.h>
-#include <infra/string_view.h>
+#include <func_sim/traps/trap.h>
+#include <infra/macro.h>
 #include <infra/types.h>
 
+#include <cassert>
 #include <sstream>
+#include <string_view>
 
 enum OperationType : uint8
 {
@@ -24,6 +26,7 @@ enum OperationType : uint8
     OUT_BREAK,
     OUT_R_SUBTR,
     OUT_BRANCH,
+    OUT_BRANCH_LIKELY,
     OUT_TRAP,
     OUT_LOAD,
     OUT_LOADU,
@@ -39,7 +42,7 @@ enum class Imm : uint8
 {
     NO, SHIFT,
     LOGIC, ARITH, TRAP, ADDR,
-    JUMP
+    JUMP, JUMP_RELATIVE
 };
 
 template<typename T>
@@ -48,13 +51,14 @@ std::string print_immediate( Imm type, T value)
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:  oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
-    case Imm::LOGIC: oss << ", 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP:  oss <<  " 0x" << std::hex << value << std::dec; break;
-    case Imm::TRAP:  oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
-    case Imm::ARITH: oss << ", "   << std::dec << narrow_cast<int16>(value); break;
-    case Imm::SHIFT: oss << ", "   << std::dec << value; break;
-    case Imm::NO:    break;
+    case Imm::ADDR:          oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
+    case Imm::LOGIC:         oss << ", 0x" << std::hex << value << std::dec; break;
+    case Imm::JUMP:          oss <<  " 0x" << std::hex << value << std::dec; break;
+    case Imm::JUMP_RELATIVE: oss <<    " " << std::dec << narrow_cast<int16>(value); break;
+    case Imm::TRAP:          oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
+    case Imm::ARITH:         oss << ", "   << std::dec << narrow_cast<int16>(value); break;
+    case Imm::SHIFT:         oss << ", "   << std::dec << value; break;
+    case Imm::NO:            break;
     }
     return oss.str();
 }
@@ -62,18 +66,25 @@ std::string print_immediate( Imm type, T value)
 class Operation
 {
 public:
+    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
+
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
 	//target is known at ID stage but if branch is taken or not is known only at EXE stage
-	bool is_branch() const { return operation == OUT_BRANCH; }
+	bool is_common_branch() const { return operation == OUT_BRANCH; }
+
+	//target is known at ID stage; likely to be taken
+    bool is_likely_branch() const { return operation == OUT_BRANCH_LIKELY; }
+
+    bool is_branch() const { return is_common_branch() || is_likely_branch(); }
 
 	// target is known only at EXE stage
 	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
-	bool is_jump() const { return this->is_direct_jump()     ||
-				      this->is_branch()   ||
-				      this->is_indirect_jump(); }
+	bool is_jump() const { return this->is_direct_jump()
+	                           || this->is_branch()
+	                           || this->is_indirect_jump(); }
 
     bool is_taken() const
     {
@@ -100,8 +111,8 @@ public:
     bool is_divmult() const { return operation == OUT_DIVMULT || get_accumulation_type() != 0; }
 
     bool is_explicit_trap() const { return operation == OUT_TRAP; }
-    bool is_syscall() const { return operation == OUT_SYSCALL; }
     bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+    void set_trap( Trap value) { trap = value; }
     bool is_store() const { return operation == OUT_STORE; }
 
     auto get_mem_addr() const { return mem_addr; }
@@ -116,8 +127,6 @@ public:
     auto get_new_PC() const { return new_PC; }
 
 protected:
-    Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
-
     std::string_view opname = {};
     OperationType operation = OUT_UNKNOWN;
     Trap trap = Trap(Trap::NO_TRAP);
@@ -154,7 +163,7 @@ public:
     using RegisterUInt = T;
     using RegisterSInt = sign_t<RegisterUInt>;
 
-    void set_v_src( const T& value, uint8 index)
+    void set_v_src( const T& value, size_t index)
     {
         if ( index == 0)
             v_src1 = value;
@@ -198,10 +207,12 @@ void Datapath<T>::load( const T& value)
     {
         switch ( get_mem_size())
         {
+            case 0: break; // e.g. fences
             case 1: v_dst = sign_extension<8>( value); break;
             case 2: v_dst = sign_extension<16>( value); break;
             case 4: v_dst = sign_extension<32>( value); break;
             case 8: v_dst = sign_extension<64>( value); break;
+            case 16: v_dst = sign_extension<128>( value); break;
             default: assert( false);
         }
     }
@@ -222,7 +233,7 @@ public:
     using MyDatapath = Datapath<T>;
     using Register = R;
     using RegisterUInt = T;
-    R get_src_num( uint8 index) const { return ( index == 0) ? src1 : src2; }
+    R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }
 
@@ -297,7 +308,7 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     }
     out << " ]";
     if ( this->trap != Trap::NO_TRAP)
-        out << "\t trap";
+        out << "\t " << this->trap;
 
     out << std::dec;
     return out;

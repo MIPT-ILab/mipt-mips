@@ -7,11 +7,10 @@
 #ifndef ALU_H
 #define ALU_H
 
-#include "trap_types.h"
 #include "multiplication.h"
+#include "traps/trap.h"
 
 #include <infra/macro.h>
-
 #include <tuple>
 
 template<size_t N, typename T>
@@ -45,8 +44,8 @@ struct ALU
     template<typename I> static
     void load_addr_aligned( I* instr) {
         load_addr( instr);
-        if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+        if ( instr->mem_addr % instr->mem_size != 0)
+            instr->trap = Trap::UNALIGNED_LOAD;
     }
 
     template<typename I> static
@@ -83,8 +82,8 @@ struct ALU
     template<typename I> static
     void store_addr_aligned( I* instr) {
         store_addr( instr);
-        if ( instr->mem_addr % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+        if ( instr->mem_addr % instr->mem_size != 0)
+            instr->trap = Trap::UNALIGNED_STORE;
     }
 
     template<typename I> static
@@ -155,9 +154,11 @@ struct ALU
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
-        subtraction<I, T>( instr);
-//      if ( sub_overflow( x, y))
-//          instr->trap = Trap::INTEGER_OVERFLOW;
+        auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
+        if (ret.second)
+            instr->trap = Trap::INTEGER_OVERFLOW;
+        else
+            instr->v_dst = ret.first;
     }
 
     // RISCV mul/div
@@ -169,8 +170,19 @@ struct ALU
     template<typename I, typename T> static void riscv_rem( I* instr) { instr->v_dst = riscv_remainder <T>(instr->v_src1, instr->v_src2); }
 
     // MIPS mul/div
-    template<typename I, typename T> static void multiplication( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_multiplication<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void division( I* instr) { std::tie(instr->v_dst, instr->v_dst2) = mips_division<T>(instr->v_src1, instr->v_src2); }
+    template<typename I, typename T> static void multiplication( I* instr)
+    {
+        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
+
+    template<typename I, typename T> static void division( I* instr)
+    {
+        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
+        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
+        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+    }
 
     // Shifts
     template<typename I, typename T> static void sll( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) << shamt_imm( instr)); }
@@ -213,9 +225,6 @@ struct ALU
             instr->new_PC = instr->get_decoded_target();
             check_halt_trap( instr);
         }
-        else {
-            instr->new_PC = instr->PC + 4 * (1 + instr->get_delayed_slots());
-        }
     }
 
     template<typename I> static
@@ -232,14 +241,14 @@ struct ALU
     template<typename I> static
     void jr( I* instr) {
         if (instr->v_src1 % 4 != 0)
-            instr->trap = Trap::UNALIGNED_ADDRESS;
+            instr->trap = Trap::UNALIGNED_FETCH;
         jump( instr, align_up<2>(instr->v_src1));
     }
 
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots()); // link
+        instr->v_dst = instr->new_PC; // link
         j( instr);   // jump
     }
 
@@ -247,7 +256,7 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst = instr->PC + 4 * (1 + instr->get_delayed_slots());
+        instr->v_dst = instr->new_PC;
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
@@ -255,8 +264,17 @@ struct ALU
         }
     }
 
+    template<typename I> static
+    void eret( I* instr)
+    {
+        // FIXME(pikryukov): That should behave differently for ErrorEPC
+        jump( instr, instr->v_src1);
+        instr->v_dst &= instr->v_src2 & ~(1 << 2);
+    }
+
     // Traps
     template<typename I> static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
+    template<typename I> static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
     template<typename I> static void halt( I* instr)   { instr->trap = Trap::HALT; }
     template<typename I, Predicate<I> p> static void trap( I* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
     template<typename I> static void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }

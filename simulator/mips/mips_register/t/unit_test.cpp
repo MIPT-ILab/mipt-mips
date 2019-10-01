@@ -39,6 +39,7 @@ TEST_CASE( "MIPS_registers: GDB_ID_converter")
     CHECK( MIPSRegister::from_gdb_index(34) == MIPSRegister::mips_hi());
     CHECK( MIPSRegister::from_gdb_index(35) == MIPSRegister::from_cp0_index( 8));  // BadVAddr
     CHECK( MIPSRegister::from_gdb_index(36) == MIPSRegister::cause());
+    CHECK( MIPSRegister::from_gdb_index(1000) == MIPSRegister::zero());
 }
 
 TEST_CASE( "MIPS_registers: CP1_ID_converter")
@@ -116,4 +117,11 @@ TEST_CASE( "MIPS_registers: no csr register")
 {
     auto reg = MIPSRegister::from_csr_name( "balalaika");
     CHECK( reg.is_zero());
+}
+
+TEST_CASE( "MIPS_registers: CP0 registers")
+{
+    CHECK( MIPSRegister::cause().dump() == "Cause");
+    CHECK( MIPSRegister::epc().dump() == "EPC");
+    CHECK( MIPSRegister::status().dump() == "SR");
 }

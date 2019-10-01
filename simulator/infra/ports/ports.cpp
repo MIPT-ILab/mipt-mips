@@ -12,23 +12,6 @@ std::shared_ptr<PortMap> PortMap::create_port_map()
     return std::make_shared<PortMapHack>();
 }
 
-std::shared_ptr<PortMap> PortMap::instance = nullptr;
-
-std::shared_ptr<PortMap> PortMap::get_instance()
-{
-    if ( instance == nullptr)
-        reset_instance();
-
-    return instance;
-}
-
-void PortMap::reset_instance()
-{
-    instance = create_port_map();
-}
-
-PortMap::PortMap() noexcept : Log( false) { }
-
 void PortMap::init() const
 {
     for ( const auto& cluster : map)
@@ -56,7 +39,7 @@ void PortMap::add_port( BasicReadPort* port)
 }
 
 Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
-    : Log( false), pm( std::move( port_map)), k( std::move( key))
+    : pm( std::move( port_map)), k( std::move( key))
 { }
 
 BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const std::string& key, Latency latency)
@@ -65,8 +48,8 @@ BasicReadPort::BasicReadPort( const std::shared_ptr<PortMap>& port_map, const st
     get_port_map()->add_port( this);
 }
 
-BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout) :
-    Port( port_map, key), _fanout(fanout), installed_bandwidth(bandwidth)
+BasicWritePort::BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth) :
+    Port( port_map, key), installed_bandwidth(bandwidth)
 {
     get_port_map()->add_port( this);
 }
@@ -75,10 +58,7 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
 {
     if ( readers.empty())
         throw PortError( get_key() + " has no ReadPorts");
-    if ( readers.size() > _fanout)
-        throw PortError( get_key() + " WritePort is overloaded by fanout");
-    if ( readers.size() != _fanout)
-        throw PortError( get_key() + " WritePort is underloaded by fanout");
+    _fanout = readers.size();
 
     initialized_bandwidth = installed_bandwidth;
 }

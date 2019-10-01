@@ -74,8 +74,8 @@ static constexpr inline auto unpack_array( T value) noexcept
 {
     if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
         return unpack_array_le<T>( value);
-
-    return unpack_array_be<T>( value);
+    else
+        return unpack_array_be<T>( value);
 }
 
 template<typename T, Endian e>
@@ -83,8 +83,8 @@ static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array) n
 {
     if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
         return pack_array_le<T>( array);
-
-    return pack_array_be<T>( array);
+    else
+        return pack_array_be<T>( array);
 }
 
 template<typename T>
@@ -94,14 +94,14 @@ static inline constexpr T swap_endian( T value) noexcept
 }
 
 template<typename T, Endian e>
-static inline void constexpr put_value_to_pointer( Byte* buf, T value, size_t size = bytewidth<T>) {
+static inline void constexpr put_value_to_pointer( Byte* buf, T value, size_t size) {
     auto array = unpack_array<T, e>(value);
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         *(buf + i) = array[i];
 }
 
 template<typename T, Endian e>
-static inline constexpr T get_value_from_pointer( const Byte* buf, size_t size = bytewidth<T>) {
+static inline constexpr T get_value_from_pointer( const Byte* buf, size_t size) {
     std::array<Byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         array[i] = *( buf + i);

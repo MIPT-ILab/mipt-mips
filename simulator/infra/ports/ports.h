@@ -27,19 +27,14 @@ struct PortError final : Exception {
 
 class PortMap : public Log
 {
-public:
-    static std::shared_ptr<PortMap> create_port_map();
-
-    static std::shared_ptr<PortMap> get_instance();
-    static void reset_instance();
-
-    void init() const;
-
 private:
-    PortMap() noexcept;
+    static std::shared_ptr<PortMap> create_port_map();
+    void init() const;
 
     friend class BasicWritePort;
     friend class BasicReadPort;
+    friend class Root;
+
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
 
@@ -50,17 +45,17 @@ private:
     };
 
     std::unordered_map<std::string, Cluster> map = { };
-    static std::shared_ptr<PortMap> instance;
 };
 
 class Port : public Log
 {
 public:
     const std::string& get_key() const noexcept { return k; }
-    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
 
 protected:
     Port( std::shared_ptr<PortMap> port_map, std::string key);
+    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
+
     Cycle get_last_cycle() const noexcept { return last_cycle; }
     void update_last_cycle( Cycle cycle) noexcept
     {
@@ -95,7 +90,7 @@ public:
     auto get_bandwidth() const noexcept { return initialized_bandwidth; }
 
 protected:
-    BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout);
+    BasicWritePort( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth);
     void base_init( const std::vector<BasicReadPort*>& readers);
 
     void increment_write_counter( Cycle cycle)
@@ -112,8 +107,8 @@ private:
 
     uint32 write_counter = 0;
     uint32 initialized_bandwidth = 0;
-
-    const uint32 _fanout = 0;
+    std::size_t _fanout = 0;
+    
     const uint32 installed_bandwidth = 0;
 };
 
@@ -122,8 +117,8 @@ template<class T> class ReadPort;
 template<class T> class WritePort : public BasicWritePort
 {
 public:
-    WritePort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth, uint32 fanout)
-        : BasicWritePort( port_map, key, bandwidth, fanout)
+    WritePort<T>( const std::shared_ptr<PortMap>& port_map, const std::string& key, uint32 bandwidth)
+        : BasicWritePort( port_map, key, bandwidth)
     { }
 
     void write( T&& what, Cycle cycle)

@@ -9,6 +9,13 @@
 
 #include "mips_instr.h"
 
+#include <memory>
+
+class Driver;
+class Simulator;
+
+std::unique_ptr<Driver> create_mips32_driver( Simulator* sim);
+
 template<MIPSVersion version>
 struct MIPS
 {
@@ -17,6 +24,9 @@ struct MIPS
     using FuncInstr = BaseMIPSInstr<RegisterUInt>;
     static auto create_instr( uint32 bytes, Endian endian, Addr PC) {
         return FuncInstr( version, endian, bytes, PC);
+    }
+    static auto create_driver( Simulator* sim) {
+        return create_mips32_driver( sim);
     }
 };
 

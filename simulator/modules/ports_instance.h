@@ -7,7 +7,7 @@
 #ifndef PORT_INSTANCE_H
 #define PORT_INSTANCE_H
 
-#include <infra/ports/ports.h>
+#include <infra/ports/module.h>
 
 /*
  * Let's describe the black magic occuring here. The problem of Port
@@ -48,17 +48,5 @@ template<typename T> class BypassCommand;
     extern template class WritePort<x>;
 #include "ports_instance.def"
 #undef PORT_TOKEN
-
-template<typename T>
-auto make_write_port( std::string key, uint32 bandwidth, uint32 fanout) 
-{
-    return std::make_unique<WritePort<T>>( PortMap::get_instance(), std::move(key), bandwidth, fanout);
-}
-
-template<typename T>
-auto make_read_port( std::string key, Latency latency)
-{
-    return std::make_unique<ReadPort<T>>( PortMap::get_instance(), std::move(key), latency);
-}
 
 #endif

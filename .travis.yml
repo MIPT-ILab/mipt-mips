@@ -25,17 +25,15 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-xenial-8
-    - sourceline: deb http://www.emdebian.org/debian/ squeeze main
+    - sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main
     update: true
     packages:
-    - clang-tidy-8
-    - libstdc++-7-dev # To fix lack of std::hash<enum E> in C++11
     - libboost-dev
     - ninja-build
   homebrew:
     packages:
     - ninja
+    update: true
 
 install:
   - pip install --user future
@@ -44,46 +42,40 @@ install:
         sudo apt-get install g++-7
         CXX=g++-7
     fi
-# Download and build binutils on OS X
   - |
-    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        ./mips-tests/.get-binutils.sh $TRAVIS_BUILD_DIR/binutils/cross/mips
-        export PATH=$PATH:$TRAVIS_BUILD_DIR/binutils/cross/mips/bin
-    fi
-# Download binutils on Linux
-  - |
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install binutils-mips-linux-gnu --allow-unauthenticated
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install libstdc++-7-dev
     fi
 # Download GDB
-  - git clone --depth=1 https://github.com/bminor/binutils-gdb.git --single-branch --branch gdb-8.3-branch
+  - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
+  - tar -xzf gdb-8.3.tar.gz
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/mips-tests        && make tt
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/binutils-gdb -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
 # Prepare for GDB build
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/libdecnumber && ./configure && make libdecnumber.a
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/readline     && ./configure && make libreadline.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/libdecnumber && ./configure && make libdecnumber.a
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/readline     && ./configure && make libreadline.a
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/mips-tests/fib.out -n 1000000
-  - cd $TRAVIS_BUILD_DIR/binutils-gdb/gdb
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
+  - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
   - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/mips-tests/tt.core.universal_reorder.out
+  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
 
 after_success:
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        sudo apt-get install clang-tidy-9 --allow-unauthenticated
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        run-clang-tidy-8.py -header-filter='.*' 2> /dev/null
+        run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
     fi
   - |
     if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then

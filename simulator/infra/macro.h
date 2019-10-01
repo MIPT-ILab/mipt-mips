@@ -33,15 +33,15 @@ template<typename ... Args>
 constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
 
 /* Bit width of integer type */
-template<typename T>
+template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 
 /* 128 types have no std::numeric_limits */
-template<> constexpr size_t bitwidth<uint128> = 128u;
-template<> constexpr size_t bitwidth<int128> = 128u;
+template<> constexpr size_t bitwidth<uint128> = 128u; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr size_t bitwidth<int128> = 128u; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
 /* Byte width of integer type */
-template<typename T>
+template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
@@ -121,17 +121,17 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
     return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
 }
 
-template <typename T>
+template <typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
 
 /*
  * Templated no-value (non-trivial data of given size)
  */
-template<typename T> constexpr T NO_VAL = all_ones<T>();
-template<> constexpr uint8  NO_VAL<uint8>  = NO_VAL8;
-template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16;
-template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32;
-template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64;
+template<typename T> constexpr T NO_VAL = all_ones<T>(); // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr uint8  NO_VAL<uint8>  = NO_VAL8; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
@@ -190,6 +190,21 @@ auto test_addition_overflow( T_src1 src1, T_src2 src2)
     auto result = narrow_cast<T_signed>( val1) + narrow_cast<T_signed>( val2);
 
     bool is_overflow = ( val1 > 0 && val2 > 0 && result < 0) || ( val1 < 0 && val2 < 0 && result > 0);
+    return std::make_pair( narrow_cast<T>( result), is_overflow);
+}
+
+template<typename T, typename T_src1, typename T_src2> static
+auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
+{
+    using T_src1_signed = sign_t<T_src1>;
+    using T_src2_signed = sign_t<T_src2>;
+    using T_signed      = sign_t<T>;
+
+    auto val1 = narrow_cast<T_src1_signed>( src1);
+    auto val2 = narrow_cast<T_src2_signed>( src2);
+    auto result = narrow_cast<T_signed>( val1) - narrow_cast<T_signed>( val2);
+
+    bool is_overflow = ( val1 > 0 && val2 < 0 && result < 0) || ( val1 < 0 && val2 > 0 && result > 0);
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 

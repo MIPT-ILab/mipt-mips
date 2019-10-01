@@ -15,7 +15,7 @@
 #ifndef GDB_WRAPPER_H
 #define GDB_WRAPPER_H
 
-#include <func_sim/trap_types.h>
+#include <func_sim/traps/trap.h>
 #include <infra/byte.h>
 
 #include <memory>
@@ -26,6 +26,7 @@ class GDBSim
 {
     std::shared_ptr<class Simulator> cpu = nullptr;
     std::shared_ptr<class FuncMemory> memory = nullptr;
+    std::shared_ptr<class Kernel> kernel = nullptr;
     Trap trap = Trap(Trap::NO_TRAP);
 public:
     explicit GDBSim( const std::string& isa);
@@ -33,7 +34,7 @@ public:
     bool load( const std::string& filename) const;
     void shutdown();
     void resume( uint64 step);
-    bool create_inferior( Addr start_addr) const;
+    bool create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const;
 
     // Not implemented yet
     int  stop() { return 0; }

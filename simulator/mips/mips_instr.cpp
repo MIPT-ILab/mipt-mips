@@ -66,18 +66,19 @@ template<typename I> auto mips_dsrl32  = ALU::dsrl32<I>;
 template<typename I> auto mips_dsrlv   = ALU::srlv<I, uint64>;
 template<typename I> auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
 template<typename I> auto mips_dsubu   = ALU::subtraction<I, uint64>;
+template<typename I> auto mips_eret    = ALU::eret<I>;
 template<typename I> auto mips_j       = ALU::j<I>;
 template<typename I> auto mips_jal     = ALU::jump_and_link<I, ALU::j<I>>;
 template<typename I> auto mips_jalr    = ALU::jump_and_link<I, ALU::jr<I>>;
 template<typename I> auto mips_jr      = ALU::jr<I>;
 template<typename I> auto mips_lb      = ALU::load_addr<I>;
 template<typename I> auto mips_lbu     = ALU::load_addr<I>;
-template<typename I> auto mips_ld      = ALU::load_addr<I>;
+template<typename I> auto mips_ld      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_ldl     = ALU::load_addr<I>;
 template<typename I> auto mips_ldr     = ALU::load_addr<I>;
 template<typename I> auto mips_lh      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lhu     = ALU::load_addr_aligned<I>;
-template<typename I> auto mips_ll      = ALU::load_addr<I>;
+template<typename I> auto mips_ll      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lui     = ALU::upper_immediate<I, 16>;
 template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
@@ -102,11 +103,11 @@ template<typename I> auto mips_nor     = ALU::nor<I>;
 template<typename I> auto mips_or      = ALU::orv<I>;
 template<typename I> auto mips_ori     = ALU::ori<I>;
 template<typename I> auto mips_sb      = ALU::store_addr<I>;
-template<typename I> auto mips_sc      = ALU::store_addr<I>;
-template<typename I> auto mips_sd      = ALU::store_addr<I>;
+template<typename I> auto mips_sc      = ALU::store_addr_aligned<I>;
+template<typename I> auto mips_sd      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_sdl     = ALU::store_addr<I>;
 template<typename I> auto mips_sdr     = ALU::store_addr<I>;
-template<typename I> auto mips_sh      = ALU::store_addr<I>;
+template<typename I> auto mips_sh      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_sll     = ALU::sll<I, uint32>;
 template<typename I> auto mips_sllv    = ALU::sllv<I, uint32>;
 template<typename I> auto mips_slt     = ALU::set<I, ALU::lt<I>>;
@@ -122,7 +123,7 @@ template<typename I> auto mips_subu    = ALU::subtraction<I, uint32>;
 template<typename I> auto mips_sw      = ALU::store_addr_aligned<I>;
 template<typename I> auto mips_swl     = ALU::store_addr_left32<I>;
 template<typename I> auto mips_swr     = ALU::store_addr_right32<I>;
-template<typename I> auto mips_syscall = do_nothing<I>;
+template<typename I> auto mips_syscall = ALU::syscall<I>;
 template<typename I> auto mips_teq     = ALU::trap<I, ALU::eq<I>>;
 template<typename I> auto mips_teqi    = ALU::trap<I, ALU::eqi<I>>;
 template<typename I> auto mips_tge     = ALU::trap<I, ALU::ge<I>>;
@@ -359,8 +360,8 @@ static const Table<I> isaMapRI =
     // Branches
     {0x0,  { "bltz",  mips_bltz<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
     {0x1,  { "bgez",  mips_bgez<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_I_Instr} },
-    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
-    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x2,  { "bltzl", mips_bltzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
+    {0x3,  { "bgezl", mips_bgezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     // Conditional traps
     {0x8,  { "tgei",  mips_tgei<I>,  OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
     {0x9,  { "tgeiu", mips_tgeiu<I>, OUT_TRAP, 0, 'I', Imm::TRAP, { Reg::RS }, Dst::ZERO, MIPS_II_Instr} },
@@ -371,8 +372,8 @@ static const Table<I> isaMapRI =
     // Linking branches
     {0x10, { "bltzal",  mips_bltzal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
     {0x11, { "bgezal",  mips_bgezal<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_I_Instr} },
-    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
-    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
+    {0x12, { "bltzall", mips_bltzall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} },
+    {0x13, { "bgezall", mips_bgezall<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS }, Dst::RA, MIPS_II_Instr} }
 };
 
 //unordered map for I-instructions and J-instructions
@@ -399,10 +400,10 @@ static const Table<I> isaMapIJ =
     {0xF, { "lui",   mips_lui<I>,   OUT_ARITHM, 0, 'I', Imm::LOGIC, { }, Dst::RT, MIPS_I_Instr} },
     // 0x10 - 0x13 coprocessor operations
     // Likely branches (MIPS II)
-    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
-    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x14, { "beql",  mips_beql<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x15, { "bnel",  mips_bnel<I>,  OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x16, { "blezl", mips_blezl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
+    {0x17, { "bgtzl", mips_bgtzl<I>, OUT_BRANCH_LIKELY, 0, 'I', Imm::ARITH, { Reg::RS, Reg::RT }, Dst::ZERO, MIPS_II_Instr} },
     // Doubleword unaligned loads
     {0x1A, { "ldl", mips_ldl<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
     {0x1B, { "ldr", mips_ldr<I>,  OUT_LOAD, 8, 'I', Imm::ADDR, { Reg::RS }, Dst::RT, MIPS_III_Instr} },
@@ -455,10 +456,16 @@ static const Table<I> isaMapMIPS32 =
 };
 
 template<typename I>
-static const Table<I> isaMapCOP0 =
+static const Table<I> isaMapCOP0_rs =
 {
-    {0x00, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
-    {0x04, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RT }, Dst::RD, MIPS_I_Instr} },
+    {0x00, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::CP0_RD }, Dst::RT, MIPS_I_Instr} },
+    {0x04, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Reg::RT }, Dst::CP0_RD, MIPS_I_Instr} },
+};
+
+template<typename I>
+static const Table<I> isaMapCOP0_funct =
+{
+    {0x18, { "eret",  mips_eret<I>, OUT_R_JUMP, 0, 'N', Imm::NO, { Reg::EPC, Reg::SR }, Dst::SR, MIPS_I_Instr} },
 };
 
 template<typename I>
@@ -663,7 +670,8 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapRI<I>,
     &isaMapMIPS32<I>,
     &isaMapIJ<I>,
-    &isaMapCOP0<I>,
+    &isaMapCOP0_rs<I>,
+    &isaMapCOP0_funct<I>,
     &isaMapCOP1<I>,
     &isaMapCOP1X<I>,
     &isaMapCOP1_s<I>,
@@ -692,7 +700,7 @@ MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
         return get_table_entry( isaMapMOVCI<I>, instr.ft);
@@ -700,7 +708,7 @@ MIPSTableEntry<I> get_opcode_special_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
@@ -708,7 +716,7 @@ MIPSTableEntry<I> get_COP1_s_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
@@ -716,7 +724,17 @@ MIPSTableEntry<I> get_COP1_d_entry( MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_cp1_entry( MIPSInstrDecoder& instr)
+MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
+{
+    switch ( instr.funct)
+    {
+        case 0x0:  return get_table_entry( isaMapCOP0_rs<I>,    instr.rs);
+        default:   return get_table_entry( isaMapCOP0_funct<I>, instr.funct);
+    }
+}
+
+template<typename I>
+MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
@@ -741,7 +759,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
     {
         case 0x0:  return get_opcode_special_entry<I>( instr);
         case 0x1:  return get_table_entry( isaMapRI<I>,     instr.rt);
-        case 0x10: return get_table_entry( isaMapCOP0<I>,   instr.rs);
+        case 0x10: return get_cp0_entry<I>( instr);
         case 0x11: return get_cp1_entry<I>( instr);
         case 0x13: return get_table_entry( isaMapCOP1X<I>,  instr.funct);
         case 0x1C: return get_table_entry( isaMapMIPS32<I>, instr.funct);
@@ -841,8 +859,12 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->print_src2 =  entry.sources.size() > 1 && is_explicit_register( entry.sources[1]);
     this->print_src3 =  entry.sources.size() > 2 && is_explicit_register( entry.sources[2]);
 
-    bool has_delayed_slot = this->is_jump() && version != MIPSVersion::mars && version != MIPSVersion::mars64;
+    bool has_delayed_slot = this->is_jump()
+        && version != MIPSVersion::mars
+        && version != MIPSVersion::mars64
+        && (entry.sources.empty() || entry.sources[0] != Reg::EPC);
     this->delayed_slots = has_delayed_slot ? 1 : 0;
+    this->new_PC += this->delayed_slots * 4;
 }
 
 template<typename R>

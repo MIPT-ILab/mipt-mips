@@ -11,14 +11,14 @@
 #include <modules/ports_instance.h>
 
 template <typename FuncInstr>
-class Execute : public Log
+class Execute : public Module
 {
     using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename FuncInstr::RegisterUInt;
     using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
 
-    private:   
+    private:
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;
         const Latency last_execution_stage_latency;
 
@@ -26,6 +26,7 @@ class Execute : public Log
         std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
         std::unique_ptr<ReadPort<Instr>> rp_long_latency_execution_unit = nullptr;
         std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
+        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
 
         struct BypassPorts {
             std::unique_ptr<ReadPort<BypassCommand<Register>>> command_port;
@@ -51,9 +52,8 @@ class Execute : public Log
         }
         auto has_flush_expired() const { return flush_expiration_latency == 0_lt; }
 
-
     public:
-        explicit Execute( bool log);
+        explicit Execute( Module* module);
         void clock( Cycle cycle);
 };
 

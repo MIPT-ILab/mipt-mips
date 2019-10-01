@@ -9,24 +9,25 @@
 #include <infra/argv.h>
 #include <infra/config/config.h>
 #include <kernel/kernel.h>
-#include <memory/elf/elf_loader.h>
+#include <memory/argv_loader/argv_loader.h>
 #include <memory/memory.h>
 #include <simulator.h>
 
 GDBSim::GDBSim( const std::string& isa)
 {
     cpu = Simulator::create_configured_isa_simulator( isa);
-    memory = FuncMemory::create_hierarchied_memory();
-    auto kernel = Kernel::create_configured_kernel();
+    cpu->enable_driver_hooks();
+    memory = FuncMemory::create_default_hierarchied_memory();
+    kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);
     cpu->set_kernel( kernel);
     kernel->set_simulator( cpu);
-    kernel->set_memory( memory);
+    kernel->connect_memory( memory);
 }
 
 bool GDBSim::load( const std::string& filename) const try
 {
-    ElfLoader( filename).load_to( memory.get());
+    kernel->load_file( filename);
     std::cout << "MIPT-MIPS: Binary file " << filename << " loaded" << std::endl;
     return true;
 }
@@ -39,11 +40,32 @@ catch (...) {
     return false;
 }
 
-bool GDBSim::create_inferior( Addr start_addr) const
+bool GDBSim::create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const try
 {
+    Addr sp = cpu->read_gdb_register( 29);
+
+    if ( cpu->sizeof_register() == bytewidth<uint32>)
+        sp += ArgvLoader<uint32, Endian::native>( argv, envp).load_to( memory, sp);
+
+    if ( cpu->sizeof_register() == bytewidth<uint64>)
+        sp += ArgvLoader<uint64, Endian::native>( argv, envp).load_to( memory, sp);
+
+    while ( sp % 4 != 0) ++sp;
+
+    cpu->write_gdb_register( 29, sp);
+    std::cout << "MIPT-MIPS: arguments loaded" << std::endl;
+
     cpu->set_pc( start_addr);
     std::cout << "MIPT-MIPS: prepared to run" << std::endl;
     return true;
+}
+catch (const std::exception& e) {
+    std::cerr << "MIPT-MIPS: failed to load arguments:\n\t" << e.what() << std::endl;
+    return false;
+}
+catch (...) {
+    std::cerr << "MIPT-MIPS: failed to load arguments due to unknown exception" << std::endl;
+    return false;
 }
 
 void GDBSim::shutdown()
@@ -56,10 +78,7 @@ void GDBSim::resume( uint64 step) try
 {
     std::cout << "MIPT-MIPS: resuming, steps: " << step << std::endl;
     uint64 instrs_to_run = (step == 0) ? MAX_VAL64 : step;
-    if (instrs_to_run == 1)
-        trap = cpu->run_single_step ();
-    else
-        trap = cpu->run_until_trap( instrs_to_run);
+    trap = cpu->run( instrs_to_run);
 }
 catch (const BearingLost &e) {
     trap = Trap::HALT;
@@ -85,9 +104,9 @@ int GDBSim::memory_write( Addr dst, const Byte* src, size_t length) const
 int GDBSim::read_register(int regno, Byte* buf, int length) const
 {
     if ( length == 8)
-        put_value_to_pointer<uint64, Endian::native>( buf, cpu->read_gdb_register( regno));
+        put_value_to_pointer<uint64, Endian::native>( buf, cpu->read_gdb_register( regno), 8);
     else if ( length == 4)
-        put_value_to_pointer<uint32, Endian::native>( buf, cpu->read_gdb_register( regno));
+        put_value_to_pointer<uint32, Endian::native>( buf, cpu->read_gdb_register( regno), 4);
     else
         return 0;
 
@@ -97,9 +116,9 @@ int GDBSim::read_register(int regno, Byte* buf, int length) const
 int GDBSim::write_register(int regno, const Byte* buf, int length) const
 {
     if ( length == 8)
-        cpu->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( buf));
+        cpu->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( buf, 8));
     else if ( length == 4)
-        cpu->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( buf));
+        cpu->write_gdb_register( regno, get_value_from_pointer<uint32, Endian::native>( buf, 4));
     else
         return 0;
 
