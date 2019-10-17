@@ -7,3 +7,4 @@ List of 2019/2020 MIPT-V project members:
 6. Eric Konks
 7. Vladimir Prokhorov
 8. Nikolay Zernov
+9. Aleksandr Vinogradov
