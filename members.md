@@ -12,4 +12,5 @@ List of 2019/2020 MIPT-V project members:
 11. Roman Zlobin
 12. Airat Nazmiev
 13. Nikita Gorbachev
-14. Daniel Kofanov
+14. Igor Bulatov
+15. Daniel Kofanov
