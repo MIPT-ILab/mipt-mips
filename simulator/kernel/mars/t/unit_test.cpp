@@ -38,7 +38,7 @@ struct System
     std::shared_ptr<Simulator> sim = nullptr;
     std::shared_ptr<Kernel> mars_kernel = nullptr;
     std::shared_ptr<FuncMemory> mem = nullptr;
-    
+
     template<typename ... KernelArgs>
     explicit System( KernelArgs&&... args)
         : sim( Simulator::create_simulator( "mips64", true))
@@ -236,6 +236,27 @@ TEST_CASE( "MARS: open non existing file")
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
 }
 
+static void write_buff_to_file
+(System* sys, uint64 descr, uint64 buff_ptr, uint64 chars_to_write)
+{
+  sys.sim->write_cpu_register( v0, 15u); //write to file
+  sys.sim->write_cpu_register( a0, descr);
+  sys.sim->write_cpu_register( a1, buff_ptr);
+  sys.sim->write_cpu_register( a2, chars_to_write);
+  CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+}
+
+static uint64 open_file(System* sys, uint64 filename_ptr, uint64 flags)
+{
+  sys.sim->write_cpu_register( v0, 13u); // open file
+  sys.sim->write_cpu_register( a0, filename_ptr);
+  sys.sim->write_cpu_register( a1, flags);
+  CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+  uint64 descriptor = sys.sim->read_cpu_register( v0);
+  CHECK( descriptor >= 3); // May be print line from it was called?
+  return descriptor;
+}
+
 TEST_CASE( "MARS: open, write, read and close a file")
 {
     std::string filename("tempfile");
@@ -244,35 +265,15 @@ TEST_CASE( "MARS: open, write, read and close a file")
     sys.mem->write_string( filename, 0x1000);
     sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
 
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 1); // write
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-    auto descriptor = sys.sim->read_cpu_register( v0);
-    CHECK( descriptor >= 3);
-
-    sys.sim->write_cpu_register( v0, 15u); // write to file
-    sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x2000);
-    sys.sim->write_cpu_register( a2, 11);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    auto descriptor = open_file(&sys, 0x1000, 1); // open WRONLY
+    write_buff_to_file(&sys, descriptor, 0x2000, 11); // write string to file
 
     sys.sim->write_cpu_register( v0, 16u); // close file
     sys.sim->write_cpu_register( a0, descriptor);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 9); // append
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-    descriptor = sys.sim->read_cpu_register( v0);
-    CHECK( descriptor >= 3);
-
-    sys.sim->write_cpu_register( v0, 15u); // write to file
-    sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x2000);
-    sys.sim->write_cpu_register( a2, 11);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    descriptor = open_file(&sys, 0x1000, 9); // open O_APPEND
+    write_buff_to_file(sys, descriptor, 0x2000, 11); //write string to file
 
     sys.sim->write_cpu_register( v0, 16u); // close file
     sys.sim->write_cpu_register( a0, descriptor);
@@ -342,7 +343,7 @@ TEST_CASE( "MARS: close error")
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
 }
 
-TEST_CASE( "MARS: exit with code") 
+TEST_CASE( "MARS: exit with code")
 {
     auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
@@ -354,7 +355,7 @@ TEST_CASE( "MARS: exit with code")
     CHECK( mars_kernel->get_exit_code() == 21u);
 }
 
-TEST_CASE( "MARS: unsupported syscall") 
+TEST_CASE( "MARS: unsupported syscall")
 {
     auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
