@@ -236,28 +236,33 @@ TEST_CASE( "MARS: open non existing file")
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
 }
 
-static void write_buff_to_file
-(System* sys, uint64 descr, uint64 buff_ptr, uint64 chars_to_write)
+static void write_buff_to_file( System* sys, uint64 descr,
+                                uint64 buff_ptr, uint64 chars_to_write)
 {
-  sys.sim->write_cpu_register( v0, 15u); //write to file
-  sys.sim->write_cpu_register( a0, descr);
-  sys.sim->write_cpu_register( a1, buff_ptr);
-  sys.sim->write_cpu_register( a2, chars_to_write);
-  CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    sys->sim->write_cpu_register( v0, 15u); //write to file
+    sys->sim->write_cpu_register( a0, descr);
+    sys->sim->write_cpu_register( a1, buff_ptr);
+    sys->sim->write_cpu_register( a2, chars_to_write);
 }
 
-static uint64 open_file(System* sys, uint64 filename_ptr, uint64 flags)
+static void open_file( System* sys, uint64 filename_ptr, uint64 flags)
 {
-  sys.sim->write_cpu_register( v0, 13u); // open file
-  sys.sim->write_cpu_register( a0, filename_ptr);
-  sys.sim->write_cpu_register( a1, flags);
-  CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-  uint64 descriptor = sys.sim->read_cpu_register( v0);
-  CHECK( descriptor >= 3); // May be print line from it was called?
-  return descriptor;
+    sys->sim->write_cpu_register( v0, 13u); // open file
+    sys->sim->write_cpu_register( a0, filename_ptr);
+    sys->sim->write_cpu_register( a1, flags);
+    //return sys->sim->read_cpu_register( v0); //FIXME: tests failed
 }
 
-TEST_CASE( "MARS: open, write, read and close a file")
+static void read_from_file( System* sys, uint64 descr,
+                            uint64 buff_ptr, uint64 chars_to_read)
+{
+    sys->sim->write_cpu_register( v0, 14u); // read from file
+    sys->sim->write_cpu_register( a0, descr);
+    sys->sim->write_cpu_register( a1, buff_ptr);
+    sys->sim->write_cpu_register( a2, chars_to_read);
+}
+
+TEST_CASE( "MARS: open, read and close a file")
 {
     std::string filename("tempfile");
     std::ostringstream output;
@@ -265,31 +270,35 @@ TEST_CASE( "MARS: open, write, read and close a file")
     sys.mem->write_string( filename, 0x1000);
     sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
 
-    auto descriptor = open_file(&sys, 0x1000, 1); // open WRONLY
+    open_file(&sys, 0x1000, 1); // open WRONLY
+    //auto descriptor = sys.sim->read_cpu_register( v0);
+    //FIXME test fails if it's used in this sequence
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    auto descriptor = sys.sim->read_cpu_register( v0);
+    CHECK( descriptor >= 3);
     write_buff_to_file(&sys, descriptor, 0x2000, 11); // write string to file
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
 
     sys.sim->write_cpu_register( v0, 16u); // close file
     sys.sim->write_cpu_register( a0, descriptor);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
 
-    descriptor = open_file(&sys, 0x1000, 9); // open O_APPEND
-    write_buff_to_file(sys, descriptor, 0x2000, 11); //write string to file
-
-    sys.sim->write_cpu_register( v0, 16u); // close file
-    sys.sim->write_cpu_register( a0, descriptor);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 0); // read
+    open_file(&sys, 0x1000, 9); // open O_APPEND
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     descriptor = sys.sim->read_cpu_register( v0);
     CHECK( descriptor >= 3);
+    write_buff_to_file(&sys, descriptor, 0x2000, 11); //write string to file
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 14u); // read from file
+    sys.sim->write_cpu_register( v0, 16u); // close file
     sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x3000);
-    sys.sim->write_cpu_register( a2, 22);
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+
+    open_file(&sys, 0x1000, 0); // read
+    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    descriptor = sys.sim->read_cpu_register( v0);
+    CHECK( descriptor >= 3);
+    read_from_file(&sys, descriptor, 0x3000, 22);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.mem->read_string( 0x3000) == "Lorem IpsumLorem Ipsum");
 
