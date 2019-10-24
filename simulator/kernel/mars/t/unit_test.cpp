@@ -300,8 +300,8 @@ TEST_CASE( "MARS: open, write and close file")
     CHECK( trap == Trap::NO_TRAP);
     CHECK( descr >= 3);
 
-    trap = write_buff_to_file( &sys, descr, 0x2000, 11); // write string to file
-    CHECK( trap == Trap::NO_TRAP); // FIXME: Can file be checked by read(unistd.h)
+    trap = write_buff_to_file( &sys, descr, 0x2000, 11);
+    CHECK( trap == Trap::NO_TRAP); // FIXME(pkryukov): Can file be checked by read()
 
     trap = close_file ( &sys, descr);
     CHECK( trap == Trap::NO_TRAP);
@@ -319,7 +319,7 @@ TEST_CASE( "MARS: open, read and close a file")
     auto descriptor = sys.sim->read_cpu_register( v0);
     CHECK( trap == Trap::NO_TRAP);
     CHECK( descriptor >= 3);
-    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11); // write string to file
+    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11);
     CHECK( trap == Trap::NO_TRAP);
 
     trap = close_file( &sys, descriptor);
@@ -329,7 +329,7 @@ TEST_CASE( "MARS: open, read and close a file")
     descriptor = sys.sim->read_cpu_register( v0);
     CHECK( trap == Trap::NO_TRAP);
     CHECK( descriptor >= 3);
-    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11); //write string to file
+    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11);
     CHECK( trap == Trap::NO_TRAP);
 
     trap = close_file( &sys, descriptor);
