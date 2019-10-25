@@ -5,3 +5,19 @@ List of 2019/2020 MIPT-V project members:
 4. Yuly Tarasov
 5. Kirill Chemrov
 6. Eric Konks
+<<<<<<< HEAD
+=======
+7. Vladimir Prokhorov
+8. Nikolay Zernov
+9. Aleksandr Vinogradov
+10. Alexey Akmaev
+11. Roman Zlobin
+12. Airat Nazmiev
+13. Nikita Gorbachev
+14. Igor Bulatov
+15. Daniel Kofanov
+16. Ilya Andreev
+17. Andrey Tomashev
+18. Ilya Burtakov
+19. Aleksei Meshcheriakov
+>>>>>>> 1e9ca4fbb81d04c6ec75e6912fce317dfd529432
