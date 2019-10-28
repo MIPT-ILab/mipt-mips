@@ -70,7 +70,7 @@ public:
 protected:
     void init_portmap() { portmap->init(); }
     void enable_logging( const std::string& values);
-    void enable_dumping( bool dump );
+    void enable_dumping( bool dump);
 
 private:
     std::shared_ptr<PortMap> get_portmap() const final { return portmap; }

@@ -41,7 +41,7 @@ void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
         c->enable_logging_impl( names);
 }
 
-void Module::enable_dumping_impl(pt::ptree& topology) {
+void Module::enable_dumping_impl( pt::ptree& topology) {
     pt::ptree topology_module;
     topology_module.put("module_name", name);
     topology_module.add_child("write_ports", topology_write_ports);
@@ -58,7 +58,7 @@ void Root::enable_logging( const std::string& values)
     enable_logging_impl( tokens);
 }
 
-void Root::enable_dumping(bool dump)
+void Root::enable_dumping( bool dump)
 {
     if (dump) {
         pt::ptree topology;
