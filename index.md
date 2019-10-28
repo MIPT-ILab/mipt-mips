@@ -8,14 +8,27 @@ Additionally, it is a supporting project to MIPT lectures on Computer Architectu
 
 Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building**.
 
-Date | Type | Event name
-:----: | :----: | ----------------------------
-09 Sep | Org. | **Promotion event**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true)
-16 Sep | Org.<br/><br/>Lecture | **Course introduction**<br/> • Slides: [russian version](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Course%20Introduction.pptx?raw=true)<br/> **Layers of Computer Science. ISA and uArch**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true), [audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch%20AUDIO.pptx?raw=true)
-23 Sep | Lecture | **Integrated Circuits. CMOS**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L2/Lecture%202%20-%20Integrated%20Circuits.%20CMOS.pptx?raw=true)
-30 Sep | Lecture | **Combinational and sequential circuits**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L3/Lecture%203%20-%20Combinational%20%26%20Sequential%20Circuits%20-%20NO%20AUDIO.pptx?raw=true)
-07 Oct | Practice | **Combinational and Sequential Circuits**<br/> • Slides: [no audio](https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true)
+[Promo]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true
+[Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Course%20Introduction.pptx?raw=true
+[L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
+[L1 AUDIO]: https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch%20AUDIO.pptx?raw=true
+[L2]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L2/Lecture%202%20-%20Integrated%20Circuits.%20CMOS.pptx?raw=true
+[L3]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L3/Lecture%203%20-%20Combinational%20%26%20Sequential%20Circuits%20-%20NO%20AUDIO.pptx?raw=true
+[L4]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA.pptx?raw=true
+[L4 AUDIO]: https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA%20AUDIO.pptx?raw=true
+[L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
+[P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true 
 
+Date   | Type     | Event
+:----: | :------: | ------
+09 Sep | Org.     | **Promotion event**<br>                               • Slides: [russian version][Promo]
+16 Sep | Org.     | **Course introduction**<br>                           • Slides: [russian version][Intro]
+16 Sep | Lecture  | **L1: Layers of Computer Science. ISA and uArch**<br> • Slides: [no audio][L1], [audio][L1 AUDIO]
+23 Sep | Lecture  | **L2: Integrated Circuits. CMOS**<br>                 • Slides: [no audio][L2]
+30 Sep | Lecture  | **L3: Combinational and sequential circuits**<br>     • Slides: [no audio][L3]
+07 Oct | Practice | **P1: Combinational and Sequential Circuits**<br>     • Slides: [no audio][P1]
+14 Oct | Lecture  | **L4: RISC-V ISA**<br>                                • Slides: [no audio][L4], [audio][L4 AUDIO]
+21 Oct | Lecture  | **L5: RISC-V Single-Cycle implementation**<br>        • Slides: [no audio][L5]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
@@ -58,6 +71,7 @@ MIPT | Name | Score | Comments
 717 | Ivan Startsev | 2 | [#525](https://github.com/MIPT-ILab/mipt-mips/issues/525) |
 717 | Arsen Davtyan | 2 | [#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643) |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
+81? | Maxim Davydov | 1 | [#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096) |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
