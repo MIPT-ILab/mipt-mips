@@ -12,6 +12,7 @@
 
 namespace config {
     static AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
+    static Switch topology_dump = {"tdump", "topology dump json file" };
 } // namespace config
 
 template <typename ISA>
@@ -29,6 +30,7 @@ PerfSim<ISA>::PerfSim( Endian endian)
 
     init_portmap();
     enable_logging( config::units_to_log);
+    enable_dumping( config::topology_dump);
 }
 
 template <typename ISA>
