@@ -41,14 +41,24 @@ void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
         c->enable_logging_impl( names);
 }
 
-void Module::enable_dumping_impl( pt::ptree& topology) {
-    pt::ptree topology_module;
-    topology_module.put("module_name", name);
-    topology_module.add_child("write_ports", topology_write_ports);
-    topology_module.add_child("read_ports", topology_read_ports);
-    topology.push_back(std::make_pair("", topology_module));
+void Module::module_dumping( pt::ptree& pt_modules) const
+{
+    pt::ptree pt_module;
+    pt_module.put( "module_name", name);
+    pt_module.add_child( "write_ports", topology_write_ports);
+    pt_module.add_child( "read_ports", topology_read_ports);
+    pt_modules.push_back(std::make_pair( "", pt_module));
     for ( const auto& c : children)
-        c->enable_dumping_impl(topology);
+        c->module_dumping( pt_modules);
+}
+
+void Module::modulemap_dumping_impl( pt::ptree& pt_modulemap) const
+{
+    pt::ptree pt_c_modulemap;
+    for ( const auto& c : children) {
+        c -> modulemap_dumping_impl( pt_c_modulemap);
+    }
+    pt_modulemap.add_child(name, pt_c_modulemap);
 }
 
 void Root::enable_logging( const std::string& values)
@@ -58,14 +68,66 @@ void Root::enable_logging( const std::string& values)
     enable_logging_impl( tokens);
 }
 
-void Root::enable_dumping( bool dump)
+void Root::portmap_dumping( pt::ptree& pt_portmap) const
 {
-    if (dump) {
-        pt::ptree topology;
-        enable_dumping_impl(topology);
-        pt::ptree result;
-        result.add_child("topology", topology);
-        pt::write_json("topology.json", result);
-        std::cout << std::endl << "Topology dumped in topology.json" << std::endl;
+    for ( const auto& elem : portmap->map) {
+        pt::ptree pt_cluster;
+        pt::ptree pt_write_port;
+        pt::ptree pt_read_ports;
+        pt_cluster.put( "name", elem.first);
+        pt_write_port.put( "key", elem.second.writer->get_key());
+        pt_write_port.put( "fanout", elem.second.writer->get_fanout());
+        pt_write_port.put( "bandwidth", elem.second.writer->get_bandwidth());
+        for ( const auto& read_port : elem.second.readers) {
+            pt::ptree pt_read_port;
+            pt_read_port.put( "latency", read_port->get_latency());
+            pt_read_ports.add_child( read_port->get_key(), pt_read_port);
+        }
+        pt_cluster.add_child( "write_port", pt_write_port);
+        pt_cluster.add_child( "read_ports", pt_read_ports);
+        pt_portmap.push_back( std::make_pair("", pt_cluster));
     }
+}
+
+void Root::modulemap_dumping( pt::ptree& pt_modulemap) const
+{
+    modulemap_dumping_impl( pt_modulemap);
+}
+
+void Root::topology_dumping_impl( pt::ptree& pt_topology) const
+{
+    pt::ptree pt_modules;
+    pt::ptree pt_portmap;
+    pt::ptree pt_modulemap;
+    module_dumping( pt_modules);
+    portmap_dumping( pt_portmap);
+    modulemap_dumping( pt_modulemap);
+    pt_topology.add_child( "modules", pt_modules);
+    pt_topology.add_child( "portmap", pt_portmap);
+    pt_topology.add_child( "modulemap", pt_modulemap);
+}
+
+void Root::topology_dumping( bool dump, const std::string& filename) const
+{
+    pt::ptree pt_topology;
+    topology_dumping_impl( pt_topology);
+    if (dump) {
+        if ( filename.empty()) {
+            std::cout << "*************Module topology dump***************" << std::endl;
+            pt::write_json( std::cout, pt_topology);
+            std::cout << "************************************************" << std::endl;
+        }
+        else {
+            pt::write_json( filename, pt_topology);
+            std::cout << std::endl << "Module topology dumped in topology.json" << std::endl;
+        }
+    }
+}
+
+void Root::topology_dumping( bool dump, std::stringstream& ss) const 
+{
+    pt::ptree pt_topology;
+    topology_dumping_impl(pt_topology);
+    if (dump)
+        pt::write_json( ss, pt_topology);
 }

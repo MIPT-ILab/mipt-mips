@@ -25,25 +25,26 @@ protected:
     template<typename T>
     auto make_write_port( std::string key, uint32 bandwidth) 
     {
-        pt::ptree write_port;
-        write_port.put("key", key);
-        write_port.put("bandwidth", bandwidth);
-        topology_write_ports.push_back(std::make_pair("", write_port));
+        //pt::ptree pt_write_port;
+        //pt_write_port.put(key, "");
+        //write_port.put("bandwidth", bandwidth);
+        topology_write_ports.put(key, "");
         return std::make_unique<WritePort<T>>( get_portmap(), std::move(key), bandwidth);
     }
 
     template<typename T>
     auto make_read_port( std::string key, Latency latency)
     {
-        pt::ptree read_port;
-        read_port.put("key", key);
-        read_port.put("latency", latency);
-        topology_read_ports.push_back(std::make_pair("", read_port));
+        //pt::ptree pt_read_port;
+        //pt_read_port.put(key, "");
+        //read_port.put("latency", latency);
+        topology_read_ports.put(key, "");
         return std::make_unique<ReadPort<T>>( get_portmap(), std::move(key), latency);
     }
 
     void enable_logging_impl( const std::unordered_set<std::string>& names);
-    void enable_dumping_impl( pt::ptree& topology);
+    void module_dumping( pt::ptree& pt_modules) const;
+    void modulemap_dumping_impl( pt::ptree& pt_modulemap) const;
 
 private:
     virtual std::shared_ptr<PortMap> get_portmap() const { return parent->get_portmap(); }
@@ -70,11 +71,15 @@ public:
 protected:
     void init_portmap() { portmap->init(); }
     void enable_logging( const std::string& values);
-    void enable_dumping( bool dump);
+    void topology_dumping( bool dump, const std::string& filename = "") const;
+    void topology_dumping( bool dump, std::stringstream& ss) const;
+    void portmap_dumping( pt::ptree& pt_portmap) const;
+    void modulemap_dumping ( pt::ptree& pt_modulemap) const;
 
 private:
     std::shared_ptr<PortMap> get_portmap() const final { return portmap; }
     std::shared_ptr<PortMap> portmap;
+    void topology_dumping_impl( pt::ptree& pt_topology) const;
 };
 
 #endif

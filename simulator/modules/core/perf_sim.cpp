@@ -30,7 +30,7 @@ PerfSim<ISA>::PerfSim( Endian endian)
 
     init_portmap();
     enable_logging( config::units_to_log);
-    enable_dumping( config::topology_dump);
+    topology_dumping( config::topology_dump);
 }
 
 template <typename ISA>
