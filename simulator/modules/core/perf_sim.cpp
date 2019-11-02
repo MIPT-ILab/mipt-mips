@@ -12,7 +12,7 @@
 
 namespace config {
     static AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
-    static Switch topology_dump = {"tdump", "topology dump json file" };
+    static Switch topology_dump = {"tdump", "topology dump into topology.json" };
 } // namespace config
 
 template <typename ISA>
