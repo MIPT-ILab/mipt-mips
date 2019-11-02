@@ -72,14 +72,13 @@ protected:
     void init_portmap() { portmap->init(); }
     void enable_logging( const std::string& values);
     void topology_dumping( bool dump, const std::string& filename = "") const;
-    void topology_dumping( bool dump, std::stringstream& ss) const;
+    void topology_dumping_impl( pt::ptree& pt_topology) const;
     void portmap_dumping( pt::ptree& pt_portmap) const;
     void modulemap_dumping ( pt::ptree& pt_modulemap) const;
 
 private:
     std::shared_ptr<PortMap> get_portmap() const final { return portmap; }
     std::shared_ptr<PortMap> portmap;
-    void topology_dumping_impl( pt::ptree& pt_topology) const;
 };
 
 #endif

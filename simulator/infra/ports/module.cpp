@@ -123,11 +123,3 @@ void Root::topology_dumping( bool dump, const std::string& filename) const
         }
     }
 }
-
-void Root::topology_dumping( bool dump, std::stringstream& ss) const 
-{
-    pt::ptree pt_topology;
-    topology_dumping_impl(pt_topology);
-    if (dump)
-        pt::write_json( ss, pt_topology);
-}
