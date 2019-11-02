@@ -1,0 +1,132 @@
+{
+    "modules": {
+        "test-root": {
+            "write_ports": "",
+            "read_ports": ""
+        },
+        "A": {
+            "write_ports": {
+                "A_to_C": "",
+                "A_to_D": ""
+            },
+            "read_ports": {
+                "C_to_A": "",
+                "D_to_A": ""
+            }
+        },
+        "B": {
+            "write_ports": {
+                "B_to_C": "",
+                "B_to_D": ""
+            },
+            "read_ports": {
+                "C_to_B": "",
+                "D_to_B": ""
+            }
+        },
+        "C": {
+            "write_ports": {
+                "C_to_A": "",
+                "C_to_B": ""
+            },
+            "read_ports": {
+                "A_to_C": "",
+                "B_to_C": ""
+            }
+        },
+        "D": {
+            "write_ports": {
+                "D_to_A": "",
+                "D_to_B": ""
+            },
+            "read_ports": {
+                "A_to_D": "",
+                "B_to_D": ""
+            }
+        }
+    },
+    "portmap": {
+        "A_to_C": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "A_to_D": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "C_to_A": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "D_to_A": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "B_to_C": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "B_to_D": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "C_to_B": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        },
+        "D_to_B": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports" : {
+                "latency": "1"
+            }
+        }
+    },
+    "modulemap": {
+        "test-root": {
+            "A": {
+                "B": ""
+            },
+            "C": {
+                "D": ""
+            }
+        }
+    }
+}
