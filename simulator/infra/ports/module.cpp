@@ -73,13 +73,9 @@ void Root::portmap_dumping( pt::ptree& pt_portmap) const
         pt::ptree pt_cluster;
         pt::ptree pt_write_port;
         pt::ptree pt_read_ports;
-        //pt_cluster.put( "name", elem.first);
-        //pt_write_port.put( "key", elem.second.writer->get_key());
         pt_write_port.put( "fanout", elem.second.writer->get_fanout());
         pt_write_port.put( "bandwidth", elem.second.writer->get_bandwidth());
         for ( const auto& read_port : elem.second.readers) {
-            //pt::ptree pt_read_port;
-            //pt_read_port.put( "latency", read_port->get_latency());
             pt_read_ports.put( "latency", read_port->get_latency());
         }
         pt_cluster.add_child( "write_port", pt_write_port);
