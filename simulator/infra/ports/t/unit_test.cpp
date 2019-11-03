@@ -305,7 +305,7 @@ TEST_CASE( "Topology: modulemap")
     pt::ptree pt_modulemap;
     CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/modulemap_test.json", pt_exp_modulemap));
     CHECK_NOTHROW( t.modulemap_load( pt_modulemap));
-    CHECK(pt_modulemap == pt_exp_modulemap);
+    CHECK( pt_modulemap == pt_exp_modulemap);
 }
 
 TEST_CASE( "Topology: portmap")
@@ -316,7 +316,7 @@ TEST_CASE( "Topology: portmap")
     CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/portmap_test.json", pt_exp_portmap));
     CHECK_NOTHROW( t.portmap_load( pt_portmap));
     for ( const pt::ptree::value_type &v : pt_exp_portmap) {
-        CHECK(v.second == pt_portmap.get_child(v.first.data()));
+        CHECK( v.second == pt_portmap.get_child(v.first.data()));
     }
 }
 
@@ -327,7 +327,7 @@ TEST_CASE( "Topology: modules")
     pt::ptree pt_modules;
     CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/modules_test.json", pt_exp_modules));
     CHECK_NOTHROW( t.modules_load( pt_modules));
-    CHECK(pt_modules == pt_exp_modules);
+    CHECK( pt_modules == pt_exp_modules);
 }
 
 TEST_CASE( "Topology: topology")

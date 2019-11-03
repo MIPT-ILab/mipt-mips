@@ -46,7 +46,7 @@ void Module::module_dumping( pt::ptree& pt_modules) const
     pt::ptree pt_module;
     pt_module.add_child( "write_ports", topology_write_ports);
     pt_module.add_child( "read_ports", topology_read_ports);
-    pt_modules.add_child(name, pt_module);
+    pt_modules.add_child( name, pt_module);
     for ( const auto& c : children)
         c->module_dumping( pt_modules);
 }
@@ -57,7 +57,7 @@ void Module::modulemap_dumping_impl( pt::ptree& pt_modulemap) const
     for ( const auto& c : children) {
         c->modulemap_dumping_impl( pt_c_modulemap);
     }
-    pt_modulemap.add_child(name, pt_c_modulemap);
+    pt_modulemap.add_child( name, pt_c_modulemap);
 }
 
 void Root::enable_logging( const std::string& values)
@@ -98,7 +98,7 @@ void Root::topology_dumping_impl( pt::ptree& pt_topology) const
     module_dumping( pt_modules);
     portmap_dumping( pt_portmap);
     modulemap_dumping( pt_modulemap);
-    
+
     pt_topology.add_child( "modules", pt_modules);
     pt_topology.add_child( "portmap", pt_portmap);
     pt_topology.add_child( "modulemap", pt_modulemap);
