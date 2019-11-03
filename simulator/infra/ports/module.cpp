@@ -107,9 +107,8 @@ void Root::topology_dumping( bool dump, const std::string& filename) const
     pt::ptree pt_topology;
     pt::ptree pt1;
     pt::ptree pt2;
-    topology_dumping_impl( pt_topology);
-    std::cout << bool(pt1 == pt2) << bool(pt1 == pt1) << bool(pt1 == pt_topology);
     if ( dump) {
+        topology_dumping_impl( pt_topology);
         try {
             if ( filename.empty()) {
                 std::cout << "*************Module topology dump***************" << std::endl;
