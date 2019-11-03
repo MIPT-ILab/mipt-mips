@@ -94,9 +94,11 @@ void Root::topology_dumping_impl( pt::ptree& pt_topology) const
     pt::ptree pt_modules;
     pt::ptree pt_portmap;
     pt::ptree pt_modulemap;
+
     module_dumping( pt_modules);
     portmap_dumping( pt_portmap);
     modulemap_dumping( pt_modulemap);
+    
     pt_topology.add_child( "modules", pt_modules);
     pt_topology.add_child( "portmap", pt_portmap);
     pt_topology.add_child( "modulemap", pt_modulemap);
