@@ -9,12 +9,10 @@
  
 #include <infra/log.h>
 #include <infra/ports/ports.h>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
 #include <unordered_set>
 
-namespace pt = boost::property_tree;
+//Forward declarations
+#include <boost/property_tree/ptree_fwd.hpp>
 
 class Module : public Log
 {
@@ -25,21 +23,21 @@ protected:
     template<typename T>
     auto make_write_port( std::string key, uint32 bandwidth) 
     {
-        topology_write_ports.put(key, "");
+        topology_write_ports.push_back(key);
         return std::make_unique<WritePort<T>>( get_portmap(), std::move(key), bandwidth);
     }
 
     template<typename T>
     auto make_read_port( std::string key, Latency latency)
     {
-        topology_read_ports.put(key, "");
+        topology_read_ports.push_back(key);
         return std::make_unique<ReadPort<T>>( get_portmap(), std::move(key), latency);
     }
 
     void enable_logging_impl( const std::unordered_set<std::string>& names);
 
-    void module_dumping( pt::ptree& pt_modules) const;
-    void modulemap_dumping_impl( pt::ptree& pt_modulemap) const;
+    void module_dumping( boost::property_tree::ptree* modules) const;
+    void modulemap_dumping( boost::property_tree::ptree* modulemap) const;
 
 private:
     virtual std::shared_ptr<PortMap> get_portmap() const { return parent->get_portmap(); }
@@ -51,8 +49,8 @@ private:
     Module* const parent;
     std::vector<Module*> children;
     const std::string name;
-    pt::ptree topology_write_ports;
-    pt::ptree topology_read_ports;
+    std::vector<std::string> topology_write_ports;
+    std::vector<std::string> topology_read_ports;
 };
 
 class Root : public Module
@@ -68,9 +66,9 @@ protected:
     void enable_logging( const std::string& values);
     
     void topology_dumping( bool dump, const std::string& filename = "");
-    void topology_dumping_impl( pt::ptree& pt_topology) const;
-    void portmap_dumping( pt::ptree& pt_portmap) const;
-    void modulemap_dumping( pt::ptree& pt_modulemap) const;
+    void topology_dumping_impl( boost::property_tree::ptree* topology) const;
+    void portmap_dumping( boost::property_tree::ptree* portmap) const;
+    //void modulemap_dumping( boost::property_tree::ptree* modulemap) const;
 
 private:
     std::shared_ptr<PortMap> get_portmap() const final { return portmap; }

@@ -71,6 +71,7 @@ set(TESTS_CPPS
     infra/ports/port_queue/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     infra/ports/t/example_test.cpp
+    infra/ports/t/topology_test.cpp
     memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp

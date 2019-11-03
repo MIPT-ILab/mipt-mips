@@ -18,6 +18,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 struct PortError final : Exception {
     explicit PortError( const std::string& msg)
@@ -37,6 +38,8 @@ private:
 
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
+
+    void dump( boost::property_tree::ptree* portmap) const;
 
     struct Cluster
     {
