@@ -121,7 +121,7 @@ void Root::topology_dumping( bool dump, const std::string& filename) const
             }
         }
         catch( pt::json_parser_error& e) {
-            std::cout << e.what();
+            std::cerr << e.what();
             throw e;
         }
     }

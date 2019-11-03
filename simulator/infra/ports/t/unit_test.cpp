@@ -7,6 +7,7 @@
 #include "../module.h"
 #include <catch.hpp>
 #include <map>
+#include <boost/algorithm/string/replace.hpp>
 
 TEST_CASE( "Latency to string")
 {
@@ -300,20 +301,24 @@ struct SomeTopology : public BaseTestRoot
 
 TEST_CASE( "Topology: modulemap")
 {
+    std::string file_path = __FILE__;
+    boost::algorithm::replace_last( file_path, "unit_test.cpp", "modulemap_test.json");
     SomeTopology t;
     pt::ptree pt_exp_modulemap;
     pt::ptree pt_modulemap;
-    CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/modulemap_test.json", pt_exp_modulemap));
+    CHECK_NOTHROW( read_json( file_path, pt_exp_modulemap));
     CHECK_NOTHROW( t.modulemap_load( pt_modulemap));
     CHECK( pt_modulemap == pt_exp_modulemap);
 }
 
 TEST_CASE( "Topology: portmap")
 {
+    std::string file_path = __FILE__;
+    boost::algorithm::replace_last( file_path, "unit_test.cpp", "portmap_test.json");
     SomeTopology t;
     pt::ptree pt_exp_portmap;
     pt::ptree pt_portmap;
-    CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/portmap_test.json", pt_exp_portmap));
+    CHECK_NOTHROW( read_json( file_path, pt_exp_portmap));
     CHECK_NOTHROW( t.portmap_load( pt_portmap));
     for ( const pt::ptree::value_type &v : pt_exp_portmap) {
         CHECK( v.second == pt_portmap.get_child(v.first.data()));
@@ -322,20 +327,24 @@ TEST_CASE( "Topology: portmap")
 
 TEST_CASE( "Topology: modules")
 {
+    std::string file_path = __FILE__;
+    boost::algorithm::replace_last( file_path, "unit_test.cpp", "modules_test.json");
     SomeTopology t;
     pt::ptree pt_exp_modules;
     pt::ptree pt_modules;
-    CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/modules_test.json", pt_exp_modules));
+    CHECK_NOTHROW( read_json( file_path, pt_exp_modules));
     CHECK_NOTHROW( t.modules_load( pt_modules));
     CHECK( pt_modules == pt_exp_modules);
 }
 
 TEST_CASE( "Topology: topology")
 {
+    std::string file_path = __FILE__;
+    boost::algorithm::replace_last( file_path, "unit_test.cpp", "topology_test.json");
     SomeTopology t;
     pt::ptree pt_exp_topology;
     pt::ptree pt_topology;
-    CHECK_NOTHROW( read_json( "../simulator/infra/ports/t/topology_test.json", pt_exp_topology));
+    CHECK_NOTHROW( read_json( file_path, pt_exp_topology));
     CHECK_NOTHROW( t.topology_load( pt_topology));
     CHECK( pt_exp_topology.get_child("modules") == pt_topology.get_child( "modules"));
     for ( const pt::ptree::value_type &v : pt_exp_topology.get_child( "portmap")) {
