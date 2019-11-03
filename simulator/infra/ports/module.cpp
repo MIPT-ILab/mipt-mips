@@ -107,8 +107,6 @@ void Root::topology_dumping_impl( pt::ptree& pt_topology) const
 void Root::topology_dumping( bool dump, const std::string& filename) const
 {
     pt::ptree pt_topology;
-    pt::ptree pt1;
-    pt::ptree pt2;
     if ( dump) {
         topology_dumping_impl( pt_topology);
         try {
