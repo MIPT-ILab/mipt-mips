@@ -283,6 +283,9 @@ struct SomeTopology : public BaseTestRoot
     void portmap_load( pt::ptree& pt_portmap) const { portmap_dumping( pt_portmap); }
     void modules_load( pt::ptree& pt_modules) const { module_dumping( pt_modules); }
     void topology_load( pt::ptree& pt_topology) const { topology_dumping_impl( pt_topology); }
+    void topology_save() { topology_dumping(true); }
+    void topology_save(const std::string& filename) { topology_dumping(true, filename); }
+    bool check_if_dumps() const { return sout.enabled(); }
     explicit SomeTopology()
     {
         /* Root
@@ -351,4 +354,20 @@ TEST_CASE( "Topology: topology")
         CHECK( v.second == pt_topology.get_child("portmap." + std::string(v.first.data())));
     }
     CHECK( pt_exp_topology.get_child("modulemap") == pt_topology.get_child("modulemap"));
+}
+
+TEST_CASE( "Topology: dump into sout")
+{
+    SomeTopology t;
+    pt::ptree pt_topology;
+    CHECK_NOTHROW( t.topology_save());
+    CHECK( t.check_if_dumps());
+}
+
+TEST_CASE( "Topology: dump into file")
+{
+    SomeTopology t;
+    pt::ptree pt_topology;
+    CHECK_NOTHROW( t.topology_save("topology.json"));
+    CHECK( t.check_if_dumps());
 }

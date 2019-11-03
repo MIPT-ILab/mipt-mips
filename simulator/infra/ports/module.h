@@ -67,7 +67,7 @@ protected:
     void init_portmap() { portmap->init(); }
     void enable_logging( const std::string& values);
     
-    void topology_dumping( bool dump, const std::string& filename = "") const;
+    void topology_dumping( bool dump, const std::string& filename = "");
     void topology_dumping_impl( pt::ptree& pt_topology) const;
     void portmap_dumping( pt::ptree& pt_portmap) const;
     void modulemap_dumping( pt::ptree& pt_modulemap) const;

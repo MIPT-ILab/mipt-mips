@@ -104,25 +104,21 @@ void Root::topology_dumping_impl( pt::ptree& pt_topology) const
     pt_topology.add_child( "modulemap", pt_modulemap);
 }
 
-void Root::topology_dumping( bool dump, const std::string& filename) const
+void Root::topology_dumping( bool dump, const std::string& filename)
 {
     pt::ptree pt_topology;
     if ( dump) {
         topology_dumping_impl( pt_topology);
-        try {
-            if ( filename.empty()) {
-                std::cout << "*************Module topology dump***************" << std::endl;
-                pt::write_json( std::cout, pt_topology);
-                std::cout << "************************************************" << std::endl;
-            }
-            else {
-                pt::write_json( filename, pt_topology);
-                std::cout << std::endl << "Module topology dumped in topology.json" << std::endl;
-            }
+        if ( filename.empty()) {
+            sout.enable();
+            sout << "*************Module topology dump***************" << std::endl;
+            pt::write_json( std::cout, pt_topology);
+            sout << "************************************************" << std::endl;
         }
-        catch( pt::json_parser_error& e) {
-            std::cerr << e.what();
-            throw e;
+        else {
+            sout.enable();
+            pt::write_json( filename, pt_topology);
+            sout << std::endl << "Module topology dumped in topology.json" << std::endl;
         }
     }
 }
