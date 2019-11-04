@@ -75,6 +75,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
     * `-l cpu` —  prints all stages
     * `-l cpu,!mem` —  print all except mem stage
 * `-d` — enables output of functional simulator
+* `--tdump` — enables module topology dump into topology.json
 
 ### Performance mode options
 
