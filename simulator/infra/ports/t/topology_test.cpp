@@ -19,12 +19,16 @@ static auto read_json_from_file( const std::string& path)
 
 struct SomeTopology : public Root
 {
-    struct A : public Module {
+    struct TestModule : public Module {
+        pt::ptree topology_load_from_module() { return topology_dumping_impl(); }
+        explicit TestModule( Module* root, const std::string& name) : Module( root, name) { }
+    };
+    struct A : public TestModule {
         std::unique_ptr<WritePort<int>> to_C;
         std::unique_ptr<WritePort<int>> to_D;
         std::unique_ptr<ReadPort<int>> from_C;
         std::unique_ptr<ReadPort<int>> from_D;
-        explicit A( Module* root) : Module( root, "A")
+        explicit A( Module* root) : TestModule( root, "A")
         {
             to_C = make_write_port<int>( "A_to_C", PORT_BW);
             to_D = make_write_port<int>( "A_to_D", PORT_BW);
@@ -32,12 +36,12 @@ struct SomeTopology : public Root
             from_D = make_read_port<int>( "D_to_A", PORT_LATENCY);
         }
     };
-    struct B : public Module {
+    struct B : public TestModule {
         std::unique_ptr<WritePort<int>> to_C;
         std::unique_ptr<WritePort<int>> to_D;
         std::unique_ptr<ReadPort<int>> from_C;
         std::unique_ptr<ReadPort<int>> from_D;
-        explicit B( Module* root) : Module( root, "B")
+        explicit B( Module* root) : TestModule( root, "B")
         {
             to_C = make_write_port<int>( "B_to_C", PORT_BW);
             to_D = make_write_port<int>( "B_to_D", PORT_BW);
@@ -45,12 +49,12 @@ struct SomeTopology : public Root
             from_D = make_read_port<int>( "D_to_B", PORT_LATENCY);
         }
     };
-    struct C : public Module {
+    struct C : public TestModule {
         std::unique_ptr<WritePort<int>> to_A;
         std::unique_ptr<WritePort<int>> to_B;
         std::unique_ptr<ReadPort<int>> from_A;
         std::unique_ptr<ReadPort<int>> from_B;
-        explicit C( Module* root) : Module( root, "C")
+        explicit C( Module* root) : TestModule( root, "C")
         {
             to_A = make_write_port<int>( "C_to_A", PORT_BW);
             to_B = make_write_port<int>( "C_to_B", PORT_BW);
@@ -58,12 +62,12 @@ struct SomeTopology : public Root
             from_B = make_read_port<int>( "B_to_C", PORT_LATENCY);
         }
     };
-    struct D : public Module {
+    struct D : public TestModule {
         std::unique_ptr<WritePort<int>> to_A;
         std::unique_ptr<WritePort<int>> to_B;
         std::unique_ptr<ReadPort<int>> from_A;
         std::unique_ptr<ReadPort<int>> from_B;
-        explicit D( Module* root) : Module( root, "D")
+        explicit D( Module* root) : TestModule( root, "D")
         {
             to_A = make_write_port<int>( "D_to_A", PORT_BW);
             to_B = make_write_port<int>( "D_to_B", PORT_BW);
@@ -84,16 +88,28 @@ struct SomeTopology : public Root
     }
 };
 
-TEST_CASE( "Topology: dump into file")
+TEST_CASE( "Topology: dump into file from root")
 {
     SomeTopology t;
-    t.topology_save( "topology.json");
-    auto topology = read_json_from_file( "topology.json");
-    auto exp_topology = read_json_from_file( TEST_PATH + std::string( "/topology_test.json"));
+    t.topology_save( "topology_test.json");
+    auto topology = read_json_from_file( "topology_test.json");
+    auto exp_topology = read_json_from_file( TEST_PATH + std::string( "/topology_root_test.json"));
     CHECK( exp_topology.get_child( "modules") == topology.get_child( "modules"));
     for ( const pt::ptree::value_type &v : exp_topology.get_child( "portmap")) {
         CHECK( v.second == topology.get_child( "portmap." + std::string( v.first.data())));
     }
     CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
     CHECK( t.check_if_dumps());
+}
+
+TEST_CASE( "Topology: dump into file from module")
+{
+    SomeTopology t;
+    auto topology = t.a.topology_load_from_module();
+    auto exp_topology = read_json_from_file( TEST_PATH + std::string( "/topology_module_test.json"));
+    CHECK( exp_topology.get_child( "modules") == topology.get_child( "modules"));
+    for ( const pt::ptree::value_type &v : exp_topology.get_child( "portmap")) {
+        CHECK( v.second == topology.get_child( "portmap." + std::string( v.first.data())));
+    }
+    CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
 }

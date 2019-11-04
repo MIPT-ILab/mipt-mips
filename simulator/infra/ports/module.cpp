@@ -81,7 +81,6 @@ void Module::modulemap_dumping( pt::ptree* modulemap) const
     modulemap->add_child( name, c_modulemap);
 }
 
-
 pt::ptree Module::portmap_dumping() const
 {
     return parent->portmap_dumping();
@@ -121,5 +120,5 @@ void Root::topology_dumping( bool dump, const std::string& filename)
     pt::ptree topology = topology_dumping_impl();
     pt::write_json( filename, topology);
     sout.enable();
-    sout << std::endl << "Module topology dumped in topology.json" << std::endl;
+    sout << std::endl << "Module topology dumped into " + filename << std::endl;
 }
