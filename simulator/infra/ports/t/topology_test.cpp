@@ -24,10 +24,10 @@ struct SomeTopology : public Root
         explicit TestModule( Module* root, const std::string& name) : Module( root, name) { }
     };
     struct A : public TestModule {
-        std::unique_ptr<WritePort<int>> to_C;
-        std::unique_ptr<WritePort<int>> to_D;
-        std::unique_ptr<ReadPort<int>> from_C;
-        std::unique_ptr<ReadPort<int>> from_D;
+        WritePort<int>* to_C;
+        WritePort<int>* to_D;
+        ReadPort<int>* from_C;
+        ReadPort<int>* from_D;
         explicit A( Module* root) : TestModule( root, "A")
         {
             to_C = make_write_port<int>( "A_to_C", PORT_BW);
@@ -37,10 +37,10 @@ struct SomeTopology : public Root
         }
     };
     struct B : public TestModule {
-        std::unique_ptr<WritePort<int>> to_C;
-        std::unique_ptr<WritePort<int>> to_D;
-        std::unique_ptr<ReadPort<int>> from_C;
-        std::unique_ptr<ReadPort<int>> from_D;
+        WritePort<int>* to_C;
+        WritePort<int>* to_D;
+        ReadPort<int>* from_C;
+        ReadPort<int>* from_D;
         explicit B( Module* root) : TestModule( root, "B")
         {
             to_C = make_write_port<int>( "B_to_C", PORT_BW);
@@ -50,10 +50,10 @@ struct SomeTopology : public Root
         }
     };
     struct C : public TestModule {
-        std::unique_ptr<WritePort<int>> to_A;
-        std::unique_ptr<WritePort<int>> to_B;
-        std::unique_ptr<ReadPort<int>> from_A;
-        std::unique_ptr<ReadPort<int>> from_B;
+        WritePort<int>* to_A;
+        WritePort<int>* to_B;
+        ReadPort<int>* from_A;
+        ReadPort<int>* from_B;
         explicit C( Module* root) : TestModule( root, "C")
         {
             to_A = make_write_port<int>( "C_to_A", PORT_BW);
@@ -63,10 +63,10 @@ struct SomeTopology : public Root
         }
     };
     struct D : public TestModule {
-        std::unique_ptr<WritePort<int>> to_A;
-        std::unique_ptr<WritePort<int>> to_B;
-        std::unique_ptr<ReadPort<int>> from_A;
-        std::unique_ptr<ReadPort<int>> from_B;
+        WritePort<int>* to_A;
+        WritePort<int>* to_B;
+        ReadPort<int>* from_A;
+        ReadPort<int>* from_B;
         explicit D( Module* root) : TestModule( root, "D")
         {
             to_A = make_write_port<int>( "D_to_A", PORT_BW);

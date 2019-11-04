@@ -49,18 +49,18 @@ void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
 
 pt::ptree Module::write_ports_dumping() const
 {
-    pt::ptree write_ports;
-    for ( const auto& k : topology_write_ports)
-        write_ports.put(k, "");
-    return write_ports;
+    pt::ptree result;
+    for ( const auto& p : write_ports)
+        result.put( p->get_key(), "");
+    return result;
 }
 
 pt::ptree Module::read_ports_dumping() const
 {
-    pt::ptree read_ports;
-    for ( const auto& k : topology_read_ports) 
-        read_ports.put(k, "");
-    return read_ports;
+    pt::ptree result;
+    for ( const auto& p : read_ports) 
+        result.put( p->get_key(), "");
+    return result;
 }
 
 void Module::module_dumping( pt::ptree* modules) const
