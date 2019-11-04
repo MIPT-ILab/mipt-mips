@@ -77,7 +77,7 @@ private:
     Writeback<ISA> writeback;
 
     /* ports */
-    std::unique_ptr<ReadPort<Trap>> rp_halt = nullptr;
+    ReadPort<Trap>* rp_halt = nullptr;
 
     void clock_tree( Cycle cycle);
     void dump_statistics() const;
