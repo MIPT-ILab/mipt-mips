@@ -66,9 +66,8 @@ void Module::module_dumping( pt::ptree* modules) const
 void Module::modulemap_dumping( pt::ptree* modulemap) const
 {
     pt::ptree c_modulemap;
-    for ( const auto& c : children) {
+    for ( const auto& c : children)
         c->modulemap_dumping( &c_modulemap);
-    }
     modulemap->add_child( name, c_modulemap);
 }
 
@@ -79,23 +78,23 @@ void Root::enable_logging( const std::string& values)
     enable_logging_impl( tokens);
 }
 
-void Root::portmap_dumping( pt::ptree* portmap) const
+void Root::portmap_dumping( pt::ptree* pt_portmap) const
 {
-    Root::portmap->dump( portmap);
+    portmap->dump( pt_portmap);
 }
 
 void Root::topology_dumping_impl( pt::ptree* topology) const
 {
     pt::ptree modules;
-    pt::ptree portmap;
+    pt::ptree pt_portmap;
     pt::ptree modulemap;
 
     module_dumping( &modules);
-    portmap_dumping( &portmap);
+    portmap_dumping( &pt_portmap);
     modulemap_dumping( &modulemap);
 
     topology->add_child( "modules", modules);
-    topology->add_child( "portmap", portmap);
+    topology->add_child( "portmap", pt_portmap);
     topology->add_child( "modulemap", modulemap);
 }
 
@@ -103,7 +102,7 @@ void Root::topology_dumping( bool dump, const std::string& filename)
 {
     pt::ptree topology;
     if ( !dump)
-        return
+        return;
     topology_dumping_impl( &topology);
     pt::write_json( filename, topology);
     sout.enable();

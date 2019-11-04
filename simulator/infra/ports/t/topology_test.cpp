@@ -10,7 +10,14 @@
 
 namespace pt = boost::property_tree;
 
-struct SomeTopology : public BaseTestRoot
+static auto read_json_from_file( const std::string& path)
+{
+    pt::ptree t;
+    read_json( TEST_PATH + path, t);
+    return t;
+}
+
+struct SomeTopology : public Root
 {
     struct A : public Module {
         std::unique_ptr<WritePort<int>> to_C;
@@ -72,10 +79,9 @@ struct SomeTopology : public BaseTestRoot
     void portmap_load( pt::ptree* portmap) const { portmap_dumping( portmap); }
     void modules_load( pt::ptree* modules) const { module_dumping( modules); }
     void topology_load( pt::ptree* topology) const { topology_dumping_impl( topology); }
-    void topology_save() { topology_dumping(true); }
-    void topology_save(const std::string& filename) { topology_dumping(true, filename); }
+    void topology_save( const std::string& filename) { topology_dumping( true, filename); }
     bool check_if_dumps() const { return sout.enabled(); }
-    explicit SomeTopology()
+    explicit SomeTopology() : Root( "test-root")
     {
         /* Root
          * | \
@@ -94,31 +100,28 @@ struct SomeTopology : public BaseTestRoot
 TEST_CASE( "Topology: modulemap")
 {
     SomeTopology t;
-    pt::ptree exp_modulemap;
+    auto exp_modulemap = read_json_from_file( "/modulemap_test.json");
     pt::ptree modulemap;
-    read_json( TEST_PATH + std::string( "/modulemap_test.json"), exp_modulemap);
-    t.modulemap_load( &modulemap));
+    t.modulemap_load( &modulemap);
     CHECK( modulemap == exp_modulemap);
 }
 
 TEST_CASE( "Topology: portmap")
 {
     SomeTopology t;
-    pt::ptree exp_portmap;
+    auto exp_portmap = read_json_from_file( "/portmap_test.json");
     pt::ptree portmap;
-    read_json( TEST_PATH + std::string( "/portmap_test.json"), exp_portmap);
-    t.portmap_load( &portmap));
+    t.portmap_load( &portmap);
     for ( const pt::ptree::value_type &v : exp_portmap) {
-        CHECK( v.second == portmap.get_child(v.first.data()));
+        CHECK( v.second == portmap.get_child( v.first.data()));
     }
 }
 
 TEST_CASE( "Topology: modules")
 {
     SomeTopology t;
-    pt::ptree exp_modules;
+    auto exp_modules = read_json_from_file( "/modules_test.json");
     pt::ptree modules;
-    read_json( TEST_PATH + std::string( "/modules_test.json"), exp_modules);
     t.modules_load( &modules);
     CHECK( modules == exp_modules);
 }
@@ -126,21 +129,19 @@ TEST_CASE( "Topology: modules")
 TEST_CASE( "Topology: topology")
 {
     SomeTopology t;
-    pt::ptree exp_topology;
+    auto exp_topology = read_json_from_file( "/topology_test.json");
     pt::ptree topology;
-    read_json( TEST_PATH + std::string( "/topology_test.json"), exp_topology);
-    t.topology_load( &topology));
+    t.topology_load( &topology);
     CHECK( exp_topology.get_child( "modules") == topology.get_child( "modules"));
     for ( const pt::ptree::value_type &v : exp_topology.get_child( "portmap")) {
-        CHECK( v.second == topology.get_child("portmap." + std::string(v.first.data())));
+        CHECK( v.second == topology.get_child( "portmap." + std::string( v.first.data())));
     }
-    CHECK( exp_topology.get_child("modulemap") == topology.get_child("modulemap"));
+    CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
 }
 
 TEST_CASE( "Topology: dump into file")
 {
     SomeTopology t;
-    pt::ptree topology;
-    CHECK_NOTHROW( t.topology_save("topology.json"));
+    t.topology_save( "topology.json");
     CHECK( t.check_if_dumps());
 }

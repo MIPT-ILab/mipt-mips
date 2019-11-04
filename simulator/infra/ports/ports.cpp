@@ -20,7 +20,7 @@ void PortMap::init() const
 {
     for ( const auto& cluster : map)
     {
-        if (cluster.second.writer == nullptr)
+        if ( cluster.second.writer == nullptr)
             throw PortError( cluster.first + " has no WritePort");
 
         cluster.second.writer->init( cluster.second.readers);

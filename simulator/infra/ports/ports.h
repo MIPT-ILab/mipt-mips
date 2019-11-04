@@ -13,12 +13,13 @@
 #include "port_queue/port_queue.h"
 #include "timing.h"
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 #include <cassert>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <boost/property_tree/ptree_fwd.hpp>
 
 struct PortError final : Exception {
     explicit PortError( const std::string& msg)
