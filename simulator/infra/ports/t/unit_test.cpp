@@ -8,8 +8,6 @@
 #include <catch.hpp>
 #include <map>
 
-namespace pt = boost::property_tree;
-
 TEST_CASE( "Latency to string")
 {
     CHECK( (5_cl).to_string() == "5");

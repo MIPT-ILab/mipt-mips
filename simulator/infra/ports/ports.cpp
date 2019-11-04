@@ -42,8 +42,9 @@ void PortMap::add_port( BasicReadPort* port)
     map[ port->get_key()].readers.push_back( port);
 }
 
-void PortMap::dump( pt::ptree* portmap) const
+pt::ptree PortMap::dump() const
 {
+    pt::ptree portmap;
     for ( const auto& elem : map) {
         pt::ptree cluster;
         pt::ptree write_port;
@@ -55,8 +56,9 @@ void PortMap::dump( pt::ptree* portmap) const
         }
         cluster.add_child( "write_port", write_port);
         cluster.add_child( "read_ports", read_ports);
-        portmap->add_child( elem.first, cluster);
+        portmap.add_child( elem.first, cluster);
     }
+    return portmap;
 }
 
 Port::Port( std::shared_ptr<PortMap> port_map, std::string key)

@@ -40,7 +40,7 @@ private:
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
 
-    void dump( boost::property_tree::ptree* portmap) const;
+    boost::property_tree::ptree dump() const;
 
     struct Cluster
     {
