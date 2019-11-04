@@ -76,7 +76,7 @@ struct SomeTopology : public Root
     std::unique_ptr<C> c;
     std::unique_ptr<D> d;
     void modulemap_load( pt::ptree* modulemap) const { modulemap_dumping( modulemap); }
-    void portmap_load( pt::ptree* portmap) const { portmap_dumping( portmap); }
+    void portmap_load( pt::ptree* pt_portmap) const { portmap_dumping( pt_portmap); }
     void modules_load( pt::ptree* modules) const { module_dumping( modules); }
     void topology_load( pt::ptree* topology) const { topology_dumping_impl( topology); }
     void topology_save( const std::string& filename) { topology_dumping( true, filename); }
