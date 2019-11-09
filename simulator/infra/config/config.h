@@ -91,6 +91,11 @@ struct HelpOption : Exception
     explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
 };
 
+struct InvalidOption : Exception
+{
+    explicit InvalidOption( const std::string& msg) : Exception( "Invalid option", msg) {}
+};
+
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 void handleArgs( int argc, const char* const argv[], int start_index);
 
