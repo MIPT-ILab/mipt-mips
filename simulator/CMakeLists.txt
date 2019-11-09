@@ -26,6 +26,7 @@ endif()
 
 set(CPPS
     infra/print128.cpp
+    infra/config/main_wrapper.cpp
     infra/config/config.cpp
     infra/ports/module.cpp
     infra/ports/ports.cpp

@@ -7,6 +7,7 @@
 
 #include <infra/cache/cache_tag_array.h>
 #include <infra/config/config.h>
+#include <infra/config/main_wrapper.h>
 #include <infra/macro.h>
 
 namespace config {
@@ -18,26 +19,18 @@ namespace config {
     static AliasedValue<uint32> line_size = { "l", "line_size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
-int main( int argc, const char* argv[]) try {
-    config::handleArgs( argc, argv, 1);
-    auto cache = CacheTagArray::create( config::replacement, config::size, config::ways, config::line_size, 32);
-    std::cout << run_cache( cache.get(), config::file);
-    return 0;
-}
-catch (const config::HelpOption& e) {
-    std::cout << "MIPT-V Standalone cache simulator."
-              << std::endl << std::endl << e.what() << std::endl;
-    return 0;
-}
-catch (const Exception& e) {
-    std::cerr << e.what() << std::endl;
-    return 2;
-}
-catch (const std::exception& e) {
-    std::cerr << "System exception:\t\n" << e.what() << std::endl;
-    return 2;
-}
-catch (...) {
-    std::cerr << "Unknown exception\n";
-    return 3;
+class Main : public MainWrapper
+{
+    using MainWrapper::MainWrapper;
+private:
+    void impl( int argc, const char* argv[]) const final {
+        config::handleArgs( argc, argv, 1);
+        auto cache = CacheTagArray::create( config::replacement, config::size, config::ways, config::line_size, 32);
+        std::cout << run_cache( cache.get(), config::file);
+    }
+};
+
+int main( int argc, const char* argv[])
+{
+    return Main( "MIPT-V Standalone cache simulator.").run( argc, argv);
 }
