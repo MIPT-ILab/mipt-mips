@@ -6,6 +6,7 @@
 
 /* Simulator modules. */
 #include <infra/config/config.h>
+#include <infra/config/main_wrapper.h>
 #include <kernel/kernel.h>
 #include <memory/memory.h>
 #include <simulator.h>
@@ -16,39 +17,31 @@ namespace config {
     static Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
 } // namespace config
 
-int main( int argc, const char* argv[]) try {
-    config::handleArgs( argc, argv, 1);
-    auto memory = FuncMemory::create_default_hierarchied_memory();
+class Main : public MainWrapper
+{
+    using MainWrapper::MainWrapper;
+private:
+    int impl( int argc, const char* argv[]) const final {
+        config::handleArgs( argc, argv, 1);
+        auto memory = FuncMemory::create_default_hierarchied_memory();
 
-    auto sim = Simulator::create_configured_simulator();
-    sim->set_memory( memory);
-    sim->write_csr_register( "mscratch", 0x400'0000);
+        auto sim = Simulator::create_configured_simulator();
+        sim->set_memory( memory);
+        sim->write_csr_register( "mscratch", 0x400'0000);
 
-    auto kernel = Kernel::create_configured_kernel();
-    kernel->connect_memory( memory);
-    kernel->set_simulator( sim);
-    kernel->load_file( config::binary_filename);
-    sim->set_kernel( kernel);
+        auto kernel = Kernel::create_configured_kernel();
+        kernel->connect_memory( memory);
+        kernel->set_simulator( sim);
+        kernel->load_file( config::binary_filename);
+        sim->set_kernel( kernel);
 
-    sim->init_checker();
-    sim->set_pc( kernel->get_start_pc());
-    sim->run( config::num_steps);
-    return sim->get_exit_code();
-}
-catch (const config::HelpOption& e) {
-    std::cout << "Functional and performance simulators for MIPS-based CPU."
-              << std::endl << std::endl << e.what() << std::endl;
-    return 0;
-}
-catch (const Exception& e) {
-    std::cerr << e.what() << std::endl;
-    return 2;
-}
-catch (const std::exception& e) {
-    std::cerr << "System exception:\t\n" << e.what() << std::endl;
-    return 2;
-}
-catch (...) {
-    std::cerr << "Unknown exception\n";
-    return 3;
+        sim->init_checker();
+        sim->set_pc( kernel->get_start_pc());
+        sim->run( config::num_steps);
+        return sim->get_exit_code();
+    }
+};
+
+int main( int argc, const char* argv[]) {
+    return Main( "Functional and performance simulators for MIPS-based CPU.").run( argc, argv);
 }
