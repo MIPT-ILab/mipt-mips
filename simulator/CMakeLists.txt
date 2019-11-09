@@ -48,6 +48,7 @@ set(CPPS
     risc_v/riscv_instr.cpp
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
+    export/cache/runner.cpp
     kernel/kernel.cpp
     kernel/mars/mars_kernel.cpp
     modules/ports_instance.cpp
@@ -98,6 +99,7 @@ set(TESTS_CPPS
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
+    export/cache/t/unit_test.cpp
 )
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests\")
@@ -177,9 +179,11 @@ add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opco
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
+add_executable(cachesim export/cache/main.cpp)
 
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
 target_link_libraries(mipt-mips mipt-mips-src)
+target_link_libraries(cachesim mipt-mips-src)
 target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
 
 add_test(all_tests unit-tests)
