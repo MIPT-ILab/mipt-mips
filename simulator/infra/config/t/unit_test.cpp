@@ -106,7 +106,7 @@ TEST_CASE( "config_parse: Pass_No_Args")
         "mipt-mips", nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -121,7 +121,7 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
         nullptr
     };
     
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -136,7 +136,7 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -153,7 +153,7 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 #if 0
@@ -171,7 +171,7 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 #endif
 
@@ -188,7 +188,7 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -204,7 +204,7 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 TEST_CASE( "config_parse: Pass help option alias")
@@ -233,6 +233,18 @@ TEST_CASE( "config_parse: Pass help option")
     };
 
     CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
+}
+
+TEST_CASE( "config_parse: Pass help option and invalid option")
+{
+    std::vector<const char*> argv
+    {
+        "mipt-mips",
+        "--help",
+        nullptr
+    };
+
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 #if 0
@@ -272,10 +284,21 @@ TEST_CASE("MainWrapper: throw help")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw config::HelpOption( "Help!"); }
+        int impl( int, const char* []) const final { throw config::HelpOption(); }
     };
 
     CHECK( Main().run( 0, nullptr) == 0);
+}
+
+TEST_CASE("MainWrapper: invalid option")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        int impl( int, const char* []) const final { throw config::InvalidOption( "Help!"); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 4);
 }
 
 TEST_CASE("MainWrapper: throw exception")
