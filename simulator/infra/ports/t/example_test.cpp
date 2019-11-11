@@ -85,10 +85,10 @@ public:
     }
 
 private:
-    std::unique_ptr<WritePort<int>> to_B;
-    std::unique_ptr<ReadPort<int>> from_B;
-    std::unique_ptr<ReadPort<int>> init;
-    std::unique_ptr<WritePort<bool>> stop;
+    WritePort<int>* to_B;
+    ReadPort<int>* from_B;
+    ReadPort<int>* init;
+    WritePort<bool>* stop;
 };
 
 class B : public Module
@@ -113,8 +113,8 @@ public:
     }
 
 private:
-    std::unique_ptr<WritePort<int>> to_A;
-    std::unique_ptr<ReadPort<int>> from_A;
+    WritePort<int>* to_A;
+    ReadPort<int>* from_A;
 };
 
 class TestRoot : public Root
@@ -149,8 +149,8 @@ private:
     A a;
     B b;
 
-    std::unique_ptr<WritePort<int>> init;
-    std::unique_ptr<ReadPort<bool>> stop;
+    WritePort<int>* init;
+    ReadPort<bool>* stop;
 };
 
 TEST_CASE( "test_ports: Test_Ports_A_B")

@@ -25,7 +25,7 @@ TEST_CASE("Ports: no write port")
     {
         TestRoot()
         {
-            auto input = make_read_port<int>( "Key", PORT_LATENCY);
+            make_read_port<int>( "Key", PORT_LATENCY);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -37,7 +37,7 @@ TEST_CASE("Ports: no read port")
     {
         TestRoot()
         {
-            auto output = make_write_port<int>( "Yek", PORT_BW);
+            make_write_port<int>( "Yek", PORT_BW);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -49,8 +49,8 @@ TEST_CASE("Ports: two write ports")
     {
         TestRoot()
         {
-            auto input = make_read_port<int>( "Key", PORT_LATENCY);
-            auto output = make_write_port<int>( "Key", PORT_BW);
+            make_read_port<int>( "Key", PORT_LATENCY);
+            make_write_port<int>( "Key", PORT_BW);
             CHECK_THROWS_AS( make_write_port<int>( "Key", PORT_BW), PortError);
         }
     } tr;
@@ -62,8 +62,8 @@ TEST_CASE("Ports: type mismatch")
     {
         TestRoot()
         {
-            auto input = make_read_port<int>( "Key", PORT_LATENCY);
-            auto output = make_write_port<std::string>( "Key", PORT_BW);
+            make_read_port<int>( "Key", PORT_LATENCY);
+            make_write_port<std::string>( "Key", PORT_BW);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -71,8 +71,8 @@ TEST_CASE("Ports: type mismatch")
 
 struct PairOfPorts : public BaseTestRoot
 {
-    std::unique_ptr<ReadPort<int>> rp;
-    std::unique_ptr<WritePort<int>> wp;
+    ReadPort<int>* rp;
+    WritePort<int>* wp;
 
     explicit PairOfPorts( uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
     {
