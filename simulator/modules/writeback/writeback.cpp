@@ -28,7 +28,7 @@ void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
 template <typename ISA>
 auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
-    auto ports = { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get() };
+    auto ports = { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath };
     std::vector<Instr> result;
 
     for ( auto& port : ports)

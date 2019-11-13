@@ -22,13 +22,13 @@ class Mem : public Module
     private:
         std::shared_ptr<FuncMemory> memory;
 
-        std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
-        std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
+        WritePort<Instr>* wp_datapath = nullptr;
+        ReadPort<Instr>* rp_datapath = nullptr;
 
-        std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+        ReadPort<bool>* rp_flush = nullptr;
+        ReadPort<bool>* rp_trap = nullptr;
 
-        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = nullptr;
 
     public:
         explicit Mem( Module* parent);
