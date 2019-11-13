@@ -24,15 +24,19 @@ protected:
     template<typename T>
     auto make_write_port( std::string key, uint32 bandwidth) 
     {
-        topology_write_ports.emplace_back( key);
-        return std::make_unique<WritePort<T>>( get_portmap(), std::move( key), bandwidth);
+        auto port = std::make_unique<WritePort<T>>( get_portmap(), std::move(key), bandwidth);
+        auto ptr = port.get();
+        write_ports.emplace_back( std::move( port));
+        return ptr;
     }
 
     template<typename T>
     auto make_read_port( std::string key, Latency latency)
     {
-        topology_read_ports.emplace_back( key);
-        return std::make_unique<ReadPort<T>>( get_portmap(), std::move( key), latency);
+        auto port = std::make_unique<ReadPort<T>>( get_portmap(), std::move(key), latency);
+        auto ptr = port.get();
+        read_ports.emplace_back( std::move( port));
+        return ptr;
     }
 
     void enable_logging_impl( const std::unordered_set<std::string>& names);
@@ -55,8 +59,8 @@ private:
     Module* const parent;
     std::vector<Module*> children;
     const std::string name;
-    std::vector<std::string> topology_write_ports;
-    std::vector<std::string> topology_read_ports;
+    std::vector<std::unique_ptr<BasicWritePort>> write_ports;
+    std::vector<std::unique_ptr<BasicReadPort>> read_ports;
 };
 
 class Root : public Module

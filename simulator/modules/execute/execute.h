@@ -23,24 +23,24 @@ class Execute : public Module
         const Latency last_execution_stage_latency;
 
         /* Inputs */
-        std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
-        std::unique_ptr<ReadPort<Instr>> rp_long_latency_execution_unit = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+        ReadPort<Instr>* rp_datapath = nullptr;
+        ReadPort<Instr>* rp_long_latency_execution_unit = nullptr;
+        ReadPort<bool>* rp_flush = nullptr;
+        ReadPort<bool>* rp_trap = nullptr;
 
         struct BypassPorts {
-            std::unique_ptr<ReadPort<BypassCommand<Register>>> command_port;
-            std::array<std::unique_ptr<ReadPort<InstructionOutput>>, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
+            ReadPort<BypassCommand<Register>>* command_port;
+            std::array<ReadPort<InstructionOutput>*, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
         };
         std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;
 
         /* Outputs */
-        std::unique_ptr<WritePort<Instr>> wp_mem_datapath = nullptr;
-        std::unique_ptr<WritePort<Instr>> wp_branch_datapath = nullptr;
-        std::unique_ptr<WritePort<Instr>> wp_writeback_datapath = nullptr;
-        std::unique_ptr<WritePort<Instr>> wp_long_latency_execution_unit = nullptr;
-        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
-        std::unique_ptr<WritePort<InstructionOutput>> wp_long_arithmetic_bypass = nullptr;
+        WritePort<Instr>* wp_mem_datapath = nullptr;
+        WritePort<Instr>* wp_branch_datapath = nullptr;
+        WritePort<Instr>* wp_writeback_datapath = nullptr;
+        WritePort<Instr>* wp_long_latency_execution_unit = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_long_arithmetic_bypass = nullptr;
 
         Latency flush_expiration_latency = 0_lt;
 

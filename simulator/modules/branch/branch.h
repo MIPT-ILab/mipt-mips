@@ -23,21 +23,21 @@ class Branch : public Module
         uint64 num_mispredictions = 0;
         uint64 num_jumps          = 0;
 
-        std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
-        std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
+        ReadPort<Instr>* rp_datapath = nullptr;
+        WritePort<Instr>* wp_datapath = nullptr;
 
-        std::unique_ptr<WritePort<bool>> wp_flush_all = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+        WritePort<bool>* wp_flush_all = nullptr;
+        ReadPort<bool>* rp_flush = nullptr;
+        ReadPort<bool>* rp_trap = nullptr;
 
-        std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
-        std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
+        WritePort<Target>* wp_flush_target = nullptr;
+        WritePort<BPInterface>* wp_bp_update = nullptr;
 
-        std::unique_ptr<ReadPort<Instr>> rp_recive_datapath_from_mem = nullptr;
+        ReadPort<Instr>* rp_recive_datapath_from_mem = nullptr;
 
-        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = nullptr;
 
-        std::unique_ptr<WritePort<bool>> wp_bypassing_unit_flush_notify = nullptr;
+        WritePort<bool>* wp_bypassing_unit_flush_notify = nullptr;
 
     public:
         explicit Branch( Module* parent);
