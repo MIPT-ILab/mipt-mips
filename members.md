@@ -1,5 +1,3 @@
-
-<<<<<<< HEAD
 List of 2019/2020 MIPT-V project members:
 1. Pavel Kryukov
 2. Maxim Davydov
@@ -25,9 +23,4 @@ List of 2019/2020 MIPT-V project members:
 22. Aleksandr Troegubov
 23. Grigoriy Egorov
 24. Yaroslav Okatev
-<<<<<<< HEAD
-=======
->>>>>>> 82fedd60ea4740a91f8667083af970ea04c9acff
-=======
 
->>>>>>> 9fe4d8c1228fa25f726f7975039c2ade2ced72e7
