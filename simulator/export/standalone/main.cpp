@@ -6,6 +6,7 @@
 
 /* Simulator modules. */
 #include <infra/config/config.h>
+#include <infra/config/main_wrapper.h>
 #include <kernel/kernel.h>
 #include <memory/memory.h>
 #include <simulator.h>
@@ -16,7 +17,14 @@ namespace config {
     static Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
 } // namespace config
 
-int main( int argc, const char* argv[]) try {
+class Main : public MainWrapper
+{
+    using MainWrapper::MainWrapper;
+private:
+    int impl( int argc, const char* argv[]) const final; 
+};
+
+int Main::impl( int argc, const char* argv[]) const {
     config::handleArgs( argc, argv, 1);
     auto memory = FuncMemory::create_default_hierarchied_memory();
 
@@ -35,20 +43,7 @@ int main( int argc, const char* argv[]) try {
     sim->run( config::num_steps);
     return sim->get_exit_code();
 }
-catch (const config::HelpOption& e) {
-    std::cout << "Functional and performance simulators for MIPS-based CPU."
-              << std::endl << std::endl << e.what() << std::endl;
-    return 0;
-}
-catch (const Exception& e) {
-    std::cerr << e.what() << std::endl;
-    return 2;
-}
-catch (const std::exception& e) {
-    std::cerr << "System exception:\t\n" << e.what() << std::endl;
-    return 2;
-}
-catch (...) {
-    std::cerr << "Unknown exception\n";
-    return 3;
+
+int main( int argc, const char* argv[]) {
+    return Main( "Functional and performance simulators for MIPS-based CPU.").run( argc, argv);
 }
