@@ -26,6 +26,7 @@ endif()
 
 set(CPPS
     infra/print128.cpp
+    infra/config/main_wrapper.cpp
     infra/config/config.cpp
     infra/ports/module.cpp
     infra/ports/ports.cpp
@@ -71,6 +72,7 @@ set(TESTS_CPPS
     infra/ports/port_queue/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     infra/ports/t/example_test.cpp
+    infra/ports/t/topology_test.cpp
     memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
@@ -104,8 +106,8 @@ add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
+    COMMAND python ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/../riscv-bitmanip-opcodes
 )
 
 if (MSVC)
