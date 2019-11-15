@@ -155,3 +155,45 @@ TEST_CASE( "RISCV lq/sq")
     memory->load_store( &load);
     CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
+
+template<typename T>
+struct TestData {
+    T src1, src2,dst;
+};
+
+TEST_CASE( "RISCV slo32")
+{
+    CHECK( RISCVInstr<uint32>( 0x20E797B3).get_disasm() == "slo $a5, $a5, $a4");
+    std::vector<TestData<uint32>> cases = {
+        {0x1C, 2, 0x73},
+        {all_ones<uint32>(), 0xAA, all_ones<uint32>()},
+        {0xAA, 0xFF, bitmask<uint32>(31)},
+        {0xAB, 0xFF, all_ones<uint32>()},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        RISCVInstr<uint32> instr( "slo", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
+
+TEST_CASE ("RISCV slo64") {
+    std::vector<TestData<uint64>> cases = {
+        {0x1C, 2, 0x73},
+        {all_ones<uint32>(), 5, bitmask<uint64>(37)},
+        {all_ones<uint64>(), 0xFF, all_ones<uint64>()},
+        {0xAA, 0xFF, bitmask<uint64>(63)},
+        {0xAB, 0xFF, all_ones<uint64>()},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        RISCVInstr<uint64> instr( "slo", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}

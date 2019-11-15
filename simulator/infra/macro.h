@@ -167,6 +167,12 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
     return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
 
+template<typename T>
+static constexpr T ones_ls(const T& value, size_t shamt)
+{
+    return ~(~value << shamt);
+}
+
 template<size_t N, typename T>
 T sign_extension( T value)
 {
