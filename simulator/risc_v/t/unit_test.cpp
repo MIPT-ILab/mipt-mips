@@ -156,34 +156,44 @@ TEST_CASE( "RISCV lq/sq")
     CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
 
-TEST_CASE( "RISCV slo")
+template<typename T>
+struct TestData {
+    T src1, src2,dst;
+};
+
+TEST_CASE( "RISCV slo32")
 {
     CHECK( RISCVInstr<uint32>( 0x20E797B3).get_disasm() == "slo $a5, $a5, $a4");
-    RISCVInstr<uint32> instr32( "slo", 0);
-    RISCVInstr<uint64> instr64( "slo", 8);
-    std::vector<std::tuple<uint32, uint32, uint32>> cases32 = {
+    RISCVInstr<uint32> instr( "slo", 0);
+    std::vector<TestData<uint32>> cases = {
         {0x1C, 2, 0x73},
         {0xFFFFFFFF, 0xAA, 0xFFFFFFFF},
         {0xAA, 0xFF, 0x7FFFFFFF},
         {0xAB, 0xFF, 0xFFFFFFFF},
     };
-    std::vector<std::tuple<uint64, uint64, uint64>> cases64 = {
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
+
+TEST_CASE ("RISCV slo64") {
+    RISCVInstr<uint64> instr( "slo", 0);
+    std::vector<TestData<uint64>> cases = {
         {0x1C, 2, 0x73},
         {0xFFFFFFFF, 5, 0x1FFFFFFFFF},
         {0xFFFFFFFFFFFFFFFF, 0xFF, 0xFFFFFFFFFFFFFFFF},
         {0xAA, 0xFF, 0x7FFFFFFFFFFFFFFF},
         {0xAB, 0xFF, 0xFFFFFFFFFFFFFFFF},
     };
-    for ( const auto& c : cases32) {
-        instr32.set_v_src( std::get<0>( c), 0);
-        instr32.set_v_src( std::get<1>( c), 1);
-        instr32.execute();
-        CHECK( instr32.get_v_dst() == std::get<2>( c));
-    }
-    for ( const auto& c : cases64) {
-        instr64.set_v_src( std::get<0>( c), 0);
-        instr64.set_v_src( std::get<1>( c), 1);
-        instr64.execute();
-        CHECK( instr64.get_v_dst() == std::get<2>( c));
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
     }
 }
