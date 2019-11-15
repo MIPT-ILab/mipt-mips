@@ -75,6 +75,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
     * `-l cpu` —  prints all stages
     * `-l cpu,!mem` —  print all except mem stage
 * `-d` — enables output of functional simulator
+* `--tdump` — enables module topology dump into topology.json
 
 ### Performance mode options
 
@@ -99,7 +100,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
-To build simulator faster, we recommend to install Ninja.
+To build simulator faster, we recommend to [install Ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
   1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake

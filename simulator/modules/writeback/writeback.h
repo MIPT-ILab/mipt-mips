@@ -48,16 +48,16 @@ private:
     void writeback_bubble( Cycle cycle);
 
     /* Input */
-    std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
-    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+    ReadPort<Instr>* rp_mem_datapath = nullptr;
+    ReadPort<Instr>* rp_execute_datapath = nullptr;
+    ReadPort<Instr>* rp_branch_datapath = nullptr;    
+    ReadPort<bool>* rp_trap = nullptr;
 
     /* Output */
-    std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
-    std::unique_ptr<WritePort<Trap>> wp_halt = nullptr;
-    std::unique_ptr<WritePort<bool>> wp_trap = nullptr;
-    std::unique_ptr<WritePort<Target>> wp_target = nullptr;
+    WritePort<std::pair<RegisterUInt, RegisterUInt>>* wp_bypass = nullptr;
+    WritePort<Trap>* wp_halt = nullptr;
+    WritePort<bool>* wp_trap = nullptr;
+    WritePort<Target>* wp_target = nullptr;
 
 public:
     Writeback( Module* parent, Endian endian);

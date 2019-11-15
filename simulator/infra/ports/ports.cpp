@@ -6,6 +6,10 @@
 
 #include "ports.h"
 
+#include <boost/property_tree/ptree.hpp>
+
+namespace pt = boost::property_tree;
+
 std::shared_ptr<PortMap> PortMap::create_port_map()
 {
     struct PortMapHack : public PortMap {};
@@ -16,7 +20,7 @@ void PortMap::init() const
 {
     for ( const auto& cluster : map)
     {
-        if (cluster.second.writer == nullptr)
+        if ( cluster.second.writer == nullptr)
             throw PortError( cluster.first + " has no WritePort");
 
         cluster.second.writer->init( cluster.second.readers);
@@ -36,6 +40,25 @@ void PortMap::add_port( BasicWritePort* port)
 void PortMap::add_port( BasicReadPort* port)
 {
     map[ port->get_key()].readers.push_back( port);
+}
+
+pt::ptree PortMap::dump() const
+{
+    pt::ptree portmap;
+    for ( const auto& elem : map) {
+        pt::ptree cluster;
+        pt::ptree write_port;
+        pt::ptree read_ports;
+        write_port.put( "fanout", elem.second.writer->get_fanout());
+        write_port.put( "bandwidth", elem.second.writer->get_bandwidth());
+        for ( const auto& read_port : elem.second.readers) {
+            read_ports.put( "latency", read_port->get_latency());
+        }
+        cluster.add_child( "write_port", write_port);
+        cluster.add_child( "read_ports", read_ports);
+        portmap.add_child( elem.first, cluster);
+    }
+    return portmap;
 }
 
 Port::Port( std::shared_ptr<PortMap> port_map, std::string key)
