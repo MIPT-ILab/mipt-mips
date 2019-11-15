@@ -155,3 +155,13 @@ TEST_CASE( "RISCV lq/sq")
     memory->load_store( &load);
     CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
+
+TEST_CASE("RISCV RV32 orn")
+{
+    CHECK( RISCVInstr<uint32>(0x411865b3).get_disasm() == "nor $a1, $a6, $a7");
+    RISCVInstr<uint32> instr( "nor", 0);
+    instr.set_v_src( 0xf7, 0);
+    instr.set_v_src( 0xffffef77, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x10ff);
+}
