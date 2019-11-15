@@ -215,3 +215,4 @@ TEST_CASE("RISCV RV64 orn")
     instr.set_v_src( 0xbfffffffffffef77, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x400000000010ff);
+}
