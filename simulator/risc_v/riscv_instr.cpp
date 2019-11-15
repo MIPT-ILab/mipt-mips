@@ -78,6 +78,8 @@ template<typename I> auto execute_div = ALU::riscv_div<I, sign_t<typename I::Reg
 template<typename I> auto execute_divu = ALU::riscv_div<I, typename I::RegisterUInt>;
 template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::RegisterUInt>>;
 template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
+// B
+template<typename I> auto execute_orn = ALU::orn<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
