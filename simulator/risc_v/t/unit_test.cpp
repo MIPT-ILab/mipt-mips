@@ -168,7 +168,7 @@ TEST_CASE("RISCV RV32 orn")
 
 TEST_CASE("RISCV RV64 orn")
 {
-    RISCVInstr<uint32> instr( "nor", 0);
+    RISCVInstr<uint64> instr( "nor", 0);
     instr.set_v_src( 0xf7, 0);
     instr.set_v_src( 0xbfffffffffffef77, 1);
     instr.execute();
