@@ -4,6 +4,8 @@
  */
 
 #include "../config.h"
+#include "../main_wrapper.h"
+
 #include "infra/argv.h"
 #include "infra/macro.h"
 
@@ -265,3 +267,47 @@ TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twi
 }
 #endif
 
+TEST_CASE("MainWrapper: throw help")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        int impl( int, const char* []) const final { throw config::HelpOption( "Help!"); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 0);
+}
+
+TEST_CASE("MainWrapper: throw exception")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        int impl( int, const char* []) const final { throw Exception( "Exception"); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 2);
+}
+
+TEST_CASE("MainWrapper: throw std exception")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        int impl( int, const char* []) const final { throw std::exception(); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 2);
+}
+
+
+TEST_CASE("MainWrapper: throw integer")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        int impl( int, const char* []) const final { throw 222; }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 3);
+}
