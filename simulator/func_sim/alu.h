@@ -191,6 +191,7 @@ struct ALU
     template<typename I, typename T> static void sllv( I* instr) { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) << shamt_v_src2<T>( instr)); }
     template<typename I, typename T> static void srlv( I* instr) { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<typename I, typename T> static void srav( I* instr) { instr->v_dst = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src1), shamt_v_src2<T>( instr)); }
+    template<typename I, typename T> static void slo( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ~(~( instr->v_src1 & all_ones<T>()) << shamt_v_src2<T>( instr))); }
 
     // MIPS extra shifts
     template<typename I> static void dsll32( I* instr) { instr->v_dst = instr->v_src1 << shamt_imm_32( instr); }
