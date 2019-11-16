@@ -214,4 +214,11 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+template<typename T>
+static constexpr T shift_ones_right( const T& rs1, const T& rs2)
+{
+    int shmat = rs2 & (bitwidth<T> - 1); // FIXME(M-ximus): I want to fill overflow bit, but I can't find anything about this in the RISC_V spec
+    return ~((~rs1) >> shmat);
+}
+
 #endif

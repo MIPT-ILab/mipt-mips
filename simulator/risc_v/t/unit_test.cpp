@@ -5,7 +5,7 @@
  */
 
 #include "../riscv_instr.h"
- 
+
 #include <catch.hpp>
 #include <memory/memory.h>
 
@@ -180,7 +180,8 @@ TEST_CASE( "RISCV slo32")
     }
 }
 
-TEST_CASE ("RISCV slo64") {
+TEST_CASE ( "RISCV slo64")
+{
     std::vector<TestData<uint64>> cases = {
         {0x1C, 2, 0x73},
         {all_ones<uint32>(), 5, bitmask<uint64>(37)},
@@ -196,4 +197,25 @@ TEST_CASE ("RISCV slo64") {
         INFO( "Iteration: " << i);
         CHECK( instr.get_v_dst() == cases[i].dst);
     }
+}
+
+TEST_CASE ( "RISCV sro")
+{
+    //CHECK( RISCVInstr<uint32>( 0x2020d1b3).get_disasm() == "sro $a1, $a2, $a3");
+    CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
+
+    INFO("32-bit check");
+    RISCVInstr<uint32> test_32( "sro", 0);
+    test_32.set_v_src( 0x8000'c000, 0);
+    test_32.set_v_src( 0xf, 1);
+    test_32.execute();
+    CHECK( test_32.get_v_dst() == 0xffff'0001);
+
+    INFO("64-bit check");
+    RISCVInstr<uint64> test_64( "sro", 0);
+    test_64.set_v_src( 0x8000'0000'c000'0000, 0);
+    test_64.set_v_src( 0x1f, 1);
+    test_64.execute();
+    CHECK( test_64.get_v_dst() == 0xffff'ffff'0000'0001);
+
 }
