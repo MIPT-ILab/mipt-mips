@@ -80,7 +80,7 @@ template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::Reg
 template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
 // B
 template<typename I> auto execute_slo = ALU::slo<I>;
-template<typename I> auto execute_unshfl = ALU::unshfl<I>;
+template<typename I> auto execute_orn = ALU::orn<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -285,8 +285,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_or,       execute_or<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     {'C', instr_c_and,      execute_and<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     /*-------------- B --------------*/
-    {'B', instr_slo,      execute_slo<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_unshfl,   execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 
 template<typename I>
