@@ -200,8 +200,8 @@ TEST_CASE ("RISCV slo64") {
 
 TEST_CASE("RISCV RV32 orn")
 {
-    CHECK( RISCVInstr<uint32>(0x411865b3).get_disasm() == "nor $a1, $a6, $a7");
-    RISCVInstr<uint32> instr( "nor", 0);
+    CHECK( RISCVInstr<uint32>(0x411865b3).get_disasm() == "orn $a1, $a6, $a7");
+    RISCVInstr<uint32> instr( "orn", 0);
     instr.set_v_src( 0xf7, 0);
     instr.set_v_src( 0xffffef77, 1);
     instr.execute();
@@ -210,9 +210,9 @@ TEST_CASE("RISCV RV32 orn")
 
 TEST_CASE("RISCV RV64 orn")
 {
-    RISCVInstr<uint64> instr( "nor", 0);
+    RISCVInstr<uint64> instr( "orn", 0);
     instr.set_v_src( 0xf7, 0);
-    instr.set_v_src( 0xbfffffffffffef77, 1);
+    instr.set_v_src( 0xbfff'ffff'ffff'ef77, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x400000000010ff);
+    CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
