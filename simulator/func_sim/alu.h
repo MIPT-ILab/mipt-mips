@@ -218,6 +218,9 @@ struct ALU
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
 
+    // Bit manipulations
+    template<typename I, typename T> static void pack( I* instr)  { instr->v_dst = (instr->v_src1 & (bitmask<T>(bitwidth<T> >> 1))) | (instr->v_src2 << (bitwidth<T> >> 1)); }
+
     // Branches
     template<typename I, Predicate<I> p> static
     void branch( I* instr)
