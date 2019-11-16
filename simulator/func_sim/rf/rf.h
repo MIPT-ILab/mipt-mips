@@ -37,11 +37,20 @@ public:
         return get_value( num);
     }
 
-    void write( Register num, RegisterUInt val, RegisterUInt mask = all_ones<RegisterUInt>(), int8 accumulation = 0)
+    void write( Register num, RegisterUInt val)
     {
-        if ( num.is_zero())
-            return;
+        if ( !num.is_zero())
+            get_value( num) = val;
+    }
 
+    void write( Register num, RegisterUInt val, RegisterUInt mask)
+    {
+        const auto new_val = ( get_value( num) & ~mask) | ( val & mask);
+        write( num, new_val);
+    }
+
+    void write( Register num, RegisterUInt val, RegisterUInt mask, int8 accumulation)
+    {
         if ( accumulation != 0) {
             assert( num.is_mips_hi() || num.is_mips_lo());
             const auto old_val = get_value( num);
@@ -57,8 +66,7 @@ public:
                 val = narrow_cast<uint32>(old_val) - narrow_cast<uint32>(val);
         }
 
-        get_value( num) &= ~mask;      // Clear old bits
-        get_value( num) |= val & mask; // Set new bits
+        write( num, val, mask);
     }
 
     inline void read_source( FuncInstr* instr, size_t index) const

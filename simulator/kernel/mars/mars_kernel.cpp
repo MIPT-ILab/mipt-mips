@@ -6,8 +6,8 @@
 
 #include "mars_kernel.h"
 
-#include <memory/elf/elf_loader.h>
 #include <kernel/base_kernel.h>
+#include <memory/elf/elf_loader.h>
 
 #include <fstream>
 #include <string>
@@ -177,7 +177,7 @@ std::fstream* MARSKernel::find_user_file_by_descriptor(uint64 descriptor) {
 std::istream* MARSKernel::find_in_file_by_descriptor(uint64 descriptor) {
     switch ( descriptor) {
     case 0:  return &instream;
-    case 1:  return nullptr;
+    case 1:  /* fallthrough */
     case 2:  return nullptr;
     default: return find_user_file_by_descriptor( descriptor);
     }

@@ -272,7 +272,7 @@ TEST_CASE("MainWrapper: throw help")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw config::HelpOption( "Help!"); }
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw config::HelpOption( "Help!"); }
     };
 
     CHECK( Main().run( 0, nullptr) == 0);
@@ -283,7 +283,7 @@ TEST_CASE("MainWrapper: throw exception")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw Exception( "Exception"); }
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw Exception( "Exception"); }
     };
 
     CHECK( Main().run( 0, nullptr) == 2);
@@ -294,7 +294,7 @@ TEST_CASE("MainWrapper: throw std exception")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw std::exception(); }
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw std::exception(); }
     };
 
     CHECK( Main().run( 0, nullptr) == 2);
@@ -306,7 +306,7 @@ TEST_CASE("MainWrapper: throw integer")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw 222; }
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw 222; }
     };
 
     CHECK( Main().run( 0, nullptr) == 3);
