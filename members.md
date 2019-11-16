@@ -22,3 +22,4 @@ List of 2019/2020 MIPT-V project members:
 21. Vitaly Nizamutdinov
 22. Aleksandr Troegubov
 23. Grigoriy Egorov
+24. Yaroslav Okatev
