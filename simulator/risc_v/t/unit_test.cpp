@@ -216,3 +216,22 @@ TEST_CASE("RISCV RV64 orn")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
+
+TEST_CASE("RISCV RV32 bfp")
+{                               
+    CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
+    RISCVInstr<uint32> instr( "bfp", 0);
+    instr.set_v_src( 0x5555, 0);
+    instr.set_v_src( 0x080400C0, 1); //len = 8, off = 4, data = 1100'0000
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x5C05);
+}
+
+TEST_CASE("RISCV RV64 bfp")
+{                               
+    RISCVInstr<uint64> instr( "bfp", 0);
+    instr.set_v_src( 0x5555CCCC, 0);
+    instr.set_v_src( 0x080C00C5, 1); //len = 8, off = 12, data = 1100'0101
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x555C5CCC);
+}

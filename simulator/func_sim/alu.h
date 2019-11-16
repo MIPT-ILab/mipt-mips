@@ -308,6 +308,21 @@ struct ALU
     {
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
     }
+
+    // Bit-field
+    template<typename I> static
+    void bit_field_place( I* instr)
+    {
+        using XLENType = typename I::RegisterUInt;
+        size_t XLEN = bitwidth<XLENType>;
+        int len = (instr->v_src2 >> 24) & 15;
+        len = len ? len : 16;
+        int off = (instr->v_src2 >> 16) & (XLEN-1);
+        XLENType mask = circ_s(ones_ls(0, len), off, XLEN);
+        XLENType data = circ_s(instr->v_src2, off, XLEN);
+        instr->v_dst = (data & mask) | (instr->v_src1 & ~mask);
+    }
+
 };
 
 #endif

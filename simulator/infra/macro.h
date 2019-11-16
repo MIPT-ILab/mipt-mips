@@ -173,6 +173,13 @@ static constexpr T ones_ls(const T& value, size_t shamt)
     return ~(~value << shamt);
 }
 
+/*Circular shift for the value with XLEN bits*/
+template<typename T>
+static constexpr T circ_s(const T& value, size_t shamt, size_t XLEN)
+{
+    return (value << shamt) | (value >> ((XLEN - shamt) & (XLEN - 1)));
+}
+
 template<size_t N, typename T>
 T sign_extension( T value)
 {
