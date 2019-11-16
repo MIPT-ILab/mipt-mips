@@ -217,6 +217,9 @@ struct ALU
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
+    
+    // Bit manipulations
+    template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> ( instr->v_src2 & ( bitwidth<typename I::RegisterUInt> - 1))); }
 
     // Branches
     template<typename I, Predicate<I> p> static
