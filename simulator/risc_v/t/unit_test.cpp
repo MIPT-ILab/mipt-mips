@@ -188,8 +188,9 @@ struct TestData {
 TEST_CASE ("RISCV sbext32") 
 {
     CHECK( RISCVInstr<uint32>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
+    TestData data = new TestData(0xf, 1, 0x1);
     std::vector<TestData<uint32>> cases {
-        new TestData(0xf, 1, 0x1),
+        data,
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
