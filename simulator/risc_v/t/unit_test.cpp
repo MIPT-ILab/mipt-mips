@@ -158,7 +158,7 @@ TEST_CASE( "RISCV lq/sq")
 
 template<typename T>
 struct TestData {
-    T src1, src2,dst;
+    T src1, src2, dst;
 };
 
 TEST_CASE( "RISCV slo32")
