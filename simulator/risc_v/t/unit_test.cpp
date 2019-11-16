@@ -216,3 +216,43 @@ TEST_CASE("RISCV RV64 orn")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
+
+TEST_CASE ("RISCV sbext32") 
+{
+    CHECK( RISCVInstr<uint32>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
+    std::vector<TestData<uint32>> cases = {
+        { 0xf, 1, 0x1},
+        { all_ones<uint32>(), 31, 0x1},
+        { 0x6eda, 4, 0x1},
+        { 0x6eca, 4, 0x0},
+        { 0x0000D00, 8, 0x1},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        RISCVInstr<uint32> instr( "sbext", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
+
+TEST_CASE ("RISCV sbext64") 
+{
+    CHECK( RISCVInstr<uint64>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
+    std::vector<TestData<uint64>> cases = {
+        { 0xf, 1, 0x1},
+        { all_ones<uint64>(), 44, 0x1},
+        { 0x6eda, 4, 0x1},
+        { 0x6eca, 4, 0x0},
+        { 0x0000D00, 8, 0x1},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        RISCVInstr<uint64> instr( "sbext", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
