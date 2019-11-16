@@ -185,7 +185,7 @@ TEST_CASE ("RISCV sbext32")
         new TestData( all_ones<uint32>(), 31, 0x1),
         new TestData( 0x6eda, 4, 0x1),
         new TestData( 0x6eca, 4, 0x0),
-        new TestData( 0x0000D00, 8, 0x1),
+        new TestData( 0x0000D00, 8, 0x0),
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
