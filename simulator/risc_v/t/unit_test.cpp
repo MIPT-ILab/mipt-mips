@@ -158,20 +158,58 @@ TEST_CASE( "RISCV lq/sq")
 
 template<typename T>
 struct TestData {
-    T src1, src2,dst;
+    T src1, src2, dst;
+
+    TestData( T src1, T src2, T dst)
+    {
+       this->src1 = src1;
+       this->src2 = src2;
+       this->dst = dst;
+    }
+
+    void make_test( char* str) 
+    {
+        RISCVInstr<uint32> instr( str, 0);
+        instr.set_v_src( src1, 0);
+        instr.set_v_src( src2, 1);
+        instr.execute();
+        CHECK( instr.get_v_dst() == dst);
+    }
 };
 
+TEST_CASE ("RISCV sbext32") 
+{
+    CHECK( RISCVInstr<uint32>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
+    std::vector<TestData<uint32>> cases = {
+        new TestData( 0xf, 1, 0x1),
+        new TestData( all_ones<uint32>(), 31, 0x1),
+        new TestData( 0x6eda, 4, 0x1),
+        new TestData( 0x6eca, 4, 0x0),
+        new TestData( 0x0000D00, 8, 0x1),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sbext");
+    }
+}
+
+/*
 TEST_CASE( "RISCV slo32")
 {
     CHECK( RISCVInstr<uint32>( 0x20E797B3).get_disasm() == "slo $a5, $a5, $a4");
-    std::vector<TestData<uint32>> cases = {
+    TestData<uint32> test_data;
+    std::vector<test_data> cases = {
         {0x1C, 2, 0x73},
         {all_ones<uint32>(), 0xAA, all_ones<uint32>()},
         {0xAA, 0xFF, bitmask<uint32>(31)},
         {0xAB, 0xFF, all_ones<uint32>()},
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
+
+        test_data.test();
+
         RISCVInstr<uint32> instr( "slo", 0);
+
         instr.set_v_src( cases[i].src1, 0);
         instr.set_v_src( cases[i].src2, 1);
         instr.execute();
@@ -256,3 +294,4 @@ TEST_CASE ("RISCV sbext64")
         CHECK( instr.get_v_dst() == cases[i].dst);
     }
 }
+*/
