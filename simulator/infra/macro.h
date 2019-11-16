@@ -214,4 +214,40 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+uint32_t shfl( uint32_t src1, uint32_t src2)
+{
+    uint32_t x = src1;
+    uint32_t shamt = src2 & 15;
+    if (shamt & 1) x = shuffle_stage(x, 0x44444444, 0x22222222, 1);
+    if (shamt & 2) x = shuffle_stage(x, 0x30303030, 0x0c0c0c0c, 2);
+    if (shamt & 4) x = shuffle_stage(x, 0x0f000f00, 0x00f000f0, 4);
+    if (shamt & 8) x = shuffle_stage(x, 0x00ff0000, 0x0000ff00, 8);
+    return x;
+}
+
+uint64_t shfl( uint64_t src1, uint64_t src2)
+{
+    uint64_t x = src1;
+    uint64_t shamt = src2 & 31;
+    if (shamt & 1) x = shuffle_stage(x, 0x4444444444444444ll, 0x2222222222222222ll, 1);
+    if (shamt & 2) x = shuffle_stage(x, 0x3030303030303030ll, 0x0c0c0c0c0c0c0c0cll, 2);
+    if (shamt & 4) x = shuffle_stage(x, 0x0f000f000f000f00ll, 0x00f000f000f000f0ll, 4);
+    if (shamt & 8) x = shuffle_stage(x, 0x00ff000000ff0000ll, 0x0000ff000000ff00ll, 8);
+    if (shamt & 16) x = shuffle_stage(x, 0x0000ffff00000000ll, 0x00000000ffff0000ll, 16);
+    return x;
+}
+
+uint128_t shfl( uint128_t src1, uint128_t src2)
+{
+    uint128_t x = src1;
+    uint128_t shamt = src2 & 63;
+    if (shamt & 1) x = shuffle_stage(x, 0x44444444444444444444444444444444, 0x22222222222222222222222222222222, 1);
+    if (shamt & 2) x = shuffle_stage(x, 0x30303030303030303030303030303030, 0x0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2);
+    if (shamt & 4) x = shuffle_stage(x, 0x0f000f000f000f000f000f000f000f00, 0x00f000f000f000f000f000f000f000f0, 4);
+    if (shamt & 8) x = shuffle_stage(x, 0x00ff000000ff000000ff000000ff0000, 0x0000ff000000ff000000ff000000ff00, 8);
+    if (shamt & 16) x = shuffle_stage(x, 0x0000ffff000000000000ffff00000000, 0x00000000ffff000000000000ffff0000, 16);
+    if (shamt & 32) x = shuffle_stage(x, 0x00000000ffffffff0000000000000000, 0x0000000000000000ffffffff00000000, 32);
+    return x;
+}
+
 #endif

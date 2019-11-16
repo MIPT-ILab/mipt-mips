@@ -307,6 +307,17 @@ struct ALU
     {
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
     }
+
+    // RISC-V Shuffle
+    template<typename I> static
+    void riscv_unshfl( I* instr)
+    {
+         for(int i = 3; i >= 0; --i)
+	 {
+             if((instr->v_src2 >> i) & 1)
+                 instr->v_dst = shfl( instr->v_src1, 1 << i);
+	 }
+    }
 };
 
 #endif
