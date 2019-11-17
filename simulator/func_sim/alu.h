@@ -215,6 +215,10 @@ struct ALU
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
     template<typename I> static void xnor( I* instr)  { instr->v_dst = instr->v_src1 ^ ~instr->v_src2; }
 
+    // Bit permutation
+    template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
+
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
@@ -224,7 +228,6 @@ struct ALU
 
     // Bit manipulations
     template<typename I, typename T> static void pack( I* instr)  { instr->v_dst = (instr->v_src1 & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src2 << (half_bitwidth<T>)); }
-    template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     // Branches
     template<typename I, Predicate<I> p> static
