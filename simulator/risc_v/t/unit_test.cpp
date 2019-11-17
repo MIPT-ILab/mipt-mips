@@ -296,7 +296,7 @@ TEST_CASE( "RISV RV64 xnor")
 }
 
 TEST_CASE("RISCV RV32 bfp")
-{                               
+{
     CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
@@ -306,10 +306,20 @@ TEST_CASE("RISCV RV32 bfp")
 }
 
 TEST_CASE("RISCV RV64 bfp")
-{                               
+{
     RISCVInstr<uint64> instr( "bfp", 0);
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
+}
+
+TEST_CASE("RISCV RV32 gorc")
+{
+
+}
+
+TEST_CASE("RISCV RV64 gorc")
+{
+
 }
