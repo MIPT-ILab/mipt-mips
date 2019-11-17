@@ -233,7 +233,7 @@ TEST_CASE ("RISCV sbext32")
         TestData<uint32>( all_ones<uint32>(), 31, 0x1),
         TestData<uint32>( 0x6eda, 4, 0x1),
         TestData<uint32>( 0x6eca, 4, 0x0),
-        TestData<uint32>( 0x0000D00, 8, 0x1),
+        TestData<uint32>( 0xD00, 8, 0x1),
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
@@ -249,10 +249,29 @@ TEST_CASE ("RISCV sbext64")
         TestData<uint64>( all_ones<uint64>(), 56, 0x1),
         TestData<uint64>( 0x6eda, 4, 0x1),
         TestData<uint64>( 0x6eca, 4, 0x0),
-        TestData<uint64>( 0x0000D00, 8, 0x1),
+        TestData<uint64>( 0xD00, 8, 0x1),
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
         cases[i].make_test("sbext");
     }
+}
+
+TEST_CASE( "RISV RV32 pack")
+{
+    CHECK( RISCVInstr<uint32>(0x44d60533).get_disasm() == "pack $a0, $a2, $a3");
+    RISCVInstr<uint32> instr( "pack", 0);
+    instr.set_v_src( 0xffff'2222, 0);
+    instr.set_v_src( 0x1111'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x3333'2222);
+}
+
+TEST_CASE( "RISV RV64 pack")
+{
+    RISCVInstr<uint64> instr( "pack", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
 }

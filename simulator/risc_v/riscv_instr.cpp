@@ -82,6 +82,7 @@ template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterU
 template<typename I> auto execute_slo = ALU::slo<I>;
 template<typename I> auto execute_orn = ALU::orn<I>;
 template<typename I> auto execute_sbext = ALU::sbext<I>;
+template<typename I> auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -290,6 +291,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ',    Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 
 template<typename I>
