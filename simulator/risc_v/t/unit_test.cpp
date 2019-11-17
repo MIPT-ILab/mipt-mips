@@ -235,3 +235,4 @@ TEST_CASE("RISCV RV64 bfp")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
 }
+
