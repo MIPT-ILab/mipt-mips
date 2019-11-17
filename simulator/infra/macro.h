@@ -69,6 +69,16 @@ static constexpr T msb_set()
 }
 
 /*
+ * Return value of T with only the lest significant bit set
+ * Examples: lsb_set<uint8>() -> 0x01
+ */ 
+template <typename T>
+static constexpr T lsb_set()
+{
+    return 1;
+}
+
+/*
  * Returns a value full on one bits.
  * all_ones<uint8>()  -> 0xFF
  * all_ones<uint32>() -> 0xFFFF'FFFF
@@ -101,6 +111,19 @@ static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
     uint8 count = 0;
     for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
+    {
+        if ( ( value & mask) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
+template <typename T>
+static constexpr inline auto count_trailing_zeroes( const T& value) noexcept
+{
+    uint8 count = 0;
+    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1u)
     {
         if ( ( value & mask) != 0)
            break;

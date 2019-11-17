@@ -313,3 +313,78 @@ TEST_CASE("RISCV RV64 bfp")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
 }
+
+TEST_CASE ("RISCV RV32 clz")
+{
+    CHECK ( RISCVInstr<uint32>(0x60079793).get_disasm() == "clz $a5, $a5");
+    RISCVInstr<uint32> instr( "clz", 0);
+
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 32);
+
+    instr.set_v_src( -1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+
+    instr.set_v_src( 0x000ffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 16);
+} 
+
+
+TEST_CASE ("RISCV RV64 clz32")
+{
+    CHECK ( RISCVInstr<uint32>(0x60079793).get_disasm() == "clz $a5, $a5");
+    RISCVInstr<uint64> instr( "clz", 0);
+
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 64);
+
+    instr.set_v_src( -1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+
+    instr.set_v_src( 0x0000000ffffffff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 32);
+} 
+
+TEST_CASE ("RISCV RV32 ctz")
+{
+    CHECK ( RISCVInstr<uint32>(0x60179793).get_disasm() == "ctz $a5, $a5");
+    RISCVInstr<uint32> instr( "ctz", 0);
+
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 32);
+
+    instr.set_v_src( -1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+
+    instr.set_v_src( 0xffff0000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 16);
+} 
+
+
+TEST_CASE ("RISCV RV64 ctz32")
+{
+    CHECK ( RISCVInstr<uint32>(0x60179793).get_disasm() == "ctz $a5, $a5");
+    RISCVInstr<uint64> instr( "ctz", 0);
+    
+    instr.set_v_src( 0, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 64);
+
+    instr.set_v_src( -1, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0);
+
+    instr.set_v_src( 0xffffffff00000000, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 32);
+} 
+
