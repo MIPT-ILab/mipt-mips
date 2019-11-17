@@ -15,6 +15,7 @@
 #include <climits>
 #include <limits>
 #include <type_traits>
+#include <cassert>
 
 /* Checks if values is power of two */
 template<typename T>
@@ -214,7 +215,7 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
-template<typename T_src1> static inline auto grev_32( T_src1 src1, size_t shamt) {
+static inline uint32 gen_reverse( uint32 src1, size_t shamt) {
     if (shamt &  1) src1 = ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
     if (shamt &  2) src1 = ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
     if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
@@ -223,7 +224,7 @@ template<typename T_src1> static inline auto grev_32( T_src1 src1, size_t shamt)
     return src1;
 }
 
-template<typename T_src1> static inline auto grev_64( T_src1 src1, size_t shamt) {
+static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
     if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555LL) <<  1) |
                            ((src1 & 0xAAAA'AAAA'AAAA'AAAALL) >>  1);
     if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333LL) <<  2) |
@@ -239,4 +240,8 @@ template<typename T_src1> static inline auto grev_64( T_src1 src1, size_t shamt)
     return src1;
 }
 
+static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
+    throw std::runtime_error( "Generalized reverse is not implemented for RV128");
+    return 0;
+}
 #endif

@@ -260,3 +260,11 @@ TEST_CASE("RISCV RV64 grev")
         CHECK( instr.get_v_dst() == cases[i].dst);
     }
 }
+
+TEST_CASE("RISCV RV128 grev")
+{
+    RISCVInstr<uint128> instr( "grev", 0);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    CHECK_THROWS_AS(instr.execute(), std::runtime_error);
+}

@@ -215,18 +215,8 @@ struct ALU
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
 
     // Bit permutation
-    template<typename I> static void grev( I* instr) {
-        //typename I::RegisterUInt x = instr->v_src1;
-        size_t shamt = shamt_v_src2<typename I::RegisterUInt>( instr);
-        size_t bit_width = bitwidth<typename I::RegisterUInt>;
+    template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
-        if (bit_width == 32) {
-            instr->v_dst = grev_32( instr->v_src1, shamt);
-
-        } else if (bit_width == 64) {
-            instr->v_dst = grev_64( instr->v_src1, shamt);
-        }
-    }
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
