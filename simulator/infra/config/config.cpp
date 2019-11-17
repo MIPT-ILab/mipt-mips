@@ -12,12 +12,20 @@ namespace config {
 static AliasedSwitch help_option = { "h", "help", "print help"};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-void handleArgs( int argc, const char* const argv[], int start_index)
+void handleArgs( int argc, const char* const argv[], int start_index) try
 {
     BaseValue::options().parse( argc, argv, start_index);
 
     if ( help_option)
-        throw HelpOption( BaseValue::options().help());
+        throw HelpOption();
+}
+catch ( const popl::invalid_option& e) {
+    throw InvalidOption( e.what());
+}
+
+std::string help()
+{
+    return BaseValue::options().help();
 }
 
 popl::OptionParser& BaseValue::options()
