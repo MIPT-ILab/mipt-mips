@@ -238,18 +238,18 @@ static inline uint32 gen_reverse( uint32 src1, size_t shamt) {
 }
 
 static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
-    if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555LL) <<  1) |
-                           ((src1 & 0xAAAA'AAAA'AAAA'AAAALL) >>  1);
-    if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333LL) <<  2) |
-                           ((src1 & 0xCCCC'CCCC'CCCC'CCCCLL) >>  2);
-    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FLL) <<  4) |
-                           ((src1 & 0xF0F0'F0F0'F0F0'F0F0LL) >>  4);
-    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF'00FF'00FFLL) <<  8) |
-                           ((src1 & 0xFF00'FF00'FF00'FF00LL) >>  8);
-    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF'0000'FFFFLL) << 16) |
-                           ((src1 & 0xFFFF'0000'FFFF'0000LL) >> 16);
-    if (shamt & 32) src1 = ((src1 & 0x0000'0000'FFFF'FFFFLL) << 32) |
-                           ((src1 & 0xFFFF'FFFF'0000'0000LL) >> 32);
+    if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555ULL) <<  1) |
+                           ((src1 & 0xAAAA'AAAA'AAAA'AAAAULL) >>  1);
+    if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333ULL) <<  2) |
+                           ((src1 & 0xCCCC'CCCC'CCCC'CCCCULL) >>  2);
+    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FULL) <<  4) |
+                           ((src1 & 0xF0F0'F0F0'F0F0'F0F0ULL) >>  4);
+    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF'00FF'00FFULL) <<  8) |
+                           ((src1 & 0xFF00'FF00'FF00'FF00ULL) >>  8);
+    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF'0000'FFFFULL) << 16) |
+                           ((src1 & 0xFFFF'0000'FFFF'0000ULL) >> 16);
+    if (shamt & 32) src1 = ((src1 & 0x0000'0000'FFFF'FFFFULL) << 32) |
+                           ((src1 & 0xFFFF'FFFF'0000'0000ULL) >> 32);
     return src1;
 }
 
