@@ -216,3 +216,24 @@ TEST_CASE("RISCV RV64 orn")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
+
+
+TEST_CASE("RISCV RV32 grev")
+{
+    CHECK( RISCVInstr<uint32>(0x68D6'55B3).get_disasm() == "grev $a1, $a2, $a3");
+    RISCVInstr<uint32> instr( "grev", 0);
+    instr.set_v_src( 0x5555'5555, 0);
+    instr.set_v_src( 0x1, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xAAAA'AAAA);
+}
+
+
+TEST_CASE("RISCV RV64 grev")
+{
+    RISCVInstr<uint64> instr( "grev", 0);
+    instr.set_v_src( 0x0123'4567'89AB'CDEF, 0);
+    instr.set_v_src( 0x3F, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xF7B3'D591'E6A2'C480);
+}

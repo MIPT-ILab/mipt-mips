@@ -214,6 +214,37 @@ struct ALU
     template<typename I> static void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ instr->v_imm; }
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
 
+    // Bit permutation
+    template<typename I> static void grev( I* instr)  {
+        typename I::RegisterUInt x = instr->v_src1;
+        size_t bit_width = bitwidth<typename I::RegisterUInt>;
+
+        if (bit_width == 32) {
+            int shamt = instr->v_src2 & 31;
+            if (shamt &  1) x = ((x & 0x5555'5555) <<  1) | ((x & 0xAAAA'AAAA) >>  1);
+            if (shamt &  2) x = ((x & 0x3333'3333) <<  2) | ((x & 0xCCCC'CCCC) >>  2);
+            if (shamt &  4) x = ((x & 0x0F0F'0F0F) <<  4) | ((x & 0xF0F0'F0F0) >>  4);
+            if (shamt &  8) x = ((x & 0x00FF'00FF) <<  8) | ((x & 0xFF00'FF00) >>  8);
+            if (shamt & 16) x = ((x & 0x0000'FFFF) << 16) | ((x & 0xFFFF'0000) >> 16);
+
+        } else if (bit_width == 64) {
+            int shamt = instr->v_src2 & 63;
+            if (shamt &  1) x = ((x & 0x5555'5555'5555'5555LL) <<  1) |
+                                ((x & 0xAAAA'AAAA'AAAA'AAAALL) >>  1);
+            if (shamt &  2) x = ((x & 0x3333'3333'3333'3333LL) <<  2) |
+                                ((x & 0xCCCC'CCCC'CCCC'CCCCLL) >>  2);
+            if (shamt &  4) x = ((x & 0x0F0F'0F0F'0F0F'0F0FLL) <<  4) |
+                                ((x & 0xF0F0'F0F0'F0F0'F0F0LL) >>  4);
+            if (shamt &  8) x = ((x & 0x00FF'00FF'00FF'00FFLL) <<  8) |
+                                ((x & 0xFF00'FF00'FF00'FF00LL) >>  8);
+            if (shamt & 16) x = ((x & 0x0000'FFFF'0000'FFFFLL) << 16) |
+                                ((x & 0xFFFF'0000'FFFF'0000LL) >> 16);
+            if (shamt & 32) x = ((x & 0x0000'0000'FFFF'FFFFLL) << 32) |
+                                ((x & 0xFFFF'FFFF'0000'0000LL) >> 32);
+        }
+
+        instr->v_dst = x;
+    }
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }

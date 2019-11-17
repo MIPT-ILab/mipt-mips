@@ -81,6 +81,7 @@ template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterU
 // B
 template<typename I> auto execute_slo = ALU::slo<I>;
 template<typename I> auto execute_orn = ALU::orn<I>;
+template<typename I> auto execute_grev = ALU::grev<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -287,6 +288,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     /*-------------- B --------------*/
     {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_grev,     execute_grev<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      }
 };
 
 template<typename I>
