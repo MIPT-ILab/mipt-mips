@@ -288,7 +288,6 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     /*-------------- B --------------*/
     {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    // Bit-Field
     {'B', instr_bfp,      execute_bfp<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 

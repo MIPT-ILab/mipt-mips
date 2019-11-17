@@ -309,7 +309,6 @@ struct ALU
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
     }
 
-    // Bit-field
     template<typename I> static
     void bit_field_place( I* instr)
     {
