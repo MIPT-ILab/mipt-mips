@@ -306,10 +306,40 @@ TEST_CASE("RISCV RV32 bfp")
 }
 
 TEST_CASE("RISCV RV64 bfp")
-{                               
+{
     RISCVInstr<uint64> instr( "bfp", 0);
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
+}
+
+TEST_CASE("RISCV RV32 rol")
+{
+    CHECK( RISCVInstr<uint32>(0x411815b3).get_disasm() == "rol $a1, $a6, $a7");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0x17013f, 0x0,  0x17013f),
+        TestData<uint32>( 0x17013f, 0x1,  0x2e0273),
+        TestData<uint32>( 0x6eda,   0x8,  0x17013f00),
+        TestData<uint32>( 0x6eca,   0x20, 0x17013f),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
+}
+
+TEST_CASE("RISCV RV64 rol")
+{
+    CHECK( RISCVInstr<uint32>(0x411815b3).get_disasm() == "rol $a1, $a6, $a7");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint64>( 0x17013f, 0x0,  0x17013f),
+        TestData<uint64>( 0x17013f, 0x1,  0x2e0273),
+        TestData<uint64>( 0x6eda,   0x8,  0x17013f00),
+        TestData<uint64>( 0x6eca,   0x40, 0x17013f),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
 }
