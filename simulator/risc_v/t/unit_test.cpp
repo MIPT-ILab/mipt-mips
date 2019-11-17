@@ -364,3 +364,33 @@ TEST_CASE("RISCV RV128 grev")
     instr.set_v_src( 0, 1);
     CHECK_THROWS_AS(instr.execute(), std::runtime_error);
 }
+
+TEST_CASE ("RISCV bext32")
+{
+    CHECK( RISCVInstr<uint32>(0x91865B3).get_disasm() == "bext $a4, $a5, $a6");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0xf, 0x1, 0x3),
+        TestData<uint32>( 0xa, 0x3, 0x2),
+        TestData<uint32>( 0xa, 0x5, 0x0),
+        TestData<uint32>( 0xc, 0x4, 0x1),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("bext");
+    }
+}
+
+TEST_CASE ("RISCV bext64")
+{
+    CHECK( RISCVInstr<uint64>(0x91865B3).get_disasm() == "bext $a4, $a5, $a6");
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0xf, 0x1, 0x3),
+        TestData<uint64>( 0xa, 0x3, 0x2),
+        TestData<uint64>( 0xa, 0x5, 0x0),
+        TestData<uint64>( 0xc, 0x4, 0x1),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("bext");
+    }
+}
