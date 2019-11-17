@@ -15,6 +15,7 @@
 #include <climits>
 #include <limits>
 #include <type_traits>
+#include <cassert>
 
 /* Checks if values is power of two */
 template<typename T>
@@ -69,6 +70,16 @@ static constexpr T msb_set()
 }
 
 /*
+ * Return value of T with only the lest significant bit set
+ * Examples: lsb_set<uint8>() -> 0x01
+ */ 
+template <typename T>
+static constexpr T lsb_set()
+{
+    return 1;
+}
+
+/*
  * Returns a value full on one bits.
  * all_ones<uint8>()  -> 0xFF
  * all_ones<uint32>() -> 0xFFFF'FFFF
@@ -85,9 +96,9 @@ static constexpr T all_ones()
  *           bitmask<uint32>(32) -> 0xFFFF'FFFF
  */
 template <typename T>
-static constexpr T bitmask(unsigned int const onecount)
+static constexpr T bitmask( size_t onecount)
 {
-    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
+    return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
 
 template <typename T>
@@ -101,6 +112,19 @@ static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
     uint8 count = 0;
     for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
+    {
+        if ( ( value & mask) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
+template <typename T>
+static constexpr inline auto count_trailing_zeroes( const T& value) noexcept
+{
+    uint8 count = 0;
+    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1u)
     {
         if ( ( value & mask) != 0)
            break;
@@ -183,6 +207,15 @@ static constexpr T ones_ls(const T& value, size_t shamt)
     return ~(~value << shamt);
 }
 
+/*Circular left shift*/
+template<typename T>
+static constexpr T circ_ls(const T& value, size_t shamt)
+{
+    if( shamt == 0 || shamt == bitwidth<T>)
+        return value;
+    return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
+}
+
 template<size_t N, typename T>
 T sign_extension( T value)
 {
@@ -224,4 +257,33 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+static inline uint32 gen_reverse( uint32 src1, size_t shamt) {
+    if (shamt &  1) src1 = ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
+    if (shamt &  2) src1 = ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
+    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
+    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF) <<  8) | ((src1 & 0xFF00'FF00) >>  8);
+    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF) << 16) | ((src1 & 0xFFFF'0000) >> 16);
+    return src1;
+}
+
+static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
+    if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555ULL) <<  1) |
+                           ((src1 & 0xAAAA'AAAA'AAAA'AAAAULL) >>  1);
+    if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333ULL) <<  2) |
+                           ((src1 & 0xCCCC'CCCC'CCCC'CCCCULL) >>  2);
+    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FULL) <<  4) |
+                           ((src1 & 0xF0F0'F0F0'F0F0'F0F0ULL) >>  4);
+    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF'00FF'00FFULL) <<  8) |
+                           ((src1 & 0xFF00'FF00'FF00'FF00ULL) >>  8);
+    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF'0000'FFFFULL) << 16) |
+                           ((src1 & 0xFFFF'0000'FFFF'0000ULL) >> 16);
+    if (shamt & 32) src1 = ((src1 & 0x0000'0000'FFFF'FFFFULL) << 32) |
+                           ((src1 & 0xFFFF'FFFF'0000'0000ULL) >> 32);
+    return src1;
+}
+
+static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
+    throw std::runtime_error( "Generalized reverse is not implemented for RV128");
+    return 0;
+}
 #endif
