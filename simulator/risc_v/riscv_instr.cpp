@@ -290,13 +290,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_or,       execute_or<I>,   OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     {'C', instr_c_and,      execute_and<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     /*-------------- B --------------*/
-    {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    // Bit manipulation
+    {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ',    Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_xnor,     execute_xnor<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 },
+    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_xnor,     execute_xnor<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_bfp,      execute_bfp<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_pcnt,     execute_pcnt<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_pcnt,     execute_pcnt<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 
 template<typename I>

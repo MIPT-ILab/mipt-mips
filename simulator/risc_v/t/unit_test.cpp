@@ -297,6 +297,7 @@ TEST_CASE( "RISV RV64 xnor")
 
 TEST_CASE("RISCV RV32 bfp")
 {
+
     CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
