@@ -173,11 +173,11 @@ static constexpr T ones_ls(const T& value, size_t shamt)
     return ~(~value << shamt);
 }
 
-/*Circular shift for the value with XLEN bits*/
+/*Circular left shift*/
 template<typename T>
-static constexpr T circ_s(const T& value, size_t shamt, size_t XLEN)
+static constexpr T circ_ls(const T& value, size_t shamt)
 {
-    return (value << shamt) | (value >> ((XLEN - shamt) & (XLEN - 1)));
+    return (value << shamt) | (value >> ((bitwidth<T> - shamt) & (bitwidth<T> - 1)));
 }
 
 template<size_t N, typename T>
