@@ -142,6 +142,12 @@ template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definition
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
  */
+ template<typename T>
+ static constexpr T ones_rs( const T& rs1, size_t shamt)
+ {
+     return ~((~rs1) >> shamt);
+ }
+
 template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
 {
@@ -159,14 +165,8 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     else if ((value & msb_set<T>()) == 0)
         result = value >> shamt;        // just shift if MSB is zero
     else
-        result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+        result = ones_rs( value, shamt);   // invert to propagate zeroes and invert back
     return result;
-}
-
-template<typename T>
-static constexpr T ones_rs( const T& rs1, size_t shamt)
-{
-    return ~((~rs1) >> shamt);
 }
 
 static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
@@ -174,7 +174,7 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
     if ((value & msb_set<uint128>()) == 0)
         return value >> shamt;        // just shift if MSB is zero
 
-    return ones_rs(value, shamt);   // invert to propagate zeroes and invert back
+    return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
 }
 
 template<typename T>
