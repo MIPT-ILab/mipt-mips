@@ -163,12 +163,18 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     return result;
 }
 
+template<typename T>
+static constexpr T ones_rs( const T& rs1, size_t shamt)
+{
+    return ~((~rs1) >> shamt);
+}
+
 static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
 {
     if ((value & msb_set<uint128>()) == 0)
         return value >> shamt;        // just shift if MSB is zero
 
-    return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+    return ones_rs(value, shamt);   // invert to propagate zeroes and invert back
 }
 
 template<typename T>
@@ -216,12 +222,6 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
 
     bool is_overflow = ( val1 > 0 && val2 < 0 && result < 0) || ( val1 < 0 && val2 > 0 && result > 0);
     return std::make_pair( narrow_cast<T>( result), is_overflow);
-}
-
-template<typename T>
-static constexpr T ones_rs( const T& rs1, size_t shmat)
-{
-    return ~((~rs1) >> shmat);
 }
 
 #endif

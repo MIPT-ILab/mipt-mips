@@ -241,29 +241,29 @@ TEST_CASE( "RISCV sro32")
 {
     CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
     RISCVInstr<uint32> test_32_1( "sro", 0);
-    test_32_1.set_v_src( 0x8000'c000, 0);
+    test_32_1.set_v_src( 0x8000'c000u, 0);
     test_32_1.set_v_src( 0xf, 1);
     test_32_1.execute();
     CHECK( test_32_1.get_v_dst() == 0xffff'0001);
 
     RISCVInstr<uint32> test_32_2( "sro", 0);
-    test_32_2.set_v_src( 0x8000'c000, 0);
-    test_32_2.set_v_src( 0xff, 1);
+    test_32_2.set_v_src( 0x8000'c000u, 0);
+    test_32_2.set_v_src( 0xffu, 1);
     test_32_2.execute();
-    CHECK( test_32_2.get_v_dst() == 0xffff'ffff);
+    CHECK( test_32_2.get_v_dst() == 0xffff'ffffu);
 }
 
 TEST_CASE( "RISCV sro64")
 {
     RISCVInstr<uint64> test_64_1( "sro", 0);
-    test_64_1.set_v_src( 0x8000'0000'c000'0000, 0);
-    test_64_1.set_v_src( 0x1f, 1);
+    test_64_1.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    test_64_1.set_v_src( 0x1fu, 1);
     test_64_1.execute();
-    CHECK( test_64_1.get_v_dst() == 0xffff'ffff'0000'0001);
+    CHECK( test_64_1.get_v_dst() == 0xffff'ffff'0000'0001ull);
 
     RISCVInstr<uint64> test_64_2( "sro", 0);
-    test_64_2.set_v_src( 0x8000'0000'c000'0000, 0);
-    test_64_2.set_v_src( 0xff, 1);
+    test_64_2.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    test_64_2.set_v_src( 0xffu, 1);
     test_64_2.execute();
-    CHECK( test_64_2.get_v_dst() == 0xffff'ffff'ffff'ffff);
+    CHECK( test_64_2.get_v_dst() == 0xffff'ffff'ffff'ffffull);
 }
