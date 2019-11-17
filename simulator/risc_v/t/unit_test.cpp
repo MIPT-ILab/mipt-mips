@@ -277,6 +277,25 @@ TEST_CASE( "RISV RV64 pack")
     CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
 }
 
+TEST_CASE( "RISV RV32 xnor")
+{
+    CHECK( RISCVInstr<uint32>(0x40e6c633).get_disasm() == "xnor $a2, $a3, $a4");
+    RISCVInstr<uint32> instr ( "xnor", 0);
+    instr.set_v_src( 0x3000'0000, 0);
+    instr.set_v_src( 0xa000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x6fff'ffff);
+}
+
+TEST_CASE( "RISV RV64 xnor")
+{
+    RISCVInstr<uint64> instr ( "xnor", 0);
+    instr.set_v_src( 0x3000'0000'3000'0000, 0);
+    instr.set_v_src( 0xa000'0000'a000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
+}
+
 TEST_CASE( "RISCV sro32")
 {
     CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
