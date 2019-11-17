@@ -85,9 +85,9 @@ static constexpr T all_ones()
  *           bitmask<uint32>(32) -> 0xFFFF'FFFF
  */
 template <typename T>
-static constexpr T bitmask(unsigned int const onecount)
+static constexpr T bitmask( size_t onecount)
 {
-    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
+    return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
 
 template <typename T>
@@ -175,6 +175,15 @@ template<typename T>
 static constexpr T ones_ls(const T& value, size_t shamt)
 {
     return ~(~value << shamt);
+}
+
+/*Circular left shift*/
+template<typename T>
+static constexpr T circ_ls(const T& value, size_t shamt)
+{
+    if( shamt == 0 || shamt == bitwidth<T>)
+        return value;
+    return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }
 
 template<size_t N, typename T>

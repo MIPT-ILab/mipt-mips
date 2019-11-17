@@ -5,7 +5,7 @@
  */
 
 #include "../riscv_instr.h"
- 
+
 #include <catch.hpp>
 #include <memory/memory.h>
 
@@ -167,7 +167,7 @@ struct TestData {
        this->dst = dst;
     }
 
-    void make_test( std::string str) 
+    void make_test( std::string str)
     {
         RISCVInstr<T> instr( str, 0);
         instr.set_v_src( src1, 0);
@@ -225,7 +225,7 @@ TEST_CASE("RISCV RV64 orn")
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
 
-TEST_CASE ("RISCV sbext32") 
+TEST_CASE ("RISCV sbext32")
 {
     CHECK( RISCVInstr<uint32>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
     std::vector<TestData<uint32>> cases {
@@ -241,7 +241,7 @@ TEST_CASE ("RISCV sbext32")
     }
 }
 
-TEST_CASE ("RISCV sbext64") 
+TEST_CASE ("RISCV sbext64")
 {
     CHECK( RISCVInstr<uint64>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
     std::vector<TestData<uint64>> cases {
@@ -274,4 +274,42 @@ TEST_CASE( "RISV RV64 pack")
     instr.set_v_src( 0x1111'1111'3333'3333, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
+}
+
+TEST_CASE( "RISV RV32 xnor")
+{
+    CHECK( RISCVInstr<uint32>(0x40e6c633).get_disasm() == "xnor $a2, $a3, $a4");
+    RISCVInstr<uint32> instr ( "xnor", 0);
+    instr.set_v_src( 0x3000'0000, 0);
+    instr.set_v_src( 0xa000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x6fff'ffff);
+}
+
+TEST_CASE( "RISV RV64 xnor")
+{
+    RISCVInstr<uint64> instr ( "xnor", 0);
+    instr.set_v_src( 0x3000'0000'3000'0000, 0);
+    instr.set_v_src( 0xa000'0000'a000'0000, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
+}
+
+TEST_CASE("RISCV RV32 bfp")
+{                               
+    CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
+    RISCVInstr<uint32> instr( "bfp", 0);
+    instr.set_v_src( 0x5555, 0);
+    instr.set_v_src( 0x080400C0, 1); //len = 8, off = 4, data = 1100'0000
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x5C05);
+}
+
+TEST_CASE("RISCV RV64 bfp")
+{                               
+    RISCVInstr<uint64> instr( "bfp", 0);
+    instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
+    instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
 }
