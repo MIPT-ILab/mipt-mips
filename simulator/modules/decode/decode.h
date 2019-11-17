@@ -41,23 +41,23 @@ private:
     std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
 
     /* Inputs */
-    std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_stall_datapath = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_bypassing_unit_notify = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_bypassing_unit_flush_notify = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_flush_fetch = nullptr;
-    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+    ReadPort<Instr>* rp_datapath = nullptr;
+    ReadPort<Instr>* rp_stall_datapath = nullptr;
+    ReadPort<bool>* rp_flush = nullptr;
+    ReadPort<Instr>* rp_bypassing_unit_notify = nullptr;
+    ReadPort<bool>* rp_bypassing_unit_flush_notify = nullptr;
+    ReadPort<bool>* rp_flush_fetch = nullptr;
+    ReadPort<bool>* rp_trap = nullptr;
 
     /* Outputs */
-    std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
-    std::unique_ptr<WritePort<Instr>> wp_stall_datapath = nullptr;
-    std::unique_ptr<WritePort<bool>> wp_stall = nullptr;
-    std::unique_ptr<WritePort<Instr>> wp_bypassing_unit_notify = nullptr;
-    std::unique_ptr<WritePort<BPInterface>> wp_bp_update = nullptr;
-    std::array<std::unique_ptr<WritePort<BypassCommand<Register>>>, SRC_REGISTERS_NUM> wps_command;
-    std::unique_ptr<WritePort<bool>> wp_flush_fetch = nullptr;
-    std::unique_ptr<WritePort<Target>> wp_flush_target = nullptr;
+    WritePort<Instr>* wp_datapath = nullptr;
+    WritePort<Instr>* wp_stall_datapath = nullptr;
+    WritePort<bool>* wp_stall = nullptr;
+    WritePort<Instr>* wp_bypassing_unit_notify = nullptr;
+    WritePort<BPInterface>* wp_bp_update = nullptr;
+    std::array<WritePort<BypassCommand<Register>>*, SRC_REGISTERS_NUM> wps_command;
+    WritePort<bool>* wp_flush_fetch = nullptr;
+    WritePort<Target>* wp_flush_target = nullptr;
 };
 
 

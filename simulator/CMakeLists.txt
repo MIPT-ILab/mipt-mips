@@ -26,6 +26,7 @@ endif()
 
 set(CPPS
     infra/print128.cpp
+    infra/config/main_wrapper.cpp
     infra/config/config.cpp
     infra/ports/module.cpp
     infra/ports/ports.cpp
@@ -47,6 +48,7 @@ set(CPPS
     risc_v/riscv_instr.cpp
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
+    export/cache/runner.cpp
     kernel/kernel.cpp
     kernel/mars/mars_kernel.cpp
     modules/ports_instance.cpp
@@ -71,6 +73,7 @@ set(TESTS_CPPS
     infra/ports/port_queue/t/unit_test.cpp
     infra/ports/t/unit_test.cpp
     infra/ports/t/example_test.cpp
+    infra/ports/t/topology_test.cpp
     memory/argv_loader/t/unit_tests.cpp
     memory/cen64/t/unit_test.cpp
     memory/t/check_coherency.cpp
@@ -96,6 +99,7 @@ set(TESTS_CPPS
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
+    export/cache/t/unit_test.cpp
 )
 
 add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests\")
@@ -104,8 +108,8 @@ add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc
+    COMMAND python ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/../riscv-bitmanip-opcodes
 )
 
 if (MSVC)
@@ -175,9 +179,11 @@ add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opco
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
+add_executable(cachesim export/cache/main.cpp)
 
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
 target_link_libraries(mipt-mips mipt-mips-src)
+target_link_libraries(cachesim mipt-mips-src)
 target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
 
 add_test(all_tests unit-tests)

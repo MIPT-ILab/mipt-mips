@@ -1,0 +1,18 @@
+# format of a line in this file:
+# <instruction name> <args> <opcode>
+#
+# <opcode> is given by specifying one or more range/value pairs:
+# hi..lo=value or bit=value or arg=value (e.g. 6..2=0x45 10=1 rd=0)
+#
+# <args> is one of rd, rs1, rs2, rs3, imm20, imm12, imm12lo, imm12hi,
+# shamtw, shamt, rm
+#
+# Example:
+# add     rd rs1 rs2 31..25=0  14..12=0 6..2=0x0C 1..0=3
+
+# RV32B
+slo     rd rs1 rs2  31..25=0x10 14..12=1 6..2=0x0C 1..0=3
+orn     rd rs1 rs2  31..25=0x20 14..12=6 6..2=0x0C 1..0=3
+pack    rd rs1 rs2  31..25=0x22 14..12=0 6..2=0x0C 1..0=3
+xnor    rd rs1 rs2  31..25=0x20 14..12=4 6..2=0x0C 1..0=3
+sbext   rd rs1 rs2  31..25=0x24 14..12=5 6..2=0x0C 1..0=3
