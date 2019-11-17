@@ -74,10 +74,10 @@ struct PairOfPorts : public BaseTestRoot
     ReadPort<int>* rp;
     WritePort<int>* wp;
 
-    explicit PairOfPorts( uint32 bw = PORT_BW, Latency lat = PORT_LATENCY)
+    PairOfPorts()
     {
-        rp = make_read_port<int>( "Key", lat);
-        wp = make_write_port<int>( "Key", bw);
+        rp = make_read_port<int>( "Key", PORT_LATENCY);
+        wp = make_write_port<int>( "Key", PORT_BW);
         init_portmap();
     }
 };

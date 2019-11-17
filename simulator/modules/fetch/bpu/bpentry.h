@@ -34,7 +34,7 @@ class BPEntryBackwardJumps final
 {
 public:
     /* prediction */
-    bool is_taken( Addr PC, Addr target) const { return target < PC ; }
+    static bool is_taken( Addr PC, Addr target) { return target < PC ; }
     void update( bool /* is_taken */) { }
     void reset() { }
 };
@@ -92,7 +92,7 @@ public:
                 {
                     case StateValue::NT:  value = StateValue::WNT; break;
                     case StateValue::WNT: value = StateValue::WT;  break;
-                    case StateValue::WT:  value = StateValue::T;   break;
+                    case StateValue::WT:  /* fallthrough */
                     case StateValue::T:   value = StateValue::T;   break; // saturation
                 }
             }
@@ -100,7 +100,7 @@ public:
             {
                 switch ( value)
                 {
-                    case StateValue::NT:  value = StateValue::NT;  break; // saturation
+                    case StateValue::NT:  /* fallthrough, saturation */
                     case StateValue::WNT: value = StateValue::NT;  break;
                     case StateValue::WT:  value = StateValue::WNT; break;
                     case StateValue::T:   value = StateValue::WT;  break;

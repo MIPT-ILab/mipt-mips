@@ -40,7 +40,7 @@ TEST_CASE( "check_method_size: Check_Method_Size")
 
     uint32 instr_bytes = 0x2484ae10;
     Addr PC = 0x30ae17;
-    const std::size_t SIZE = instr_cache.get_capacity() / 12;
+    const std::size_t SIZE = decltype(instr_cache)::get_capacity() / 12;
 
     for ( std::size_t i = 0; i < SIZE; ++i)
     {

@@ -51,7 +51,8 @@ public:
     ElfLoader& operator=( const ElfLoader&) = delete;
     ElfLoader& operator=( ElfLoader&&) = delete;
 
-    void load_to( WriteableMemory *memory, AddrDiff offset = 0) const;
+    void load_to( WriteableMemory *memory, AddrDiff offset) const;
+    void load_to( WriteableMemory *memory) const { load_to( memory, 0); }
     Addr get_startPC() const;
     Addr get_text_section_addr() const;
 private:
