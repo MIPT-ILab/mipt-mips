@@ -318,8 +318,8 @@ struct ALU
         int len = (instr->v_src2 >> 24) & 15;
         len = len ? len : 16;
         int off = (instr->v_src2 >> 16) & (XLEN-1);
-        XLENType mask = circ_s(ones_ls(0, len), off, XLEN);
-        XLENType data = circ_s(instr->v_src2, off, XLEN);
+        XLENType mask = circ_ls(ones_ls(XLENType(0), len), off);
+        XLENType data = circ_ls(instr->v_src2, off);
         instr->v_dst = (data & mask) | (instr->v_src1 & ~mask);
     }
 };
