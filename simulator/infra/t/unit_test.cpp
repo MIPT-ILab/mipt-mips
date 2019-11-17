@@ -279,15 +279,15 @@ TEST_CASE("Test uint128 octal printing")
 TEST_CASE("Test circular left shift for uint32")
 {
     uint32 value = 0xA0B0'C0D0;
-    CHECK(value == circ_ls(value, 0));
-    CHECK(value == circ_ls(value, 32));
-    CHECK(0x0B0C'0D0A == circ_ls(value, 4));
+    CHECK( value == circ_ls( value, 0));
+    CHECK( value == circ_ls( value, 32));
+    CHECK( x0B0C'0D0A == circ_ls( value, 4));
 }
 
 TEST_CASE("Test circular left shift for uint64")
 {
     uint64 value = 0xA0B0'C0D0'A0B0'C0D0;
-    CHECK(value == circ_ls(value, 0));
-    CHECK(value == circ_ls(value, 64));
-    CHECK(0x0B0C'0D0A'0B0C'0D0A == circ_ls(value, 4));
+    CHECK( value == circ_ls( value, 0));
+    CHECK( value == circ_ls( value, 64));
+    CHECK( 0x0B0C'0D0A'0B0C'0D0A == circ_ls( value, 4));
 }
