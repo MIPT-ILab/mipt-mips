@@ -181,6 +181,8 @@ static constexpr T ones_ls(const T& value, size_t shamt)
 template<typename T>
 static constexpr T circ_ls(const T& value, size_t shamt)
 {
+    if(shamt == 0 || shamt == bitwidth<T>)
+        return value;
     return (value << shamt) | (value >> (bitwidth<T> - shamt));
 }
 
