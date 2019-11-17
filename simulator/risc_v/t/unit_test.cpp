@@ -331,8 +331,8 @@ TEST_CASE("RISCV RV32 rol")
 
 TEST_CASE("RISCV RV64 rol")
 {
-    CHECK( RISCVInstr<uint32>(0x411815b3).get_disasm() == "rol $a1, $a6, $a7");
-    std::vector<TestData<uint32>> cases {
+    CHECK( RISCVInstr<uint64>(0x411815b3).get_disasm() == "rol $a1, $a6, $a7");
+    std::vector<TestData<uint64>> cases {
         TestData<uint64>( 0x17013f, 0x0,  0x17013f),
         TestData<uint64>( 0x17013f, 0x1,  0x2e0273),
         TestData<uint64>( 0x6eda,   0x8,  0x17013f00),
