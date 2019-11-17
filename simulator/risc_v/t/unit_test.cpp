@@ -216,3 +216,23 @@ TEST_CASE("RISCV RV64 orn")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
 }
+
+TEST_CASE( "RISV RV32 pack")
+{
+    CHECK( RISCVInstr<uint32>(0x44d60533).get_disasm() == "pack $a0, $a2, $a3");
+    RISCVInstr<uint32> instr( "pack", 0);
+    instr.set_v_src( 0xffff'2222, 0);
+    instr.set_v_src( 0x1111'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x3333'2222);
+}
+
+TEST_CASE( "RISV RV64 pack")
+{
+    RISCVInstr<uint64> instr( "pack", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
+}
+
