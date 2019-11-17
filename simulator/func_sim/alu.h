@@ -203,6 +203,7 @@ struct ALU
     // Leading zero/ones
     template<typename I, typename T> static void clo( I* instr)  { instr->v_dst = count_leading_ones<T>( instr->v_src1); }
     template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
+    template<typename I, typename T> static void ctz( I* instr)  { instr->v_dst = count_trailing_zeroes<T>( instr->v_src1); }
 
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -214,6 +215,9 @@ struct ALU
     template<typename I> static void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ instr->v_imm; }
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
     template<typename I> static void xnor( I* instr)  { instr->v_dst = instr->v_src1 ^ ~instr->v_src2; }
+
+    // Bit permutation
+    template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
