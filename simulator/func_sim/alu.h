@@ -320,11 +320,14 @@ struct ALU
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
-         for(int i = 3; i >= 0; --i)
-	 {
-             if((instr->v_src2 >> i) & 1)
-                 instr->v_dst = shfl( instr->v_src1, 1 << i);
-	 }
+	auto x = instr->v_src1;
+	int limit = 4 + sizeof( instr->v_src1) / sizeof( uint64_t);
+        for( int i = 0; i < limit; ++i)
+	    {
+            if(( instr->v_src2 >> i) & 1)
+                x = bit_shuffle( x, 1 << i);
+	    }
+	instr->v_dst = x;
     }
 };
 

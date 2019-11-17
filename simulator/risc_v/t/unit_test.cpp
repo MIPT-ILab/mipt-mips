@@ -294,3 +294,23 @@ TEST_CASE( "RISV RV64 xnor")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
 }
+
+TEST_CASE("RISCV RV32 unshfl")
+{
+    CHECK( RISCVInstr<uint32>(0x091855b3).get_disasm() == "unshfl $a1, $a6, $a7");
+    RISCVInstr<uint32> instr("unshfl", 0);
+    instr.set_v_src( 0xbf534fde, 0);
+    instr.set_v_src( 0x07, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xf17d3bbe);
+}
+
+TEST_CASE("RISCV RV64 unshfl")
+{
+    RISCVInstr<uint64> instr( "unshfl", 0);
+    instr.set_v_src( 0xf14c'82a6'ac81'2410, 0);
+    instr.set_v_src( 0x16, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xc7d0'b881'892a'1084);
+}
+

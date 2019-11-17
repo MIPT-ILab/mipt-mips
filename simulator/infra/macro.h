@@ -218,39 +218,38 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
-uint32_t shfl( uint32_t src1, uint32_t src2)
+template<typename T> static
+auto shuffle_stage( T src, uint64_t maskL, uint64_t maskR, int N)
 {
-    uint32_t x = src1;
-    uint32_t shamt = src2 & 15;
-    if (shamt & 1) x = shuffle_stage(x, 0x44444444, 0x22222222, 1);
-    if (shamt & 2) x = shuffle_stage(x, 0x30303030, 0x0c0c0c0c, 2);
-    if (shamt & 4) x = shuffle_stage(x, 0x0f000f00, 0x00f000f0, 4);
-    if (shamt & 8) x = shuffle_stage(x, 0x00ff0000, 0x0000ff00, 8);
+    auto x = src & ~( maskL | maskR);
+    x |= ( ( src << N) & maskL) | ( ( src >> N) & maskR);
     return x;
 }
 
-uint64_t shfl( uint64_t src1, uint64_t src2)
-{
-    uint64_t x = src1;
-    uint64_t shamt = src2 & 31;
-    if (shamt & 1) x = shuffle_stage(x, 0x4444444444444444ll, 0x2222222222222222ll, 1);
-    if (shamt & 2) x = shuffle_stage(x, 0x3030303030303030ll, 0x0c0c0c0c0c0c0c0cll, 2);
-    if (shamt & 4) x = shuffle_stage(x, 0x0f000f000f000f00ll, 0x00f000f000f000f0ll, 4);
-    if (shamt & 8) x = shuffle_stage(x, 0x00ff000000ff0000ll, 0x0000ff000000ff00ll, 8);
-    if (shamt & 16) x = shuffle_stage(x, 0x0000ffff00000000ll, 0x00000000ffff0000ll, 16);
-    return x;
-}
+// array with constants for shuffle
+const uint64_t shfl_consts[] = {
+    0x0000000000ff0000ull, 0x000000000000ff00ull,
+    0x000000000f000f00ull, 0x0000000000f000f0ull,
+    0x0000000030303030ull, 0x000000000c0c0c0cull,
+    0x0000000044444444ull, 0x0000000022222222ull,
+    0x0000ffff00000000ull, 0x00000000ffff0000ull,
+    0x00ff000000ff0000ull, 0x0000ff000000ff00ull,
+    0x0f000f000f000f00ull, 0x00f000f000f000f0ull,
+    0x3030303030303030ull, 0x0c0c0c0c0c0c0c0cull,
+    0x4444444444444444ull, 0x2222222222222222ull,
+};
 
-uint128_t shfl( uint128_t src1, uint128_t src2)
+template<typename T, typename U> static
+auto bit_shuffle( T src1, U src2)
 {
-    uint128_t x = src1;
-    uint128_t shamt = src2 & 63;
-    if (shamt & 1) x = shuffle_stage(x, 0x44444444444444444444444444444444, 0x22222222222222222222222222222222, 1);
-    if (shamt & 2) x = shuffle_stage(x, 0x30303030303030303030303030303030, 0x0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2);
-    if (shamt & 4) x = shuffle_stage(x, 0x0f000f000f000f000f000f000f000f00, 0x00f000f000f000f000f000f000f000f0, 4);
-    if (shamt & 8) x = shuffle_stage(x, 0x00ff000000ff000000ff000000ff0000, 0x0000ff000000ff000000ff000000ff00, 8);
-    if (shamt & 16) x = shuffle_stage(x, 0x0000ffff000000000000ffff00000000, 0x00000000ffff000000000000ffff0000, 16);
-    if (shamt & 32) x = shuffle_stage(x, 0x00000000ffffffff0000000000000000, 0x0000000000000000ffffffff00000000, 32);
+    auto x = src1;
+    auto shamt = src2 & ( ( sizeof( src1) > sizeof( uint32_t)) ? 31 : 15);
+    int offset = sizeof( src1) / sizeof( uint64_t);
+    int limit = 4 + offset;
+    for( int i = 0; i < limit ; ++i)
+    {
+        if ( shamt & ( 1 << ( limit - i - 1))) x = shuffle_stage( x, shfl_consts[2 * i + offset * 8], shfl_consts[2 * i + 1 + offset * 8], ( 1 << ( limit - i - 1)));
+    }
     return x;
 }
 
