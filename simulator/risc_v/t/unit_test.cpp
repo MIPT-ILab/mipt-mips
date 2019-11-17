@@ -5,7 +5,7 @@
  */
 
 #include "../riscv_instr.h"
- 
+
 #include <catch.hpp>
 #include <memory/memory.h>
 
@@ -236,3 +236,21 @@ TEST_CASE( "RISV RV64 pack")
     CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
 }
 
+TEST_CASE( "RISV RV32 xnor")
+{
+    CHECK( RISCVInstr<uint32>(0x40e6c633).get_disasm() == "xnor $a2, $a3, $a4");
+    RISCVInstr<uint32> instr ( "xnor", 0);
+    instr.set_v_src( 0x1234abcd, 0);
+    instr.set_v_src( 0xaaaaaaaa, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x4761fe98);
+}
+
+TEST_CASE( "RISV RV64 xnor")
+{
+    RISCVInstr<uint64> instr ( "xnor", 0);
+    instr.set_v_src( 0x1234abcd1234abcd, 0);
+    instr.set_v_src( 0xaaaaaaaaaaaaaaaa, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x4761fe984761fe98);
+}
