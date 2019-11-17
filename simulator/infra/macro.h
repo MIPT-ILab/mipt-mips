@@ -177,6 +177,15 @@ static constexpr T ones_ls(const T& value, size_t shamt)
     return ~(~value << shamt);
 }
 
+/*Circular left shift*/
+template<typename T>
+static constexpr T circ_ls(const T& value, size_t shamt)
+{
+    if( shamt == 0 || shamt == bitwidth<T>)
+        return value;
+    return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
+}
+
 template<size_t N, typename T>
 T sign_extension( T value)
 {
