@@ -5,7 +5,7 @@
  */
 
 #include "../riscv_instr.h"
- 
+
 #include <catch.hpp>
 #include <memory/memory.h>
 
@@ -215,4 +215,21 @@ TEST_CASE("RISCV RV64 orn")
     instr.set_v_src( 0xbfff'ffff'ffff'ef77, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
+}
+
+TEST_CASE("RISCV RV32 pcnt")
+{
+    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
+    RISCVInstr<uint32> instr( "pcnt", 0);
+    instr.set_v_src( 0xfff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xC);
+}
+
+TEST_CASE("RISCV RV64 pcnt")
+{
+    RISCVInstr<uint64> instr( "pcnt", 0);
+    instr.set_v_src( 0xfafb'fcfd'feff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 41);
 }

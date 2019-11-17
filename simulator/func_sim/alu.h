@@ -18,7 +18,7 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 struct ALU
 {
-    // Generic  
+    // Generic
     template<typename I> using Predicate = bool (*)( const I*);
     template<typename I> using Execute = void (*)( I*);
     template<typename I> static size_t shamt_imm( const I* instr) { return narrow_cast<size_t>( instr->v_imm); }
@@ -203,6 +203,15 @@ struct ALU
     // Leading zero/ones
     template<typename I, typename T> static void clo( I* instr)  { instr->v_dst = count_leading_ones<T>( instr->v_src1); }
     template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
+    template<typename I> static
+    void pcnt( I* instr){
+      uint8 count = 0;
+      std::size_t width = log_bitwidth<I>;
+      for(std::size_t index = 0; index < width; index++){
+        count += (instr->v_src1 >> index) & 1;
+      }
+      instr->v_dst = count;
+    }
 
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
