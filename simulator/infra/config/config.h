@@ -23,6 +23,7 @@ class BaseValue
 {
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     friend void handleArgs( int argc, const char* const argv[], int start_index);
+    friend std::string help();
 protected:
     static popl::OptionParser& options();
     static void register_switch( const std::string& alias, const std::string& name, const std::string& desc, bool* value);
@@ -88,11 +89,17 @@ struct Switch : AliasedSwitch
 
 struct HelpOption : Exception
 {
-    explicit HelpOption( const std::string& msg) : Exception( "Help", msg) {}
+    HelpOption() : Exception( "Help") {}
+};
+
+struct InvalidOption : Exception
+{
+    explicit InvalidOption( const std::string& msg) : Exception( "Invalid option", msg) {}
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 void handleArgs( int argc, const char* const argv[], int start_index);
+std::string help();
 
 } // namespace config
 
