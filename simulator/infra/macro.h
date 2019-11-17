@@ -85,9 +85,9 @@ static constexpr T all_ones()
  *           bitmask<uint32>(32) -> 0xFFFF'FFFF
  */
 template <typename T>
-static constexpr T bitmask(unsigned int const onecount)
+static constexpr T bitmask( size_t onecount)
 {
-    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
+    return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
 
 template <typename T>
