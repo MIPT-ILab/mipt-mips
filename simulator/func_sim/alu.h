@@ -18,7 +18,7 @@ T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 struct ALU
 {
-    // Generic  
+    // Generic
     template<typename I> using Predicate = bool (*)( const I*);
     template<typename I> using Execute = void (*)( I*);
     template<typename I> static size_t shamt_imm( const I* instr) { return narrow_cast<size_t>( instr->v_imm); }
@@ -213,6 +213,7 @@ struct ALU
     template<typename I> static void ori( I* instr)   { instr->v_dst = instr->v_src1 | instr->v_imm; }
     template<typename I> static void xori( I* instr)  { instr->v_dst = instr->v_src1 ^ instr->v_imm; }
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
+    template<typename I> static void xnor( I* instr)  { instr->v_dst = instr->v_src1 ^ ~instr->v_src2; }
 
     // Bit permutation
     template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
@@ -220,6 +221,12 @@ struct ALU
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
+
+    // Bit manipulations
+    template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+
+    // Bit manipulations
+    template<typename I, typename T> static void pack( I* instr)  { instr->v_dst = (instr->v_src1 & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src2 << (half_bitwidth<T>)); }
 
     // Branches
     template<typename I, Predicate<I> p> static
@@ -310,6 +317,19 @@ struct ALU
     void riscv_addition_imm( I* instr)
     {
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
+    }
+
+    template<typename I> static
+    void bit_field_place( I* instr)
+    {
+        using XLENType = typename I::RegisterUInt;
+        size_t XLEN = bitwidth<XLENType>;
+        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15;
+        len = len ? len : 16;
+        size_t off = ( narrow_cast<size_t>( instr->v_src2) >> 16) & ( XLEN-1);
+        auto mask = circ_ls( bitmask<XLENType>( len), off);
+        auto data = circ_ls( instr->v_src2, off);
+        instr->v_dst = ( data & mask) | ( instr->v_src1 & ~mask);
     }
 };
 
