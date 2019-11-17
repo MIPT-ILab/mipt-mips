@@ -219,7 +219,7 @@ TEST_CASE("RISCV RV64 orn")
 
 TEST_CASE( "RISV RV32 pack")
 {
-    CHECK( RISCVInstr<uint32>(0x2cd60513).getdisasm() == "pack $a0, $a2, $a3");
+    CHECK( RISCVInstr<uint32>(0x2cd60513).get_disasm() == "pack $a0, $a2, $a3");
     RISCVInstr<uint32> instr( "pack", 0);
     instr.set_v_src( 0xffff'2222, 0);
     instr.set_v_src( 0x1111'3333, 1);
