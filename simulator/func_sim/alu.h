@@ -209,7 +209,7 @@ struct ALU
       uint8 count = 0;
       for ( std::size_t index = 0; index < max; index++)
       {
-        count += (instr->v_src1 >> index) & 1;
+        count += narrow_cast<uint8>(instr->v_src1 >> index) & 1;
       }
       instr->v_dst = count;
     }
