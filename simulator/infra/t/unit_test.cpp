@@ -290,5 +290,4 @@ TEST_CASE("Test circular left shift ")
     CHECK(value == circ_ls(value, 64));
     CHECK(0x0B0C'0D0A'0B0C'0D0A == circ_ls(value, 4));
     }
-
 }
