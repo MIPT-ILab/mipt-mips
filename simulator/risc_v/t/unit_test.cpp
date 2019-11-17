@@ -230,8 +230,8 @@ TEST_CASE("RISCV RV32 bfp")
 TEST_CASE("RISCV RV64 bfp")
 {                               
     RISCVInstr<uint64> instr( "bfp", 0);
-    instr.set_v_src( 0x00005555CCCC0000, 0);
+    instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x0000555C5CCC0000);
+    CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
 }
