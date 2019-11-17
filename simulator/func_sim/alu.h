@@ -322,7 +322,6 @@ struct ALU
         XLENType data = circ_s(instr->v_src2, off, XLEN);
         instr->v_dst = (data & mask) | (instr->v_src1 & ~mask);
     }
-
 };
 
 #endif
