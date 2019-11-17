@@ -221,19 +221,42 @@ TEST_CASE("RISCV RV64 orn")
 TEST_CASE("RISCV RV32 grev")
 {
     CHECK( RISCVInstr<uint32>(0x68D6'55B3).get_disasm() == "grev $a1, $a2, $a3");
-    RISCVInstr<uint32> instr( "grev", 0);
-    instr.set_v_src( 0x5555'5555, 0);
-    instr.set_v_src( 0x1, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xAAAA'AAAA);
+    std::vector<TestData<uint32>> cases = {
+            {0x5555'5555,  0x1, 0xAAAA'AAAA},
+            {0x3333'3333,  0x2, 0xCCCC'CCCC},
+            {0x1111'1111,  0x3, 0x8888'8888},
+            {0x0123'4567,  0x7, 0x80C4'A2E6},
+            {0x3333'3333,  0xF, 0xCCCC'CCCC},
+            {0x0123'4567, 0x1F, 0xE6A2'C480},
+    };
+    for (std::size_t i = 0; i < cases.size(); ++i) {
+        RISCVInstr<uint32> instr( "grev", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
 }
 
 
 TEST_CASE("RISCV RV64 grev")
 {
-    RISCVInstr<uint64> instr( "grev", 0);
-    instr.set_v_src( 0x0123'4567'89AB'CDEF, 0);
-    instr.set_v_src( 0x3F, 1);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xF7B3'D591'E6A2'C480);
+    std::vector<TestData<uint64>> cases = {
+            {0x5555'5555'5555'5555LL,  0x1, 0xAAAA'AAAA'AAAA'AAAALL},
+            {0x3333'3333'3333'3333LL,  0x2, 0xCCCC'CCCC'CCCC'CCCCLL},
+            {0x1111'1111'1111'1111LL,  0x3, 0x8888'8888'8888'8888LL},
+            {0x0123'4567'89AB'CDEFLL,  0x7, 0x80C4'A2E6'91D5'B3F7LL},
+            {0x0123'4567'89AB'CDEFLL,  0xF, 0xC480'E6A2'D591'F7B3LL},
+            {0x0123'4567'89AB'CDEFLL, 0x1F, 0xE6A2'C480'F7B3'D591LL},
+            {0x0123'4567'89AB'CDEFLL, 0x3F, 0xF7B3'D591'E6A2'C480LL},
+    };
+    for (std::size_t i = 0; i < cases.size(); ++i) {
+        RISCVInstr<uint64> instr( "grev", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
 }
