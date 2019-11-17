@@ -276,15 +276,15 @@ TEST_CASE("Test uint128 octal printing")
     CHECK( uint128_to_oct_string( all_ones<uint128>()) == "3777777777777777777777777777777777777777777");
 }
 
-TEST_CASE("Test circular left shift for uint32")
+TEST_CASE("Test uint32 circular left shift")
 {
     uint32 value = 0xA0B0'C0D0;
     CHECK( value == circ_ls( value, 0));
     CHECK( value == circ_ls( value, 32));
-    CHECK( x0B0C'0D0A == circ_ls( value, 4));
+    CHECK( 0x0B0C'0D0A == circ_ls( value, 4));
 }
 
-TEST_CASE("Test circular left shift for uint64")
+TEST_CASE("Test uint64 circular left shift")
 {
     uint64 value = 0xA0B0'C0D0'A0B0'C0D0;
     CHECK( value == circ_ls( value, 0));
