@@ -292,8 +292,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ',    Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_sro,      execute_sro<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_sro,      execute_sro<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 
 template<typename I>

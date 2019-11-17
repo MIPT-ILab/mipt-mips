@@ -137,16 +137,16 @@ template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16; // NOLINT(misc-definition
 template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
+template<typename T>
+static constexpr T ones_rs( const T& rs1, size_t shamt)
+{
+    return ~((~rs1) >> shamt);
+}
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
  */
- template<typename T>
- static constexpr T ones_rs( const T& rs1, size_t shamt)
- {
-     return ~((~rs1) >> shamt);
- }
 
 template <typename T>
 static constexpr T arithmetic_rs(const T& value, size_t shamt)
