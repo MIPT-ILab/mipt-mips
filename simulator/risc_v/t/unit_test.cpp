@@ -289,8 +289,8 @@ TEST_CASE( "RISV RV32 xnor")
 TEST_CASE( "RISV RV64 xnor")
 {
     RISCVInstr<uint64> instr ( "xnor", 0);
-    instr.set_v_src( 0x1234abcd1234abcd, 0);
-    instr.set_v_src( 0xaaaaaaaaaaaaaaaa, 1);
+    instr.set_v_src( 0x3000'0000'3000'0000, 0);
+    instr.set_v_src( 0xa000'0000'a000'0000, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x4761fe984761fe98);
+    CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
 }
