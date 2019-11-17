@@ -44,6 +44,10 @@ template<> constexpr size_t bitwidth<int128> = 128u; // NOLINT(misc-definitions-
 template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 
+/* Bit width / 2 */
+template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+constexpr size_t half_bitwidth = bitwidth<T> >> 1;
+
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T>
 constexpr auto popcount( T x) noexcept
@@ -165,6 +169,12 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
         return value >> shamt;        // just shift if MSB is zero
 
     return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+}
+
+template<typename T>
+static constexpr T ones_ls(const T& value, size_t shamt)
+{
+    return ~(~value << shamt);
 }
 
 template<size_t N, typename T>

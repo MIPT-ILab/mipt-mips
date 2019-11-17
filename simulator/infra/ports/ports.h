@@ -13,6 +13,8 @@
 #include "port_queue/port_queue.h"
 #include "timing.h"
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 #include <cassert>
 #include <memory>
 #include <string>
@@ -37,6 +39,8 @@ private:
 
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
+
+    boost::property_tree::ptree dump() const;
 
     struct Cluster
     {
