@@ -316,18 +316,31 @@ struct ALU
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
     }
 
-    // RISC-V Shuffle
+    template<typename I> static
+    void bit_field_place( I* instr)
+    {
+        using XLENType = typename I::RegisterUInt;
+        size_t XLEN = bitwidth<XLENType>;
+        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15;
+        len = len ? len : 16;
+        size_t off = ( narrow_cast<size_t>( instr->v_src2) >> 16) & ( XLEN-1);
+        auto mask = circ_ls( bitmask<XLENType>( len), off);
+        auto data = circ_ls( instr->v_src2, off);
+        instr->v_dst = ( data & mask) | ( instr->v_src1 & ~mask);
+    }
+  
+      // RISC-V Shuffle
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
-	auto pre_result = instr->v_src1;
-	size_t limit = 4 + bytewidth( instr->v_src1) / bytewidth( uint64_t);
-        for( size_t i = 0; i < limit; ++i)
-	    {
+	      auto x = instr->v_src1;
+	      int limit = 4 + sizeof( instr->v_src1) / sizeof( uint64_t);
+        for( int i = 0; i < limit; ++i)
+	      {
             if(( instr->v_src2 >> i) & 1)
-                pre_result = bit_shuffle( pre_result, 1 << i);
-	    }
-	instr->v_dst = pre_result;
+                x = bit_shuffle( x, 1 << i);
+	      }
+	      instr->v_dst = x;
     }
 };
 
