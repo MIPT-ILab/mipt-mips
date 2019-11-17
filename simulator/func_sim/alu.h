@@ -315,11 +315,11 @@ struct ALU
     {
         using XLENType = typename I::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
-        int len = (instr->v_src2 >> 24) & 15;
+        size_t len = (narrow_cast<size_t>(instr->v_src2) >> 24) & 15;
         len = len ? len : 16;
         int off = (instr->v_src2 >> 16) & (XLEN-1);
-        XLENType mask = circ_ls(ones_ls(XLENType(0), len), off);
-        XLENType data = circ_ls(instr->v_src2, off);
+        auto mask = circ_ls(bitmask<XLENType>(len), off);
+        auto data = circ_ls(instr->v_src2, off);
         instr->v_dst = (data & mask) | (instr->v_src1 & ~mask);
     }
 };
