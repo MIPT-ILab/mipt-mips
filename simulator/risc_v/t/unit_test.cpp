@@ -313,20 +313,3 @@ TEST_CASE("RISCV RV64 bfp")
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
 }
-
-TEST_CASE("RISCV RV32 pcnt")
-{
-    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
-    RISCVInstr<uint32> instr( "pcnt", 0);
-    instr.set_v_src( 0xfff, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 0xc);
-}
-
-TEST_CASE("RISCV RV64 pcnt")
-{
-    RISCVInstr<uint64> instr( "pcnt", 0);
-    instr.set_v_src( 0xfafb'fcfd'feff, 0);
-    instr.execute();
-    CHECK( instr.get_v_dst() == 41);
-}
