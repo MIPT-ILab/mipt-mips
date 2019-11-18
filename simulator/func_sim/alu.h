@@ -291,6 +291,19 @@ struct ALU
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 
+    // Bit Extract/Deposit
+    template<typename I> static
+    void bext( I* instr)
+    {
+        instr->v_dst = 0;
+        for (int i = 0, j = 0; i <bitwidth<typename I::RegisterUInt>; i++)
+            if ((instr->v_src2 >> i) & 1) {
+                if ((instr->v_src1 >> i) & 1)
+                    instr->v_dst |= 1 << j;
+                j++;
+            }
+    }
+    
     // Branches
     template<typename I, Predicate<I> p> static
     void branch( I* instr)

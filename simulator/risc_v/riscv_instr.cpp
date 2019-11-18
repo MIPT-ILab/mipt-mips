@@ -83,6 +83,7 @@ template<typename I> const auto execute_divu = RISCVMultALU::div<I, typename I::
 template<typename I> const auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
 template<typename I> const auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
 // B
+template<typename I> const auto execute_bext = ALU::bext<I>;
 template<typename I> const auto execute_bfp = ALU::bit_field_place<I>;
 template<typename I> const auto execute_clmul = ALU::clmul<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
@@ -317,6 +318,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_and,      execute_and<I>,    OUT_ARITHM, ' ',                       Imm::NO,       { Src::RS1_3BIT, Src::RS2_3BIT }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     /*-------------- B --------------*/
     // Bit manipulation
+    {'B', instr_bext,       execute_bext<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_slo,        execute_slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sro,        execute_sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_orn,        execute_orn<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
