@@ -365,6 +365,23 @@ TEST_CASE("RISCV RV128 grev")
     CHECK_THROWS_AS(instr.execute(), std::runtime_error);
 }
 
+TEST_CASE("RISCV RV32 pcnt")
+{
+    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
+    RISCVInstr<uint32> instr( "pcnt", 0);
+    instr.set_v_src( 0xfff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xc);
+}
+
+TEST_CASE("RISCV RV64 pcnt")
+{
+    RISCVInstr<uint64> instr( "pcnt", 0);
+    instr.set_v_src( 0xfafb'fcfd'feff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x29);
+}
+
 TEST_CASE ("RISCV RV32 clz")
 {
     CHECK ( RISCVInstr<uint32>(0x60079793).get_disasm() == "clz $a5, $a5");

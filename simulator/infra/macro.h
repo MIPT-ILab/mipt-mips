@@ -59,6 +59,12 @@ constexpr auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
 }
 
+static inline auto popcount( uint128 x) noexcept
+{
+    return popcount( narrow_cast<uint64>( x))
+         + popcount( narrow_cast<uint64>( x >> 64));
+}
+
 /*
  * Returns value of T type with only the most significant bit set
  * Examples: msb_set<uint8>() -> 0x80
