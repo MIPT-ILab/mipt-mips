@@ -108,7 +108,7 @@ add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
     OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
+    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/../riscv-bitmanip-opcodes
 )
 
