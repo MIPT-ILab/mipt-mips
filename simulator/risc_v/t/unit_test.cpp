@@ -389,8 +389,7 @@ TEST_CASE("RISCV RV128 pcnt")
     RISCVInstr<uint128> instr( "pcnt", 0);
     instr.set_v_src( value, 0);
     instr.execute();
-    std::cout << instr.get_v_dst() << std::endl;
-    CHECK( instr.get_v_dst() == 82);
+    CHECK( narrow_cast<size_t>( instr.get_v_dst()) == 82);
 }
 
 TEST_CASE ("RISCV RV32 clz")
