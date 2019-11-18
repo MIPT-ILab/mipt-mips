@@ -425,7 +425,7 @@ struct ALU
     void riscv_unshfl( I* instr)
     {
         auto pre_result = instr->v_src1;
-        size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64_t>;
+        size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
         for( size_t i = 0; i < limit; ++i)
         {
             if(( instr->v_src2 >> i) & 1)
