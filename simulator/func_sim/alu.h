@@ -292,6 +292,17 @@ struct ALU
     template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
     template<typename I, typename T> static void ctz( I* instr)  { instr->v_dst = count_trailing_zeroes<T>( instr->v_src1); }
 
+    template<typename I, typename T> static
+    void pcnt(I* instr){
+      std::size_t max = bitwidth<T> - 1 - count_leading_zeroes<T>( ~instr->v_src1);
+      uint8 count = 0;
+      for ( std::size_t index = 0; index < max; index++)
+      {
+        count += narrow_cast<uint8>(instr->v_src1 >> index) & 1;
+      }
+      instr->v_dst = count;
+    }
+
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
     template<typename I> static void orv( I* instr)   { instr->v_dst = instr->v_src1 | instr->v_src2; }

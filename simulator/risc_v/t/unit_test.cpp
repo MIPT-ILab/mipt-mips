@@ -296,7 +296,7 @@ TEST_CASE( "RISV RV64 xnor")
 }
 
 TEST_CASE("RISCV RV32 bfp")
-{                               
+{
     CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
@@ -306,7 +306,7 @@ TEST_CASE("RISCV RV32 bfp")
 }
 
 TEST_CASE("RISCV RV64 bfp")
-{                               
+{
     RISCVInstr<uint64> instr( "bfp", 0);
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
@@ -363,6 +363,23 @@ TEST_CASE("RISCV RV128 grev")
     instr.set_v_src( 0, 0);
     instr.set_v_src( 0, 1);
     CHECK_THROWS_AS(instr.execute(), std::runtime_error);
+}
+
+TEST_CASE("RISCV RV32 pcnt")
+{
+    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
+    RISCVInstr<uint32> instr( "pcnt", 0);
+    instr.set_v_src( 0xfff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xc);
+}
+
+TEST_CASE("RISCV RV64 pcnt")
+{
+    RISCVInstr<uint64> instr( "pcnt", 0);
+    instr.set_v_src( 0xfafb'fcfd'feff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x29);
 }
 
 TEST_CASE ("RISCV RV32 clz")
