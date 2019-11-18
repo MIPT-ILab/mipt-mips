@@ -303,7 +303,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_grev,     execute_grev<I>,   OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_clz,      execute_clz<I>,    OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
     {'B', instr_ctz,      execute_ctz<I>,    OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
-    {'B', instr_unshfl,   execute_unshfl<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_unshfl,   execute_unshfl<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128},
 };
 
 template<typename I>

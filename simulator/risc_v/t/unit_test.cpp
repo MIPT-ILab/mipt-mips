@@ -439,3 +439,4 @@ TEST_CASE("RISCV RV64 unshfl")
     instr.execute();
     CHECK( instr.get_v_dst() == 0xc7d0'b881'892a'1084);
 }
+
