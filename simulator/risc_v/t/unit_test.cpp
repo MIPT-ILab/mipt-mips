@@ -451,9 +451,19 @@ TEST_CASE("RISCV RV32 unshfl")
 TEST_CASE("RISCV RV64 unshfl")
 {
     RISCVInstr<uint64> instr( "unshfl", 0);
-    instr.set_v_src( 0xf14c'82a6'ac81'2410, 0);
+    instr.set_v_src( 0x0138'745b'ffff'acd1, 0);
     instr.set_v_src( 0x16, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xc7d0'b881'892a'1084);
+    CHECK( instr.get_v_dst() == 0x021c'ffff'56c7'bc85);
+}
+
+TEST_CASE("RISCV RV128 unshfl")
+{
+    RISCVInstr<uint128> instr( "unshfl", 0);
+    instr.set_v_src( 0xf14c'82a6'ac81'2410, 0);
+    instr.set_v_src( 0x36, 1);
+    uint128 check_value = ( ( static_cast<uint128>( 0xc7d0b881)) << 64) + 0x892a1084;
+    instr.execute();
+    CHECK( instr.get_v_dst() == check_value);
 }
 

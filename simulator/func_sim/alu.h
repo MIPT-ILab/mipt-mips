@@ -10,94 +10,79 @@
 #include "multiplication.h"
 #include "traps/trap.h"
 
+#include <array>
 #include <infra/macro.h>
 #include <tuple>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
-enum shuffle_consts { MASK_L_0 = 0x00ff0000, MASK_R_0 = 0x0000ff00,
-                      MASK_L_1 = 0x0f000f00, MASK_R_1 = 0x00f000f0,
-                      MASK_L_2 = 0x30303030, MASK_R_2 = 0x0c0c0c0c,
-                      MASK_L_3 = 0x44444444, MASK_R_3 = 0x22222222,
+struct Mask {
+   const uint32 left_mask, right_mask;
+};
+
+static std::array<Mask, 4> shuffle_consts = {
+  Mask{ 0x00ff0000, 0x0000ff00},
+  Mask{ 0x0f000f00, 0x00f000f0},
+  Mask{ 0x30303030, 0x0c0c0c0c},
+  Mask{ 0x44444444, 0x22222222},
 };
 
 static uint32 shuffle_stage( uint32 src, size_t index)
 {
-    uint32 maskL, maskR;
-    switch(index)
-    {
-        case 0:
-            maskL = MASK_L_0;
-            maskR = MASK_R_0;
-            break;
-        case 1:
-            maskL = MASK_L_1;
-            maskR = MASK_R_1;
-            break;
-        case 2:
-            maskL = MASK_L_2;
-            maskR = MASK_R_2;
-            break;
-        case 3:
-            maskL = MASK_L_3;
-            maskR = MASK_R_3;
-            break;
-        default:
-            throw std::runtime_error( "Unexpexted index in 'shuffle_stage' function");
-            break;
-    }
-    index = 1 << (3 - index);
+    uint32 maskL = shuffle_consts[index].left_mask;
+    uint32 maskR = shuffle_consts[index].right_mask;
+    index = 1 << ( 3 - index);
     uint32 x = src & ~( maskL | maskR);
     x |= ( ( src << index) & maskL) | ( ( src >> index) & maskR);
     return x;
 }
 
-static uint32 bit_shuffle( uint32 src1, uint32 src2)
+static inline uint32 bit_shuffle( uint32 src1, uint32 src2)
 {
-    uint32 pre_result = src1;
+    uint32 result = src1;
     uint32 shamt = src2 & 15;
     for( size_t i = 0; i < 4 ; ++i)
     {
         if ( shamt & ( 1 << ( 3 - i)))
-            pre_result = shuffle_stage( pre_result, i);
+            result = shuffle_stage( result, i);
     }
-    return pre_result;
+    return result;
 }
 
-static uint64 bit_shuffle( uint64& src1, uint64 src2)
+static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
 {
     uint64 result = src1;
     uint32 shamt = src2 & 31;
     uint32 left_part = result >> 32;
     uint32 right_part = result;
-    if( shamt & (1 << 4))
+    if( shamt & ( 1 << 4))
     {
         uint32 buf = left_part & bitmask<uint32>(16);
-        left_part = (left_part & ~(bitmask<uint32>(16))) | ((right_part >> 16) & bitmask<uint32>(16));
-        right_part = (right_part & (bitmask<uint32>(16))) | (buf << 16);
+        left_part = ( left_part & ~( bitmask<uint32>(16))) | ( ( right_part >> 16) & bitmask<uint32>(16));
+        right_part = ( right_part & ( bitmask<uint32>(16))) | ( buf << 16);
     }
-    left_part = bit_shuffle(left_part, shamt & 15);
-    right_part = bit_shuffle(right_part, shamt & 15);
+    left_part = bit_shuffle( left_part, shamt & 15);
+    right_part = bit_shuffle( right_part, shamt & 15);
     result = left_part;
     result <<= 32;
     return result + right_part;
 }
 
-__attribute__( ( unused)) static uint128 bit_shuffle( uint128 src1, uint128 src2)
+static inline uint128 bit_shuffle( uint128 src1, uint128 src2)
 {
     uint128 result = src1;
     uint64 shamt = src2 & 63;
     uint64 left_part = result >> 64;
     uint64 right_part = result;
-    if( shamt & (1 << 5))
+    if( shamt & ( 1 << 5))
     {
         uint64 buf = left_part & bitmask<uint64>(32);
-        left_part = (left_part & ~(bitmask<uint64>(32))) | ((right_part >> 32) & bitmask<uint64>(32));
-        right_part = (right_part & (bitmask<uint64>(32))) | (buf << 32);
+        left_part = ( left_part & ~( bitmask<uint64>(32))) | ( ( right_part >> 32) & bitmask<uint64>(32));
+        right_part = ( right_part & ( bitmask<uint64>(32))) | ( buf << 32);
     }
-    left_part = bit_shuffle(left_part, shamt & 31);
-    right_part = bit_shuffle(right_part, shamt & 31);
+    left_part = bit_shuffle( left_part, shamt & 31);
+    right_part = bit_shuffle( right_part, shamt & 31);
     result = left_part;
     result <<= 64;
     return result + right_part;
@@ -435,14 +420,14 @@ struct ALU
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
-        auto pre_result = instr->v_src1;
-        size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
+        auto dst_value = instr->v_src1;
+        constexpr size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
         for( size_t i = 0; i < limit; ++i)
         {
-            if(( instr->v_src2 >> i) & 1)
-                pre_result = bit_shuffle( pre_result, static_cast<decltype( instr->v_src1)>( 1 << i));
+            if( ( instr->v_src2 >> i) & 1)
+                dst_value = bit_shuffle( dst_value, static_cast<decltype( instr->v_src1)>( 1 << i));
         }
-        instr->v_dst = pre_result;
+        instr->v_dst = dst_value;
     }
 };
 
