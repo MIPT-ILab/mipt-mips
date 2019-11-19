@@ -15,7 +15,6 @@
 #include <climits>
 #include <limits>
 #include <type_traits>
-#include <cassert>
 
 /* Checks if values is power of two */
 template<typename T>
@@ -167,6 +166,18 @@ template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16; // NOLINT(misc-definition
 template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
+template<typename T>
+static constexpr T ones_ls( const T& value, size_t shamt)
+{
+    return ~(~value << shamt);
+}
+
+template<typename T>
+static constexpr T ones_rs( const T& value, size_t shamt)
+{
+    return ~(~value >> shamt);
+}
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
@@ -189,7 +200,7 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     else if ((value & msb_set<T>()) == 0)
         result = value >> shamt;        // just shift if MSB is zero
     else
-        result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+        result = ones_rs( value, shamt);
     return result;
 }
 
@@ -198,20 +209,14 @@ static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
     if ((value & msb_set<uint128>()) == 0)
         return value >> shamt;        // just shift if MSB is zero
 
-    return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
-}
-
-template<typename T>
-static constexpr T ones_ls(const T& value, size_t shamt)
-{
-    return ~(~value << shamt);
+    return ones_rs( value, shamt);
 }
 
 /*Circular left shift*/
 template<typename T>
-static constexpr T circ_ls(const T& value, size_t shamt)
+static constexpr T circ_ls( const T& value, size_t shamt)
 {
-    if( shamt == 0 || shamt == bitwidth<T>)
+    if ( shamt == 0 || shamt == bitwidth<T>)
         return value;
     return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }
@@ -257,33 +262,36 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
-static inline uint32 gen_reverse( uint32 src1, size_t shamt) {
-    if (shamt &  1) src1 = ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
-    if (shamt &  2) src1 = ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
-    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
-    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF) <<  8) | ((src1 & 0xFF00'FF00) >>  8);
-    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF) << 16) | ((src1 & 0xFFFF'0000) >> 16);
+static inline uint32 gen_reverse( uint32 src1, size_t shamt)
+{
+    if ((shamt &  1) != 0) src1 = ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
+    if ((shamt &  2) != 0) src1 = ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
+    if ((shamt &  4) != 0) src1 = ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
+    if ((shamt &  8) != 0) src1 = ((src1 & 0x00FF'00FF) <<  8) | ((src1 & 0xFF00'FF00) >>  8);
+    if ((shamt & 16) != 0) src1 = ((src1 & 0x0000'FFFF) << 16) | ((src1 & 0xFFFF'0000) >> 16);
     return src1;
 }
 
-static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
-    if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555ULL) <<  1) |
-                           ((src1 & 0xAAAA'AAAA'AAAA'AAAAULL) >>  1);
-    if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333ULL) <<  2) |
-                           ((src1 & 0xCCCC'CCCC'CCCC'CCCCULL) >>  2);
-    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FULL) <<  4) |
-                           ((src1 & 0xF0F0'F0F0'F0F0'F0F0ULL) >>  4);
-    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF'00FF'00FFULL) <<  8) |
-                           ((src1 & 0xFF00'FF00'FF00'FF00ULL) >>  8);
-    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF'0000'FFFFULL) << 16) |
-                           ((src1 & 0xFFFF'0000'FFFF'0000ULL) >> 16);
-    if (shamt & 32) src1 = ((src1 & 0x0000'0000'FFFF'FFFFULL) << 32) |
-                           ((src1 & 0xFFFF'FFFF'0000'0000ULL) >> 32);
+static inline uint64 gen_reverse( uint64 src1, size_t shamt)
+{
+    if ((shamt &  1) != 0)
+        src1 = ((src1 & 0x5555'5555'5555'5555ULL) <<  1) | ((src1 & 0xAAAA'AAAA'AAAA'AAAAULL) >>  1);
+    if ((shamt &  2) != 0)
+        src1 = ((src1 & 0x3333'3333'3333'3333ULL) <<  2) | ((src1 & 0xCCCC'CCCC'CCCC'CCCCULL) >>  2);
+    if ((shamt &  4) != 0)
+        src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FULL) <<  4) | ((src1 & 0xF0F0'F0F0'F0F0'F0F0ULL) >>  4);
+    if ((shamt &  8) != 0)
+        src1 = ((src1 & 0x00FF'00FF'00FF'00FFULL) <<  8) | ((src1 & 0xFF00'FF00'FF00'FF00ULL) >>  8);
+    if ((shamt & 16) != 0)
+        src1 = ((src1 & 0x0000'FFFF'0000'FFFFULL) << 16) | ((src1 & 0xFFFF'0000'FFFF'0000ULL) >> 16);
+    if ((shamt & 32) != 0)
+        src1 = ((src1 & 0x0000'0000'FFFF'FFFFULL) << 32) | ((src1 & 0xFFFF'FFFF'0000'0000ULL) >> 32);
     return src1;
 }
 
-static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
+static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */)
+{
     throw std::runtime_error( "Generalized reverse is not implemented for RV128");
-    return 0;
 }
+
 #endif
