@@ -18,14 +18,14 @@ template<size_t N, typename T>
 T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
 
 struct Mask {
-   const uint32 left_mask, right_mask;
+    const uint32 left_mask, right_mask;
 };
 
 static std::array<Mask, 4> shuffle_consts = {
-  Mask{ 0x00ff0000, 0x0000ff00},
-  Mask{ 0x0f000f00, 0x00f000f0},
-  Mask{ 0x30303030, 0x0c0c0c0c},
-  Mask{ 0x44444444, 0x22222222},
+    Mask{ 0x00ff0000, 0x0000ff00},
+    Mask{ 0x0f000f00, 0x00f000f0},
+    Mask{ 0x30303030, 0x0c0c0c0c},
+    Mask{ 0x44444444, 0x22222222},
 };
 
 static uint32 shuffle_stage( uint32 src, size_t index)
@@ -302,6 +302,19 @@ struct ALU
     // Bit permutation
     template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
+    template<typename I> static
+    void riscv_unshfl( I* instr)
+    {
+        auto dst_value = instr->v_src1;
+        constexpr size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
+        for( size_t i = 0; i < limit; ++i)
+        {
+            if( ( instr->v_src2 >> i) & 1)
+                dst_value = bit_shuffle( dst_value, static_cast<decltype( instr->v_src1)>( 1 << i));
+        }
+        instr->v_dst = dst_value;
+    }
+
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
@@ -414,20 +427,6 @@ struct ALU
         auto mask = circ_ls( bitmask<XLENType>( len), off);
         auto data = circ_ls( instr->v_src2, off);
         instr->v_dst = ( data & mask) | ( instr->v_src1 & ~mask);
-    }
-  
-    // RISC-V Shuffle
-    template<typename I> static
-    void riscv_unshfl( I* instr)
-    {
-        auto dst_value = instr->v_src1;
-        constexpr size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
-        for( size_t i = 0; i < limit; ++i)
-        {
-            if( ( instr->v_src2 >> i) & 1)
-                dst_value = bit_shuffle( dst_value, static_cast<decltype( instr->v_src1)>( 1 << i));
-        }
-        instr->v_dst = dst_value;
     }
 };
 
