@@ -11,7 +11,7 @@
 TEST_CASE( "ArgvLoader: load of argc and argv[]")
 {
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-    const char* argv[4] = { "a", "b", "c"};
+    const char* const argv[4] = { "a", "b", "c"};
     auto mem = FuncMemory::create_plain_memory( 20);
     CHECK( ArgvLoader<uint64,  Endian::little>( argv_cast( argv)).load_to( mem, 0) == 46);
     CHECK( ( mem->read<uint64, Endian::little>( 0)) == 3);
@@ -27,10 +27,10 @@ TEST_CASE( "ArgvLoader: load of argc and argv[]")
 TEST_CASE( "ArgvLoader: load of argc, argv[] and envp[]")
 {
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-    const char* argv[4] = { "a", "b", "c"};
+    const char* const argv[4] = { "a", "b", "c"};
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-    const char* envp[3] = { "d", "e"};
+    const char* const envp[3] = { "d", "e"};
 
     auto mem = FuncMemory::create_plain_memory( 20);
     CHECK( ArgvLoader<uint64,  Endian::little>( argv_cast( argv), argv_cast( envp)).load_to( mem, 0) == 74);

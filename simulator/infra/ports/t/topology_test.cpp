@@ -4,9 +4,11 @@
  */
 
 #include "../module.h"
-#include <catch.hpp>
-#include <boost/property_tree/ptree.hpp>
+
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include <catch.hpp>
 
 namespace pt = boost::property_tree;
 

@@ -17,7 +17,7 @@ class ArgvLoader
 {
 public:
     ArgvLoader( const char* const* argv, const char* const* envp);
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init) https://bugs.llvm.org/show_bug.cgi?id=32231, fixed in 9.0.1
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) https://bugs.llvm.org/show_bug.cgi?id=32231
     explicit ArgvLoader( const char* const* argv) : ArgvLoader( argv, nullptr) { }
 
     size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);

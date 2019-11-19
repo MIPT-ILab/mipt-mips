@@ -180,7 +180,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     CHECK( sim->get_exit_code() == 0);
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks = false)
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks)
 {
     auto sim = Simulator::create_functional_simulator(isa);
     auto mem = FuncMemory::create_default_hierarchied_memory();
@@ -208,20 +208,20 @@ TEST_CASE( "Torture_Test: Stop on trap")
 
 TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin")->run( 10000) == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", false)->run( 10000) == Trap::HALT );
 }
 
 static bool riscv_tt( const std::string& isa, const std::string& name)
 {
-    auto sim = get_simulator_with_test( isa, name);
+    auto sim = get_simulator_with_test( isa, name, false);
     auto trap = sim->run_no_limit();
     return trap == Trap::HALT && sim->read_cpu_register( 3) == 1;
 }
 
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin")->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin")->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin", false)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin", false)->run_no_limit() == Trap::HALT );
     CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
