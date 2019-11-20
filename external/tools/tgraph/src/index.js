@@ -1,4 +1,7 @@
 import draw2d from 'draw2d'
+import loadConfig from './miptv'
+
+loadConfig();
 
 var router = new draw2d.layout.connection.CircuitConnectionRouter();
 router.abortRoutingOnFirstVertexNode=false;
