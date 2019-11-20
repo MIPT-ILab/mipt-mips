@@ -16,6 +16,7 @@ module.exports = {
     filename: 'bundle.js'
   },
   devtool: "source-map",
+  node: { fs: "empty"},
   module: {
     rules: [{
         test: /\.js$/,
