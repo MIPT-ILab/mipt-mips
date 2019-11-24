@@ -89,6 +89,7 @@ template<typename I> auto execute_grev = ALU::grev<I>;
 template<typename I> auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
 template<typename I> auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
 template<typename I> auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
+template<typename I> auto execute_rol = ALU::rol<I>;
 
 using Src1 = Reg;
 using Src2 = Reg;
@@ -294,16 +295,17 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_and,      execute_and<I>,  OUT_ARITHM, ' ',                       Imm::NO,    Src1::RS1_3_BITS, Src2::RS2_3_BITS, Dst::RS1_3_BITS, 0, 32 | 64 | 128},
     /*-------------- B --------------*/
     // Bit manipulation
-    {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ',    Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_xnor,     execute_xnor<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_bfp,      execute_bfp<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_grev,     execute_grev<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_pcnt,     execute_pcnt<I>, OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
-    {'B', instr_clz,      execute_clz<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
-    {'B', instr_ctz,      execute_ctz<I>,  OUT_ARITHM, ' ',     Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
+    {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_pack,     execute_pack<I>, OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_xnor,     execute_xnor<I>, OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_bfp,      execute_bfp<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_grev,     execute_grev<I>, OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_pcnt,     execute_pcnt<I>, OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_clz,      execute_clz<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
+    {'B', instr_ctz,      execute_ctz<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64      },
+    {'B', instr_rol,      execute_rol<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
 };
 
 template<typename I>
