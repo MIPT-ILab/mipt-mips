@@ -8,8 +8,8 @@
 
 #include "checker/checker.h"
 
-#include <func_sim/driver/driver.h>
 #include <infra/exception.h>
+#include <func_sim/driver/driver.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
 
@@ -69,7 +69,7 @@ public:
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
     int get_exit_code() const noexcept;
-    void set_kernel( const std::shared_ptr<Kernel>& k) { kernel = k; }
+    void set_kernel( std::shared_ptr<Kernel> k) { kernel = std::move( k); }
     void set_driver( std::unique_ptr<Driver> d) { driver = std::move( d); }
     void enable_driver_hooks();
 };

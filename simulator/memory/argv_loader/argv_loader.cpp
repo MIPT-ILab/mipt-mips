@@ -11,7 +11,7 @@
 
 template <typename T, Endian endian>
 ArgvLoader<T, endian>::ArgvLoader( const char* const* argv, const char* const* envp)
-        : argc( argv != nullptr ? count_argc( argv) : 0)
+        : argc( argv ? count_argc( argv) : 0)
         , argv( argv)
         , envp( envp)
         , offset( 0)
@@ -51,7 +51,6 @@ void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory
     {
         mem->write<T, endian>( narrow_cast<T>( addr + offset), addr + ( 1 + contents_offset) * GUEST_WORD_SIZE);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         std::string content( argv[contents_offset]);
         mem->write_string( content,  addr + offset);
         offset += content.size();
@@ -64,12 +63,10 @@ void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory
 template<typename T, Endian endian>
 void ArgvLoader<T, endian>::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     for ( int contents_offset = 0; envp[contents_offset] != nullptr; contents_offset++)
     {
         mem->write<T, endian>( narrow_cast<T>( addr + offset), addr + ( 1 + argc + 1 + contents_offset) * GUEST_WORD_SIZE);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         std::string content( envp[contents_offset]);
         mem->write_string( content,  addr + offset);
         offset += content.size();

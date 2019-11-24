@@ -59,6 +59,12 @@ constexpr auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
 }
 
+static inline auto popcount( uint128 x) noexcept
+{
+    return popcount( narrow_cast<uint64>( x))
+         + popcount( narrow_cast<uint64>( x >> 64));
+}
+
 /*
  * Returns value of T type with only the most significant bit set
  * Examples: msb_set<uint8>() -> 0x80
@@ -280,30 +286,4 @@ static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
     throw std::runtime_error( "Generalized reverse is not implemented for RV128");
     return 0;
 }
-
-static inline uint32 gen_or_combine( uint32 src1, size_t shamt) {
-    if (shamt &  1) src1 |= ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
-    if (shamt &  2) src1 |= ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
-    if (shamt &  4) src1 |= ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
-    if (shamt &  8) src1 |= ((src1 & 0x00FF'00FF) <<  8) | ((src1 & 0xFF00'FF00) >>  8);
-    if (shamt & 16) src1 |= ((src1 & 0x0000'FFFF) << 16) | ((src1 & 0xFFFF'0000) >> 16);
-    return src1;
-}
-
- static inline uint64 gen_or_combine( uint64 src1, size_t shamt) {
-    if (shamt &  1) src1 |= ((src1 & 0x5555'5555'5555'5555LL) <<  1) |
-                            ((src1 & 0xAAAA'AAAA'AAAA'AAAALL) >>  1);
-    if (shamt &  2) src1 |= ((src1 & 0x3333'3333'3333'3333LL) <<  2) |
-                            ((src1 & 0xCCCC'CCCC'CCCC'CCCCLL) >>  2);
-    if (shamt &  4) src1 |= ((src1 & 0x0F0F'0F0F'0F0F'0F0FLL) <<  4) |
-                            ((src1 & 0xF0F0'F0F0'F0F0'F0F0LL) >>  4);
-    if (shamt &  8) src1 |= ((src1 & 0x00FF'00FF'00FF'00FFLL) <<  8) |
-                            ((src1 & 0xFF00'FF00'FF00'FF00LL) >>  8);
-    if (shamt & 16) src1 |= ((src1 & 0x0000'FFFF'0000'FFFFLL) << 16) |
-                            ((src1 & 0xFFFF'0000'FFFF'0000LL) >> 16);
-    if (shamt & 32) src1 |= ((src1 & 0x0000'0000'FFFF'FFFFLL) << 32) |
-                            ((src1 & 0xFFFF'FFFF'0000'0000LL) >> 32);
-    return src1;
-}
-
 #endif

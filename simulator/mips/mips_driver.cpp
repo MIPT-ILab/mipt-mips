@@ -32,7 +32,7 @@ public:
     }
     std::unique_ptr<Driver> clone() const final { return std::make_unique<DriverMIPS32>( cpu); }
 private:
-    Simulator* const cpu;
+    Simulator* const cpu = nullptr;
 };
 
 std::unique_ptr<Driver> create_mips32_driver( Simulator* sim)

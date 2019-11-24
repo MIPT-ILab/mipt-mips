@@ -13,7 +13,6 @@ static const constexpr int EXCEPTION_EXIT_CODE = 2;
 static const constexpr int NO_EXCEPTION_EXIT_CODE = 3;
 static const constexpr int INVALID_OPTION_EXIT_CODE = 4;
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 int MainWrapper::run( int argc, const char* argv[]) const try {
     return impl( argc, argv);
 }

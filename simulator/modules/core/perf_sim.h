@@ -30,7 +30,7 @@ public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
 
-    explicit PerfSim( Endian endian);
+    PerfSim( Endian endian);
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
@@ -57,7 +57,6 @@ public:
     PerfSim( PerfSim&&) = delete;
     PerfSim operator=( const PerfSim&) = delete;
     PerfSim operator=( PerfSim&&) = delete;
-    ~PerfSim() override = default;
 private:
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
@@ -85,7 +84,7 @@ private:
     Trap current_trap = Trap(Trap::NO_TRAP);
 
     uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
-    void write_register( Register index, uint64 value) { rf.write( index, narrow_cast<RegisterUInt>( value)); }
+    void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
 };
 
 #endif

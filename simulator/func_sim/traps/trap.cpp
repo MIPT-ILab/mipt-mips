@@ -88,7 +88,7 @@ uint8 Trap::to_gdb_format() const
 
 Trap Trap::from_gdb_format(uint8 id)
 {
-    #define TRAP(name, gdb, riscv, mips) if ( id == ( gdb)) return Trap(name);
+    #define TRAP(name, gdb, riscv, mips) if ( id == gdb) return Trap(name);
     #include "trap.def"
     #undef TRAP
     throw InvalidTrapConversion("Unsupported GDB trap code (" + std::to_string(id) + ")");
@@ -106,7 +106,7 @@ uint8 Trap::to_riscv_format() const
 
 Trap Trap::from_riscv_format(uint8 id)
 {
-    #define TRAP(name, gdb, riscv, mips) if ( id == ( riscv)) return Trap(name);
+    #define TRAP(name, gdb, riscv, mips) if ( id == riscv) return Trap(name);
     #include "trap.def"
     #undef TRAP
     throw InvalidTrapConversion("Unsupported RISC-V trap code (" + std::to_string(id) + ")");
@@ -124,7 +124,7 @@ uint8 Trap::to_mips_format() const
 
 Trap Trap::from_mips_format(uint8 id)
 {
-    #define TRAP(name, gdb, riscv, mips) if ( id == ( mips)) return Trap(name);
+    #define TRAP(name, gdb, riscv, mips) if ( id == mips) return Trap(name);
     #include "trap.def"
     #undef TRAP
     throw InvalidTrapConversion("Unsupported MIPS trap code (" + std::to_string(id) + ")");

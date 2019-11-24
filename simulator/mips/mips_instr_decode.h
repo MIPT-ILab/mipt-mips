@@ -86,7 +86,7 @@ struct MIPSInstrDecoder
         switch ( type) {
         case Reg::ZERO:   break;
         case Reg::HI:     return MIPSRegister::mips_hi();
-        case Reg::LO:     /* fallthrough */
+        case Reg::LO:     return MIPSRegister::mips_lo();
         case Reg::HI_LO:  return MIPSRegister::mips_lo();
         case Reg::RA:     return MIPSRegister::return_address();
         case Reg::RS:     return MIPSRegister::from_cpu_index( rs);

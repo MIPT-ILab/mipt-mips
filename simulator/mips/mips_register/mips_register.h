@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cassert>
-#include <iostream>
 #include <string_view>
+#include <iostream>
 #include <utility>
 
 class MIPSRegister {

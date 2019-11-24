@@ -8,6 +8,7 @@
 #include <catch.hpp>
 
 #include <kernel/kernel.h>
+#include <kernel/mars/mars_kernel.h>
 #include <memory/memory.h>
 #include <mips/mips_register/mips_register.h>
 #include <simulator.h>
@@ -188,7 +189,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     if ( enable_hooks)
         sim->enable_driver_hooks();
 
-    auto kernel = Kernel::create_mars_kernel();
+    auto kernel = create_mars_kernel();
     kernel->connect_memory( mem);
     kernel->set_simulator( sim);
     sim->set_kernel( kernel);

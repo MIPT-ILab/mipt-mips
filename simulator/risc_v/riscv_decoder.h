@@ -251,7 +251,7 @@ struct RISCVInstrDecoder
 
     RISCVRegister get_register( Reg::Type type) const noexcept
     {
-        return registers.at( type);
+        return registers[type];
     }
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept

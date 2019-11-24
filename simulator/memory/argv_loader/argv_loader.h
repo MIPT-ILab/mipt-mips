@@ -16,11 +16,9 @@ template <typename T, Endian endian>
 class ArgvLoader
 {
 public:
-    ArgvLoader( const char* const* argv, const char* const* envp);
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init) https://bugs.llvm.org/show_bug.cgi?id=32231, fixed in 9.0.1
-    explicit ArgvLoader( const char* const* argv) : ArgvLoader( argv, nullptr) { }
+    explicit ArgvLoader( const char* const* argv, const char* const* envp = nullptr);
 
-    size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr);
+    size_t load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr = 0);
 private:
     const int argc;
     const char* const* argv;

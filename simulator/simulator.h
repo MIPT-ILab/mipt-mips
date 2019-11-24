@@ -30,10 +30,6 @@ class CPUModel
 {
 public:
     CPUModel() = default;
-    CPUModel( const CPUModel&) = delete;
-    CPUModel( CPUModel&&) = delete;
-    CPUModel& operator=( const CPUModel&) = delete;
-    CPUModel& operator=( CPUModel&&) = delete;
     virtual ~CPUModel() = default;
 
     void set_pc( Addr pc) { set_target( Target( pc, 0)); }
@@ -79,7 +75,6 @@ public:
     }
 };
 
-// NOLINTNEXTLINE(fuchsia-multiple-inheritance) Need to mix timing and functional model somewhere...
 class CycleAccurateSimulator : public Simulator, public Root
 {
 public:

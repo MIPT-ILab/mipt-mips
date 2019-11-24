@@ -23,7 +23,6 @@ class Main : public MainWrapper
 {
     using MainWrapper::MainWrapper;
 private:
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
     int impl( int argc, const char* argv[]) const final {
         config::handleArgs( argc, argv, 1);
         auto cache = CacheTagArray::create( config::replacement, config::size, config::ways, config::line_size, 32);

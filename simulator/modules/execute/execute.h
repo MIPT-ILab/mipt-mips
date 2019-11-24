@@ -53,7 +53,7 @@ class Execute : public Module
         auto has_flush_expired() const { return flush_expiration_latency == 0_lt; }
 
     public:
-        explicit Execute( Module* parent);
+        explicit Execute( Module* module);
         void clock( Cycle cycle);
 };
 

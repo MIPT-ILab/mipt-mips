@@ -9,6 +9,6 @@
 
 #include <kernel/kernel.h>
 
-std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream);
+std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream = std::cin, std::ostream& outstream = std::cout, std::ostream& errstream = std::cerr);
 
 #endif //MARS_KERNEL_H
