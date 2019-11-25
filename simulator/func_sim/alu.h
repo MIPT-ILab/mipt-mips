@@ -133,32 +133,32 @@ struct ALU
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
-        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
-        if (ret.second)
+        const auto [result, overflow] = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
+            instr->v_dst = result;
     }
 
     template<typename I, typename T> static
     void addition_overflow_imm( I* instr)
     {
-        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
-        if (ret.second)
+        const auto [result, overflow] = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
+            instr->v_dst = result;
     }
 
 
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
-        auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
-        if (ret.second)
+        const auto [result, overflow] = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
+            instr->v_dst = result;
     }
 
     // RISCV mul/div
@@ -287,7 +287,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->new_PC; // link
+        instr->v_dst = narrow_cast<decltype(instr->v_dst)>( instr->new_PC); // link
         j( instr);   // jump
     }
 
@@ -295,7 +295,7 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst = instr->new_PC;
+        instr->v_dst = narrow_cast<decltype(instr->v_dst)>( instr->new_PC);
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();

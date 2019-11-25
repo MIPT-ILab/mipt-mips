@@ -282,9 +282,9 @@ static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
     return src1;
 }
 
-static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
+static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */)
+{
     throw std::runtime_error( "Generalized reverse is not implemented for RV128");
-    return 0;
 }
 
 static inline uint32 gen_or_combine( uint32 src1, size_t shamt)
@@ -317,6 +317,5 @@ static inline uint64 gen_or_combine( uint64 src1, size_t shamt)
 static inline uint128 gen_or_combine( uint128 /* src1 */, size_t /* shamt */)
 {
     throw std::runtime_error( "Generalized OR Combine is not implemented for RV128");
-    return 0;
 }
 #endif
