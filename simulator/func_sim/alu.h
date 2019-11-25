@@ -10,8 +10,9 @@
 #include "multiplication.h"
 #include "traps/trap.h"
 
-#include <array>
 #include <infra/macro.h>
+
+#include <array>
 #include <tuple>
 
 template<size_t N, typename T>
@@ -30,11 +31,10 @@ static std::array<Mask, 4> shuffle_consts = {
 
 static uint32 shuffle_stage( uint32 src, size_t index)
 {
-    uint32 maskL = shuffle_consts[index].left_mask;
-    uint32 maskR = shuffle_consts[index].right_mask;
-    index = 1 << ( 3 - index);
+    auto [maskL, maskR] = shuffle_consts.at( index);
+    size_t N = 1 << ( 3 - index);
     uint32 x = src & ~( maskL | maskR);
-    x |= ( ( src << index) & maskL) | ( ( src >> index) & maskR);
+    x |= ( ( src << N) & maskL) | ( ( src >> N) & maskR);
     return x;
 }
 
@@ -53,9 +53,9 @@ static inline uint32 bit_shuffle( uint32 src1, uint32 src2)
 static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
 {
     uint64 result = src1;
-    uint32 shamt = src2 & 31;
-    uint32 left_part = result >> 32;
-    uint32 right_part = result;
+    uint32 shamt = static_cast<uint32>( src2 & 31);
+    uint32 left_part = static_cast<uint32>( result >> 32);
+    uint32 right_part = static_cast<uint32>( result);
     if( shamt & ( 1 << 4))
     {
         uint32 buf = left_part & bitmask<uint32>(16);
@@ -64,7 +64,7 @@ static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
     }
     left_part = bit_shuffle( left_part, shamt & 15);
     right_part = bit_shuffle( right_part, shamt & 15);
-    result = left_part;
+    result = static_cast<uint64>( left_part);
     result <<= 32;
     return result + right_part;
 }
@@ -72,9 +72,9 @@ static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
 static inline uint128 bit_shuffle( uint128 src1, uint128 src2)
 {
     uint128 result = src1;
-    uint64 shamt = src2 & 63;
-    uint64 left_part = result >> 64;
-    uint64 right_part = result;
+    uint64 shamt = static_cast<uint64>( src2 & 63);
+    uint64 left_part = static_cast<uint64>( result >> 64);
+    uint64 right_part = static_cast<uint64>( result);
     if( shamt & ( 1 << 5))
     {
         uint64 buf = left_part & bitmask<uint64>(32);
@@ -83,7 +83,7 @@ static inline uint128 bit_shuffle( uint128 src1, uint128 src2)
     }
     left_part = bit_shuffle( left_part, shamt & 31);
     right_part = bit_shuffle( right_part, shamt & 31);
-    result = left_part;
+    result = static_cast<uint128>( left_part);
     result <<= 64;
     return result + right_part;
 }
@@ -306,12 +306,10 @@ struct ALU
     void riscv_unshfl( I* instr)
     {
         auto dst_value = instr->v_src1;
-        constexpr size_t limit = 4 + bytewidth<decltype( instr->v_src1)> / bytewidth<uint64>;
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
         for( size_t i = 0; i < limit; ++i)
-        {
             if( ( instr->v_src2 >> i) & 1)
                 dst_value = bit_shuffle( dst_value, static_cast<decltype( instr->v_src1)>( 1 << i));
-        }
         instr->v_dst = dst_value;
     }
 
