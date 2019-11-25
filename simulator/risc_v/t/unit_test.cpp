@@ -395,6 +395,7 @@ TEST_CASE ("RISCV RV32 clz")
     }
 }
 
+
 TEST_CASE ("RISCV RV64 clz")
 {
     std::vector<TestData<uint64>> cases = {
@@ -421,6 +422,7 @@ TEST_CASE ("RISCV RV32 ctz")
         cases[i].make_test("ctz");
     }
 }
+
 
 TEST_CASE ("RISCV RV64 ctz")
 {
@@ -462,6 +464,46 @@ TEST_CASE("RISCV RV64 rol")
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
         cases[i].make_test("rol");
+    }
+}
+
+TEST_CASE("RISCV RV32 clmul")
+{
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0, 0, 0),
+        TestData<uint32>( 1, 0, 0),
+        TestData<uint32>( 0, 1, 0),
+        TestData<uint32>( 1, 1, 1),
+        TestData<uint32>( all_ones<uint32>(), 0, 0),
+        TestData<uint32>( all_ones<uint32>(), 1, all_ones<uint32>()),
+        TestData<uint32>( 0, all_ones<uint32>(), 0),
+        TestData<uint32>( 0xA2, 0x96, 0x58EC),
+        TestData<uint32>( 0xA328B534, 0x923ACD6E, 0xDA9AB898),
+        TestData<uint32>( 0xABCDEF45, 0xEEE111BB, 0x3093E097),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clmul");
+    }
+}
+
+TEST_CASE("RISCV RV64 clmul")
+{
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0, 0, 0),
+        TestData<uint64>( 1, 0, 0),
+        TestData<uint64>( 0, 1, 0),
+        TestData<uint64>( 1, 1, 1),
+        TestData<uint64>( 0xA2, 0x96, 0x58EC),
+        TestData<uint64>( all_ones<uint64>(), 0, 0),
+        TestData<uint64>( all_ones<uint64>(), 1, all_ones<uint64>()),
+        TestData<uint64>( 0, all_ones<uint64>(), 0),
+        TestData<uint64>( 0xEEE111BBABCDEF45, 0xEEE1CC34FFAA11BB, 0xA18865DFBF34E097),
+        TestData<uint64>( 0xEE3333333BCDEF45, 0x0055552222000000, 0x271E511C2A000000),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clmul");
     }
 }
 
