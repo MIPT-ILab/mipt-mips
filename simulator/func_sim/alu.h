@@ -240,6 +240,15 @@ struct ALU
     // Bit manipulations
     template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
+    template<typename I, typename T>
+    static void clmul( I* instr)
+    {
+        instr->v_dst = 0;
+        for ( std::size_t index = 0; index < bitwidth<T>; index++)
+            if ( (instr->v_src2 >> index) & 1)
+                instr->v_dst ^= instr->v_src1 << index;
+    }
+
     // Bit manipulations
     template<typename I, typename T> static void pack( I* instr)  { instr->v_dst = (instr->v_src1 & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src2 << (half_bitwidth<T>)); }
 
