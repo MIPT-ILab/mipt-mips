@@ -244,8 +244,7 @@ struct ALU
     static void clmul( I* instr)
     {
         instr->v_dst = 0;
-        std::size_t max = bitwidth<T> - count_leading_zeroes<T>( instr->v_src2);
-        for ( std::size_t index = 0; index < max; index++)
+        for ( std::size_t index = 0; index < bitwidth<T>; index++)
             if ( (instr->v_src2 >> index) & 1)
                 instr->v_dst ^= instr->v_src1 << index;
     }
