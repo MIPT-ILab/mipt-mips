@@ -53,9 +53,9 @@ static inline uint32 bit_shuffle( uint32 src1, uint32 src2)
 static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
 {
     uint64 result = src1;
-    uint32 shamt = static_cast<uint32>( src2 & 31);
-    uint32 left_part = static_cast<uint32>( result >> 32);
-    uint32 right_part = static_cast<uint32>( result);
+    uint32 shamt = narrow_cast<uint32>( src2 & 31);
+    uint32 left_part = narrow_cast<uint32>( result >> 32);
+    uint32 right_part = narrow_cast<uint32>( result);
     if( shamt & ( 1 << 4))
     {
         uint32 buf = left_part & bitmask<uint32>(16);
@@ -72,9 +72,9 @@ static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
 static inline uint128 bit_shuffle( uint128 src1, uint128 src2)
 {
     uint128 result = src1;
-    uint64 shamt = static_cast<uint64>( src2 & 63);
-    uint64 left_part = static_cast<uint64>( result >> 64);
-    uint64 right_part = static_cast<uint64>( result);
+    uint64 shamt = narrow_cast<uint64>( src2 & 63);
+    uint64 left_part = narrow_cast<uint64>( result >> 64);
+    uint64 right_part = narrow_cast<uint64>( result);
     if( shamt & ( 1 << 5))
     {
         uint64 buf = left_part & bitmask<uint64>(32);
