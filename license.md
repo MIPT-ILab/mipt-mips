@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 
-Copyright &copy; 2012–2019 MIPT-ILab, Alexander Titov, Pavel Kryukov, Igor Smirnov, Igor Burovenko, Kamil Garifullin, Oleg Ladin, Kirill Korolev, Victor Prutyanov, Ivan Korostelev, Alex Seppar, George Korepanov, Alexey Steksov, Kirill Nedostoev, Alexander Misevich, Denis Los, Alexander Timofeev, Konstantin Soshin, Yan Logovskiy, Andrei Sultan, Vyacheslav Kompan, Yauheni Sharamed, Andrey Agrachev, Vsevolod Pukhov, Arsen Davtyan, Egor Bova, Rustem Yunusov, Maxim Davydov, Eric Konks, Igor Bulatov, Serge Lamikhov-Center, and Johannes Pohl.
+Copyright &copy; 2012–2019 MIPT-ILab, Alexander Titov, Pavel Kryukov, Igor Smirnov, Igor Burovenko, Kamil Garifullin, Oleg Ladin, Kirill Korolev, Victor Prutyanov, Ivan Korostelev, Alex Seppar, George Korepanov, Alexey Steksov, Kirill Nedostoev, Alexander Misevich, Denis Los, Alexander Timofeev, Konstantin Soshin, Yan Logovskiy, Andrei Sultan, Vyacheslav Kompan, Yauheni Sharamed, Andrey Agrachev, Vsevolod Pukhov, Arsen Davtyan, Egor Bova, Rustem Yunusov, Maxim Davydov, Eric Konks, Igor Bulatov, Kirill Chemrov, Alexandr Vinogradov, Airat Nazmiev, Daniel Kofanov, Nikolay Zernov, Vladimir Prokhorov, Ilya Burtakov, Nikita Gorbachev, Serge Lamikhov-Center, and Johannes Pohl.
 
 ----
 

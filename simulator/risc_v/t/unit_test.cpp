@@ -328,7 +328,7 @@ TEST_CASE( "RISCV sro64")
 }
 
 TEST_CASE("RISCV RV32 bfp")
-{                               
+{
     CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
@@ -338,7 +338,7 @@ TEST_CASE("RISCV RV32 bfp")
 }
 
 TEST_CASE("RISCV RV64 bfp")
-{                               
+{
     RISCVInstr<uint64> instr( "bfp", 0);
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
@@ -397,6 +397,23 @@ TEST_CASE("RISCV RV128 grev")
     CHECK_THROWS_AS(instr.execute(), std::runtime_error);
 }
 
+TEST_CASE("RISCV RV32 pcnt")
+{
+    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
+    RISCVInstr<uint32> instr( "pcnt", 0);
+    instr.set_v_src( 0xfff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xc);
+}
+
+TEST_CASE("RISCV RV64 pcnt")
+{
+    RISCVInstr<uint64> instr( "pcnt", 0);
+    instr.set_v_src( 0xfafb'fcfd'feff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x29);
+}
+
 TEST_CASE ("RISCV RV32 clz")
 {
     CHECK ( RISCVInstr<uint32>(0x60079793).get_disasm() == "clz $a5, $a5");
@@ -452,4 +469,34 @@ TEST_CASE ("RISCV RV64 ctz")
         cases[i].make_test("ctz");
     }
 } 
+
+TEST_CASE("RISCV RV32 rol")
+{
+    CHECK( RISCVInstr<uint32>( 0x60E797B3).get_disasm() == "rol $a5, $a5, $a4");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0x01234567, 0,  0x01234567),
+        TestData<uint32>( 0x01234567, 4,  0x12345670),
+        TestData<uint32>( 0x01234567, 8,  0x23456701),
+	TestData<uint32>( 0x01234567, 32, 0x01234567),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
+}
+
+TEST_CASE("RISCV RV64 rol")
+{
+    CHECK( RISCVInstr<uint64>( 0x60E797B3).get_disasm() == "rol $a5, $a5, $a4");
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 0,  0x0123'4567'89ab'cdef),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 4,  0x1234'5678'9abc'def0),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 8,  0x2345'6789'abcd'ef01),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 64, 0x0123'4567'89ab'cdef),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
+}
 
