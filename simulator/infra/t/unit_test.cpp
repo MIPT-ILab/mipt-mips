@@ -160,8 +160,31 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-TEST_CASE("arithmetic shift for 128 instructions")
+static_assert( ones_ls<uint64>( 0x1, 1) == 0x3);
+static_assert( ones_ls<uint64>( 0x8, 4) == 0x8f);
+static_assert( ones_ls<uint64>( msb_set<uint64>(), 1) == 0x1);
+
+static_assert( ones_rs<uint64>( 0x1, 1) == msb_set<uint64>());
+static_assert( ones_rs<uint64>( msb_set<uint64>(), 63) == all_ones<uint64>());
+static_assert( ones_rs<uint64>( all_ones<uint64>(), 63) == all_ones<uint64>());
+
+static_assert( arithmetic_rs<uint64>( 0xA, 1) == 0x5);
+static_assert( arithmetic_rs<uint64>( msb_set<uint64>(), 3) == ones_rs<uint64>( msb_set<uint64>(), 3));
+
+TEST_CASE("ones shift dynamic check")
 {
+    // Need that test to check VS behavior
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
+}
+
+TEST_CASE("ones shift for 128 instructions")
+{
+    CHECK( ones_ls<uint128>( 0x1, 1) == 0x3);
+    CHECK( ones_ls<uint128>( 0x8, 4) == 0x8f);
+    CHECK( ones_ls<uint128>( msb_set<uint128>(), 1) == 0x1);
+    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << (128 - 17)));
+    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
 }
