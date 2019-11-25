@@ -174,8 +174,8 @@ static_assert( arithmetic_rs<uint64>( msb_set<uint64>(), 3) == ones_rs<uint64>( 
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior
-    CHECK( ones_ls<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
-    CHECK( ones_ls<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
 }
 
 TEST_CASE("ones shift for 128 instructions")
