@@ -11,11 +11,11 @@
 #include <infra/types.h>
 
 #include <algorithm>
+#include <array>
 #include <bitset>
 #include <climits>
 #include <limits>
 #include <type_traits>
-#include <cassert>
 
 /* Checks if values is power of two */
 template<typename T>
@@ -78,7 +78,7 @@ static constexpr T msb_set()
 /*
  * Return value of T with only the lest significant bit set
  * Examples: lsb_set<uint8>() -> 0x01
- */ 
+ */
 template <typename T>
 static constexpr T lsb_set()
 {
@@ -284,6 +284,39 @@ static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
 
 static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
     throw std::runtime_error( "Generalized reverse is not implemented for RV128");
+    return 0;
+}
+
+static inline uint32 gen_or_combine( uint32 src1, size_t shamt)
+{
+    static constexpr std::array<uint32, 5> masks = { 0x5555'5555, 0x3333'3333, 0x0F0F'0F0F,
+                                                     0x00FF'00FF, 0x0000'FFFF };
+    for(std::size_t j = 0; j < 5; j++)
+    {
+        auto shift = (1 << j);
+        if (shamt &  shift)
+            src1 |= ((src1 & masks.at(j)) << shift) | ((src1 & ~masks.at(j)) >> shift);
+    }
+    return src1;
+}
+
+static inline uint64 gen_or_combine( uint64 src1, size_t shamt)
+{
+    static constexpr std::array<uint64, 6> masks = { 0x5555'5555'5555'5555ULL, 0x3333'3333'3333'3333ULL,
+                                                     0x0F0F'0F0F'0F0F'0F0FULL, 0x00FF'00FF'00FF'00FFULL,
+                                                     0x0000'FFFF'0000'FFFFULL, 0x0000'0000'FFFF'FFFFULL };
+    for(std::size_t j = 0; j < 6; j++)
+    {
+        auto shift = (1 << j);
+        if (shamt &  shift)
+            src1 |= ((src1 & masks.at(j)) << shift) | ((src1 & ~masks.at(j)) >> shift);
+    }
+    return src1;
+}
+
+static inline uint128 gen_or_combine( uint128 /* src1 */, size_t /* shamt */)
+{
+    throw std::runtime_error( "Generalized OR Combine is not implemented for RV128");
     return 0;
 }
 #endif
