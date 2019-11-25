@@ -168,7 +168,7 @@ template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definition
 template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
 template<typename T>
-static constexpr T ones_ls(const T& value, size_t shamt)
+static constexpr T ones_ls( const T& value, size_t shamt)
 {
     return ~( ~value << shamt);
 }
@@ -185,7 +185,7 @@ static constexpr T ones_rs( const T& value, size_t shamt)
  * 0xF0 sra 2 -> 0xFC
  */
 template <typename T>
-static constexpr T arithmetic_rs(const T& value, size_t shamt)
+static constexpr T arithmetic_rs( const T& value, size_t shamt)
 {
     using ST = sign_t<T>;
     T result = 0;
@@ -207,17 +207,17 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
 
 #ifndef USE_GNUC_INT128 // Cannot do constexpr for that
 
-static inline uint128 ones_ls( uint128 value, size_t shamt)
+static inline uint128 ones_ls( const uint128& value, size_t shamt)
 {
     return ~( ~value >> shamt);
 }
 
-static inline uint128 ones_rs( uint128 value, size_t shamt)
+static inline uint128 ones_rs( const uint128& value, size_t shamt)
 {
     return ~( ~value >> shamt);
 }
 
-static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
+static inline uint128 arithmetic_rs( const uint128& value, size_t shamt)
 {
     if (( value & msb_set<uint128>()) == 0)
         return value >> shamt;        // just shift if MSB is zero
