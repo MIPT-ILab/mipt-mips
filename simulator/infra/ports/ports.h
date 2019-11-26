@@ -13,6 +13,8 @@
 #include "port_queue/port_queue.h"
 #include "timing.h"
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 #include <cassert>
 #include <memory>
 #include <string>
@@ -27,21 +29,18 @@ struct PortError final : Exception {
 
 class PortMap : public Log
 {
-public:
-    static std::shared_ptr<PortMap> create_port_map();
-
-    static std::shared_ptr<PortMap> get_instance();
-    static void reset_instance();
-
-    void init() const;
-
 private:
-    PortMap() noexcept;
+    static std::shared_ptr<PortMap> create_port_map();
+    void init() const;
 
     friend class BasicWritePort;
     friend class BasicReadPort;
+    friend class Root;
+
     void add_port( class BasicWritePort* port);
     void add_port( class BasicReadPort* port);
+
+    boost::property_tree::ptree dump() const;
 
     struct Cluster
     {
@@ -50,17 +49,17 @@ private:
     };
 
     std::unordered_map<std::string, Cluster> map = { };
-    static std::shared_ptr<PortMap> instance;
 };
 
 class Port : public Log
 {
 public:
     const std::string& get_key() const noexcept { return k; }
-    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
 
 protected:
     Port( std::shared_ptr<PortMap> port_map, std::string key);
+    std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
+
     Cycle get_last_cycle() const noexcept { return last_cycle; }
     void update_last_cycle( Cycle cycle) noexcept
     {

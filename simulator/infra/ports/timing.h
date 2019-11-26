@@ -22,7 +22,7 @@ class Latency;
 class Cycle : public boost::totally_ordered<Cycle>
 {
     public:
-        constexpr explicit Cycle( uint64 value = NO_VAL64) : value( value) { }
+        constexpr explicit Cycle( uint64 value) : value( value) { }
 
         constexpr auto operator==( const Cycle& rhs) const { return value == rhs.value; }
         constexpr auto operator<( const Cycle& rhs) const { return value < rhs.value; }
@@ -59,7 +59,7 @@ constexpr inline auto operator""_cl( unsigned long long int number)
 class Latency : public boost::totally_ordered<Latency>
 {
     public:
-        constexpr explicit Latency( int64 value = 0) : value( value) { }
+        constexpr explicit Latency( int64 value) : value( value) { }
 
         constexpr auto operator==( const Latency& rhs) const { return value == rhs.value; }
         constexpr auto operator<( const Latency& rhs) const { return value < rhs.value; }

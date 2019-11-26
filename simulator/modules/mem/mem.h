@@ -13,7 +13,7 @@
 class FuncMemory;
 
 template <typename FuncInstr>
-class Mem : public Log
+class Mem : public Module
 {
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename FuncInstr::RegisterUInt;
@@ -22,16 +22,16 @@ class Mem : public Log
     private:
         std::shared_ptr<FuncMemory> memory;
 
-        std::unique_ptr<WritePort<Instr>> wp_datapath = nullptr;
-        std::unique_ptr<ReadPort<Instr>> rp_datapath = nullptr;
+        WritePort<Instr>* wp_datapath = nullptr;
+        ReadPort<Instr>* rp_datapath = nullptr;
 
-        std::unique_ptr<ReadPort<bool>> rp_flush = nullptr;
-        std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+        ReadPort<bool>* rp_flush = nullptr;
+        ReadPort<bool>* rp_trap = nullptr;
 
-        std::unique_ptr<WritePort<InstructionOutput>> wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = nullptr;
 
     public:
-        explicit Mem( bool log);
+        explicit Mem( Module* parent);
         void clock( Cycle cycle);
         void set_memory( const std::shared_ptr<FuncMemory>& mem) { memory = mem; }
 };

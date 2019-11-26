@@ -26,7 +26,7 @@ struct vr4300 : private PerfSim<MIPS64>
     void write_cause_register( uint64 value) { return write_cpu_register( cause_index, value); }
 
 public:
-    explicit vr4300( bool log) : PerfSim<MIPS64>( Endian::big, log) { }
+    vr4300() : PerfSim<MIPS64>( Endian::big) { sout.enable(); }
 
     int init( std::shared_ptr<FuncMemory> mem);
     void apply_mask_to_cause( uint64 mask);

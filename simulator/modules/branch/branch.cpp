@@ -7,7 +7,7 @@
 #include "branch.h"
 
 template <typename FuncInstr>
-Branch<FuncInstr>::Branch( bool log) : Log( log)
+Branch<FuncInstr>::Branch( Module* parent) : Module( parent, "branch")
 {
     wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", PORT_BW);
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);

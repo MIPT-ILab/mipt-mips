@@ -23,7 +23,7 @@ TEST_CASE( "MARS: construct kernel") {
 
 TEST_CASE( "MARS: print integer") {
     std::ostringstream output;
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
@@ -38,12 +38,12 @@ struct System
     std::shared_ptr<Simulator> sim = nullptr;
     std::shared_ptr<Kernel> mars_kernel = nullptr;
     std::shared_ptr<FuncMemory> mem = nullptr;
-    
+
     template<typename ... KernelArgs>
     explicit System( KernelArgs&&... args)
-        : sim( Simulator::create_simulator( "mips64", true, false))
+        : sim( Simulator::create_simulator( "mips64", true))
         , mars_kernel( create_mars_kernel(std::forward<KernelArgs>(args)...))
-        , mem( FuncMemory::create_hierarchied_memory())
+        , mem( FuncMemory::create_default_hierarchied_memory())
     {
         mars_kernel->set_simulator( sim);
         sim->set_memory( mem);
@@ -66,7 +66,7 @@ TEST_CASE( "MARS: print string")
 static uint64 read_integer( const std::string& str)
 {
     std::istringstream input( str);
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -85,7 +85,7 @@ TEST_CASE( "MARS: read integer")
 
 TEST_CASE( "MARS: read bad integer ang fix") {
     std::istringstream input( "133q\n133\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -106,7 +106,7 @@ TEST_CASE( "MARS: read string")
 }
 
 TEST_CASE( "MARS: exit") {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator (sim);
 
@@ -117,7 +117,7 @@ TEST_CASE( "MARS: exit") {
 
 TEST_CASE( "MARS: print character") {
     std::ostringstream output;
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, output);
     mars_kernel->set_simulator( sim);
 
@@ -129,7 +129,7 @@ TEST_CASE( "MARS: print character") {
 
 TEST_CASE( "MARS: read character") {
     std::istringstream input( "z\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -140,7 +140,7 @@ TEST_CASE( "MARS: read character") {
 
 TEST_CASE( "MARS: read bad character") {
     std::istringstream input( "zz\n");
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( input);
     mars_kernel->set_simulator( sim);
 
@@ -236,7 +236,78 @@ TEST_CASE( "MARS: open non existing file")
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
 }
 
-TEST_CASE( "MARS: open, write, read and close a file")
+static Trap write_buff_to_file( System* sys, uint64 descr,
+                                uint64 buff_ptr, uint64 chars_to_write)
+{
+    sys->sim->write_cpu_register( v0, 15u); //write to file
+    sys->sim->write_cpu_register( a0, descr);
+    sys->sim->write_cpu_register( a1, buff_ptr);
+    sys->sim->write_cpu_register( a2, chars_to_write);
+    return sys->mars_kernel->execute();
+}
+
+static Trap open_file( System* sys, uint64 filename_ptr, uint64 flags)
+{
+    sys->sim->write_cpu_register( v0, 13u); // open file
+    sys->sim->write_cpu_register( a0, filename_ptr);
+    sys->sim->write_cpu_register( a1, flags);
+    return sys->mars_kernel->execute();
+}
+
+static Trap read_from_file( System* sys, uint64 descr,
+                            uint64 buff_ptr, uint64 chars_to_read)
+{
+    sys->sim->write_cpu_register( v0, 14u); // read from file
+    sys->sim->write_cpu_register( a0, descr);
+    sys->sim->write_cpu_register( a1, buff_ptr);
+    sys->sim->write_cpu_register( a2, chars_to_read);
+    return sys->mars_kernel->execute();
+}
+
+static Trap close_file( System* sys, uint64 descr)
+{
+    sys->sim->write_cpu_register( v0, 16u);
+    sys->sim->write_cpu_register( a0, descr);
+    return sys->mars_kernel->execute();
+}
+
+TEST_CASE( "MARS: open and close a file")
+{
+    std::string filename( "tempfile");
+    std::ostringstream output;
+    System sys( std::cin, output);
+    sys.mem->write_string( filename, 0x1000);
+
+    auto trap = open_file( &sys, 0x1000, 1); // WRONLY
+    auto descr = sys.sim->read_cpu_register( v0);
+    CHECK( trap == Trap::NO_TRAP);
+    CHECK( descr >= 3);
+
+    trap = close_file ( &sys, descr);
+    CHECK( trap == Trap::NO_TRAP);
+}
+
+TEST_CASE( "MARS: open, write and close file")
+{
+    std::string filename( "tempfile");
+    std::ostringstream output;
+    System sys( std::cin, output);
+    sys.mem->write_string( filename, 0x1000);
+    sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
+
+    auto trap = open_file( &sys, 0x1000, 1); // WRONLY
+    auto descr = sys.sim->read_cpu_register( v0);
+    CHECK( trap == Trap::NO_TRAP);
+    CHECK( descr >= 3);
+
+    trap = write_buff_to_file( &sys, descr, 0x2000, 11);
+    CHECK( trap == Trap::NO_TRAP); // FIXME(pkryukov): Can file be checked by read()
+
+    trap = close_file ( &sys, descr);
+    CHECK( trap == Trap::NO_TRAP);
+}
+
+TEST_CASE( "MARS: open, read and close a file")
 {
     std::string filename("tempfile");
     std::ostringstream output;
@@ -244,57 +315,37 @@ TEST_CASE( "MARS: open, write, read and close a file")
     sys.mem->write_string( filename, 0x1000);
     sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
 
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 1); // write
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    auto trap = open_file( &sys, 0x1000, 1); // open WRONLY
     auto descriptor = sys.sim->read_cpu_register( v0);
+    CHECK( trap == Trap::NO_TRAP);
     CHECK( descriptor >= 3);
+    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11);
+    CHECK( trap == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 15u); // write to file
-    sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x2000);
-    sys.sim->write_cpu_register( a2, 11);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    trap = close_file( &sys, descriptor);
+    CHECK( trap == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 16u); // close file
-    sys.sim->write_cpu_register( a0, descriptor);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 9); // append
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    trap = open_file( &sys, 0x1000, 9); // open O_APPEND
     descriptor = sys.sim->read_cpu_register( v0);
+    CHECK( trap == Trap::NO_TRAP);
     CHECK( descriptor >= 3);
+    trap = write_buff_to_file( &sys, descriptor, 0x2000, 11);
+    CHECK( trap == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 15u); // write to file
-    sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x2000);
-    sys.sim->write_cpu_register( a2, 11);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    trap = close_file( &sys, descriptor);
+    CHECK( trap == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 16u); // close file
-    sys.sim->write_cpu_register( a0, descriptor);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
-    sys.sim->write_cpu_register( a1, 0); // read
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    trap = open_file( &sys, 0x1000, 0); // read
     descriptor = sys.sim->read_cpu_register( v0);
+    CHECK( trap == Trap::NO_TRAP);
     CHECK( descriptor >= 3);
+    trap = read_from_file( &sys, descriptor, 0x3000, 22);
+    CHECK( trap == Trap::NO_TRAP);
 
-    sys.sim->write_cpu_register( v0, 14u); // read from file
-    sys.sim->write_cpu_register( a0, descriptor);
-    sys.sim->write_cpu_register( a1, 0x3000);
-    sys.sim->write_cpu_register( a2, 22);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.mem->read_string( 0x3000) == "Lorem IpsumLorem Ipsum");
 
-    sys.sim->write_cpu_register( v0, 16u); // close file
-    sys.sim->write_cpu_register( a0, descriptor);
-    CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
+    trap = close_file( &sys, descriptor);
+    CHECK( trap == Trap::NO_TRAP);
 }
 
 TEST_CASE( "MARS: open file with invalid mode")
@@ -324,7 +375,7 @@ TEST_CASE( "MARS: open file with invalid mode")
 
 TEST_CASE( "MARS: close stdout")
 {
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel();
     mars_kernel->set_simulator( sim);
     sim->write_cpu_register( v0, 16u); // close file
@@ -334,7 +385,7 @@ TEST_CASE( "MARS: close stdout")
 
 TEST_CASE( "MARS: close error")
 {
-    auto sim = Simulator::create_simulator( "mips64", true, false);
+    auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel();
     mars_kernel->set_simulator( sim);
     sim->write_cpu_register( v0, 16u); // close file
@@ -342,9 +393,9 @@ TEST_CASE( "MARS: close error")
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
 }
 
-TEST_CASE( "MARS: exit with code") 
+TEST_CASE( "MARS: exit with code")
 {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator(sim);
 
@@ -354,9 +405,9 @@ TEST_CASE( "MARS: exit with code")
     CHECK( mars_kernel->get_exit_code() == 21u);
 }
 
-TEST_CASE( "MARS: unsupported syscall") 
+TEST_CASE( "MARS: unsupported syscall")
 {
-    auto sim = Simulator::create_simulator ("mips64", true, false);
+    auto sim = Simulator::create_simulator ("mips64", true);
     auto mars_kernel = create_mars_kernel( );
     mars_kernel->set_simulator(sim);
 

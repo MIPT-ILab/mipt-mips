@@ -1,12 +1,9 @@
 #include "writeback.h"
 
-#include <func_sim/driver/driver.h>
 #include <kernel/kernel.h>
 
 template <typename ISA>
-Writeback<ISA>::Writeback( Endian endian, bool log)
-    : Log( log)
-    , endian( endian)
+Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "writeback"), endian( endian)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
@@ -31,7 +28,7 @@ void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
 template <typename ISA>
 auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
-    auto ports = { rp_branch_datapath.get(), rp_mem_datapath.get(), rp_execute_datapath.get() };
+    auto ports = { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath };
     std::vector<Instr> result;
 
     for ( auto& port : ports)

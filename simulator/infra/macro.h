@@ -11,6 +11,7 @@
 #include <infra/types.h>
 
 #include <algorithm>
+#include <array>
 #include <bitset>
 #include <climits>
 #include <limits>
@@ -44,6 +45,10 @@ template<> constexpr size_t bitwidth<int128> = 128u; // NOLINT(misc-definitions-
 template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 
+/* Bit width / 2 */
+template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+constexpr size_t half_bitwidth = bitwidth<T> >> 1;
+
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T>
 constexpr auto popcount( T x) noexcept
@@ -54,6 +59,12 @@ constexpr auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
 }
 
+static inline auto popcount( uint128 x) noexcept
+{
+    return popcount( narrow_cast<uint64>( x))
+         + popcount( narrow_cast<uint64>( x >> 64));
+}
+
 /*
  * Returns value of T type with only the most significant bit set
  * Examples: msb_set<uint8>() -> 0x80
@@ -62,6 +73,16 @@ template <typename T>
 static constexpr T msb_set()
 {
     return T{ 1u} << (bitwidth<T> - 1);
+}
+
+/*
+ * Return value of T with only the lest significant bit set
+ * Examples: lsb_set<uint8>() -> 0x01
+ */
+template <typename T>
+static constexpr T lsb_set()
+{
+    return 1;
 }
 
 /*
@@ -81,9 +102,9 @@ static constexpr T all_ones()
  *           bitmask<uint32>(32) -> 0xFFFF'FFFF
  */
 template <typename T>
-static constexpr T bitmask(unsigned int const onecount)
+static constexpr T bitmask( size_t onecount)
 {
-    return onecount != 0 ? all_ones<T>() >> (bitwidth<T> - onecount) : T{ 0};
+    return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
 
 template <typename T>
@@ -97,6 +118,19 @@ static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
     uint8 count = 0;
     for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
+    {
+        if ( ( value & mask) != 0)
+           break;
+        count++;
+    }
+    return count;
+}
+
+template <typename T>
+static constexpr inline auto count_trailing_zeroes( const T& value) noexcept
+{
+    uint8 count = 0;
+    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1u)
     {
         if ( ( value & mask) != 0)
            break;
@@ -133,13 +167,25 @@ template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16; // NOLINT(misc-definition
 template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
+template<typename T>
+static constexpr T ones_ls( const T& value, size_t shamt)
+{
+    return ~( ~value << shamt);
+}
+
+template<typename T>
+static constexpr T ones_rs( const T& value, size_t shamt)
+{
+    return ~( ~value >> shamt);
+}
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
  */
 template <typename T>
-static constexpr T arithmetic_rs(const T& value, size_t shamt)
+static constexpr T arithmetic_rs( const T& value, size_t shamt)
 {
     using ST = sign_t<T>;
     T result = 0;
@@ -155,16 +201,39 @@ static constexpr T arithmetic_rs(const T& value, size_t shamt)
     else if ((value & msb_set<T>()) == 0)
         result = value >> shamt;        // just shift if MSB is zero
     else
-        result = ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+        result = ones_rs( value, shamt);
     return result;
 }
 
-static inline uint128 arithmetic_rs(uint128 value, size_t shamt)
+#ifndef USE_GNUC_INT128 // Cannot do constexpr for that
+
+static inline uint128 ones_ls( const uint128& value, size_t shamt)
 {
-    if ((value & msb_set<uint128>()) == 0)
+    return ~( ~value >> shamt);
+}
+
+static inline uint128 ones_rs( const uint128& value, size_t shamt)
+{
+    return ~( ~value >> shamt);
+}
+
+static inline uint128 arithmetic_rs( const uint128& value, size_t shamt)
+{
+    if (( value & msb_set<uint128>()) == 0)
         return value >> shamt;        // just shift if MSB is zero
 
-    return ~((~value) >> shamt);   // invert to propagate zeroes and invert back
+    return ones_rs( value, shamt);
+}
+
+#endif // USE_GNUC_INT128
+
+/*Circular left shift*/
+template<typename T>
+static constexpr T circ_ls(const T& value, size_t shamt)
+{
+    if( shamt == 0 || shamt == bitwidth<T>)
+        return value;
+    return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }
 
 template<size_t N, typename T>
@@ -208,4 +277,66 @@ auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
     return std::make_pair( narrow_cast<T>( result), is_overflow);
 }
 
+static inline uint32 gen_reverse( uint32 src1, size_t shamt) {
+    if (shamt &  1) src1 = ((src1 & 0x5555'5555) <<  1) | ((src1 & 0xAAAA'AAAA) >>  1);
+    if (shamt &  2) src1 = ((src1 & 0x3333'3333) <<  2) | ((src1 & 0xCCCC'CCCC) >>  2);
+    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F) <<  4) | ((src1 & 0xF0F0'F0F0) >>  4);
+    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF) <<  8) | ((src1 & 0xFF00'FF00) >>  8);
+    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF) << 16) | ((src1 & 0xFFFF'0000) >> 16);
+    return src1;
+}
+
+static inline uint64 gen_reverse( uint64 src1, size_t shamt) {
+    if (shamt &  1) src1 = ((src1 & 0x5555'5555'5555'5555ULL) <<  1) |
+                           ((src1 & 0xAAAA'AAAA'AAAA'AAAAULL) >>  1);
+    if (shamt &  2) src1 = ((src1 & 0x3333'3333'3333'3333ULL) <<  2) |
+                           ((src1 & 0xCCCC'CCCC'CCCC'CCCCULL) >>  2);
+    if (shamt &  4) src1 = ((src1 & 0x0F0F'0F0F'0F0F'0F0FULL) <<  4) |
+                           ((src1 & 0xF0F0'F0F0'F0F0'F0F0ULL) >>  4);
+    if (shamt &  8) src1 = ((src1 & 0x00FF'00FF'00FF'00FFULL) <<  8) |
+                           ((src1 & 0xFF00'FF00'FF00'FF00ULL) >>  8);
+    if (shamt & 16) src1 = ((src1 & 0x0000'FFFF'0000'FFFFULL) << 16) |
+                           ((src1 & 0xFFFF'0000'FFFF'0000ULL) >> 16);
+    if (shamt & 32) src1 = ((src1 & 0x0000'0000'FFFF'FFFFULL) << 32) |
+                           ((src1 & 0xFFFF'FFFF'0000'0000ULL) >> 32);
+    return src1;
+}
+
+static inline uint128 gen_reverse( uint128 /* src1 */, size_t /* shamt */) {
+    throw std::runtime_error( "Generalized reverse is not implemented for RV128");
+    return 0;
+}
+
+static inline uint32 gen_or_combine( uint32 src1, size_t shamt)
+{
+    static constexpr std::array<uint32, 5> masks = { 0x5555'5555, 0x3333'3333, 0x0F0F'0F0F,
+                                                     0x00FF'00FF, 0x0000'FFFF };
+    for(std::size_t j = 0; j < 5; j++)
+    {
+        auto shift = (1 << j);
+        if (shamt &  shift)
+            src1 |= ((src1 & masks.at(j)) << shift) | ((src1 & ~masks.at(j)) >> shift);
+    }
+    return src1;
+}
+
+static inline uint64 gen_or_combine( uint64 src1, size_t shamt)
+{
+    static constexpr std::array<uint64, 6> masks = { 0x5555'5555'5555'5555ULL, 0x3333'3333'3333'3333ULL,
+                                                     0x0F0F'0F0F'0F0F'0F0FULL, 0x00FF'00FF'00FF'00FFULL,
+                                                     0x0000'FFFF'0000'FFFFULL, 0x0000'0000'FFFF'FFFFULL };
+    for(std::size_t j = 0; j < 6; j++)
+    {
+        auto shift = (1 << j);
+        if (shamt &  shift)
+            src1 |= ((src1 & masks.at(j)) << shift) | ((src1 & ~masks.at(j)) >> shift);
+    }
+    return src1;
+}
+
+static inline uint128 gen_or_combine( uint128 /* src1 */, size_t /* shamt */)
+{
+    throw std::runtime_error( "Generalized OR Combine is not implemented for RV128");
+    return 0;
+}
 #endif

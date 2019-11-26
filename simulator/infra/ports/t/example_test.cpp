@@ -3,7 +3,7 @@
  * @author Denis Los
  */
 
-#include "../ports.h"
+#include "../module.h"
 #include <catch.hpp>
 #include <map>
 
@@ -46,20 +46,21 @@ static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
     return check_data( cycle, code, NONE) != is_ready;
 }
 
-class A
+class A : public Module
 {
 public:
-    explicit A( const std::shared_ptr<PortMap>& map)
-        : to_B( map, "A_to_B", PORT_BW)
-        , from_B( map, "B_to_A", PORT_LATENCY)
-        , init( map, "init_A", PORT_LATENCY)
-        , stop( map, "stop", PORT_BW)
-    { }
+    explicit A( Module* root) : Module( root, "A")
+    {
+        to_B = make_write_port<int>( "A_to_B", PORT_BW);
+        from_B = make_read_port<int>( "B_to_A", PORT_LATENCY);
+        init = make_read_port<int>( "init_A", PORT_LATENCY);
+        stop = make_write_port<bool>( "stop", PORT_BW);
+    }
 
     void clock( Cycle cycle)
     {
-        bool is_init_ready = init.is_ready( cycle);
-        bool is_from_B_ready = from_B.is_ready( cycle);
+        bool is_init_ready = init->is_ready( cycle);
+        bool is_from_B_ready = from_B->is_ready( cycle);
 
         if ( cycle != 1_cl)
             CHECK( !is_init_ready);
@@ -67,86 +68,96 @@ public:
 
         if ( is_init_ready)
         {
-            auto data = init.read( cycle);
+            auto data = init->read( cycle);
             CHECK( cycle == 1_cl );
             CHECK( data == 0 );
-            to_B.write( data + 1, cycle);
+            to_B->write( data + 1, cycle);
         }
         else if ( is_from_B_ready)
         {
-            auto data = from_B.read( cycle);
+            auto data = from_B->read( cycle);
             CHECK( check_data( cycle, MODULE_B, data));
             if ( data >= DATA_LIMIT)
-                stop.write( true, cycle);
+                stop->write( true, cycle);
             else
-                to_B.write( data + 1, cycle);
+                to_B->write( data + 1, cycle);
         }
     }
 
 private:
-    WritePort<int> to_B;
-    ReadPort<int> from_B;
-    ReadPort<int> init;
-    WritePort<bool> stop;
+    WritePort<int>* to_B;
+    ReadPort<int>* from_B;
+    ReadPort<int>* init;
+    WritePort<bool>* stop;
 };
 
-class B
+class B : public Module
 {
 public:
-    explicit B( const std::shared_ptr<PortMap>& map)
-        : to_A( map, "B_to_A", PORT_BW)
-        , from_A( map, "A_to_B", PORT_LATENCY)
-    { };
+    explicit B(  Module* root) : Module( root, "B")
+    {
+        to_A = make_write_port<int>( "B_to_A", PORT_BW);
+        from_A = make_read_port<int>( "A_to_B", PORT_LATENCY);
+    };
 
     void clock( Cycle cycle)
     {
-        bool is_from_A_ready = from_A.is_ready( cycle);
+        bool is_from_A_ready = from_A->is_ready( cycle);
         CHECK( check_readiness( cycle, MODULE_A, is_from_A_ready));
         if ( is_from_A_ready)
         {
-            auto data = from_A.read( cycle);
+            auto data = from_A->read( cycle);
             CHECK( check_data( cycle, MODULE_A, data));
-            to_A.write( data + 1, cycle);
+            to_A->write( data + 1, cycle);
         }
     }
 
 private:
-    WritePort<int> to_A;
-    ReadPort<int> from_A;
+    WritePort<int>* to_A;
+    ReadPort<int>* from_A;
 };
 
-TEST_CASE( "Latency to string")
+class TestRoot : public Root
 {
-    CHECK( (5_cl).to_string() == "5");
-    CHECK( (2_lt).to_string() == "2");
-}
-
-TEST_CASE( "test_ports: Test_Ports_A_B")
-{
-    auto map = PortMap::create_port_map();
-    A a( map);
-    B b( map);
-
-    WritePort<int> init( map, "init_A", PORT_BW);
-    ReadPort<bool> stop( map, "stop", PORT_LATENCY);
-
-    map->init();
-    CHECK( init.get_fanout() == 1);
-
-    // init object A by value 0
-    init.write( 0, 0_cl);
-
-    for ( auto cycle = 0_cl; cycle < CLOCK_LIMIT; cycle.inc())
+public:
+    TestRoot() : Root( "test-root"), a( this), b( this)
     {
-        if ( stop.is_ready( cycle))
+        init = make_write_port<int>( "init_A", PORT_BW);
+        stop = make_read_port<bool>( "stop", PORT_LATENCY);
+        init_portmap();
+        CHECK( init->get_fanout() == 1);
+
+        // init object A by value 0
+        init->write( 0, 0_cl);
+    }
+
+    bool clock( Cycle cycle)
+    {
+        if ( stop->is_ready( cycle))
         {
             CHECK( cycle == EXPECTED_MAX_CYCLE);
-            stop.read( cycle);
-            break;
+            stop->read( cycle);
+            return true;
         }
 
         CHECK( cycle < EXPECTED_MAX_CYCLE);
         a.clock( cycle);
         b.clock( cycle);
+        return false;
     }
+private:
+    A a;
+    B b;
+
+    WritePort<int>* init;
+    ReadPort<bool>* stop;
+};
+
+TEST_CASE( "test_ports: Test_Ports_A_B")
+{
+    TestRoot tr;
+
+    for ( auto cycle = 0_cl; cycle < CLOCK_LIMIT; cycle.inc())
+        if ( tr.clock( cycle))
+            break;
 }

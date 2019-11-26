@@ -135,14 +135,14 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data()) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data()) == 0x7856);
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
 
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
     std::array<Byte, 2> res{};
-    put_value_to_pointer<uint16, e>( res.data(), 0x3456);
+    put_value_to_pointer<uint16, e>( res.data(), 0x3456, 2);
     return res;
 }
 
@@ -160,8 +160,31 @@ static_assert(count_leading_zeroes<uint128>(0xFF) == 120);
 static_assert(count_leading_zeroes<uint128>(~0x0) == 0);
 */
 
-TEST_CASE("arithmetic shift for 128 instructions")
+static_assert( ones_ls<uint64>( 0x1, 1) == 0x3);
+static_assert( ones_ls<uint64>( 0x8, 4) == 0x8f);
+static_assert( ones_ls<uint64>( msb_set<uint64>(), 1) == 0x1);
+
+static_assert( ones_rs<uint64>( 0x1, 1) == msb_set<uint64>());
+static_assert( ones_rs<uint64>( msb_set<uint64>(), 63) == all_ones<uint64>());
+static_assert( ones_rs<uint64>( all_ones<uint64>(), 63) == all_ones<uint64>());
+
+static_assert( arithmetic_rs<uint64>( 0xA, 1) == 0x5);
+static_assert( arithmetic_rs<uint64>( msb_set<uint64>(), 3) == ones_rs<uint64>( msb_set<uint64>(), 3));
+
+TEST_CASE("ones shift dynamic check")
 {
+    // Need that test to check VS behavior
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
+    CHECK( ones_rs<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
+}
+
+TEST_CASE("ones shift for 128 instructions")
+{
+    CHECK( ones_ls<uint128>( 0x1, 1) == 0x3);
+    CHECK( ones_ls<uint128>( 0x8, 4) == 0x8f);
+    CHECK( ones_ls<uint128>( msb_set<uint128>(), 1) == 0x1);
+    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << (128 - 17)));
+    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
     CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
 }
@@ -193,14 +216,19 @@ TEST_CASE("Exception")
 TEST_CASE("Logging enabled")
 {
     std::ostringstream oss;
-    LogOstream( true, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str() == "Hello World! 14\n" );
 }
 
 TEST_CASE("Logging disabled")
 {
     std::ostringstream oss;
-    LogOstream( false, oss) << "Hello World! " << std::hex << 20 << std::endl;
+    LogOstream ls(oss);
+    ls.enable();
+    ls.disable();
+    ls << "Hello World! " << std::hex << 20 << std::endl;
     CHECK( oss.str().empty() );
 }
 
@@ -269,4 +297,20 @@ TEST_CASE("Test uint128 octal printing")
     CHECK( uint128_to_oct_string( 0765) == "765");
     CHECK( uint128_to_oct_string( narrow_cast<uint128>(UINT64_MAX) + 1) == "2000000000000000000000");
     CHECK( uint128_to_oct_string( all_ones<uint128>()) == "3777777777777777777777777777777777777777777");
+}
+
+TEST_CASE("Test uint32 circular left shift")
+{
+    uint32 value = 0xA0B0'C0D0;
+    CHECK( value == circ_ls( value, 0));
+    CHECK( value == circ_ls( value, 32));
+    CHECK( 0x0B0C'0D0A == circ_ls( value, 4));
+}
+
+TEST_CASE("Test uint64 circular left shift")
+{
+    uint64 value = 0xA0B0'C0D0'A0B0'C0D0;
+    CHECK( value == circ_ls( value, 0));
+    CHECK( value == circ_ls( value, 64));
+    CHECK( 0x0B0C'0D0A'0B0C'0D0A == circ_ls( value, 4));
 }

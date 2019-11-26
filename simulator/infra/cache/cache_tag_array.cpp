@@ -17,11 +17,9 @@
 class AlwaysHitCacheTagArray : public CacheTagArray
 {
     public:
-        explicit AlwaysHitCacheTagArray( bool log) : CacheTagArray( log) { }
-
         uint32 set( Addr /* unused */) const final { return 0; }
         Addr tag( Addr addr) const final { return addr; }
-        int32 write( Addr /* unused */) { return -1; }
+        int32 write( Addr /* unused */) final { return -1; }
         std::pair<bool, int32> read( Addr addr) final { return read_no_touch( addr); }
         std::pair<bool, int32> read_no_touch( Addr /* unused */) const final { return {true, -1}; }
 };
@@ -29,7 +27,7 @@ class AlwaysHitCacheTagArray : public CacheTagArray
 class InfiniteCacheTagArray : public CacheTagArray
 {
     public:
-        explicit InfiniteCacheTagArray( bool log) : CacheTagArray( log) {
+        InfiniteCacheTagArray() {
             lookup_helper.set_empty_key( impossible_key);
             lookup_helper.set_deleted_key( impossible_key - 1);
         }
@@ -61,7 +59,7 @@ int32 InfiniteCacheTagArray::write( Addr addr)
     if ( result.first)
         return result.second;
 
-    int32 way = narrow_cast<int32>( tags.size());
+    auto way = narrow_cast<int32>( tags.size());
     tags.emplace_back( addr);
     lookup_helper.emplace( addr, way);
 
@@ -73,7 +71,6 @@ class CacheTagArraySizeCheck : public CacheTagArray
 {
     public:
         CacheTagArraySizeCheck(
-            bool log,
             uint32 size_in_bytes,
             uint32 ways,
             uint32 line_size,
@@ -87,13 +84,11 @@ class CacheTagArraySizeCheck : public CacheTagArray
 };
 
 CacheTagArraySizeCheck::CacheTagArraySizeCheck(
-    bool log,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
-    : CacheTagArray( log)
-    , size_in_bytes( size_in_bytes)
+    : size_in_bytes( size_in_bytes)
     , ways( ways)
     , line_size( line_size)
     , addr_size_in_bits( addr_size_in_bits)
@@ -131,13 +126,12 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
 {
     protected:
         CacheTagArraySize(
-            bool log,
             uint32 size_in_bytes,
             uint32 ways,
             uint32 line_size,
             uint32 addr_size_in_bits
         )
-            : CacheTagArraySizeCheck( log, size_in_bytes, ways, line_size, addr_size_in_bits)
+            : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
             , line_bits( find_first_set( line_size))
             , sets( size_in_bytes / ( ways * line_size))
             , set_bits( find_first_set( sets) + line_bits)
@@ -157,7 +151,7 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
 class ReplacementModule
 {
     public:
-        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy = "LRU");
+        ReplacementModule( std::size_t number_of_sets, std::size_t number_of_ways, const std::string& replacement_policy);
         void touch( uint32 num_set, uint32 num_way) { replacement_info[ num_set]->touch( num_way); }
         auto update( uint32 num_set) { return replacement_info[ num_set]->update(); }
 
@@ -176,11 +170,11 @@ class SimpleCacheTagArray : public CacheTagArraySize
 {
     public:
         SimpleCacheTagArray(
-            bool log,
             uint32 size_in_bytes,
             uint32 ways,
             uint32 line_size,
-            uint32 addr_size_in_bits = 32
+            uint32 addr_size_in_bits,
+            const std::string& repl_policy
         );
 
         int32 write( Addr addr) final;
@@ -203,16 +197,16 @@ class SimpleCacheTagArray : public CacheTagArraySize
 };
 
 SimpleCacheTagArray::SimpleCacheTagArray(
-    bool log,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
-    uint32 addr_size_in_bits)
-        : CacheTagArraySize( log, size_in_bytes, ways, line_size, addr_size_in_bits)
+    uint32 addr_size_in_bits,
+    const std::string& repl_policy)
+        : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
         , tags( sets, std::vector<Tag>( ways))
         , lookup_helper( sets, google::dense_hash_map<Addr, int32>( ways))
 {
-    replacement_module = std::make_unique<ReplacementModule>( sets, ways);
+    replacement_module = std::make_unique<ReplacementModule>( sets, ways, repl_policy);
 
     //theese are spicial dense_hash_map requirements
     for (uint32 i = 0; i < sets; i++) {
@@ -271,20 +265,17 @@ int32 SimpleCacheTagArray::write( Addr addr)
 }
 
 std::unique_ptr<CacheTagArray> CacheTagArray::create(
-    bool log,
-    const std::string& type,
+    const std::string& repl_policy,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
 {
-    if ( type == "always_hit")
-        return std::make_unique<AlwaysHitCacheTagArray>( log);
-    if ( type == "infinite")
-        return std::make_unique<InfiniteCacheTagArray>( log);
-    if ( type == "default")
-        return std::make_unique<SimpleCacheTagArray>( log, size_in_bytes, ways, line_size, addr_size_in_bits);
+    if ( repl_policy == "always_hit")
+        return std::make_unique<AlwaysHitCacheTagArray>();
+    if ( repl_policy == "infinite")
+        return std::make_unique<InfiniteCacheTagArray>();
 
-    throw CacheTagArrayInvalidSizeException(std::string("Unsupported mode (") + type + ")");
+    return std::make_unique<SimpleCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits, repl_policy);
 }
 

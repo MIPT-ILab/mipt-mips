@@ -129,13 +129,17 @@ class ReadableAndWritableMemory : public ReadableMemory, public WriteableMemory 
 class FuncMemory : public ReadableAndWritableMemory
 {
 public:
-    static std::shared_ptr<FuncMemory>
-        create_hierarchied_memory( uint32 addr_bits = 36,
-				 uint32 page_bits = 10,
-				 uint32 offset_bits = 12);
+    static std::shared_ptr<FuncMemory> create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
+    static std::shared_ptr<FuncMemory> create_default_hierarchied_memory()
+    {
+        return create_hierarchied_memory( 36, 10, 12);
+    }
 
-    static std::shared_ptr<FuncMemory>
-        create_plain_memory( uint32 addr_bits = 20);
+    static std::shared_ptr<FuncMemory> create_plain_memory( uint32 addr_bits);
+    static std::shared_ptr<FuncMemory> create_4M_plain_memory()
+    {
+        return create_plain_memory( 22);
+    }
 
     template<typename T, Endian endian> void masked_write( T value, Addr addr, T mask)
     {
@@ -187,7 +191,7 @@ void FuncMemory::load_store( Instr* instr)
 class FuncMemoryReplicant : public FuncMemory
 {
 public:
-    explicit FuncMemoryReplicant( const std::shared_ptr<FuncMemory>& memory) : primary( memory) { }
+    explicit FuncMemoryReplicant( std::shared_ptr<FuncMemory> memory) : primary( std::move( memory)) { }
     void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
 
     size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final

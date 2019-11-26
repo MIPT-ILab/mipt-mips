@@ -9,14 +9,14 @@
 
 namespace config {
     /* Cache parameters */
-    static Value<std::string> instruction_cache_type = { "icache-type", "default", "Type of instruction level 1 cache (in bytes)"};
+    static Value<std::string> instruction_cache_type = { "icache-type", "LRU", "Type of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_size = { "icache-size", 2048, "Size of instruction level 1 cache (in bytes)"};
     static Value<uint32> instruction_cache_ways = { "icache-ways", 4, "Amount of ways in instruction level 1 cache"};
     static Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
 template <typename FuncInstr>
-Fetch<FuncInstr>::Fetch(bool log) : Log( log)
+Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
 {
     wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW);
     rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
@@ -44,7 +44,7 @@ Fetch<FuncInstr>::Fetch(bool log) : Log( log)
     rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
 
     bp = BaseBP::create_configured_bp();
-    tags = CacheTagArray::create( log,
+    tags = CacheTagArray::create(
         config::instruction_cache_type,
         config::instruction_cache_size,
         config::instruction_cache_ways,

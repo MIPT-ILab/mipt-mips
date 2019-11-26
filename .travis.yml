@@ -30,13 +30,13 @@ addons:
     packages:
     - libboost-dev
     - ninja-build
+    - python3
   homebrew:
     packages:
     - ninja
     update: true
 
 install:
-  - pip install --user future
   - |
     if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get install g++-7

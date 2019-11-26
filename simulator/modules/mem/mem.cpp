@@ -7,7 +7,7 @@
 #include <memory/memory.h>
 
 template <typename FuncInstr>
-Mem<FuncInstr>::Mem( bool log) : Log( log)
+Mem<FuncInstr>::Mem( Module* parent) : Module( parent, "mem")
 {
     wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", PORT_BW);
     rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", PORT_LATENCY);

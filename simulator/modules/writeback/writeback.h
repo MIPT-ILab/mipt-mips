@@ -9,6 +9,7 @@
 #include "checker/checker.h"
 
 #include <infra/exception.h>
+#include <func_sim/driver/driver.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
 
@@ -22,7 +23,7 @@ struct Deadlock final : Exception
 };
 
 template <typename ISA>
-class Writeback : public Log
+class Writeback : public Module
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
@@ -47,19 +48,19 @@ private:
     void writeback_bubble( Cycle cycle);
 
     /* Input */
-    std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
-    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+    ReadPort<Instr>* rp_mem_datapath = nullptr;
+    ReadPort<Instr>* rp_execute_datapath = nullptr;
+    ReadPort<Instr>* rp_branch_datapath = nullptr;    
+    ReadPort<bool>* rp_trap = nullptr;
 
     /* Output */
-    std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
-    std::unique_ptr<WritePort<Trap>> wp_halt = nullptr;
-    std::unique_ptr<WritePort<bool>> wp_trap = nullptr;
-    std::unique_ptr<WritePort<Target>> wp_target = nullptr;
+    WritePort<std::pair<RegisterUInt, RegisterUInt>>* wp_bypass = nullptr;
+    WritePort<Trap>* wp_halt = nullptr;
+    WritePort<bool>* wp_trap = nullptr;
+    WritePort<Target>* wp_target = nullptr;
 
 public:
-    explicit Writeback( Endian endian, bool log);
+    Writeback( Module* parent, Endian endian);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( const FuncMemory& mem) { checker.init( endian, mem, kernel.get()); }

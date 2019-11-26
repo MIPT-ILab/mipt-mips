@@ -18,6 +18,7 @@
 
 namespace config {
     static Value<std::string> bp_mode = { "bp-mode", "saturating_two_bits", "branch prediction mode"};
+    static Value<std::string> bp_lru = { "bp-lru", "pseudo-LRU", "branch prediction replacement policy"};
     static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
     static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
@@ -34,14 +35,14 @@ class BP final: public BaseBP
         return directions[ way][ tags->set(PC)].is_taken( PC, target);
     }
 public:
-    BP( uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
+    BP( const std::string& lru, uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits) try
         : directions( ways, std::vector<T>( size_in_entries / ways))
         , targets( ways, std::vector<Addr>( size_in_entries / ways))
     {
         // we're reusing existing CacheTagArray functionality,
         // but here we don't split memory in blocks, storing
         // IP's only, so hardcoding here the granularity of 4 bytes:
-        tags = CacheTagArray::create( false, "default", size_in_entries, ways, 4, branch_ip_size_in_bits);
+        tags = CacheTagArray::create( lru, size_in_entries, ways, 4, branch_ip_size_in_bits);
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
         throw BPInvalidMode(e.what());
@@ -95,7 +96,7 @@ public:
 
 class BPFactory {
     struct BaseBPCreator {
-        virtual std::unique_ptr<BaseBP> create(uint32 size_in_entries, uint32 ways,
+        virtual std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
                                                uint32 branch_ip_size_in_bits) const = 0;
         BaseBPCreator() = default;
         virtual ~BaseBPCreator() = default;
@@ -107,12 +108,11 @@ class BPFactory {
 
     template<typename T>
     struct BPCreator : BaseBPCreator {
-        std::unique_ptr<BaseBP> create(uint32 size_in_entries, uint32 ways,
+        std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
                                        uint32 branch_ip_size_in_bits) const final
         {
-            return std::make_unique<BP<T>>( size_in_entries,
-                                            ways,
-                                            branch_ip_size_in_bits);
+            return std::make_unique<BP<T>>( lru, size_in_entries,
+                                            ways, branch_ip_size_in_bits);
         }
         BPCreator() = default;
     };
@@ -141,27 +141,27 @@ class BPFactory {
 public:
     BPFactory() : map( generate_map()) { }
 
-    auto create( const std::string& name,
+    auto create( const std::string& name, const std::string& lru,
                  uint32 size_in_entries, uint32 ways,
-                 uint32 branch_ip_size_in_bits = 32) const
+                 uint32 branch_ip_size_in_bits) const
     {
         auto it = map.find( name);
         if ( it != map.end())
-            return it->second->create( size_in_entries, ways, branch_ip_size_in_bits);
+            return it->second->create( lru, size_in_entries, ways, branch_ip_size_in_bits);
 
         print_map(std::cerr);
         throw BPInvalidMode( name);
     }
 };
 
-std::unique_ptr<BaseBP> BaseBP::create_bp( const std::string& name, uint32 size_in_entries,
-                                           uint32 ways, uint32 branch_ip_size_in_bits)
+std::unique_ptr<BaseBP> BaseBP::create_bp( const std::string& name, const std::string& lru, 
+                                           uint32 size_in_entries, uint32 ways, uint32 branch_ip_size_in_bits)
 {
     static const BPFactory factory;
-    return factory.create(name, size_in_entries, ways, branch_ip_size_in_bits);
+    return factory.create(name, lru, size_in_entries, ways, branch_ip_size_in_bits);
 }
 
 std::unique_ptr<BaseBP> BaseBP::create_configured_bp()
 {
-    return create_bp( config::bp_mode, config::bp_size, config::bp_ways);
+    return create_bp( config::bp_mode, config::bp_lru, config::bp_size, config::bp_ways, 32);
 }

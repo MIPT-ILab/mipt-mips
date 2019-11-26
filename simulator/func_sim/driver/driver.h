@@ -19,7 +19,6 @@ class Simulator;
 class Driver : public Log
 {
 public:
-    explicit Driver( bool verbose = false) : Log( verbose) { }
     static std::unique_ptr<Driver> create_default_driver();
     static std::unique_ptr<Driver> create_hooked_driver( const Driver* drv);
     virtual Trap handle_trap( const Operation& instr) const = 0;

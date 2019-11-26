@@ -49,8 +49,7 @@ Our build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
-To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
-If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
+To generate RISC-V opcodes, CMake uses Python 3. `python3` interpreter should be available in your environment.
 
 ## Command line options
 
@@ -68,17 +67,25 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
     * `mipsI`, `mipsII`, `mipsIII`, `mipsIV` — legacy MIPS versions
 * `-f` — enables functional simulation only
 * `--mars` — enables MARS-compatible mode of system calls
-* `-d` — enables detailed output of each cycle
+
+### Outputs
+* `-l` — enables per-module output, for instance:
+    * `-l fetch,decode` — prints only fetch and decode stages
+    * `-l cpu` —  prints all stages
+    * `-l cpu,!mem` —  print all except mem stage
+* `-d` — enables output of functional simulator
+* `--tdump` — enables module topology dump into topology.json
 
 ### Performance mode options
 
 #### Branch prediction
-* `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model).
+* `--bp-mode` — prediction mode. Check supported modes in [manual](https://github.com/MIPT-ILab/mipt-mips/wiki/BPU-model)
+* `--bp-lru` — prediction replacement policy: _LRU_, _pseudo-LRU_, or _infinite_
 * `--bp-size` — branch prediction cache size (amount of tracked branch instructions)
 * `--bp-ways` — # of ways in branch prediction cache
 
 #### Instruction cache
-* `--icache-type` — instruction cache type: _default_, _always-hit_, or _infinite_
+* `--icache-type` — instruction cache type: _LRU_, _pseudo-LRU_, _always-hit_, or _infinite_
 * `--icache-size` — instruction cache size in bytes
 * `--icache-ways` — # of ways in instruction cache
 * `--icache-line-size` — line size of instruction cache
@@ -92,7 +99,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
-To build simulator faster, we recommend to install Ninja.
+To build simulator faster, we recommend to [install Ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
   1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake
