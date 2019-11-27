@@ -4,11 +4,10 @@ import './css/jsplumbtoolkit-defaults.css'
 import './css/jsplumbtoolkit-demo.css'
 import './css/main.css'
 import './css/index.css'
-import MIPTV from './miptv'
-
+import Topology from './topology'
 jsPlumb.ready(function() {
     var instance = jsPlumb.getInstance({
-        Endpoint:["Dot",{radius: 2}],
+        Endpoint: ["Dot",{radius: 2}],
         Connector: "Flowchart",
         HoverPaintStyle: {stroke: "#1e8151", strokeWidth: 2},
         ConnectionOverlays: [
@@ -18,21 +17,20 @@ jsPlumb.ready(function() {
                 lenght: 14,
                 foldback: 0.8
             } ],
-            [ "Label", { label: "FOO", location: 0.5, id: "label", cssClass: "aLabel" }]
         ],
         Container: "canvas"
     });
 
 
-    instance.registerConnectionType("basic0.1", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.1 } ] });
-    instance.registerConnectionType("basic0.2", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.2 } ] });
-    instance.registerConnectionType("basic0.3", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.3 } ] });
-    instance.registerConnectionType("basic0.4", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.4 } ] });
-    instance.registerConnectionType("basic0.5", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.5 } ] });
-    instance.registerConnectionType("basic0.6", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.6 } ] });
-    instance.registerConnectionType("basic0.7", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.7 } ] });
-    instance.registerConnectionType("basic0.8", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.8 } ] });
-    instance.registerConnectionType("basic0.9", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.9 } ] });
+    instance.registerConnectionType("basic0.1", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.1 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4} });
+    instance.registerConnectionType("basic0.2", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.2 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.3", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.3 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.4", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.4 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.5", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.5 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.6", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.6 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.7", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.7 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.8", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.8 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.9", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.9 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
 
     window.jps = instance;
 
@@ -86,9 +84,14 @@ jsPlumb.ready(function() {
         for (var i = 0; i < windows.length; i++) {
             initNode(windows[i], true);
         }
-        $.getJSON("topology.json").done(function(data) {
-            const miptv = new MIPTV(data, instance);
-            miptv.configure();
+        $.getJSON('topology.json', function(data) {
+            const topology = new Topology(data, instance);
+            topology.configure();
+        }).fail(function() {
+            const err = `Couldn't open file ${process.env.path}`
+            alert(err);
+            throw(new Error(err));
         });
     });
 });
+
