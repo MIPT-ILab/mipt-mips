@@ -42,16 +42,12 @@ template<typename T> static T bit_shuffle( T src1, size_t src2);
 
 template<typename T> static auto wide_shuffle_stage( T src1, size_t shamt)
 {
-    size_t quarter_width = bitwidth<T> >> 2;
-    T part_type;
-    ( quarter_width == 16)
-        ? narrow_cast<uint32>( part_type)
-        : narrow_cast<uint64>( part_type);
-    decltype(part_type) left_part = ( src1 >> ( quarter_width * 2)) & bitmask<decltype(part_type)>( quarter_width * 2);
-    decltype(part_type) right_part = src1 & bitmask<decltype(part_type)>( ( quarter_width * 2));
-    decltype(part_type) buf = left_part & bitmask<decltype(part_type)>( quarter_width);
-    left_part = ( left_part & ~( bitmask<decltype(part_type)>( quarter_width))) | ( ( right_part >> quarter_width) & bitmask<decltype(part_type)>(quarter_width));
-    right_part = ( right_part & ( bitmask<decltype(part_type)>( quarter_width))) | ( buf << quarter_width);
+    constexpr const size_t quarter_width = bitwidth<T> >> 2;
+    T left_part = ( src1 >> ( quarter_width * 2)) & bitmask<T>( quarter_width * 2);
+    T right_part = src1 & bitmask<T>( ( quarter_width * 2));
+    T buf = left_part & bitmask<T>( quarter_width);
+    left_part = ( left_part & ~( bitmask<T>( quarter_width))) | ( ( right_part >> quarter_width) & bitmask<T>(quarter_width));
+    right_part = ( right_part & ( bitmask<T>( quarter_width))) | ( buf << quarter_width);
     left_part = bit_shuffle( left_part, shamt & ( quarter_width - 1));
     right_part = bit_shuffle( right_part, shamt & ( quarter_width - 1));
     return ( T{ left_part} << (quarter_width * 2)) + T{ right_part};
