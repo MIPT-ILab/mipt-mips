@@ -1,0 +1,416 @@
+{
+    "modules": {
+        "cpu": {
+            "write_ports": "",
+            "read_ports": {
+                "WRITEBACK_2_CORE_HALT": ""
+            }
+        },
+        "fetch": {
+            "write_ports": {
+                "FETCH_2_DECODE": "",
+                "TARGET": "",
+                "HOLD_PC": "",
+                "LONG_LATENCY_PC_HOLDER": "",
+                "HIT_OR_MISS": ""
+            },
+            "read_ports": {
+                "DECODE_2_FETCH_STALL": "",
+                "BRANCH_2_FETCH_TARGET": "",
+                "TARGET": "",
+                "HOLD_PC": "",
+                "WRITEBACK_2_FETCH_TARGET": "",
+                "BRANCH_2_FETCH": "",
+                "LONG_LATENCY_PC_HOLDER": "",
+                "HIT_OR_MISS": "",
+                "DECODE_2_FETCH": "",
+                "DECODE_2_FETCH_TARGET": ""
+            }
+        },
+        "decode": {
+            "write_ports": {
+                "DECODE_2_EXECUTE": "",
+                "DECODE_2_DECODE": "",
+                "DECODE_2_FETCH_STALL": "",
+                "DECODE_2_EXECUTE_SRC1_COMMAND": "",
+                "DECODE_2_EXECUTE_SRC2_COMMAND": "",
+                "DECODE_2_BYPASSING_UNIT_NOTIFY": "",
+                "DECODE_2_FETCH_FLUSH": "",
+                "DECODE_2_FETCH_TARGET": "",
+                "DECODE_2_FETCH": ""
+            },
+            "read_ports": {
+                "FETCH_2_DECODE": "",
+                "DECODE_2_DECODE": "",
+                "BRANCH_2_ALL_FLUSH": "",
+                "DECODE_2_BYPASSING_UNIT_NOTIFY": "",
+                "BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY": "",
+                "DECODE_2_FETCH_FLUSH": "",
+                "WRITEBACK_2_ALL_FLUSH": ""
+            }
+        },
+        "execute": {
+            "write_ports": {
+                "EXECUTE_2_MEMORY": "",
+                "EXECUTE_2_BRANCH": "",
+                "EXECUTE_2_WRITEBACK": "",
+                "EXECUTE_2_EXECUTE_LONG_LATENCY": "",
+                "EXECUTE_2_EXECUTE_BYPASS": "",
+                "EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS": ""
+            },
+            "read_ports": {
+                "DECODE_2_EXECUTE": "",
+                "WRITEBACK_2_ALL_FLUSH": "",
+                "EXECUTE_2_EXECUTE_LONG_LATENCY": "",
+                "BRANCH_2_ALL_FLUSH": "",
+                "DECODE_2_EXECUTE_SRC1_COMMAND": "",
+                "DECODE_2_EXECUTE_SRC2_COMMAND": "",
+                "EXECUTE_2_EXECUTE_BYPASS": "",
+                "EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS": "",
+                "MEMORY_2_EXECUTE_BYPASS": "",
+                "WRITEBACK_2_EXECUTE_BYPASS": "",
+                "BRANCH_2_EXECUTE_BYPASS": ""
+            }
+        },
+        "mem": {
+            "write_ports": {
+                "MEMORY_2_WRITEBACK": "",
+                "MEMORY_2_EXECUTE_BYPASS": ""
+            },
+            "read_ports": {
+                "EXECUTE_2_MEMORY": "",
+                "WRITEBACK_2_ALL_FLUSH": "",
+                "BRANCH_2_ALL_FLUSH": ""
+            }
+        },
+        "branch": {
+            "write_ports": {
+                "BRANCH_2_ALL_FLUSH": "",
+                "BRANCH_2_FETCH_TARGET": "",
+                "BRANCH_2_FETCH": "",
+                "BRANCH_2_WRITEBACK": "",
+                "BRANCH_2_EXECUTE_BYPASS": "",
+                "BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY": ""
+            },
+            "read_ports": {
+                "BRANCH_2_ALL_FLUSH": "",
+                "WRITEBACK_2_ALL_FLUSH": "",
+                "EXECUTE_2_BRANCH": ""
+            }
+        },
+        "writeback": {
+            "write_ports": {
+                "WRITEBACK_2_EXECUTE_BYPASS": "",
+                "WRITEBACK_2_CORE_HALT": "",
+                "WRITEBACK_2_ALL_FLUSH": "",
+                "WRITEBACK_2_FETCH_TARGET": ""
+            },
+            "read_ports": {
+                "MEMORY_2_WRITEBACK": "",
+                "EXECUTE_2_WRITEBACK": "",
+                "BRANCH_2_WRITEBACK": "",
+                "WRITEBACK_2_ALL_FLUSH": ""
+            }
+        }
+    },
+    "portmap": {
+        "MEMORY_2_WRITEBACK": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "WRITEBACK_2_EXECUTE_BYPASS": {
+            "write_port": {
+                "fanout": "2",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "MEMORY_2_EXECUTE_BYPASS": {
+            "write_port": {
+                "fanout": "2",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS": {
+            "write_port": {
+                "fanout": "2",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_2_EXECUTE_BYPASS": {
+            "write_port": {
+                "fanout": "2",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_2_EXECUTE_LONG_LATENCY": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "2"
+            }
+        },
+        "DECODE_2_EXECUTE_SRC2_COMMAND": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_WRITEBACK": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_EXECUTE_SRC1_COMMAND": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "WRITEBACK_2_CORE_HALT": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_2_BRANCH": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "WRITEBACK_2_ALL_FLUSH": {
+            "write_port": {
+                "fanout": "5",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "WRITEBACK_2_FETCH_TARGET": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_EXECUTE": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "TARGET": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "FETCH_2_DECODE": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_FETCH_TARGET": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "HOLD_PC": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_2_MEMORY": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_ALL_FLUSH": {
+            "write_port": {
+                "fanout": "4",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_BYPASSING_UNIT_NOTIFY": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_FETCH": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "HIT_OR_MISS": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "LONG_LATENCY_PC_HOLDER": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "30"
+            }
+        },
+        "DECODE_2_FETCH": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_FETCH_TARGET": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "BRANCH_2_EXECUTE_BYPASS": {
+            "write_port": {
+                "fanout": "2",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_DECODE": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "EXECUTE_2_WRITEBACK": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_FETCH_STALL": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        },
+        "DECODE_2_FETCH_FLUSH": {
+            "write_port": {
+                "fanout": "1",
+                "bandwidth": "1"
+            },
+            "read_ports": {
+                "latency": "1"
+            }
+        }
+    },
+    "modulemap": {
+        "cpu": {
+            "fetch": "",
+            "decode": "",
+            "execute": "",
+            "mem": "",
+            "branch": "",
+            "writeback": ""
+        }
+    }
+}

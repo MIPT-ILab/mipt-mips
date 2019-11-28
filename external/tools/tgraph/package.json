@@ -2,13 +2,13 @@
   "name": "tgraph",
   "version": "0.0.1",
   "description": "MIPT-V Topology graph visualizer tool",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
     "dev": "webpack --mode development",
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "start": "webpack-dev-server --mode development --open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require @babel/register"
   },
   "repository": {
     "type": "git",
@@ -18,16 +18,33 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.7.2",
-    "babel-core": "^6.26.3",
+    "@babel/polyfill": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.4",
     "babel-loader": "^8.0.6",
-    "babel-preset-env": "^1.7.0",
-    "draw2d": "^1.0.19",
+    "canvas": "^2.6.0",
+    "chai": "^4.2.0",
+    "copy-webpack-plugin": "^5.0.5",
+    "css-loader": "^3.2.0",
+    "dagre": "^0.8.4",
+    "fibers": "^4.0.2",
     "html-webpack-plugin": "^3.2.0",
     "jquery": "^3.4.1",
     "jquery-ui-dist": "^1.12.1",
+    "jsdom": "^15.2.1",
+    "jsplumb": "^2.12.6",
     "mini-css-extract-plugin": "^0.8.0",
+    "mocha": "^6.2.2",
+    "node-sass": "^4.13.0",
+    "sass": "^1.23.7",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
+  },
+  "engines": {
+    "npm": ">=6",
+    "node": ">=8"
   }
 }

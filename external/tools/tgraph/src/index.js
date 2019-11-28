@@ -1,78 +1,51 @@
-import draw2d from 'draw2d'
-import loadConfig from './miptv'
-
-loadConfig();
-
-var router = new draw2d.layout.connection.CircuitConnectionRouter();
-router.abortRoutingOnFirstVertexNode=false;
-var createConnection=function(sourcePort, targetPort){
-    var c = new draw2d.Connection({
-        outlineColor:"#ffffff",
-        outlineStroke:1,
-        color:"#000000",
-        router: router,
-        stroke:1,
-        radius:2
+//import './css/jsplumb-doc.css'
+import './css/jsplumb.css'
+import './css/jsplumbtoolkit-defaults.css'
+import './css/jsplumbtoolkit-demo.css'
+import './css/main.css'
+import './css/index.css'
+import Topology from './topology'
+jsPlumb.ready(function() {
+    var instance = jsPlumb.getInstance({
+        Endpoint: ["Dot",{radius: 2}],
+        Connector: "Flowchart",
+        HoverPaintStyle: {stroke: "#1e8151", strokeWidth: 2},
+        ConnectionOverlays: [
+            [ "Arrow", {
+                location: 1,
+                id: "arrow",
+                lenght: 14,
+                foldback: 0.8
+            } ],
+        ],
+        Container: "canvas"
     });
-    if(sourcePort) {
-        c.setSource(sourcePort);
-        c.setTarget(targetPort);
-    }
-    return c;
-};
 
-document.addEventListener("DOMContentLoaded",function () {
-        // create the canvas for the user interaction
-        //
-        var canvas = new draw2d.Canvas("gfx_holder");
-        canvas.installEditPolicy(new draw2d.policy.canvas.ShowGridEditPolicy());
-        canvas.installEditPolicy(new draw2d.policy.canvas.FadeoutDecorationPolicy());
 
-        // install a Connection create policy which matches to a "circuit like"
-        // connections
-        //
-        canvas.installEditPolicy( new draw2d.policy.connection.ComposedConnectionCreatePolicy(
-            [
-                // create a connection via Drag&Drop of ports
-                //
-                new draw2d.policy.connection.DragConnectionCreatePolicy({
-                    createConnection:createConnection
-                }),
-                // or via click and point
-                //
-                new draw2d.policy.connection.OrthogonalConnectionCreatePolicy({
-                    createConnection:createConnection
-                })
-            ])
-        );
+    instance.registerConnectionType("basic0.1", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.1 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4} });
+    instance.registerConnectionType("basic0.2", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.2 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.3", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.3 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.4", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.4 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.5", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.5 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.6", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.6 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.7", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.7 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.8", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.8 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
+    instance.registerConnectionType("basic0.9", { anchor:"Continuous", connector: [ "Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true, midpoint: 0.9 } ], paintStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 } });
 
-        var amp =new draw2d.shape.analog.OpAmp();
-        canvas.add(amp,90,50);
+    window.jps = instance;
 
-        var bridge=new draw2d.shape.analog.ResistorBridge()
-        canvas.add(bridge,90,150);
+    instance.bind("connection", function (info) {
+        info.connection.getOverlay("label").setLabel(info.connection.id);
+    });
 
-        var voltage=new draw2d.shape.analog.VoltageSupplyHorizontal();
-        canvas.add(voltage,230,110);
-
-        var voltage2 = new draw2d.shape.analog.VoltageSupplyVertical();
-        canvas.add(voltage2,20,350);
-        canvas.add(new draw2d.shape.basic.Label({text:"draw2d.shape.analog.VoltageSupplyVertical"}),200,355);
-
-        var resistor = new draw2d.shape.analog.ResistorVertical();
-        canvas.add(resistor,50,450);
-        canvas.add(new draw2d.shape.basic.Label({text:"draw2d.shape.analog.ResistorVertical"}),200,455);
-
-        var fulcrum = new draw2d.shape.node.Fulcrum();
-        canvas.add(fulcrum,280,270);
-
-	   	 // Create a Connection and connect the Start and End node
-	   	 //
-	   	 // add the connection to the canvas as well
-	   	 canvas.add(createConnection(amp.getInputPort(0),bridge.getHybridPort(2)));
-         canvas.add(createConnection(voltage.getHybridPort(0),bridge.getHybridPort(1)));
-         canvas.add(createConnection(voltage2.getHybridPort(1),voltage.getHybridPort(0)));
-         canvas.add(createConnection(fulcrum.getHybridPort(0),amp.getOutputPort(0)));
-
-	   	 canvas.getCommandStack().notifyListeners(null, draw2d.command.CommandStack.POST_EXECUTE);
+    instance.batch(function () {
+        $.getJSON('topology.json', function(data) {
+            const topology = new Topology(data, instance);
+            topology.configure();
+        }).fail(function() {
+            const err = `Couldn't open file ${process.env.path}`
+            alert(err);
+            throw(new Error(err));
+        });
+    });
 });
