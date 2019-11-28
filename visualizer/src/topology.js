@@ -1,3 +1,8 @@
+// Copyright MIPTV 2019
+/*
+ * (Type docs)
+ * @author Eric Konks exdevour@gmail.com
+*/
 var dagre = require('dagre');
 var jsPlumb = require('jsplumb').jsPlumb;
 module.exports = class Topology {
@@ -20,8 +25,8 @@ module.exports = class Topology {
             align: 'DL'
         });
         this.graph.setDefaultEdgeLabel(function() { return {}; });
-        this.moduleWidth = 150;
-        this.moduleHeight = 150;
+        this.moduleWidth = 100;
+        this.moduleHeight = 100;
         this.modulesLayout = {};
     }
 
@@ -125,6 +130,9 @@ module.exports = class Topology {
     modulesWithReadPort(portName, mName) {
         const modules = [];
         for (const [moduleName, ports] of Object.entries(this.data.modules)) {
+            if (moduleName == mName || ports.read_ports =='') {
+                continue;
+            }
             if (portName in ports.read_ports && moduleName !== mName) {
                 modules.push(moduleName);
             }

@@ -1,8 +1,11 @@
-//import './css/jsplumb-doc.css'
+// Copyright MIPTV 2019
+/*
+ * (Type docs)
+ * @author Eric Konks exdevour@gmail.com
+*/
 import './css/jsplumb.css'
 import './css/jsplumbtoolkit-defaults.css'
 import './css/jsplumbtoolkit-demo.css'
-import './css/main.css'
 import './css/index.css'
 import Topology from './topology'
 jsPlumb.ready(function() {

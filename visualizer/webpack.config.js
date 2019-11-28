@@ -1,3 +1,9 @@
+// Copyright MIPTV 2019
+/*
+ * (Type docs)
+ * @author Eric Konks exdevour@gmail.com
+*/
+
 const path = require('path');
 const fs = require('fs')
 const HTMLWebpackPlugin = require('html-webpack-plugin');

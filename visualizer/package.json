@@ -1,5 +1,5 @@
 {
-  "name": "tgraph",
+  "name": "visualizer",
   "version": "0.0.1",
   "description": "MIPT-V Topology graph visualizer tool",
   "main": "./index.js",
@@ -15,6 +15,7 @@
     "url": "htpps://github.com/MIPT-ILab/mipt-mips"
   },
   "author": "Eric Konks",
+  "email": "exdevour@gmail.com",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.7.2",
