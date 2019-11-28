@@ -146,7 +146,8 @@ Assigned to tile images in a tiled background
 }
 
 .jtk-surface-tile:focus {
-    outline: none;
+    border: 1px solid red;
+    outline: 0;
 }
 
 /*
@@ -503,7 +504,8 @@ Assigned to tile images in a tiled background
 }
 
 .jtk-dialog-overlay input:focus, .jtk-dialog-overlay textarea:focus {
-    outline: none;
+    border: 1px solid red;
+    outline: 0;
 }
 
 .jtk-dialog-overlay input:focus, .jtk-dialog-overlay textarea:focus {
