@@ -24,8 +24,8 @@ module.exports = class Topology {
             align: 'DL'
         });
         this.graph.setDefaultEdgeLabel(function() { return {}; });
-        this.moduleWidth = 100;
-        this.moduleHeight = 100;
+        this.moduleWidth = 125;
+        this.moduleHeight = 125;
         this.modulesLayout = {};
     }
 
@@ -150,7 +150,7 @@ module.exports = class Topology {
                 "action":"the-action"
             },
             maxConnections: 5,
-            onMaxConnections: function (info, e) {
+            onMaxConnections: function (info) {
                 alert("Maximum connections (" + info.maxConnections + ") reached");
             }
         });

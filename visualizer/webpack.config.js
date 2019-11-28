@@ -17,7 +17,7 @@ module.exports = env => {
   try {
     fs.mkdirSync(BUILD_PATH);
   } catch (EEXIST) {
-    
+    // continue regardless of error
   }
   if (!fs.existsSync(env.path)) {
     const err = `Couldn't open file ${env.path}`
