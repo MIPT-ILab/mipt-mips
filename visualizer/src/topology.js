@@ -1,7 +1,7 @@
-// Copyright MIPTV 2019
+// Copyright 2019 MIPT-MIPS
 /*
  * (Type docs)
- * @author Eric Konks exdevour@gmail.com
+ * @author Eric Konks konks.em@phystech.edu
 */
 var dagre = require('dagre');
 var jsPlumb = require('jsplumb').jsPlumb;

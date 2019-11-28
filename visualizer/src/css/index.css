@@ -1,10 +1,9 @@
-/* Copyright MIPTV 2019 
- *
- * @author Eric Konks exdevour@gmail.com
+/*
+ * Copyright 2019 MIPT-MIPS
+ * @author Eric Konks konks.em@phystech.edu
 */
 
 .demo {
-    /* for IE10+ touch devices */
     touch-action:none;
 }
 
