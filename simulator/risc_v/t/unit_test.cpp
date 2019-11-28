@@ -630,5 +630,5 @@ TEST_CASE("RISCV RV128 unshfl")
         INFO( "Iteration: " << i);
         cases[i].make_128test( "unshfl");
     }
-
 }
+
