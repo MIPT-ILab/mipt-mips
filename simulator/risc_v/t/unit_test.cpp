@@ -192,7 +192,8 @@ TEST_CASE( "RISCV slo32")
     }
 }
 
-TEST_CASE ("RISCV slo64") {
+TEST_CASE ( "RISCV slo64")
+{
     std::vector<TestData<uint64>> cases = {
         TestData<uint64>( 0x1C, 2, 0x73),
         TestData<uint64>( all_ones<uint32>(), 5, bitmask<uint64>(37)),
@@ -293,6 +294,43 @@ TEST_CASE( "RISV RV64 xnor")
     instr.set_v_src( 0xa000'0000'a000'0000, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
+}
+
+TEST_CASE( "RISCV sro32")
+{
+    CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
+    RISCVInstr<uint32> instr( "sro", 0);
+    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0xf, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'0001);
+}
+
+TEST_CASE( "RISCV sro32 overflow")
+{
+    RISCVInstr<uint32> instr( "sro", 0);
+    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0xffu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffffu);
+}
+
+TEST_CASE( "RISCV sro64")
+{
+    RISCVInstr<uint64> instr( "sro", 0);
+    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    instr.set_v_src( 0x1fu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ull);
+}
+
+TEST_CASE( "RISCV sro64 overflow")
+{
+    RISCVInstr<uint64> instr( "sro", 0);
+    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    instr.set_v_src( 0xffu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffull);
 }
 
 TEST_CASE("RISCV RV32 bfp")
