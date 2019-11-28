@@ -145,7 +145,7 @@ Assigned to tile images in a tiled background
     transition: opacity .3s ease .15s;
 }
 
-.jtk-surface-tile {
+.jtk-surface-tile:focus {
     outline: none;
 }
 
@@ -165,7 +165,7 @@ Assigned to tile images in a tiled background
     This class is added to the document body on lasso drag start and removed at the end of lasso dragging. Its purpose
     is to switch off text selection on all elements while the user is dragging the lasso.
 */
-.jtk-lasso-select-defeat * {
+.jtk-lasso-select-defeat * a{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -498,9 +498,12 @@ Assigned to tile images in a tiled background
     color: #333;
     font-size: 14px;
     font-style: normal;
-    outline: none;
     padding: 6px 4px;
     margin-right: 6px;
+}
+
+.jtk-dialog-overlay input:focus, .jtk-dialog-overlay textarea:focus {
+    outline: none;
 }
 
 .jtk-dialog-overlay input:focus, .jtk-dialog-overlay textarea:focus {
@@ -596,7 +599,7 @@ Assigned to tile images in a tiled background
     This class is added to the document body on drag resize start and removed at the end of resizing. Its purpose
     is to switch off text selection on all elements while the user is resizing an element.
 */
-.jtk-drag-select-defeat * {
+.jtk-drag-select-defeat * a{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

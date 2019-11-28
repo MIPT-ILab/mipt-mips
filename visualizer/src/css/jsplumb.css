@@ -1,6 +1,5 @@
 /** DISABLE TEXT SELECTION (SET ON BODY WHEN DRAGGING IS OCCURRING) **/
-/* universal selector is not key */
-._jsPlumb_drag_select * {
+._jsPlumb_drag_select * a{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
