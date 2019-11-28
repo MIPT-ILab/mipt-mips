@@ -15,7 +15,7 @@
     "url": "htpps://github.com/MIPT-ILab/mipt-mips"
   },
   "author": "Eric Konks",
-  "email": "exdevour@gmail.com",
+  "email": "konks.em@phystech.edu",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.7.2",

@@ -4,7 +4,6 @@
  * @author Eric Konks konks.em@phystech.edu
 */
 var dagre = require('dagre');
-var jsPlumb = require('jsplumb').jsPlumb;
 module.exports = class Topology {
     constructor(data, instance) {
         this.data = data;
@@ -116,7 +115,7 @@ module.exports = class Topology {
                                     <div class='portinfo'>Bandwidth: ${portinfo.write_port.bandwidth}</div>
                                     <div class='portinfo'>Latency: ${portinfo.read_ports.latency}</div>`;
                             });
-                            c.bind('mouseout', (conn) => {
+                            c.bind('mouseout', () => {
                                 const info = document.querySelector('#infobox');
                                 info.style.animation = 'infobox_disappear 0.5s ease-in-out 0s 1 normal forwards';
                             })
@@ -163,7 +162,7 @@ module.exports = class Topology {
     }
 
     initParent(module) {
-        const test = this.instance.addGroup({
+        this.instance.addGroup({
             el: module,
             id: `${module.id}_group`,
             constrain: true,
