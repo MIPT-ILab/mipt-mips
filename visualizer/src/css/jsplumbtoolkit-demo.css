@@ -233,13 +233,6 @@ path {
     position: fixed;
     right: 0;
     top: 57px;
-    font-size: 11px;
-    background-color: white;
-    opacity: 0.8;
-    padding-right: 10px;
-    padding-left: 5px;
-    text-transform: uppercase;
-    z-index:100001;
 }
 
 .demo-links div {

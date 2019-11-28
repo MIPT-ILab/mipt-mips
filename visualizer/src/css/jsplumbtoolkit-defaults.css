@@ -44,10 +44,11 @@
     the issue has been fixed in more recent versions of Chrome, but the style is left here in case you come across
     the problem.
 */
+/*
 .jtk-node.jtk-drag {
-    /*-webkit-backface-visibility: hidden;*/
+    -webkit-backface-visibility: hidden;
 }
-
+*/
 /*
     Suppresses the pointer events on an element that was created by Katavorio in response to a drag in which the element
     should first be cloned. Having this clone ignore pointer events means there is less chance that any other
@@ -136,13 +137,16 @@ Assigned to tile images in a tiled background
 */
 .jtk-surface-tile {
     border:none;
-    outline:none;
     margin:0;
     -webkit-transition: opacity .3s ease .15s;
     -moz-transition: opacity .3s ease .15s;
     -o-transition: opacity .3s ease .15s;
     -ms-transition: opacity .3s ease .15s;
     transition: opacity .3s ease .15s;
+}
+
+.jtk-surface-tile {
+    outline: none;
 }
 
 /*
