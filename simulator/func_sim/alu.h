@@ -29,7 +29,7 @@ static std::array<Mask, 4> shuffle_consts = {
     Mask{ 0x44444444, 0x22222222},
 };
 
-static uint32 shuffle_stage( uint32 src, size_t index)
+static inline uint32 shuffle_stage( uint32 src, size_t index)
 {
     auto [maskL, maskR] = shuffle_consts.at( index);
     size_t N = 1 << ( 3 - index);
@@ -38,54 +38,59 @@ static uint32 shuffle_stage( uint32 src, size_t index)
     return x;
 }
 
-static inline uint32 bit_shuffle( uint32 src1, uint32 src2)
+template<typename T> static T bit_shuffle( T src1, size_t src2);
+
+template<typename T> static auto wide_shuffle_stage( T src1, size_t shamt)
 {
-    uint32 result = src1;
-    uint32 shamt = src2 & 15;
-    for( size_t i = 0; i < 4 ; ++i)
-    {
-        if ( shamt & ( 1 << ( 3 - i)))
-            result = shuffle_stage( result, i);
-    }
-    return result;
+    size_t quarter_width = bitwidth<T> >> 2;
+    T part_type;
+    ( quarter_width == 16)
+        ? narrow_cast<uint32>( part_type)
+        : narrow_cast<uint64>( part_type);
+    decltype(part_type) left_part = ( src1 >> ( quarter_width * 2)) & bitmask<decltype(part_type)>( quarter_width * 2);
+    decltype(part_type) right_part = src1 & bitmask<decltype(part_type)>( ( quarter_width * 2));
+    decltype(part_type) buf = left_part & bitmask<decltype(part_type)>( quarter_width);
+    left_part = ( left_part & ~( bitmask<decltype(part_type)>( quarter_width))) | ( ( right_part >> quarter_width) & bitmask<decltype(part_type)>(quarter_width));
+    right_part = ( right_part & ( bitmask<decltype(part_type)>( quarter_width))) | ( buf << quarter_width);
+    left_part = bit_shuffle( left_part, shamt & ( quarter_width - 1));
+    right_part = bit_shuffle( right_part, shamt & ( quarter_width - 1));
+    return ( T{ left_part} << (quarter_width * 2)) + T{ right_part};
 }
 
-static inline uint64 bit_shuffle( uint64 src1, uint64 src2)
+template<typename T> static T bit_shuffle( T src1, size_t src2)
 {
-    uint64 result = src1;
-    uint32 shamt = narrow_cast<uint32>( src2 & 31);
-    uint32 left_part = narrow_cast<uint32>( result >> 32);
-    uint32 right_part = narrow_cast<uint32>( result);
-    if( shamt & ( 1 << 4))
-    {
-        uint32 buf = left_part & bitmask<uint32>(16);
-        left_part = ( left_part & ~( bitmask<uint32>(16))) | ( ( right_part >> 16) & bitmask<uint32>(16));
-        right_part = ( right_part & ( bitmask<uint32>(16))) | ( buf << 16);
-    }
-    left_part = bit_shuffle( left_part, shamt & 15);
-    right_part = bit_shuffle( right_part, shamt & 15);
-    result = static_cast<uint64>( left_part);
-    result <<= 32;
-    return result + right_part;
-}
-
-static inline uint128 bit_shuffle( uint128 src1, uint128 src2)
-{
-    uint128 result = src1;
-    uint64 shamt = narrow_cast<uint64>( src2 & 63);
-    uint64 left_part = narrow_cast<uint64>( result >> 64);
-    uint64 right_part = narrow_cast<uint64>( result);
+    uint128 result = uint128{ src1};
+    auto shamt = src2 & ( bitwidth<T> / 2 - 1);
     if( shamt & ( 1 << 5))
     {
-        uint64 buf = left_part & bitmask<uint64>(32);
-        left_part = ( left_part & ~( bitmask<uint64>(32))) | ( ( right_part >> 32) & bitmask<uint64>(32));
-        right_part = ( right_part & ( bitmask<uint64>(32))) | ( buf << 32);
+        return wide_shuffle_stage( src1, shamt);
     }
-    left_part = bit_shuffle( left_part, shamt & 31);
-    right_part = bit_shuffle( right_part, shamt & 31);
-    result = static_cast<uint128>( left_part);
-    result <<= 64;
-    return result + right_part;
+    if( shamt & ( 1 << 4))
+    {
+        uint64 left_part = ( bytewidth<T> == 16)
+            ? wide_shuffle_stage( narrow_cast<uint64>( result >> 64), shamt)
+            : 0ull;
+        uint64 right_part = wide_shuffle_stage( narrow_cast<uint64>( result), shamt);
+        return (left_part != 0)
+            ? ( uint128{ left_part} << 64) | uint128{ right_part}
+            : right_part;
+    }
+    std::array<uint32, 4> compound = {
+        narrow_cast<uint32>( result),
+        narrow_cast<uint32>( result >> 32),
+        narrow_cast<uint32>( result >> 64),
+        narrow_cast<uint32>( result >> 96),
+    };
+    result = 0;
+    size_t limit = bytewidth<T> / 4;
+    for( size_t j = 0; j < limit; ++j)
+    {
+        for( size_t i = 0; i < 4 ; ++i)
+            if ( shamt & ( 1 << ( 3 - i)))
+                compound[j] = shuffle_stage( compound[j], i);
+        result |= T{ compound[j]} << (32 * j);
+    }
+    return result;
 }
 
 struct ALU
@@ -312,7 +317,7 @@ struct ALU
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
         for( size_t i = 0; i < limit; ++i)
             if( ( instr->v_src2 >> i) & 1)
-                dst_value = bit_shuffle( dst_value, static_cast<decltype( instr->v_src1)>( 1 << i));
+                dst_value = bit_shuffle( dst_value, 1 << i);
         instr->v_dst = dst_value;
     }
   

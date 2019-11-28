@@ -575,4 +575,5 @@ TEST_CASE("RISCV RV128 unshfl")
     uint128 check_value = ( ( static_cast<uint128>( 0xc7d0b881)) << 64) + 0x892a1084;
     instr.execute();
     CHECK( narrow_cast<uint64>( instr.get_v_dst()) == narrow_cast<uint64>( check_value));
+    CHECK( narrow_cast<uint64>( instr.get_v_dst() >> 64) == narrow_cast<uint64>( check_value >> 64));
 }
