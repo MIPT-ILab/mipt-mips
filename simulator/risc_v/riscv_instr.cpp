@@ -70,14 +70,14 @@ template<typename I> auto execute_csrrwi = ALU::csrrwi<I>;
 template<typename I> auto execute_csrrsi = do_nothing<I>;
 template<typename I> auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> auto execute_mul = ALU::riscv_mult_l<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulh = ALU::riscv_mult_h_ss<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhsu = ALU::riscv_mult_h_su<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhu = ALU::riscv_mult_h_uu<I, typename I::RegisterUInt>;
-template<typename I> auto execute_div = ALU::riscv_div<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_divu = ALU::riscv_div<I, typename I::RegisterUInt>;
-template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mul = RISCVMultALU::mult_l<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulh = RISCVMultALU::mult_h_ss<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulhsu = RISCVMultALU::mult_h_su<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulhu = RISCVMultALU::mult_h_uu<I, typename I::RegisterUInt>;
+template<typename I> auto execute_div = RISCVMultALU::div<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> auto execute_divu = RISCVMultALU::div<I, typename I::RegisterUInt>;
+template<typename I> auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
 // B
 template<typename I> auto execute_slo = ALU::slo<I>;
 template<typename I> auto execute_orn = ALU::orn<I>;
