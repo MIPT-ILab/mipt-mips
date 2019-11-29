@@ -96,7 +96,9 @@ module.exports = class Topology {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
                     for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
                         if (layoutmode) {
-                            if (this.graph.parent(moduleName) !== targetName) {
+                            // Waiting fix : https://github.com/dagrejs/dagre/issues/236
+                            if (Object.entries(this.graph._children[moduleName]).length === 0 
+                                    && Object.entries(this.graph._children[targetName]).length === 0) {
                                 this.graph.setEdge(moduleName, targetName);
                             }
                         } else {
