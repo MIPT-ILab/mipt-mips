@@ -31,6 +31,7 @@ addons:
     - libboost-dev
     - ninja-build
     - python3
+    - nodejs
   homebrew:
     packages:
     - ninja
@@ -61,6 +62,9 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/readline     && ./configure && make libreadline.a
 
 script:
+  - cd $TRAVIS_BUILD_DIR/visualizer
+  - npm install
+  - npm run test
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
