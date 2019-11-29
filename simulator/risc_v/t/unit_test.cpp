@@ -192,7 +192,8 @@ TEST_CASE( "RISCV slo32")
     }
 }
 
-TEST_CASE ("RISCV slo64") {
+TEST_CASE ( "RISCV slo64")
+{
     std::vector<TestData<uint64>> cases = {
         TestData<uint64>( 0x1C, 2, 0x73),
         TestData<uint64>( all_ones<uint32>(), 5, bitmask<uint64>(37)),
@@ -295,8 +296,45 @@ TEST_CASE( "RISV RV64 xnor")
     CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
 }
 
+TEST_CASE( "RISCV sro32")
+{
+    CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
+    RISCVInstr<uint32> instr( "sro", 0);
+    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0xf, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'0001);
+}
+
+TEST_CASE( "RISCV sro32 overflow")
+{
+    RISCVInstr<uint32> instr( "sro", 0);
+    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0xffu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffffu);
+}
+
+TEST_CASE( "RISCV sro64")
+{
+    RISCVInstr<uint64> instr( "sro", 0);
+    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    instr.set_v_src( 0x1fu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ull);
+}
+
+TEST_CASE( "RISCV sro64 overflow")
+{
+    RISCVInstr<uint64> instr( "sro", 0);
+    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
+    instr.set_v_src( 0xffu, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffull);
+}
+
 TEST_CASE("RISCV RV32 bfp")
-{                               
+{
     CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
@@ -306,10 +344,244 @@ TEST_CASE("RISCV RV32 bfp")
 }
 
 TEST_CASE("RISCV RV64 bfp")
-{                               
+{
     RISCVInstr<uint64> instr( "bfp", 0);
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
     instr.execute();
     CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
+}
+
+TEST_CASE("RISCV RV32 grev")
+{
+    CHECK( RISCVInstr<uint32>(0x68D6'55B3).get_disasm() == "grev $a1, $a2, $a3");
+    std::vector<TestData<uint32>> cases = {
+            {0x5555'5555,  0x1, 0xAAAA'AAAA},
+            {0x3333'3333,  0x2, 0xCCCC'CCCC},
+            {0x1111'1111,  0x3, 0x8888'8888},
+            {0x0123'4567,  0x7, 0x80C4'A2E6},
+            {0x3333'3333,  0xF, 0xCCCC'CCCC},
+            {0x0123'4567, 0x1F, 0xE6A2'C480},
+    };
+    for (std::size_t i = 0; i < cases.size(); ++i) {
+        RISCVInstr<uint32> instr( "grev", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
+
+TEST_CASE("RISCV RV64 grev")
+{
+    std::vector<TestData<uint64>> cases = {
+            {0x5555'5555'5555'5555ULL,  0x1, 0xAAAA'AAAA'AAAA'AAAAULL},
+            {0x3333'3333'3333'3333ULL,  0x2, 0xCCCC'CCCC'CCCC'CCCCULL},
+            {0x1111'1111'1111'1111ULL,  0x3, 0x8888'8888'8888'8888ULL},
+            {0x0123'4567'89AB'CDEFULL,  0x7, 0x80C4'A2E6'91D5'B3F7ULL},
+            {0x0123'4567'89AB'CDEFULL,  0xF, 0xC480'E6A2'D591'F7B3ULL},
+            {0x0123'4567'89AB'CDEFULL, 0x1F, 0xE6A2'C480'F7B3'D591ULL},
+            {0x0123'4567'89AB'CDEFULL, 0x3F, 0xF7B3'D591'E6A2'C480ULL},
+    };
+    for (std::size_t i = 0; i < cases.size(); ++i) {
+        RISCVInstr<uint64> instr( "grev", 0);
+        instr.set_v_src( cases[i].src1, 0);
+        instr.set_v_src( cases[i].src2, 1);
+        instr.execute();
+        INFO( "Iteration: " << i);
+        CHECK( instr.get_v_dst() == cases[i].dst);
+    }
+}
+
+TEST_CASE("RISCV RV128 grev")
+{
+    RISCVInstr<uint128> instr( "grev", 0);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    CHECK_THROWS_AS(instr.execute(), std::runtime_error);
+}
+
+TEST_CASE("RISCV RV32 pcnt")
+{
+    CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
+    RISCVInstr<uint32> instr( "pcnt", 0);
+    instr.set_v_src( 0xfff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xc);
+}
+
+TEST_CASE("RISCV RV64 pcnt")
+{
+    RISCVInstr<uint64> instr( "pcnt", 0);
+    instr.set_v_src( 0xfafb'fcfd'feff, 0);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x29);
+}
+
+TEST_CASE ("RISCV RV32 clz")
+{
+    CHECK ( RISCVInstr<uint32>(0x60079793).get_disasm() == "clz $a5, $a5");
+    std::vector<TestData<uint32>> cases = {
+        TestData<uint32>( 0 , 0 , 32),
+        TestData<uint32>( all_ones<uint32>(), 0, 0),
+        TestData<uint32>( 0x0000ffff, 0 , 16),
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clz");
+    }
+}
+
+
+TEST_CASE ("RISCV RV64 clz")
+{
+    std::vector<TestData<uint64>> cases = {
+        TestData<uint64>( 0 , 0 , 64),
+        TestData<uint64>( all_ones<uint64>(), 0, 0),
+        TestData<uint64>( 0x0000000ffffffff, 0 , 32),
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clz");
+    }
+}
+
+TEST_CASE ("RISCV RV32 ctz")
+{
+    CHECK ( RISCVInstr<uint32>(0x60179793).get_disasm() == "ctz $a5, $a5");
+    std::vector<TestData<uint32>> cases = {
+        TestData<uint32>( 0 , 0 , 32),
+        TestData<uint32>( all_ones<uint32>(), 0, 0),
+        TestData<uint32>( 0xffff0000, 0 , 16),
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("ctz");
+    }
+}
+
+
+TEST_CASE ("RISCV RV64 ctz")
+{
+    std::vector<TestData<uint64>> cases = {
+        TestData<uint64>( 0 , 0 , 64),
+        TestData<uint64>( all_ones<uint64>(), 0, 0),
+        TestData<uint64>( 0xffffffff00000000, 0 , 32),
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("ctz");
+    }
+}
+
+TEST_CASE("RISCV RV32 rol")
+{
+    CHECK( RISCVInstr<uint32>( 0x60E797B3).get_disasm() == "rol $a5, $a5, $a4");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0x01234567, 0,  0x01234567),
+        TestData<uint32>( 0x01234567, 4,  0x12345670),
+        TestData<uint32>( 0x01234567, 8,  0x23456701),
+	TestData<uint32>( 0x01234567, 32, 0x01234567),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
+}
+
+TEST_CASE("RISCV RV64 rol")
+{
+    CHECK( RISCVInstr<uint64>( 0x60E797B3).get_disasm() == "rol $a5, $a5, $a4");
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 0,  0x0123'4567'89ab'cdef),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 4,  0x1234'5678'9abc'def0),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 8,  0x2345'6789'abcd'ef01),
+        TestData<uint64>( 0x0123'4567'89ab'cdef, 64, 0x0123'4567'89ab'cdef),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("rol");
+    }
+}
+
+TEST_CASE("RISCV RV32 clmul")
+{
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0, 0, 0),
+        TestData<uint32>( 1, 0, 0),
+        TestData<uint32>( 0, 1, 0),
+        TestData<uint32>( 1, 1, 1),
+        TestData<uint32>( all_ones<uint32>(), 0, 0),
+        TestData<uint32>( all_ones<uint32>(), 1, all_ones<uint32>()),
+        TestData<uint32>( 0, all_ones<uint32>(), 0),
+        TestData<uint32>( 0xA2, 0x96, 0x58EC),
+        TestData<uint32>( 0xA328B534, 0x923ACD6E, 0xDA9AB898),
+        TestData<uint32>( 0xABCDEF45, 0xEEE111BB, 0x3093E097),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clmul");
+    }
+}
+
+TEST_CASE("RISCV RV64 clmul")
+{
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0, 0, 0),
+        TestData<uint64>( 1, 0, 0),
+        TestData<uint64>( 0, 1, 0),
+        TestData<uint64>( 1, 1, 1),
+        TestData<uint64>( 0xA2, 0x96, 0x58EC),
+        TestData<uint64>( all_ones<uint64>(), 0, 0),
+        TestData<uint64>( all_ones<uint64>(), 1, all_ones<uint64>()),
+        TestData<uint64>( 0, all_ones<uint64>(), 0),
+        TestData<uint64>( 0xEEE111BBABCDEF45, 0xEEE1CC34FFAA11BB, 0xA18865DFBF34E097),
+        TestData<uint64>( 0xEE3333333BCDEF45, 0x0055552222000000, 0x271E511C2A000000),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("clmul");
+    }
+}
+
+TEST_CASE("RISCV RV32 gorc")
+{
+    CHECK( RISCVInstr<uint32>(0x28D6'55B3).get_disasm() == "gorc $a1, $a2, $a3");
+    std::vector<TestData<uint32>> cases = {
+            {0x1111'0000,  0x1, 0x3333'0000},
+            {0x0022'0033,  0x2, 0x00AA'00FF},
+            {0x0C0C'0F0F,  0x5, 0xCCCC'FFFF},
+            {0x8712'4789,  0xC, all_ones<uint32>()},
+            {1,  0xFF, all_ones<uint32>()},
+            {0x1252'0391,  0x3, 0xFFFF'0FFF},
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("gorc");
+    }
+}
+
+TEST_CASE("RISCV RV64 gorc")
+{
+    std::vector<TestData<uint64>> cases = {
+            {0x1111'1111'1111'1111ULL,  0x1, 0x3333'3333'3333'3333ULL},
+            {0x0022'0033'0044'0055ULL,  0x2, 0x00AA'00FF'0055'0055ULL},
+            {0x0C0C'0F0F'0A0A'0B0BULL,  0x5, 0xCCCC'FFFF'FFFF'FFFFULL},
+            {0x8712'4789'1244'1231ULL,  0xC, 0xFFFF'FFFF'7777'3333ULL},
+            {1,  0xFF, all_ones<uint64>()},
+            {0x1252'0391'1234'0987ULL,  0x3, 0xFFFF'0FFF'FFFF'0FFFULL},
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("gorc");
+    }
+}
+
+TEST_CASE("RISCV RV128 gorc")
+{
+    RISCVInstr<uint128> instr( "gorc", 0);
+    instr.set_v_src( 0, 0);
+    instr.set_v_src( 0, 1);
+    CHECK_THROWS_AS(instr.execute(), std::runtime_error);
 }
