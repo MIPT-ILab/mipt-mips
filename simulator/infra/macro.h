@@ -49,22 +49,6 @@ constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 constexpr size_t half_bitwidth = bitwidth<T> >> 1;
 
-// https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
-template<typename T>
-constexpr auto popcount( T x) noexcept
-{
-    static_assert( std::is_integral<T>::value, "popcount works only for integral types");
-    static_assert( std::numeric_limits<T>::radix == 2, "popcount works only for binary types");
-    static_assert( bitwidth<T> <= bitwidth<uint64>, "popcount works only for uint64 and narrower types");
-    return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
-}
-
-static inline auto popcount( uint128 x) noexcept
-{
-    return popcount( narrow_cast<uint64>( x))
-         + popcount( narrow_cast<uint64>( x >> 64));
-}
-
 /*
  * Returns value of T type with only the most significant bit set
  * Examples: msb_set<uint8>() -> 0x80
@@ -105,6 +89,23 @@ template <typename T>
 static constexpr T bitmask( size_t onecount)
 {
     return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
+}
+
+// https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
+template<typename T>
+constexpr auto popcount( T x) noexcept
+{
+    static_assert( std::is_integral<T>::value, "popcount works only for integral types");
+    static_assert( std::numeric_limits<T>::radix == 2, "popcount works only for binary types");
+    static_assert( bitwidth<T> <= bitwidth<uint64>, "popcount works only for uint64 and narrower types");
+    return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
+}
+
+static inline auto popcount( uint128 x) noexcept
+{
+    auto left  = narrow_cast<uint64>( ( x >> 64) & bitmask<uint128>( 64));
+    auto right = narrow_cast<uint64>( x & bitmask<uint128>( 64));
+    return popcount( left) + popcount( right);
 }
 
 template <typename T>
