@@ -64,7 +64,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/visualizer
   - npm install
-  - npx nyc --reporter=lcov npm test && npx codecov
+  - npm run test
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
@@ -87,4 +87,5 @@ after_success:
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
         ninja unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
+        npx nyc --reporter=lcov npm test && npx codecov
     fi
