@@ -87,5 +87,6 @@ after_success:
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
         ninja unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
+        cd $TRAVIS_BUILD_DIR/visualizer
         npx nyc --reporter=lcov npm test && npx codecov
     fi
