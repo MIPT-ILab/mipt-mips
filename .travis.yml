@@ -64,7 +64,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/visualizer
   - npm install
-  - npm run test
+  - npx nyc --reporter=lcov npm test && npx codecov
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
