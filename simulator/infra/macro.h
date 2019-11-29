@@ -176,9 +176,10 @@ static constexpr T ones_ls( const T& value, size_t shamt)
 template<typename T>
 static constexpr T ones_rs( const T& value, size_t shamt)
 {
-#ifdef _MSC_VER
+#if defined(_MSC_FULL_VER) && (_MSC_FULL_VER < 192328105)
     // Workaround for Visual Studio bug
     // https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
+    // TODO (pkryukov): remove once we switch to C++20
     const volatile auto x = ~value;
 #else
     const auto x = ~value;
