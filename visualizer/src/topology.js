@@ -79,19 +79,6 @@ class BaseConfig {
         this.initModule(d);
         return d;
     }
-
-    moduleConnectionNumber(mName) {
-        const connectionsNumber = {};
-        for (const moduleName of Object.keys(this.data.modules)) {
-            connectionsNumber[moduleName] = 0;
-        }
-        for (const portName of Object.keys(this.data.modules[mName])) {
-            for (const moduleName of this.modulesWithReadPort(portName, mName)) {
-                connectionsNumber[moduleName] += 1;
-            }
-        }
-        return connectionsNumber;
-    }
 }
 
 class jsPlumbConfig extends BaseConfig {
