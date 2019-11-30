@@ -61,6 +61,13 @@ describe('Layout checking', function() {
     });
     it('edges', function(done) {
         expect(topology.layout._edgeCount).to.equal(2);
+        const info = document.querySelector('#infobox');
+        for (const conn of instance.getAllConnections()) {
+            conn._listeners.mouseover[1]({}, {clientX: 0, clientY: 0});
+            expect(info.style.animation).to.equal('infobox_appear 0.5s ease-in-out 0s 1 normal forwards');
+            conn._listeners.mouseout[1]({}, {});
+            expect(info.style.animation).to.equal('infobox_disappear 0.5s ease-in-out 0s 1 normal forwards')
+        }
         done();
     });
 })
