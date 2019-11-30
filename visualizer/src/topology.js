@@ -155,10 +155,6 @@ module.exports = class Topology {
             extract:{
                 "action":"the-action"
             },
-            maxConnections: 5,
-            onMaxConnections: function (info) {
-                alert("Maximum connections (" + info.maxConnections + ") reached");
-            }
         });
         this.instance.makeTarget(el, {
             dropOptions: { hoverClass: "dragHover" },

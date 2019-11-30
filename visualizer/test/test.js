@@ -42,7 +42,7 @@ describe('Layout checking', function() {
     dom.window.jps = instance;
 
     topology.configure();
-    
+
     it('nodes', function(done) {
         expect(Object.keys(topology.layout._nodes).includes('A')).to.equal(true);
         expect(Object.keys(topology.layout._nodes).includes('B')).to.equal(true);
@@ -61,6 +61,17 @@ describe('Layout checking', function() {
     });
     it('edges', function(done) {
         expect(topology.layout._edgeCount).to.equal(2);
+        done();
+    });
+    // This test dispatches mouse events for each connection and then tests handler
+    it('mouse event handlers', function(done) {
+        const info = document.querySelector('#infobox');
+        for (const conn of instance.getAllConnections()) {
+            conn._listeners.mouseover[1]({}, {clientX: 0, clientY: 0});
+            expect(info.style.animation).to.equal('infobox_appear 0.5s ease-in-out 0s 1 normal forwards');
+            conn._listeners.mouseout[1]({}, {});
+            expect(info.style.animation).to.equal('infobox_disappear 0.5s ease-in-out 0s 1 normal forwards')
+        }
         done();
     });
 })
