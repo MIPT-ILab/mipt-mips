@@ -42,7 +42,7 @@ describe('Layout checking', function() {
     dom.window.jps = instance;
 
     topology.configure();
-    
+
     it('nodes', function(done) {
         expect(Object.keys(topology.layout._nodes).includes('A')).to.equal(true);
         expect(Object.keys(topology.layout._nodes).includes('B')).to.equal(true);
