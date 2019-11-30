@@ -155,7 +155,6 @@ module.exports = class Topology {
             extract:{
                 "action":"the-action"
             },
-            maxConnections: 5,
         });
         this.instance.makeTarget(el, {
             dropOptions: { hoverClass: "dragHover" },
