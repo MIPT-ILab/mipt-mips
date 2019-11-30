@@ -1,4 +1,4 @@
-# MIPTV Module topology visualizer tool
+# MIPT-V Module topology visualizer tool
 ## Requirements
 * npm >= 6
 * node >= 8
