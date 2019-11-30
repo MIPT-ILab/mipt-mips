@@ -61,6 +61,10 @@ describe('Layout checking', function() {
     });
     it('edges', function(done) {
         expect(topology.layout._edgeCount).to.equal(2);
+        done();
+    });
+    // This test dispatches mouse events for each connection and then tests handler
+    it('mouse event handlers', function(done) {
         const info = document.querySelector('#infobox');
         for (const conn of instance.getAllConnections()) {
             conn._listeners.mouseover[1]({}, {clientX: 0, clientY: 0});
