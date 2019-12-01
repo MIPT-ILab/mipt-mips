@@ -159,7 +159,7 @@ class dagreConfig extends BaseConfig {
     }
 
     configureConnections() {
-        for (const [portName, portinfo] of Object.entries(this.data.portmap)) {
+        for (const portName of Object.keys(this.data.portmap)) {
             for (const [moduleName, ports] of Object.entries(this.data.modules)) {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
                     for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
