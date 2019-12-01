@@ -161,29 +161,6 @@ struct ALU
             instr->v_dst = ret.first;
     }
 
-    // RISCV mul/div
-    template<typename I, typename T> static void riscv_mult_h_uu( I* instr) { instr->v_dst = riscv_multiplication_high_uu<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_h_ss( I* instr) { instr->v_dst = riscv_multiplication_high_ss<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_h_su( I* instr) { instr->v_dst = riscv_multiplication_high_su<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_l( I* instr) { instr->v_dst = riscv_multiplication_low <T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_div( I* instr) { instr->v_dst = riscv_division <T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_rem( I* instr) { instr->v_dst = riscv_remainder <T>(instr->v_src1, instr->v_src2); }
-
-    // MIPS mul/div
-    template<typename I, typename T> static void multiplication( I* instr)
-    {
-        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
-        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
-    }
-
-    template<typename I, typename T> static void division( I* instr)
-    {
-        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
-        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
-    }
-
     // Shifts
     template<typename I, typename T> static void sll( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) << shamt_imm( instr)); }
     template<typename I, typename T> static void srl( I* instr)  { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) >> shamt_imm( instr)); }
@@ -192,6 +169,10 @@ struct ALU
     template<typename I, typename T> static void srlv( I* instr) { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<typename I, typename T> static void srav( I* instr) { instr->v_dst = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src1), shamt_v_src2<T>( instr)); }
     template<typename I> static void slo( I* instr) { instr->v_dst = ones_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src1), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sro( I* instr) { instr->v_dst = ones_rs( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
+
+    // Circular shifts
+    template<typename I> static void rol( I* instr) { instr->v_dst = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src1), shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     // MIPS extra shifts
     template<typename I> static void dsll32( I* instr) { instr->v_dst = instr->v_src1 << shamt_imm_32( instr); }
@@ -203,6 +184,8 @@ struct ALU
     // Leading zero/ones
     template<typename I, typename T> static void clo( I* instr)  { instr->v_dst = count_leading_ones<T>( instr->v_src1); }
     template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
+    template<typename I, typename T> static void ctz( I* instr)  { instr->v_dst = count_trailing_zeroes<T>( instr->v_src1); }
+    template<typename I, typename T> static void pcnt( I* instr) { instr->v_dst = narrow_cast<T>( popcount( instr->v_src1)); }
 
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -215,15 +198,28 @@ struct ALU
     template<typename I> static void orn( I* instr)   { instr->v_dst = instr->v_src1 | ~instr->v_src2; }
     template<typename I> static void xnor( I* instr)  { instr->v_dst = instr->v_src1 ^ ~instr->v_src2; }
 
+    // Bit permutation
+    template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
+
+    // Generalized OR-Combine
+    template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
+
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src2 == 0) instr->mask = 0; }
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
 
     // Bit manipulations
     template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sbinv(I* instr) {instr->v_dst = v_src1 ^ (1 << shamt_v_src2<typename I::RegisterUInt>(instr));}
 
-	// Bit manipulations
-	template<typename I> static void sbinv(I* instr) {instr->v_dst = v_src1 ^ (1 << shamt_v_src2<typename I::RegisterUInt>(instr));}
+    template<typename I, typename T>
+    static void clmul( I* instr)
+    {
+        instr->v_dst = 0;
+        for ( std::size_t index = 0; index < bitwidth<T>; index++)
+            if ( (instr->v_src2 >> index) & 1)
+                instr->v_dst ^= instr->v_src1 << index;
+    }
 
     // Bit manipulations
     template<typename I, typename T> static void pack( I* instr)  { instr->v_dst = (instr->v_src1 & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src2 << (half_bitwidth<T>)); }
@@ -317,6 +313,19 @@ struct ALU
     void riscv_addition_imm( I* instr)
     {
         instr->v_dst = sign_extension<bitwidth<T>>( instr->v_src1 + instr->v_imm);
+    }
+
+    template<typename I> static
+    void bit_field_place( I* instr)
+    {
+        using XLENType = typename I::RegisterUInt;
+        size_t XLEN = bitwidth<XLENType>;
+        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15;
+        len = len ? len : 16;
+        size_t off = ( narrow_cast<size_t>( instr->v_src2) >> 16) & ( XLEN-1);
+        auto mask = circ_ls( bitmask<XLENType>( len), off);
+        auto data = circ_ls( instr->v_src2, off);
+        instr->v_dst = ( data & mask) | ( instr->v_src1 & ~mask);
     }
 };
 
