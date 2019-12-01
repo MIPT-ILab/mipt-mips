@@ -1,5 +1,9 @@
 ignore:
-  - "external/.*"
+  - "external"
+  - "*/cen64/*.h"
+  - "*/cen64/*.cpp"
+  - "*/gdb/*.h"
+  - "*/gdb/*.cpp"
   - "*/t/*.h"
   - "*/t/*.cpp"
 
