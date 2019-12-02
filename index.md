@@ -67,6 +67,7 @@ MIPT | Name | Score | Comments
 717 | Vsevolod Pukhov | 9 | [#589](https://github.com/MIPT-ILab/mipt-mips/issues/589), ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#602](https://github.com/MIPT-ILab/mipt-mips/issues/602), [#130](https://github.com/MIPT-ILab/mipt-mips/issues/130) |
 711 | Yan Logovskiy | 9 | [#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383), [#506](https://github.com/MIPT-ILab/mipt-mips/issues/506), ¼[#613](https://github.com/MIPT-ILab/mipt-mips/issues/613) |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+**81?** | **Eric Konks** | **6** | **[#520](https://github.com/MIPT-ILab/mipt-mips/issues/520)**
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
@@ -75,8 +76,10 @@ MIPT | Name | Score | Comments
 717 | Ivan Startsev | 2 | [#525](https://github.com/MIPT-ILab/mipt-mips/issues/525) |
 717 | Arsen Davtyan | 2 | [#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643) |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
-81? | Maxim Davydov | 1 | [#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096) |
+**81?** | **Maxim Davydov** | **1** | **[#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)** |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, and Ilya Burtakov.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
