@@ -141,8 +141,8 @@ class jsPlumbConfig extends BaseConfig {
      * @this {jsPlumbConfig}
      * @param {string} source - Source module.
      * @param {string} target - Target module.
-     * @param {object} map - Map of connection type between each module.
-     * @return {string} - Connection Type.
+     * @param {object} map - Map of midpoint location between each module.
+     * @return {string} - Midpoint location.
      */
     getClosestMidpointLocation(source, target, map) {
         const currentMidPointLocation = map[source][target];
