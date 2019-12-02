@@ -13,6 +13,17 @@ class BaseConfig {
         this.moduleWidth = moduleWidth;
         this.moduleHeight = moduleHeight;
         this.modulesLayout = modulesLayout;
+        this.connectionType = {
+            'basic0.1': 1,
+            'basic0.2': 2,
+            'basic0.3': 3,
+            'basic0.4': 4,
+            'basic0.5': 5,
+            'basic0.6': 6,
+            'basic0.7': 7,
+            'basic0.8': 8,
+            'basic0.9': 9,
+        };
     }
 
     modulesWithReadPort(portName, mName) {
@@ -85,7 +96,7 @@ class BaseConfig {
         for (const source of Object.keys(this.data.modules)) {
             connectionTypeMap[source] = {};
             for (const target of Object.keys(this.data.modules)) {
-                connectionTypeMap[source][target] = 5;
+                connectionTypeMap[source][target] = this.connectionType['basic0.5'];
             }
         }
         return connectionTypeMap;
@@ -119,26 +130,26 @@ class jsPlumbConfig extends BaseConfig {
     }
 
     /**
-     * Utility method that return the nearest to 5 free number for a specific pair of source and target 
+     * Utility method that return the nearest to basic0.5 free type for a specific pair of source and target 
      * and help to reduce lines overlaying.
-     * 
-     * This number is greater than 0 and less than 10. It's interpeted as the type of connection.
      * 
      * @private
      * @this {jsPlumbConfig}
      * @param {string} source - Source module.
      * @param {string} target - Target module.
      * @param {object} map - Map of connection type between each module.
-     * @return {number} - Connection Type.
+     * @return {string} - Connection Type.
      */
     getConnectionType(source, target, map) {
-        const tmp = map[source][target];
-        if (5 - tmp < 0) {
-            map[source][target] = 5 + (5 - tmp);
+        const currentType = map[source][target];
+        const diff = this.connectionType['basic0.5'] - currentType;
+        if (diff < 0) {
+            map[source][target] = this.connectionType['basic0.5'] + diff;
         } else {
-            map[source][target] = Math.min(5 + 1 + (5 - tmp), 9)
+            const nextType = this.connectionType['basic0.5'] + diff + this.connectionType['basic0.1'];
+            map[source][target] = Math.min(nextType, this.connectionType['basic0.9']);
         }
-        return tmp;
+        return Object.keys(this.connectionType).find(type => this.connectionType[type] === currentType);
     }
 
     configureConnection(portName, moduleName, portInfo, connectionTypeMap) {
@@ -146,7 +157,7 @@ class jsPlumbConfig extends BaseConfig {
             let c = this.instance.connect({
                 source: moduleName,
                 target: targetName,
-                type: `basic0.${this.getConnectionType(moduleName, targetName, connectionTypeMap)}`,
+                type: this.getConnectionType(moduleName, targetName, connectionTypeMap),
             });
             c.bind('mouseover', (conn, event) => {
                 const info = document.querySelector('#infobox');
