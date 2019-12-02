@@ -24,6 +24,18 @@ global.Biltong = Biltong;
 const rdata = fs.readFileSync('../tests/topology_root_test.json', (err) => {if (err) throw err;});
 const data = JSON.parse(rdata);
 
+data.modules.B.write_ports['B_to_D_2'] = '';
+data.modules.D.read_ports['B_to_D_2'] = '';
+data.portmap['B_to_D_2'] = {
+    write_port: {
+        fanout: '1',
+        bandwidth: '1'
+    },
+    read_ports: {
+        latency: '1'
+    }
+}
+
 describe('Layout checking', function() {
     const instance = jsPlumb.getInstance({
         Container: "canvas"
