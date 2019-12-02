@@ -108,29 +108,29 @@ class jsPlumbConfig extends BaseConfig {
     }
     
     /**
-     * Utility method that return the nearest to 5 free number for a specific pair of source and target and help to reduce lines overlaying.
+     * Utility method that return the nearest to 5 free number for a specific pair of source and target 
+     * and help to reduce lines overlaying.
+     * 
      * This number is greater than 0 and less than 10. It's interpeted as the type of connection.
      * 
      * @private
      * @this {jsPlumbConfig}
-     * @param {string} s - Source module.
-     * @param {string} t - Target module.
+     * @param {string} source - Source module.
+     * @param {string} target - Target module.
      * @param {object} map - Map of connection type between each module.
      * @return {number} - Connection Type.
      */
-    getConnectionType(s, t, map) {
-        const tmp = map[s][t];
+    getConnectionType(source, target, map) {
+        const tmp = map[source][target];
         if (5 - tmp < 0) {
-            map[s][t] = 5 + (5 - tmp);
+            map[source][target] = 5 + (5 - tmp);
         } else {
-            map[s][t] = 5 + 1 + (5 - tmp);
-            map[s][t] = (map[s][t] === 10) ? 9 : map[s][t];
+            map[source][target] = Math.min(5 + 1 + (5 - tmp), 9)
         }
         return tmp;
     }
 
-    configureConnection(portName, portInfo, moduleName) {
-        const connectionTypeMap = this.createConnectionTypeMap();
+    configureConnection(portName, portInfo, moduleName, connectionTypeMap) {
         for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
             let c = this.instance.connect({
                 source: moduleName,
@@ -155,10 +155,11 @@ class jsPlumbConfig extends BaseConfig {
     }
 
     configureConnections() {
+        const connectionTypeMap = this.createConnectionTypeMap();
         for (const [portName, portInfo] of Object.entries(this.data.portmap)) {
             for (const [moduleName, ports] of Object.entries(this.data.modules)) {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    this.configureConnection(portName, portInfo, moduleName);
+                    this.configureConnection(portName, portInfo, moduleName, connectionTypeMap);
                 }
             }
         }
