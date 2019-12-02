@@ -20,10 +20,9 @@ Generate topology.json
 
     cd /path/to/mipt-v/build/directory
     ./mipt-mips -b /path/to/binary --tdump
+    cd /path/to/visualizer
 
 ## Run
-
-    cd /path/to/visualizer
     npm run start -- --env.path=/path/to/topology.json
 Project runs at http://localhost:8080/
 ## Test
