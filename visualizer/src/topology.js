@@ -106,7 +106,18 @@ class jsPlumbConfig extends BaseConfig {
         }
         return connectionTypeMap;
     }
-
+    
+    /**
+     * Utility method that return the nearest to 5 free number for a specific pair of source and target.
+     * This number is greater than 0 and less than 10. It's interpeted as the type of connection.
+     * 
+     * @private
+     * @this {jsPlumbConfig}
+     * @param {string} s - Source module.
+     * @param {string} t - Target module.
+     * @param {object} map - Map of connection type between each module.
+     * @return {number} - Connection Type.
+     */
     getConnectionType(s, t, map) {
         const tmp = map[s][t];
         if (5 - tmp < 0) {
