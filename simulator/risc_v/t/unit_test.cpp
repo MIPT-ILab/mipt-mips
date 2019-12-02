@@ -416,7 +416,17 @@ TEST_CASE("RISCV RV64 pcnt")
     RISCVInstr<uint64> instr( "pcnt", 0);
     instr.set_v_src( 0xfafb'fcfd'feff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x29);
+    CHECK( instr.get_v_dst() == 41);
+}
+
+TEST_CASE("RISCV RV128 pcnt")
+{
+    uint128 value = 0xfafb'fcfd'feffULL;
+    value = (value << 64) | value;
+    RISCVInstr<uint128> instr( "pcnt", 0);
+    instr.set_v_src( value, 0);
+    instr.execute();
+    CHECK( narrow_cast<size_t>( instr.get_v_dst()) == 82);
 }
 
 TEST_CASE ("RISCV RV32 clz")
