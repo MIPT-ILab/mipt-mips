@@ -13,8 +13,7 @@ class BaseConfig {
         this.moduleWidth = moduleWidth;
         this.moduleHeight = moduleHeight;
         this.modulesLayout = modulesLayout;
-        // ConnectionType format : basic{jsPlumb midpoint location}
-        this.connectionType = {
+        this.midpointLocations = {
             'basic0.1': 1,
             'basic0.2': 2,
             'basic0.3': 3,
@@ -92,15 +91,15 @@ class BaseConfig {
         return d;
     }
 
-    createConnectionTypeMap() {
-        const connectionTypeMap = {};
+    createMidpointLocationsMap() {
+        const midpointLocationsMap = {};
         for (const source of Object.keys(this.data.modules)) {
-            connectionTypeMap[source] = {};
+            midpointLocationsMap[source] = {};
             for (const target of Object.keys(this.data.modules)) {
-                connectionTypeMap[source][target] = this.connectionType['basic0.5'];
+                midpointLocationsMap[source][target] = this.midpointLocations['basic0.5'];
             }
         }
-        return connectionTypeMap;
+        return midpointLocationsMap;
     }
     
     configureModules(modulemap, parent) {
@@ -110,11 +109,11 @@ class BaseConfig {
     }
 
     configureConnections() {
-        const connectionTypeMap = this.createConnectionTypeMap();
+        const midpointLocationsMap = this.createMidpointLocationsMap();
         for (const [portName, portInfo] of Object.entries(this.data.portmap)) {
             for (const [moduleName, ports] of Object.entries(this.data.modules)) {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    this.configureConnection(portName, moduleName, portInfo, connectionTypeMap);
+                    this.configureConnection(portName, moduleName, portInfo, midpointLocationsMap);
                 }
             }
         }
@@ -145,24 +144,24 @@ class jsPlumbConfig extends BaseConfig {
      * @param {object} map - Map of connection type between each module.
      * @return {string} - Connection Type.
      */
-    getConnectionType(source, target, map) {
-        const currentType = map[source][target];
-        const diff = this.connectionType['basic0.5'] - currentType;
+    getClosestMidpointLocation(source, target, map) {
+        const currentMidPointLocation = map[source][target];
+        const diff = this.midpointLocations['basic0.5'] - currentMidPointLocation;
         if (diff < 0) {
-            map[source][target] = this.connectionType['basic0.5'] + diff;
+            map[source][target] = this.midpointLocations['basic0.5'] + diff;
         } else {
-            const nextType = this.connectionType['basic0.5'] + diff + this.connectionType['basic0.1'];
-            map[source][target] = Math.min(nextType, this.connectionType['basic0.9']);
+            const nextMidpointLocation = this.midpointLocations['basic0.5'] + diff + this.midpointLocations['basic0.1'];
+            map[source][target] = Math.min(nextMidpointLocation, this.midpointLocations['basic0.9']);
         }
-        return Object.keys(this.connectionType).find(type => this.connectionType[type] === currentType);
+        return Object.keys(this.midpointLocations).find(type => this.midpointLocations[type] === currentMidPointLocation);
     }
 
-    configureConnection(portName, moduleName, portInfo, connectionTypeMap) {
+    configureConnection(portName, moduleName, portInfo, midpointLocationsMap) {
         for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
             let c = this.instance.connect({
                 source: moduleName,
                 target: targetName,
-                type: this.getConnectionType(moduleName, targetName, connectionTypeMap),
+                type: this.getClosestMidpointLocation(moduleName, targetName, midpointLocationsMap),
             });
             c.bind('mouseover', (conn, event) => {
                 const info = document.querySelector('#infobox');
