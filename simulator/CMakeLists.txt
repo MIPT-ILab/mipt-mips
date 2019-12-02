@@ -41,7 +41,6 @@ set(CPPS
     func_sim/driver/driver.cpp
     func_sim/traps/trap.cpp
     mips/mips_instr.cpp
-    mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
@@ -89,6 +88,7 @@ set(TESTS_CPPS
     mips/t/mips32_memory_test.cpp
     mips/t/mips32_traps_test.cpp
     mips/t/mips64_test.cpp
+    mips/t/mips_version_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
