@@ -96,49 +96,58 @@ class jsPlumbConfig extends BaseConfig {
         }
     }
 
+    createConnectionTypeMap() {
+        const connectionTypeMap = {};
+        for (const source of Object.keys(this.data.modules)) {
+            connectionTypeMap[source] = {};
+            for (const target of Object.keys(this.data.modules)) {
+                connectionTypeMap[source][target] = 5;
+            }
+        }
+        return connectionTypeMap;
+    }
+
+    getConnectionType(s, t, map) {
+        const tmp = map[s][t];
+        if (5 - tmp < 0) {
+            map[s][t] = 5 + (5 - tmp);
+        } else {
+            map[s][t] = 5 + 1 + (5 - tmp);
+            map[s][t] = (map[s][t] === 10) ? 9 : map[s][t];
+        }
+        return tmp;
+    }
+
+    configureConnection(portName, portInfo, moduleName) {
+        const connectionTypeMap = this.createConnectionTypeMap();
+        for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
+            let c = this.instance.connect({
+                source: moduleName,
+                target: targetName,
+                type: `basic0.${this.getConnectionType(moduleName, targetName, connectionTypeMap)}`,
+            });
+            c.bind('mouseover', (conn, event) => {
+                const info = document.querySelector('#infobox');
+                info.style.left = `${event.clientX - info.offsetWidth / 2}px`;
+                info.style.top = `${event.clientY - 80}px`;
+                info.style.animation = 'infobox_appear 0.5s ease-in-out 0s 1 normal forwards';
+                info.innerHTML = `
+                    <div class='portinfo'>${portName}</div>
+                    <div class='portinfo'>Bandwidth: ${portInfo.write_port.bandwidth}</div>
+                    <div class='portinfo'>Latency: ${portInfo.read_ports.latency}</div>`;
+            });
+            c.bind('mouseout', () => {
+                const info = document.querySelector('#infobox');
+                info.style.animation = 'infobox_disappear 0.5s ease-in-out 0s 1 normal forwards';
+            })
+        }
+    }
+
     configureConnections() {
-        const moduleMapConnections = {};
-        for (const pName of Object.keys(this.data.modules)) {
-            moduleMapConnections[pName] = {};
-            for (const cName of Object.keys(this.data.modules)) {
-                moduleMapConnections[pName][cName] = 5;
-            }
-        }
-        // Output 5 6 4 7 3 8 2 9 1
-        const getType = function(s, t, map) {
-            const tmp = map[s][t];
-            if (5 - tmp < 0) {
-                map[s][t] = 5 + (5 - tmp);
-            } else {
-                map[s][t] = 5 + 1 + (5 - tmp);
-                map[s][t] = (map[s][t] === 10) ? 9 : map[s][t];
-            }
-            return tmp;
-        }
-        for (const [portName, portinfo] of Object.entries(this.data.portmap)) {
+        for (const [portName, portInfo] of Object.entries(this.data.portmap)) {
             for (const [moduleName, ports] of Object.entries(this.data.modules)) {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
-                        let c = this.instance.connect({
-                            source: moduleName,
-                            target: targetName,
-                            type: `basic0.${getType(moduleName, targetName, moduleMapConnections)}`,
-                        });
-                        c.bind('mouseover', (conn, event) => {
-                            const info = document.querySelector('#infobox');
-                            info.style.left = `${event.clientX - info.offsetWidth / 2}px`;
-                            info.style.top = `${event.clientY - 80}px`;
-                            info.style.animation = 'infobox_appear 0.5s ease-in-out 0s 1 normal forwards';
-                            info.innerHTML = `
-                                <div class='portinfo'>${portName}</div>
-                                <div class='portinfo'>Bandwidth: ${portinfo.write_port.bandwidth}</div>
-                                <div class='portinfo'>Latency: ${portinfo.read_ports.latency}</div>`;
-                        });
-                        c.bind('mouseout', () => {
-                            const info = document.querySelector('#infobox');
-                            info.style.animation = 'infobox_disappear 0.5s ease-in-out 0s 1 normal forwards';
-                        })
-                    }
+                    this.configureConnection(portName, portInfo, moduleName);
                 }
             }
         }
@@ -158,21 +167,25 @@ class dagreConfig extends BaseConfig {
         }
     }
 
+    configureConnection(portName, moduleName) {
+        for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
+            // Waiting fix : https://github.com/dagrejs/dagre/issues/236
+            const haveNoChildren = (graph, source, target) => {
+                let sourceC = Object.entries(graph._children[source]).length;
+                let targetC = Object.entries(graph._children[target]).length;
+                return sourceC === 0 && targetC === 0;
+            }
+            if (haveNoChildren(this.graph, moduleName, targetName)) {
+                this.graph.setEdge(moduleName, targetName);
+            }
+        }
+    }
+
     configureConnections() {
         for (const portName of Object.keys(this.data.portmap)) {
             for (const [moduleName, ports] of Object.entries(this.data.modules)) {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
-                        // Waiting fix : https://github.com/dagrejs/dagre/issues/236
-                        const haveNoChildren = (graph, source, target) => {
-                            let sourceC = Object.entries(graph._children[source]).length;
-                            let targetC = Object.entries(graph._children[target]).length;
-                            return sourceC === 0 && targetC === 0;
-                        }
-                        if (haveNoChildren(this.graph, moduleName, targetName)) {
-                            this.graph.setEdge(moduleName, targetName);
-                        }
-                    }
+                    this.configureConnection(portName, moduleName);
                 }
             }
         }
