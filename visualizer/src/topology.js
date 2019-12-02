@@ -150,7 +150,7 @@ class jsPlumbConfig extends BaseConfig {
         if (diff < 0) {
             map[source][target] = this.midpointLocations['basic0.5'] + diff;
         } else {
-            const nextMidpointLocation = this.midpointLocations['basic0.5'] + diff + this.midpointLocations['basic0.1'];
+            const nextMidpointLocation = this.midpointLocations['basic0.6'] + diff;
             map[source][target] = Math.min(nextMidpointLocation, this.midpointLocations['basic0.9']);
         }
         return Object.keys(this.midpointLocations).find(type => this.midpointLocations[type] === currentMidPointLocation);
