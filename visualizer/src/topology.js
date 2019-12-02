@@ -96,7 +96,13 @@ module.exports = class Topology {
                 if (ports.write_ports !== '' && portName in ports.write_ports) {
                     for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
                         if (layoutmode) {
-                            if (this.graph.parent(moduleName) !== targetName) {
+                            // Waiting fix : https://github.com/dagrejs/dagre/issues/236
+                            const haveNoChildren = (graph, source, target) => {
+                                let sourceC = Object.entries(graph._children[source]).length;
+                                let targetC = Object.entries(graph._children[target]).length;
+                                return sourceC === 0 && targetC === 0;
+                            }
+                            if (haveNoChildren(this.graph, moduleName, targetName)) {
                                 this.graph.setEdge(moduleName, targetName);
                             }
                         } else {
@@ -149,10 +155,6 @@ module.exports = class Topology {
             extract:{
                 "action":"the-action"
             },
-            maxConnections: 5,
-            onMaxConnections: function (info) {
-                alert("Maximum connections (" + info.maxConnections + ") reached");
-            }
         });
         this.instance.makeTarget(el, {
             dropOptions: { hoverClass: "dragHover" },
