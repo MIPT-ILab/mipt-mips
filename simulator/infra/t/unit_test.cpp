@@ -171,6 +171,12 @@ static_assert( ones_rs<uint64>( all_ones<uint64>(), 63) == all_ones<uint64>());
 static_assert( arithmetic_rs<uint64>( 0xA, 1) == 0x5);
 static_assert( arithmetic_rs<uint64>( msb_set<uint64>(), 3) == ones_rs<uint64>( msb_set<uint64>(), 3));
 
+static_assert( interleaved_mask<uint32>(0) == 0x5555'5555);
+static_assert( interleaved_mask<uint32>(1) == 0x3333'3333);
+static_assert( interleaved_mask<uint32>(2) == 0x0F0F'0F0F);
+static_assert( interleaved_mask<uint32>(3) == 0x00FF'00FF);
+static_assert( interleaved_mask<uint32>(4) == 0x0000'FFFF);
+
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior
