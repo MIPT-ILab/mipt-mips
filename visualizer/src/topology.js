@@ -108,7 +108,7 @@ class jsPlumbConfig extends BaseConfig {
     }
     
     /**
-     * Utility method that return the nearest to 5 free number for a specific pair of source and target.
+     * Utility method that return the nearest to 5 free number for a specific pair of source and target and help to reduce lines overlaying.
      * This number is greater than 0 and less than 10. It's interpeted as the type of connection.
      * 
      * @private
