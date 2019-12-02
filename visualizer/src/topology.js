@@ -79,6 +79,28 @@ class BaseConfig {
         this.initModule(d);
         return d;
     }
+
+    createConnectionTypeMap() {
+        const connectionTypeMap = {};
+        for (const source of Object.keys(this.data.modules)) {
+            connectionTypeMap[source] = {};
+            for (const target of Object.keys(this.data.modules)) {
+                connectionTypeMap[source][target] = 5;
+            }
+        }
+        return connectionTypeMap;
+    }
+
+    configureConnections() {
+        const connectionTypeMap = this.createConnectionTypeMap();
+        for (const [portName, portInfo] of Object.entries(this.data.portmap)) {
+            for (const [moduleName, ports] of Object.entries(this.data.modules)) {
+                if (ports.write_ports !== '' && portName in ports.write_ports) {
+                    this.configureConnection(portName, moduleName, portInfo, connectionTypeMap);
+                }
+            }
+        }
+    }
 }
 
 class jsPlumbConfig extends BaseConfig {
@@ -96,17 +118,6 @@ class jsPlumbConfig extends BaseConfig {
         }
     }
 
-    createConnectionTypeMap() {
-        const connectionTypeMap = {};
-        for (const source of Object.keys(this.data.modules)) {
-            connectionTypeMap[source] = {};
-            for (const target of Object.keys(this.data.modules)) {
-                connectionTypeMap[source][target] = 5;
-            }
-        }
-        return connectionTypeMap;
-    }
-    
     /**
      * Utility method that return the nearest to 5 free number for a specific pair of source and target 
      * and help to reduce lines overlaying.
@@ -130,7 +141,7 @@ class jsPlumbConfig extends BaseConfig {
         return tmp;
     }
 
-    configureConnection(portName, portInfo, moduleName, connectionTypeMap) {
+    configureConnection(portName, moduleName, portInfo, connectionTypeMap) {
         for (const targetName of this.modulesWithReadPort(portName, moduleName)) {
             let c = this.instance.connect({
                 source: moduleName,
@@ -151,17 +162,6 @@ class jsPlumbConfig extends BaseConfig {
                 const info = document.querySelector('#infobox');
                 info.style.animation = 'infobox_disappear 0.5s ease-in-out 0s 1 normal forwards';
             })
-        }
-    }
-
-    configureConnections() {
-        const connectionTypeMap = this.createConnectionTypeMap();
-        for (const [portName, portInfo] of Object.entries(this.data.portmap)) {
-            for (const [moduleName, ports] of Object.entries(this.data.modules)) {
-                if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    this.configureConnection(portName, portInfo, moduleName, connectionTypeMap);
-                }
-            }
         }
     }
 }
@@ -189,16 +189,6 @@ class dagreConfig extends BaseConfig {
             }
             if (haveNoChildren(this.graph, moduleName, targetName)) {
                 this.graph.setEdge(moduleName, targetName);
-            }
-        }
-    }
-
-    configureConnections() {
-        for (const portName of Object.keys(this.data.portmap)) {
-            for (const [moduleName, ports] of Object.entries(this.data.modules)) {
-                if (ports.write_ports !== '' && portName in ports.write_ports) {
-                    this.configureConnection(portName, moduleName);
-                }
             }
         }
     }
