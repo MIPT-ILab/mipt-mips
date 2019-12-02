@@ -115,7 +115,13 @@ add_custom_command(
 if (MSVC)
     # /Zc:rvalueCast is a workaround for VS non-standard behavior, see
     # https://developercommunity.visualstudio.com/content/problem/457095/cannot-bind-temporary-int-object-to-an-rvalue-refe.html
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast")
+    #
+    # -D_SCL_SECURE_NO_WARNINGS is a workaround for Boost warning, see
+    # https://docs.microsoft.com/en-us/cpp/standard-library/scl-secure-no-warnings?view=vs-2019
+    # https://lists.boost.org/Archives/boost/2008/09/141771.php
+    #
+    # Warning 4244 is required to reduce excessive narrow casting
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast -D_SCL_SECURE_NO_WARNINGS /wd4244 ")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
