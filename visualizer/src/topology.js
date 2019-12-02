@@ -13,6 +13,7 @@ class BaseConfig {
         this.moduleWidth = moduleWidth;
         this.moduleHeight = moduleHeight;
         this.modulesLayout = modulesLayout;
+        // ConnectionType format : basic{jsPlumb midpoint location}
         this.connectionType = {
             'basic0.1': 1,
             'basic0.2': 2,
@@ -101,6 +102,12 @@ class BaseConfig {
         }
         return connectionTypeMap;
     }
+    
+    configureModules(modulemap, parent) {
+        for (const [moduleName, children] of Object.entries(modulemap)) {
+            this.configureModule(moduleName, children, parent);
+        }
+    }
 
     configureConnections() {
         const connectionTypeMap = this.createConnectionTypeMap();
@@ -115,23 +122,21 @@ class BaseConfig {
 }
 
 class jsPlumbConfig extends BaseConfig {
-    configureModules(modulemap, parent) {
-        for (const [moduleName, children] of Object.entries(modulemap)) {
-            let module = {}
-            module = this.newModule(moduleName);
-            if (children !== "") {
-                this.initParent(module);
-                this.configureModules(children, moduleName);
-            }
-            if (parent !== "") {
-                this.instance.addToGroup(`${parent}_group`, module);
-            }
+    configureModule(moduleName, children, parent) {
+        let module = {}
+        module = this.newModule(moduleName);
+        if (children !== "") {
+            this.initParent(module);
+            this.configureModules(children, moduleName);
+        }
+        if (parent !== "") {
+            this.instance.addToGroup(`${parent}_group`, module);
         }
     }
 
     /**
-     * Utility method that return the nearest to basic0.5 free type for a specific pair of source and target 
-     * and help to reduce lines overlaying.
+     * Utility method that return free type with the closest midpoint location to basic0.5 
+     * for a specific pair of source and target and help to reduce lines overlaying.
      * 
      * @private
      * @this {jsPlumbConfig}
@@ -178,15 +183,13 @@ class jsPlumbConfig extends BaseConfig {
 }
 
 class dagreConfig extends BaseConfig {
-    configureModules(modulemap, parent) {
-        for (const [moduleName, children] of Object.entries(modulemap)) {
-            this.graph.setNode(moduleName, { label: `${moduleName}_L`, width: this.moduleWidth, height: this.moduleHeight});
-            if (children !== "") {
-                this.configureModules(children, moduleName);
-            }
-            if (parent !== "") {
-                this.graph.setParent(moduleName, parent);
-            }
+    configureModule(moduleName, children, parent) {
+        this.graph.setNode(moduleName, { label: `${moduleName}_L`, width: this.moduleWidth, height: this.moduleHeight});
+        if (children !== "") {
+            this.configureModules(children, moduleName);
+        }
+        if (parent !== "") {
+            this.graph.setParent(moduleName, parent);
         }
     }
 
