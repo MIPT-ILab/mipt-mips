@@ -102,9 +102,6 @@ void Decode<FuncInstr>::clock( Cycle cycle)
 
     auto[instr, from_stall] = read_instr( cycle);
 
-    /* acquiring real information for BPU */
-    wp_bp_update->write( instr.get_bp_upd(), cycle);
-
     if ( instr.is_jump())
         num_jumps++;
 
@@ -112,6 +109,9 @@ void Decode<FuncInstr>::clock( Cycle cycle)
     if ( is_misprediction( instr, instr.get_bp_data()))
     {
         num_mispredictions++;
+
+        /* acquiring real information for BPU */
+        wp_bp_update->write( instr.get_bp_upd(), cycle);
 
         // flushing fetch stage, instr fetch will appear at decode stage next clock,
         // so we send flush signal to decode

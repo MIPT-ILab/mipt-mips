@@ -25,6 +25,14 @@ struct BPInterface {
         , target( target)
         , is_hit( is_hit)
     { }
+
+    friend std::ostream& operator<<( std::ostream& out, const BPInterface& info)
+    {
+        return out << "{ pc=0x" << std::hex << info.pc
+                   << ", target=0x" << info.target
+                   << ( info.is_taken ? ", T" : ", NT")
+                   << ( info.is_hit ? ", hit " : ", miss ") << '}' << std::dec;
+    }
 };
 
 #endif // BP_INTERFACE_H_
