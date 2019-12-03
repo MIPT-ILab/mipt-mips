@@ -17,10 +17,16 @@ os:
   - linux
   - osx
 
+arch:
+  - amd64
+  - arm64
+
 matrix:
   exclude:
     - os: osx
       compiler: gcc
+    - os: osx
+      arch: arm64
 
 addons:
   apt:
@@ -45,10 +51,12 @@ install:
   - tar -xzf gdb-8.3.tar.gz
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/visualizer        && npm install
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
-# Prepare for GDB build
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer       && npm install;
+    fi
   - cd $TRAVIS_BUILD_DIR/gdb-8.3              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
   - cd $TRAVIS_BUILD_DIR/gdb-8.3              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
@@ -56,15 +64,23 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/readline     && ./configure && make libreadline.a
 
 script:
-  - cd $TRAVIS_BUILD_DIR/visualizer
-  - npm run test
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
-  - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
-  - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+  # TODO (pkryukov): run NPM on ARM
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer
+        npm run test
+    fi
+  # TODO (pkryukov): GDB build hangs on ARM...
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
+        make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+    fi
 
 after_success:
   - |
@@ -81,5 +97,5 @@ after_success:
         ninja unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
         cd $TRAVIS_BUILD_DIR/visualizer
-        npx nyc --reporter=lcov npm test && npx codecov
+        if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
     fi
