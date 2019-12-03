@@ -2,7 +2,7 @@ notifications:
   email: false
 
 language: cpp
-dist: xenial
+dist: bionic
 osx_image: xcode10.1
 
 branches:
@@ -12,6 +12,7 @@ branches:
 compiler:
   - gcc
   - clang
+
 os:
   - linux
   - osx
@@ -24,10 +25,11 @@ matrix:
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
-    - sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main
+    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+      key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     update: true
     packages:
+    - cmake
     - libboost-dev
     - ninja-build
     - python3
@@ -38,15 +40,6 @@ addons:
     update: true
 
 install:
-  - |
-    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install g++-7
-        CXX=g++-7
-    fi
-  - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install libstdc++-7-dev
-    fi
 # Download GDB
   - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
   - tar -xzf gdb-8.3.tar.gz
@@ -82,7 +75,7 @@ after_success:
         run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
     fi
   - |
-    if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
         ninja unit-tests && ctest
