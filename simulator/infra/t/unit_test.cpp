@@ -12,6 +12,7 @@
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
+#include <infra/target.h>
 
 #include <cctype>
 #include <memory>
@@ -319,4 +320,18 @@ TEST_CASE("Test uint64 circular left shift")
     CHECK( value == circ_ls( value, 0));
     CHECK( value == circ_ls( value, 64));
     CHECK( 0x0B0C'0D0A'0B0C'0D0A == circ_ls( value, 4));
+}
+
+TEST_CASE("Invalid target print")
+{
+    std::ostringstream oss;
+    oss << Target();
+    CHECK( oss.str() == "invalid" );
+}
+
+TEST_CASE("Valid target print")
+{
+    std::ostringstream oss;
+    oss << std::hex << Target( 0x400, 15);
+    CHECK( oss.str() == "400" );
 }
