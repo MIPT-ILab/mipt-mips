@@ -41,7 +41,6 @@ set(CPPS
     func_sim/driver/driver.cpp
     func_sim/traps/trap.cpp
     mips/mips_instr.cpp
-    mips/mips_version.cpp
     mips/mips_register/mips_register.cpp
     mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
@@ -89,6 +88,7 @@ set(TESTS_CPPS
     mips/t/mips32_memory_test.cpp
     mips/t/mips32_traps_test.cpp
     mips/t/mips64_test.cpp
+    mips/t/mips_version_test.cpp
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
@@ -115,15 +115,27 @@ add_custom_command(
 if (MSVC)
     # /Zc:rvalueCast is a workaround for VS non-standard behavior, see
     # https://developercommunity.visualstudio.com/content/problem/457095/cannot-bind-temporary-int-object-to-an-rvalue-refe.html
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast")
+    #
+    # -D_SCL_SECURE_NO_WARNINGS is a workaround for Boost warning, see
+    # https://docs.microsoft.com/en-us/cpp/standard-library/scl-secure-no-warnings?view=vs-2019
+    # https://lists.boost.org/Archives/boost/2008/09/141771.php
+    #
+    # Warning 4244 is required to reduce excessive narrow casting
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast -D_SCL_SECURE_NO_WARNINGS /wd4244 ")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+if(COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+endif()
 
 if (ENABLE_COVERAGE)
     if (WIN32)

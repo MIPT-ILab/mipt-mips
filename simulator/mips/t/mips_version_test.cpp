@@ -4,7 +4,7 @@
  * Copyright 2018 MIPT-MIPS
  */
  
-#include "mips_version.h"
+#include "../mips_version.h"
 
 // MIPS_I must support only MIPS I instructions
 static_assert(  MIPS_I_Instr.is_supported(MIPSVersion::I));
@@ -50,5 +50,3 @@ static_assert(  MIPS_III_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_IV_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_V_Instr.is_supported(MIPSVersion::v64));
 static_assert(  MIPS_64_Instr.is_supported(MIPSVersion::v64));
-
-bool mips_version_tested = true;

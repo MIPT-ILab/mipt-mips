@@ -31,7 +31,7 @@ std::string wrap_shift_operator(const T& value)
 
 static void handleArgs( const std::vector<const char*>& argv)
 {
-    config::handleArgs( count_argc( argv_cast( argv.data())), argv_cast( argv.data()), 1);
+    config::handleArgs( count_argc( argv.data()), argv.data(), 1);
 }
 
 //
@@ -284,7 +284,8 @@ TEST_CASE("MainWrapper: throw help")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw config::HelpOption(); }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw config::HelpOption(); }
     };
 
     CHECK( Main().run( 0, nullptr) == 0);
@@ -295,7 +296,8 @@ TEST_CASE("MainWrapper: invalid option")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw config::InvalidOption( "Help!"); }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw config::InvalidOption( "Help!"); }
     };
 
     CHECK( Main().run( 0, nullptr) == 4);
@@ -306,7 +308,8 @@ TEST_CASE("MainWrapper: throw exception")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw Exception( "Exception"); }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw Exception( "Exception"); }
     };
 
     CHECK( Main().run( 0, nullptr) == 2);
@@ -317,19 +320,20 @@ TEST_CASE("MainWrapper: throw std exception")
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw std::exception(); }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw std::exception(); }
     };
 
     CHECK( Main().run( 0, nullptr) == 2);
 }
-
 
 TEST_CASE("MainWrapper: throw integer")
 {
     struct Main : public MainWrapper
     {
         Main() : MainWrapper( "Example Unit Test") { }
-        int impl( int, const char* []) const final { throw 222; }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw 222; } // NOLINT(hicpp-exception-baseclass) test bad behavior
     };
 
     CHECK( Main().run( 0, nullptr) == 3);

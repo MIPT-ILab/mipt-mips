@@ -167,7 +167,7 @@ struct TestData {
        this->dst = dst;
     }
 
-    void make_test( std::string str)
+    void make_test( std::string_view str)
     {
         RISCVInstr<T> instr( str, 0);
         instr.set_v_src( src1, 0);
@@ -394,14 +394,6 @@ TEST_CASE("RISCV RV64 grev")
     }
 }
 
-TEST_CASE("RISCV RV128 grev")
-{
-    RISCVInstr<uint128> instr( "grev", 0);
-    instr.set_v_src( 0, 0);
-    instr.set_v_src( 0, 1);
-    CHECK_THROWS_AS(instr.execute(), std::runtime_error);
-}
-
 TEST_CASE("RISCV RV32 pcnt")
 {
     CHECK( RISCVInstr<uint32>(0x60281593).get_disasm() == "pcnt $a1, $a6, $sp");
@@ -586,12 +578,4 @@ TEST_CASE("RISCV RV64 gorc")
         INFO( "Iteration: " << i);
         cases[i].make_test("gorc");
     }
-}
-
-TEST_CASE("RISCV RV128 gorc")
-{
-    RISCVInstr<uint128> instr( "gorc", 0);
-    instr.set_v_src( 0, 0);
-    instr.set_v_src( 0, 1);
-    CHECK_THROWS_AS(instr.execute(), std::runtime_error);
 }
