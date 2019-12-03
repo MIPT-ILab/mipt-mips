@@ -358,15 +358,15 @@ TEST_CASE( "Func_memory: Write to 0")
 {
     class DummyStore {
     public:
-        Addr get_mem_addr() const { return 0; };
-        uint32 get_mem_size() const { return 8; }
-        auto get_endian() const { return Endian::little; } 
-        uint64 get_mask() const { return all_ones<uint64>(); }
-        bool is_load() const { return false; }
-        bool is_store() const { return true; }
-        uint64 get_v_src2() const { return NO_VAL64; }
-        uint64 get_v_dst() const { return 0; }
-        void load(uint64 /* unused */) { }
+        static Addr get_mem_addr() { return 0; };
+        static uint32 get_mem_size() { return 8; }
+        static auto get_endian() { return Endian::little; } 
+        static uint64 get_mask() { return all_ones<uint64>(); }
+        static bool is_load() { return false; }
+        static bool is_store() { return true; }
+        static uint64 get_v_src2() { return NO_VAL64; }
+        static uint64 get_v_dst() { return 0; }
+        static void load(uint64 /* unused */) { }
     } store;
     auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);

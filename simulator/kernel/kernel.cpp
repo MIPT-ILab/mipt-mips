@@ -7,9 +7,9 @@
 #include "base_kernel.h"
 #include "mars/mars_kernel.h"
 
+#include <func_sim/operation.h>
 #include <infra/config/config.h>
 #include <memory/elf/elf_loader.h>
-#include <func_sim/operation.h>
 
 namespace config {
     static Switch use_mars = {"mars", "use MARS syscalls"};
@@ -33,7 +33,7 @@ std::shared_ptr<Kernel> Kernel::create_dummy_kernel() {
 }
 
 std::shared_ptr<Kernel> Kernel::create_mars_kernel() {
-    return ::create_mars_kernel();
+    return ::create_mars_kernel( std::cin, std::cout, std::cerr);
 }
 
 std::shared_ptr<Kernel> Kernel::create_configured_kernel() {

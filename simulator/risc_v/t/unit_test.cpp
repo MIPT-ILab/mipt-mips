@@ -167,7 +167,7 @@ struct TestData {
        this->dst = dst;
     }
 
-    void make_test( std::string str)
+    void make_test( std::string_view str)
     {
         RISCVInstr<T> instr( str, 0);
         instr.set_v_src( src1, 0);

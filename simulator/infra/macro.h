@@ -238,9 +238,9 @@ static inline uint128 arithmetic_rs( const uint128& value, size_t shamt)
 
 /*Circular left shift*/
 template<typename T>
-static constexpr T circ_ls(const T& value, size_t shamt)
+static constexpr T circ_ls( const T& value, size_t shamt)
 {
-    if( shamt == 0 || shamt == bitwidth<T>)
+    if ( shamt == 0 || shamt == bitwidth<T>)
         return value;
     return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }

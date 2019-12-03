@@ -4,9 +4,11 @@
  */
 
 #include "../module.h"
-#include <catch.hpp>
-#include <boost/property_tree/ptree.hpp>
+
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include <catch.hpp>
 
 namespace pt = boost::property_tree;
 
@@ -96,7 +98,7 @@ TEST_CASE( "Topology: dump into file from root")
     auto exp_topology = read_json_from_file( TEST_PATH + std::string( "/topology_root_test.json"));
     CHECK( exp_topology.get_child( "modules") == topology.get_child( "modules"));
     for ( const pt::ptree::value_type &v : exp_topology.get_child( "portmap")) {
-        CHECK( v.second == topology.get_child( "portmap." + std::string( v.first.data())));
+        CHECK( v.second == topology.get_child( "portmap." + v.first));
     }
     CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
     CHECK( t.check_if_dumps());
@@ -109,7 +111,7 @@ TEST_CASE( "Topology: dump into file from module")
     auto exp_topology = read_json_from_file( TEST_PATH + std::string( "/topology_module_test.json"));
     CHECK( exp_topology.get_child( "modules") == topology.get_child( "modules"));
     for ( const pt::ptree::value_type &v : exp_topology.get_child( "portmap")) {
-        CHECK( v.second == topology.get_child( "portmap." + std::string( v.first.data())));
+        CHECK( v.second == topology.get_child( "portmap." + v.first));
     }
     CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
 }

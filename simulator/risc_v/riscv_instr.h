@@ -29,8 +29,11 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         static constexpr auto get_endian() { return Endian::little; }
 
         RISCVInstr() = delete;
-        explicit RISCVInstr( uint32 bytes, Addr PC = 0);
-        explicit RISCVInstr( std::string_view name, uint32 immediate, Addr PC = 0);
+        RISCVInstr( uint32 bytes, Addr PC);
+        RISCVInstr( std::string_view name, uint32 immediate, Addr PC);
+
+        explicit RISCVInstr( uint32 bytes) : RISCVInstr( bytes, 0) { }
+        RISCVInstr( std::string_view name, uint32 immediate) : RISCVInstr( name, immediate, 0)  { }
 
         bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
