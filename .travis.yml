@@ -40,6 +40,7 @@ addons:
     - ninja-build
     - python3
     - nodejs
+    - libssl1.0-dev
     - nodejs-dev
     - node-gyp
     - npm
