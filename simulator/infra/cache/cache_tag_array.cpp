@@ -236,8 +236,8 @@ std::pair<bool, int32> SimpleCacheTagArray::read_no_touch( Addr addr) const
 
     const auto& result = lookup_helper[ num_set].find( num_tag);
     return ( result != lookup_helper[ num_set].end())
-           ? std::make_pair( true, result->second)
-           : std::make_pair( false, -1);
+           ? std::pair{ true, result->second}
+           : std::pair{ false, -1};
 }
 
 int32 SimpleCacheTagArray::write( Addr addr)

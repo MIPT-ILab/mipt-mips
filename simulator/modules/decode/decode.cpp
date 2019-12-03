@@ -39,9 +39,9 @@ template <typename FuncInstr>
 auto Decode<FuncInstr>::read_instr( Cycle cycle) const
 {
     if ( rp_stall_datapath->is_ready( cycle))
-        return std::make_pair( rp_stall_datapath->read( cycle), true);
+        return std::pair{ rp_stall_datapath->read( cycle), true};
 
-    return std::make_pair( rp_datapath->read( cycle), false);
+    return std::pair{ rp_datapath->read( cycle), false};
 }
 
 template <typename FuncInstr>
