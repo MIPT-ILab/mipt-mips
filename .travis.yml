@@ -40,6 +40,7 @@ addons:
     - ninja-build
     - python3
     - nodejs
+    - npm
   homebrew:
     packages:
     - ninja
