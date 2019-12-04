@@ -1,0 +1,10 @@
+ignore:
+  - "external"
+  - "*/cen64/*.h"
+  - "*/cen64/*.cpp"
+  - "*/gdb/*.h"
+  - "*/gdb/*.cpp"
+
+codecov:
+  ci:
+    - !appveyor

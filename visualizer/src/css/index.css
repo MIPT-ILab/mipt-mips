@@ -1,0 +1,166 @@
+/*
+ * Copyright 2019 MIPT-MIPS
+ * @author Eric Konks konks.em@phystech.edu
+*/
+
+.demo {
+    touch-action:none;
+}
+
+.w {
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    position: absolute;
+    z-index: 1;
+    border: 1px solid #2e6f9a;
+    -o-box-shadow: 2px 2px 19px #e0e0e0;
+    -webkit-box-shadow: 2px 2px 19px #e0e0e0;
+    -moz-box-shadow: 2px 2px 19px #e0e0e0;
+    box-shadow: 2px 2px 19px #e0e0e0;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    opacity: 0.8;
+    cursor: move;
+    background-color: white;
+    font-size: 25px;
+    -webkit-transition: background-color 0.25s ease-in;
+    -moz-transition: background-color 0.25s ease-in;
+    transition: background-color 0.25s ease-in;
+}
+
+.jtk-demo-canvas {
+    background-color: transparent;
+}
+
+.w:hover {
+    -o-box-shadow: 2px 2px 19px #8bb6f7;
+    -webkit-box-shadow: 2px 2px 19px #8bb6f7;
+    -moz-box-shadow: 2px 2px 19px #8bb6f7;
+    box-shadow: 2px 2px 19px #8bb6f7;
+}
+
+.aLabel {
+    -webkit-transition: background-color 0.25s ease-in;
+    -moz-transition: background-color 0.25s ease-in;
+    transition: background-color 0.25s ease-in;
+}
+
+.aLabel.jtk-hover, .jtk-source-hover, .jtk-target-hover {
+    background-color: #1e8151;
+    color: white;
+}
+
+.aLabel {
+    background-color: white;
+    opacity: 0.8;
+    padding: 0.3em;
+    border-radius: 0.5em;
+    border: 1px solid #346789;
+    cursor: pointer;
+}
+
+.ep {
+    position: absolute;
+    bottom: 10%;
+    right: 5px;
+    width: 1em;
+    height: 1em;
+    background-color: orange;
+    cursor: pointer;
+    box-shadow: 0 0 2px black;
+    -webkit-transition: -webkit-box-shadow 0.25s ease-in;
+    -moz-transition: -moz-box-shadow 0.25s ease-in;
+    transition: box-shadow 0.25s ease-in;
+}
+
+.ep:hover {
+    box-shadow: 0 0 6px black;
+}
+
+.statemachine-demo .jtk-endpoint {
+    z-index: 3;
+}
+
+#opened {
+    left: 10em;
+    top: 5em;
+}
+
+#phone1 {
+    left: 35em;
+    top: 12em;
+    width: 7em;
+}
+
+#inperson {
+    left: 12em;
+    top: 23em;
+}
+
+#phone2 {
+    left: 28em;
+    top: 24em;
+}
+
+#rejected {
+    left: 10em;
+    top: 35em;
+}
+
+.dragHover {
+    border: 2px solid orange;
+}
+
+#infobox {
+    position: absolute;
+    width: auto;
+    height: 55px;
+    left: -300px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    margin-top: 8px;
+    background-color: #1e8151;
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.4);
+    z-index: 2;
+    animation: infobox_appear 0.5s ease-in-out;
+    color: white;
+    opacity: 0;
+    font-size: 15px;
+    text-align: center;
+}
+
+#infobox:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 17px solid transparent;
+	border-top-color: #1e8151;
+	border-bottom: 0;
+	margin-left: -17px;
+    margin-bottom: -17px;
+    z-index: 2;
+}
+
+@-webkit-keyframes infobox_appear { from { opacity: 0 } to {opacity: 0.8 }  }
+   @-moz-keyframes infobox_appear { from { opacity: 0 } to {opacity: 0.8 }  }
+     @-o-keyframes infobox_appear { from { opacity: 0 } to {opacity: 0.8 }  }
+        @keyframes infobox_appear { from { opacity: 0 } to {opacity: 0.8 }  }
+
+@-webkit-keyframes infobox_disappear { from { opacity: 0.8 } to {opacity: 0 }  }
+   @-moz-keyframes infobox_disappear { from { opacity: 0.8 } to {opacity: 0 }  }
+     @-o-keyframes infobox_disappear { from { opacity: 0.8 } to {opacity: 0 }  }
+        @keyframes infobox_disappear { from { opacity: 0.8 } to {opacity: 0 }  }
+
+path, .jtk-endpoint { cursor:pointer; }

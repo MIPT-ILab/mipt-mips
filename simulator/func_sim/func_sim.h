@@ -21,8 +21,11 @@
 class Driver;
 class Operation;
 
+// NOLINTNEXTLINE(fuchsia-multiple-inheritance) Cannot inherit Simulator from Log, since PerfSim inherits Module as well
+class BasicFuncSim : public Simulator, public Log { };
+
 template <typename ISA>
-class FuncSim : public Simulator, public Log
+class FuncSim : public BasicFuncSim
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Register = typename ISA::Register;
@@ -44,7 +47,7 @@ class FuncSim : public Simulator, public Log
         void update_and_check_nop_counter( const FuncInstr& instr);
 
         uint64 read_register( Register index) const { return narrow_cast<uint64>( rf.read( index)); }
-        void write_register( Register index, uint64 value) { return rf.write( index, narrow_cast<RegisterUInt>( value)); }
+        void write_register( Register index, uint64 value) { rf.write( index, narrow_cast<RegisterUInt>( value)); }
 
     public:
         FuncSim( Endian endian, bool log);

@@ -176,14 +176,15 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
     /* hold PC for the stall case */
     wp_hold_pc->write( target, cycle);
 
-    Instr instr( memory->fetch_instr( target.address), bp->get_bp_info( target.address));
+    auto bp_info = bp->get_bp_info( target.address);
+    Instr instr( memory->fetch_instr( target.address), bp_info);
     instr.set_sequence_id( target.sequence_id);
 
     /* set next target according to prediction */
     wp_target->write( instr.get_predicted_target(), cycle);
 
     /* log */
-    sout << "fetch   cycle " << std::dec << cycle << ": " << instr << std::endl;
+    sout << "fetch   cycle " << std::dec << cycle << ": " << instr << " " << bp_info << std::endl;
 
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);

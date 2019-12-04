@@ -12,15 +12,17 @@
 class MIPS64Instr : public BaseMIPSInstr<uint64>
 {
 public:
-    explicit MIPS64Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::little, bytes, pc) { }
-    explicit MIPS64Instr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::little, immediate, 0xc000) { }
+    explicit MIPS64Instr( uint32 bytes) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::little, bytes, 0) { }
+    explicit MIPS64Instr( std::string_view str_opcode) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::little, 0, 0xc000) { }
+    MIPS64Instr( std::string_view str_opcode, uint32 immediate) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::little, immediate, 0xc000) { }
 };
 
 class MIPS64BEInstr : public BaseMIPSInstr<uint64>
 {
 public:
-    explicit MIPS64BEInstr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::big, bytes, pc) { }
-    explicit MIPS64BEInstr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::big, immediate, 0xc000) { }
+    explicit MIPS64BEInstr( uint32 bytes) : BaseMIPSInstr<uint64>( MIPSVersion::v64, Endian::big, bytes, 0) { }
+    explicit MIPS64BEInstr( std::string_view str_opcode) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::big, 0, 0xc000) { }
+    MIPS64BEInstr( std::string_view str_opcode, uint32 immediate) : BaseMIPSInstr<uint64>( MIPSVersion::v64, str_opcode, Endian::big, immediate, 0xc000) { }
 };
 
 static auto get_plain_memory_with_data()
@@ -549,8 +551,7 @@ static bool not_a_mips32_instruction( std::string_view name)
     class MIPS32Instr : public BaseMIPSInstr<uint32>
     {
     public:
-        explicit MIPS32Instr( uint32 bytes, Addr pc = 0x0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, Endian::little, bytes, pc) { }
-        explicit MIPS32Instr( std::string_view str_opcode, uint32 immediate = 0) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::little, immediate, 0xc000) { }
+        explicit MIPS32Instr( std::string_view str_opcode) : BaseMIPSInstr<uint32>( MIPSVersion::v32, str_opcode, Endian::little, 0, 0xc000) { }
     };
     MIPS32Instr instr( name);
     instr.execute(); 

@@ -286,11 +286,24 @@ TEST_CASE( "Func_memory: ZeroMemory")
 {
     ZeroMemory zm;
     CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm.dump() == "empty memory\n");
 }
 
 TEST_CASE( "Func_memory: String length in zero memory")
 {
     CHECK( ZeroMemory().strlen(0x10) == 0);
+}
+
+TEST_CASE( "Zero_memory: Duplicate")
+{
+    auto mem1 = FuncMemory::create_plain_memory( 24);
+    auto mem2 = FuncMemory::create_plain_memory( 24);
+
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
+    mem1->duplicate_to( mem2);
+    ZeroMemory().duplicate_to( mem1); // nop
+
+    check_coherency( mem1.get(), mem2.get(), 0);
 }
 
 TEST_CASE( "Func_memory: String length, no zero bytes")
@@ -345,15 +358,15 @@ TEST_CASE( "Func_memory: Write to 0")
 {
     class DummyStore {
     public:
-        Addr get_mem_addr() const { return 0; };
-        uint32 get_mem_size() const { return 8; }
-        auto get_endian() const { return Endian::little; } 
-        uint64 get_mask() const { return all_ones<uint64>(); }
-        bool is_load() const { return false; }
-        bool is_store() const { return true; }
-        uint64 get_v_src2() const { return NO_VAL64; }
-        uint64 get_v_dst() const { return 0; }
-        void load(uint64 /* unused */) { }
+        static Addr get_mem_addr() { return 0; };
+        static uint32 get_mem_size() { return 8; }
+        static auto get_endian() { return Endian::little; } 
+        static uint64 get_mask() { return all_ones<uint64>(); }
+        static bool is_load() { return false; }
+        static bool is_store() { return true; }
+        static uint64 get_v_src2() { return NO_VAL64; }
+        static uint64 get_v_dst() { return 0; }
+        static void load(uint64 /* unused */) { }
     } store;
     auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);

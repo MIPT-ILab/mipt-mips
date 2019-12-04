@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cassert>
-#include <string_view>
 #include <iostream>
+#include <string_view>
 #include <utility>
 
 class RISCVRegister {
@@ -41,8 +41,8 @@ public:
 
     std::string_view dump()        const { return regTable.at( value); }
     bool is_zero()                 const { return value == RISCV_REG_zero; }
-    constexpr bool is_mips_hi()    const { return false; }
-    constexpr bool is_mips_lo()    const { return false; }
+    static constexpr bool is_mips_hi() { return false; }
+    static constexpr bool is_mips_lo() { return false; }
     static auto from_cpu_index( size_t id) { return RISCVRegister( RegNum{ id}); }
     static auto from_gdb_index( size_t id) { return RISCVRegister( RegNum{ id}); }
     static auto from_csr_index( size_t id) { return RISCVRegister( get_csr_regnum( id)); }

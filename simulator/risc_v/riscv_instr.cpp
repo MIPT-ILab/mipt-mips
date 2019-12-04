@@ -70,20 +70,21 @@ template<typename I> auto execute_csrrwi = ALU::csrrwi<I>;
 template<typename I> auto execute_csrrsi = do_nothing<I>;
 template<typename I> auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> auto execute_mul = ALU::riscv_mult_l<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulh = ALU::riscv_mult_h_ss<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhsu = ALU::riscv_mult_h_su<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhu = ALU::riscv_mult_h_uu<I, typename I::RegisterUInt>;
-template<typename I> auto execute_div = ALU::riscv_div<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_divu = ALU::riscv_div<I, typename I::RegisterUInt>;
-template<typename I> auto execute_rem = ALU::riscv_rem<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_remu = ALU::riscv_rem<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mul = RISCVMultALU::mult_l<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulh = RISCVMultALU::mult_h_ss<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulhsu = RISCVMultALU::mult_h_su<I, typename I::RegisterUInt>;
+template<typename I> auto execute_mulhu = RISCVMultALU::mult_h_uu<I, typename I::RegisterUInt>;
+template<typename I> auto execute_div = RISCVMultALU::div<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> auto execute_divu = RISCVMultALU::div<I, typename I::RegisterUInt>;
+template<typename I> auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
 // B
 template<typename I> auto execute_slo = ALU::slo<I>;
 template<typename I> auto execute_orn = ALU::orn<I>;
 template<typename I> auto execute_sbext = ALU::sbext<I>;
 template<typename I> auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
 template<typename I> auto execute_xnor = ALU::xnor<I>;
+template<typename I> auto execute_sro = ALU::sro<I>;
 template<typename I> auto execute_bfp = ALU::bit_field_place<I>;
 template<typename I> auto execute_grev = ALU::grev<I>;
 template<typename I> auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
@@ -298,6 +299,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     /*-------------- B --------------*/
     // Bit manipulation
     {'B', instr_slo,      execute_slo<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
+    {'B', instr_sro,      execute_sro<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_orn,      execute_orn<I>,  OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_sbext,    execute_sbext<I>, OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },
     {'B', instr_pack,     execute_pack<I>, OUT_ARITHM,  ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64      },

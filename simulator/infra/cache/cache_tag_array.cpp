@@ -265,17 +265,17 @@ int32 SimpleCacheTagArray::write( Addr addr)
 }
 
 std::unique_ptr<CacheTagArray> CacheTagArray::create(
-    const std::string& repl_policy,
+    const std::string& type,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
 {
-    if ( repl_policy == "always_hit")
+    if ( type == "always_hit")
         return std::make_unique<AlwaysHitCacheTagArray>();
-    if ( repl_policy == "infinite")
+    if ( type == "infinite")
         return std::make_unique<InfiniteCacheTagArray>();
 
-    return std::make_unique<SimpleCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits, repl_policy);
+    return std::make_unique<SimpleCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits, type);
 }
 

@@ -133,55 +133,32 @@ struct ALU
     template<typename I, typename T> static
     void addition_overflow( I* instr)
     {
-        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
-        if (ret.second)
+        const auto [result, overflow] = test_addition_overflow<T>( instr->v_src1, instr->v_src2);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
+            instr->v_dst = result;
     }
 
     template<typename I, typename T> static
     void addition_overflow_imm( I* instr)
     {
-        auto ret = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
-        if (ret.second)
+        const auto [result, overflow] = test_addition_overflow<T>( instr->v_src1, instr->v_imm);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
+            instr->v_dst = result;
     }
 
 
     template<typename I, typename T> static
     void subtraction_overflow( I* instr)
     {
-        auto ret = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
-        if (ret.second)
+        const auto [result, overflow] = test_subtraction_overflow<T>( instr->v_src1, instr->v_src2);
+        if ( overflow)
             instr->trap = Trap::INTEGER_OVERFLOW;
         else
-            instr->v_dst = ret.first;
-    }
-
-    // RISCV mul/div
-    template<typename I, typename T> static void riscv_mult_h_uu( I* instr) { instr->v_dst = riscv_multiplication_high_uu<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_h_ss( I* instr) { instr->v_dst = riscv_multiplication_high_ss<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_h_su( I* instr) { instr->v_dst = riscv_multiplication_high_su<T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_mult_l( I* instr) { instr->v_dst = riscv_multiplication_low <T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_div( I* instr) { instr->v_dst = riscv_division <T>(instr->v_src1, instr->v_src2); }
-    template<typename I, typename T> static void riscv_rem( I* instr) { instr->v_dst = riscv_remainder <T>(instr->v_src1, instr->v_src2); }
-
-    // MIPS mul/div
-    template<typename I, typename T> static void multiplication( I* instr)
-    {
-        const auto& result = mips_multiplication<T>( instr->v_src1, instr->v_src2);
-        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
-    }
-
-    template<typename I, typename T> static void division( I* instr)
-    {
-        const auto& result = mips_division<T>( instr->v_src1, instr->v_src2);
-        instr->v_dst  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst2 = narrow_cast<typename I::RegisterUInt>( result.second);
+            instr->v_dst = result;
     }
 
     // Shifts
@@ -192,6 +169,7 @@ struct ALU
     template<typename I, typename T> static void srlv( I* instr) { instr->v_dst = sign_extension<bitwidth<T>>( ( instr->v_src1 & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<typename I, typename T> static void srav( I* instr) { instr->v_dst = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src1), shamt_v_src2<T>( instr)); }
     template<typename I> static void slo( I* instr) { instr->v_dst = ones_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src1), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sro( I* instr) { instr->v_dst = ones_rs( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     // Circular shifts
     template<typename I> static void rol( I* instr) { instr->v_dst = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src1), shamt_v_src2<typename I::RegisterUInt>( instr)); }
@@ -207,17 +185,7 @@ struct ALU
     template<typename I, typename T> static void clo( I* instr)  { instr->v_dst = count_leading_ones<T>( instr->v_src1); }
     template<typename I, typename T> static void clz( I* instr)  { instr->v_dst = count_leading_zeroes<T>( instr->v_src1); }
     template<typename I, typename T> static void ctz( I* instr)  { instr->v_dst = count_trailing_zeroes<T>( instr->v_src1); }
-
-    template<typename I, typename T> static
-    void pcnt(I* instr){
-      std::size_t max = bitwidth<T> - 1 - count_leading_zeroes<T>( ~instr->v_src1);
-      uint8 count = 0;
-      for ( std::size_t index = 0; index < max; index++)
-      {
-        count += narrow_cast<uint8>(instr->v_src1 >> index) & 1;
-      }
-      instr->v_dst = count;
-    }
+    template<typename I, typename T> static void pcnt( I* instr) { instr->v_dst = narrow_cast<T>( popcount( instr->v_src1)); }
 
     // Logic
     template<typename I> static void andv( I* instr)  { instr->v_dst = instr->v_src1 & instr->v_src2; }
@@ -287,7 +255,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst = instr->new_PC; // link
+        instr->v_dst = narrow_cast<decltype(instr->v_dst)>( instr->new_PC); // link
         j( instr);   // jump
     }
 
@@ -295,7 +263,7 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst = instr->new_PC;
+        instr->v_dst = narrow_cast<decltype(instr->v_dst)>( instr->new_PC);
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
