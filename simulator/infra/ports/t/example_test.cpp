@@ -128,12 +128,10 @@ public:
     {
         if ( stop->is_ready( cycle))
         {
-            CHECK( cycle == EXPECTED_MAX_CYCLE);
             stop->read( cycle);
             return true;
         }
 
-        CHECK( cycle < EXPECTED_MAX_CYCLE);
         a.clock( cycle);
         b.clock( cycle);
         return false;
