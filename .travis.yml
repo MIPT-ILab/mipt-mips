@@ -97,7 +97,7 @@ after_success:
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
         ninja unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
-        coveralls --exclude lib --exclude tests --gcov-options '\-lp'
+        coveralls --exclude external --exclude cen64 --exclude gdb --gcov-options '\-lp'
         cd $TRAVIS_BUILD_DIR/visualizer
         if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
     fi
