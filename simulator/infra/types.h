@@ -19,6 +19,23 @@ static constexpr To narrow_cast(const From& value)
     return static_cast<To>( value);
 }
 
+// Signed types
+using int8 = int8_t;
+using int16 = int16_t;
+using int32 = int32_t;
+using int64 = int64_t;
+
+// Unsigned types
+using uint8 = uint8_t;
+using uint16 = uint16_t;
+using uint32 = uint32_t;
+using uint64 = uint64_t;
+
+// Float types
+using float32 = float;
+using float64 = double;
+
+// Byte casts
 static inline std::byte* byte_cast( char* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
@@ -43,22 +60,6 @@ static inline const std::byte* byte_cast( const uint8* b)
     return reinterpret_cast<const std::byte*>( b);
 }
 
-// Signed types
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
-
-// Unsigned types
-using uint8 = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
-
-// Float types
-using float32 = float;
-using float64 = double;
-
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
 #if defined(__GNUC__) && defined(__SIZEOF_INT128__)
 
@@ -78,10 +79,7 @@ std::ostream& operator<<(std::ostream& out, uint128 value);
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-/* Unsigned 128-bit integer type */
 using uint128 = boost::multiprecision::uint128_t;
-
-/* Signed 128-bit integer type */
 using int128 = boost::multiprecision::int128_t;
 
 #endif // __SIZEOF_INT128__
