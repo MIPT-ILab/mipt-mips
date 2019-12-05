@@ -3,14 +3,13 @@
  * The types are used in algorithms affected by size of a variable
  *
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012-2018 MIPT-MIPS project
+ * Copyright 2012-2019 MIPT-MIPS project
  */
 
-// protection from multi-include
 #ifndef COMMON__TYPES_H
 #define COMMON__TYPES_H
 
-// C++11 fixed width integer types
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 
@@ -18,6 +17,30 @@ template <typename To, typename From>
 static constexpr To narrow_cast(const From& value)
 {
     return static_cast<To>( value);
+}
+
+static inline std::byte* byte_cast( char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
+static inline std::byte* byte_cast( uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
 }
 
 // Signed types
