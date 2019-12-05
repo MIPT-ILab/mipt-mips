@@ -1,6 +1,6 @@
 ignore:
   - "external"
-  - "*/cen64/*.h"
-  - "*/cen64/*.cpp"
-  - "*/gdb/*.h"
-  - "*/gdb/*.cpp"
+  - "simulator/export/cen64/*.h"
+  - "simulator/export/cen64/*.cpp"
+  - "simulator/export/gdb/*.h"
+  - "simulator/export/gdb/*.cpp"
