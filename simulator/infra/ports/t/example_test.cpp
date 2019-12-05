@@ -11,7 +11,6 @@
 
 static const constexpr int NONE = -1;
 static const constexpr int DATA_LIMIT = 5;
-static const constexpr Cycle EXPECTED_MAX_CYCLE = 8_cl;
 static const constexpr Cycle CLOCK_LIMIT = 10_cl;
 
 enum CheckCode {  MODULE_A, MODULE_B };
@@ -32,8 +31,7 @@ static bool check_data( Cycle cycle, CheckCode code, int data)
        { 8_cl, { NONE,    NONE }}
     };
 
-    assert( cycle <= EXPECTED_MAX_CYCLE);
-    return ( code == MODULE_A ? script[cycle].first : script[cycle].second) == data;
+    return ( code == MODULE_A ? script.at( cycle).first : script.at( cycle).second) == data;
 }
 
 static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
