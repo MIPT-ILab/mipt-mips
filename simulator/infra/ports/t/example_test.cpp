@@ -11,7 +11,6 @@
 
 static const constexpr int NONE = -1;
 static const constexpr int DATA_LIMIT = 5;
-static const constexpr Cycle CLOCK_LIMIT = 10_cl;
 
 enum CheckCode {  MODULE_A, MODULE_B };
 
@@ -146,6 +145,7 @@ private:
 
 TEST_CASE( "test_ports: Test_Ports_A_B")
 {
+    static const constexpr Cycle CLOCK_LIMIT = 10_cl;
     TestRoot tr;
 
     for ( auto cycle = 0_cl; cycle < CLOCK_LIMIT; cycle.inc())
