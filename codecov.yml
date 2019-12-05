@@ -4,7 +4,3 @@ ignore:
   - "*/cen64/*.cpp"
   - "*/gdb/*.h"
   - "*/gdb/*.cpp"
-
-codecov:
-  ci:
-    - !appveyor
