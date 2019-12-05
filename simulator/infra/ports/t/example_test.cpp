@@ -33,7 +33,7 @@ static bool check_data( Cycle cycle, CheckCode code, int data)
     };
 
     assert( cycle <= EXPECTED_MAX_CYCLE);
-    return code == MODULE_A ? script[cycle].first : script[cycle].second;
+    return ( code == MODULE_A ? script[cycle].first : script[cycle].second) == data;
 }
 
 static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
