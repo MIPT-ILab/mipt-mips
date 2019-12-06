@@ -248,6 +248,7 @@ static constexpr T circ_ls( const T& value, size_t shamt)
 template<size_t N, typename T>
 T sign_extension( T value)
 {
+    // NOLINTNEXTLINE(bugprone-suspicious-semicolon) https://bugs.llvm.org/show_bug.cgi?id=35824
     if constexpr (N < bitwidth<T>) {
         const T msb = T{ 1} << ( N - 1);
         value = ( ( value & bitmask<T>(N)) ^ msb) - msb;
