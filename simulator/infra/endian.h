@@ -2,10 +2,9 @@
  * endian.h - functions to deal with little-endian and big-endian
  *
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
- * Copyright 2018 MIPT-MIPS project
+ * Copyright 2018-2019 MIPT-MIPS project
  */
  
-// protection from multi-include
 #ifndef ENDIAN_H
 #define ENDIAN_H
 
@@ -72,7 +71,7 @@ static inline constexpr auto unpack_array_be( T value) noexcept
 template<typename T, Endian e>
 static constexpr inline auto unpack_array( T value) noexcept
 {
-    if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
+    if constexpr (e == Endian::little)
         return unpack_array_le<T>( value);
     else
         return unpack_array_be<T>( value);
@@ -81,7 +80,7 @@ static constexpr inline auto unpack_array( T value) noexcept
 template<typename T, Endian e>
 static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array) noexcept
 {
-    if constexpr (e == Endian::little) // NOLINTNEXTLINE(bugprone-suspicious-semicolon) llvm bug 35824
+    if constexpr (e == Endian::little)
         return pack_array_le<T>( array);
     else
         return pack_array_be<T>( array);
