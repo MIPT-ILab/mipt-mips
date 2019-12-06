@@ -101,4 +101,5 @@ TEST_CASE( "RISCV_registers: CSR by invalid name")
 TEST_CASE( "RISCV_registers: GDB interface")
 {
     CHECK( RISCVRegister::from_gdb_index( 2).dump() == "sp");
+    CHECK( RISCVRegister::get_gdb_pc_index() == 37);
 }
