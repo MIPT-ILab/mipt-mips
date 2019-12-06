@@ -19,6 +19,8 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
 [L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L6/Lecture%206%20-%20Pipelining.%20Data%20Hazards.pptx?raw=true
 [L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L7/Lecture%207%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
+[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches.pptx?raw=true
+[L9]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L9/Lecture%209%20-%20Caches%2C%20part%202.pptx?raw=true
 [P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true 
 
 Date   | Type     | Event
@@ -33,6 +35,9 @@ Date   | Type     | Event
 21 Oct | Lecture  | **L5: RISC-V Single-Cycle implementation**<br>        • Slides: [no audio][L5]
 28 Oct | Lecture  | **L6: Pipelining. Data Hazards.**<br>                 • Slides: [no audio][L6]
 11 Nov | Lecture  | **L7: Control Hazards. Branch Prediction.**<br>       • Slides: [no audio][L7]
+25 Nov | Lecture  | **L8: Caches, part 1**<br>                            • Slides: [no audio][L8]  
+02 Dec | Lecture  | **L9: Caches, part 2**<br>                            • Slides: [no audio][L9]  
+07 Dec | Test     | **Final Test**<br>
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
