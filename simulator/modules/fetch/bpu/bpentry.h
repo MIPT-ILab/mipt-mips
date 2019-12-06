@@ -9,6 +9,7 @@
 
 #include <array>
 
+#include <infra/macro.h>
 #include <infra/types.h>
 
 /* TODO: move implemetations to .cpp file */
@@ -154,13 +155,12 @@ class BPEntryAdaptive final
      * 11 -- WNT
      * ---------
      */
-    std::array<BPEntryTwoBit::State, (1ull << DEPTH)> state_table = {{}};
+    std::array<BPEntryTwoBit::State, bitmask<size_t>(DEPTH) + 1> state_table = {{}};
 
     /* two-level predictor */
     class PredictionPattern
     {
-        static const constexpr uint32 pattern_mask = ( 1ull << DEPTH) - 1;
-
+        static const constexpr uint32 pattern_mask = bitmask<uint32>(DEPTH);
         static const constexpr uint32 default_pattern = 0;
         uint32 value = default_pattern;
 
@@ -170,10 +170,10 @@ class BPEntryAdaptive final
 
         void update( bool is_taken)
         {
-            value <<= 1u;
+            value <<= 1U;
             value &= pattern_mask;
             if ( is_taken)
-                value |= 1u;
+                value |= 1U;
         }
 
         void reset() { value = default_pattern; }
