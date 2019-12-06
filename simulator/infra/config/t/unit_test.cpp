@@ -56,6 +56,7 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
+    CHECK( config::string_config != "another_file.elf");
     CHECK_FALSE( config::bool_config_1);
     CHECK( config::bool_config_2);
 
