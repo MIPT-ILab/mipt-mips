@@ -95,7 +95,7 @@ TEST_CASE( "check_method_empty: Check_Method_Empty")
 
 TEST_CASE( "exceed_capacity_and_test_lru: Add_More_Elements_Than_Capacity_And_Check")
 {
-    constexpr const auto CAPACITY = 8192u;
+    constexpr const auto CAPACITY = 8192U;
 
     InstrCache<std::size_t, Dummy, CAPACITY, 0, all_ones<std::size_t>()> cache;
     for ( std::size_t i = 1; i <= CAPACITY; ++i) // note the <=

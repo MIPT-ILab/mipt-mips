@@ -23,7 +23,7 @@ TEST_CASE( "MARS: print integer") {
     auto mars_kernel = create_mars_kernel( std::cin, output, std::cerr);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 1u); // print integer
+    sim->write_cpu_register( v0, 1U); // print integer
     sim->write_cpu_register( a0, narrow_cast<uint64>( -1337));
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( output.str() == "-1337");
@@ -54,8 +54,8 @@ TEST_CASE( "MARS: print string")
     System sys( std::cin, output, err);
     sys.mem->write_string( "Hello World!", 0x1000);
 
-    sys.sim->write_cpu_register( v0, 4u); // print character
-    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( v0, 4U); // print character
+    sys.sim->write_cpu_register( a0, 0x1000U);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( output.str() == "Hello World!");
 }
@@ -68,7 +68,7 @@ static uint64 read_integer( const std::string& str)
     auto mars_kernel = create_mars_kernel( input, out, out);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 5u); // read integer
+    sim->write_cpu_register( v0, 5U); // read integer
     mars_kernel->execute();
     return sim->read_cpu_register( v0);
 }
@@ -89,7 +89,7 @@ TEST_CASE( "MARS: read bad integer ang fix")
     auto mars_kernel = create_mars_kernel( input, out, out);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 5u); // read integer
+    sim->write_cpu_register( v0, 5U); // read integer
     CHECK( mars_kernel->execute_interactive() == Trap::NO_TRAP);
     CHECK( sim->read_cpu_register( v0) == 133);
 }
@@ -99,11 +99,11 @@ TEST_CASE( "MARS: read string")
     std::istringstream input( "Hello World\n");
     std::ostringstream output;
     System sys( input, output, output);
-    sys.sim->write_cpu_register( v0, 8u); // read string
-    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( v0, 8U); // read string
+    sys.sim->write_cpu_register( a0, 0x1000U);
     sys.sim->write_cpu_register( a1, 0x5);
     CHECK_NOTHROW( sys.mars_kernel->execute());
-    CHECK( sys.mem->read_string(0x1000u) == "Hello");
+    CHECK( sys.mem->read_string(0x1000U) == "Hello");
 }
 
 TEST_CASE( "MARS: exit") {
@@ -111,7 +111,7 @@ TEST_CASE( "MARS: exit") {
     auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
     mars_kernel->set_simulator (sim);
 
-    sim->write_cpu_register( v0, 10u); // exit
+    sim->write_cpu_register( v0, 10U); // exit
     CHECK( mars_kernel->execute() == Trap::HALT);
     CHECK( mars_kernel->get_exit_code() == 0);
 }
@@ -124,7 +124,7 @@ TEST_CASE( "MARS: print character")
     auto mars_kernel = create_mars_kernel( std::cin, output, err);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 11u); // print character
+    sim->write_cpu_register( v0, 11U); // print character
     sim->write_cpu_register( a0, uint64{ 'x'});
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( output.str() == "x");
@@ -138,7 +138,7 @@ TEST_CASE( "MARS: read character")
     auto mars_kernel = create_mars_kernel( input, out, out);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 12u); // read character
+    sim->write_cpu_register( v0, 12U); // read character
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sim->read_cpu_register( v0) == 'z');
 }
@@ -151,7 +151,7 @@ TEST_CASE( "MARS: read bad character")
     auto mars_kernel = create_mars_kernel( input, out, out);
     mars_kernel->set_simulator( sim);
 
-    sim->write_cpu_register( v0, 12u); // read character
+    sim->write_cpu_register( v0, 12U); // read character
     CHECK_THROWS_AS( mars_kernel->execute(), BadInputValue);
 }
 
@@ -161,12 +161,12 @@ TEST_CASE( "MARS: read from stdin")
     std::ostringstream output;
     System sys( input, output, output);
 
-    sys.sim->write_cpu_register( v0, 14u); // read from file
+    sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 0);   // stdin
     sys.sim->write_cpu_register( a1, 0x1000);
     sys.sim->write_cpu_register( a2, 5);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
-    CHECK( sys.mem->read_string(0x1000u) == "Lorem");
+    CHECK( sys.mem->read_string(0x1000U) == "Lorem");
 }
 
 TEST_CASE( "MARS: read from stdout")
@@ -175,13 +175,13 @@ TEST_CASE( "MARS: read from stdout")
     std::ostringstream output;
     System sys( input, output, output);
 
-    sys.sim->write_cpu_register( v0, 14u); // read from file
+    sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 1);   // stdin
     sys.sim->write_cpu_register( a1, 0x1000);
     sys.sim->write_cpu_register( a2, 5);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
-    CHECK( sys.mem->read_string(0x1000u).empty());
+    CHECK( sys.mem->read_string(0x1000U).empty());
 }
 
 TEST_CASE( "MARS: read from stderr")
@@ -190,21 +190,21 @@ TEST_CASE( "MARS: read from stderr")
     std::ostringstream output;
     System sys( input, output, output);
 
-    sys.sim->write_cpu_register( v0, 14u); // read from file
+    sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 2);   // stderr
     sys.sim->write_cpu_register( a1, 0x1000);
     sys.sim->write_cpu_register( a2, 5);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
-    CHECK( sys.mem->read_string(0x1000u).empty());
+    CHECK( sys.mem->read_string(0x1000U).empty());
 }
 
 static void write_to_descriptor(System* sys, int desc)
 {
     sys->mem->write_string( "Lorem Ipsum", 0x1000);
-    sys->sim->write_cpu_register( v0, 15u); // write to file
+    sys->sim->write_cpu_register( v0, 15U); // write to file
     sys->sim->write_cpu_register( a0, desc); // stdout
-    sys->sim->write_cpu_register( a1, 0x1000u);
+    sys->sim->write_cpu_register( a1, 0x1000U);
     sys->sim->write_cpu_register( a2, 7);
 }
 
@@ -241,8 +241,8 @@ TEST_CASE( "MARS: open non existing file")
     std::ostringstream err;
     System sys( std::cin, output, err);
     sys.mem->write_string( "/ksagklhfgldg/sgsfgdsfgadg", 0x1000);
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( v0, 13U); // open file
+    sys.sim->write_cpu_register( a0, 0x1000U);
     sys.sim->write_cpu_register( a1, 1); // write
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
@@ -251,7 +251,7 @@ TEST_CASE( "MARS: open non existing file")
 static Trap write_buff_to_file( System* sys, uint64 descr,
                                 uint64 buff_ptr, uint64 chars_to_write)
 {
-    sys->sim->write_cpu_register( v0, 15u); //write to file
+    sys->sim->write_cpu_register( v0, 15U); //write to file
     sys->sim->write_cpu_register( a0, descr);
     sys->sim->write_cpu_register( a1, buff_ptr);
     sys->sim->write_cpu_register( a2, chars_to_write);
@@ -260,7 +260,7 @@ static Trap write_buff_to_file( System* sys, uint64 descr,
 
 static Trap open_file( System* sys, uint64 filename_ptr, uint64 flags)
 {
-    sys->sim->write_cpu_register( v0, 13u); // open file
+    sys->sim->write_cpu_register( v0, 13U); // open file
     sys->sim->write_cpu_register( a0, filename_ptr);
     sys->sim->write_cpu_register( a1, flags);
     return sys->mars_kernel->execute();
@@ -269,7 +269,7 @@ static Trap open_file( System* sys, uint64 filename_ptr, uint64 flags)
 static Trap read_from_file( System* sys, uint64 descr,
                             uint64 buff_ptr, uint64 chars_to_read)
 {
-    sys->sim->write_cpu_register( v0, 14u); // read from file
+    sys->sim->write_cpu_register( v0, 14U); // read from file
     sys->sim->write_cpu_register( a0, descr);
     sys->sim->write_cpu_register( a1, buff_ptr);
     sys->sim->write_cpu_register( a2, chars_to_read);
@@ -278,7 +278,7 @@ static Trap read_from_file( System* sys, uint64 descr,
 
 static Trap close_file( System* sys, uint64 descr)
 {
-    sys->sim->write_cpu_register( v0, 16u);
+    sys->sim->write_cpu_register( v0, 16U);
     sys->sim->write_cpu_register( a0, descr);
     return sys->mars_kernel->execute();
 }
@@ -371,18 +371,18 @@ TEST_CASE( "MARS: open file with invalid mode")
     System sys( std::cin, output, err);
     sys.mem->write_string( filename, 0x1000);
 
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( v0, 13U); // open file
+    sys.sim->write_cpu_register( a0, 0x1000U);
     sys.sim->write_cpu_register( a1, 1); // write
     auto descriptor = sys.sim->read_cpu_register( v0);
     sys.mars_kernel->execute();
 
-    sys.sim->write_cpu_register( v0, 16u); // close file
+    sys.sim->write_cpu_register( v0, 16U); // close file
     sys.sim->write_cpu_register( a0, descriptor);
     sys.mars_kernel->execute();
 
-    sys.sim->write_cpu_register( v0, 13u); // open file
-    sys.sim->write_cpu_register( a0, 0x1000u);
+    sys.sim->write_cpu_register( v0, 13U); // open file
+    sys.sim->write_cpu_register( a0, 0x1000U);
     sys.sim->write_cpu_register( a1, 131); // INVALID MODE!
 
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
@@ -394,7 +394,7 @@ TEST_CASE( "MARS: close stdout")
     auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
     mars_kernel->set_simulator( sim);
-    sim->write_cpu_register( v0, 16u); // close file
+    sim->write_cpu_register( v0, 16U); // close file
     sim->write_cpu_register( a0, 0);
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
 }
@@ -404,7 +404,7 @@ TEST_CASE( "MARS: close error")
     auto sim = Simulator::create_simulator( "mips64", true);
     auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
     mars_kernel->set_simulator( sim);
-    sim->write_cpu_register( v0, 16u); // close file
+    sim->write_cpu_register( v0, 16U); // close file
     sim->write_cpu_register( a0, 111);
     CHECK( mars_kernel->execute() == Trap::NO_TRAP);
 }
@@ -415,10 +415,10 @@ TEST_CASE( "MARS: exit with code")
     auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
     mars_kernel->set_simulator(sim);
 
-    sim->write_cpu_register( v0, 17u); // exit
-    sim->write_cpu_register( a0, 21u); // exit code
+    sim->write_cpu_register( v0, 17U); // exit
+    sim->write_cpu_register( a0, 21U); // exit code
     CHECK( mars_kernel->execute() == Trap::HALT);
-    CHECK( mars_kernel->get_exit_code() == 21u);
+    CHECK( mars_kernel->get_exit_code() == 21U);
 }
 
 TEST_CASE( "MARS: unsupported syscall")
@@ -427,6 +427,6 @@ TEST_CASE( "MARS: unsupported syscall")
     auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
     mars_kernel->set_simulator(sim);
 
-    sim->write_cpu_register( v0, 666u);
+    sim->write_cpu_register( v0, 666U);
     CHECK( mars_kernel->execute() == Trap::UNSUPPORTED_SYSCALL);
 }
