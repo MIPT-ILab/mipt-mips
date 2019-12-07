@@ -138,8 +138,9 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
         { }
 
-        const size_t line_bits;
+        auto get_line_bits() const noexcept { return line_bits; }
     public:
+        const size_t line_bits;
         uint32 sets;
         const size_t set_bits;
         const Addr   addr_mask;
@@ -180,11 +181,12 @@ class SimpleCacheTagArray : public CacheTagArraySize
         int32 write( Addr addr) final;
         std::pair<bool, int32> read( Addr addr) final;
         std::pair<bool, int32> read_no_touch( Addr addr) const final;
-    protected:
+
+    private:
         struct Tag
         {
             bool is_valid = false;
-            Addr tag = 0u;
+            Addr tag = {};
         };
 
         // tags storage

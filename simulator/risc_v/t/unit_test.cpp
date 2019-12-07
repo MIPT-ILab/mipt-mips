@@ -280,7 +280,7 @@ TEST_CASE( "RISCV sro32")
 {
     CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
     RISCVInstr<uint32> instr( "sro", 0);
-    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0x8000'c000U, 0);
     instr.set_v_src( 0xf, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff'0001);
@@ -289,28 +289,28 @@ TEST_CASE( "RISCV sro32")
 TEST_CASE( "RISCV sro32 overflow")
 {
     RISCVInstr<uint32> instr( "sro", 0);
-    instr.set_v_src( 0x8000'c000u, 0);
-    instr.set_v_src( 0xffu, 1);
+    instr.set_v_src( 0x8000'c000U, 0);
+    instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffffu);
+    CHECK( instr.get_v_dst() == 0xffff'ffffU);
 }
 
 TEST_CASE( "RISCV sro64")
 {
     RISCVInstr<uint64> instr( "sro", 0);
-    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
-    instr.set_v_src( 0x1fu, 1);
+    instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
+    instr.set_v_src( 0x1fU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ull);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ULL);
 }
 
 TEST_CASE( "RISCV sro64 overflow")
 {
     RISCVInstr<uint64> instr( "sro", 0);
-    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
-    instr.set_v_src( 0xffu, 1);
+    instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
+    instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffull);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffULL);
 }
 
 TEST_CASE("RISCV RV32 bfp")

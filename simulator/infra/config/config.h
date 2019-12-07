@@ -38,6 +38,8 @@ template<typename T, Type type>
 class BaseTValue : public BaseValue
 {
 public:
+    BaseTValue() = delete;
+
     // Converter is implicit intentionally, so bypass Clang-Tidy check
     // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
@@ -56,7 +58,6 @@ public:
 protected:
     T value = T();
     BaseTValue( std::string_view alias, std::string_view name, std::string_view desc, const T& default_value ) noexcept;
-    BaseTValue( ) = delete;
 };
     
 template<typename T>
