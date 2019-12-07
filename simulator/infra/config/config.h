@@ -56,8 +56,10 @@ public:
     }
 
 protected:
-    T value = T();
     BaseTValue( std::string_view alias, std::string_view name, std::string_view desc, const T& default_value ) noexcept;
+
+private:
+    T value = T();
 };
     
 template<typename T>

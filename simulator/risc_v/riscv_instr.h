@@ -45,7 +45,7 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 
         bool is_same_checker( const RISCVInstr& rhs) const {
             return is_same( rhs)
-                && this->sequence_id == rhs.sequence_id
+                && this->get_sequence_id() == rhs.get_sequence_id()
                 && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
                 && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
         }
