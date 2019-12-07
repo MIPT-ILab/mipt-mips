@@ -84,8 +84,11 @@ script:
 
 after_success:
   - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-9 --allow-unauthenticated
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        sudo apt-get install clang-tidy-9 g++-8
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
+        clang-tidy-9 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
         run-clang-tidy-9.py -header-filter='.*' 2> /dev/null

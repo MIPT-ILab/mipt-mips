@@ -12,7 +12,7 @@
 #include "../memory.h"
 #include "check_coherency.h"
 
-static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
+static const std::string_view valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
 static const uint64 dataSectAddrShifted = 0x100c0;
@@ -50,7 +50,7 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the "__start" label*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0U /*address of the "__start" label*/);
 }
 
 TEST_CASE( "Func_memory: StartPC Invalid")
@@ -95,8 +95,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
     CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
-    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFULL) == 0x030201);
+    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ULL) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
     CHECK( func_mem->read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
@@ -198,7 +198,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     const  constexpr size_t size = 1024;
     std::array<Byte, size> write_data_1024{};
     for (size_t i = 0; i < size; i++)
-        write_data_1024.at(i) = Byte( i & 0xFFu);
+        write_data_1024.at(i) = Byte( i & 0xFFU);
 
     std::array<Byte, size> read_data_1024{};
     read_data_1024.fill(Byte( 0xFF));
