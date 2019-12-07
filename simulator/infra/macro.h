@@ -38,8 +38,8 @@ template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs
 constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 
 /* 128 types have no std::numeric_limits */
-template<> constexpr size_t bitwidth<uint128> = 128u; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr size_t bitwidth<int128> = 128u; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr size_t bitwidth<uint128> = 128U; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> constexpr size_t bitwidth<int128> = 128U; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
 
 /* Byte width of integer type */
 template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
@@ -56,7 +56,7 @@ constexpr size_t half_bitwidth = bitwidth<T> >> 1;
 template <typename T>
 static constexpr T msb_set()
 {
-    return T{ 1u} << (bitwidth<T> - 1);
+    return T{ 1U} << (bitwidth<T> - 1);
 }
 
 /*
@@ -77,7 +77,7 @@ static constexpr T lsb_set()
 template <typename T>
 static constexpr T all_ones()
 {
-    return (msb_set<T>() - 1u) | msb_set<T>();
+    return (msb_set<T>() - 1U) | msb_set<T>();
 }
 
 /* Returns a bitmask with desired amount of LSB set to '1'
@@ -118,7 +118,7 @@ template <typename T>
 static constexpr inline auto count_leading_zeroes( const T& value) noexcept
 {
     uint8 count = 0;
-    for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1u)
+    for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1U)
     {
         if ( ( value & mask) != 0)
            break;
@@ -131,7 +131,7 @@ template <typename T>
 static constexpr inline auto count_trailing_zeroes( const T& value) noexcept
 {
     uint8 count = 0;
-    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1u)
+    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1U)
     {
         if ( ( value & mask) != 0)
            break;
@@ -153,7 +153,7 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
         return bitwidth<T>;
     using UT = typename std::make_unsigned<T>::type;
     UT uvalue{ value};
-    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1u))) - 1u;
+    return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1U))) - 1U;
 }
 
 template <typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
@@ -202,7 +202,7 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    if constexpr ((ST{ -2} >> 1u) == ST{ -1})
+    if constexpr ((ST{ -2} >> 1U) == ST{ -1})
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise)

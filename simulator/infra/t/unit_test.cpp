@@ -21,10 +21,10 @@
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
-static_assert(is_power_of_two(1u));
-static_assert(is_power_of_two(2u));
-static_assert(is_power_of_two(4u));
-static_assert(!is_power_of_two(5u));
+static_assert(is_power_of_two(1U));
+static_assert(is_power_of_two(2U));
+static_assert(is_power_of_two(4U));
+static_assert(!is_power_of_two(5U));
 
 static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
 static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));
@@ -59,13 +59,13 @@ static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
 static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
 static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
 
-static_assert(all_ones<uint8>()  == 0xFFull);
-static_assert(all_ones<uint16>() == 0xFFFFull);
-static_assert(all_ones<uint32>() == 0xFFFF'FFFFull);
+static_assert(all_ones<uint8>()  == 0xFFULL);
+static_assert(all_ones<uint16>() == 0xFFFFULL);
+static_assert(all_ones<uint32>() == 0xFFFF'FFFFULL);
 
-static_assert(msb_set<uint8>()  == 0x80ull);
-static_assert(msb_set<uint16>() == 0x8000ull);
-static_assert(msb_set<uint32>() == 0x8000'0000ull);
+static_assert(msb_set<uint8>()  == 0x80ULL);
+static_assert(msb_set<uint16>() == 0x8000ULL);
+static_assert(msb_set<uint32>() == 0x8000'0000ULL);
 
 /* Check that NO_VAL values are really non-trivial */
 static_assert(NO_VAL<uint8> != 0);
@@ -181,8 +181,8 @@ static_assert( interleaved_mask<uint32>(4) == 0x0000'FFFF);
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior
-    CHECK( ones_rs<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
-    CHECK( ones_rs<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
+    CHECK( ones_rs<uint32>( 0x8000'c000U, 15) == 0xffff'0001U);
+    CHECK( ones_rs<uint32>( 0x8000'c000U, 31) == 0xffff'ffffU);
 }
 
 TEST_CASE("ones shift for 128 instructions")

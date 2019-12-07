@@ -52,7 +52,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 
         std::string get_disasm() const;
 
-        bool is_nop() const { return raw == 0x0u; }
+        bool is_nop() const { return raw == 0x0U; }
 
         std::string string_dump() const;
         std::string bytes_dump() const;
