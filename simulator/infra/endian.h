@@ -28,12 +28,18 @@ enum class Endian
 #endif
 };
 
+// GCC 9 poorly optimizes that stuff: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65424
+// See https://godbolt.org/z/ff-NAF for example
+
 template<typename T>
 static inline constexpr T pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
-    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        value |= unsign_t<T>( uint8( array[i])) << (i * CHAR_BIT);
+    size_t shift = 0;
+    for ( const auto& el : array) {
+        value |= unsign_t<T>( uint8( el)) << shift;
+        shift += CHAR_BIT;
+    }
 
     return value;
 }
@@ -42,8 +48,11 @@ template<typename T>
 static inline constexpr T pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
-    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        value |= unsign_t<T>( uint8( array[i])) << ((array.size() - i - 1) * CHAR_BIT);
+    size_t shift = (array.size() - 1) * CHAR_BIT;
+    for ( const auto& el : array) {
+        value |= unsign_t<T>( uint8( el)) << shift;
+        shift -= CHAR_BIT;
+    }   
 
     return value;
 }
@@ -52,8 +61,11 @@ template<typename T>
 static inline constexpr auto unpack_array_le( T value) noexcept
 {
     std::array<std::byte, bytewidth<T>> array{};
-    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = std::byte( uint8( value >> ( i * CHAR_BIT)));
+    size_t shift = 0;
+    for ( auto& el: array) {
+        el = std::byte( uint8( value >> shift));
+        shift += CHAR_BIT;
+    }
 
     return array;
 }
@@ -62,8 +74,11 @@ template<typename T>
 static inline constexpr auto unpack_array_be( T value) noexcept
 {
     std::array<std::byte, bytewidth<T>> array{};
-    for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = std::byte( uint8( value >> ((array.size() - i - 1) * CHAR_BIT)));
+    size_t shift = (array.size() - 1) * CHAR_BIT;
+    for ( auto& el: array) {
+        el = std::byte( uint8( value >> shift));
+        shift -= CHAR_BIT;
+    }
 
     return array;
 }
@@ -93,14 +108,16 @@ static inline constexpr T swap_endian( T value) noexcept
 }
 
 template<typename T, Endian e>
-static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size) {
+static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size)
+{
     auto array = unpack_array<T, e>(value);
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         *(buf + i) = array[i];
 }
 
 template<typename T, Endian e>
-static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size) {
+static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size)
+{
     std::array<std::byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         array[i] = *( buf + i);
