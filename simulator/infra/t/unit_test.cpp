@@ -178,6 +178,14 @@ static_assert( interleaved_mask<uint32>(2) == 0x0F0F'0F0F);
 static_assert( interleaved_mask<uint32>(3) == 0x00FF'00FF);
 static_assert( interleaved_mask<uint32>(4) == 0x0000'FFFF);
 
+static_assert( shuffle_mask<uint32, 2>(0) == 0x4444'4444);
+static_assert( shuffle_mask<uint32, 2>(1) == 0x3030'3030);
+static_assert( shuffle_mask<uint32, 2>(2) == 0x0F00'0F00);
+
+static_assert( shuffle_mask<uint32, 1>(0) == 0x2222'2222);
+static_assert( shuffle_mask<uint32, 1>(1) == 0x0C0C'0C0C);
+static_assert( shuffle_mask<uint32, 1>(2) == 0x00F0'00F0);
+
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior
