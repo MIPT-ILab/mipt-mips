@@ -95,9 +95,12 @@ template<typename To, typename From>
 static constexpr inline auto unpack_to( From src) noexcept
 {
     std::array<To, bytewidth<From> / bytewidth<To>> result{};
-    const constexpr size_t shift = bitwidth<To>;
-    for ( size_t i = 0; i < result.size(); ++i)
-        result[i] = narrow_cast<To>( src >> ( shift * i) & bitmask<From>( shift));
+    const constexpr size_t offset = bitwidth<To>;
+    size_t shift = 0;
+    for ( auto& v : result) {
+        v = narrow_cast<To>( ( src >> shift) & bitmask<From>( offset));
+        shift += offset;
+    }
 
     return result;
 }
