@@ -178,6 +178,13 @@ static_assert( interleaved_mask<uint32>(2) == 0x0F0F'0F0F);
 static_assert( interleaved_mask<uint32>(3) == 0x00FF'00FF);
 static_assert( interleaved_mask<uint32>(4) == 0x0000'FFFF);
 
+static_assert( unpack_to<uint16>( uint32{0xABCD'EF12})[0] == 0xEF12);
+static_assert( unpack_to<uint16>( uint32{0xABCD'EF12})[1] == 0xABCD);
+
+static constexpr std::array<uint16, 2> pack_test_array = {{0xEF12, 0xABCD}};
+
+static_assert( pack_from( pack_test_array) == 0xABCD'EF12);
+
 static_assert( shuffle_mask<uint32, 2>(0) == 0x4444'4444);
 static_assert( shuffle_mask<uint32, 2>(1) == 0x3030'3030);
 static_assert( shuffle_mask<uint32, 2>(2) == 0x0F00'0F00);

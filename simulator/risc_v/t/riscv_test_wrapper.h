@@ -21,8 +21,8 @@ struct TestData {
         instr.execute();
         if constexpr ( std::is_same_v<T, uint128>) {
             // CATCH cannot handle 128 bit integers, let's check both parts sequentially
-            CHECK( split( instr.get_v_dst()).first == split( dst).first);
-            CHECK( split( instr.get_v_dst()).second == split( dst).second);
+            CHECK( unpack_to<uint64>( instr.get_v_dst())[0] == unpack_to<uint64>( dst)[0]);
+            CHECK( unpack_to<uint64>( instr.get_v_dst())[1] == unpack_to<uint64>( dst)[1]);
         }
         else {
             CHECK( instr.get_v_dst() == dst);
