@@ -101,10 +101,15 @@ constexpr auto popcount( T x) noexcept
     return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
 }
 
+static inline auto split( uint128 x) noexcept
+{
+    return std::pair{ narrow_cast<uint64>( ( x >> 64) & bitmask<uint128>( 64)),
+                      narrow_cast<uint64>( x & bitmask<uint128>( 64))};
+}
+
 static inline auto popcount( uint128 x) noexcept
 {
-    auto left  = narrow_cast<uint64>( ( x >> 64) & bitmask<uint128>( 64));
-    auto right = narrow_cast<uint64>( x & bitmask<uint128>( 64));
+    auto [left, right] = split( x);
     return popcount( left) + popcount( right);
 }
 
