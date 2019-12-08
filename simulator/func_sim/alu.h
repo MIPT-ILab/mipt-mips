@@ -11,10 +11,83 @@
 #include "traps/trap.h"
 
 #include <infra/macro.h>
+
+#include <array>
 #include <tuple>
 
 template<size_t N, typename T>
 T align_up(T value) { return ((value + bitmask<T>(N)) >> N) << N; }
+
+struct Mask {
+    const uint32 left_mask, right_mask;
+};
+
+static std::array<Mask, 4> shuffle_consts = {
+    Mask{ 0x00ff0000, 0x0000ff00},
+    Mask{ 0x0f000f00, 0x00f000f0},
+    Mask{ 0x30303030, 0x0c0c0c0c},
+    Mask{ 0x44444444, 0x22222222},
+};
+
+static inline uint32 shuffle_stage( uint32 src, size_t index)
+{
+    auto [maskL, maskR] = shuffle_consts.at( index);
+    size_t N = 1 << ( 3 - index);
+    uint32 x = src & ~( maskL | maskR);
+    x |= ( ( src << N) & maskL) | ( ( src >> N) & maskR);
+    return x;
+}
+
+template<typename T> static T bit_shuffle( T src1, size_t src2);
+
+template<typename T> static auto wide_shuffle_stage( T src1, size_t shamt)
+{
+    constexpr const size_t quarter_width = bitwidth<T> >> 2;
+    T left_part = ( src1 >> ( quarter_width * 2)) & bitmask<T>( quarter_width * 2);
+    T right_part = src1 & bitmask<T>( ( quarter_width * 2));
+    T buf = left_part & bitmask<T>( quarter_width);
+    left_part = ( left_part & ~( bitmask<T>( quarter_width))) | ( ( right_part >> quarter_width) & bitmask<T>(quarter_width));
+    right_part = ( right_part & ( bitmask<T>( quarter_width))) | ( buf << quarter_width);
+    left_part = bit_shuffle( left_part, shamt & ( quarter_width - 1));
+    right_part = bit_shuffle( right_part, shamt & ( quarter_width - 1));
+    return ( T{ left_part} << (quarter_width * 2)) + T{ right_part};
+}
+
+template<typename T> static T bit_shuffle( T src1, size_t src2)
+{
+    uint128 result = uint128{ src1};
+    auto shamt = src2 & ( bitwidth<T> / 2 - 1);
+    if( shamt & ( 1 << 5))
+    {
+        return wide_shuffle_stage( src1, shamt);
+    }
+    if( shamt & ( 1 << 4))
+    {
+        uint64 left_part = ( bytewidth<T> == 16)
+            ? wide_shuffle_stage( narrow_cast<uint64>( result >> 64), shamt)
+            : 0ull;
+        uint64 right_part = wide_shuffle_stage( narrow_cast<uint64>( result), shamt);
+        return (left_part != 0)
+            ? ( uint128{ left_part} << 64) | uint128{ right_part}
+            : right_part;
+    }
+    std::array<uint32, 4> compound = {
+        narrow_cast<uint32>( result),
+        narrow_cast<uint32>( result >> 32),
+        narrow_cast<uint32>( result >> 64),
+        narrow_cast<uint32>( result >> 96),
+    };
+    result = 0;
+    size_t limit = bytewidth<T> / 4;
+    for( size_t j = 0; j < limit; ++j)
+    {
+        for( size_t i = 0; i < 4 ; ++i)
+            if ( shamt & ( 1 << ( 3 - i)))
+                compound[j] = shuffle_stage( compound[j], i);
+        result |= T{ compound[j]} << (32 * j);
+    }
+    return result;
+}
 
 struct ALU
 {
@@ -201,6 +274,17 @@ struct ALU
     // Bit permutation
     template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
+    template<typename I> static
+    void riscv_unshfl( I* instr)
+    {
+        auto dst_value = instr->v_src1;
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
+        for( size_t i = 0; i < limit; ++i)
+            if( ( instr->v_src2 >> i) & 1)
+                dst_value = bit_shuffle( dst_value, 1 << i);
+        instr->v_dst = dst_value;
+    }
+  
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 

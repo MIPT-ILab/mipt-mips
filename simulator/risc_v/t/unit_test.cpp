@@ -559,3 +559,40 @@ TEST_CASE("RISCV RV64 gorc")
         cases[i].make_test("gorc");
     }
 }
+
+TEST_CASE("RISCV RV32 unshfl")
+{
+    CHECK( RISCVInstr<uint32>(0x091855b3).get_disasm() == "unshfl $a1, $a6, $a7");
+    RISCVInstr<uint32> instr("unshfl", 0);
+    instr.set_v_src( 0xbf534fdeu, 0);
+    instr.set_v_src( 0x07, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xf17d3bbeu);
+}
+
+TEST_CASE("RISCV RV64 unshfl")
+{
+    RISCVInstr<uint64> instr("unshfl", 0);
+    instr.set_v_src( 0x0138'745b'ffff'acd1ull, 0);
+    instr.set_v_src( 0x16, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x021c'ffff'56c7'bc85ull);
+}
+
+TEST_CASE("RISCV RV128 unshfl")
+{
+    std::vector<TestData<uint128>> cases = {
+            { 0x3146'2351'2464'6245ull,  0x11, 0x5126'4262'4531'6423ull},
+            { 0xf14c'82a6'ac81'2410ull,  0x36, ( uint128{ 0xc7d0b881u} << 64) + uint128{ 0x892a1084u}},
+            { 0x1234'9abc'5678'def0ull,  0x0, 0x1234'9abc'5678'def0ull},
+            { ( uint128{ 0x7fff'0fe3'3630'0001ull} << 64) + uint128{ 0x7f3d'ff39'5400'6401ull},  0x0f,
+                ( uint128{ 0x7f3d'ff39'5400'6401ull} << 64) + uint128{ 0x76f6'f7f5'0040'e0a1ull}},
+            { ( uint128{ 0x9846'5982'6593'659full} << 64) + uint128{ 0x8534'9dab'c820'f892ull},  0x3f,
+                ( uint128{ 0xa129'494b'84af'a4e9ull} << 64) + uint128{ 0x4ad0'b5b7'3671'80c4ull}},
+    };
+    for( std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test( "unshfl");
+    }
+}
+
