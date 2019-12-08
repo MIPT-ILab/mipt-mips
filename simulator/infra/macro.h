@@ -200,15 +200,22 @@ static constexpr T ones_ls( const T& value, size_t shamt)
 template<typename T>
 static constexpr T ones_rs( const T& value, size_t shamt)
 {
-#if defined(_MSC_FULL_VER) && (_MSC_FULL_VER < 192328105)
-    // Workaround for Visual Studio bug
-    // https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
-    // TODO (pkryukov): remove once we switch to C++20
-    const volatile auto x = ~value;
+#ifdef _MSC_FULL_VER
+    T result = 0;
+    if constexpr ( std::is_same_v<T, uint128> || _MSC_FULL_VER >= 192328105) {
+        result = ~( ~value >> shamt);
+    }
+    else {
+        // Workaround for Visual Studio bug
+        // https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
+        // TODO (pkryukov): remove once we switch to C++20
+        const volatile auto x = ~value;
+        result = ~( x >> shamt);
+    }
+    return result;
 #else
-    const auto x = ~value;
+    return ~( ~value >> shamt);
 #endif
-    return ~( x >> shamt);
 }
 
 /*
@@ -225,39 +232,17 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
     // but for the most of cases it does arithmetic right shift
     // Let's check what our implementation does and reuse it if it is OK
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    if constexpr ((ST{ -2} >> 1U) == ST{ -1})
+    if constexpr ( !std::is_same_v<T, uint128> && ( ST{ -2} >> 1U) == ST{ -1})
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
         result = narrow_cast<ST>(value) >> shamt;
-    else if ((value & msb_set<T>()) == 0)
+    else if ( ( value & msb_set<T>()) == 0)
         result = value >> shamt;        // just shift if MSB is zero
     else
         result = ones_rs( value, shamt);
     return result;
 }
-
-#ifndef USE_GNUC_INT128 // Cannot do constexpr for that
-
-static inline uint128 ones_ls( const uint128& value, size_t shamt)
-{
-    return ~( ~value >> shamt);
-}
-
-static inline uint128 ones_rs( const uint128& value, size_t shamt)
-{
-    return ~( ~value >> shamt);
-}
-
-static inline uint128 arithmetic_rs( const uint128& value, size_t shamt)
-{
-    if (( value & msb_set<uint128>()) == 0)
-        return value >> shamt;        // just shift if MSB is zero
-
-    return ones_rs( value, shamt);
-}
-
-#endif // USE_GNUC_INT128
 
 /*Circular left shift*/
 template<typename T>
