@@ -11,6 +11,7 @@
 #include "../elf/elf_loader.h"
 #include "../memory.h"
 #include "check_coherency.h"
+#include "func_sim/operation.h"
 
 static const std::string_view valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
@@ -354,22 +355,31 @@ TEST_CASE( "Func_memory: Write string limited")
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
 }
 
-TEST_CASE( "Func_memory: Write to 0")
-{
-    class DummyStore {
+class DummyStore : public Datapath<uint64> {
     public:
-        static Addr get_mem_addr() { return 0; };
-        static uint32 get_mem_size() { return 8; }
+        explicit DummyStore( Addr a) : Datapath<uint64>( 0, 0)
+        {
+            set_type( OUT_STORE);
+            mem_addr = a;
+            mem_size = 8;
+            v_src2 = 0xABCD'EF12'3456'7890ULL;
+        }
         static auto get_endian() { return Endian::little; } 
-        static uint64 get_mask() { return all_ones<uint64>(); }
-        static bool is_load() { return false; }
-        static bool is_store() { return true; }
-        static uint64 get_v_src2() { return NO_VAL64; }
-        static uint64 get_v_dst() { return 0; }
-        static void load(uint64 /* unused */) { }
-    } store;
+};
+
+TEST_CASE( "Func_memory: Store to 0")
+{
+    DummyStore store( 0);
     auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);
+}
+
+TEST_CASE( "Func_memory: Store to 0x100")
+{
+    DummyStore store( 0x100);
+    auto mem = FuncMemory::create_4M_plain_memory();
+    mem->load_store( &store);
+    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src2());
 }
 
 TEST_CASE( "Func_memory Replicant: read and write")

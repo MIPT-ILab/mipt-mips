@@ -48,7 +48,6 @@ public:
 };
 
 #ifndef INSTR_CACHE_CAPACITY
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage) We keep it as a macro to easily it from makefile
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 
