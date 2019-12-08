@@ -380,7 +380,7 @@ void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
 
     this->imm_print_type = entry.immediate_print_type;
     this->mem_size  = entry.mem_size;
-    this->operation = entry.type;
+    this->set_type( entry.type);
     this->executor  = entry.function;
     this->opname  = entry.entry.name;
     this->print_dst  = entry.check_print_dst( entry.dst);

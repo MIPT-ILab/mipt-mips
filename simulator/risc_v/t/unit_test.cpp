@@ -5,6 +5,7 @@
  */
 
 #include "../riscv_instr.h"
+#include "riscv_test_wrapper.h"
 
 #include <catch.hpp>
 #include <memory/memory.h>
@@ -155,27 +156,6 @@ TEST_CASE( "RISCV lq/sq")
     memory->load_store( &load);
     CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
-
-template<typename T>
-struct TestData {
-    T src1, src2, dst;
-
-    TestData( T src1, T src2, T dst)
-    {
-       this->src1 = src1;
-       this->src2 = src2;
-       this->dst = dst;
-    }
-
-    void make_test( std::string_view str)
-    {
-        RISCVInstr<T> instr( str, 0);
-        instr.set_v_src( src1, 0);
-        instr.set_v_src( src2, 1);
-        instr.execute();
-        CHECK( instr.get_v_dst() == dst);
-    }
-};
 
 TEST_CASE( "RISCV slo32")
 {
