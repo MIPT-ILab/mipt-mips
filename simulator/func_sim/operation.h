@@ -68,6 +68,8 @@ class Operation
 public:
     Operation(Addr pc, Addr new_pc) : PC(pc), new_PC(new_pc) { }
 
+    void set_type( OperationType type) { operation = type; }
+
 	//target is known at ID stage and always taken
 	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
@@ -91,14 +93,10 @@ public:
         return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
     }
 
-    bool is_partial_load() const
-    {
-        return operation == OUT_PARTIAL_LOAD;
-    }
-
-    bool is_load() const { return operation == OUT_LOAD ||
-                                   operation == OUT_LOADU ||
-                                   is_partial_load(); }
+    bool is_partial_load()  const { return operation == OUT_PARTIAL_LOAD; }
+    bool is_unsigned_load() const { return operation == OUT_LOADU; }
+    bool is_signed_load()   const { return operation == OUT_LOAD; }
+    bool is_load() const { return is_unsigned_load() || is_signed_load() || is_partial_load(); }
 
     int8 get_accumulation_type() const
     {
@@ -128,7 +126,6 @@ public:
 
 protected:
     std::string_view opname = {};
-    OperationType operation = OUT_UNKNOWN;
     Trap trap = Trap(Trap::NO_TRAP);
 
     Addr mem_addr = NO_VAL32;
@@ -138,9 +135,7 @@ protected:
     uint8 delayed_slots = 0;
 
     // convert this to bitset
-    bool complete   = false;
     bool is_taken_branch = false; // actual result
-    bool memory_complete = false;
     bool print_dst = false;
     bool print_dst2 = false;
     bool print_src1 = false;
@@ -151,6 +146,8 @@ protected:
     Addr new_PC = NO_VAL32;
     Addr target = NO_VAL32;
 
+private:
+    OperationType operation = OUT_UNKNOWN;
     uint64 sequence_id = NO_VAL64;
 };
 
@@ -179,6 +176,9 @@ public:
     T get_v_dst2() const { return v_dst2; }
     T get_mask() const { return mask; }
 
+    bool has_memory_address() const { return ( is_load() || is_store()) && complete; }
+    bool is_dst_complete() const { return is_load() ? memory_complete : complete; }
+
     void load( const T& value);
     void execute();
 
@@ -193,6 +193,10 @@ protected:
     T mask   = all_ones<T>();
 
     Execute executor;
+
+private:
+    bool complete   = false;
+    bool memory_complete = false;
 };
 
 template<typename T>
@@ -206,26 +210,20 @@ template<typename T>
 void Datapath<T>::load( const T& value)
 {
     memory_complete = true;
-    if ( operation == OUT_LOAD || is_partial_load())
-    {
-        switch ( get_mem_size())
-        {
-            case 0: break; // e.g. fences
-            case 1: v_dst = sign_extension<8>( value); break;
-            case 2: v_dst = sign_extension<16>( value); break;
-            case 4: v_dst = sign_extension<32>( value); break;
-            case 8: v_dst = sign_extension<64>( value); break;
-            case 16: v_dst = sign_extension<128>( value); break;
-            default: assert( false);
-        }
-    }
-    else if ( operation == OUT_LOADU)
+    assert( is_load());
+    if ( is_unsigned_load())
     {
         v_dst = value;
     }
-    else
+    else switch ( get_mem_size())
     {
-        assert( false);
+        case 0: break; // e.g. fences
+        case 1: v_dst = sign_extension<8>( value); break;
+        case 2: v_dst = sign_extension<16>( value); break;
+        case 4: v_dst = sign_extension<32>( value); break;
+        case 8: v_dst = sign_extension<64>( value); break;
+        case 16: v_dst = sign_extension<128>( value); break;
+        default: assert( false);
     }
 }
 
@@ -288,13 +286,12 @@ std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std:
     if ( this->PC != 0)
         out << std::hex << "0x" << this->PC << ": ";
 
-    out << "{" << std::dec << this->sequence_id << "}\t" << disasm << "\t [";
-    bool has_ma = ( this->is_load() || this->is_store()) && this->complete;
+    out << "{" << std::dec << this->get_sequence_id() << "}\t" << disasm << "\t [";
+    bool has_ma = this->has_memory_address();
     if ( has_ma)
-    {
         out << " $ma = 0x" << std::hex << this->get_mem_addr();
-    }
-    if ( this->is_load() ? this->memory_complete : this->complete)
+
+    if ( this->is_dst_complete())
     {
         bool has_dst = !dst.is_zero() && this->get_mask();
         if ( has_ma && has_dst)
