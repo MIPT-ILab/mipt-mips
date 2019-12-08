@@ -18,86 +18,14 @@
 template<size_t N, typename T>
 T align_up(T value) { return ((value + bitmask<T>(N)) >> N) << N; }
 
-struct Mask {
-    const uint32 left_mask, right_mask;
-};
-
-static std::array<Mask, 4> shuffle_consts = {
-    Mask{ 0x00ff0000, 0x0000ff00},
-    Mask{ 0x0f000f00, 0x00f000f0},
-    Mask{ 0x30303030, 0x0c0c0c0c},
-    Mask{ 0x44444444, 0x22222222},
-};
-
-static inline uint32 shuffle_stage( uint32 src, size_t index)
+template<typename T> static T bit_shuffle( T value, size_t level)
 {
-    auto [maskL, maskR] = shuffle_consts.at( index);
-    const auto N = size_t{ 1} << ( 3 - index);
-    uint32 x = src & ~( maskL | maskR);
-    x |= ( ( src << N) & maskL) | ( ( src >> N) & maskR);
-    return x;
-}
-
-template<typename T> static T bit_shuffle( T src1, size_t src2);
-
-template<typename T> static auto wide_shuffle_stage( T src1, size_t shamt)
-{
-    constexpr const size_t quarter_width = bitwidth<T> >> 2;
-    T left_part = ( src1 >> ( quarter_width * 2)) & bitmask<T>( quarter_width * 2);
-    T right_part = src1 & bitmask<T>( ( quarter_width * 2));
-    T buf = left_part & bitmask<T>( quarter_width);
-    left_part = ( left_part & ~( bitmask<T>( quarter_width))) | ( ( right_part >> quarter_width) & bitmask<T>(quarter_width));
-    right_part = ( right_part & ( bitmask<T>( quarter_width))) | ( buf << quarter_width);
-    left_part = bit_shuffle( left_part, shamt & ( quarter_width - 1));
-    right_part = bit_shuffle( right_part, shamt & ( quarter_width - 1));
-    return ( T{ left_part} << (quarter_width * 2)) + T{ right_part};
-}
-
-template<typename T> static T narrow_shuffle( T src1, size_t shamt)
-{
-    const uint128 src1_wide{ src1};
-    std::array<uint32, 4> compound = {
-        narrow_cast<uint32>( ( src1_wide      ) & bitmask<uint128>( 32)),
-        narrow_cast<uint32>( ( src1_wide >> 32) & bitmask<uint128>( 32)),
-        narrow_cast<uint32>( ( src1_wide >> 64) & bitmask<uint128>( 32)),
-        narrow_cast<uint32>( ( src1_wide >> 96) & bitmask<uint128>( 32)),
-    };
-
-    uint128 result{};
-
-    const constexpr size_t limit = bytewidth<T> / 4;
-    for ( size_t j = 0; j < limit; ++j)
-    {
-        for ( size_t i = 0; i < 4 ; ++i)
-            if ( shamt & ( size_t{ 1} << ( 3 - i)))
-                compound[j] = shuffle_stage( compound[j], i);
-        result |= T{ compound[j]} << (32 * j);
-    }
-    return narrow_cast<T>( result);
-}
-
-template<typename T> static T bit_shuffle( T src1, size_t src2)
-{
-    const auto shamt = src2 & ( bitwidth<T> / 2 - 1);
-
-    if ( shamt & ( 1 << 5))
-        return wide_shuffle_stage( src1, shamt);
-
-    if ( shamt & ( 1 << 4)) {
-        // NOLINTNEXTLINE(bugprone-suspicious-semicolon) https://bugs.llvm.org/show_bug.cgi?id=35824
-        if constexpr ( std::is_same_v<T, uint128>)       
-        {
-            auto [left, right] = split( src1);
-            uint128 left_res{  wide_shuffle_stage( left, shamt)};
-            uint128 right_res{ wide_shuffle_stage( right, shamt)};
-            return ( left_res << 64) | right_res;
-        }
-        else {
-            return narrow_cast<T>( wide_shuffle_stage( uint64{ src1}, shamt));
-        }
-    }
-
-    return narrow_shuffle( src1, shamt);
+    const auto maskL = shuffle_mask<T, 2>( level);
+    const auto maskR = shuffle_mask<T, 1>( level);
+    const auto shamt = size_t{ 1} << ( level);
+    T result = value & ~( maskL | maskR);
+    result |= ( ( value << shamt) & maskL) | ( ( value >> shamt) & maskR);
+    return result;
 }
 
 struct ALU
@@ -292,7 +220,7 @@ struct ALU
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
         for ( size_t i = 0; i < limit; ++i)
             if ( ( instr->v_src2 >> i) & 1)
-                dst_value = bit_shuffle( dst_value, size_t{ 1} << i);
+                dst_value = bit_shuffle( dst_value, i);
         instr->v_dst = dst_value;
     }
   

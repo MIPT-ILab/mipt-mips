@@ -185,6 +185,14 @@ static constexpr std::array<uint16, 2> pack_test_array = {{0xEF12, 0xABCD}};
 
 static_assert( pack_from( pack_test_array) == 0xABCD'EF12);
 
+static_assert( shuffle_mask<uint32, 2>(0) == 0x4444'4444);
+static_assert( shuffle_mask<uint32, 2>(1) == 0x3030'3030);
+static_assert( shuffle_mask<uint32, 2>(2) == 0x0F00'0F00);
+
+static_assert( shuffle_mask<uint32, 1>(0) == 0x2222'2222);
+static_assert( shuffle_mask<uint32, 1>(1) == 0x0C0C'0C0C);
+static_assert( shuffle_mask<uint32, 1>(2) == 0x00F0'00F0);
+
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior

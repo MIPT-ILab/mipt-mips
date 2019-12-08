@@ -326,6 +326,27 @@ static constexpr T interleaved_mask( size_t density)
     return result;
 }
 
+/*
+ * With shift = 2, returns a left unshuffling mask
+ * 0 -> 0x4444'4444 (0010'0010'01...)
+ * 1 -> 0x3030'3030 (0000'1100'00...)
+ * 2 -> 0x0F00'0F00
+ * With shift = 1, return a right unshuffling mask
+ * 0 -> 0x2222'2222 (0100'0100'00...)
+ * 1 -> 0x0C0C'0C0C (0011'0000'00...)
+ * 2 -> 0x00F0'00F0
+ */
+template<typename T, size_t shift>
+static constexpr T shuffle_mask( size_t density)
+{
+    T result{};
+    for ( size_t i = 0; i < bitwidth<T>; ++i)
+        if ( (i >> density) % 4 == shift)
+            result |= lsb_set<T>() << i;
+
+    return result;
+}
+
 template<typename T>
 static inline T gen_reverse( T value, size_t shamt)
 {
