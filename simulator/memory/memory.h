@@ -52,7 +52,7 @@ class WriteableMemory;
 class ReadableMemory : public DestructableMemory
 {
 public:
-    virtual size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept = 0;
+    virtual size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
     virtual std::string dump() const = 0;
     virtual size_t strlen( Addr addr) const = 0;
@@ -71,7 +71,7 @@ template<typename T, Endian endian>
 T ReadableMemory::read( Addr addr) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) Initialized by memcpy
-    std::array<Byte, bytewidth<T>> bytes;
+    std::array<std::byte, bytewidth<T>> bytes;
     memcpy_guest_to_host( bytes.data(), addr, bytes.size());
     return pack_array<T, endian>( bytes);
 }
@@ -90,7 +90,7 @@ void ReadableMemory::load( Instr* instr) const
 class ZeroMemory : public ReadableMemory
 {
 public:
-    size_t memcpy_guest_to_host( Byte* dst, Addr /* src */, size_t size) const noexcept final;
+    size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
     std::string dump() const final { return std::string( "empty memory\n"); }
     size_t strlen( Addr /* addr */) const final { return 0; }
@@ -99,9 +99,9 @@ public:
 class WriteableMemory : public DestructableMemory
 {
 public:
-    virtual size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) = 0;
+    virtual size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) = 0;
 
-    size_t memcpy_host_to_guest_noexcept( Addr dst, const Byte* src, size_t size) noexcept try
+    size_t memcpy_host_to_guest_noexcept( Addr dst, const std::byte* src, size_t size) noexcept try
     {
         return memcpy_host_to_guest( dst, src, size);
     }
@@ -194,12 +194,12 @@ public:
     explicit FuncMemoryReplicant( std::shared_ptr<FuncMemory> memory) : primary( std::move( memory)) { }
     void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
 
-    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
+    size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final
     {
         return primary->memcpy_guest_to_host( dst, src, size);
     }
 
-    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final
+    size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final
     {
         auto result = primary->memcpy_host_to_guest( dst, src, size);
         for ( auto& e : replicas)

@@ -91,17 +91,17 @@ catch (...) {
     std::cerr << "MIPT-MIPS: Unknown exception\n";
 }
 
-int GDBSim::memory_read( Byte* dst, Addr src, size_t length) const
+int GDBSim::memory_read( std::byte* dst, Addr src, size_t length) const
 {
     return narrow_cast<int>( memory->memcpy_guest_to_host( dst, src, length));
 }
 
-int GDBSim::memory_write( Addr dst, const Byte* src, size_t length) const
+int GDBSim::memory_write( Addr dst, const std::byte* src, size_t length) const
 {
     return narrow_cast<int>( memory->memcpy_host_to_guest_noexcept( dst, src, length));
 }
 
-int GDBSim::read_register(int regno, Byte* buf, int length) const
+int GDBSim::read_register(int regno, std::byte* buf, int length) const
 {
     if ( length == 8)
         put_value_to_pointer<uint64, Endian::native>( buf, cpu->read_gdb_register( regno), 8);
@@ -113,7 +113,7 @@ int GDBSim::read_register(int regno, Byte* buf, int length) const
     return length;
 }
 
-int GDBSim::write_register(int regno, const Byte* buf, int length) const
+int GDBSim::write_register(int regno, const std::byte* buf, int length) const
 {
     if ( length == 8)
         cpu->write_gdb_register( regno, get_value_from_pointer<uint64, Endian::native>( buf, 8));

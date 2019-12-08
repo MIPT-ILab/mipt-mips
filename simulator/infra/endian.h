@@ -8,8 +8,8 @@
 #ifndef ENDIAN_H
 #define ENDIAN_H
 
-#include "byte.h"
 #include "macro.h"
+#include "types.h"
 
 #include <array>
 #include <climits>
@@ -29,7 +29,7 @@ enum class Endian
 };
 
 template<typename T>
-static inline constexpr T pack_array_le( std::array<Byte, bytewidth<T>> array) noexcept
+static inline constexpr T pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
@@ -39,7 +39,7 @@ static inline constexpr T pack_array_le( std::array<Byte, bytewidth<T>> array) n
 }
 
 template<typename T>
-static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) noexcept
+static inline constexpr T pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
@@ -51,9 +51,9 @@ static inline constexpr T pack_array_be( std::array<Byte, bytewidth<T>> array) n
 template<typename T>
 static inline constexpr auto unpack_array_le( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array{};
+    std::array<std::byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = Byte( uint8( value >> ( i * CHAR_BIT)));
+        array[i] = std::byte( uint8( value >> ( i * CHAR_BIT)));
 
     return array;
 }
@@ -61,9 +61,9 @@ static inline constexpr auto unpack_array_le( T value) noexcept
 template<typename T>
 static inline constexpr auto unpack_array_be( T value) noexcept
 {
-    std::array<Byte, bytewidth<T>> array{};
+    std::array<std::byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < array.size(); ++i) // NOLINTNEXTLINE
-        array[i] = Byte( uint8( value >> ((array.size() - i - 1) * CHAR_BIT)));
+        array[i] = std::byte( uint8( value >> ((array.size() - i - 1) * CHAR_BIT)));
 
     return array;
 }
@@ -78,7 +78,7 @@ static constexpr inline auto unpack_array( T value) noexcept
 }
 
 template<typename T, Endian e>
-static inline constexpr auto pack_array( std::array<Byte, bytewidth<T>> array) noexcept
+static inline constexpr auto pack_array( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     if constexpr (e == Endian::little)
         return pack_array_le<T>( array);
@@ -93,15 +93,15 @@ static inline constexpr T swap_endian( T value) noexcept
 }
 
 template<typename T, Endian e>
-static inline void constexpr put_value_to_pointer( Byte* buf, T value, size_t size) {
+static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size) {
     auto array = unpack_array<T, e>(value);
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         *(buf + i) = array[i];
 }
 
 template<typename T, Endian e>
-static inline constexpr T get_value_from_pointer( const Byte* buf, size_t size) {
-    std::array<Byte, bytewidth<T>> array{};
+static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size) {
+    std::array<std::byte, bytewidth<T>> array{};
     for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
         array[i] = *( buf + i);
 

@@ -16,7 +16,7 @@
 #include <bfd/config.h>
 
 #include <infra/argv.h>
-#include <infra/byte.h>
+#include <infra/types.h>
 
 #include <tuple>
 

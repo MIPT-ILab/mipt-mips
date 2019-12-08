@@ -119,7 +119,7 @@ static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
 static_assert(log_bitwidth<uint32> == 5);
 static_assert(log_bitwidth<uint64> == 6);
 
-static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
+static constexpr std::array<std::byte, 4> test_array = {{std::byte{0x78}, std::byte{0x56}, std::byte{0x34}, std::byte{0x12}}};
 
 static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
 static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
@@ -142,15 +142,15 @@ static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2)
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
-    std::array<Byte, 2> res{};
+    std::array<std::byte, 2> res{};
     put_value_to_pointer<uint16, e>( res.data(), 0x3456, 2);
     return res;
 }
 
-static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
-static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
+static_assert(check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
+static_assert(check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
 
 static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
 static_assert( count_argc( some_argv.data()) == 3);

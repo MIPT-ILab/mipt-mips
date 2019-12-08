@@ -3,14 +3,13 @@
  * The types are used in algorithms affected by size of a variable
  *
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012-2018 MIPT-MIPS project
+ * Copyright 2012-2019 MIPT-MIPS project
  */
 
-// protection from multi-include
 #ifndef COMMON__TYPES_H
 #define COMMON__TYPES_H
 
-// C++11 fixed width integer types
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 
@@ -36,6 +35,31 @@ using uint64 = uint64_t;
 using float32 = float;
 using float64 = double;
 
+// Byte casts
+static inline std::byte* byte_cast( char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
+static inline std::byte* byte_cast( uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
 #if defined(__GNUC__) && defined(__SIZEOF_INT128__)
 
@@ -55,10 +79,7 @@ std::ostream& operator<<(std::ostream& out, uint128 value);
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-/* Unsigned 128-bit integer type */
 using uint128 = boost::multiprecision::uint128_t;
-
-/* Signed 128-bit integer type */
 using int128 = boost::multiprecision::int128_t;
 
 #endif // __SIZEOF_INT128__

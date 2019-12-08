@@ -67,7 +67,7 @@ TEST_CASE( "Func_memory: Bad section")
 
 TEST_CASE( "Plain memory: out of range")
 {
-    std::array<Byte, 16> arr{};
+    std::array<std::byte, 16> arr{};
     auto ptr = FuncMemory::create_plain_memory( 10);
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
@@ -78,7 +78,7 @@ TEST_CASE( "Plain memory: out of range")
 
 TEST_CASE( "Hierarchied memory: out of range")
 {
-    std::array<Byte, 16> arr{};
+    std::array<std::byte, 16> arr{};
     auto ptr = FuncMemory::create_hierarchied_memory( 10, 3, 4);
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
@@ -156,8 +156,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
     // Single byte
-    const Byte write_data_1{ 0xA5};
-    Byte read_data_1{ 0xFF};
+    const std::byte write_data_1{ 0xA5};
+    std::byte read_data_1{ 0xFF};
 
     // Write
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
@@ -174,9 +174,9 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
     // 8 bytes
     const constexpr size_t size = 8;
-    const std::array<Byte, size> write_data_8 = {{Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}}};
-    std::array<Byte, size> read_data_8{};
-    read_data_8.fill(Byte{ 0xFF});
+    const std::array<std::byte, size> write_data_8 = {{std::byte{0x11}, std::byte{0x22}, std::byte{0x33}, std::byte{0x44}, std::byte{0x55}, std::byte{0x66}, std::byte{0x77}, std::byte{0x88}}};
+    std::array<std::byte, size> read_data_8{};
+    read_data_8.fill(std::byte{ 0xFF});
 
     // Write
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_8.data(), size) == size);
@@ -194,14 +194,14 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
     auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
-    // 1 KByte
+    // 1 Kstd::byte
     const  constexpr size_t size = 1024;
-    std::array<Byte, size> write_data_1024{};
+    std::array<std::byte, size> write_data_1024{};
     for (size_t i = 0; i < size; i++)
-        write_data_1024.at(i) = Byte( i & 0xFFU);
+        write_data_1024.at(i) = std::byte( i & 0xFFU);
 
-    std::array<Byte, size> read_data_1024{};
-    read_data_1024.fill(Byte( 0xFF));
+    std::array<std::byte, size> read_data_1024{};
+    read_data_1024.fill(std::byte( 0xFF));
 
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
