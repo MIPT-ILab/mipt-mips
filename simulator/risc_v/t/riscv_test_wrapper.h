@@ -19,7 +19,14 @@ struct TestData {
         instr.set_v_src( src1, 0);
         instr.set_v_src( src2, 1);
         instr.execute();
-        CHECK( instr.get_v_dst() == dst);
+        if constexpr ( std::is_same_v<T, uint128>) {
+            // CATCH cannot handle 128 bit integers, let's check both parts sequentially
+            CHECK( unpack_to<uint64>( instr.get_v_dst())[0] == unpack_to<uint64>( dst)[0]);
+            CHECK( unpack_to<uint64>( instr.get_v_dst())[1] == unpack_to<uint64>( dst)[1]);
+        }
+        else {
+            CHECK( instr.get_v_dst() == dst);
+        }
     }
 
     void make_test( std::string_view str)

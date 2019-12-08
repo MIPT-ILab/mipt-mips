@@ -123,6 +123,19 @@ template<> struct doubled<int64>   { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
+template<size_t N, typename T> struct packed       { using type = doubled_t<typename packed<N / 2, T>::type>; };
+template<typename T>           struct packed<1, T> { using type = T; };
+template<size_t N, typename T> using packed_t = typename packed<N, T>::type;
+
+/* Convert type to 2x smaller type */
+template<typename> struct halved;
+template<> struct halved<uint16>  { using type = uint8; };
+template<> struct halved<uint32>  { using type = uint16; };
+template<> struct halved<uint64>  { using type = uint32; };
+template<> struct halved<uint128> { using type = uint64; };
+
+template<typename T> using halved_t = typename halved<T>::type;
+
 using Addr = uint64;
 using AddrDiff = int64;
 

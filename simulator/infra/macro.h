@@ -91,6 +91,30 @@ static constexpr T bitmask( size_t onecount)
     return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
 
+template<typename To, typename From>
+static constexpr inline auto unpack_to( From src) noexcept
+{
+    std::array<To, bytewidth<From> / bytewidth<To>> result{};
+    const constexpr size_t shift = bitwidth<To>;
+    for ( size_t i = 0; i < result.size(); ++i)
+        result[i] = narrow_cast<To>( src >> ( shift * i) & bitmask<From>( shift));
+
+    return result;
+}
+
+template<typename From, size_t N>
+static constexpr inline auto pack_from( std::array<From, N> src) noexcept
+{
+    using To = packed_t<N, From>;
+    To result{};
+    size_t shift = 0;
+    for ( const auto& value : src) {
+        result |= To{ value} << shift;
+        shift += bitwidth<From>;
+    }
+    return result;
+}        
+
 // https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
 template<typename T>
 constexpr auto popcount( T x) noexcept
@@ -103,9 +127,8 @@ constexpr auto popcount( T x) noexcept
 
 static inline auto popcount( uint128 x) noexcept
 {
-    auto left  = narrow_cast<uint64>( ( x >> 64) & bitmask<uint128>( 64));
-    auto right = narrow_cast<uint64>( x & bitmask<uint128>( 64));
-    return popcount( left) + popcount( right);
+    const auto& u = unpack_to<uint64>( x);
+    return popcount( u[0]) + popcount( u[1]);
 }
 
 template <typename T>
@@ -298,6 +321,27 @@ static constexpr T interleaved_mask( size_t density)
     T result{};
     for ( size_t i = 0; i < bitwidth<T>; ++i)
         if ( ( i >> density) % 2 == 0)
+            result |= lsb_set<T>() << i;
+
+    return result;
+}
+
+/*
+ * With shift = 2, returns a left unshuffling mask
+ * 0 -> 0x4444'4444 (0010'0010'01...)
+ * 1 -> 0x3030'3030 (0000'1100'00...)
+ * 2 -> 0x0F00'0F00
+ * With shift = 1, return a right unshuffling mask
+ * 0 -> 0x2222'2222 (0100'0100'00...)
+ * 1 -> 0x0C0C'0C0C (0011'0000'00...)
+ * 2 -> 0x00F0'00F0
+ */
+template<typename T, size_t shift>
+static constexpr T shuffle_mask( size_t density)
+{
+    T result{};
+    for ( size_t i = 0; i < bitwidth<T>; ++i)
+        if ( (i >> density) % 4 == shift)
             result |= lsb_set<T>() << i;
 
     return result;
