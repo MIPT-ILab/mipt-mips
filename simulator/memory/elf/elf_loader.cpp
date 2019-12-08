@@ -20,11 +20,12 @@ static void load_elf_section( WriteableMemory* memory, const ELFIO::section& sec
     memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
 }
 
-ElfLoader::ElfLoader( const std::string& filename)
+ElfLoader::ElfLoader( std::string_view filename)
     : reader( std::make_unique<ELFIO::elfio>())
 {
-    if ( !reader->load( filename))
-        throw InvalidElfFile( filename);
+    std::string name( filename);
+    if ( !reader->load( name))
+        throw InvalidElfFile( name);
 }
 
 void ElfLoader::load_to( WriteableMemory *memory, AddrDiff offset) const

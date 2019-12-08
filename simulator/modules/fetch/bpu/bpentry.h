@@ -9,6 +9,7 @@
 
 #include <array>
 
+#include <infra/macro.h>
 #include <infra/types.h>
 
 /* TODO: move implemetations to .cpp file */
@@ -34,7 +35,7 @@ class BPEntryBackwardJumps final
 {
 public:
     /* prediction */
-    bool is_taken( Addr PC, Addr target) const { return target < PC ; }
+    static bool is_taken( Addr PC, Addr target) { return target < PC ; }
     void update( bool /* is_taken */) { }
     void reset() { }
 };
@@ -92,7 +93,7 @@ public:
                 {
                     case StateValue::NT:  value = StateValue::WNT; break;
                     case StateValue::WNT: value = StateValue::WT;  break;
-                    case StateValue::WT:  value = StateValue::T;   break;
+                    case StateValue::WT:  /* fallthrough */
                     case StateValue::T:   value = StateValue::T;   break; // saturation
                 }
             }
@@ -100,7 +101,7 @@ public:
             {
                 switch ( value)
                 {
-                    case StateValue::NT:  value = StateValue::NT;  break; // saturation
+                    case StateValue::NT:  /* fallthrough, saturation */
                     case StateValue::WNT: value = StateValue::NT;  break;
                     case StateValue::WT:  value = StateValue::WNT; break;
                     case StateValue::T:   value = StateValue::WT;  break;
@@ -154,13 +155,12 @@ class BPEntryAdaptive final
      * 11 -- WNT
      * ---------
      */
-    std::array<BPEntryTwoBit::State, (1ull << DEPTH)> state_table = {{}};
+    std::array<BPEntryTwoBit::State, bitmask<size_t>(DEPTH) + 1> state_table = {{}};
 
     /* two-level predictor */
     class PredictionPattern
     {
-        static const constexpr uint32 pattern_mask = ( 1ull << DEPTH) - 1;
-
+        static const constexpr uint32 pattern_mask = bitmask<uint32>(DEPTH);
         static const constexpr uint32 default_pattern = 0;
         uint32 value = default_pattern;
 
@@ -170,10 +170,10 @@ class BPEntryAdaptive final
 
         void update( bool is_taken)
         {
-            value <<= 1u;
+            value <<= 1U;
             value &= pattern_mask;
             if ( is_taken)
-                value |= 1u;
+                value |= 1U;
         }
 
         void reset() { value = default_pattern; }

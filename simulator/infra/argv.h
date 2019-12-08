@@ -49,9 +49,4 @@ static inline constexpr const char* const* argv_cast( const char** argv)
     return static_cast<const char* const*>( argv);
 }
 
-static inline constexpr const char* const* argv_cast( const char* const* argv)
-{
-    return argv;
-}
-
 #endif

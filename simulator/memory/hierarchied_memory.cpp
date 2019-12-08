@@ -83,9 +83,9 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
     offset_mask( bitmask<Addr>( offset_bits)),
     page_mask ( bitmask<Addr>( page_bits) << offset_bits),
     set_mask ( bitmask<Addr>( set_bits) << ( page_bits + offset_bits)),
-    page_cnt ( 1ull << page_bits ),
-    set_cnt ( 1ull << set_bits ),
-    page_size ( 1ull << offset_bits)
+    page_cnt ( 1ULL << page_bits ),
+    set_cnt ( 1ULL << set_bits ),
+    page_size ( 1ULL << offset_bits)
 {
     using namespace std::literals::string_literals;
     if ( set_bits >= min_sizeof<uint32, size_t>() * 8)

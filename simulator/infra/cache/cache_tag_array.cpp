@@ -138,8 +138,9 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
         { }
 
-        const size_t line_bits;
+        auto get_line_bits() const noexcept { return line_bits; }
     public:
+        const size_t line_bits;
         uint32 sets;
         const size_t set_bits;
         const Addr   addr_mask;
@@ -180,11 +181,12 @@ class SimpleCacheTagArray : public CacheTagArraySize
         int32 write( Addr addr) final;
         std::pair<bool, int32> read( Addr addr) final;
         std::pair<bool, int32> read_no_touch( Addr addr) const final;
-    protected:
+
+    private:
         struct Tag
         {
             bool is_valid = false;
-            Addr tag = 0u;
+            Addr tag = {};
         };
 
         // tags storage
@@ -265,17 +267,17 @@ int32 SimpleCacheTagArray::write( Addr addr)
 }
 
 std::unique_ptr<CacheTagArray> CacheTagArray::create(
-    const std::string& repl_policy,
+    const std::string& type,
     uint32 size_in_bytes,
     uint32 ways,
     uint32 line_size,
     uint32 addr_size_in_bits)
 {
-    if ( repl_policy == "always_hit")
+    if ( type == "always_hit")
         return std::make_unique<AlwaysHitCacheTagArray>();
-    if ( repl_policy == "infinite")
+    if ( type == "infinite")
         return std::make_unique<InfiniteCacheTagArray>();
 
-    return std::make_unique<SimpleCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits, repl_policy);
+    return std::make_unique<SimpleCacheTagArray>( size_in_bytes, ways, line_size, addr_size_in_bits, type);
 }
 

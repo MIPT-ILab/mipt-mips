@@ -12,7 +12,7 @@
 #include "../memory.h"
 #include "check_coherency.h"
 
-static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
+static const std::string_view valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
 static const uint64 dataSectAddrShifted = 0x100c0;
@@ -50,7 +50,7 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the "__start" label*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0U /*address of the "__start" label*/);
 }
 
 TEST_CASE( "Func_memory: StartPC Invalid")
@@ -95,8 +95,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
     CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
-    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFULL) == 0x030201);
+    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ULL) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
     CHECK( func_mem->read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
@@ -198,7 +198,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
     const  constexpr size_t size = 1024;
     std::array<Byte, size> write_data_1024{};
     for (size_t i = 0; i < size; i++)
-        write_data_1024.at(i) = Byte( i & 0xFFu);
+        write_data_1024.at(i) = Byte( i & 0xFFU);
 
     std::array<Byte, size> read_data_1024{};
     read_data_1024.fill(Byte( 0xFF));
@@ -286,11 +286,24 @@ TEST_CASE( "Func_memory: ZeroMemory")
 {
     ZeroMemory zm;
     CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm.dump() == "empty memory\n");
 }
 
 TEST_CASE( "Func_memory: String length in zero memory")
 {
     CHECK( ZeroMemory().strlen(0x10) == 0);
+}
+
+TEST_CASE( "Zero_memory: Duplicate")
+{
+    auto mem1 = FuncMemory::create_plain_memory( 24);
+    auto mem2 = FuncMemory::create_plain_memory( 24);
+
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
+    mem1->duplicate_to( mem2);
+    ZeroMemory().duplicate_to( mem1); // nop
+
+    check_coherency( mem1.get(), mem2.get(), 0);
 }
 
 TEST_CASE( "Func_memory: String length, no zero bytes")
@@ -345,15 +358,15 @@ TEST_CASE( "Func_memory: Write to 0")
 {
     class DummyStore {
     public:
-        Addr get_mem_addr() const { return 0; };
-        uint32 get_mem_size() const { return 8; }
-        auto get_endian() const { return Endian::little; } 
-        uint64 get_mask() const { return all_ones<uint64>(); }
-        bool is_load() const { return false; }
-        bool is_store() const { return true; }
-        uint64 get_v_src2() const { return NO_VAL64; }
-        uint64 get_v_dst() const { return 0; }
-        void load(uint64 /* unused */) { }
+        static Addr get_mem_addr() { return 0; };
+        static uint32 get_mem_size() { return 8; }
+        static auto get_endian() { return Endian::little; } 
+        static uint64 get_mask() { return all_ones<uint64>(); }
+        static bool is_load() { return false; }
+        static bool is_store() { return true; }
+        static uint64 get_v_src2() { return NO_VAL64; }
+        static uint64 get_v_dst() { return 0; }
+        static void load(uint64 /* unused */) { }
     } store;
     auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);

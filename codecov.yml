@@ -1,0 +1,6 @@
+ignore:
+  - "external"
+  - "simulator/export/cen64/*.h"
+  - "simulator/export/cen64/*.cpp"
+  - "simulator/export/gdb/*.h"
+  - "simulator/export/gdb/*.cpp"

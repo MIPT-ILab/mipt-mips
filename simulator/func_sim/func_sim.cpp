@@ -13,7 +13,7 @@
 
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log)
-    : Simulator()
+    : BasicFuncSim()
     , imem( endian)
     , driver( ISA::create_driver( this))
 {
@@ -61,12 +61,12 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
     auto current_pc = pc[0];
     for (size_t i = 0; i < instr.get_delayed_slots(); ++i) {
         current_pc += 4;
-        pc[i] = current_pc;
+        pc.at(i) = current_pc;
     }
-    pc[instr.get_delayed_slots()] = instr.get_new_PC();
+    pc.at(instr.get_delayed_slots()) = instr.get_new_PC();
     if (delayed_slots > 0) {
         for (size_t i = 0; i < delayed_slots; ++i)
-            pc[i] = pc[i + 1];
+            pc.at(i) = pc.at(i + 1);
         --delayed_slots;
     }
     else {

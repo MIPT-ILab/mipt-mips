@@ -10,6 +10,12 @@ using Instr = RISCVInstr<uint64>;
  
 #include "riscv_test_wrapper.h"
 
+// TODO(pkryukov): Visual Studio is right - sign extension may produce unexpected results.
+// Let's clean up that later.
+#ifdef _MSC_VER
+#pragma warning( disable : 4245 )
+#endif
+
 TEST_IMM_OP( 2,  addi, 0x00000000, 0x00000000, 0x000 )
 TEST_IMM_OP( 3,  addi, 0x00000002, 0x00000001, 0x001 )
 TEST_IMM_OP( 4,  addi, 0x0000000a, 0x00000003, 0x007 )

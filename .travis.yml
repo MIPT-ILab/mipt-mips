@@ -2,7 +2,7 @@ notifications:
   email: false
 
 language: cpp
-dist: xenial
+dist: bionic
 osx_image: xcode10.1
 
 branches:
@@ -12,40 +12,40 @@ branches:
 compiler:
   - gcc
   - clang
+
 os:
   - linux
   - osx
+
+arch:
+  - amd64
+  - arm64
 
 matrix:
   exclude:
     - os: osx
       compiler: gcc
+    - os: osx
+      arch: arm64
 
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
-    - sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main
+    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+      key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     update: true
     packages:
+    - cmake
     - libboost-dev
     - ninja-build
     - python3
+    - nodejs
   homebrew:
     packages:
     - ninja
     update: true
 
 install:
-  - |
-    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install g++-7
-        CXX=g++-7
-    fi
-  - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install libstdc++-7-dev
-    fi
 # Download GDB
   - wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz
   - tar -xzf gdb-8.3.tar.gz
@@ -53,7 +53,10 @@ install:
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
-# Prepare for GDB build
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer       && npm install;
+    fi
   - cd $TRAVIS_BUILD_DIR/gdb-8.3              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
   - cd $TRAVIS_BUILD_DIR/gdb-8.3              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - cd $TRAVIS_BUILD_DIR/gdb-8.3/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
@@ -65,22 +68,37 @@ script:
   - ninja mipt-mips unit-tests
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
-  - cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
-  - make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+  # TODO (pkryukov): run NPM on ARM
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer
+        npm run test
+    fi
+  # TODO (pkryukov): GDB build hangs on ARM...
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/gdb-8.3/gdb
+        make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+    fi
 
 after_success:
   - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get install clang-tidy-9 --allow-unauthenticated
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        sudo apt-get install clang-tidy-9 g++-8
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
+        clang-tidy-9 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
         run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
     fi
   - |
-    if [ $CXX == g++-7 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
         ninja unit-tests && ctest
         bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
+        cd $TRAVIS_BUILD_DIR/visualizer
+        if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
     fi
