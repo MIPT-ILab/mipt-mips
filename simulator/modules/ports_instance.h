@@ -41,7 +41,6 @@ class MIPSRegister;
 class RISCVRegister;
 template<typename T> class BypassCommand;
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define PORT_TOKEN(x) \
     extern template class PortQueue<std::pair<x, Cycle>>; \
     extern template class ReadPort<x>; \
