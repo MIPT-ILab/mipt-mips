@@ -93,3 +93,13 @@ void signal_dd_interrupt(struct vr4300* vr4300)
 {
     vr4300->apply_mask_to_cause( 0x800);
 }
+
+uint64_t get_profile_sample(struct vr4300 const *, size_t)
+{
+    return 0;
+}
+
+int has_profile_samples(struct vr4300 const *)
+{
+    return 0;
+}

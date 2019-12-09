@@ -62,6 +62,9 @@ void signal_rcp_interrupt(struct vr4300 *vr4300, enum rcp_interrupt_mask mask);
 void clear_dd_interrupt(struct vr4300 *vr4300);
 void signal_dd_interrupt(struct vr4300 *vr4300);
 
+uint64_t get_profile_sample(struct vr4300 const *vr4300, size_t i);
+int has_profile_samples(struct vr4300 const *vr4300);
+
 }
 
 #endif
