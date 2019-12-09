@@ -34,20 +34,20 @@ template<typename ... Args>
 constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
 
 /* Bit width of integer type */
-template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
+template<typename T>
+static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 
 /* 128 types have no std::numeric_limits */
-template<> constexpr size_t bitwidth<uint128> = 128U; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr size_t bitwidth<int128> = 128U; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<> inline constexpr size_t bitwidth<uint128> = 128U;
+template<> inline constexpr size_t bitwidth<int128> = 128U;
 
 /* Byte width of integer type */
-template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
+template<typename T>
+static constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 
 /* Bit width / 2 */
-template<typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-constexpr size_t half_bitwidth = bitwidth<T> >> 1;
+template<typename T>
+static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
 
 /*
  * Returns value of T type with only the most significant bit set
@@ -182,8 +182,8 @@ static constexpr inline size_t find_first_set(const T& value) noexcept
     return bitwidth<UT> - count_leading_zeroes<UT>( uvalue - ( uvalue & ( uvalue - 1U))) - 1U;
 }
 
-template <typename T> // NOLINTNEXTLINE(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
+template <typename T>
+static constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
 
 /*
  * Templated no-value (non-trivial data of given size)
