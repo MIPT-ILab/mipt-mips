@@ -2,7 +2,7 @@
  * macro.h - Implementation of useful inline functions
  *
  * @author Pavel Kryukov <pavel.kryukov@phystech.edu>
- * Copyright 2017-2018 MIPT-MIPS
+ * Copyright 2017-2019 MIPT-MIPS
  */
 
 #ifndef COMMON__MACRO_H
@@ -188,11 +188,11 @@ static constexpr size_t log_bitwidth = find_first_set(bitwidth<T>);
 /*
  * Templated no-value (non-trivial data of given size)
  */
-template<typename T> constexpr T NO_VAL = all_ones<T>(); // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr uint8  NO_VAL<uint8>  = NO_VAL8; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr uint16 NO_VAL<uint16> = NO_VAL16; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr uint32 NO_VAL<uint32> = NO_VAL32; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
-template<> constexpr uint64 NO_VAL<uint64> = NO_VAL64; // NOLINT(misc-definitions-in-headers) https://bugs.llvm.org/show_bug.cgi?id=43109
+template<typename T> static constexpr T NO_VAL = all_ones<T>();
+template<> inline constexpr uint8  NO_VAL<uint8>  = NO_VAL8;
+template<> inline constexpr uint16 NO_VAL<uint16> = NO_VAL16;
+template<> inline constexpr uint32 NO_VAL<uint32> = NO_VAL32;
+template<> inline constexpr uint64 NO_VAL<uint64> = NO_VAL64;
 
 template<typename T>
 static constexpr T ones_ls( const T& value, size_t shamt)
