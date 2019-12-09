@@ -136,9 +136,6 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
-
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
@@ -147,10 +144,28 @@ static constexpr auto check_to_pointer()
     return res;
 }
 
+#if 0 // C++ 20 allows constexpr std::copy
+
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
 static_assert(check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
 static_assert(check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
 static_assert(check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+
+#else
+
+TEST_CASE( "Byte swapping pointer access")
+{    
+    CHECK( get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+    CHECK( get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
+    CHECK( check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
+    CHECK( check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
+    CHECK( check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
+    CHECK( check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+}
+
+#endif
 
 static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
 static_assert( count_argc( some_argv.data()) == 3);
