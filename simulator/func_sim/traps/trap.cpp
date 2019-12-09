@@ -73,17 +73,21 @@ struct Entry
     uint8 mips;
 };
 
-static const std::unordered_map<Trap, Entry> converter =
+static const auto& converter()
 {
-    #define TRAP(name, gdb, riscv, mips) { Trap( Trap:: name), Entry{ #name, gdb, riscv, mips } },
-    #include "trap.def"
-    #undef TRAP
-};
+    static const std::unordered_map<Trap, Entry> instance =
+    {
+#define TRAP(name, gdb, riscv, mips) { Trap( Trap:: name), Entry{ #name, gdb, riscv, mips } },
+#include "trap.def"
+#undef TRAP
+    };
+    return instance;
+}
 
 template<typename T, T Entry::*ptr>
 T convert_to( const Trap& trap) try
 {
-    return converter.at( trap).*ptr;
+    return converter().at( trap).*ptr;
 }
 catch ( const std::out_of_range&)
 {
@@ -93,7 +97,7 @@ catch ( const std::out_of_range&)
 template<typename T, T Entry::*ptr>
 Trap convert_from( const T& id, std::string_view name)
 {
-    for ( const auto& [trap, e] : converter)
+    for ( const auto& [trap, e] : converter())
         if ( e.*ptr == id)
             return trap;
 
