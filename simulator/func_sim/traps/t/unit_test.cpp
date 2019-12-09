@@ -28,7 +28,7 @@ TEST_CASE( "Trap: check conversion")
 TEST_CASE( "Trap: check initialization")
 {
     CHECK( Trap::from_riscv_format( CAUSE_MISALIGNED_FETCH) == Trap::UNALIGNED_FETCH);
-    CHECK( Trap::from_gdb_format( 5) == Trap::BREAKPOINT);
+    CHECK( Trap::from_gdb_format( 12) == Trap::UNSUPPORTED_SYSCALL);
     CHECK( Trap::from_mips_format( 16) == Trap::FP_OVERFLOW);
 }
 
