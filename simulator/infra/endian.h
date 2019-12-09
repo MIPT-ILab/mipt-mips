@@ -111,17 +111,15 @@ template<typename T, Endian e>
 static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size)
 {
     auto array = unpack_array<T, e>(value);
-    for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
-        *(buf + i) = array[i];
+    std::copy( array.begin(), array.begin() + size, buf);
 }
 
 template<typename T, Endian e>
 static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size)
 {
     std::array<std::byte, bytewidth<T>> array{};
-    for ( size_t i = 0; i < size; ++i) // NOLINTNEXTLINE
-        array[i] = *( buf + i);
-
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    std::copy( buf, buf + size, array.begin());
     return pack_array<T, e>( array);
 }
 
