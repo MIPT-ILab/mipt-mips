@@ -38,8 +38,8 @@ template<typename T>
 static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 
 /* 128 types have no std::numeric_limits */
-template<> static constexpr size_t bitwidth<uint128> = 128U;
-template<> static constexpr size_t bitwidth<int128> = 128U;
+template<> inline constexpr size_t bitwidth<uint128> = 128U;
+template<> inline constexpr size_t bitwidth<int128> = 128U;
 
 /* Byte width of integer type */
 template<typename T>
