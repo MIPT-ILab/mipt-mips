@@ -11,10 +11,22 @@
 #include "traps/trap.h"
 
 #include <infra/macro.h>
+
+#include <array>
 #include <tuple>
 
 template<size_t N, typename T>
-T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
+T align_up(T value) { return ((value + bitmask<T>(N)) >> N) << N; }
+
+template<typename T> static T bit_shuffle( T value, size_t level)
+{
+    const auto maskL = shuffle_mask<T, 2>( level);
+    const auto maskR = shuffle_mask<T, 1>( level);
+    const auto shamt = size_t{ 1} << ( level);
+    T result = value & ~( maskL | maskR);
+    result |= ( ( value << shamt) & maskL) | ( ( value >> shamt) & maskR);
+    return result;
+}
 
 struct ALU
 {
@@ -201,6 +213,17 @@ struct ALU
     // Bit permutation
     template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
+    template<typename I> static
+    void riscv_unshfl( I* instr)
+    {
+        auto dst_value = instr->v_src1;
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
+        for ( size_t i = 0; i < limit; ++i)
+            if ( ( instr->v_src2 >> i) & 1)
+                dst_value = bit_shuffle( dst_value, i);
+        instr->v_dst = dst_value;
+    }
+  
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 

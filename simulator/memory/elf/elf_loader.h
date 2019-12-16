@@ -42,7 +42,7 @@ namespace ELFIO {
 class ElfLoader
 {
 public:
-    explicit ElfLoader( const std::string& filename);
+    explicit ElfLoader( std::string_view filename);
     ~ElfLoader();
 
     // Regardless of 'const std::unique_ptr', we delete everything explicitly

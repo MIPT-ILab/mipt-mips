@@ -17,12 +17,12 @@ class PlainMemory : public FuncMemory
         explicit PlainMemory ( uint32 addr_bits);
 
         std::string dump() const final;
-        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
-        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
+        size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final;
+        size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
         size_t strlen( Addr addr) const final;
     private:
-        std::vector<Byte> arena;
+        std::vector<std::byte> arena;
 };
 
 std::shared_ptr<FuncMemory>
@@ -31,14 +31,14 @@ FuncMemory::create_plain_memory( uint32 addr_bits)
     return std::make_shared<PlainMemory>( addr_bits);
 }
 
-PlainMemory::PlainMemory( uint32 addr_bits) : arena( 1ull << addr_bits) { }
+PlainMemory::PlainMemory( uint32 addr_bits) : arena( 1ULL << addr_bits) { }
 
 void PlainMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
     target->memcpy_host_to_guest( 0, arena.data(), arena.size());
 }
 
-size_t PlainMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+size_t PlainMemory::memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size)
 {
     if ( size > arena.size())
         throw FuncMemoryOutOfRange( dst + size, arena.size());
@@ -54,7 +54,7 @@ size_t PlainMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size
     return size;
 }
 
-size_t PlainMemory::memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept
+size_t PlainMemory::memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept
 {
     size_t valid_size = std::min<size_t>( size, arena.size() - src);
     std::copy( arena.begin() + src, arena.begin() + src + valid_size, dst);
@@ -76,5 +76,5 @@ std::string PlainMemory::dump() const
 
 size_t PlainMemory::strlen( Addr addr) const
 {
-    return std::distance( arena.begin() + addr, std::find( arena.begin() + addr, arena.end(), Byte{}));
+    return std::distance( arena.begin() + addr, std::find( arena.begin() + addr, arena.end(), std::byte{}));
 }

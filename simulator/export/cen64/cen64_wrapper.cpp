@@ -12,9 +12,9 @@ static const constexpr uint64 MI_REGS_BASE_ADDRESS = 0x04300000;
 int vr4300::init( std::shared_ptr<FuncMemory> m)
 {
     set_memory( std::move( m));
-    set_pc( 0x1fc00000ull);
-    mi_regs[MI_VERSION_REG] = 0x01010101u;
-    mi_regs[MI_INIT_MODE_REG] = 0x80u;
+    set_pc( 0x1fc00000ULL);
+    mi_regs[MI_VERSION_REG] = 0x01010101U;
+    mi_regs[MI_INIT_MODE_REG] = 0x80U;
     return 0;
 }
 
@@ -76,26 +76,26 @@ void vr4300::write_mi_init_mode_reg( uint32 word)
     static const constexpr uint64 MI_EBUS_TEST_MODE = 0x0080;
     static const constexpr uint64 MI_INIT_MODE = 0x0100;
     static const constexpr uint64 MI_RDRAM_REG_MODE = 0x0200;
-    uint32 result = word & 0x3FFu;
+    uint32 result = word & 0x3FFU;
 
-    if ((word & 0x0080u) != 0)
+    if ((word & 0x0080U) != 0)
         result &= ~MI_INIT_MODE;
-    else if ((word & 0x0100u) != 0)
+    else if ((word & 0x0100U) != 0)
         result |= MI_INIT_MODE;
 
-    if ((word & 0x0200u) != 0)
+    if ((word & 0x0200U) != 0)
         result &= ~MI_EBUS_TEST_MODE;
-    else if ((word & 0x0400u) != 0)
+    else if ((word & 0x0400U) != 0)
         result |= MI_EBUS_TEST_MODE;
 
-    if ((word & 0x0800u) != 0) {
+    if ((word & 0x0800U) != 0) {
         mi_regs[MI_INTR_REG] &= ~MI_INTR_DP;
         check_for_interrupts();
     }
 
-    if ((word & 0x1000u) != 0)
+    if ((word & 0x1000U) != 0)
         result &= ~MI_RDRAM_REG_MODE;
-    else if ((word & 0x2000u) != 0)
+    else if ((word & 0x2000U) != 0)
         result |= MI_RDRAM_REG_MODE;
 
     mi_regs[MI_INIT_MODE_REG] = result;
@@ -103,34 +103,34 @@ void vr4300::write_mi_init_mode_reg( uint32 word)
 
 void vr4300::write_mi_intr_mask_reg( uint32 word)
 {
-    if ((word & 0x0001u) != 0)
+    if ((word & 0x0001U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_SP;
-    else if ((word & 0x0002u) != 0)
+    else if ((word & 0x0002U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_SP;
 
-    if ((word & 0x0004u) != 0)
+    if ((word & 0x0004U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_SI;
-    else if ((word & 0x0008u) != 0)
+    else if ((word & 0x0008U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_SI;
 
-    if ((word & 0x0010u) != 0)
+    if ((word & 0x0010U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_AI;
-    else if ((word & 0x0020u) != 0)
+    else if ((word & 0x0020U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_AI;
 
-    if ((word & 0x0040u) != 0)
+    if ((word & 0x0040U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_VI;
-    else if ((word & 0x0080u) != 0)
+    else if ((word & 0x0080U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_VI;
 
-    if ((word & 0x0100u) != 0)
+    if ((word & 0x0100U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_PI;
-    else if ((word & 0x0200u) != 0)
+    else if ((word & 0x0200U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_PI;
 
-    if ((word & 0x0400u) != 0)
+    if ((word & 0x0400U) != 0)
         mi_regs[MI_INTR_MASK_REG] &= ~MI_INTR_DP;
-    else if ((word & 0x0800u) != 0)
+    else if ((word & 0x0800U) != 0)
         mi_regs[MI_INTR_MASK_REG] |= MI_INTR_DP;
 
     check_for_interrupts();

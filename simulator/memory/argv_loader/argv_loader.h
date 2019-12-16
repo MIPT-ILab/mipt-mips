@@ -8,7 +8,6 @@
 #define ARGV_LOADER_H
 
 #include <infra/argv.h>
-#include <infra/byte.h>
 #include <infra/types.h>
 #include <memory/memory.h>
 

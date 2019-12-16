@@ -34,15 +34,15 @@ class MIPSVersionMask {
     uint64 mask = 0;
 public:
     constexpr MIPSVersionMask() = default;
-    constexpr bool is_supported( MIPSVersion version) const {
-        return ((mask >> static_cast<unsigned>(version)) & 0x1u) != 0;
+    constexpr bool is_supported( MIPSVersion version) const noexcept {
+        return ((mask >> static_cast<unsigned>(version)) & 0x1U) != 0;
     }
-    constexpr MIPSVersionMask operator|( MIPSVersion rhs) const {
+    constexpr MIPSVersionMask operator|( MIPSVersion rhs) const noexcept {
         MIPSVersionMask result = *this;
-        result.mask |= ( 1ull << static_cast<unsigned>(rhs));
+        result.mask |= ( 1ULL << static_cast<unsigned>(rhs));
         return result;
     }
-    constexpr MIPSVersionMask operator|( MIPSVersionMask rhs) const {
+    constexpr MIPSVersionMask operator|( MIPSVersionMask rhs) const noexcept {
         MIPSVersionMask result = *this;
         result.mask |= rhs.mask;
         return result;

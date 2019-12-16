@@ -3,14 +3,13 @@
  * The types are used in algorithms affected by size of a variable
  *
  * @author Alexander Titov <alexander.igorevich.titov@gmail.com>
- * Copyright 2012-2018 MIPT-MIPS project
+ * Copyright 2012-2019 MIPT-MIPS project
  */
 
-// protection from multi-include
 #ifndef COMMON__TYPES_H
 #define COMMON__TYPES_H
 
-// C++11 fixed width integer types
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 
@@ -36,6 +35,31 @@ using uint64 = uint64_t;
 using float32 = float;
 using float64 = double;
 
+// Byte casts
+static inline std::byte* byte_cast( char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
+static inline std::byte* byte_cast( uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
 // Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
 #if defined(__GNUC__) && defined(__SIZEOF_INT128__)
 
@@ -55,10 +79,7 @@ std::ostream& operator<<(std::ostream& out, uint128 value);
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-/* Unsigned 128-bit integer type */
 using uint128 = boost::multiprecision::uint128_t;
-
-/* Signed 128-bit integer type */
 using int128 = boost::multiprecision::int128_t;
 
 #endif // __SIZEOF_INT128__
@@ -102,6 +123,19 @@ template<> struct doubled<int64>   { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
+template<size_t N, typename T> struct packed       { using type = doubled_t<typename packed<N / 2, T>::type>; };
+template<typename T>           struct packed<1, T> { using type = T; };
+template<size_t N, typename T> using packed_t = typename packed<N, T>::type;
+
+/* Convert type to 2x smaller type */
+template<typename> struct halved;
+template<> struct halved<uint16>  { using type = uint8; };
+template<> struct halved<uint32>  { using type = uint16; };
+template<> struct halved<uint64>  { using type = uint32; };
+template<> struct halved<uint128> { using type = uint64; };
+
+template<typename T> using halved_t = typename halved<T>::type;
+
 using Addr = uint64;
 using AddrDiff = int64;
 
@@ -112,8 +146,8 @@ using AddrDiff = int64;
 // or array index.
 static const uint8  NO_VAL8  = 0xBA;
 static const uint16 NO_VAL16 = 0xf00d;
-static const uint32 NO_VAL32 = 0xdead'beeful;
-static const uint64 NO_VAL64 = 0xfeed'face'cafe'beafull;
+static const uint32 NO_VAL32 = 0xdead'beefUL;
+static const uint64 NO_VAL64 = 0xfeed'face'cafe'beafULL;
 
 static const uint8  MAX_VAL8  = UINT8_MAX;
 static const uint16 MAX_VAL16 = UINT16_MAX;

@@ -851,7 +851,7 @@ template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     this->imm_print_type = entry.imm_print_type;
-    this->operation = entry.operation;
+    this->set_type( entry.operation);
     this->mem_size  = entry.mem_size;
     this->executor  = entry.versions.is_supported(version) ? entry.function : mips_unknown<MyDatapath>;
     this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();

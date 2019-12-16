@@ -47,5 +47,8 @@
   "engines": {
     "npm": ">=6",
     "node": ">=8"
+  },
+  "dependencies": {
+    "serialize-javascript": "^2.1.1"
   }
 }

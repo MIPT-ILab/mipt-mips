@@ -45,14 +45,14 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
-                && this->sequence_id == rhs.sequence_id
+                && this->get_sequence_id() == rhs.get_sequence_id()
                 && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
                 && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
         }
 
         std::string get_disasm() const;
 
-        bool is_nop() const { return raw == 0x0u; }
+        bool is_nop() const { return raw == 0x0U; }
 
         std::string string_dump() const;
         std::string bytes_dump() const;
