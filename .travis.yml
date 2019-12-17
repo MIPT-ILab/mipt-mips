@@ -78,7 +78,7 @@ script:
   # TODO (pkryukov): GDB build hangs on ARM...
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        cd $GDB_DIR
+        cd $GDB_DIR/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
     fi
