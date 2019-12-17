@@ -61,7 +61,7 @@ before_script:
   - cd $GDB_DIR              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - cd $GDB_DIR/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
   - cd $GDB_DIR/libdecnumber && ./configure && make libdecnumber.a
-  - cd $GDB_DIR/readline     && ./configure && make libreadline.a
+  - cd $GDB_DIR/readline     && ./configure && cd readline && make libreadline.a
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
