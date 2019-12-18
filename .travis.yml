@@ -43,18 +43,13 @@ addons:
   homebrew:
     packages:
     - ninja
-    - bison
     update: true
 
 install:
 # Download GDB
   - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
-  - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
-# Newer Bison for GDB 9 build
-  - |
-    if [ $TRAVIS_OS_NAME == osx ]; then
-        export PATH=/usr/local/opt/bison/bin:$PATH
-    fi
+#  --branch gdb-9-branch -- need recent patches for MacOS
+  - git clone git://sourceware.org/git/binutils-gdb.git --depth 1
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
