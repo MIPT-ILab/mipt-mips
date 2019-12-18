@@ -43,6 +43,7 @@ addons:
   homebrew:
     packages:
     - ninja
+    - bison
     update: true
 
 install:
