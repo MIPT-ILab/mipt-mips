@@ -48,8 +48,7 @@ addons:
 install:
 # Download GDB
   - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
-#  --branch gdb-9-branch -- need recent patches for MacOS
-  - git clone git://sourceware.org/git/binutils-gdb.git --depth 1
+  - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
