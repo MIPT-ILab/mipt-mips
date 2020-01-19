@@ -165,7 +165,7 @@ if (GDB_SOURCE_PATH)
     include_directories(SYSTEM
             ${GDB_SOURCE_PATH}/
 	    ${GDB_BUILD_PATH}/
-            ${GDB_SOURCE_PATH}/bfd
+            ${GDB_BUILD_PATH}/bfd
             ${GDB_SOURCE_PATH}/include
             ${GDB_SOURCE_PATH}/sim/common)
 else ()
