@@ -206,5 +206,5 @@ if (GDB_SOURCE_PATH)
             PREFIX ""
             SUFFIX ""
             OUTPUT_NAME "libsim.a"
-            ARCHIVE_OUTPUT_DIRECTORY "${GDB_SOURCE_PATH}/sim/mips")
+            ARCHIVE_OUTPUT_DIRECTORY "${GDB_BUILD_PATH}/}/sim/mips")
 endif (GDB_SOURCE_PATH)
