@@ -53,7 +53,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
