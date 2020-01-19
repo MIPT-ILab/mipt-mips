@@ -48,6 +48,7 @@ addons:
 install:
 # Download GDB
   - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
+  - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
   - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
 
 before_script:
@@ -58,12 +59,12 @@ before_script:
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
     fi
   - cd $TRAVIS_BUILD_DIR     && mkdir gdb_build
-  - cd $TRAVIS_BUILD_DIR/gdb_build && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $TRAVIS_BUILD_DIR/gdb_build && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $GDB_DIR/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $GDB_DIR/libdecnumber && ./configure && make libdecnumber.a
-  - cd $GDB_DIR/readline     && ./configure && cd readline && make libreadline.a
-  - cd $GDB_DIR/libctf       && ./configure && make libctf.la
+  - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
+  - cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+  - cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && make libreadline.a
+  - cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure && make libctf.la
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
