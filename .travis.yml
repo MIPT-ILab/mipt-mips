@@ -57,9 +57,9 @@ before_script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
     fi
-  - mkdir gdb_build
-  - cd gdb_build             && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd gdb_build             && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $TRAVIS_BUILD_DIR     && mkdir gdb_build
+  - cd $TRAVIS_BUILD_DIR/gdb_build && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $TRAVIS_BUILD_DIR/gdb_build && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
   - cd $GDB_DIR/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
   - cd $GDB_DIR/libdecnumber && ./configure && make libdecnumber.a
   - cd $GDB_DIR/readline     && ./configure && cd readline && make libreadline.a
