@@ -164,7 +164,8 @@ if (GDB_SOURCE_PATH)
     include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
     include_directories(SYSTEM
             ${GDB_SOURCE_PATH}/
-            ${GDB_SOURCE_PATH}/bfd
+            ${GDB_BUILD_PATH}/
+            ${GDB_BUILD_PATH}/bfd
             ${GDB_SOURCE_PATH}/include
             ${GDB_SOURCE_PATH}/sim/common)
 else ()
@@ -205,5 +206,5 @@ if (GDB_SOURCE_PATH)
             PREFIX ""
             SUFFIX ""
             OUTPUT_NAME "libsim.a"
-            ARCHIVE_OUTPUT_DIRECTORY "${GDB_SOURCE_PATH}/sim/mips")
+            ARCHIVE_OUTPUT_DIRECTORY "${GDB_BUILD_PATH}/sim/mips")
 endif (GDB_SOURCE_PATH)
