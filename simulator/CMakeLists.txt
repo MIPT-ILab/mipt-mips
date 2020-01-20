@@ -163,7 +163,6 @@ if (GDB_SOURCE_PATH)
     add_definitions(-DHAVE_CONFIG_H)
     include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
     include_directories(SYSTEM
-            ${GDB_SOURCE_PATH}/
             ${GDB_BUILD_PATH}/
             ${GDB_BUILD_PATH}/bfd
             ${GDB_SOURCE_PATH}/include
