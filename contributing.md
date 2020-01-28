@@ -17,7 +17,7 @@ However, you are free to open new issues. Mentors will assign them to project me
 1. Similarly, you must assign yourself to the Issue you're solving to prevent conflict.
 1. If you are trying to solve a new issue (not listed), please open a tracker, so mentor will be able to provide you points.
 1. Students are allowed to perform a task in collaboration, points will be divided half-by-half. You may use this option to solve really tough issues.
-1. The guideline is to have no more than two tasks assigned simultaneuosly. Exceptions are possible with mentors' approves.
+1. The guideline is to have no more than two tasks assigned simultaneously. Exceptions are possible with mentors' approves.
 
 ### Code and Merges
 1. Please follow our [code style guidelines](https://github.com/MIPT-ILab/mipt-mips/wiki/Code-style-guidelines).
@@ -25,6 +25,6 @@ However, you are free to open new issues. Mentors will assign them to project me
 1. Students are granted with write access to repository, so they can assign themselves on issues and change wiki.
 1. Students cannot push the changes directly to the `master` branch of repository, but they may create new branches.
 1. Keep commit messages and pull request description clean.
-1. We use continious integration by Travis and AppVeyour. If your changes did not pass all tests, your code would be reviewed in low priority.
+1. We use continuous integration by Travis and AppVeyour. If your changes did not pass all tests, your code would be reviewed in low priority.
 1. Continious integration may be bypassed by adding [skip ci] to commit message. It is allowed only for documentation changes.
 1. New code should be covered with existing unit tests or new unit tests, excepting special cases.

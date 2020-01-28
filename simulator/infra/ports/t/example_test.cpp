@@ -5,12 +5,12 @@
 
 #include "../module.h"
 #include <catch.hpp>
+
+#include <cassert>
 #include <map>
 
-static const int NONE = -1;
-static const int DATA_LIMIT = 5;
-static const Cycle EXPECTED_MAX_CYCLE = 8_cl;
-static const Cycle CLOCK_LIMIT = 10_cl;
+static const constexpr int NONE = -1;
+static const constexpr int DATA_LIMIT = 5;
 
 enum CheckCode {  MODULE_A, MODULE_B };
 
@@ -30,15 +30,7 @@ static bool check_data( Cycle cycle, CheckCode code, int data)
        { 8_cl, { NONE,    NONE }}
     };
 
-    if ( cycle > EXPECTED_MAX_CYCLE)
-        return false;
-
-    switch ( code)
-    {
-    case MODULE_A: return script[cycle].first  == data;
-    case MODULE_B: return script[cycle].second == data;
-    default: return false;
-    };
+    return ( code == MODULE_A ? script.at( cycle).first : script.at( cycle).second) == data;
 }
 
 static bool check_readiness( Cycle cycle, CheckCode code, bool is_ready)
@@ -85,10 +77,10 @@ public:
     }
 
 private:
-    std::unique_ptr<WritePort<int>> to_B;
-    std::unique_ptr<ReadPort<int>> from_B;
-    std::unique_ptr<ReadPort<int>> init;
-    std::unique_ptr<WritePort<bool>> stop;
+    WritePort<int>* to_B;
+    ReadPort<int>* from_B;
+    ReadPort<int>* init;
+    WritePort<bool>* stop;
 };
 
 class B : public Module
@@ -113,8 +105,8 @@ public:
     }
 
 private:
-    std::unique_ptr<WritePort<int>> to_A;
-    std::unique_ptr<ReadPort<int>> from_A;
+    WritePort<int>* to_A;
+    ReadPort<int>* from_A;
 };
 
 class TestRoot : public Root
@@ -135,12 +127,10 @@ public:
     {
         if ( stop->is_ready( cycle))
         {
-            CHECK( cycle == EXPECTED_MAX_CYCLE);
             stop->read( cycle);
             return true;
         }
 
-        CHECK( cycle < EXPECTED_MAX_CYCLE);
         a.clock( cycle);
         b.clock( cycle);
         return false;
@@ -149,12 +139,13 @@ private:
     A a;
     B b;
 
-    std::unique_ptr<WritePort<int>> init;
-    std::unique_ptr<ReadPort<bool>> stop;
+    WritePort<int>* init;
+    ReadPort<bool>* stop;
 };
 
 TEST_CASE( "test_ports: Test_Ports_A_B")
 {
+    static const constexpr Cycle CLOCK_LIMIT = 10_cl;
     TestRoot tr;
 
     for ( auto cycle = 0_cl; cycle < CLOCK_LIMIT; cycle.inc())

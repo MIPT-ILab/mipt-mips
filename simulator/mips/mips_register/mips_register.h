@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cassert>
-#include <string_view>
 #include <iostream>
+#include <string_view>
 #include <utility>
 
 class MIPSRegister {
@@ -62,7 +62,7 @@ public:
 
     static MIPSRegister from_gdb_index( size_t id)
     {
-        if (id < 32u)
+        if ( id < 32)
             return from_cpu_index( id);
 
         switch (id) {

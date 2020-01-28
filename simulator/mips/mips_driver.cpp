@@ -22,8 +22,8 @@ public:
 
         auto status = cpu->read_cpu_register( MIPSRegister::status().to_rf_index());
         auto cause  = cpu->read_cpu_register( MIPSRegister::cause().to_rf_index());
-        status |= 0x2;
-        cause = (cause & ~(bitmask<uint64>(4) << 2)) | ((trap.to_mips_format() & bitmask<uint64>(4)) << 2);
+        status |= 0x2U;
+        cause = (cause & ~(bitmask<uint64>(4) << 2U)) | ((trap.to_mips_format() & bitmask<uint64>(4)) << 2U);
         cpu->write_cpu_register( MIPSRegister::status().to_rf_index(), status);
         cpu->write_cpu_register( MIPSRegister::cause().to_rf_index(), cause);
         cpu->write_cpu_register( MIPSRegister::epc().to_rf_index(), instr.get_PC());
@@ -32,7 +32,7 @@ public:
     }
     std::unique_ptr<Driver> clone() const final { return std::make_unique<DriverMIPS32>( cpu); }
 private:
-    Simulator* const cpu = nullptr;
+    Simulator* const cpu;
 };
 
 std::unique_ptr<Driver> create_mips32_driver( Simulator* sim)

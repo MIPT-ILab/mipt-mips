@@ -17,6 +17,10 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L4]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA.pptx?raw=true
 [L4 AUDIO]: https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA%20AUDIO.pptx?raw=true
 [L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
+[L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L6/Lecture%206%20-%20Pipelining.%20Data%20Hazards.pptx?raw=true
+[L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L7/Lecture%207%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
+[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches.pptx?raw=true
+[L9]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L9/Lecture%209%20-%20Caches%2C%20part%202.pptx?raw=true
 [P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true 
 
 Date   | Type     | Event
@@ -29,6 +33,11 @@ Date   | Type     | Event
 07 Oct | Practice | **P1: Combinational and Sequential Circuits**<br>     • Slides: [no audio][P1]
 14 Oct | Lecture  | **L4: RISC-V ISA**<br>                                • Slides: [no audio][L4], [audio][L4 AUDIO]
 21 Oct | Lecture  | **L5: RISC-V Single-Cycle implementation**<br>        • Slides: [no audio][L5]
+28 Oct | Lecture  | **L6: Pipelining. Data Hazards.**<br>                 • Slides: [no audio][L6]
+11 Nov | Lecture  | **L7: Control Hazards. Branch Prediction.**<br>       • Slides: [no audio][L7]
+25 Nov | Lecture  | **L8: Caches, part 1**<br>                            • Slides: [no audio][L8]  
+02 Dec | Lecture  | **L9: Caches, part 2**<br>                            • Slides: [no audio][L9]  
+07 Dec | Test     | **Final Test**<br>
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
@@ -63,6 +72,7 @@ MIPT | Name | Score | Comments
 717 | Vsevolod Pukhov | 9 | [#589](https://github.com/MIPT-ILab/mipt-mips/issues/589), ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#602](https://github.com/MIPT-ILab/mipt-mips/issues/602), [#130](https://github.com/MIPT-ILab/mipt-mips/issues/130) |
 711 | Yan Logovskiy | 9 | [#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383), [#506](https://github.com/MIPT-ILab/mipt-mips/issues/506), ¼[#613](https://github.com/MIPT-ILab/mipt-mips/issues/613) |
 616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+**81?** | **Eric Konks** | **6** | **[#520](https://github.com/MIPT-ILab/mipt-mips/issues/520)**
 616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
@@ -71,8 +81,10 @@ MIPT | Name | Score | Comments
 717 | Ivan Startsev | 2 | [#525](https://github.com/MIPT-ILab/mipt-mips/issues/525) |
 717 | Arsen Davtyan | 2 | [#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643) |
 612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
-81? | Maxim Davydov | 1 | [#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096) |
+**81?** | **Maxim Davydov** | **1** | **[#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)** |
 516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, and Ilya Burtakov.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 

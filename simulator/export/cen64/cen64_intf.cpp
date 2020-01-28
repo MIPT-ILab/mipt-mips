@@ -62,16 +62,14 @@ uint64 vr4300_get_pc(struct vr4300* vr4300)
     return vr4300->get_pc();
 }
 
-int read_mi_regs( void* opaque, uint32_t address, uint32_t* word)
+int read_mi_regs( struct vr4300* vr4300, uint32_t address, uint32_t* word)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
-    return reinterpret_cast<const struct vr4300*>( opaque)->read_mi_regs( address, word);
+    return vr4300->read_mi_regs( address, word);
 }
 
-int write_mi_regs( void* opaque, uint32 address, uint32 word, uint32 dqm)
+int write_mi_regs( struct vr4300* vr4300, uint32 address, uint32 word, uint32 dqm)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Need to fix signature in CEN64
-    return reinterpret_cast<struct vr4300*>( opaque)->write_mi_regs( address, word, dqm);
+    return vr4300->write_mi_regs( address, word, dqm);
 }
 
 void clear_rcp_interrupt(struct vr4300* vr4300, enum rcp_interrupt_mask mask)
@@ -92,4 +90,14 @@ void clear_dd_interrupt(struct vr4300* vr4300)
 void signal_dd_interrupt(struct vr4300* vr4300)
 {
     vr4300->apply_mask_to_cause( 0x800);
+}
+
+uint64_t get_profile_sample(struct vr4300 const* /* vr4300 */, size_t /* i */)
+{
+    return 0;
+}
+
+int has_profile_samples(struct vr4300 const* /* vr4300 */)
+{
+    return 0;
 }

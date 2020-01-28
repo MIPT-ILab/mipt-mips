@@ -53,7 +53,7 @@ TEST_CASE( "RISCV_registers: no_mips")
 TEST_CASE( "RISCV_registers: return_address")
 {
     auto reg = std::make_unique<RISCVRegister>(RISCVRegister::return_address());
-    CHECK( reg->to_rf_index() == 1u);
+    CHECK( reg->to_rf_index() == 1U);
     CHECK_FALSE( reg->is_zero());
     CHECK_FALSE( reg->is_mips_hi());
     CHECK_FALSE( reg->is_mips_lo());
@@ -101,4 +101,5 @@ TEST_CASE( "RISCV_registers: CSR by invalid name")
 TEST_CASE( "RISCV_registers: GDB interface")
 {
     CHECK( RISCVRegister::from_gdb_index( 2).dump() == "sp");
+    CHECK( RISCVRegister::get_gdb_pc_index() == 37);
 }

@@ -49,12 +49,6 @@ template<typename I> auto mips_daddiu  = ALU::addition_imm<I, uint64>;
 template<typename I> auto mips_daddu   = ALU::addition<I, uint64>;
 template<typename I> auto mips_dclo    = ALU::clo<I, uint64>;
 template<typename I> auto mips_dclz    = ALU::clz<I, uint64>;
-template<typename I> auto mips_ddiv    = ALU::division<I, int64>;
-template<typename I> auto mips_ddivu   = ALU::division<I, uint64>;
-template<typename I> auto mips_div     = ALU::division<I, int32>;
-template<typename I> auto mips_divu    = ALU::division<I, uint32>;
-template<typename I> auto mips_dmult   = ALU::multiplication<I, int64>;
-template<typename I> auto mips_dmultu  = ALU::multiplication<I, uint64>;
 template<typename I> auto mips_dsll    = ALU::sll<I, uint64>;
 template<typename I> auto mips_dsll32  = ALU::dsll32<I>;
 template<typename I> auto mips_dsllv   = ALU::sllv<I, uint64>;
@@ -84,21 +78,14 @@ template<typename I> auto mips_lw      = ALU::load_addr_aligned<I>;
 template<typename I> auto mips_lwl     = ALU::load_addr_left32<I>;
 template<typename I> auto mips_lwr     = ALU::load_addr_right32<I>;
 template<typename I> auto mips_lwu     = ALU::load_addr_aligned<I>;
-template<typename I> auto mips_madd    = ALU::multiplication<I, int32>;
-template<typename I> auto mips_maddu   = ALU::multiplication<I, uint32>;
 template<typename I> auto mips_mfc0    = ALU::move<I>;
 template<typename I> auto mips_mfhi    = ALU::move<I>;
 template<typename I> auto mips_mflo    = ALU::move<I>;
 template<typename I> auto mips_movn    = ALU::movn<I>;
 template<typename I> auto mips_movz    = ALU::movz<I>;
-template<typename I> auto mips_msub    = ALU::multiplication<I, int32>;
-template<typename I> auto mips_msubu   = ALU::multiplication<I, uint32>;
 template<typename I> auto mips_mtc0    = ALU::move<I>;
 template<typename I> auto mips_mthi    = ALU::move<I>;
 template<typename I> auto mips_mtlo    = ALU::move<I>;
-template<typename I> auto mips_mul     = ALU::multiplication<I, int32>;
-template<typename I> auto mips_mult    = ALU::multiplication<I, int32>;
-template<typename I> auto mips_multu   = ALU::multiplication<I, uint32>;
 template<typename I> auto mips_nor     = ALU::nor<I>;
 template<typename I> auto mips_or      = ALU::orv<I>;
 template<typename I> auto mips_ori     = ALU::ori<I>;
@@ -139,6 +126,21 @@ template<typename I> auto mips_tnei    = ALU::trap<I, ALU::nei<I>>;
 template<typename I> auto mips_xor     = ALU::xorv<I>;
 template<typename I> auto mips_xori    = ALU::xori<I>;
 template<typename I> auto mips_unknown = ALU::unknown_instruction<I>;
+
+// Multiplicate/Divide instructions
+template<typename I> auto mips_madd    = MIPSMultALU::multiplication<I, int32>;
+template<typename I> auto mips_maddu   = MIPSMultALU::multiplication<I, uint32>;
+template<typename I> auto mips_msub    = MIPSMultALU::multiplication<I, int32>;
+template<typename I> auto mips_msubu   = MIPSMultALU::multiplication<I, uint32>;
+template<typename I> auto mips_dmult   = MIPSMultALU::multiplication<I, int64>;
+template<typename I> auto mips_dmultu  = MIPSMultALU::multiplication<I, uint64>;
+template<typename I> auto mips_mul     = MIPSMultALU::multiplication<I, int32>;
+template<typename I> auto mips_mult    = MIPSMultALU::multiplication<I, int32>;
+template<typename I> auto mips_multu   = MIPSMultALU::multiplication<I, uint32>;
+template<typename I> auto mips_ddiv    = MIPSMultALU::division<I, int64>;
+template<typename I> auto mips_ddivu   = MIPSMultALU::division<I, uint64>;
+template<typename I> auto mips_div     = MIPSMultALU::division<I, int32>;
+template<typename I> auto mips_divu    = MIPSMultALU::division<I, uint32>;
 
 // CP1 instructions
 template<typename I> auto mips_abs_d     = ALU::unknown_instruction<I>;
@@ -849,7 +851,7 @@ template<typename R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     this->imm_print_type = entry.imm_print_type;
-    this->operation = entry.operation;
+    this->set_type( entry.operation);
     this->mem_size  = entry.mem_size;
     this->executor  = entry.versions.is_supported(version) ? entry.function : mips_unknown<MyDatapath>;
     this->dst2      = ( entry.dst == Reg::HI_LO) ? MIPSRegister::mips_hi() : MIPSRegister::zero();

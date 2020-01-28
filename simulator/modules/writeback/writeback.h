@@ -8,8 +8,8 @@
 
 #include "checker/checker.h"
 
-#include <infra/exception.h>
 #include <func_sim/driver/driver.h>
+#include <infra/exception.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
 
@@ -48,16 +48,16 @@ private:
     void writeback_bubble( Cycle cycle);
 
     /* Input */
-    std::unique_ptr<ReadPort<Instr>> rp_mem_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_execute_datapath = nullptr;
-    std::unique_ptr<ReadPort<Instr>> rp_branch_datapath = nullptr;    
-    std::unique_ptr<ReadPort<bool>> rp_trap = nullptr;
+    ReadPort<Instr>* rp_mem_datapath = nullptr;
+    ReadPort<Instr>* rp_execute_datapath = nullptr;
+    ReadPort<Instr>* rp_branch_datapath = nullptr;    
+    ReadPort<bool>* rp_trap = nullptr;
 
     /* Output */
-    std::unique_ptr<WritePort<std::pair<RegisterUInt, RegisterUInt>>> wp_bypass = nullptr;
-    std::unique_ptr<WritePort<Trap>> wp_halt = nullptr;
-    std::unique_ptr<WritePort<bool>> wp_trap = nullptr;
-    std::unique_ptr<WritePort<Target>> wp_target = nullptr;
+    WritePort<std::pair<RegisterUInt, RegisterUInt>>* wp_bypass = nullptr;
+    WritePort<Trap>* wp_halt = nullptr;
+    WritePort<bool>* wp_trap = nullptr;
+    WritePort<Target>* wp_target = nullptr;
 
 public:
     Writeback( Module* parent, Endian endian);
@@ -69,7 +69,7 @@ public:
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
     int get_exit_code() const noexcept;
-    void set_kernel( std::shared_ptr<Kernel> k) { kernel = std::move( k); }
+    void set_kernel( const std::shared_ptr<Kernel>& k) { kernel = k; }
     void set_driver( std::unique_ptr<Driver> d) { driver = std::move( d); }
     void enable_driver_hooks();
 };

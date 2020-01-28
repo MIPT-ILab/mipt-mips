@@ -25,8 +25,8 @@ class HierarchiedMemory : public FuncMemory
         HierarchiedMemory ( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
 
         std::string dump() const final;
-        size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final;
-        size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final;
+        size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final;
+        size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final;
         size_t strlen( Addr addr) const final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
 
@@ -44,7 +44,7 @@ class HierarchiedMemory : public FuncMemory
         const size_t set_cnt;
         const size_t page_size;
 
-        using Page = std::vector<Byte>;
+        using Page = std::vector<std::byte>;
         using Set  = std::vector<Page>;
         using Mem  = std::vector<Set>;
         Mem memory = {};
@@ -59,12 +59,12 @@ class HierarchiedMemory : public FuncMemory
                       const Page::const_iterator& byte_it) const noexcept;
 
         bool check( Addr addr) const noexcept;
-        Byte read_byte( Addr addr) const noexcept;
-        Byte check_and_read_byte( Addr addr) const noexcept;
+        std::byte read_byte( Addr addr) const noexcept;
+        std::byte check_and_read_byte( Addr addr) const noexcept;
 
         void alloc( Addr addr);
-        void write_byte( Addr addr, Byte value);
-        void alloc_and_write_byte( Addr addr, Byte value);
+        void write_byte( Addr addr, std::byte value);
+        void alloc_and_write_byte( Addr addr, std::byte value);
 };
 
 std::shared_ptr<FuncMemory>
@@ -83,9 +83,9 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
     offset_mask( bitmask<Addr>( offset_bits)),
     page_mask ( bitmask<Addr>( page_bits) << offset_bits),
     set_mask ( bitmask<Addr>( set_bits) << ( page_bits + offset_bits)),
-    page_cnt ( 1ull << page_bits ),
-    set_cnt ( 1ull << set_bits ),
-    page_size ( 1ull << offset_bits)
+    page_cnt ( 1ULL << page_bits ),
+    set_cnt ( 1ULL << set_bits ),
+    page_size ( 1ULL << offset_bits)
 {
     using namespace std::literals::string_literals;
     if ( set_bits >= min_sizeof<uint32, size_t>() * 8)
@@ -100,7 +100,7 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
     memory.resize(set_cnt);
 }
 
-size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_t size)
+size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size)
 {
     if (size > addr_mask + 1)
         throw FuncMemoryOutOfRange( dst + size, addr_mask + 1);
@@ -118,7 +118,7 @@ size_t HierarchiedMemory::memcpy_host_to_guest( Addr dst, const Byte* src, size_
     return offset;
 }
 
-size_t HierarchiedMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size) const noexcept
+size_t HierarchiedMemory::memcpy_guest_to_host( std::byte *dst, Addr src, size_t size) const noexcept
 {
     size_t offset = 0;
     for (; offset < size; ++offset)
@@ -127,7 +127,7 @@ size_t HierarchiedMemory::memcpy_guest_to_host( Byte *dst, Addr src, size_t size
     return offset;
 }
 
-void HierarchiedMemory::alloc_and_write_byte( Addr addr, Byte value)
+void HierarchiedMemory::alloc_and_write_byte( Addr addr, std::byte value)
 {
     alloc( addr);
     write_byte( addr, value);
@@ -141,7 +141,7 @@ void HierarchiedMemory::alloc( Addr addr)
 
     auto& page = set[get_page(addr)];
     if ( page.empty())
-        page.resize(page_size, Byte());
+        page.resize(page_size, std::byte());
 }
 
 bool HierarchiedMemory::check( Addr addr) const noexcept
@@ -201,17 +201,17 @@ inline Addr HierarchiedMemory::get_addr( Addr set, Addr page, Addr offset) const
     return (set << (page_bits + offset_bits)) | (page << offset_bits) | offset;
 }
 
-inline Byte HierarchiedMemory::read_byte( Addr addr) const noexcept
+inline std::byte HierarchiedMemory::read_byte( Addr addr) const noexcept
 {
     return memory[get_set(addr)][get_page(addr)][get_offset(addr)];
 }
 
-Byte HierarchiedMemory::check_and_read_byte( Addr addr) const noexcept
+std::byte HierarchiedMemory::check_and_read_byte( Addr addr) const noexcept
 {
-    return check( addr) ? read_byte( addr) : Byte{};
+    return check( addr) ? read_byte( addr) : std::byte{};
 }
 
-inline void HierarchiedMemory::write_byte( Addr addr, Byte value)
+inline void HierarchiedMemory::write_byte( Addr addr, std::byte value)
 {
     memory[get_set(addr)][get_page(addr)][get_offset(addr)] = value;
 }
@@ -219,7 +219,7 @@ inline void HierarchiedMemory::write_byte( Addr addr, Byte value)
 size_t HierarchiedMemory::strlen( Addr addr) const
 {
     for (size_t i = 0; i <= addr_mask; ++i)
-        if ( check_and_read_byte( addr + i) == Byte{})
+        if ( check_and_read_byte( addr + i) == std::byte{})
             return i;
 
     return addr_mask + 1;

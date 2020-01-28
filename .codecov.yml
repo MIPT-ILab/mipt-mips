@@ -1,8 +1,0 @@
-ignore:
-  - "external/.*"
-  - "*/t/*.h"
-  - "*/t/*.cpp"
-
-codecov:
-  ci:
-    - !appveyor

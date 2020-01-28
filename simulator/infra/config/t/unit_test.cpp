@@ -4,6 +4,8 @@
  */
 
 #include "../config.h"
+#include "../main_wrapper.h"
+
 #include "infra/argv.h"
 #include "infra/macro.h"
 
@@ -29,7 +31,7 @@ std::string wrap_shift_operator(const T& value)
 
 static void handleArgs( const std::vector<const char*>& argv)
 {
-    config::handleArgs( count_argc( argv_cast( argv.data())), argv_cast( argv.data()), 1);
+    config::handleArgs( count_argc( argv.data()), argv.data(), 1);
 }
 
 //
@@ -54,6 +56,7 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
+    CHECK( config::string_config != "another_file.elf");
     CHECK_FALSE( config::bool_config_1);
     CHECK( config::bool_config_2);
 
@@ -104,7 +107,7 @@ TEST_CASE( "config_parse: Pass_No_Args")
         "mipt-mips", nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -119,7 +122,7 @@ TEST_CASE( "config_parse: Pass_Args_Without_Binary_Option")
         nullptr
     };
     
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -134,7 +137,7 @@ TEST_CASE( "config_parse:  Pass_Args_Without_Numsteps_Option")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -151,7 +154,7 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 #if 0
@@ -169,7 +172,7 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Multiple_Times")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 #endif
 
@@ -186,7 +189,7 @@ TEST_CASE( "config_parse:  Pass_Binary_Option_Without_Arg")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 //
@@ -202,7 +205,7 @@ TEST_CASE( "config_parse:  Pass_Numsteps_Option_Without_Arg")
         nullptr
     };
 
-    CHECK_THROWS_AS( handleArgs( argv), std::exception);
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 TEST_CASE( "config_parse: Pass help option alias")
@@ -231,6 +234,18 @@ TEST_CASE( "config_parse: Pass help option")
     };
 
     CHECK_THROWS_AS( handleArgs( argv), config::HelpOption);
+}
+
+TEST_CASE( "config_parse: Pass help option and invalid option")
+{
+    std::vector<const char*> argv
+    {
+        "mipt-mips",
+        "--help",
+        nullptr
+    };
+
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
 #if 0
@@ -265,3 +280,62 @@ TEST_CASE( "config_provide_options: Provide_Config_Parser_With_Binary_Option_Twi
 }
 #endif
 
+TEST_CASE("MainWrapper: throw help")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw config::HelpOption(); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 0);
+}
+
+TEST_CASE("MainWrapper: invalid option")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw config::InvalidOption( "Help!"); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 4);
+}
+
+TEST_CASE("MainWrapper: throw exception")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw Exception( "Exception"); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 2);
+}
+
+TEST_CASE("MainWrapper: throw std exception")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw std::exception(); }
+    };
+
+    CHECK( Main().run( 0, nullptr) == 2);
+}
+
+TEST_CASE("MainWrapper: throw integer")
+{
+    struct Main : public MainWrapper
+    {
+        Main() : MainWrapper( "Example Unit Test") { }
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+        int impl( int /* argc */, const char* /* argv */ []) const final { throw 222; } // NOLINT(hicpp-exception-baseclass) test bad behavior
+    };
+
+    CHECK( Main().run( 0, nullptr) == 3);
+}

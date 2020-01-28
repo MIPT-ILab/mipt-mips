@@ -16,7 +16,7 @@
 #define GDB_WRAPPER_H
 
 #include <func_sim/traps/trap.h>
-#include <infra/byte.h>
+#include <infra/types.h>
 
 #include <memory>
 #include <string>
@@ -37,15 +37,16 @@ public:
     bool create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const;
 
     // Not implemented yet
-    int  stop() { return 0; }
-    void do_command( const std::string& /*command*/ ) { }
-    void info( int /* verbose */) { }
+    int  stop() { return 0; } // NOLINT(readability-convert-member-functions-to-static)
+    void do_command( const std::string& /*command*/ ) { } // NOLINT(readability-convert-member-functions-to-static)
+    void info( int /* verbose */) { } // NOLINT(readability-convert-member-functions-to-static)
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     char** sim_complete_command( const std::string& /*text*/, const std::string& /*word*/) { return nullptr; }
 
-    int memory_read( Byte* dst, Addr src, size_t length) const;
-    int memory_write( Addr dst, const Byte* src, size_t length) const;
-    int read_register( int regno, Byte* buf, int length) const;
-    int write_register( int regno, const Byte* buf, int length) const;
+    int memory_read( std::byte* dst, Addr src, size_t length) const;
+    int memory_write( Addr dst, const std::byte* src, size_t length) const;
+    int read_register( int regno, std::byte* buf, int length) const;
+    int write_register( int regno, const std::byte* buf, int length) const;
 
     auto get_trap() const { return trap; }
     int get_exit_code() const;

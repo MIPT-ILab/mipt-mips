@@ -11,8 +11,9 @@
 #include "../elf/elf_loader.h"
 #include "../memory.h"
 #include "check_coherency.h"
+#include "func_sim/operation.h"
 
-static const std::string valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
+static const std::string_view valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
 static const uint64 dataSectAddrShifted = 0x100c0;
@@ -50,7 +51,7 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
-    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0u /*address of the "__start" label*/);
+    CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0U /*address of the "__start" label*/);
 }
 
 TEST_CASE( "Func_memory: StartPC Invalid")
@@ -67,7 +68,7 @@ TEST_CASE( "Func_memory: Bad section")
 
 TEST_CASE( "Plain memory: out of range")
 {
-    std::array<Byte, 16> arr{};
+    std::array<std::byte, 16> arr{};
     auto ptr = FuncMemory::create_plain_memory( 10);
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
@@ -78,7 +79,7 @@ TEST_CASE( "Plain memory: out of range")
 
 TEST_CASE( "Hierarchied memory: out of range")
 {
-    std::array<Byte, 16> arr{};
+    std::array<std::byte, 16> arr{};
     auto ptr = FuncMemory::create_hierarchied_memory( 10, 3, 4);
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0xFF0000, arr.data(), 16), FuncMemoryOutOfRange );
     CHECK_THROWS_AS( ptr->memcpy_host_to_guest( 0x3fc, arr.data(), 16), FuncMemoryOutOfRange );
@@ -95,8 +96,8 @@ TEST_CASE( "Func_memory: Read_Method_Test")
     CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFull) == 0x030201);
-    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ull) == 0x01020300);
+    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFULL) == 0x030201);
+    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ULL) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
     CHECK( func_mem->read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
@@ -156,8 +157,8 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
     // Single byte
-    const Byte write_data_1{ 0xA5};
-    Byte read_data_1{ 0xFF};
+    const std::byte write_data_1{ 0xA5};
+    std::byte read_data_1{ 0xFF};
 
     // Write
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
@@ -174,9 +175,9 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
     // 8 bytes
     const constexpr size_t size = 8;
-    const std::array<Byte, size> write_data_8 = {{Byte{0x11}, Byte{0x22}, Byte{0x33}, Byte{0x44}, Byte{0x55}, Byte{0x66}, Byte{0x77}, Byte{0x88}}};
-    std::array<Byte, size> read_data_8{};
-    read_data_8.fill(Byte{ 0xFF});
+    const std::array<std::byte, size> write_data_8 = {{std::byte{0x11}, std::byte{0x22}, std::byte{0x33}, std::byte{0x44}, std::byte{0x55}, std::byte{0x66}, std::byte{0x77}, std::byte{0x88}}};
+    std::array<std::byte, size> read_data_8{};
+    read_data_8.fill(std::byte{ 0xFF});
 
     // Write
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_8.data(), size) == size);
@@ -194,14 +195,14 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 {
     auto func_mem = FuncMemory::create_default_hierarchied_memory();
 
-    // 1 KByte
+    // 1 Kstd::byte
     const  constexpr size_t size = 1024;
-    std::array<Byte, size> write_data_1024{};
+    std::array<std::byte, size> write_data_1024{};
     for (size_t i = 0; i < size; i++)
-        write_data_1024.at(i) = Byte( i & 0xFFu);
+        write_data_1024.at(i) = std::byte( i & 0xFFU);
 
-    std::array<Byte, size> read_data_1024{};
-    read_data_1024.fill(Byte( 0xFF));
+    std::array<std::byte, size> read_data_1024{};
+    read_data_1024.fill(std::byte( 0xFF));
 
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
@@ -286,11 +287,24 @@ TEST_CASE( "Func_memory: ZeroMemory")
 {
     ZeroMemory zm;
     CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm.dump() == "empty memory\n");
 }
 
 TEST_CASE( "Func_memory: String length in zero memory")
 {
     CHECK( ZeroMemory().strlen(0x10) == 0);
+}
+
+TEST_CASE( "Zero_memory: Duplicate")
+{
+    auto mem1 = FuncMemory::create_plain_memory( 24);
+    auto mem2 = FuncMemory::create_plain_memory( 24);
+
+    ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
+    mem1->duplicate_to( mem2);
+    ZeroMemory().duplicate_to( mem1); // nop
+
+    check_coherency( mem1.get(), mem2.get(), 0);
 }
 
 TEST_CASE( "Func_memory: String length, no zero bytes")
@@ -341,22 +355,31 @@ TEST_CASE( "Func_memory: Write string limited")
     CHECK( mem->read_string( 0x20) == "MIPT-MIPS");
 }
 
-TEST_CASE( "Func_memory: Write to 0")
-{
-    class DummyStore {
+class DummyStore : public Datapath<uint64> {
     public:
-        Addr get_mem_addr() const { return 0; };
-        uint32 get_mem_size() const { return 8; }
-        auto get_endian() const { return Endian::little; } 
-        uint64 get_mask() const { return all_ones<uint64>(); }
-        bool is_load() const { return false; }
-        bool is_store() const { return true; }
-        uint64 get_v_src2() const { return NO_VAL64; }
-        uint64 get_v_dst() const { return 0; }
-        void load(uint64 /* unused */) { }
-    } store;
+        explicit DummyStore( Addr a) : Datapath<uint64>( 0, 0)
+        {
+            set_type( OUT_STORE);
+            mem_addr = a;
+            mem_size = 8;
+            v_src2 = 0xABCD'EF12'3456'7890ULL;
+        }
+        static auto get_endian() { return Endian::little; } 
+};
+
+TEST_CASE( "Func_memory: Store to 0")
+{
+    DummyStore store( 0);
     auto mem = FuncMemory::create_4M_plain_memory();
     CHECK_THROWS_AS( mem->load_store( &store), Exception);
+}
+
+TEST_CASE( "Func_memory: Store to 0x100")
+{
+    DummyStore store( 0x100);
+    auto mem = FuncMemory::create_4M_plain_memory();
+    mem->load_store( &store);
+    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src2());
 }
 
 TEST_CASE( "Func_memory Replicant: read and write")

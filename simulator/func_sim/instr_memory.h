@@ -14,9 +14,6 @@
 template<typename FuncInstr>
 class InstrMemoryIface
 {
-protected:
-    std::shared_ptr<ReadableMemory> mem = nullptr;
-    const Endian endian;
 public:
     explicit InstrMemoryIface( Endian e) : endian( e) { }
     auto fetch( Addr pc) const
@@ -25,6 +22,7 @@ public:
             ? mem->read<uint32, Endian::little>( pc)
             : mem->read<uint32, Endian::big>( pc);
     }
+    auto get_endian() const { return endian; }
 
     void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
     virtual FuncInstr fetch_instr( Addr PC) = 0;
@@ -34,6 +32,10 @@ public:
     InstrMemoryIface( InstrMemoryIface&&) noexcept = default;
     InstrMemoryIface& operator=( const InstrMemoryIface&) = delete;
     InstrMemoryIface& operator=( InstrMemoryIface&&) noexcept = default;
+
+private:
+    std::shared_ptr<ReadableMemory> mem = nullptr;
+    const Endian endian;
 };
 
 template<typename ISA>
@@ -42,11 +44,10 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 public:
     using Instr = typename ISA::FuncInstr;
     explicit InstrMemory( Endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
-    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->endian, PC); }
+    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->get_endian(), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage) We keep it as a macro to easily it from makefile
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 

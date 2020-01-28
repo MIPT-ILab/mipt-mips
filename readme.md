@@ -29,6 +29,9 @@ Key microarchitecture features:
 * Configurable instruction cache
 * Interstage data bypassing
 
+Automatically generated pipeline visualization:
+[![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/mipt-mips/tree/master/visualizer)
+
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
 ## Requirements
@@ -49,8 +52,7 @@ Our build system is CMake. You should install CMake 3.9 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
-To generate RISC-V opcodes, CMake uses Python. Python interpreter should be available in your environment.
-If you still use Python 2, be sure you have `future` package installed: `pip install --user future`.
+To generate RISC-V opcodes, CMake uses Python 3. `python3` interpreter should be available in your environment.
 
 ## Command line options
 
@@ -75,6 +77,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
     * `-l cpu` —  prints all stages
     * `-l cpu,!mem` —  print all except mem stage
 * `-d` — enables output of functional simulator
+* `--tdump` — enables module topology dump into topology.json
 
 ### Performance mode options
 
@@ -99,7 +102,7 @@ If you still use Python 2, be sure you have `future` package installed: `pip ins
   1. Check that your environment meets all the requirements above.
   1. Clone repository with submodules: `git clone --recursive https://github.com/MIPT-ILab/mipt-mips.git`
 #### Build
-To build simulator faster, we recommend to install Ninja.
+To build simulator faster, we recommend to [install Ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
   1. Create a **new** build directory somewhere, then cd into it: `mkdir /path/to/your/build/directory`
   1. Go to the build directory: `cd /path/to/your/build/directory`
   1. Run `cmake /path/to/mipt-mips/simulator -G "Ninja"` to configure CMake

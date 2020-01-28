@@ -10,7 +10,8 @@
 #include <riscv.opcode.gen.h>
 
 #include <cassert>
-#include <vector>
+#include <sstream>
+#include <unordered_map>
 
 static constexpr const uint8 GDB_SIGNAL_0    = 0;
 // static constexpr const uint8 GDB_SIGNAL_INT  = 2;
@@ -64,68 +65,56 @@ static constexpr const uint8 FLOATING_POINT_OVERFLOW        = 16;
 static constexpr const uint8 FLOATING_POINT_UNDERFLOW       = 17;
 #endif
 
+struct Entry
+{
+    std::string_view str;
+    uint8 gdb;
+    uint8 riscv;
+    uint8 mips;
+};
+
+static const auto& converter()
+{
+    static const std::unordered_map<Trap, Entry> instance =
+    {
+#define TRAP(name, gdb, riscv, mips) { Trap( Trap:: name), Entry{ #name, gdb, riscv, mips } },
+#include "trap.def"
+#undef TRAP
+    };
+    return instance;
+}
+
+template<typename T, T Entry::*ptr>
+T convert_to( const Trap& trap) try
+{
+    return converter().at( trap).*ptr;
+}
+catch ( const std::out_of_range&)
+{
+    throw InvalidTrapConversion("Invalid trap");
+}
+
+template<typename T, T Entry::*ptr>
+Trap convert_from( const T& id, std::string_view name)
+{
+    for ( const auto& [trap, e] : converter())
+        if ( e.*ptr == id)
+            return trap;
+
+    std::ostringstream oss;
+    oss << "Unsupported " << name << " trap code (" << id << ")";
+    throw InvalidTrapConversion( oss.str());
+}
+
 std::ostream& operator<<( std::ostream& out, const Trap& trap)
 {
-    static const std::vector<std::string_view> table =
-    {{
-        #define TRAP(name, gdb, riscv, mips) #name ,
-        #include "trap.def"
-        #undef TRAP
-        "INVALID_TRAP"
-    }};
-    return out << table.at( trap.value).data();
+    return out << convert_to<std::string_view, &Entry::str>( trap);
 }
 
-uint8 Trap::to_gdb_format() const
-{
-    switch ( value) {
-    #define TRAP(name, gdb, riscv, mips) case name: return gdb;
-    #include "trap.def"
-    #undef TRAP
-    default: throw InvalidTrapConversion("Invalid trap");
-    }
-}
+uint8 Trap::to_gdb_format()   const { return convert_to<uint8, &Entry::gdb>  ( *this); }
+uint8 Trap::to_riscv_format() const { return convert_to<uint8, &Entry::riscv>( *this); }
+uint8 Trap::to_mips_format()  const { return convert_to<uint8, &Entry::mips> ( *this); }
 
-Trap Trap::from_gdb_format(uint8 id)
-{
-    #define TRAP(name, gdb, riscv, mips) if ( id == gdb) return Trap(name);
-    #include "trap.def"
-    #undef TRAP
-    throw InvalidTrapConversion("Unsupported GDB trap code (" + std::to_string(id) + ")");
-}
-
-uint8 Trap::to_riscv_format() const
-{
-    switch ( value) {
-    #define TRAP(name, gdb, riscv, mips) case name: return riscv;
-    #include "trap.def"
-    #undef TRAP
-    default: throw InvalidTrapConversion("Invalid trap");
-    }
-}
-
-Trap Trap::from_riscv_format(uint8 id)
-{
-    #define TRAP(name, gdb, riscv, mips) if ( id == riscv) return Trap(name);
-    #include "trap.def"
-    #undef TRAP
-    throw InvalidTrapConversion("Unsupported RISC-V trap code (" + std::to_string(id) + ")");
-}
-
-uint8 Trap::to_mips_format() const
-{
-    switch ( value) {
-    #define TRAP(name, gdb, riscv, mips) case name: return mips;
-    #include "trap.def"
-    #undef TRAP
-    default: throw InvalidTrapConversion("Invalid trap");
-    }
-}
-
-Trap Trap::from_mips_format(uint8 id)
-{
-    #define TRAP(name, gdb, riscv, mips) if ( id == mips) return Trap(name);
-    #include "trap.def"
-    #undef TRAP
-    throw InvalidTrapConversion("Unsupported MIPS trap code (" + std::to_string(id) + ")");
-}
+Trap Trap::from_gdb_format(uint8 id)   { return convert_from<uint8, &Entry::gdb>( id, "GDB"); }
+Trap Trap::from_mips_format(uint8 id)  { return convert_from<uint8, &Entry::mips>( id, "MIPS"); }
+Trap Trap::from_riscv_format(uint8 id) { return convert_from<uint8, &Entry::riscv>( id, "RISC-V"); }

@@ -29,6 +29,14 @@ public:
         , sequence_id( id)
         , valid( true)
     { }
+
+    friend std::ostream& operator<<( std::ostream& out, const Target& target)
+    {
+        if ( target.valid)
+            return out << target.address;
+
+        return out << "invalid";
+    }
 };
 
 #endif
