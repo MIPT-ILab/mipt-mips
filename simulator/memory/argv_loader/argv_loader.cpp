@@ -28,7 +28,7 @@ size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, A
     place_nullptr( mem, addr + offset);
     offset += GUEST_WORD_SIZE;
 
-    if ( envp)
+    if ( envp != nullptr)
     {
         offset += count_argc( envp) * GUEST_WORD_SIZE; // reserved space for envp[]
 
@@ -38,7 +38,7 @@ size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, A
 
     load_argv_contents( mem, addr);
 
-    if ( envp)
+    if ( envp != nullptr)
         load_envp_contents( mem, addr);
 
     return offset;

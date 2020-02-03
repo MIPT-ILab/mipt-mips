@@ -35,7 +35,7 @@ extern "C"
 TEST_CASE( "bus_controller mock" )
 {
     bus_controller bus;
-    uint32 data;
+    uint32 data = 0;
 
     bus_write_word( &bus, 0x153, 0x22334455, all_ones<uint32>());
     bus_read_word( &bus, 0x153, &data);
