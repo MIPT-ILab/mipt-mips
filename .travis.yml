@@ -92,10 +92,10 @@ after_success:
         sudo apt-get install clang-tidy-10 g++-8
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
-        clang-tidy-9 --version
+        clang-tidy-10 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
+        run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
     fi
   - |
     if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
