@@ -15,6 +15,20 @@
 
 #include <memory>
 
+enum ISA {
+    MIPSI_T,
+    MIPSII_T,
+    MIPSIII_T,
+    MIPSIV_T,
+    MIPS32_T,
+    MIPS64_T,
+    MARS_T,
+    MARS64_T,
+    RISCV32_T,
+    RISCV64_T,
+    RISCV128_T,
+};
+
 struct BearingLost final : Exception {
     BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
 };
@@ -39,7 +53,8 @@ public:
     void set_pc( Addr pc) { set_target( Target( pc, 0)); }
     virtual void set_target( const Target& target) = 0;
     virtual Addr get_pc() const = 0;
-    
+    virtual ISA get_isa() const = 0;
+
     virtual size_t sizeof_register() const = 0;
 
     virtual uint64 read_cpu_register( size_t regno) const = 0;
@@ -59,9 +74,11 @@ public:
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
+    void set_isa( ISA i) { isa = i; }
     virtual void init_checker() = 0;
     virtual void enable_driver_hooks() = 0;
     virtual int get_exit_code() const noexcept = 0;
+    ISA get_isa() const final { return isa; }
 
     Trap run_no_limit() { return run( MAX_VAL64); }
 
@@ -77,6 +94,8 @@ public:
     {
         return create_functional_simulator( isa, false);
     }
+private:
+    ISA isa;
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Need to mix timing and functional model somewhere...

@@ -35,8 +35,8 @@ int Main::impl( int argc, const char* argv[]) const {
     sim->write_csr_register( "mscratch", 0x400'0000);
 
     auto kernel = Kernel::create_configured_kernel();
-    kernel->connect_memory( memory);
     kernel->set_simulator( sim);
+    kernel->connect_memory( memory);
     kernel->load_file( config::binary_filename);
     sim->set_kernel( kernel);
 

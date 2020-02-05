@@ -97,8 +97,8 @@ static auto get_mars32_tt_simulator( bool has_hooks)
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_mars_kernel();
-    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     if ( has_hooks)
@@ -132,8 +132,8 @@ static auto get_smc_loaded_simulator( bool init_checker)
     sim->set_memory( mem);
 
     auto kernel = Kernel::create_mars_kernel();
-    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
     kernel->load_file( TEST_PATH "/mips-smc.bin");
     sim->set_kernel( kernel);
 
@@ -159,8 +159,8 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
     auto kernel = Kernel::create_dummy_kernel();
-    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
     kernel->load_file( TEST_PATH "/rv32ui-p-simple");
     sim->set_kernel( kernel);
     sim->init_checker();

@@ -189,8 +189,8 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
         sim->enable_driver_hooks();
 
     auto kernel = Kernel::create_mars_kernel();
-    kernel->connect_memory( mem);
     kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
     sim->set_kernel( kernel);
     kernel->load_file( test);
 

@@ -231,6 +231,17 @@ void MARSKernel::read_from_file() {
 void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
 {
     BaseKernel::connect_memory( m);
-    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin");
-    elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
+    ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32_le.bin");
+    ElfLoader mars_elf_loader( KERNEL_IMAGES "mars32_le.bin");
+    switch( sim->get_isa()) {
+    case ISA::RISCV32_T:
+    case ISA::RISCV64_T:
+    case ISA::RISCV128_T:
+        auto tvec = sim->read_csr_register(" mtvec");
+        riscv_elf_loader.load_to( mem.get(), tvec - riscv_elf_loader.get_text_section_addr());
+        break;
+    default:
+        mars_elf_loader.load_to( mem.get(), 0x8'0000'0180 - mars_elf_loader.get_text_section_addr());
+        break;
+    }
 }
