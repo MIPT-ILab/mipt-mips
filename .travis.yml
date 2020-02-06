@@ -68,9 +68,10 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ninja mipt-mips unit-tests
+  - ninja mipt-mips unit-tests mipt-v
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
+  - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
   # TODO (pkryukov): run NPM on ARM
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
