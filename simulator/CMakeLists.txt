@@ -192,6 +192,7 @@ add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64
 add_executable(mipt-mips export/standalone/main.cpp)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
 add_executable(cachesim export/cache/main.cpp)
+add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
 
 target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
 target_link_libraries(mipt-mips mipt-mips-src)
