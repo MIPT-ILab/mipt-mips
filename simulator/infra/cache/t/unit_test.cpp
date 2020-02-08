@@ -15,8 +15,6 @@
 #include <map>
 #include <vector>
 
-static const uint32 LINE_SIZE = 4; // why not 32?
-
 static const uint32 cache_size = 4;
 static const uint32 cache_ways = 4;
 static const uint32 cache_line_size = 1;
