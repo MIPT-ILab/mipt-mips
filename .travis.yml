@@ -47,10 +47,11 @@ addons:
 
 install:
 # Download GDB
-  - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
+  - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
   - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
   - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
-  - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
+  - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
+  - tar -xzf gdb-9.1.tar.gz
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
