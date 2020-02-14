@@ -44,6 +44,7 @@ struct System
         mars_kernel->set_simulator( sim);
         sim->set_memory( mem);
         mars_kernel->connect_memory( mem);
+        mars_kernel->connect_exception_handler();
     }
 };
 

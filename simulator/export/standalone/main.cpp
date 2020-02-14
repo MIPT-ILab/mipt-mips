@@ -37,6 +37,7 @@ int Main::impl( int argc, const char* argv[]) const {
     auto kernel = Kernel::create_configured_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( memory);
+    kernel->connect_exception_handler();
     kernel->load_file( config::binary_filename);
     sim->set_kernel( kernel);
 

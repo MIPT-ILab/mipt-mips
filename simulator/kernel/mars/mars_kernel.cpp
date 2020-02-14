@@ -41,7 +41,7 @@ class MARSKernel : public BaseKernel {
 
 public:
     Trap execute() final;
-    void connect_memory( std::shared_ptr<FuncMemory> m) final;
+    void connect_exception_handler() final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
       : instream( instream), outstream( outstream), errstream( errstream) {}
@@ -228,20 +228,16 @@ void MARSKernel::read_from_file() {
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
 }
 
-void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
+void MARSKernel::connect_exception_handler()
 {
-    BaseKernel::connect_memory( m);
-    ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32_le.bin");
-    ElfLoader mars_elf_loader( KERNEL_IMAGES "mars32_le.bin");
-    switch( sim->get_isa()) {
-    case ISA::RISCV32_T:
-    case ISA::RISCV64_T:
-    case ISA::RISCV128_T:
-        auto tvec = sim->read_csr_register(" mtvec");
+    auto isa = sim->get_isa();
+    if ( isa == "riscv32" || isa == "riscv64" || isa == "riscv128") {
+        auto tvec = sim->read_csr_register( "mtvec");
+        tvec = (tvec >> 2U) & ~(bitmask<uint64>( 3));
+        ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32_le.bin");
         riscv_elf_loader.load_to( mem.get(), tvec - riscv_elf_loader.get_text_section_addr());
-        break;
-    default:
+    } else {
+        ElfLoader mars_elf_loader( KERNEL_IMAGES "mars32_le.bin");
         mars_elf_loader.load_to( mem.get(), 0x8'0000'0180 - mars_elf_loader.get_text_section_addr());
-        break;
     }
 }

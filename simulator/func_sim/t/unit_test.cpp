@@ -29,6 +29,7 @@ static auto run_over_empty_memory( const std::string& isa)
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( m);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     return sim->run( 30);
@@ -49,6 +50,7 @@ TEST_CASE( "FuncSim: get lost without pc")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( m);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
@@ -64,6 +66,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     CHECK_NOTHROW( sim->set_pc( kernel->get_start_pc()) );
@@ -78,6 +81,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
@@ -99,6 +103,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
@@ -148,6 +153,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto kernel = Kernel::create_mars_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
@@ -166,6 +172,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
@@ -191,6 +198,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     auto kernel = Kernel::create_mars_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
     sim->set_kernel( kernel);
     kernel->load_file( test);
 
