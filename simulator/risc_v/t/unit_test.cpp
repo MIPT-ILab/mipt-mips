@@ -4,11 +4,19 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../riscv_instr.h"
+#include "../risc_v.h"
+#include "../../simulator.h"
 #include "riscv_test_wrapper.h"
 
 #include <catch.hpp>
 #include <memory/memory.h>
+
+static auto get_op_with_trap( Trap trap)
+{
+    Operation op( 0x100, 0x104);
+    op.set_trap( trap);
+    return op;
+}
 
 TEST_CASE("RISCV disassembly")
 {
@@ -596,3 +604,15 @@ TEST_CASE("RISCV RV128 unshfl")
     }
 }
 
+TEST_CASE("RISCV32 driver")
+{
+    auto sim = Simulator::create_configured_isa_simulator( "riscv32");
+    auto drv = create_riscv32_driver( sim.get());
+    CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::NO_TRAP))) == Trap::NO_TRAP);
+    CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::HALT))) == Trap::HALT);
+    CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::BREAKPOINT))) == Trap::NO_TRAP);
+    auto expected_pc = (sim->read_csr_register( "mtvec") >> 2U) & ~(bitmask<uint64>( 3));
+    CHECK( sim->get_pc() == expected_pc);
+    auto expected_cause = Trap( Trap::BREAKPOINT).to_riscv_format();
+    CHECK( sim->read_csr_register( "mcause") == expected_cause);
+}
