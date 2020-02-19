@@ -1,4 +1,8 @@
 	.data
+__m1_:	.string "  Exception "
+__m2_:	.string "  Interrupt "
+__m3_:	.string "  occurred\n"
+
 __i0_:	.string "  [User software interrupt] "
 __i1_:	.string	"  [Supervisor software interrupt]"
 __i2_:	.string	"  [Reserved for future standard use]"
@@ -47,18 +51,52 @@ _start:
 
 	# Interrupt-specific code
 
+	# Print information about interrupt
+	li x2, 4		# Syscall 4 (print string)
+	la x4, __m2_
+	ecall
+	li x2, 1		# Syscall 1 (print int)
+	mv x4, t0
+	ecall
+	li x2, 4		# Syscall 4 (print string)
+	lw x4, %lo(__intr)(t0)
+	ecall
+	li x2, 4		# Syscall 4 (print string)
+	la x4, __m3_
+	ecall
+
 _not_intr:
 
 	# Exception-specific code
 
-	bnez t1, _ok_pc		# EPC check
+	# Print information about exception
+	li x2, 4		# Syscall 4 (print str)
+	la x4, __m1_
+	ecall
+	li x2, 1		# Syscall 1 (print int)
+	mv x4, t0
+	ecall
+	li x2, 4		# Syscall 4 (print string)
+	lw x4, %lo(__excp)(t0)
+	ecall
+	li x2, 4		# Syscall 4 (print string)
+	la x4, __m3_
+	ecall
 
-_bad_pc:
+	# 0x2 Illegal insruction
+	li t1, 2
+	beq t0, t1, _terminate
+
+	# 0x0 Instruction Address misaligned
+	bnez t0, _ok_pc		# Branch if exception code != 0
 	csrr t0, mepc
-	andi t0, t0, 0x3	# Word-aligning check
-	beqz t0, _ok_pc
+	andi t0, t0, 3		# Word-aligning check
+	beqz t0, _ok_pc		# Branch if EPC word-aligned
+	j _terminate
 
-	# Specific code for misaligned instruction address
+_terminate:
+	li x2, 0xA		# Syscall 10 (exit)
+	ecall
 
 _ok_pc:
 

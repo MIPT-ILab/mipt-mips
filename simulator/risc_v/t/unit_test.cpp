@@ -604,6 +604,20 @@ TEST_CASE("RISCV RV128 unshfl")
     }
 }
 
+TEST_CASE("RISCV ecall")
+{
+    RISCVInstr<uint32> instr( "ecall", 0);
+    instr.execute();
+    CHECK( instr.trap_type() == Trap::SYSCALL);
+}
+
+TEST_CASE("RISCV ebreak")
+{
+    RISCVInstr<uint32> instr( "c_ebreak", 0);
+    instr.execute();
+    CHECK( instr.trap_type() == Trap::HALT);
+}
+
 TEST_CASE("RISCV32 driver")
 {
     auto sim = Simulator::create_configured_isa_simulator( "riscv32");
