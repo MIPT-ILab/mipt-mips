@@ -219,7 +219,7 @@ struct ALU
         auto dst_value = instr->v_src1;
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
         for ( size_t i = 0; i < limit; ++i)
-            if ( ( instr->v_src2 >> i) & 1)
+            if ( ( instr->v_src2 >> i) & 1U)
                 dst_value = bit_shuffle( dst_value, i);
         instr->v_dst = dst_value;
     }
@@ -232,14 +232,14 @@ struct ALU
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
 
     // Bit manipulations
-    template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sbext( I* instr) { instr->v_dst = 1U & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     template<typename I, typename T>
     static void clmul( I* instr)
     {
         instr->v_dst = 0;
         for ( std::size_t index = 0; index < bitwidth<T>; index++)
-            if ( (instr->v_src2 >> index) & 1)
+            if ( ( instr->v_src2 >> index) & 1U)
                 instr->v_dst ^= instr->v_src1 << index;
     }
 
@@ -299,7 +299,7 @@ struct ALU
     {
         // FIXME(pikryukov): That should behave differently for ErrorEPC
         jump( instr, instr->v_src1);
-        instr->v_dst &= instr->v_src2 & ~(1 << 2);
+        instr->v_dst &= instr->v_src2 & ~(1U << 2);
     }
 
     // Traps
@@ -342,7 +342,7 @@ struct ALU
     {
         using XLENType = typename I::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
-        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15;
+        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15U;
         len = len ? len : 16;
         size_t off = ( narrow_cast<size_t>( instr->v_src2) >> 16) & ( XLEN-1);
         auto mask = circ_ls( bitmask<XLENType>( len), off);
