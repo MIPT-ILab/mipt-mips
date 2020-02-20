@@ -220,10 +220,12 @@ TEST_CASE("ones shift for 128 instructions")
     CHECK( ones_ls<uint128>( 0x1, 1) == 0x3);
     CHECK( ones_ls<uint128>( 0x8, 4) == 0x8f);
     CHECK( ones_ls<uint128>( msb_set<uint128>(), 1) == 0x1);
-    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << (128 - 17)));
-    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
-    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
-    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+
+    const size_t shift = 128 - 17;
+    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << shift));
+    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << shift));
+    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << shift));
+    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << shift));
 }
 
 TEST_CASE("sign extension")

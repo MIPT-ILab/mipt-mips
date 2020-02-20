@@ -37,6 +37,7 @@ static inline constexpr T pack_array_le( std::array<std::byte, bytewidth<T>> arr
     T value{};
     size_t shift = 0;
     for ( const auto& el : array) {
+        // NOLINTNEXTLINE(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=45046
         value |= unsign_t<T>( uint8( el)) << shift;
         shift += CHAR_BIT;
     }
@@ -50,6 +51,7 @@ static inline constexpr T pack_array_be( std::array<std::byte, bytewidth<T>> arr
     T value{};
     size_t shift = (array.size() - 1) * CHAR_BIT;
     for ( const auto& el : array) {
+        // NOLINTNEXTLINE(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=45046
         value |= unsign_t<T>( uint8( el)) << shift;
         shift -= CHAR_BIT;
     }   
