@@ -57,7 +57,7 @@ template<typename I> auto execute_or = ALU::orv<I>;
 template<typename I> auto execute_and = ALU::andv<I>;
 // System I
 template<typename I> auto execute_ecall = ALU::syscall<I>;
-template<typename I> auto execute_ebreak = ALU::halt<I>;
+template<typename I> auto execute_ebreak = do_nothing<I>;
 template<typename I> auto execute_uret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
 template<typename I> auto execute_sret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
 template<typename I> auto execute_mret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;

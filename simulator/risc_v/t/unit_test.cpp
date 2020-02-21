@@ -611,22 +611,14 @@ TEST_CASE("RISCV ecall")
     CHECK( instr.trap_type() == Trap::SYSCALL);
 }
 
-TEST_CASE("RISCV ebreak")
-{
-    RISCVInstr<uint32> instr( "c_ebreak", 0);
-    instr.execute();
-    CHECK( instr.trap_type() == Trap::HALT);
-}
-
 TEST_CASE("RISCV32 driver")
 {
     auto sim = Simulator::create_configured_isa_simulator( "riscv32");
     auto drv = create_riscv32_driver( sim.get());
     CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::NO_TRAP))) == Trap::NO_TRAP);
     CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::HALT))) == Trap::HALT);
-    CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::BREAKPOINT))) == Trap::NO_TRAP);
-    auto expected_pc = (sim->read_csr_register( "mtvec") >> 2U) & ~(bitmask<uint64>( 3));
+    auto expected_pc = (sim->read_csr_register( "stvec") >> 2U) & ~(bitmask<uint64>( 3));
     CHECK( sim->get_pc() == expected_pc);
-    auto expected_cause = Trap( Trap::BREAKPOINT).to_riscv_format();
-    CHECK( sim->read_csr_register( "mcause") == expected_cause);
+    auto expected_cause = Trap( Trap::HALT).to_riscv_format();
+    CHECK( sim->read_csr_register( "scause") == expected_cause);
 }

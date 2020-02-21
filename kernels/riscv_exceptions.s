@@ -42,7 +42,7 @@ __intr:	.word __i0_, __i1_, __i2_, __i3_, __i4_, __i5_, __i6_, __i7_, __i8_, __i
 	.section .text
 	.globl _start
 _start:
-	csrr t0, mcause		# Save cause register
+	csrr t0, scause		# Save cause register
 	not t1, x0
 	srli t1, t1, 0x1
 	and t0, t0, t1		# Extract exception code
@@ -89,7 +89,7 @@ _not_intr:
 
 	# 0x0 Instruction Address misaligned
 	bnez t0, _ok_pc		# Branch if exception code != 0
-	csrr t0, mepc
+	csrr t0, sepc
 	andi t0, t0, 3		# Word-aligning check
 	beqz t0, _ok_pc		# Branch if EPC word-aligned
 	j _terminate
@@ -101,8 +101,8 @@ _terminate:
 _ok_pc:
 
 _return:
-	csrwi mcause, 0		# Clear cause register
-	csrr t0, mepc
+	csrwi scause, 0		# Clear cause register
+	csrr t0, sepc
 	addi t0, t0, 4		# Skip instruction to avoid infinite loop
-	csrw mepc, t0 
-	mret		# Return from exception
+	csrw sepc, t0 
+	sret		# Return from exception

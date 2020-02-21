@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
+const uint64 TRAP_VECTOR_BASE_ADDRESS = 0x8'000'0000;
+
 class MARSKernel : public BaseKernel {
     void print_integer();
     void read_integer();
@@ -232,7 +234,8 @@ void MARSKernel::connect_exception_handler()
 {
     auto isa = sim->get_isa();
     if ( isa == "riscv32" || isa == "riscv64" || isa == "riscv128") {
-        auto tvec = sim->read_csr_register( "mtvec");
+        auto tvec = TRAP_VECTOR_BASE_ADDRESS;
+        sim->write_csr_register( "stvec", tvec);
         tvec = (tvec >> 2U) & ~(bitmask<uint64>( 3));
         ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32_le.bin");
         riscv_elf_loader.load_to( mem.get(), tvec - riscv_elf_loader.get_text_section_addr());
