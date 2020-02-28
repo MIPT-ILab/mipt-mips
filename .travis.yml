@@ -49,6 +49,7 @@ install:
 # Download GDB
   - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
   - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+  - if [ "$CC" == "clang" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
   - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
   - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
   - tar -xzf gdb-9.1.tar.gz
@@ -88,6 +89,15 @@ script:
     fi
 
 after_success:
+  - cd $TRAVIS_BUILD_DIR/simulator/debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+  - ninja unit-tests && ctest
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" > /dev/null || echo "Codecov did not collect coverage reports"
+  - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer
+        npx nyc --reporter=lcov npm test && npx codecov
+    fi
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++
@@ -96,15 +106,5 @@ after_success:
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
         clang-tidy-10 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Release
         run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
-    fi
-  - |
-    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
-        ninja unit-tests && ctest
-        bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
-        cd $TRAVIS_BUILD_DIR/visualizer
-        if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
     fi
