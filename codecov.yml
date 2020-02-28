@@ -4,3 +4,6 @@ ignore:
   - "simulator/export/cen64/*.cpp"
   - "simulator/export/gdb/*.h"
   - "simulator/export/gdb/*.cpp"
+
+codecov:
+  require_ci_to_pass: yes
