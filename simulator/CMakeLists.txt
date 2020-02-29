@@ -5,6 +5,7 @@
 #! https://github.com/SoshinK
 
 cmake_minimum_required(VERSION 3.9)
+# cmake_minimum_required(VERSION 3.13.5) for add_link_options
 
 project(mipt-mips)
 enable_testing()
@@ -133,15 +134,25 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
-if(COMPILER_SUPPORTS_MARCH_NATIVE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+if (COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 endif()
 
 if (ENABLE_COVERAGE)
     if (WIN32)
         message(FATAL_ERROR "CodeCov is not supported for Windows builds")
     endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -DNDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -fno-inline -DNDEBUG")
+    # add_link_options(--coverage)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    CHECK_CXX_COMPILER_FLAG("-fno-inline-small-functions" COMPILER_SUPPORTS_NO_INLINE_SMALL_FUNCTIONS)
+    if (COMPILER_SUPPORTS_NO_INLINE_SMALL_FUNCTIONS)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-small-functions")
+    endif()
+    CHECK_CXX_COMPILER_FLAG("-fno-default-inline" COMPILER_SUPPORTS_NO_DEFAULT_INLINE)
+    if (COMPILER_SUPPORTS_NO_DEFAULT_INLINE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-default-inline")
+    endif()
 endif()
 
 if (ENABLE_PROFILE)
