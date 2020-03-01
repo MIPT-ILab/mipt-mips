@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../trap.h"
 #include <catch.hpp>
+#include <func_sim/traps/trap.h>
 #include <riscv.opcode.gen.h>
 #include <sstream>
 
