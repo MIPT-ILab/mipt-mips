@@ -91,7 +91,7 @@ script:
 after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
-  - ninja unit-tests && ctest
+  - ninja unit-tests-coverage && ./unit-tests-coverage
   - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then

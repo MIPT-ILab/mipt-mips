@@ -64,6 +64,15 @@ set(CPPS
     simulator.cpp
 )
 
+set(CEN64_CPPS
+    export/cen64/cen64_intf.cpp
+    memory/cen64/cen64_memory.cpp
+)
+
+set(CATCH_MAIN
+    export/catch/catch.cpp
+)
+
 set(TESTS_CPPS
     infra/t/unit_test.cpp
     infra/cache/t/unit_test.cpp
@@ -145,14 +154,7 @@ if (ENABLE_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -fno-inline -DNDEBUG")
     # add_link_options(--coverage)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-    CHECK_CXX_COMPILER_FLAG("-fno-inline-small-functions" COMPILER_SUPPORTS_NO_INLINE_SMALL_FUNCTIONS)
-    if (COMPILER_SUPPORTS_NO_INLINE_SMALL_FUNCTIONS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-small-functions")
-    endif()
-    CHECK_CXX_COMPILER_FLAG("-fno-default-inline" COMPILER_SUPPORTS_NO_DEFAULT_INLINE)
-    if (COMPILER_SUPPORTS_NO_DEFAULT_INLINE)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-default-inline")
-    endif()
+    link_libraries(gcov)
 endif()
 
 if (ENABLE_PROFILE)
@@ -196,9 +198,13 @@ include_directories(SYSTEM
         ${Boost_INCLUDE_DIRS})
 
 add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h)
-add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_library(mipt-mips-cen64-intf STATIC ${CEN64_CPPS})
 add_executable(mipt-mips export/standalone/main.cpp)
-add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
+add_executable(unit-tests EXCLUDE_FROM_ALL ${CATCH_MAIN} ${TESTS_CPPS})
+add_executable(unit-tests-coverage EXCLUDE_FROM_ALL
+    ${CATCH_MAIN} ${TESTS_CPPS} ${CEN64_CPPS}
+    ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h
+    )
 add_executable(cachesim export/cache/main.cpp)
 add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
 
