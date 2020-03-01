@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS team
  */
 
-#include "../port_queue.h"
 #include <catch.hpp>
+#include <infra/ports/port_queue/port_queue.h>
 
 TEST_CASE("PortQueue: empty queue")
 {

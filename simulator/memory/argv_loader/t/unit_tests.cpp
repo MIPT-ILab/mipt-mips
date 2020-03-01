@@ -4,7 +4,7 @@
  * Copyright 2019 MIPT-MIPS iLab project
  */
 
-#include "../argv_loader.h"
+#include <memory/argv_loader/argv_loader.h>
 
 #include <catch.hpp>
 

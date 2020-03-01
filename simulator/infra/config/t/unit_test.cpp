@@ -3,13 +3,12 @@
  * @author Denis Los
  */
 
-#include "../config.h"
-#include "../main_wrapper.h"
-
-#include "infra/argv.h"
-#include "infra/macro.h"
-
 #include <catch.hpp>
+
+#include <infra/argv.h>
+#include <infra/config/config.h>
+#include <infra/config/main_wrapper.h>
+#include <infra/macro.h>
 
 #include <sstream>
 

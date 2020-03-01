@@ -7,9 +7,8 @@
 #ifndef CEN64_MEMORY_H
 #define CEN64_MEMORY_H
  
-#include "../memory.h"
-
 #include <infra/exception.h>
+#include <memory/memory.h>
 
 struct bus_controller;
 

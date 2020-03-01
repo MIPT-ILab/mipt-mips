@@ -4,10 +4,9 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "../rf.h"
-
 #include <catch.hpp>
 #include <func_sim/operation.h>
+#include <func_sim/rf/rf.h>
 #include <mips/mips_register/mips_register.h>
 
 using MIPS32Instr = BaseInstruction<uint32, MIPSRegister>;

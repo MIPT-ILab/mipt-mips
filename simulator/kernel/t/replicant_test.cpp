@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../replicant.h"
 #include <catch.hpp>
+#include <kernel/replicant.h>
 
 TEST_CASE( "Replicant: set_target + get_pc")
 {

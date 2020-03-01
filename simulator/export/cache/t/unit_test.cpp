@@ -3,8 +3,7 @@
  * @author Pavel Kryukov
  */
 
-#include "../runner.h"
-
+#include <export/cache/runner.h>
 #include <infra/cache/cache_tag_array.h>
 
 #include <catch.hpp>
