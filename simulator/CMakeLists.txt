@@ -188,8 +188,8 @@ include_directories(SYSTEM
         ${RISCV_DIR}
         ${Boost_INCLUDE_DIRS})
 
-add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h)
-add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_library(mipt-mips-src OBJECT ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h)
+add_library(mipt-mips-cen64-intf OBJECT export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
 add_executable(cachesim export/cache/main.cpp)
@@ -203,7 +203,9 @@ target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
 add_test(all_tests unit-tests)
 
 if (GDB_SOURCE_PATH)
-    set_target_properties(mipt-mips-src PROPERTIES
+    add_library(gdb-mips-sim STATIC ${GDB_SIM_SRCS})
+    target_link_libraries(gdb-mips-sim mipt-mips-src)
+    set_target_properties(gdb-mips-sim PROPERTIES
             PREFIX ""
             SUFFIX ""
             OUTPUT_NAME "libsim.a"
