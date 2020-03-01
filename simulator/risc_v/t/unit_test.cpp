@@ -4,11 +4,11 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../riscv_instr.h"
 #include "riscv_test_wrapper.h"
 
 #include <catch.hpp>
 #include <memory/memory.h>
+#include <risc_v/riscv_instr.h>
 
 TEST_CASE("RISCV disassembly")
 {

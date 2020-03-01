@@ -6,6 +6,7 @@
 
 #include <catch.hpp>
 #include <memory/memory.h>
+#include <risc_v/riscv_instr.h>
 
 template<typename T>
 struct TestData {

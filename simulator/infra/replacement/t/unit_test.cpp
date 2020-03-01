@@ -3,7 +3,7 @@
  * @author Andrey Agrachev
  */
 
-#include "../cache_replacement.h"
+#include <infra/replacement/cache_replacement.h>
 
 #include <catch.hpp>
 

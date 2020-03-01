@@ -7,7 +7,7 @@
 #ifndef CACHEREPLACEMENT_H
 #define CACHEREPLACEMENT_H
 
-#include "../exception.h"
+#include <infra/exception.h>
 
 #include <memory>
 

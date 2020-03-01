@@ -4,7 +4,7 @@
  * Copyright (c) 2012-2015, The Regents of the University of California (Regents).
  */
  
-#include "../riscv_instr.h"
+#include <risc_v/riscv_instr.h>
  
 using Instr = RISCVInstr<uint64>;
  

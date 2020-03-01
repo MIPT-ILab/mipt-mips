@@ -4,10 +4,9 @@
  * Copyright 2017-2019 MIPT-MIPS
  */
 
-#include "../bpu.h"
-
 #include <catch.hpp>
 #include <infra/replacement/cache_replacement.h>
+#include <modules/fetch/bpu/bpu.h>
 
 #include <cassert>
 #include <cstdlib>
