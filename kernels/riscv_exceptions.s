@@ -1,3 +1,7 @@
+# RISC-V excpetion handler
+# Author Eric Konks
+# Copyright 2020 MIPT-V
+
 	.data
 __m1_:	.string "  Exception "
 __m2_:	.string "  Interrupt "
