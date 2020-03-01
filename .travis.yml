@@ -53,6 +53,8 @@ install:
   - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
   - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
   - tar -xzf gdb-9.1.tar.gz
+# Dump CMake version
+  - cmake --version
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
@@ -70,7 +72,7 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ninja mipt-mips unit-tests mipt-v
+  - ninja mipt-mips unit-tests mipt-v gdb-mips-sim
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
   - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
