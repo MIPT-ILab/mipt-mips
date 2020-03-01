@@ -4,8 +4,8 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "../kernel.h"
 #include <catch.hpp>
+#include <kernel/kernel.h>
 
 TEST_CASE( "Kernel: Execute nothing")
 {

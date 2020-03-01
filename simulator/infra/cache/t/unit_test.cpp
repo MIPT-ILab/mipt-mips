@@ -5,9 +5,7 @@
 
 #include <catch.hpp>
 
-// Module
-#include "../cache_tag_array.h"
-
+#include <infra/cache/cache_tag_array.h>
 #include <infra/replacement/cache_replacement.h>
 #include <infra/types.h>
 

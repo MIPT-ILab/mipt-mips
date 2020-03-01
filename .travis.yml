@@ -89,15 +89,16 @@ script:
     fi
 
 after_success:
-  - cd $TRAVIS_BUILD_DIR/simulator/debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
-  - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" || echo "Codecov did not collect coverage reports"
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer
         npx nyc --reporter=lcov npm test && npx codecov
+        rm * -rf
     fi
+  - cd $TRAVIS_BUILD_DIR/simulator/debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+  - ninja unit-tests && ctest
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++

@@ -4,7 +4,7 @@
  * Copyright 2018 MIPT-MIPS iLab project
  */
 
-#include "../memory.h"
+#include <memory/memory.h>
 #include <catch.hpp>
 
 void check_coherency(FuncMemory* mem1, FuncMemory* mem2, Addr address)

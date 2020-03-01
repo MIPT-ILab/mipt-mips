@@ -5,10 +5,10 @@
  
 #include <catch.hpp>
 
-#include "../../t/check_coherency.h"
-#include "../cen64_memory.h"
+#include <memory/cen64/cen64_memory.h>
 #include <memory/elf/elf_loader.h>
 #include <memory/memory.h>
+#include <memory/t/check_coherency.h>
 
 // Mock CEN64 with our casual FuncMemory implementation
 struct bus_controller

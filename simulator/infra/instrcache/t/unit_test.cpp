@@ -6,8 +6,7 @@
 #include <catch.hpp>
 
 // Modules
-#include "../instr_cache.h"
-
+#include <infra/instrcache/instr_cache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
