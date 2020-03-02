@@ -99,7 +99,8 @@ List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/a
 The project is mentored by [Kirill Korolev](https://github.com/kkorolev), and [Oleg Ladin](https://github.com/olegladin) under [Pavel Kryukov](https://github.com/pavelkryukov)'s supervising. For more information, check [this wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/About-Us) and [MIPT ILab site](https://mipt.ru/drec/about/ilab/)
 
 Additional repositories:
-* [MIPS traces](https://github.com/MIPT-ILab/mips-traces)
+* [Interactive MIPS traces](https://github.com/MIPT-ILab/mips-traces)
+* [Interactive RISC-V traces](https://github.com/MIPT-ILab/riscv-mars-examples)
 * [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
 * _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
