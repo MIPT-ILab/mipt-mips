@@ -63,7 +63,7 @@ install:
 before_script:
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then npm rebuild node-sass; fi
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/gdb-8.3 -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - cd $TRAVIS_BUILD_DIR/visualizer        && npm install
   - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
   - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
