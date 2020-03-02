@@ -230,14 +230,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_xor,    execute_xor<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'I', instr_or,     execute_or<I>,     OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     // CSR
-    {'I', instr_ecall,  execute_ecall<I>,  OUT_TRAP,  ' ', Imm::NO,    Src1::ZERO, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128},
-    {'I', instr_sret,   execute_sret<I>,   OUT_R_JUMP, ' ', Imm::NO,    Src1::SEPC, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128},
-    {'I', instr_mret,   execute_mret<I>,   OUT_R_JUMP, ' ', Imm::NO,    Src1::MEPC, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128},
-    {'I', instr_csrrw,  execute_csrrw<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128},
-    {'I', instr_csrrs,  execute_csrrs<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128},
-    {'I', instr_csrrwi, execute_csrrwi<I>, OUT_ARITHM, 'C', Imm::LOGIC, Src1::ZERO, Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128},
-    {'I', instr_fence,  execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128},
-    {'I', instr_fence_i,execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128},
+    {'I', instr_ecall,  execute_ecall<I>,  OUT_TRAP,   ' ', Imm::NO,    Src1::ZERO, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_sret,   execute_sret<I>,   OUT_R_JUMP, ' ', Imm::NO,    Src1::SEPC, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_mret,   execute_mret<I>,   OUT_R_JUMP, ' ', Imm::NO,    Src1::MEPC, Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_csrrw,  execute_csrrw<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_csrrs,  execute_csrrs<I>,  OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_csrrwi, execute_csrrwi<I>, OUT_ARITHM, 'C', Imm::LOGIC, Src1::ZERO, Src2::CSR,  Dst::CSR,  0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_fence,  execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_fence_i,execute_fence<I>,  OUT_LOAD,   'I', Imm::ADDR,  Src1::RS1,  Src2::ZERO, Dst::ZERO, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     /*-------------- M --------------*/
     {'M', instr_mul,    execute_mul<I>,    OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'M', instr_mulh,   execute_mulh<I>,   OUT_ARITHM, ' ', Imm::NO,    Src1::RS1,  Src2::RS2,  Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
