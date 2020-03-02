@@ -1,4 +1,4 @@
-# RISC-V excpetion handler
+# RISC-V exception handler
 # Author Eric Konks
 # Copyright 2020 MIPT-V
 
