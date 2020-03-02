@@ -3,10 +3,9 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "../func_sim.h"
-
 #include <catch.hpp>
 
+#include <func_sim/func_sim.h>
 #include <kernel/kernel.h>
 #include <memory/memory.h>
 #include <mips/mips_register/mips_register.h>

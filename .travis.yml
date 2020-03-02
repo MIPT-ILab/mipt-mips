@@ -31,7 +31,7 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     update: true
     packages:
@@ -47,10 +47,14 @@ addons:
 
 install:
 # Download GDB
-  - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
+  - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
   - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+  - if [ "$CC" == "clang" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
   - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
-  - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
+  - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
+  - tar -xzf gdb-9.1.tar.gz
+# Dump CMake version
+  - cmake --version
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
@@ -68,9 +72,10 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ninja mipt-mips unit-tests
+  - ninja mipt-mips unit-tests mipt-v gdb-mips-sim
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 1000000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
+  - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
   # TODO (pkryukov): run NPM on ARM
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
@@ -87,22 +92,22 @@ script:
 
 after_success:
   - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer
+        npx nyc --reporter=lcov npm test && npx codecov
+        rm * -rf
+    fi
+  - cd $TRAVIS_BUILD_DIR/simulator/debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+  - ninja unit-tests && ctest
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
+  - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++
-        sudo apt-get install clang-tidy-9 g++-8
+        sudo apt-get install clang-tidy-10 g++-8
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
-        clang-tidy-9 --version
+        clang-tidy-10 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
-    fi
-  - |
-    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
-        ninja unit-tests && ctest
-        bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
-        cd $TRAVIS_BUILD_DIR/visualizer
-        if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
+        run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
     fi

@@ -32,12 +32,15 @@ enum class Endian
 // See https://godbolt.org/z/ff-NAF for example
 
 template<typename T>
-static inline constexpr T pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
+static inline constexpr
+std::enable_if_t<std::is_same_v<T, unsign_t<T>>, T>
+pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
     size_t shift = 0;
     for ( const auto& el : array) {
-        value |= unsign_t<T>( uint8( el)) << shift;
+        // Shift result has to be casted since it is 'int' by default for narrow types
+        value |= T( T( uint8( el)) << shift);
         shift += CHAR_BIT;
     }
 
@@ -45,14 +48,17 @@ static inline constexpr T pack_array_le( std::array<std::byte, bytewidth<T>> arr
 }
 
 template<typename T>
-static inline constexpr T pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
+static inline constexpr
+std::enable_if_t<std::is_same_v<T, unsign_t<T>>, T>
+pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
 {
     T value{};
     size_t shift = (array.size() - 1) * CHAR_BIT;
     for ( const auto& el : array) {
-        value |= unsign_t<T>( uint8( el)) << shift;
+        // Shift result has to be casted since it is 'int' by default for narrow types
+        value |= T( T( uint8( el)) << shift);
         shift -= CHAR_BIT;
-    }   
+    }
 
     return value;
 }

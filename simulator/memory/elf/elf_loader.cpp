@@ -31,7 +31,7 @@ ElfLoader::ElfLoader( std::string_view filename)
 void ElfLoader::load_to( WriteableMemory *memory, AddrDiff offset) const
 {
     for ( const auto& section : reader->sections)
-        if ( ( section->get_flags() & SHF_ALLOC) != 0)
+        if ( ( section->get_flags() & narrow_cast<decltype(section->get_flags())>( SHF_ALLOC)) != 0)
             load_elf_section( memory, *section, offset);
 }
 
@@ -50,11 +50,11 @@ Addr ElfLoader::get_startPC() const
         for ( ELFIO::Elf_Xword j = 0; j < symbols.get_symbols_num(); ++j ) {
             std::string name;
             ELFIO::Elf64_Addr value = 0;
-            ELFIO::Elf_Xword size;
-            unsigned char bind;
-            unsigned char type;
-            ELFIO::Elf_Half section_index;
-            unsigned char other;
+            ELFIO::Elf_Xword size = 0;
+            unsigned char bind = 0;
+            unsigned char type = 0;
+            ELFIO::Elf_Half section_index = 0;
+            unsigned char other = 0;
             symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
             if ( name == "__start" || name == "_start")
                 return value;

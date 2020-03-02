@@ -3,11 +3,10 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "../perf_sim.h"
-
 #include <catch.hpp>
 
 #include <kernel/kernel.h>
+#include <modules/core/perf_sim.h>
 #include <modules/writeback/writeback.h>
 
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")

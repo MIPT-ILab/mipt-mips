@@ -54,7 +54,7 @@ private:
 
     size_t copy_word( std::byte* dst, Addr src, size_t size) const noexcept
     {
-        uint32 val;
+        uint32 val = 0;
         size_t result = bus_read_word( bus, src, &val);
         put_value_to_pointer<uint32, Endian::big>( dst, val, size);
         return result;

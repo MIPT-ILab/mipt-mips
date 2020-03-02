@@ -4,15 +4,14 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-// generic C
-#include <cassert>
-#include <cstdlib>
-
 // Catch2
 #include <catch.hpp>
 
 // MIPT-MIPS modules
-#include "../riscv_register.h"
+#include <risc_v/riscv_register/riscv_register.h>
+
+#include <cassert>
+#include <cstdlib>
 
 // Testing methods of the class
 TEST_CASE( "RISCV_registers: Size_t_converters")

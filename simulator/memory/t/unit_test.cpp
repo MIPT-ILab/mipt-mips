@@ -8,15 +8,14 @@
 #include <catch.hpp>
 
 // MIPT-MIPS modules
-#include "../elf/elf_loader.h"
-#include "../memory.h"
-#include "check_coherency.h"
-#include "func_sim/operation.h"
+#include <func_sim/operation.h>
+#include <memory/elf/elf_loader.h>
+#include <memory/memory.h>
+#include <memory/t/check_coherency.h>
 
 static const std::string_view valid_elf_file = TEST_PATH "/mips_bin_exmpl.out";
 // the address of the ".data" section
 static const uint64 dataSectAddr = 0x4100c0;
-static const uint64 dataSectAddrShifted = 0x100c0;
 
 //
 // Check that all incorect input params of the constructor
