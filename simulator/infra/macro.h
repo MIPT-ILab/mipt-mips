@@ -338,7 +338,7 @@ template<typename T>
 static inline T gen_reverse( T value, size_t shamt)
 {
     for ( size_t i = 0; i < log_bitwidth<T>; ++i) {
-        const auto shift = 1 << i;
+        const auto shift = 1U << i;
         if ( ( shamt & shift) != 0)
             value = ( ( value & interleaved_mask<T>( i)) << shift) | ( ( value & ~interleaved_mask<T>( i)) >> shift);
     }
@@ -350,7 +350,7 @@ template<typename T>
 static inline T gen_or_combine( T value, size_t shamt)
 {
     for ( size_t i = 0; i < log_bitwidth<T>; ++i) {
-        const auto shift = 1 << i;
+        const auto shift = 1U << i;
         if ( ( shamt & shift) != 0)
             value |= ( ( value & interleaved_mask<T>( i)) << shift) | ( (value & ~interleaved_mask<T>( i)) >> shift);
     }
