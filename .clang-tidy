@@ -1,2 +1,7 @@
 ---
-Checks: '*,-*braces-around-statements,-llvm-header-guard,-cert-err58-cpp,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-modernize-use-nodiscard,-*non-private-member-variables-in-classes,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-*-uppercase-literal-suffix,-hicpp-signed-bitwise,-cppcoreguidelines-macro-usage,-modernize-use-trailing-return-type'
+Checks: '*,-*braces-around-statements,-llvm-header-guard,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-*-magic-numbers,-cppcoreguidelines-macro-usage,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-*-non-private-member-variables-in-classes'
+CheckOptions:
+  - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
+    value: 1
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 1

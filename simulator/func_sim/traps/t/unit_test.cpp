@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../trap.h"
 #include <catch.hpp>
+#include <func_sim/traps/trap.h>
 #include <riscv.opcode.gen.h>
 #include <sstream>
 
@@ -28,7 +28,7 @@ TEST_CASE( "Trap: check conversion")
 TEST_CASE( "Trap: check initialization")
 {
     CHECK( Trap::from_riscv_format( CAUSE_MISALIGNED_FETCH) == Trap::UNALIGNED_FETCH);
-    CHECK( Trap::from_gdb_format( 5) == Trap::BREAKPOINT);
+    CHECK( Trap::from_gdb_format( 12) == Trap::UNSUPPORTED_SYSCALL);
     CHECK( Trap::from_mips_format( 16) == Trap::FP_OVERFLOW);
 }
 

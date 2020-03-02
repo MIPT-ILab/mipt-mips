@@ -8,7 +8,6 @@
 #define ARGV_LOADER_H
 
 #include <infra/argv.h>
-#include <infra/byte.h>
 #include <infra/types.h>
 #include <memory/memory.h>
 
@@ -31,12 +30,12 @@ private:
 
     void place_nullptr( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<T, endian>( 0, addr);
+        mem->write<T, endian>( T{}, addr);
     }
 
     void place_nullterminator( const std::shared_ptr<FuncMemory>& mem, Addr addr)
     {
-        mem->write<char, endian>( 0, addr);
+        mem->write<uint8, endian>( uint8{}, addr);
     }
 
     void load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr);

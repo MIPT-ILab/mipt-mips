@@ -4,10 +4,11 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../riscv_instr.h"
+#include "riscv_test_wrapper.h"
 
 #include <catch.hpp>
 #include <memory/memory.h>
+#include <risc_v/riscv_instr.h>
 
 TEST_CASE("RISCV disassembly")
 {
@@ -156,27 +157,6 @@ TEST_CASE( "RISCV lq/sq")
     CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
 }
 
-template<typename T>
-struct TestData {
-    T src1, src2, dst;
-
-    TestData( T src1, T src2, T dst)
-    {
-       this->src1 = src1;
-       this->src2 = src2;
-       this->dst = dst;
-    }
-
-    void make_test( std::string_view str)
-    {
-        RISCVInstr<T> instr( str, 0);
-        instr.set_v_src( src1, 0);
-        instr.set_v_src( src2, 1);
-        instr.execute();
-        CHECK( instr.get_v_dst() == dst);
-    }
-};
-
 TEST_CASE( "RISCV slo32")
 {
     CHECK( RISCVInstr<uint32>( 0x20E797B3).get_disasm() == "slo $a5, $a5, $a4");
@@ -300,7 +280,7 @@ TEST_CASE( "RISCV sro32")
 {
     CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
     RISCVInstr<uint32> instr( "sro", 0);
-    instr.set_v_src( 0x8000'c000u, 0);
+    instr.set_v_src( 0x8000'c000U, 0);
     instr.set_v_src( 0xf, 1);
     instr.execute();
     CHECK( instr.get_v_dst() == 0xffff'0001);
@@ -309,28 +289,28 @@ TEST_CASE( "RISCV sro32")
 TEST_CASE( "RISCV sro32 overflow")
 {
     RISCVInstr<uint32> instr( "sro", 0);
-    instr.set_v_src( 0x8000'c000u, 0);
-    instr.set_v_src( 0xffu, 1);
+    instr.set_v_src( 0x8000'c000U, 0);
+    instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffffu);
+    CHECK( instr.get_v_dst() == 0xffff'ffffU);
 }
 
 TEST_CASE( "RISCV sro64")
 {
     RISCVInstr<uint64> instr( "sro", 0);
-    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
-    instr.set_v_src( 0x1fu, 1);
+    instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
+    instr.set_v_src( 0x1fU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ull);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ULL);
 }
 
 TEST_CASE( "RISCV sro64 overflow")
 {
     RISCVInstr<uint64> instr( "sro", 0);
-    instr.set_v_src( 0x8000'0000'c000'0000ull, 0);
-    instr.set_v_src( 0xffu, 1);
+    instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
+    instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffull);
+    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffULL);
 }
 
 TEST_CASE("RISCV RV32 bfp")
@@ -579,3 +559,40 @@ TEST_CASE("RISCV RV64 gorc")
         cases[i].make_test("gorc");
     }
 }
+
+TEST_CASE("RISCV RV32 unshfl")
+{
+    CHECK( RISCVInstr<uint32>(0x091855b3).get_disasm() == "unshfl $a1, $a6, $a7");
+    RISCVInstr<uint32> instr("unshfl", 0);
+    instr.set_v_src( 0xbf534fdeU, 0);
+    instr.set_v_src( 0x07, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0xf17d3bbeU);
+}
+
+TEST_CASE("RISCV RV64 unshfl")
+{
+    RISCVInstr<uint64> instr("unshfl", 0);
+    instr.set_v_src( 0x0138'745b'ffff'acd1ULL, 0);
+    instr.set_v_src( 0x16, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst() == 0x021c'ffff'56c7'bc85ULL);
+}
+
+TEST_CASE("RISCV RV128 unshfl")
+{
+    std::vector<TestData<uint128>> cases = {
+            { 0x3146'2351'2464'6245ULL,  0x11, 0x5126'4262'4531'6423ULL},
+            { 0xf14c'82a6'ac81'2410ULL,  0x36, ( uint128{ 0xc7d0b881U} << 64) + uint128{ 0x892a1084U}},
+            { 0x1234'9abc'5678'def0ULL,  0x0, 0x1234'9abc'5678'def0ULL},
+            { ( uint128{ 0x7fff'0fe3'3630'0001ULL} << 64) + uint128{ 0x7f3d'ff39'5400'6401ULL},  0x0f,
+                ( uint128{ 0x7f3d'ff39'5400'6401ULL} << 64) + uint128{ 0x76f6'f7f5'0040'e0a1ULL}},
+            { ( uint128{ 0x9846'5982'6593'659fULL} << 64) + uint128{ 0x8534'9dab'c820'f892ULL},  0x3f,
+                ( uint128{ 0xa129'494b'84af'a4e9ULL} << 64) + uint128{ 0x4ad0'b5b7'3671'80c4ULL}},
+    };
+    for( std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test( "unshfl");
+    }
+}
+

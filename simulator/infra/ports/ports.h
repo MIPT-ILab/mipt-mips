@@ -7,11 +7,11 @@
 #ifndef PORTS_H
 #define PORTS_H
 
-#include "../exception.h"
-#include "../log.h"
-#include "../types.h"
-#include "port_queue/port_queue.h"
-#include "timing.h"
+#include <infra/exception.h>
+#include <infra/log.h>
+#include <infra/ports/port_queue/port_queue.h>
+#include <infra/ports/timing.h>
+#include <infra/types.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 

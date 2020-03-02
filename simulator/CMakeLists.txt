@@ -5,6 +5,7 @@
 #! https://github.com/SoshinK
 
 cmake_minimum_required(VERSION 3.9)
+# cmake_minimum_required(VERSION 3.13.5) for add_link_options
 
 project(mipt-mips)
 enable_testing()
@@ -15,6 +16,7 @@ set(default_build_type "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
 option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
+option(ENABLE_IPO "Enable interprocedural optimizations" OFF)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -23,45 +25,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
       STRING "Choose the type of build." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
-
-set(CPPS
-    infra/print128.cpp
-    infra/config/main_wrapper.cpp
-    infra/config/config.cpp
-    infra/ports/module.cpp
-    infra/ports/ports.cpp
-    infra/cache/cache_tag_array.cpp
-    infra/replacement/cache_replacement.cpp
-    memory/memory.cpp
-    memory/hierarchied_memory.cpp
-    memory/plain_memory.cpp
-    memory/elf/elf_loader.cpp
-    memory/argv_loader/argv_loader.cpp
-    func_sim/func_sim.cpp
-    func_sim/driver/driver.cpp
-    func_sim/traps/trap.cpp
-    mips/mips_instr.cpp
-    mips/mips_register/mips_register.cpp
-    mips/mips_driver.cpp
-    risc_v/riscv_register/riscv_register.cpp
-    risc_v/riscv_instr.cpp
-    export/gdb/gdb_wrapper.cpp
-    export/cen64/cen64_wrapper.cpp
-    export/cache/runner.cpp
-    kernel/kernel.cpp
-    kernel/mars/mars_kernel.cpp
-    modules/ports_instance.cpp
-    modules/fetch/fetch.cpp
-    modules/fetch/bpu/bpu.cpp
-    modules/decode/decode.cpp
-    modules/execute/execute.cpp
-    modules/mem/mem.cpp
-    modules/branch/branch.cpp
-    modules/core/perf_sim.cpp
-    modules/writeback/writeback.cpp
-    modules/writeback/checker/checker.cpp
-    simulator.cpp
-)
 
 set(TESTS_CPPS
     infra/t/unit_test.cpp
@@ -133,18 +96,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
-if(COMPILER_SUPPORTS_MARCH_NATIVE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+if (COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 endif()
 
 if (ENABLE_COVERAGE)
     if (WIN32)
         message(FATAL_ERROR "CodeCov is not supported for Windows builds")
     endif()
-    if (NOT CMAKE_COMPILER_IS_GNUCXX)
-        message(FATAL_ERROR "CodeCov is supported only for GCC builds")
-    endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -DNDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -fno-inline -DNDEBUG")
+    # add_link_options(--coverage)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    link_libraries(gcov)
 endif()
 
 if (ENABLE_PROFILE)
@@ -163,8 +126,8 @@ if (GDB_SOURCE_PATH)
     add_definitions(-DHAVE_CONFIG_H)
     include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
     include_directories(SYSTEM
-            ${GDB_SOURCE_PATH}/
-            ${GDB_SOURCE_PATH}/bfd
+            ${GDB_BUILD_PATH}/
+            ${GDB_BUILD_PATH}/bfd
             ${GDB_SOURCE_PATH}/include
             ${GDB_SOURCE_PATH}/sim/common)
 else ()
@@ -187,23 +150,61 @@ include_directories(SYSTEM
         ${RISCV_DIR}
         ${Boost_INCLUDE_DIRS})
 
-add_library(mipt-mips-src STATIC ${GDB_SIM_SRCS} ${CPPS} ${RISCV_DIR}/riscv.opcode.gen.h)
-add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
-add_executable(mipt-mips export/standalone/main.cpp)
-add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
-add_executable(cachesim export/cache/main.cpp)
+add_library(mipt-mips-src OBJECT
+    infra/print128.cpp
+    infra/config/main_wrapper.cpp
+    infra/config/config.cpp
+    infra/ports/module.cpp
+    infra/ports/ports.cpp
+    infra/cache/cache_tag_array.cpp
+    infra/replacement/cache_replacement.cpp
+    memory/memory.cpp
+    memory/hierarchied_memory.cpp
+    memory/plain_memory.cpp
+    memory/elf/elf_loader.cpp
+    memory/argv_loader/argv_loader.cpp
+    func_sim/func_sim.cpp
+    func_sim/driver/driver.cpp
+    func_sim/traps/trap.cpp
+    mips/mips_instr.cpp
+    mips/mips_register/mips_register.cpp
+    mips/mips_driver.cpp
+    risc_v/riscv_register/riscv_register.cpp
+    risc_v/riscv_instr.cpp
+    export/gdb/gdb_wrapper.cpp
+    export/cen64/cen64_wrapper.cpp
+    export/cache/runner.cpp
+    kernel/kernel.cpp
+    kernel/mars/mars_kernel.cpp
+    modules/ports_instance.cpp
+    modules/fetch/fetch.cpp
+    modules/fetch/bpu/bpu.cpp
+    modules/decode/decode.cpp
+    modules/execute/execute.cpp
+    modules/mem/mem.cpp
+    modules/branch/branch.cpp
+    modules/core/perf_sim.cpp
+    modules/writeback/writeback.cpp
+    modules/writeback/checker/checker.cpp
+    simulator.cpp
+    ${RISCV_DIR}/riscv.opcode.gen.h
+)
 
-target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
-target_link_libraries(mipt-mips mipt-mips-src)
-target_link_libraries(cachesim mipt-mips-src)
-target_link_libraries(unit-tests mipt-mips-src mipt-mips-cen64-intf)
+add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+add_executable(mipt-mips export/standalone/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} $<TARGET_OBJECTS:mipt-mips-src>)
+add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
+
+target_link_libraries(unit-tests mipt-mips-cen64-intf)
 
 add_test(all_tests unit-tests)
 
 if (GDB_SOURCE_PATH)
-    set_target_properties(mipt-mips-src PROPERTIES
+    add_library(gdb-mips-sim STATIC ${GDB_SIM_SRCS} $<TARGET_OBJECTS:mipt-mips-src>)
+    set_target_properties(gdb-mips-sim PROPERTIES
             PREFIX ""
             SUFFIX ""
             OUTPUT_NAME "libsim.a"
-            ARCHIVE_OUTPUT_DIRECTORY "${GDB_SOURCE_PATH}/sim/mips")
+            ARCHIVE_OUTPUT_DIRECTORY "${GDB_BUILD_PATH}/sim/mips")
 endif (GDB_SOURCE_PATH)

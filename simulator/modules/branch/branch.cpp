@@ -65,7 +65,7 @@ void Branch<FuncInstr>::clock( Cycle cycle)
     sout << instr << std::endl;
 
     /* bypass data */
-    wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
+    wp_bypass->write( std::pair{ instr.get_v_dst(), instr.get_v_dst2()}, cycle);
 
     /* data path */
     wp_datapath->write( std::move( instr), cycle);

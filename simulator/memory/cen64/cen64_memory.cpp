@@ -24,12 +24,12 @@ class CEN64Memory : public FuncMemory
 public:
     explicit CEN64Memory(bus_controller* value) : bus( value) { }
 
-    size_t memcpy_host_to_guest( Addr dst, const Byte* src, size_t size) final
+    size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final
     {
         return copy_by_words( dst, src, size);
     }
 
-    size_t memcpy_guest_to_host( Byte* dst, Addr src, size_t size) const noexcept final
+    size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final
     {
         return copy_by_words( dst, src, size);
     }
@@ -52,15 +52,15 @@ public:
 private:
     bus_controller* const bus = nullptr;
 
-    size_t copy_word( Byte* dst, Addr src, size_t size) const noexcept
+    size_t copy_word( std::byte* dst, Addr src, size_t size) const noexcept
     {
-        uint32 val;
+        uint32 val = 0;
         size_t result = bus_read_word( bus, src, &val);
         put_value_to_pointer<uint32, Endian::big>( dst, val, size);
         return result;
     }
 
-    size_t copy_word( Addr dst, const Byte* src, size_t size) const noexcept
+    size_t copy_word( Addr dst, const std::byte* src, size_t size) const noexcept
     {
         auto val = get_value_from_pointer<uint32, Endian::big>( src, size);
         auto dqm = swap_endian( bitmask<uint32>( narrow_cast<uint32>( size * CHAR_BIT)));

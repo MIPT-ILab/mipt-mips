@@ -4,13 +4,13 @@
  * Copyright 2017-2019 MIPT-MIPS
  */
 
-#include "../bpu.h"
-
 #include <catch.hpp>
 #include <infra/replacement/cache_replacement.h>
+#include <modules/fetch/bpu/bpu.h>
 
 #include <cassert>
 #include <cstdlib>
+#include <sstream>
 
 TEST_CASE( "Initialization: WrongParameters")
 {
@@ -18,6 +18,18 @@ TEST_CASE( "Initialization: WrongParameters")
     CHECK_THROWS_AS( BaseBP::create_bp( "saturating_three_bits", "LRU", 128, 16, 32), BPInvalidMode);
     CHECK_THROWS_AS( BaseBP::create_bp( "saturating_two_bits", "URL", 128, 16, 32), CacheReplacementException);
     CHECK_THROWS_AS( BaseBP::create_bp( "saturating_two_bits", "LRU", 100, 20, 32), BPInvalidMode);
+}
+
+static auto to_string( const BPInterface& info)
+{
+    std::ostringstream oss;
+    oss << info;
+    return oss.str();
+}
+
+TEST_CASE( "BPInterface: dump")
+{
+    CHECK( to_string( BPInterface( 0x28, false, 0x30, false)) == "{ pc=0x28, target=0x30, NT, miss }");
 }
 
 TEST_CASE( "Static, all branches not taken")

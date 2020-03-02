@@ -3,13 +3,12 @@
  * @author Denis Los
  */
 
-#include "../config.h"
-#include "../main_wrapper.h"
-
-#include "infra/argv.h"
-#include "infra/macro.h"
-
 #include <catch.hpp>
+
+#include <infra/argv.h>
+#include <infra/config/config.h>
+#include <infra/config/main_wrapper.h>
+#include <infra/macro.h>
 
 #include <sstream>
 
@@ -56,6 +55,7 @@ TEST_CASE( "config_parse: Pass_Valid_Args_1")
 
     CHECK( config::uint64_config == mandatory_int_value);
     CHECK( config::string_config == mandatory_string_value);
+    CHECK( config::string_config != "another_file.elf");
     CHECK_FALSE( config::bool_config_1);
     CHECK( config::bool_config_2);
 

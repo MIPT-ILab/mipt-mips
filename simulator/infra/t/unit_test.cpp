@@ -12,6 +12,7 @@
 #include <infra/exception.h>
 #include <infra/log.h>
 #include <infra/macro.h>
+#include <infra/target.h>
 
 #include <cctype>
 #include <memory>
@@ -20,10 +21,10 @@
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
-static_assert(is_power_of_two(1u));
-static_assert(is_power_of_two(2u));
-static_assert(is_power_of_two(4u));
-static_assert(!is_power_of_two(5u));
+static_assert(is_power_of_two(1U));
+static_assert(is_power_of_two(2U));
+static_assert(is_power_of_two(4U));
+static_assert(!is_power_of_two(5U));
 
 static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
 static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));
@@ -58,13 +59,13 @@ static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
 static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
 static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
 
-static_assert(all_ones<uint8>()  == 0xFFull);
-static_assert(all_ones<uint16>() == 0xFFFFull);
-static_assert(all_ones<uint32>() == 0xFFFF'FFFFull);
+static_assert(all_ones<uint8>()  == 0xFFULL);
+static_assert(all_ones<uint16>() == 0xFFFFULL);
+static_assert(all_ones<uint32>() == 0xFFFF'FFFFULL);
 
-static_assert(msb_set<uint8>()  == 0x80ull);
-static_assert(msb_set<uint16>() == 0x8000ull);
-static_assert(msb_set<uint32>() == 0x8000'0000ull);
+static_assert(msb_set<uint8>()  == 0x80ULL);
+static_assert(msb_set<uint16>() == 0x8000ULL);
+static_assert(msb_set<uint32>() == 0x8000'0000ULL);
 
 /* Check that NO_VAL values are really non-trivial */
 static_assert(NO_VAL<uint8> != 0);
@@ -118,7 +119,7 @@ static_assert(find_first_set<uint64>(msb_set<uint64>()) == 63);
 static_assert(log_bitwidth<uint32> == 5);
 static_assert(log_bitwidth<uint64> == 6);
 
-static constexpr std::array<Byte, 4> test_array = {{Byte{0x78}, Byte{0x56}, Byte{0x34}, Byte{0x12}}};
+static constexpr std::array<std::byte, 4> test_array = {{std::byte{0x78}, std::byte{0x56}, std::byte{0x34}, std::byte{0x12}}};
 
 static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
 static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
@@ -135,21 +136,36 @@ static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
-
 template<Endian e>
 static constexpr auto check_to_pointer()
 {
-    std::array<Byte, 2> res{};
+    std::array<std::byte, 2> res{};
     put_value_to_pointer<uint16, e>( res.data(), 0x3456, 2);
     return res;
 }
 
-static_assert(check_to_pointer<Endian::little>()[0] == Byte{ 0x56});
-static_assert(check_to_pointer<Endian::little>()[1] == Byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[0] == Byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[1] == Byte{ 0x56});
+#if 0 // C++ 20 allows constexpr std::copy
+
+static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
+static_assert(check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
+static_assert(check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
+static_assert(check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+
+#else
+
+TEST_CASE( "Byte swapping pointer access")
+{    
+    CHECK( get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
+    CHECK( get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
+    CHECK( check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
+    CHECK( check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
+    CHECK( check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
+    CHECK( check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+}
+
+#endif
 
 static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
 static_assert( count_argc( some_argv.data()) == 3);
@@ -177,11 +193,26 @@ static_assert( interleaved_mask<uint32>(2) == 0x0F0F'0F0F);
 static_assert( interleaved_mask<uint32>(3) == 0x00FF'00FF);
 static_assert( interleaved_mask<uint32>(4) == 0x0000'FFFF);
 
+static_assert( unpack_to<uint16>( uint32{0xABCD'EF12})[0] == 0xEF12);
+static_assert( unpack_to<uint16>( uint32{0xABCD'EF12})[1] == 0xABCD);
+
+static constexpr std::array<uint16, 2> pack_test_array = {{0xEF12, 0xABCD}};
+
+static_assert( pack_from( pack_test_array) == 0xABCD'EF12);
+
+static_assert( shuffle_mask<uint32, 2>(0) == 0x4444'4444);
+static_assert( shuffle_mask<uint32, 2>(1) == 0x3030'3030);
+static_assert( shuffle_mask<uint32, 2>(2) == 0x0F00'0F00);
+
+static_assert( shuffle_mask<uint32, 1>(0) == 0x2222'2222);
+static_assert( shuffle_mask<uint32, 1>(1) == 0x0C0C'0C0C);
+static_assert( shuffle_mask<uint32, 1>(2) == 0x00F0'00F0);
+
 TEST_CASE("ones shift dynamic check")
 {
     // Need that test to check VS behavior
-    CHECK( ones_rs<uint32>( 0x8000'c000u, 15) == 0xffff'0001u);
-    CHECK( ones_rs<uint32>( 0x8000'c000u, 31) == 0xffff'ffffu);
+    CHECK( ones_rs<uint32>( 0x8000'c000U, 15) == 0xffff'0001U);
+    CHECK( ones_rs<uint32>( 0x8000'c000U, 31) == 0xffff'ffffU);
 }
 
 TEST_CASE("ones shift for 128 instructions")
@@ -189,10 +220,12 @@ TEST_CASE("ones shift for 128 instructions")
     CHECK( ones_ls<uint128>( 0x1, 1) == 0x3);
     CHECK( ones_ls<uint128>( 0x8, 4) == 0x8f);
     CHECK( ones_ls<uint128>( msb_set<uint128>(), 1) == 0x1);
-    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << (128 - 17)));
-    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
-    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << (128 - 17)));
-    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << (128 - 17)));
+
+    const size_t shift = 128 - 17;
+    CHECK( ones_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 0x1fffd} << shift));
+    CHECK( ones_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << shift));
+    CHECK( arithmetic_rs( msb_set<uint128>() >> 1, 15) == (uint128{ 1}       << shift));
+    CHECK( arithmetic_rs( msb_set<uint128>(), 16)      == (uint128{ 0x1ffff} << shift));
 }
 
 TEST_CASE("sign extension")
@@ -319,4 +352,18 @@ TEST_CASE("Test uint64 circular left shift")
     CHECK( value == circ_ls( value, 0));
     CHECK( value == circ_ls( value, 64));
     CHECK( 0x0B0C'0D0A'0B0C'0D0A == circ_ls( value, 4));
+}
+
+TEST_CASE("Invalid target print")
+{
+    std::ostringstream oss;
+    oss << Target();
+    CHECK( oss.str() == "invalid" );
+}
+
+TEST_CASE("Valid target print")
+{
+    std::ostringstream oss;
+    oss << std::hex << Target( 0x400, 15);
+    CHECK( oss.str() == "400" );
 }

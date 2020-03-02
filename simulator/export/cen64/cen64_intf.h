@@ -53,14 +53,17 @@ void vr4300_cycle_extra(struct vr4300 *vr4300, struct vr4300_stats *stats);
 uint64 vr4300_get_register(struct vr4300 *vr4300, std::size_t i);
 uint64 vr4300_get_pc(struct vr4300 *vr4300);
 
-int read_mi_regs(void *opaque, uint32 address, uint32 *word);
-int write_mi_regs(void *opaque, uint32 address, uint32 word, uint32 dqm);
+int read_mi_regs(struct vr4300 *vr4300, uint32 address, uint32 *word);
+int write_mi_regs(struct vr4300 *vr4300, uint32 address, uint32 word, uint32 dqm);
 
 void clear_rcp_interrupt(struct vr4300 *vr4300, enum rcp_interrupt_mask mask);
 void signal_rcp_interrupt(struct vr4300 *vr4300, enum rcp_interrupt_mask mask);
 
 void clear_dd_interrupt(struct vr4300 *vr4300);
 void signal_dd_interrupt(struct vr4300 *vr4300);
+
+uint64_t get_profile_sample(struct vr4300 const *vr4300, size_t i);
+int has_profile_samples(struct vr4300 const *vr4300);
 
 }
 

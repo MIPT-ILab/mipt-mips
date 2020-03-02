@@ -11,10 +11,22 @@
 #include "traps/trap.h"
 
 #include <infra/macro.h>
+
+#include <array>
 #include <tuple>
 
 template<size_t N, typename T>
-T align_up(T value) { return ((value + ((1ull << N) - 1)) >> N) << N; }
+T align_up(T value) { return ((value + bitmask<T>(N)) >> N) << N; }
+
+template<typename T> static T bit_shuffle( T value, size_t level)
+{
+    const auto maskL = shuffle_mask<T, 2>( level);
+    const auto maskR = shuffle_mask<T, 1>( level);
+    const auto shamt = size_t{ 1} << ( level);
+    T result = value & ~( maskL | maskR);
+    result |= ( ( value << shamt) & maskL) | ( ( value >> shamt) & maskR);
+    return result;
+}
 
 struct ALU
 {
@@ -201,6 +213,17 @@ struct ALU
     // Bit permutation
     template<typename I> static void grev( I* instr) { instr->v_dst = gen_reverse( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
+    template<typename I> static
+    void riscv_unshfl( I* instr)
+    {
+        auto dst_value = instr->v_src1;
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src1)> - 1;
+        for ( size_t i = 0; i < limit; ++i)
+            if ( ( instr->v_src2 >> i) & 1U)
+                dst_value = bit_shuffle( dst_value, i);
+        instr->v_dst = dst_value;
+    }
+  
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst = gen_or_combine( instr->v_src1, shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
@@ -209,14 +232,14 @@ struct ALU
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src2 != 0) instr->mask = 0; }
 
     // Bit manipulations
-    template<typename I> static void sbext( I* instr) { instr->v_dst = 1 & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sbext( I* instr) { instr->v_dst = 1U & ( instr->v_src1 >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     template<typename I, typename T>
     static void clmul( I* instr)
     {
         instr->v_dst = 0;
         for ( std::size_t index = 0; index < bitwidth<T>; index++)
-            if ( (instr->v_src2 >> index) & 1)
+            if ( ( instr->v_src2 >> index) & 1U)
                 instr->v_dst ^= instr->v_src1 << index;
     }
 
@@ -276,7 +299,7 @@ struct ALU
     {
         // FIXME(pikryukov): That should behave differently for ErrorEPC
         jump( instr, instr->v_src1);
-        instr->v_dst &= instr->v_src2 & ~(1 << 2);
+        instr->v_dst &= instr->v_src2 & ~(1U << 2);
     }
 
     // Traps
@@ -319,7 +342,7 @@ struct ALU
     {
         using XLENType = typename I::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
-        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15;
+        size_t len = ( narrow_cast<size_t>( instr->v_src2) >> 24) & 15U;
         len = len ? len : 16;
         size_t off = ( narrow_cast<size_t>( instr->v_src2) >> 16) & ( XLEN-1);
         auto mask = circ_ls( bitmask<XLENType>( len), off);

@@ -18,10 +18,16 @@ class PerfInstr : public FuncInstr
 {
     /* info for branch misprediction unit */
     const BPInterface bp_data = {};
+
+    // Returns address used to train branch target prediction
+    auto get_bp_upd_address() const {
+        return this->is_indirect_jump() ? this->get_new_PC() : this->get_decoded_target();
+    }
+
 public:
     PerfInstr( const FuncInstr& instr, const BPInterface& bp_info) : FuncInstr( instr), bp_data( bp_info) { }
 
-    auto get_dst_v() const { return std::make_pair( this->get_v_dst(), this->get_v_dst2()); }
+    auto get_dst_v() const { return std::pair{ this->get_v_dst(), this->get_v_dst2()}; }
     
     const auto& get_bp_data() const { return bp_data; }
 
@@ -38,8 +44,9 @@ public:
         return Target( this->get_decoded_target(), this->get_sequence_id() + 1);
     }
 
-    
-    BPInterface get_bp_upd() const { return BPInterface( this->get_PC(), this->is_taken(), this->get_new_PC(), true); }
+    BPInterface get_bp_upd() const {
+        return BPInterface( this->get_PC(), this->is_taken(), this->get_bp_upd_address(), true);
+    }
 
     bool is_bypassible() const { return !this->is_conditional_move() &&
                                         !this->is_partial_load()     &&

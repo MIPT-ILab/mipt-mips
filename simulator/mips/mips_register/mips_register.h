@@ -62,7 +62,7 @@ public:
 
     static MIPSRegister from_gdb_index( size_t id)
     {
-        if (id < 32u)
+        if ( id < 32)
             return from_cpu_index( id);
 
         switch (id) {

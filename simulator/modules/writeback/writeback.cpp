@@ -82,7 +82,7 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
-    wp_bypass->write( std::make_pair(instr.get_v_dst(), instr.get_v_dst2()), cycle);
+    wp_bypass->write( std::pair{ instr.get_v_dst(), instr.get_v_dst2()}, cycle);
 
     sout << instr << std::endl;
 

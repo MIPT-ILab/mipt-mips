@@ -26,17 +26,20 @@ class BaseValue
     friend std::string help();
 protected:
     static popl::OptionParser& options();
-    static void register_switch( const std::string& alias, const std::string& name, const std::string& desc, bool* value);
 };
 
-template<typename T>
+enum class Type {
+    OPTIONAL,
+    REQUIRED,
+    SWITCH
+};
+
+template<typename T, Type type>
 class BaseTValue : public BaseValue
 {
-protected:
-    T value = T();
-    explicit BaseTValue<T>( T val ) noexcept : value( std::move(val)) { }
-    BaseTValue<T>( ) = default;
 public:
+    BaseTValue() = delete;
+
     // Converter is implicit intentionally, so bypass Clang-Tidy check
     // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
     operator const T&() const { return value; }
@@ -46,52 +49,80 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
         if constexpr (std::is_same<T, bool>())
-            out << std::boolalpha << rhs.value << std::noboolalpha; // NOLINT(bugprone-suspicious-semicolon)
+            out << std::boolalpha << rhs.value << std::noboolalpha;
         else
             out << std::dec << rhs.value;
         return out;
     }
+
+protected:
+    BaseTValue( std::string_view alias, std::string_view name, std::string_view desc, const T& default_value ) noexcept;
+
+private:
+    T value = T();
 };
     
 template<typename T>
-struct AliasedRequiredValue : BaseTValue<T>
+struct AliasedRequiredValue : BaseTValue<T, Type::REQUIRED>
 {
-    AliasedRequiredValue<T>( const std::string& alias, const std::string& name, const std::string& desc);
+    AliasedRequiredValue( std::string_view alias, std::string_view name, std::string_view desc) noexcept
+        : BaseTValue<T, Type::REQUIRED>( alias, name, desc, T())
+    { }
 };
 
 template<typename T>
-struct AliasedValue : BaseTValue<T>
+struct AliasedValue : BaseTValue<T, Type::OPTIONAL>
 {
-    AliasedValue<T>( const std::string& alias, const std::string& name, const T& val, const std::string& desc);
+    AliasedValue( std::string_view alias, std::string_view name, const T& val, std::string_view desc) noexcept
+        : BaseTValue<T, Type::OPTIONAL>( alias, name, desc, val)
+    { }
 };
 
-struct AliasedSwitch : BaseTValue<bool>
+template<>
+struct AliasedValue<std::string> : BaseTValue<std::string, Type::OPTIONAL>
 {
-    AliasedSwitch( const std::string& alias, const std::string& name, const std::string& desc);
+    AliasedValue( std::string_view alias, std::string_view name, std::string_view val, std::string_view desc) noexcept
+        : BaseTValue<std::string, Type::OPTIONAL>( alias, name, desc, std::string( val))
+    { }
+};
+
+struct AliasedSwitch : BaseTValue<bool, Type::SWITCH>
+{
+    AliasedSwitch( std::string_view alias, std::string_view name, std::string_view desc) noexcept
+        : BaseTValue<bool, Type::SWITCH>( alias, name, desc, false)
+    { }
 };
 
 template<typename T>
 struct Value : AliasedValue<T>
 {
-    Value( const std::string& name, const T& val, const std::string& desc) : AliasedValue<T>( "", name, val, desc) { }
+    Value( std::string_view name, const T& val, std::string_view desc) noexcept : AliasedValue<T>( "", name, val, desc) { }
+};
+
+template<>
+struct Value<std::string> : AliasedValue<std::string>
+{
+    Value( std::string_view name, std::string_view val, std::string_view desc) noexcept : AliasedValue<std::string>( "", name, val, desc) { }
 };
 
 template<typename T>
 struct RequiredValue : AliasedRequiredValue<T>
 {
-    RequiredValue( const std::string& name, const std::string& desc) : AliasedRequiredValue<T>( "", name, desc) { }
+    RequiredValue( std::string_view name, std::string_view desc) noexcept : AliasedRequiredValue<T>( "", name, desc) { }
 };
 
 struct Switch : AliasedSwitch
 {
-    Switch( const std::string& name, const std::string& desc) : AliasedSwitch( "", name, desc) { }
+    Switch( std::string_view name, std::string_view desc) noexcept : AliasedSwitch( "", name, desc) { }
 };
 
+// Thrown if help option is given by user
 struct HelpOption : Exception
 {
     HelpOption() : Exception( "Help") {}
 };
 
+// Thrown if users options are invalid
 struct InvalidOption : Exception
 {
     explicit InvalidOption( const std::string& msg) : Exception( "Invalid option", msg) {}

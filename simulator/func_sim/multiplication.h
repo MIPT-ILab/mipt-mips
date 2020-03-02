@@ -30,7 +30,7 @@ auto mips_multiplication(T x, T y) {
     // To workaround that, we mask the value with full-ones mask first.
     auto lo = narrow_cast<UT>( value & all_ones<UT>());
     auto hi = narrow_cast<UT>( value >> bitwidth<T>);
-    return std::make_pair( lo, hi);
+    return std::pair{ lo, hi};
 }
 
 template<typename T>
