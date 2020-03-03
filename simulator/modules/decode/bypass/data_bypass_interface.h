@@ -32,13 +32,13 @@ public:
                                  bypass_direction = 4; }
     void set_to_in_RF()        { set_to_stage( IN_RF_STAGE); }
 
-    bool is_same_stage( Latency v) const  { return value == v; }
-    bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
-    bool is_mem_or_branch_stage() const { return is_same_stage( MEM_OR_BRANCH_STAGE); }
-    bool is_writeback() const { return is_same_stage( WB_STAGE); }
-    bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
+    [[nodiscard]] bool is_same_stage( Latency v) const  { return value == v; }
+    [[nodiscard]] bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
+    [[nodiscard]] bool is_mem_or_branch_stage() const { return is_same_stage( MEM_OR_BRANCH_STAGE); }
+    [[nodiscard]] bool is_writeback() const { return is_same_stage( WB_STAGE); }
+    [[nodiscard]] bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
 
-    auto get_bypass_direction_value() const{ return bypass_direction; }
+    [[nodiscard]] auto get_bypass_direction_value() const{ return bypass_direction; }
 
 private:
     size_t bypass_direction = 0;
@@ -68,7 +68,7 @@ public:
     { }
 
     // returns an index of the port where bypassed data should be get from
-    size_t get_bypass_direction() const
+    [[nodiscard]] size_t get_bypass_direction() const
     {
         if ( bypassing_stage.is_same_stage( last_execution_stage))
             return 1;

@@ -64,7 +64,7 @@ public:
         ++occupied;
     }
 
-    bool full() const noexcept
+    [[nodiscard]] bool full() const noexcept
     {
         return occupied == capacity;
     }
@@ -76,12 +76,12 @@ public:
         --occupied;
     }
 
-    bool empty() const noexcept
+    [[nodiscard]] bool empty() const noexcept
     {
         return occupied == 0;
     }
 
-    const T& front() const noexcept
+    [[nodiscard]] const T& front() const noexcept
     {
         return arena[p_front];
     }

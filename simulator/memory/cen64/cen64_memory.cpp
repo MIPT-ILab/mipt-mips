@@ -34,7 +34,7 @@ public:
         return copy_by_words( dst, src, size);
     }
 
-    std::string dump() const final
+    [[nodiscard]] std::string dump() const final
     {
         throw CEN64MemoryUnsupportedInterface("dump");
     }
@@ -44,7 +44,7 @@ public:
         throw CEN64MemoryUnsupportedInterface("duplication");
     }
 
-    size_t strlen( Addr /* addr */) const final
+    [[nodiscard]] size_t strlen( Addr /* addr */) const final
     {
         throw CEN64MemoryUnsupportedInterface("string output");
     }

@@ -46,12 +46,12 @@ class InstrCache
 
         static auto get_capacity() { return CAPACITY; }
 
-        auto size() const { return pointers.size(); }
-        bool empty() const { return size() == 0; }
+        [[nodiscard]] auto size() const { return pointers.size(); }
+        [[nodiscard]] bool empty() const { return size() == 0; }
 
         // First return value is true if and only if the value was found
         // Second return value is dereferenceable only if first value if 'true'
-        auto find( const Key& key) const
+        [[nodiscard]] auto find( const Key& key) const
         {
             auto result = pointers.find( key);
             bool found = result != pointers.end();

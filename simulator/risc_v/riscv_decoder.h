@@ -77,7 +77,7 @@ struct RISCVInstrDecoder
     const uint32 CL_imm_2;
     const uint32 CJ_imm;
 
-    constexpr uint32 get_B_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_B_immediate() const noexcept
     {
         return (B_imm4_1  << 1U)
             |  (B_imm10_5 << 5U)
@@ -85,7 +85,7 @@ struct RISCVInstrDecoder
             |  (B_imm12   << 12U);
     }
 
-    constexpr uint32 get_J_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_J_immediate() const noexcept
     {
         return (J_imm10_1  << 1U)
             |  (J_imm11    << 11U)
@@ -93,72 +93,72 @@ struct RISCVInstrDecoder
             |  (J_imm20    << 20U);
     }
 
-    constexpr uint32 get_C_LWSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LWSP_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
              | ( apply_mask( CI_imm_2, 0b11100) << 2U)
              | ( apply_mask( CI_imm_2, 0b00011) << 6U);
     }
 
-    constexpr uint32 get_C_LDSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LDSP_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
              | ( apply_mask( CI_imm_2, 0b11000) << 3U)
              | ( apply_mask( CI_imm_2, 0b00111) << 6U);
     }
 
-    constexpr uint32 get_C_LQSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LQSP_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
              | ( apply_mask( CI_imm_2, 0b10000) << 4U)
              | ( apply_mask( CI_imm_2, 0b01111) << 6U);
     }
 
-    constexpr uint32 get_C_SWSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_SWSP_immediate() const noexcept
     {
         return ( apply_mask( CSS_imm, 0b111100) << 2U)
              | ( apply_mask( CSS_imm, 0b000011) << 6U);
     }
 
-    constexpr uint32 get_C_SDSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_SDSP_immediate() const noexcept
     {
         return ( apply_mask( CSS_imm, 0b111000) << 3U)
              | ( apply_mask( CSS_imm, 0b000111) << 6U);
     }
 
-    constexpr uint32 get_C_SQSP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_SQSP_immediate() const noexcept
     {
         return ( apply_mask( CSS_imm, 0b110000) << 4U)
              | ( apply_mask( CSS_imm, 0b001111) << 6U);
     }
 
-    constexpr uint32 get_C_LW_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LW_immediate() const noexcept
     {
         return ( apply_mask( CL_imm_2, 0b10) << 2U)
              | ( apply_mask( CL_imm_2, 0b01) << 6U)
              | ( apply_mask( CL_imm_1, 0b111) << 3U);
     }
 
-    constexpr uint32 get_C_LD_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LD_immediate() const noexcept
     {
         return ( apply_mask( CL_imm_1, 0b111) << 3U)
              | ( apply_mask( CL_imm_2, 0b11) << 6U);
     }
 
-    constexpr uint32 get_C_LQ_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_LQ_immediate() const noexcept
     {
         return ( apply_mask( CL_imm_1, 0b110) << 4U)
              | ( apply_mask( CL_imm_1, 0b001) << 8U)
              | ( apply_mask( CL_imm_2, 0b11) << 6U);
     }
 
-    constexpr uint32 get_C_I_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_I_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 5U)
              | ( apply_mask( CI_imm_2, 0b11111));
     }
 
-    constexpr uint32 get_C_J_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_J_immediate() const noexcept
     {
         return ( apply_mask( CJ_imm, 0b10000000000) << 11U)
              | ( apply_mask( CJ_imm, 0b01000000000) << 4U)
@@ -170,7 +170,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CJ_imm, 0b00000000001) << 5U);
     }
 
-    constexpr uint32 get_C_B_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_B_immediate() const noexcept
     {
         return ( apply_mask( CL_imm_1, 0b100) << 8U)
              | ( apply_mask( CL_imm_1, 0b011) << 3U)
@@ -179,7 +179,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CI_imm_2, 0b00001) << 5U);
     }
 
-    constexpr uint32 get_C_ADDI4SPN_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_ADDI4SPN_immediate() const noexcept
     {
         return ( apply_mask( CIW_imm, 0b11000000) << 4U)
              | ( apply_mask( CIW_imm, 0b00111100) << 6U)
@@ -187,7 +187,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CIW_imm, 0b00000001) << 3U);
     }
 
-    constexpr uint32 get_C_ADDI16SP_immediate() const noexcept
+    [[nodiscard]] constexpr uint32 get_C_ADDI16SP_immediate() const noexcept
     {
         return ( apply_mask( CI_imm_1, 0b1) << 9U)
              | ( apply_mask( CI_imm_2, 0b10000) << 4U)
@@ -196,7 +196,7 @@ struct RISCVInstrDecoder
              | ( apply_mask( CI_imm_2, 0b00001) << 5U);
     }
 
-    uint32 get_immediate_value( char subset) const noexcept
+    [[nodiscard]] uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
         case 'I': return I_imm;
@@ -210,7 +210,7 @@ struct RISCVInstrDecoder
         }
     }
 
-    uint32 get_compressed_immediate_value( char subset) const noexcept
+    [[nodiscard]] uint32 get_compressed_immediate_value( char subset) const noexcept
     {
         switch (subset) {
         case C_LWSP: return get_C_LWSP_immediate();
@@ -249,7 +249,7 @@ struct RISCVInstrDecoder
         }
     }
 
-    RISCVRegister get_register( Reg::Type type) const noexcept
+    [[nodiscard]] RISCVRegister get_register( Reg::Type type) const noexcept
     {
         return registers.at( type);
     }

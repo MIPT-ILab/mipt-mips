@@ -16,11 +16,11 @@ class PlainMemory : public FuncMemory
     public:
         explicit PlainMemory ( uint32 addr_bits);
 
-        std::string dump() const final;
+        [[nodiscard]] std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final;
         size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
-        size_t strlen( Addr addr) const final;
+        [[nodiscard]] size_t strlen( Addr addr) const final;
     private:
         std::vector<std::byte> arena;
 };

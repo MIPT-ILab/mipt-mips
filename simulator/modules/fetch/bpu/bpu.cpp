@@ -30,7 +30,7 @@ class BP final: public BaseBP
     std::vector<std::vector<Addr>> targets;
     std::unique_ptr<CacheTagArray> tags = nullptr;
 
-    bool is_way_taken( size_t way, Addr PC, Addr target) const
+    [[nodiscard]] bool is_way_taken( size_t way, Addr PC, Addr target) const
     {
         return directions[ way][ tags->set(PC)].is_taken( PC, target);
     }
@@ -49,7 +49,7 @@ public:
     }
 
     /* prediction */
-    bool is_taken( Addr PC) const final
+    [[nodiscard]] bool is_taken( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags->read" is used:
@@ -57,14 +57,14 @@ public:
         return is_hit && is_way_taken( way, PC, targets[ way][ tags->set(PC)]);
     }
 
-    bool is_hit( Addr PC) const final
+    [[nodiscard]] bool is_hit( Addr PC) const final
     {
         // do not update LRU information on this check,
         // so "no_touch" version of "tags->read" is used:
         return tags->read_no_touch( PC).first;
     }
 
-    Addr get_target( Addr PC) const final
+    [[nodiscard]] Addr get_target( Addr PC) const final
     {
         // do not update LRU information on prediction,
         // so "no_touch" version of "tags->read" is used:
@@ -96,7 +96,7 @@ public:
 
 class BPFactory {
     struct BaseBPCreator {
-        virtual std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
+        [[nodiscard]] virtual std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
                                                uint32 branch_ip_size_in_bits) const = 0;
         BaseBPCreator() = default;
         virtual ~BaseBPCreator() = default;
@@ -108,7 +108,7 @@ class BPFactory {
 
     template<typename T>
     struct BPCreator : BaseBPCreator {
-        std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
+        [[nodiscard]] std::unique_ptr<BaseBP> create( const std::string& lru, uint32 size_in_entries, uint32 ways,
                                        uint32 branch_ip_size_in_bits) const final
         {
             return std::make_unique<BP<T>>( lru, size_in_entries,
@@ -141,7 +141,7 @@ class BPFactory {
 public:
     BPFactory() : map( generate_map()) { }
 
-    auto create( const std::string& name, const std::string& lru,
+    [[nodiscard]] auto create( const std::string& name, const std::string& lru,
                  uint32 size_in_entries, uint32 ways,
                  uint32 branch_ip_size_in_bits) const
     {

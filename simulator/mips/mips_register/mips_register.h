@@ -31,7 +31,7 @@ class MIPSRegister {
 public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
 
-    auto dump() const
+    [[nodiscard]] auto dump() const
     {
         return regTable.at( value);
     }
@@ -41,9 +41,9 @@ public:
         return out << rhs.dump();
     }
 
-    bool is_zero()       const { return value == MIPS_REG_zero; }
-    bool is_mips_hi()    const { return value == MIPS_REG_hi; }
-    bool is_mips_lo()    const { return value == MIPS_REG_lo; }
+    [[nodiscard]] bool is_zero()       const { return value == MIPS_REG_zero; }
+    [[nodiscard]] bool is_mips_hi()    const { return value == MIPS_REG_hi; }
+    [[nodiscard]] bool is_mips_lo()    const { return value == MIPS_REG_lo; }
 
     static constexpr MIPSRegister from_cpu_index( size_t id) noexcept
     {
@@ -77,7 +77,7 @@ public:
     static constexpr uint8 get_gdb_pc_index() { return 37; }
     static auto from_csr_name( std::string_view /* unused */) { return zero(); }
 
-    constexpr size_t to_rf_index() const { return value; }
+    [[nodiscard]] constexpr size_t to_rf_index() const { return value; }
 
     static constexpr MIPSRegister mips_hi() noexcept;
     static constexpr MIPSRegister mips_lo() noexcept;

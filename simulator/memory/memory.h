@@ -54,21 +54,21 @@ class ReadableMemory : public DestructableMemory
 public:
     virtual size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
-    virtual std::string dump() const = 0;
-    virtual size_t strlen( Addr addr) const = 0;
-    std::string read_string( Addr addr) const;
-    std::string read_string_limited( Addr addr, size_t size) const;
+    [[nodiscard]] virtual std::string dump() const = 0;
+    [[nodiscard]] virtual size_t strlen( Addr addr) const = 0;
+    [[nodiscard]] std::string read_string( Addr addr) const;
+    [[nodiscard]] std::string read_string_limited( Addr addr, size_t size) const;
 
     template<typename T, Endian endian> T read( Addr addr) const noexcept;
-    template<typename T, Endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
+    template<typename T, Endian endian> [[nodiscard]] T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
 private:
-    std::string read_string_by_size( Addr addr, size_t size) const;
+    [[nodiscard]] std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
 template<typename T, Endian endian>
-T ReadableMemory::read( Addr addr) const noexcept
+[[nodiscard]] T ReadableMemory::read( Addr addr) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) Initialized by memcpy
     std::array<std::byte, bytewidth<T>> bytes;
@@ -92,8 +92,8 @@ class ZeroMemory : public ReadableMemory
 public:
     size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
-    std::string dump() const final { return std::string( "empty memory\n"); }
-    size_t strlen( Addr /* addr */) const final { return 0; }
+    [[nodiscard]] std::string dump() const final { return std::string( "empty memory\n"); }
+    [[nodiscard]] size_t strlen( Addr /* addr */) const final { return 0; }
 };
 
 class WriteableMemory : public DestructableMemory
@@ -212,12 +212,12 @@ public:
         primary->duplicate_to( target);
     }
 
-    std::string dump() const final
+    [[nodiscard]] std::string dump() const final
     {
         return primary->dump();
     }
 
-    size_t strlen( Addr addr) const final
+    [[nodiscard]] size_t strlen( Addr addr) const final
     {
         return primary->strlen( addr);
     }

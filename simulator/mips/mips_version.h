@@ -34,7 +34,7 @@ class MIPSVersionMask {
     uint64 mask = 0;
 public:
     constexpr MIPSVersionMask() = default;
-    constexpr bool is_supported( MIPSVersion version) const noexcept {
+    [[nodiscard]] constexpr bool is_supported( MIPSVersion version) const noexcept {
         return ((mask >> static_cast<unsigned>(version)) & 0x1U) != 0;
     }
     constexpr MIPSVersionMask operator|( MIPSVersion rhs) const noexcept {

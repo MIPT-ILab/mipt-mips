@@ -57,7 +57,7 @@ struct MIPSInstrDecoder
         return ( bytes & mask) >> find_first_set( mask);
     }
 
-    uint32 get_immediate_value( char type) const
+    [[nodiscard]] uint32 get_immediate_value( char type) const
     {
         switch ( type)
         {
@@ -81,7 +81,7 @@ struct MIPSInstrDecoder
         }
     }
 
-    MIPSRegister get_register( MIPSReg type) const
+    [[nodiscard]] MIPSRegister get_register( MIPSReg type) const
     {
         switch ( type) {
         case MIPSReg::ZERO:   break;

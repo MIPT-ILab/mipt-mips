@@ -31,7 +31,7 @@ class GDBSim
 public:
     explicit GDBSim( const std::string& isa);
 
-    bool load( const std::string& filename) const;
+    [[nodiscard]] bool load( const std::string& filename) const;
     void shutdown();
     void resume( uint64 step);
     bool create_inferior( Addr start_addr, const char* const* argv, const char* const* envp) const;
@@ -48,8 +48,8 @@ public:
     int read_register( int regno, std::byte* buf, int length) const;
     int write_register( int regno, const std::byte* buf, int length) const;
 
-    auto get_trap() const { return trap; }
-    int get_exit_code() const;
+    [[nodiscard]] auto get_trap() const { return trap; }
+    [[nodiscard]] int get_exit_code() const;
 };
 
 class GDBSimVector

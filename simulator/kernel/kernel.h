@@ -44,8 +44,8 @@ public:
     Kernel& operator=( const Kernel&) = delete;
     Kernel& operator=( Kernel&&) = delete;
 
-    int get_exit_code() const { return exit_code; }
-    Addr get_start_pc() const { return start_pc; }
+    [[nodiscard]] int get_exit_code() const { return exit_code; }
+    [[nodiscard]] Addr get_start_pc() const { return start_pc; }
 
 protected:
     int exit_code = 0;

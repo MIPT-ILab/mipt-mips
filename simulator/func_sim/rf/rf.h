@@ -22,7 +22,7 @@ class RF
     std::array<RegisterUInt, Register::MAX_REG> array = {};
 
     auto& get_value( Register num) { return array.at( num.to_rf_index()); }
-    const auto& get_value( Register num) const { return array.at( num.to_rf_index()); }
+    [[nodiscard]] const auto& get_value( Register num) const { return array.at( num.to_rf_index()); }
 
     static uint32 get_carry( uint32 x, uint32 y, int8 accumulation)
     {
@@ -32,7 +32,7 @@ class RF
 public:
     RF() = default;
 
-    const auto& read( Register num) const
+    [[nodiscard]] const auto& read( Register num) const
     {
         return get_value( num);
     }

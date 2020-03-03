@@ -16,13 +16,13 @@ class InstrMemoryIface
 {
 public:
     explicit InstrMemoryIface( Endian e) : endian( e) { }
-    auto fetch( Addr pc) const
+    [[nodiscard]] auto fetch( Addr pc) const
     {
         return endian == Endian::little
             ? mem->read<uint32, Endian::little>( pc)
             : mem->read<uint32, Endian::big>( pc);
     }
-    auto get_endian() const { return endian; }
+    [[nodiscard]] auto get_endian() const { return endian; }
 
     void set_memory( const std::shared_ptr<ReadableMemory>& m) { mem = m; }
     virtual FuncInstr fetch_instr( Addr PC) = 0;

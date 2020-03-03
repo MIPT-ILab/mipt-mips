@@ -26,21 +26,21 @@ class DataBypass
         { }
 
         // checks whether a source register of an instruction is in the RF
-        auto is_in_RF( const Instr& instr, size_t src_index) const
+        [[nodiscard]] auto is_in_RF( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether a source register of an instruction is bypassible
-        auto is_bypassible( const Instr& instr, size_t src_index) const
+        [[nodiscard]] auto is_bypassible( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).is_bypassible;
         }
 
         // checks whether the stall is needed for an instruction
-        auto is_stall( const Instr& instr) const
+        [[nodiscard]] auto is_stall( const Instr& instr) const
         {
             const auto instruction_latency = get_instruction_latency( instr);
 
@@ -53,7 +53,7 @@ class DataBypass
 
         // returns a bypass command for a source register of an instruction
         // in accordance with a current state of the scoreboard
-        auto get_bypass_command( const Instr& instr, size_t src_index) const
+        [[nodiscard]] auto get_bypass_command( const Instr& instr, size_t src_index) const
         {
             const auto reg_num = instr.get_src_num( src_index);
             return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
@@ -128,14 +128,14 @@ class DataBypass
             return scoreboard.at( num.to_rf_index());
         }
 
-        const RegisterInfo& get_entry( Register num) const
+        [[nodiscard]] const RegisterInfo& get_entry( Register num) const
         {
             return scoreboard.at( num.to_rf_index());
         }
 
         // returns a latency of an instruction
         // in accordance with a type of the instruction
-        Latency get_instruction_latency( const Instr& instr) const
+        [[nodiscard]] Latency get_instruction_latency( const Instr& instr) const
         {
             if ( instr.is_mem_stage_required() || instr.is_branch_stage_required())
                 return 2_lt;

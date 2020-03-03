@@ -71,58 +71,58 @@ public:
     void set_type( OperationType type) { operation = type; }
 
 	//target is known at ID stage and always taken
-	bool is_direct_jump() const { return operation == OUT_J_JUMP; }
+	[[nodiscard]] bool is_direct_jump() const { return operation == OUT_J_JUMP; }
 
 	//target is known at ID stage but if branch is taken or not is known only at EXE stage
-	bool is_common_branch() const { return operation == OUT_BRANCH; }
+	[[nodiscard]] bool is_common_branch() const { return operation == OUT_BRANCH; }
 
 	//target is known at ID stage; likely to be taken
-    bool is_likely_branch() const { return operation == OUT_BRANCH_LIKELY; }
+    [[nodiscard]] bool is_likely_branch() const { return operation == OUT_BRANCH_LIKELY; }
 
-    bool is_branch() const { return is_common_branch() || is_likely_branch(); }
+    [[nodiscard]] bool is_branch() const { return is_common_branch() || is_likely_branch(); }
 
 	// target is known only at EXE stage
-	bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
+	[[nodiscard]] bool is_indirect_jump() const { return operation == OUT_R_JUMP; }
 
-	bool is_jump() const { return this->is_direct_jump()
+	[[nodiscard]] bool is_jump() const { return this->is_direct_jump()
 	                           || this->is_branch()
 	                           || this->is_indirect_jump(); }
 
-    bool is_taken() const
+    [[nodiscard]] bool is_taken() const
     {
         return ( this->is_direct_jump() ) || ( this->is_indirect_jump() ) || is_taken_branch;
     }
 
-    bool is_partial_load()  const { return operation == OUT_PARTIAL_LOAD; }
-    bool is_unsigned_load() const { return operation == OUT_LOADU; }
-    bool is_signed_load()   const { return operation == OUT_LOAD; }
-    bool is_load() const { return is_unsigned_load() || is_signed_load() || is_partial_load(); }
+    [[nodiscard]] bool is_partial_load()  const { return operation == OUT_PARTIAL_LOAD; }
+    [[nodiscard]] bool is_unsigned_load() const { return operation == OUT_LOADU; }
+    [[nodiscard]] bool is_signed_load()   const { return operation == OUT_LOAD; }
+    [[nodiscard]] bool is_load() const { return is_unsigned_load() || is_signed_load() || is_partial_load(); }
 
-    int8 get_accumulation_type() const
+    [[nodiscard]] int8 get_accumulation_type() const
     {
         return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
     }
-    Trap trap_type() const { return trap; }
+    [[nodiscard]] Trap trap_type() const { return trap; }
 
-    bool is_halt() const { return trap_type() == Trap::HALT; }
-    bool is_conditional_move() const { return operation == OUT_R_CONDM; }
-    bool is_divmult() const { return operation == OUT_DIVMULT || get_accumulation_type() != 0; }
+    [[nodiscard]] bool is_halt() const { return trap_type() == Trap::HALT; }
+    [[nodiscard]] bool is_conditional_move() const { return operation == OUT_R_CONDM; }
+    [[nodiscard]] bool is_divmult() const { return operation == OUT_DIVMULT || get_accumulation_type() != 0; }
 
-    bool is_explicit_trap() const { return operation == OUT_TRAP; }
-    bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
+    [[nodiscard]] bool is_explicit_trap() const { return operation == OUT_TRAP; }
+    [[nodiscard]] bool has_trap() const { return trap_type() != Trap::NO_TRAP; }
     void set_trap( Trap value) { trap = value; }
-    bool is_store() const { return operation == OUT_STORE; }
+    [[nodiscard]] bool is_store() const { return operation == OUT_STORE; }
 
-    auto get_mem_addr() const { return mem_addr; }
-    auto get_mem_size() const { return mem_size; }
-    auto get_PC() const { return PC; }
+    [[nodiscard]] auto get_mem_addr() const { return mem_addr; }
+    [[nodiscard]] auto get_mem_size() const { return mem_size; }
+    [[nodiscard]] auto get_PC() const { return PC; }
 
     void set_sequence_id( uint64 id) { sequence_id = id; }
-    auto get_sequence_id() const { return sequence_id; }
+    [[nodiscard]] auto get_sequence_id() const { return sequence_id; }
 
-    auto get_delayed_slots() const { return delayed_slots; }
-    Addr get_decoded_target() const { return target; }
-    auto get_new_PC() const { return new_PC; }
+    [[nodiscard]] auto get_delayed_slots() const { return delayed_slots; }
+    [[nodiscard]] Addr get_decoded_target() const { return target; }
+    [[nodiscard]] auto get_new_PC() const { return new_PC; }
 
 protected:
     std::string_view opname = {};
@@ -171,13 +171,13 @@ public:
             v_src2 = value;
     }
 
-    T get_v_src2() const { return v_src2; } // for stores
-    T get_v_dst() const { return v_dst; }
-    T get_v_dst2() const { return v_dst2; }
-    T get_mask() const { return mask; }
+    [[nodiscard]] T get_v_src2() const { return v_src2; } // for stores
+    [[nodiscard]] T get_v_dst() const { return v_dst; }
+    [[nodiscard]] T get_v_dst2() const { return v_dst2; }
+    [[nodiscard]] T get_mask() const { return mask; }
 
-    bool has_memory_address() const { return ( is_load() || is_store()) && complete; }
-    bool is_dst_complete() const { return is_load() ? memory_complete : complete; }
+    [[nodiscard]] bool has_memory_address() const { return ( is_load() || is_store()) && complete; }
+    [[nodiscard]] bool is_dst_complete() const { return is_load() ? memory_complete : complete; }
 
     void load( const T& value);
     void execute();
@@ -234,15 +234,15 @@ public:
     using MyDatapath = Datapath<T>;
     using Register = R;
     using RegisterUInt = T;
-    R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
-    R get_dst_num()  const { return dst;  }
-    R get_dst2_num() const { return dst2; }
+    [[nodiscard]] R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
+    [[nodiscard]] R get_dst_num()  const { return dst;  }
+    [[nodiscard]] R get_dst2_num() const { return dst2; }
 
     std::ostream& dump_content( std::ostream& out, const std::string& disasm) const;
 
 protected:
     BaseInstruction(Addr pc, Addr new_pc) : Datapath<T>(pc, new_pc) { }
-    std::string generate_disasm() const;
+    [[nodiscard]] std::string generate_disasm() const;
 
     R src1 = R::zero();
     R src2 = R::zero();

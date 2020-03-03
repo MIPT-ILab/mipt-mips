@@ -35,26 +35,26 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         explicit RISCVInstr( uint32 bytes) : RISCVInstr( bytes, 0) { }
         RISCVInstr( std::string_view name, uint32 immediate) : RISCVInstr( name, immediate, 0)  { }
 
-        bool is_same_bytes( uint32 bytes) const {
+        [[nodiscard]] bool is_same_bytes( uint32 bytes) const {
             return bytes == instr;
         }
 
-        bool is_same( const RISCVInstr& rhs) const {
+        [[nodiscard]] bool is_same( const RISCVInstr& rhs) const {
             return this->PC == rhs.PC && is_same_bytes( rhs.instr);
         }
 
-        bool is_same_checker( const RISCVInstr& rhs) const {
+        [[nodiscard]] bool is_same_checker( const RISCVInstr& rhs) const {
             return is_same( rhs)
                 && this->get_sequence_id() == rhs.get_sequence_id()
                 && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
                 && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
         }
 
-        constexpr bool is_nop() const { return instr == 0x0U; }
+        [[nodiscard]] constexpr bool is_nop() const { return instr == 0x0U; }
 
-        std::string get_disasm() const;
-        std::string string_dump() const;
-        std::string bytes_dump() const;
+        [[nodiscard]] std::string get_disasm() const;
+        [[nodiscard]] std::string string_dump() const;
+        [[nodiscard]] std::string bytes_dump() const;
 };
 
 template <typename T>

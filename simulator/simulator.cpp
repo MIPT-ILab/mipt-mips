@@ -78,7 +78,7 @@ class SimulatorFactory {
         return my_map;
     }
 
-    auto get_factory( const std::string& name) const 
+    [[nodiscard]] auto get_factory( const std::string& name) const 
     {
         auto it = map.find( name);
         if ( it == map.end())
@@ -96,12 +96,12 @@ class SimulatorFactory {
 public:
     SimulatorFactory() : map( generate_map()) { }
 
-    auto get_funcsim( const std::string& name, bool log) const
+    [[nodiscard]] auto get_funcsim( const std::string& name, bool log) const
     {
         return get_factory( name)->get_funcsim( log);
     }
 
-    auto get_perfsim( const std::string& name) const
+    [[nodiscard]] auto get_perfsim( const std::string& name) const
     {
         return get_factory( name)->get_perfsim();
     }

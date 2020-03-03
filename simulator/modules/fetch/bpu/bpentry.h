@@ -23,7 +23,7 @@ template<bool DIRECTION>
 class BPEntryAlwaysOneDirection final
 {
 public:
-    bool is_taken( Addr /* unused */, Addr /* target */) const { return DIRECTION; }
+    [[nodiscard]] bool is_taken( Addr /* unused */, Addr /* target */) const { return DIRECTION; }
     void update( bool /* is_taken */) { }
     void reset() { }
 };
@@ -56,7 +56,7 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr /* unused */, Addr /* target */) const { return state == State::T; }
+    [[nodiscard]] bool is_taken( Addr /* unused */, Addr /* target */) const { return state == State::T; }
 
     /* update */
     void update( bool is_taken)
@@ -110,7 +110,7 @@ public:
         }
 
         /* casting to result */
-        bool is_taken() const
+        [[nodiscard]] bool is_taken() const
         {
             return value == StateValue::WT || value == StateValue::T;
         }
@@ -123,7 +123,7 @@ private:
 
 public:
     /* prediction */
-    bool is_taken( Addr /* unused */, Addr /* target */) const
+    [[nodiscard]] bool is_taken( Addr /* unused */, Addr /* target */) const
     {
         return state.is_taken();
     }
@@ -166,7 +166,7 @@ class BPEntryAdaptive final
 
     public:
         /* for vector indexing */
-        size_t get_value() const { return value; }
+        [[nodiscard]] size_t get_value() const { return value; }
 
         void update( bool is_taken)
         {
@@ -185,7 +185,7 @@ public:
     BPEntryAdaptive() = default;
 
     /* prediction */
-    bool is_taken( Addr /* unused */, Addr /* target */) const
+    [[nodiscard]] bool is_taken( Addr /* unused */, Addr /* target */) const
     {
         return state_table.at( current_pattern.get_value()).is_taken();
     }

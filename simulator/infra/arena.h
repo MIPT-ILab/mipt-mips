@@ -51,7 +51,7 @@ private:
         return sizeof(T) * capacity;
     }
 
-    auto get_aligned_storage( std::size_t capacity) const noexcept
+    [[nodiscard]] auto get_aligned_storage( std::size_t capacity) const noexcept
     {
         void* ptr = arena.get();
         auto space = get_space( capacity);

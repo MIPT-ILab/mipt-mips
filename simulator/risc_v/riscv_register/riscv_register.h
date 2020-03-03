@@ -39,8 +39,8 @@ public:
         return out << rhs.dump();
     }
 
-    std::string_view dump()        const { return regTable.at( value); }
-    bool is_zero()                 const { return value == RISCV_REG_zero; }
+    [[nodiscard]] std::string_view dump()        const { return regTable.at( value); }
+    [[nodiscard]] bool is_zero()                 const { return value == RISCV_REG_zero; }
     static constexpr bool is_mips_hi() { return false; }
     static constexpr bool is_mips_lo() { return false; }
     static auto from_cpu_index( size_t id) { return RISCVRegister( RegNum{ id}); }
@@ -49,7 +49,7 @@ public:
     static auto from_csr_name( std::string_view name) { return RISCVRegister( get_csr_regnum( name)); }
     static auto from_cpu_popular_index( size_t id) {  id += popular_reg_shift; return RISCVRegister( RegNum{ id}); }
     static constexpr uint8 get_gdb_pc_index() { return 37; }
-    size_t to_rf_index()           const { return value; }
+    [[nodiscard]] size_t to_rf_index()           const { return value; }
 
     static constexpr RISCVRegister mips_hi() noexcept;
     static constexpr RISCVRegister mips_lo() noexcept;
@@ -59,7 +59,7 @@ public:
 
     bool operator==( const RISCVRegister& rhs) const { return value == rhs.value; }
     bool operator!=( const RISCVRegister& rhs) const { return !operator==(rhs); }
-    bool is_valid() const { return value != MAX_VAL_RegNum; }
+    [[nodiscard]] bool is_valid() const { return value != MAX_VAL_RegNum; }
 
 private:
     RegNum value = RISCV_REG_zero;

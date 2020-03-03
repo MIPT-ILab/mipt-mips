@@ -31,7 +31,7 @@ public:
     virtual void touch( std::size_t) = 0;
     virtual void set_to_erase( std::size_t) = 0;
     virtual std::size_t update() = 0;
-    virtual std::size_t get_ways() const = 0;
+    [[nodiscard]] virtual std::size_t get_ways() const = 0;
 };
 
 std::unique_ptr<CacheReplacement> create_cache_replacement( const std::string& name, std::size_t ways);

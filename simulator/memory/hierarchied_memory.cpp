@@ -24,10 +24,10 @@ class HierarchiedMemory : public FuncMemory
     public:
         HierarchiedMemory ( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
 
-        std::string dump() const final;
+        [[nodiscard]] std::string dump() const final;
         size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) final;
         size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final;
-        size_t strlen( Addr addr) const final;
+        [[nodiscard]] size_t strlen( Addr addr) const final;
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
 
     private:
@@ -49,18 +49,18 @@ class HierarchiedMemory : public FuncMemory
         using Mem  = std::vector<Set>;
         Mem memory = {};
 
-        size_t get_set( Addr addr) const noexcept;
-        size_t get_page( Addr addr) const noexcept;
-        size_t get_offset( Addr addr) const noexcept;
+        [[nodiscard]] size_t get_set( Addr addr) const noexcept;
+        [[nodiscard]] size_t get_page( Addr addr) const noexcept;
+        [[nodiscard]] size_t get_offset( Addr addr) const noexcept;
 
-        Addr get_addr( Addr set, Addr page, Addr offset) const noexcept;
-        Addr get_addr(const Mem::const_iterator& set_it,
+        [[nodiscard]] Addr get_addr( Addr set, Addr page, Addr offset) const noexcept;
+        [[nodiscard]] Addr get_addr(const Mem::const_iterator& set_it,
                       const Set::const_iterator& page_it,
                       const Page::const_iterator& byte_it) const noexcept;
 
-        bool check( Addr addr) const noexcept;
-        std::byte read_byte( Addr addr) const noexcept;
-        std::byte check_and_read_byte( Addr addr) const noexcept;
+        [[nodiscard]] bool check( Addr addr) const noexcept;
+        [[nodiscard]] std::byte read_byte( Addr addr) const noexcept;
+        [[nodiscard]] std::byte check_and_read_byte( Addr addr) const noexcept;
 
         void alloc( Addr addr);
         void write_byte( Addr addr, std::byte value);

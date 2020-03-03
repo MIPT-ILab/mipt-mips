@@ -18,7 +18,7 @@ public:
 
     void enable() noexcept  { is_enabled = true;  }
     void disable() noexcept { is_enabled = false; }
-    bool enabled() const noexcept { return is_enabled; }
+    [[nodiscard]] bool enabled() const noexcept { return is_enabled; }
 
     LogOstream& operator<<(std::ostream& (*F)(std::ostream&)) {
         if ( is_enabled)

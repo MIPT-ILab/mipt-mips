@@ -15,7 +15,7 @@ class Dummy {
     const size_t pc;
 public:
     explicit Dummy( size_t val, size_t pc) : value( val), pc( pc) {};
-    bool is_same( const Dummy& rhs) const { return value == rhs.value && pc == rhs.pc; }
+    [[nodiscard]] bool is_same( const Dummy& rhs) const { return value == rhs.value && pc == rhs.pc; }
     bool operator==( const Dummy& rhs) const { return is_same(rhs); }
 };
 

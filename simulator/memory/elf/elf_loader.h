@@ -53,8 +53,8 @@ public:
 
     void load_to( WriteableMemory *memory, AddrDiff offset) const;
     void load_to( WriteableMemory *memory) const { load_to( memory, 0); }
-    Addr get_startPC() const;
-    Addr get_text_section_addr() const;
+    [[nodiscard]] Addr get_startPC() const;
+    [[nodiscard]] Addr get_text_section_addr() const;
 private:
     const std::unique_ptr<ELFIO::elfio> reader;
 };

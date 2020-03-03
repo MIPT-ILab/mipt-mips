@@ -35,12 +35,12 @@ class BaseBP
 protected:
     BaseBP() = default;
 public:
-    virtual bool is_taken( Addr PC) const = 0;
-    virtual bool is_hit( Addr PC) const = 0;
-    virtual Addr get_target( Addr PC) const = 0;
+    [[nodiscard]] virtual bool is_taken( Addr PC) const = 0;
+    [[nodiscard]] virtual bool is_hit( Addr PC) const = 0;
+    [[nodiscard]] virtual Addr get_target( Addr PC) const = 0;
     virtual void update( const BPInterface& bp_upd) = 0;
 
-    BPInterface get_bp_info( Addr PC) const
+    [[nodiscard]] BPInterface get_bp_info( Addr PC) const
     {
         if ( is_hit( PC))
             return BPInterface( PC, is_taken( PC), get_target( PC), true);

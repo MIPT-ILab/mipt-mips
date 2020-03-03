@@ -22,11 +22,11 @@ public:
             e.lock()->set_target( target);
     }
 
-    Addr get_pc() const final { return primary.lock()->get_pc(); }
-    size_t sizeof_register() const final { return primary.lock()->sizeof_register(); }
-    uint64 read_cpu_register( size_t regno) const final { return primary.lock()->read_cpu_register( regno); }
-    uint64 read_gdb_register( size_t regno) const final { return primary.lock()->read_gdb_register( regno); }
-    uint64 read_csr_register( std::string_view name) const final { return primary.lock()->read_csr_register( name); }
+    [[nodiscard]] Addr get_pc() const final { return primary.lock()->get_pc(); }
+    [[nodiscard]] size_t sizeof_register() const final { return primary.lock()->sizeof_register(); }
+    [[nodiscard]] uint64 read_cpu_register( size_t regno) const final { return primary.lock()->read_cpu_register( regno); }
+    [[nodiscard]] uint64 read_gdb_register( size_t regno) const final { return primary.lock()->read_gdb_register( regno); }
+    [[nodiscard]] uint64 read_csr_register( std::string_view name) const final { return primary.lock()->read_csr_register( name); }
     
     void write_cpu_register( size_t regno, uint64 value) final
     {

@@ -25,9 +25,9 @@ public:
             ++power;
     }
 
-    auto get_lo_part( uint128 v) const noexcept { return narrow_cast<uint64>( v % value); }
-    auto get_hi_part( uint128 v) const noexcept { return v / value; }
-    constexpr auto get_power() const noexcept { return power; }
+    [[nodiscard]] auto get_lo_part( uint128 v) const noexcept { return narrow_cast<uint64>( v % value); }
+    [[nodiscard]] auto get_hi_part( uint128 v) const noexcept { return v / value; }
+    [[nodiscard]] constexpr auto get_power() const noexcept { return power; }
 private:
     std::size_t power = 0;
     uint128 value = 1;

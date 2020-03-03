@@ -38,13 +38,13 @@ public:
 
     void set_pc( Addr pc) { set_target( Target( pc, 0)); }
     virtual void set_target( const Target& target) = 0;
-    virtual Addr get_pc() const = 0;
+    [[nodiscard]] virtual Addr get_pc() const = 0;
     
-    virtual size_t sizeof_register() const = 0;
+    [[nodiscard]] virtual size_t sizeof_register() const = 0;
 
-    virtual uint64 read_cpu_register( size_t regno) const = 0;
-    virtual uint64 read_gdb_register( size_t regno) const = 0;
-    virtual uint64 read_csr_register( std::string_view name) const = 0;
+    [[nodiscard]] virtual uint64 read_cpu_register( size_t regno) const = 0;
+    [[nodiscard]] virtual uint64 read_gdb_register( size_t regno) const = 0;
+    [[nodiscard]] virtual uint64 read_csr_register( std::string_view name) const = 0;
     virtual void write_cpu_register( size_t regno, uint64 value) = 0;
     virtual void write_gdb_register( size_t regno, uint64 value) = 0;
     virtual void write_csr_register( std::string_view name, uint64 value) = 0;
@@ -61,7 +61,7 @@ public:
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
     virtual void init_checker() = 0;
     virtual void enable_driver_hooks() = 0;
-    virtual int get_exit_code() const noexcept = 0;
+    [[nodiscard]] virtual int get_exit_code() const noexcept = 0;
 
     Trap run_no_limit() { return run( MAX_VAL64); }
 

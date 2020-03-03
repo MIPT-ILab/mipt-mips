@@ -18,7 +18,7 @@ class LRU : public CacheReplacement
         void touch( std::size_t way) override ;
         void set_to_erase( std::size_t way) override ;
         std::size_t update() override ;
-        std::size_t get_ways() const override { return lru_hash.size(); }
+        [[nodiscard]] std::size_t get_ways() const override { return lru_hash.size(); }
 
     private:
         std::list<std::size_t> lru_list{};
@@ -59,7 +59,7 @@ class PseudoLRU : public CacheReplacement
         void touch( std::size_t way) override;
         void set_to_erase( std::size_t /* unused */) override;
         std::size_t update() override;
-        std::size_t get_ways() const override { return ways; }
+        [[nodiscard]] std::size_t get_ways() const override { return ways; }
 
     private:
         enum Flags { Left = 0, Right = 1};
@@ -72,7 +72,7 @@ class PseudoLRU : public CacheReplacement
          * 3 4 5 6 - leaves
          * 0 1 2 3 - ways
          */
-        size_t get_next_node( size_t node) const { return node * 2 + ( nodes[node] == Left ? 1 : 2); }
+        [[nodiscard]] size_t get_next_node( size_t node) const { return node * 2 + ( nodes[node] == Left ? 1 : 2); }
         static Flags get_direction_to_prev_node( size_t node) { return node % 2 != 0 ? Left : Right; }
         void reverse_node( size_t node) { nodes[node] = ( nodes[node] == Left ? Right : Left); }
 

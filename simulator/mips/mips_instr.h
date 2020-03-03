@@ -33,29 +33,29 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC );
         BaseMIPSInstr() = delete;
 
-        auto get_endian() const { return endian; }
+        [[nodiscard]] auto get_endian() const { return endian; }
 
-        bool is_same_bytes( uint32 bytes) const {
+        [[nodiscard]] bool is_same_bytes( uint32 bytes) const {
             return raw == bytes;
         }
 
-        bool is_same( const BaseMIPSInstr& rhs) const {
+        [[nodiscard]] bool is_same( const BaseMIPSInstr& rhs) const {
             return this->PC == rhs.PC && is_same_bytes( rhs.raw);
         }
 
-        bool is_same_checker( const BaseMIPSInstr& rhs) const {
+        [[nodiscard]] bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
                 && this->get_sequence_id() == rhs.get_sequence_id()
                 && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
                 && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
         }
 
-        std::string get_disasm() const;
+        [[nodiscard]] std::string get_disasm() const;
 
-        bool is_nop() const { return raw == 0x0U; }
+        [[nodiscard]] bool is_nop() const { return raw == 0x0U; }
 
-        std::string string_dump() const;
-        std::string bytes_dump() const;
+        [[nodiscard]] std::string string_dump() const;
+        [[nodiscard]] std::string bytes_dump() const;
         friend std::ostream& operator<<( std::ostream& out, const BaseMIPSInstr& instr) {
             return instr.dump_content( out, instr.get_disasm());
         }

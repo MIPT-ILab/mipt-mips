@@ -35,15 +35,15 @@ class Trap {
         bool operator!=( Trap trap)     const { return value != trap.value; }
         bool operator!=( TrapType trap) const { return value != trap; }
 
-        std::size_t get_hash() const noexcept { return std::hash<std::uint8_t>{}(value); }
+        [[nodiscard]] std::size_t get_hash() const noexcept { return std::hash<std::uint8_t>{}(value); }
 
         static Trap from_gdb_format(uint8 id);
         static Trap from_riscv_format(uint8 id);
         static Trap from_mips_format(uint8 id);
 
-        uint8 to_gdb_format() const;
-        uint8 to_riscv_format() const;
-        uint8 to_mips_format() const;
+        [[nodiscard]] uint8 to_gdb_format() const;
+        [[nodiscard]] uint8 to_riscv_format() const;
+        [[nodiscard]] uint8 to_mips_format() const;
 
         friend std::ostream& operator<<( std::ostream& out, const Trap& trap);
 
