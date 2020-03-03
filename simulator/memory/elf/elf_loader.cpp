@@ -40,7 +40,7 @@ Addr ElfLoader::get_text_section_addr() const
     return reader->sections[ ".text"] != nullptr ? reader->sections[ ".text"]->get_address() : 0;
 }
 
-static bool is_start_section( const ELFIO::symbol_section_accessor& symbols. ELFIO::Elf_Xword id)
+static bool is_start_section( const ELFIO::symbol_section_accessor& symbols, ELFIO::Elf_Xword id)
 {
     std::string name;
     ELFIO::Elf64_Addr value = 0;
@@ -61,7 +61,7 @@ Addr ElfLoader::get_startPC() const
 
         ELFIO::symbol_section_accessor symbols(*reader, section);
         for ( ELFIO::Elf_Xword j = 0; j < symbols.get_symbols_num(); ++j)
-            if ( is_start_section( symbols, id))
+            if ( is_start_section( symbols, j))
                 return value;
     }
 
