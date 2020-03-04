@@ -4,9 +4,9 @@
  * Copyright 2020 MIPT-V
 */
 
+#include <catch.hpp>
 #include <risc_v/risc_v.h>
 #include <simulator.h>
-#include <catch.hpp>
 
 static auto get_op_with_trap( Trap trap)
 {

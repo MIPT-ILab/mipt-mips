@@ -6,9 +6,9 @@
 
 #include "mars_kernel.h"
 
+#include <infra/macro.h>
 #include <kernel/base_kernel.h>
 #include <memory/elf/elf_loader.h>
-#include <infra/macro.h>
 
 #include <fstream>
 #include <string>
