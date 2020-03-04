@@ -55,6 +55,7 @@ set(TESTS_CPPS
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
+    risc_v/t/riscv32_driver_test.cpp
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
     func_sim/driver/t/unit_test.cpp
