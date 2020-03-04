@@ -80,8 +80,6 @@ public:
         return create_functional_simulator( isa, false);
     }
 protected:
-    void set_isa( std::string_view i) { isa = i; }
-private:
     std::string isa;
 };
 

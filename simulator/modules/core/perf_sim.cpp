@@ -37,7 +37,7 @@ template <typename ISA>
 PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
     : PerfSim( endian)
 {
-    set_isa( isa);
+    this->isa = isa;
 }
 
 template <typename ISA>

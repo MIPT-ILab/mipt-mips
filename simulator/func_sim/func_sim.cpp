@@ -24,8 +24,8 @@ FuncSim<ISA>::FuncSim( Endian endian, bool log)
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log, std::string_view isa)
     : FuncSim( endian, log)
-{
-    set_isa( isa);
+{ 
+    this->isa = isa;
 }
 
 template <typename ISA>
