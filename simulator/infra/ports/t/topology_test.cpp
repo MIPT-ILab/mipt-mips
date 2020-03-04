@@ -3,7 +3,7 @@
  * @author Eric Konks
  */
 
-#include "../module.h"
+#include <infra/ports/module.h>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>

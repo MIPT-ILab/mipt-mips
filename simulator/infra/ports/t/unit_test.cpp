@@ -4,9 +4,8 @@
  * Copyright 2019 MIPT-MIPS team
  */
 
-#include "../module.h"
 #include <catch.hpp>
-#include <map>
+#include <infra/ports/module.h>
 
 TEST_CASE( "Latency to string")
 {

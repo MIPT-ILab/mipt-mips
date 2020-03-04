@@ -27,8 +27,6 @@ before_build:
 - set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;C:\Projects\mipt-mips\mips-linux-gnu\bin;%PATH%
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
-- appveyor DownloadFile "https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip" -FileName ninja.zip
-- 7z x ninja.zip -oC:\projects\deps\ninja > nul
 
 build_script:
 - mkdir build

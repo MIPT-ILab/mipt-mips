@@ -4,9 +4,8 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../driver.h"
-
 #include <catch.hpp>
+#include <func_sim/driver/driver.h>
 #include <func_sim/operation.h>
 
 static auto get_op_with_trap( Trap trap)

@@ -5,17 +5,13 @@
 
 #include <catch.hpp>
 
-// Module
-#include "../cache_tag_array.h"
-
+#include <infra/cache/cache_tag_array.h>
 #include <infra/replacement/cache_replacement.h>
 #include <infra/types.h>
 
 #include <fstream>
 #include <map>
 #include <vector>
-
-static const uint32 LINE_SIZE = 4; // why not 32?
 
 static const uint32 cache_size = 4;
 static const uint32 cache_ways = 4;

@@ -1,2 +1,2 @@
-#include "../gdb_wrapper.h"
 #include <catch.hpp>
+#include <export/gdb/gdb_wrapper.h>

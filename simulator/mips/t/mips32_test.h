@@ -3,8 +3,8 @@
  * Copyright (C) MIPT-MIPS 2017-2019
  */
 
-#include "../mips.h"
-#include "../mips_instr.h"
+#include <mips/mips.h>
+#include <mips/mips_instr.h>
 
 class MIPS32Instr : public BaseMIPSInstr<uint32>
 {

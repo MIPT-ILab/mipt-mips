@@ -13,7 +13,7 @@
 #include <catch.hpp>
 
 // MIPT-MIPS modules
-#include "../mips_register.h"
+#include <mips/mips_register/mips_register.h>
 
 static_assert(MIPSRegister::MAX_REG >= 32);
 

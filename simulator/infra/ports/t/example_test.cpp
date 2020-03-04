@@ -3,8 +3,8 @@
  * @author Denis Los
  */
 
-#include "../module.h"
 #include <catch.hpp>
+#include <infra/ports/module.h>
 
 #include <cassert>
 #include <map>

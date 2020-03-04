@@ -31,7 +31,7 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+    - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     update: true
     packages:
@@ -47,22 +47,28 @@ addons:
 
 install:
 # Download GDB
-  - export GDB_DIR=$TRAVIS_BUILD_DIR/binutils-gdb
-  - git clone --branch gdb-9-branch git://sourceware.org/git/binutils-gdb.git --depth 1
+  - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
+  - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+  - if [ "$CC" == "clang" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
+  - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
+  - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
+  - tar -xzf gdb-9.1.tar.gz
+# Dump CMake version
+  - cmake --version
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_PROFILE=1 -DGDB_SOURCE_PATH=$GDB_DIR -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_PROFILE=1 -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_IPO=1 -G "Ninja"
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
     fi
-  - cd $GDB_DIR              && ./configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $GDB_DIR              && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $GDB_DIR/opcodes      && ./configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $GDB_DIR/libdecnumber && ./configure && make libdecnumber.a
-  - cd $GDB_DIR/readline     && ./configure && cd readline && make libreadline.a
-  - cd $GDB_DIR/libctf       && ./configure && make libctf.la
+  - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+  - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+  - cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
+  - cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+  - cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
+  - cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
@@ -79,29 +85,29 @@ script:
   # TODO (pkryukov): GDB build hangs on ARM...
   - |
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        cd $GDB_DIR/gdb
+        cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
     fi
 
 after_success:
   - |
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $TRAVIS_BUILD_DIR/visualizer
+        npx nyc --reporter=lcov npm test && npx codecov
+        rm * -rf
+    fi
+  - cd $TRAVIS_BUILD_DIR/simulator/debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+  - ninja unit-tests && ctest
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
+  - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++
-        sudo apt-get install clang-tidy-9 g++-8
+        sudo apt-get install clang-tidy-10 g++-8
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
-        clang-tidy-9 --version
+        clang-tidy-10 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        run-clang-tidy-9.py -header-filter='.*' 2> /dev/null
-    fi
-  - |
-    if [ $CXX == g++ ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        cd $TRAVIS_BUILD_DIR/simulator/debug
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
-        ninja unit-tests && ctest
-        bash <(curl -s https://codecov.io/bash) > /dev/null || echo "Codecov did not collect coverage reports"
-        cd $TRAVIS_BUILD_DIR/visualizer
-        if [ $TRAVIS_CPU_ARCH == amd64 ]; then npx nyc --reporter=lcov npm test && npx codecov; fi
+        run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
     fi

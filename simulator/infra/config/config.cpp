@@ -38,7 +38,7 @@ template<typename T, Type type>
 static void add_option( popl::OptionParser* options, std::string_view alias, std::string_view name, std::string_view desc, const T& default_value, T* value) noexcept try
 {
     (void)default_value;
-    if constexpr ( type == Type::SWITCH) // NOLINTNEXTLINE(bugprone-branch-clone) https://bugs.llvm.org/show_bug.cgi?id=44229
+    if constexpr ( type == Type::SWITCH)
         options->add<popl::Switch>( std::string( alias), std::string( name), std::string( desc), value);
     else if constexpr ( type == Type::OPTIONAL)
         options->add<popl::Value<T>>( std::string( alias), std::string( name), std::string( desc), default_value, value);

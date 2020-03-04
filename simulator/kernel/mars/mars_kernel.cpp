@@ -196,7 +196,7 @@ void MARSKernel::write_to_file() {
     uint64 descriptor = sim->read_cpu_register( a0);
     uint64 buffer_ptr = sim->read_cpu_register( a1);
     uint64 chars_to_write = sim->read_cpu_register( a2);
-    auto file = find_out_file_by_descriptor( descriptor);
+    auto* file = find_out_file_by_descriptor( descriptor);
     if (file == nullptr) {
         io_failure();
         return;
@@ -213,7 +213,7 @@ void MARSKernel::read_from_file() {
     uint64 descriptor = sim->read_cpu_register( a0);
     uint64 buffer_ptr = sim->read_cpu_register( a1);
     uint64 chars_to_read = sim->read_cpu_register( a2);
-    auto file = find_in_file_by_descriptor( descriptor);
+    auto* file = find_in_file_by_descriptor( descriptor);
     if (file == nullptr) {
         io_failure();
         return;
