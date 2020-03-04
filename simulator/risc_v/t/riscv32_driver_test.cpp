@@ -30,7 +30,7 @@ TEST_CASE("RISCV32 driver - breakpoint")
     auto drv = create_riscv32_driver( sim.get());
     sim->write_csr_register( "stvec", 0x8000);
     CHECK( drv->handle_trap( get_op_with_trap( Trap( Trap::BREAKPOINT))) == Trap::NO_TRAP);
-    auto expected_pc = (sim->read_csr_register( "stvec") >> 2U) & ~(bitmask<uint64>( 3));
+    auto expected_pc = trap_vector_address<Addr>( sim->read_csr_register( "stvec"), 3);
     CHECK( sim->get_pc() == expected_pc);
     auto expected_cause = Trap( Trap::BREAKPOINT).to_riscv_format();
     CHECK( sim->read_csr_register( "scause") == expected_cause);

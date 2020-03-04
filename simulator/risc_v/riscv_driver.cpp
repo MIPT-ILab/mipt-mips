@@ -24,9 +24,9 @@ public:
         if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
             return trap;
         auto tvec = cpu->read_csr_register( "stvec");
-        tvec = (tvec >> 2U) & ~(bitmask<uint64>( 3));
+        auto pc = trap_vector_address<Addr>( cpu->read_csr_register( "stvec"), 3); 
         cpu->write_csr_register( "sepc", instr.get_PC());
-        cpu->set_pc( tvec);
+        cpu->set_pc( pc);
         if ( tvec == 0)
             return Trap( Trap::HALT);
         return Trap( Trap::NO_TRAP);

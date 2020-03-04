@@ -8,6 +8,7 @@
 
 #include <kernel/base_kernel.h>
 #include <memory/elf/elf_loader.h>
+#include <infra/macro.h>
 
 #include <fstream>
 #include <string>
@@ -233,11 +234,11 @@ void MARSKernel::read_from_file() {
 
 void MARSKernel::connect_riscv_handler()
 {
-    constexpr Addr TRAP_VECTOR_BASE_ADDRESS = 0x8'000'0000;
-    sim->write_csr_register( "stvec", TRAP_VECTOR_BASE_ADDRESS);
-    auto tvec = (TRAP_VECTOR_BASE_ADDRESS >> 2U) & ~(bitmask<uint64>( 3));
+    constexpr Addr TRAP_VECTOR = 0x8'000'0000;
+    sim->write_csr_register( "stvec", TRAP_VECTOR);
+    auto pc = trap_vector_address<Addr>(TRAP_VECTOR, 3);
     ElfLoader elf_loader( KERNEL_IMAGES "riscv32.bin");
-    elf_loader.load_to( mem.get(), tvec - elf_loader.get_text_section_addr());
+    elf_loader.load_to( mem.get(), pc - elf_loader.get_text_section_addr());
 }
 
 void MARSKernel::connect_mars_handler()

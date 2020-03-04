@@ -358,4 +358,10 @@ static inline T gen_or_combine( T value, size_t shamt)
     return value;
 }
 
+template<typename T>
+static inline T trap_vector_address( T value, T aligning)
+{
+    return value >> 2U & ~(bitmask<T>( aligning));
+}
+
 #endif
