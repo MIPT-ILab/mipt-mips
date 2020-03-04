@@ -12,11 +12,12 @@
 #include <stdexcept>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( Endian endian, bool log)
+FuncSim<ISA>::FuncSim( Endian endian, bool log, std::string_view isa)
     : BasicFuncSim()
     , imem( endian)
     , driver( ISA::create_driver( this))
 {
+    set_isa( isa);
     if ( log)
         sout.enable();
 }

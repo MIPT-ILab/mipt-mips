@@ -27,7 +27,7 @@ class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;
         virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim() = 0;
-        std::string isa;
+        std::string_view isa;
         Builder() = default;
         virtual ~Builder() = default;
         Builder( const Builder&) = delete;
@@ -38,52 +38,48 @@ class SimulatorFactory {
 
     template<typename T, Endian e>
     struct TBuilder : public Builder {
-        TBuilder() = default;
-        std::unique_ptr<Simulator> get_funcsim( bool log) final {
-            auto func_sim = std::make_unique<FuncSim<T>>( e, log);
-            func_sim->set_isa( Builder::isa);
-            return func_sim;
-        }
-        std::unique_ptr<CycleAccurateSimulator> get_perfsim() final {
-            auto perf_sim = std::make_unique<PerfSim<T>>( e);
-            perf_sim->set_isa( Builder::isa);
-            return perf_sim;
-        }
+        TBuilder( std::string_view i) { isa = i; }
+        std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log, isa); }
+        std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e, isa); }
     };
 
     using Map = std::map<std::string, std::unique_ptr<Builder>>;
     const Map map;
 
+    template<typename T, Endian e>
+    static void emplace( Map* map, std::string_view name)
+    {
+        map->emplace( name, std::make_unique<TBuilder<T, e>>( name));
+    }
+
     // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
     static Map generate_map() {
         Map my_map;
-        my_map.emplace("mipsI",  std::make_unique<TBuilder<MIPSI, Endian::little>>());
-        my_map.emplace("mipsII",  std::make_unique<TBuilder<MIPSII, Endian::little>>());
-        my_map.emplace("mipsIII",  std::make_unique<TBuilder<MIPSIII, Endian::little>>());
-        my_map.emplace("mipsIV",  std::make_unique<TBuilder<MIPSIV, Endian::little>>());
-        my_map.emplace("mips32", std::make_unique<TBuilder<MIPS32, Endian::little>>());
-        my_map.emplace("mips64", std::make_unique<TBuilder<MIPS64, Endian::little>>());
-        my_map.emplace("mars",   std::make_unique<TBuilder<MARS, Endian::little>>());
-        my_map.emplace("mars64", std::make_unique<TBuilder<MARS64, Endian::little>>());
-        my_map.emplace("mipsIel",  std::make_unique<TBuilder<MIPSI, Endian::little>>());
-        my_map.emplace("mipsIIel",  std::make_unique<TBuilder<MIPSII, Endian::little>>());
-        my_map.emplace("mipsIIIel",  std::make_unique<TBuilder<MIPSIII, Endian::little>>());
-        my_map.emplace("mipsIVel",  std::make_unique<TBuilder<MIPSIV, Endian::little>>());
-        my_map.emplace("mips32el", std::make_unique<TBuilder<MIPS32, Endian::little>>());
-        my_map.emplace("mips64el", std::make_unique<TBuilder<MIPS64, Endian::little>>());
-        my_map.emplace("marseb",   std::make_unique<TBuilder<MARS, Endian::big>>());
-        my_map.emplace("mars64eb", std::make_unique<TBuilder<MARS64, Endian::big>>());
-        my_map.emplace("mipsIeb",  std::make_unique<TBuilder<MIPSI, Endian::big>>());
-        my_map.emplace("mipsIIeb",  std::make_unique<TBuilder<MIPSII, Endian::big>>());
-        my_map.emplace("mipsIIIeb",  std::make_unique<TBuilder<MIPSIII, Endian::big>>());
-        my_map.emplace("mipsIVeb",  std::make_unique<TBuilder<MIPSIV, Endian::big>>());
-        my_map.emplace("mips32eb", std::make_unique<TBuilder<MIPS32, Endian::big>>());
-        my_map.emplace("mips64eb", std::make_unique<TBuilder<MIPS64, Endian::big>>());
-        my_map.emplace("marseb",   std::make_unique<TBuilder<MARS, Endian::big>>());
-        my_map.emplace("mars64eb", std::make_unique<TBuilder<MARS64, Endian::big>>());
-        my_map.emplace("riscv32", std::make_unique<TBuilder<RISCV32, Endian::little>>());
-        my_map.emplace("riscv64", std::make_unique<TBuilder<RISCV64, Endian::little>>());
-        my_map.emplace("riscv128", std::make_unique<TBuilder<RISCV128, Endian::little>>());
+        emplace<MIPSI, Endian::little>( &my_map, "mipsI");
+        emplace<MIPSII, Endian::little>( &my_map, "mipsII");
+        emplace<MIPSIII, Endian::little>( &my_map, "mipsIII");
+        emplace<MIPSIV, Endian::little>( &my_map, "mipsIV");
+        emplace<MIPS32, Endian::little>( &my_map, "mips32");
+        emplace<MIPS64, Endian::little>( &my_map, "mips64");
+        emplace<MARS, Endian::little>( &my_map, "mars");
+        emplace<MARS64, Endian::little>( &my_map, "mars64");
+        emplace<MIPSI, Endian::little>( &my_map, "mipsIel");
+        emplace<MIPSII, Endian::little>( &my_map, "mipsIIel");
+        emplace<MIPSIII, Endian::little>( &my_map, "mipsIIIel");
+        emplace<MIPSIV, Endian::little>( &my_map, "mipsIVel");
+        emplace<MIPS32, Endian::little>( &my_map, "mips32el");
+        emplace<MIPS64, Endian::little>( &my_map, "mips64el");
+        emplace<MARS, Endian::big>( &my_map, "marseb");
+        emplace<MARS64, Endian::big>( &my_map, "mars64eb");
+        emplace<MIPSI, Endian::big>( &my_map, "mipsIeb");
+        emplace<MIPSII, Endian::big>( &my_map, "mipsIIeb");
+        emplace<MIPSIII, Endian::big>( &my_map, "mipsIIIeb");
+        emplace<MIPSIV, Endian::big>( &my_map, "mipsIVeb");
+        emplace<MIPS32, Endian::big>( &my_map, "mips32eb");
+        emplace<MIPS64, Endian::big>( &my_map, "mips64eb");
+        emplace<RISCV32, Endian::little>( &my_map, "riscv32");
+        emplace<RISCV64, Endian::little>( &my_map, "riscv64");
+        emplace<RISCV128, Endian::little>( &my_map, "riscv128");
         return my_map;
     }
 
@@ -99,9 +95,7 @@ class SimulatorFactory {
             throw InvalidISA( name);
         }
 
-        auto tbuilder = it->second.get();
-        tbuilder->isa = name;
-        return tbuilder;
+        return it->second.get();
     }
 
 public:
