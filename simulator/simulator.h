@@ -82,7 +82,7 @@ public:
 protected:
     void set_isa( std::string_view i) { isa = i; }
 private:
-    std::string_view isa;
+    std::string isa;
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Need to mix timing and functional model somewhere...
