@@ -38,7 +38,7 @@ class SimulatorFactory {
 
     template<typename T, Endian e>
     struct TBuilder : public Builder {
-        TBuilder( std::string_view i) { isa = i; }
+        explicit TBuilder( std::string_view i) { isa = i; }
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log, isa); }
         std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e, isa); }
     };
