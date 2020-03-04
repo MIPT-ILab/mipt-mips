@@ -16,11 +16,10 @@ namespace config {
 } // namespace config
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
+PerfSim<ISA>::PerfSim( Endian endian)
     : endian( endian)
     , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)
 {
-    set_isa( isa);
     rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
 
     decode.set_RF( &rf);
@@ -32,6 +31,13 @@ PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
     init_portmap();
     enable_logging( config::units_to_log);
     topology_dumping( config::topology_dump, "topology.json");
+}
+
+template <typename ISA>
+PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
+    : PerfSim( endian)
+{
+    set_isa( isa);
 }
 
 template <typename ISA>
