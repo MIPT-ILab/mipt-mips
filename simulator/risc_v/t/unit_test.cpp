@@ -4,8 +4,8 @@
  * Copyright 2019 MIPT-MIPS
  */
 
-#include "../risc_v.h"
-#include "../../simulator.h"
+#include <risc_v/risc_v.h>
+#include <simulator.h>
 #include "riscv_test_wrapper.h"
 
 #include <catch.hpp>
