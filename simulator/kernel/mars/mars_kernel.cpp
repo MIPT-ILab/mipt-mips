@@ -236,7 +236,7 @@ void MARSKernel::connect_riscv_handler()
 {
     constexpr Addr TRAP_VECTOR = 0x8'000'0000;
     sim->write_csr_register( "stvec", TRAP_VECTOR);
-    auto pc = trap_vector_address<Addr>(TRAP_VECTOR, 3);
+    auto pc = trap_vector_address<Addr>( TRAP_VECTOR);
     ElfLoader elf_loader( KERNEL_IMAGES "riscv32.bin");
     elf_loader.load_to( mem.get(), pc - elf_loader.get_text_section_addr());
 }
@@ -252,6 +252,6 @@ void MARSKernel::connect_exception_handler()
     auto isa = sim->get_isa();
     if ( isa == "riscv32")
         connect_riscv_handler();
-    if ( isa == "mars" || isa == "mips32le" || isa == "mips32")
+    else if ( isa == "mars" || isa == "mips32le" || isa == "mips32")
         connect_mars_handler();
 }
