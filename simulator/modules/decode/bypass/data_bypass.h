@@ -21,7 +21,7 @@ class DataBypass
     using Instr     = PerfInstr<FuncInstr>;
 
     public:
-        explicit DataBypass( uint64 long_alu_latency)
+        explicit DataBypass( uint64 long_alu_latency) noexcept
             : long_alu_latency( long_alu_latency)
         { }
 
@@ -63,12 +63,12 @@ class DataBypass
         void trace_new_instr( const Instr& instr);
 
         // updates the scoreboard
-        void update();
+        void update() noexcept;
 
         // handles a flush of the pipeline
-        void handle_flush();
+        void handle_flush() noexcept;
 
-        void set_bandwidth( uint32 wb_bandwidth)
+        void set_bandwidth( uint32 wb_bandwidth) noexcept
         {
             writeback_stage_info.writeback_bandwidth = wb_bandwidth;
         }
@@ -84,9 +84,9 @@ class DataBypass
             bool is_bypassible = false;
             bool is_traced = false;
 
-            void reset() { *this = RegisterInfo(); }
+            void reset() noexcept { *this = RegisterInfo(); }
 
-            void set_next_stage_after_first_execution_stage( const Instr& instr)
+            void set_next_stage_after_first_execution_stage( const Instr& instr) noexcept
             {
                 if ( instr.is_long_arithmetic())
                 {
@@ -113,7 +113,7 @@ class DataBypass
             Latency operation_latency = 0_lt;
             uint32 writeback_bandwidth = 1;
 
-            void update()
+            void update() noexcept
             {
                 if ( operation_latency != 0_lt)
                     operation_latency = operation_latency - 1_lt;
@@ -135,7 +135,7 @@ class DataBypass
 
         // returns a latency of an instruction
         // in accordance with a type of the instruction
-        Latency get_instruction_latency( const Instr& instr) const
+        Latency get_instruction_latency( const Instr& instr) const noexcept
         {
             if ( instr.is_mem_stage_required() || instr.is_branch_stage_required())
                 return 2_lt;
@@ -152,7 +152,6 @@ class DataBypass
         // garners the information about a new register used for the 2nd destination
         void trace_new_dst2_register( const Instr& instr, Register num);
 };
-
 
 template <typename FuncInstr>
 void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register num)
@@ -188,7 +187,6 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
     entry.is_traced = true;
 }
 
-
 template <typename FuncInstr>
 void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Register num)
 {
@@ -202,7 +200,6 @@ void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Registe
 
     entry.is_traced = true;
 }
-
 
 template <typename FuncInstr>
 void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr)
@@ -219,9 +216,8 @@ void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr)
         trace_new_dst2_register( instr, dst2);
 }
 
-
 template <typename FuncInstr>
-void DataBypass<FuncInstr>::update()
+void DataBypass<FuncInstr>::update() noexcept
 {
     for ( auto& entry:scoreboard)
     {
@@ -237,9 +233,7 @@ void DataBypass<FuncInstr>::update()
         if ( entry.current_stage.is_first_execution_stage())
             entry.current_stage = entry.next_stage_after_first_execution_stage;
         else if ( entry.current_stage.is_same_stage( long_alu_latency - 1_lt) || entry.current_stage.is_mem_or_branch_stage())
-        {
             entry.current_stage.set_to_writeback();
-        }
         else
             entry.current_stage.inc();
         
@@ -250,9 +244,8 @@ void DataBypass<FuncInstr>::update()
     writeback_stage_info.update();
 }
 
-
 template <typename FuncInstr>
-void DataBypass<FuncInstr>::handle_flush()
+void DataBypass<FuncInstr>::handle_flush() noexcept
 {
     for ( auto& entry:scoreboard)
         if ( entry.is_traced)
