@@ -39,6 +39,9 @@ class MARSKernel : public BaseKernel {
     static const constexpr uint64 first_user_descriptor = 3;
     uint64 next_descriptor = first_user_descriptor;
 
+    void connect_riscv_handler();
+    void connect_mars_handler();
+
 public:
     Trap execute() final;
     void connect_exception_handler() final;
@@ -228,18 +231,26 @@ void MARSKernel::read_from_file() {
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
 }
 
-void MARSKernel::connect_exception_handler()
+void MARSKernel::connect_riscv_handler()
 {
     constexpr Addr TRAP_VECTOR_BASE_ADDRESS = 0x8'000'0000;
+    sim->write_csr_register( "stvec", TRAP_VECTOR_BASE_ADDRESS);
+    auto tvec = (TRAP_VECTOR_BASE_ADDRESS >> 2U) & ~(bitmask<uint64>( 3));
+    ElfLoader elf_loader( KERNEL_IMAGES "riscv32.bin");
+    elf_loader.load_to( mem.get(), tvec - elf_loader.get_text_section_addr());
+}
+
+void MARSKernel::connect_mars_handler()
+{
+    ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin");
+    elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
+}
+
+void MARSKernel::connect_exception_handler()
+{
     auto isa = sim->get_isa();
-    if ( isa == "riscv32") {
-        auto tvec = TRAP_VECTOR_BASE_ADDRESS;
-        sim->write_csr_register( "stvec", tvec);
-        tvec = (tvec >> 2U) & ~(bitmask<uint64>( 3));
-        ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32.bin");
-        riscv_elf_loader.load_to( mem.get(), tvec - riscv_elf_loader.get_text_section_addr());
-    } else {
-        ElfLoader mars_elf_loader( KERNEL_IMAGES "mars32_le.bin");
-        mars_elf_loader.load_to( mem.get(), 0x8'0000'0180 - mars_elf_loader.get_text_section_addr());
-    }
+    if ( isa == "riscv32")
+        connect_riscv_handler();
+    if ( isa == "mars" || isa == "mips32le" || isa == "mips32")
+        connect_mars_handler();
 }
