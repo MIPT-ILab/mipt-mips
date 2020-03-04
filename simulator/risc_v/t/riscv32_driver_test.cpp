@@ -5,7 +5,6 @@
 */
 
 #include <risc_v/risc_v.h>
-#include <kernel/kernel.h>
 #include <simulator.h>
 #include <catch.hpp>
 
