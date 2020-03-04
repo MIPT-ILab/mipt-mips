@@ -230,13 +230,13 @@ void MARSKernel::read_from_file() {
 
 void MARSKernel::connect_exception_handler()
 {
-    const Addr TRAP_VECTOR_BASE_ADDRESS = 0x8'000'0000;
+    constexpr Addr TRAP_VECTOR_BASE_ADDRESS = 0x8'000'0000;
     auto isa = sim->get_isa();
     if ( isa == "riscv32") {
         auto tvec = TRAP_VECTOR_BASE_ADDRESS;
         sim->write_csr_register( "stvec", tvec);
         tvec = (tvec >> 2U) & ~(bitmask<uint64>( 3));
-        ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32_le.bin");
+        ElfLoader riscv_elf_loader( KERNEL_IMAGES "riscv32.bin");
         riscv_elf_loader.load_to( mem.get(), tvec - riscv_elf_loader.get_text_section_addr());
     } else {
         ElfLoader mars_elf_loader( KERNEL_IMAGES "mars32_le.bin");

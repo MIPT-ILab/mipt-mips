@@ -11,7 +11,7 @@ RISCV_LD?=riscv64-unknown-elf-ld
 LD_FLAGS?=-melf32lriscv --no-relax
 
 # assemble all the object files 
-build_all: mars32_le.bin riscv32_le.bin
+build_all: mars32_le.bin riscv32.bin
 
 mars32_le.bin: mars32_le.o
 	@$(MIPS_LD) $< -o $@ -EL -pie
@@ -21,11 +21,11 @@ mars32_le.bin: mars32_le.o
 mars32_le.o: exceptions.s Makefile
 	@$(MIPS_AS) $< -o $@ -O0 -mips64 -no-break -EL -g -KPIC
 
-riscv32_le.bin: riscv32_le.o
+riscv32.bin: riscv32.o
 	@$(RISCV_LD) $(LD_FLAGS) $< -o $@
 	@echo $@ is built
 
-riscv32_le.o: riscv_exceptions.s
+riscv32.o: riscv_exceptions.s
 	@$(RISCV_AS) $(AS_FLAGS) $< -o $@
 
 # it is needed to preven make from 
