@@ -13,6 +13,7 @@
 #include <modules/core/perf_instr.h>
 
 #include <array>
+#include <cassert>
 
 template <typename FuncInstr>
 class DataBypass
@@ -26,21 +27,21 @@ class DataBypass
         { }
 
         // checks whether a source register of an instruction is in the RF
-        auto is_in_RF( const Instr& instr, size_t src_index) const
+        auto is_in_RF( const Instr& instr, size_t src_index) const noexcept
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether a source register of an instruction is bypassible
-        auto is_bypassible( const Instr& instr, size_t src_index) const
+        auto is_bypassible( const Instr& instr, size_t src_index) const noexcept
         {
             const auto reg_num = instr.get_src_num( src_index);
             return get_entry( reg_num).is_bypassible;
         }
 
         // checks whether the stall is needed for an instruction
-        auto is_stall( const Instr& instr) const
+        auto is_stall( const Instr& instr) const noexcept
         {
             const auto instruction_latency = get_instruction_latency( instr);
 
@@ -53,14 +54,14 @@ class DataBypass
 
         // returns a bypass command for a source register of an instruction
         // in accordance with a current state of the scoreboard
-        auto get_bypass_command( const Instr& instr, size_t src_index) const
+        auto get_bypass_command( const Instr& instr, size_t src_index) const noexcept
         {
             const auto reg_num = instr.get_src_num( src_index);
             return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
         }
 
         // garners the information about a new instruction
-        void trace_new_instr( const Instr& instr);
+        void trace_new_instr( const Instr& instr) noexcept;
 
         // updates the scoreboard
         void update() noexcept;
@@ -123,14 +124,18 @@ class DataBypass
         std::array<RegisterInfo, Register::MAX_REG> scoreboard = {};
         FuncUnitInfo writeback_stage_info = {};
 
-        RegisterInfo& get_entry( Register num)
+        RegisterInfo& get_entry( Register num) noexcept
         {
-            return scoreboard.at( num.to_rf_index());
+            auto idx = num.to_rf_index();
+            assert( idx <= scoreboard.size());
+            return scoreboard[ idx];
         }
 
-        const RegisterInfo& get_entry( Register num) const
+        const RegisterInfo& get_entry( Register num) const noexcept
         {
-            return scoreboard.at( num.to_rf_index());
+            auto idx = num.to_rf_index();
+            assert( idx <= scoreboard.size());
+            return scoreboard[ idx];
         }
 
         // returns a latency of an instruction
@@ -147,14 +152,14 @@ class DataBypass
         }
 
         // garners the information about a new register used for the 1st destination
-        void trace_new_dst_register( const Instr& instr, Register num);
+        void trace_new_dst_register( const Instr& instr, Register num) noexcept;
 
         // garners the information about a new register used for the 2nd destination
-        void trace_new_dst2_register( const Instr& instr, Register num);
+        void trace_new_dst2_register( const Instr& instr, Register num) noexcept;
 };
 
 template <typename FuncInstr>
-void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register num)
+void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register num) noexcept
 {
     auto& entry = get_entry( num);
 
@@ -188,7 +193,7 @@ void DataBypass<FuncInstr>::trace_new_dst_register( const Instr& instr, Register
 }
 
 template <typename FuncInstr>
-void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Register num)
+void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Register num) noexcept
 {
     auto& entry = get_entry( num);
 
@@ -202,7 +207,7 @@ void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Registe
 }
 
 template <typename FuncInstr>
-void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr)
+void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr) noexcept
 {
     const auto& dst  = instr.get_dst_num();
     const auto& dst2 = instr.get_dst2_num();
