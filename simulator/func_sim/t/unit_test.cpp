@@ -118,10 +118,24 @@ TEST_CASE( "FuncSim: Register R/W")
 
     /* Signed */
     sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
+    sim->write_cpu_register( 2, uint64{ MAX_VAL32});
+
     CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
-    /* Unsigned */
-    sim->write_cpu_register( 1, uint64{ MAX_VAL32});
-    CHECK( sim->read_cpu_register( 1) == MAX_VAL32 );
+    CHECK( sim->read_cpu_register( 2) == MAX_VAL32 );
+}
+
+TEST_CASE( "FuncSim: Register Duplication")
+{
+    auto sim = Simulator::create_functional_simulator("mips32");
+    auto sim2 = Simulator::create_functional_simulator("mips32");
+
+    sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
+    sim->write_cpu_register( 2, uint64{ MAX_VAL32});
+
+    sim->duplicate_all_registers_to( sim2.get());
+
+    CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
+    CHECK( sim2->read_cpu_register( 2) == MAX_VAL32 );
 }
 
 TEST_CASE( "FuncSim: GDB Register R/W")

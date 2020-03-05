@@ -42,13 +42,17 @@ public:
     virtual std::string_view get_isa() const = 0;
 
     virtual size_t sizeof_register() const = 0;
+    virtual size_t max_cpu_register() const = 0;
 
     virtual uint64 read_cpu_register( size_t regno) const = 0;
     virtual uint64 read_gdb_register( size_t regno) const = 0;
     virtual uint64 read_csr_register( std::string_view name) const = 0;
+
     virtual void write_cpu_register( size_t regno, uint64 value) = 0;
     virtual void write_gdb_register( size_t regno, uint64 value) = 0;
     virtual void write_csr_register( std::string_view name, uint64 value) = 0;
+
+    void duplicate_all_registers_to( CPUModel* model) const;
 };
 
 class FuncMemory;

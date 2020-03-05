@@ -16,6 +16,7 @@ TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
     auto mem = FuncMemory::create_default_hierarchied_memory();
     CHECK_NOTHROW( sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
+    CHECK( sim->max_cpu_register() >= 32);
 }
 
 TEST_CASE( "Perf_Sim_init: push a nop")
