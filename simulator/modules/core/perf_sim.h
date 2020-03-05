@@ -29,15 +29,14 @@ class PerfSim : public CycleAccurateSimulator
 public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
-
-    explicit PerfSim( Endian endian);
+    explicit PerfSim( Endian endian, std::string_view isa);
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
     void set_kernel( std::shared_ptr<Kernel> k) final { writeback.set_kernel( k); }
     void clock() final;
     void enable_driver_hooks() final { writeback.enable_driver_hooks(); }
-    void init_checker() final { writeback.init_checker( *memory); }
+    void init_checker() final { writeback.init_checker( *memory, get_isa()); }
     void set_writeback_bandwidth( uint32 wb_bandwidth) { decode.set_wb_bandwidth( wb_bandwidth);}
     int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
 

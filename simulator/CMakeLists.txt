@@ -55,6 +55,7 @@ set(TESTS_CPPS
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
+    risc_v/t/riscv32_driver_test.cpp
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
     func_sim/driver/t/unit_test.cpp
@@ -171,6 +172,7 @@ add_library(mipt-mips-src OBJECT
     mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
     risc_v/riscv_instr.cpp
+    risc_v/riscv_driver.cpp
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
     export/cache/runner.cpp

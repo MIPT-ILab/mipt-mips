@@ -14,6 +14,8 @@
 
 class Simulator;
 
+std::unique_ptr<Driver> create_riscv32_driver( Simulator* sim);
+
 template <typename T>
 struct RISCV
 {
@@ -23,8 +25,8 @@ struct RISCV
     static auto create_instr( uint32 bytes, Endian /* little */, Addr PC) {
         return FuncInstr( bytes, PC);
     }
-    static std::unique_ptr<Driver> create_driver( Simulator* /* sim */) {
-        return Driver::create_default_driver();
+    static auto create_driver( Simulator* sim) {
+        return create_riscv32_driver( sim);
     }
 };
 
