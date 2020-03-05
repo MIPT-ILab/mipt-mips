@@ -57,6 +57,7 @@ class Kernel;
 class Simulator : public CPUModel
 {
 public:
+    explicit Simulator( std::string_view i) : isa( i) { }
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
@@ -79,7 +80,7 @@ public:
     {
         return create_functional_simulator( isa, false);
     }
-protected:
+private:
     std::string isa;
 };
 
@@ -87,7 +88,7 @@ protected:
 class CycleAccurateSimulator : public Simulator, public Root
 {
 public:
-    CycleAccurateSimulator() : Root( "cpu") { }
+    CycleAccurateSimulator( std::string_view isa) : Simulator( isa), Root( "cpu") { }
     virtual void clock() = 0;
     static std::shared_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa);
 };
