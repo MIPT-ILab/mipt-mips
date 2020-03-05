@@ -13,7 +13,12 @@ class CPUReplicant : public CPUModel
 {
 public:
     explicit CPUReplicant( const std::shared_ptr<CPUModel>& s) : primary( s) { }
-    void add_replica( const std::shared_ptr<CPUModel>& s) { replicas.emplace_back( s); }
+
+    void add_replica( const std::shared_ptr<CPUModel>& s)
+    {
+        replicas.emplace_back( s);
+        primary.lock()->duplicate_all_registers_to( s.get());
+    }
     
     void set_target( const Target& target) final
     {
