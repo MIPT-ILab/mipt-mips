@@ -4,16 +4,16 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips/badge)](https://www.codefactor.io/repository/github/mipt-ilab/mipt-mips)
 [![Github Releases](https://img.shields.io/github/release/MIPT-ILab/mipt-mips.svg)](https://github.com/MIPT-ILab/mipt-mips/releases)
 
-# MIPT-MIPS / MIPT-V
+# MIPT-V / MIPT-MIPS
 
-MIPT-MIPS / MIPT-V is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
+MIPT-V / MIPT-MIPS is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
 * **Precision**. We provide cycle-accurate models of branch prediction unit, pipeline, and other hardware internals.
 * **Customization**. Cache size, branch prediction algorithms, and other parameters can be easily changed even to unfeasible modes.
 * **Simplicity**. Our source files are much more readable than RTL and independent on SDK and synthesis flow.
-* **Speed**. Megaherz simulation frequency on i5-7300U.
+* **Speed**. 2 MHz simulation frequency on Cascade Lake.
 * **Scalability**. Modularized structure allows integration of more microarchitecture configurations.
 
-MIPT-MIPS / MIPT-V can be used for different purposes:
+Simulator can be used for different purposes:
 * Performance control of **software optimizations**: you may check what and why happened to IPC.
 * Pathfinding of **hardware optimizations**: you may easily integrate some nice feature to CPU model.
 * **Comparison** of hardware solutions from different vendors.
@@ -21,7 +21,7 @@ MIPT-MIPS / MIPT-V can be used for different purposes:
 * **Education**: simulator is a nice experimental frog to study CPU internals and software development process.
 
 Key system-level features:
-* Compatibility with interactive [MARS](http://courses.missouristate.edu/KenVollmar/mars/) system calls.
+* Compatibility with interactive [MARS](https://github.com/MIPT-ILab/mipt-mips/wiki/MARS-syscalls) system calls.
 * Interactive simulation with [GDB](https://github.com/MIPT-ILab/mipt-mips/wiki/Interactive-simulation-with-GDB)
 
 Key microarchitecture features:
@@ -44,9 +44,9 @@ We use C++17 features and Boost 1.65.1. Thus, you have to [use compilers](https:
 
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
 
-To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
-
 To work with RISC-V traces, you need to install RISC-V toolchain. Please follow [the official instruction](https://github.com/riscv/riscv-gnu-toolchain/blob/master/README.md).
+
+To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
 Our build system is CMake. You should install CMake 3.10.2 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
@@ -113,7 +113,7 @@ To build simulator faster, we recommend to [install Ninja](https://github.com/ni
   1. See more command line options in the paragraph below
   1. To run all unit tests, call `ninja unit-tests && ctest --verbose -C Release` from your build directory.
 
-## About MIPT-MIPS / MIPT-V
+## About MIPT-V / MIPT-MIPS
 
 [![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/mipt-eng.jpg?raw=true)](https://mipt.ru/english)
 [![](https://github.com/MIPT-ILab/ca-lectures/blob/master/images/drec.gif?raw=true)](https://mipt.ru/drec/)
@@ -121,7 +121,7 @@ To build simulator faster, we recommend to [install Ninja](https://github.com/ni
 
 This project is a part of [ILab](https://mipt-ilab.github.io/) activity at [Moscow Institute of Physics and Technology](http://phystech.edu/) (MIPT).
 
-The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [MIPS](http://en.wikipedia.org/wiki/MIPS32) and [RISC-V](http://en.wikipedia.org/wiki/RISC-V)  instruction set in both functional and performance simulators.
+The main goal of the project is to teach the students the computer architecture through development of a microprocessor implementing the [RISC-V](http://en.wikipedia.org/wiki/RISC-V) and [MIPS](http://en.wikipedia.org/wiki/MIPS32) instruction set in both functional and performance simulators.
 
 ### May I contribute?
 

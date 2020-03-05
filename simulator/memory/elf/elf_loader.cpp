@@ -40,6 +40,20 @@ Addr ElfLoader::get_text_section_addr() const
     return reader->sections[ ".text"] != nullptr ? reader->sections[ ".text"]->get_address() : 0;
 }
 
+static std::pair<bool, ELFIO::Elf64_Addr>
+is_start_section( const ELFIO::symbol_section_accessor& symbols, ELFIO::Elf_Xword id)
+{
+    std::string name;
+    ELFIO::Elf64_Addr value = 0;
+    ELFIO::Elf_Xword size = 0;
+    unsigned char bind = 0;
+    unsigned char type = 0;
+    ELFIO::Elf_Half section_index = 0;
+    unsigned char other = 0;
+    symbols.get_symbol( id, name, value, size, bind, type, section_index, other);
+    return std::pair( name == "__start" || name == "_start", value);
+}
+
 Addr ElfLoader::get_startPC() const
 {
     for ( const auto& section : reader->sections) {
@@ -47,17 +61,10 @@ Addr ElfLoader::get_startPC() const
             continue;
 
         ELFIO::symbol_section_accessor symbols(*reader, section);
-        for ( ELFIO::Elf_Xword j = 0; j < symbols.get_symbols_num(); ++j ) {
-            std::string name;
-            ELFIO::Elf64_Addr value = 0;
-            ELFIO::Elf_Xword size = 0;
-            unsigned char bind = 0;
-            unsigned char type = 0;
-            ELFIO::Elf_Half section_index = 0;
-            unsigned char other = 0;
-            symbols.get_symbol( j, name, value, size, bind, type, section_index, other );
-            if ( name == "__start" || name == "_start")
-                return value;
+        for ( ELFIO::Elf_Xword j = 0; j < symbols.get_symbols_num(); ++j) {
+            auto [result, addr] = is_start_section( symbols, j);
+            if ( result)
+                return addr;
         }
     }
 

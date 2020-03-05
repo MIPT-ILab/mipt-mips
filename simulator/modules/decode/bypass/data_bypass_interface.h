@@ -15,30 +15,49 @@
 class RegisterStage
 {
 public:
-    bool operator==(const RegisterStage& rhs) const { return is_same_stage( rhs.value); }
+    bool operator==(const RegisterStage& rhs) const noexcept { return is_same_stage( rhs.value); }
 
-    void inc() { value = value + 1_lt; }
+    void inc() noexcept { value = value + 1_lt; }
 
     static constexpr const size_t BYPASSING_STAGES_NUMBER = 5;
 
-    void set_to_stage( Latency v) { value = v; }
-    void set_to_first_execution_stage() { set_to_stage( 0_lt); 
-                                          bypass_direction = 0; }
-    void set_to_mem_stage()    { set_to_stage( MEM_OR_BRANCH_STAGE); 
-                                 bypass_direction = 2; }
-    void set_to_writeback()    { set_to_stage( WB_STAGE); 
-                                 bypass_direction = 3; }
-    void set_to_branch_stage() { set_to_stage( MEM_OR_BRANCH_STAGE); 
-                                 bypass_direction = 4; }
-    void set_to_in_RF()        { set_to_stage( IN_RF_STAGE); }
+    void set_to_stage( Latency v) noexcept { value = v; }
+    void set_to_first_execution_stage() noexcept
+    {
+        set_to_stage( 0_lt); 
+        bypass_direction = 0;
+    }
 
-    bool is_same_stage( Latency v) const  { return value == v; }
-    bool is_first_execution_stage() const { return is_same_stage( 0_lt); }
-    bool is_mem_or_branch_stage() const { return is_same_stage( MEM_OR_BRANCH_STAGE); }
-    bool is_writeback() const { return is_same_stage( WB_STAGE); }
-    bool is_in_RF() const     { return is_same_stage( IN_RF_STAGE); }
+    void set_to_mem_stage() noexcept
+    {
+        set_to_stage( MEM_OR_BRANCH_STAGE); 
+        bypass_direction = 2;
+    }
 
-    auto get_bypass_direction_value() const{ return bypass_direction; }
+    void set_to_writeback() noexcept
+    {
+        set_to_stage( WB_STAGE); 
+        bypass_direction = 3;
+    }
+
+    void set_to_branch_stage() noexcept
+    {
+        set_to_stage( MEM_OR_BRANCH_STAGE);
+        bypass_direction = 4;
+    }
+
+    void set_to_in_RF() noexcept
+    {
+        set_to_stage( IN_RF_STAGE);
+    }
+
+    bool is_same_stage( Latency v) const noexcept { return value == v; }
+    bool is_first_execution_stage() const noexcept { return is_same_stage( 0_lt); }
+    bool is_mem_or_branch_stage() const noexcept { return is_same_stage( MEM_OR_BRANCH_STAGE); }
+    bool is_writeback() const noexcept { return is_same_stage( WB_STAGE); }
+    bool is_in_RF() const noexcept     { return is_same_stage( IN_RF_STAGE); }
+
+    auto get_bypass_direction_value() const noexcept { return bypass_direction; }
 
 private:
     size_t bypass_direction = 0;
@@ -62,13 +81,13 @@ template<typename Register>
 class BypassCommand
 {
 public:
-    BypassCommand(RegisterStage bypassing_stage, Latency last_execution_stage)
+    BypassCommand(RegisterStage bypassing_stage, Latency last_execution_stage) noexcept
         : bypassing_stage(bypassing_stage)
         , last_execution_stage(last_execution_stage)
     { }
 
     // returns an index of the port where bypassed data should be get from
-    size_t get_bypass_direction() const
+    size_t get_bypass_direction() const noexcept
     {
         if ( bypassing_stage.is_same_stage( last_execution_stage))
             return 1;
