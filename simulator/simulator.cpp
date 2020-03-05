@@ -23,6 +23,13 @@ namespace config {
     static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
 
+void CPUModel::duplicate_all_registers_to( CPUModel* model) const
+{
+    auto max = model->max_cpu_register();
+    for ( size_t i = 0; i < max; ++i)
+        model->write_cpu_register( i, read_cpu_register( i));
+}
+
 class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;

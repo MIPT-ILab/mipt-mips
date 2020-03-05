@@ -41,6 +41,8 @@ public:
     int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
 
     size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+    size_t max_cpu_register() const final { return Register::MAX_REG; }
+
     Addr get_pc() const final;
     
     uint64 read_cpu_register( size_t regno) const final { return read_register( Register::from_cpu_index( regno)); }

@@ -25,6 +25,7 @@ public:
     Addr get_pc() const final { return primary.lock()->get_pc(); }
     std::string_view get_isa() const final { return primary.lock()->get_isa(); }
     size_t sizeof_register() const final { return primary.lock()->sizeof_register(); }
+    size_t max_cpu_register() const final { return primary.lock()->max_cpu_register(); }
     uint64 read_cpu_register( size_t regno) const final { return primary.lock()->read_cpu_register( regno); }
     uint64 read_gdb_register( size_t regno) const final { return primary.lock()->read_gdb_register( regno); }
     uint64 read_csr_register( std::string_view name) const final { return primary.lock()->read_csr_register( name); }
