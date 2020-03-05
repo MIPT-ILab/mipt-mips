@@ -9,7 +9,6 @@
 #include <infra/macro.h>
 #include <kernel/base_kernel.h>
 #include <memory/elf/elf_loader.h>
-#include <infra/exception.h>
 
 #include <fstream>
 #include <string>

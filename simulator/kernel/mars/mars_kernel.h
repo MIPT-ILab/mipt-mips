@@ -7,6 +7,7 @@
 #ifndef MARS_KERNEL_H
 #define MARS_KERNEL_H
 
+#include <infra/macro.h>
 #include <kernel/kernel.h>
 
 struct UnsupportedISA final : Exception
