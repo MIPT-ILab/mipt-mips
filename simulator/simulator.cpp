@@ -27,7 +27,6 @@ class SimulatorFactory {
     struct Builder {
         virtual std::unique_ptr<Simulator> get_funcsim( bool log) = 0;
         virtual std::unique_ptr<CycleAccurateSimulator> get_perfsim() = 0;
-        std::string_view isa;
         Builder() = default;
         virtual ~Builder() = default;
         Builder( const Builder&) = delete;
@@ -36,70 +35,60 @@ class SimulatorFactory {
         Builder& operator=( Builder&&) = delete;
     };
 
-    template<typename T, Endian e>
+    template<typename T>
     struct TBuilder : public Builder {
-        explicit TBuilder( std::string_view i) { isa = i; }
+        const std::string isa;
+        const Endian e;
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log, isa); }
         std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e, isa); }
     };
 
     using Map = std::map<std::string, std::unique_ptr<Builder>>;
-    const Map map;
+    Map map;
 
-    template<typename T, Endian e>
-    static void emplace( Map* map, std::string_view name)
+    template<typename T>
+    void emplace( std::string_view name, Endian e)
     {
-        map->emplace( name, std::make_unique<TBuilder<T, e>>( name));
+        map.emplace( name, std::make_unique<TBuilder<T>>( name, e));
     }
 
-    // Use old-fashioned generation since initializer-lists don't work with unique_ptrs
-    static Map generate_map() {
-        Map my_map;
-        emplace<MIPSI, Endian::little>( &my_map, "mipsI");
-        emplace<MIPSII, Endian::little>( &my_map, "mipsII");
-        emplace<MIPSIII, Endian::little>( &my_map, "mipsIII");
-        emplace<MIPSIV, Endian::little>( &my_map, "mipsIV");
-        emplace<MIPS32, Endian::little>( &my_map, "mips32");
-        emplace<MIPS64, Endian::little>( &my_map, "mips64");
-        emplace<MARS, Endian::little>( &my_map, "mars");
-        emplace<MARS64, Endian::little>( &my_map, "mars64");
-        emplace<MIPSI, Endian::little>( &my_map, "mipsIel");
-        emplace<MIPSII, Endian::little>( &my_map, "mipsIIel");
-        emplace<MIPSIII, Endian::little>( &my_map, "mipsIIIel");
-        emplace<MIPSIV, Endian::little>( &my_map, "mipsIVel");
-        emplace<MIPS32, Endian::little>( &my_map, "mips32el");
-        emplace<MIPS64, Endian::little>( &my_map, "mips64el");
-        emplace<MARS, Endian::big>( &my_map, "marseb");
-        emplace<MARS64, Endian::big>( &my_map, "mars64eb");
-        emplace<MIPSI, Endian::big>( &my_map, "mipsIeb");
-        emplace<MIPSII, Endian::big>( &my_map, "mipsIIeb");
-        emplace<MIPSIII, Endian::big>( &my_map, "mipsIIIeb");
-        emplace<MIPSIV, Endian::big>( &my_map, "mipsIVeb");
-        emplace<MIPS32, Endian::big>( &my_map, "mips32eb");
-        emplace<MIPS64, Endian::big>( &my_map, "mips64eb");
-        emplace<RISCV32, Endian::little>( &my_map, "riscv32");
-        emplace<RISCV64, Endian::little>( &my_map, "riscv64");
-        emplace<RISCV128, Endian::little>( &my_map, "riscv128");
-        return my_map;
+    template<typename T>
+    void emplace_all_endians( std::string name)
+    {
+        emplace<T>( name, Endian::little);
+        emplace<T>( name + "le", Endian::little);
+        if constexpr ( std::is_base_of_v<IsMIPS, T>)
+            emplace<T>( name + "be", Endian::big);
     }
 
-    auto get_factory( const std::string& name) const 
+    auto get_factory( const std::string& name) const try
     {
-        auto it = map.find( name);
-        if ( it == map.end())
-        {
-            std::cout << "Supported ISAs:" << std::endl;
-            for ( const auto& map_name : map)
-                std::cout << "\t" << map_name.first << std::endl;
+        return map.at( name).get();
+    }
+    catch ( const std::out_of_range& e)
+    {
+        std::cout << "Supported ISAs:" << std::endl;
+        for ( const auto& map_name : map)
+            std::cout << "\t" << map_name.first << std::endl;
 
-            throw InvalidISA( name);
-        }
-
-        return it->second.get();
+        throw InvalidISA( name);
     }
 
 public:
-    SimulatorFactory() : map( generate_map()) { }
+    SimulatorFactory()
+    {
+        emplace_all_endians<MIPSI>( "mipsI");
+        emplace_all_endians<MIPSII>( "mipsII");
+        emplace_all_endians<MIPSIII>( "mipsIII");
+        emplace_all_endians<MIPSIV>( "mipsIV");
+        emplace_all_endians<MIPS32>( "mips32");
+        emplace_all_endians<MIPS64>( "mips64");
+        emplace_all_endians<MARS>( "mars");
+        emplace_all_endians<MARS64>( "mars64");
+        emplace_all_endians<RISCV32>( "riscv32");
+        emplace_all_endians<RISCV64>( "riscv64");
+        emplace_all_endians<RISCV128>( "riscv128");
+    }
 
     auto get_funcsim( const std::string& name, bool log) const
     {
@@ -111,7 +100,8 @@ public:
         return get_factory( name)->get_perfsim();
     }
     
-    static SimulatorFactory& get_instance() {
+    static SimulatorFactory& get_instance()
+    {
         static SimulatorFactory sf;
         return sf;
     }
