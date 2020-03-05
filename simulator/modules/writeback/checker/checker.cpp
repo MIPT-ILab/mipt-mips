@@ -15,7 +15,7 @@ void Checker<ISA>::init( Endian endian, const FuncMemory& outer_mem, Kernel* ker
     auto memory = FuncMemory::create_default_hierarchied_memory();
     sim = std::make_shared<FuncSim<ISA>>( endian, false, isa);
     outer_mem.duplicate_to( memory);
-    sim->set_memory( std::move( memory));
+    sim->set_memory( memory);
     kernel->add_replica_simulator( sim);
     kernel->add_replica_memory( memory);
     active = true;
