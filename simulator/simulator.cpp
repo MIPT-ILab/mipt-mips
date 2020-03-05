@@ -39,12 +39,12 @@ class SimulatorFactory {
     struct TBuilder : public Builder {
         const std::string isa;
         const Endian e;
+        TBuilder( std::string_view isa, Endian e) : isa( isa), e( e) { }
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log, isa); }
         std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e, isa); }
     };
 
-    using Map = std::map<std::string, std::unique_ptr<Builder>>;
-    Map map;
+    std::map<std::string, std::unique_ptr<Builder>> map;
 
     template<typename T>
     void emplace( std::string_view name, Endian e)
@@ -65,7 +65,7 @@ class SimulatorFactory {
     {
         return map.at( name).get();
     }
-    catch ( const std::out_of_range& e)
+    catch ( const std::out_of_range&)
     {
         std::cout << "Supported ISAs:" << std::endl;
         for ( const auto& map_name : map)
