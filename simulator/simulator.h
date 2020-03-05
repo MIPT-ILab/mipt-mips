@@ -88,7 +88,7 @@ private:
 class CycleAccurateSimulator : public Simulator, public Root
 {
 public:
-    CycleAccurateSimulator( std::string_view isa) : Simulator( isa), Root( "cpu") { }
+    explicit CycleAccurateSimulator( std::string_view isa) : Simulator( isa), Root( "cpu") { }
     virtual void clock() = 0;
     static std::shared_ptr<CycleAccurateSimulator> create_simulator(const std::string& isa);
 };
