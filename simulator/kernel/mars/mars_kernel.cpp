@@ -9,6 +9,7 @@
 #include <infra/macro.h>
 #include <kernel/base_kernel.h>
 #include <memory/elf/elf_loader.h>
+#include <infra/exception.h>
 
 #include <fstream>
 #include <string>
@@ -250,8 +251,14 @@ void MARSKernel::connect_mars_handler()
 void MARSKernel::connect_exception_handler()
 {
     auto isa = sim->get_isa();
-    if ( isa == "riscv32")
+    if ( isa == "riscv32") 
+    {
         connect_riscv_handler();
-    else if ( isa == "mars" || isa == "mips32le" || isa == "mips32")
+    } else if ( isa == "mars" || isa == "mips32le" || isa == "mips32") 
+    {
         connect_mars_handler();
+    } else 
+    {
+        throw UnsupportedISA( isa);
+    }
 }

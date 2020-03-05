@@ -186,7 +186,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     CHECK( sim->get_exit_code() == 0);
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks)
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks, bool enable_ehandler= false)
 {
     auto sim = Simulator::create_functional_simulator(isa);
     auto mem = FuncMemory::create_default_hierarchied_memory();
@@ -197,7 +197,9 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     auto kernel = Kernel::create_mars_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
-    kernel->connect_exception_handler();
+    if ( enable_ehandler)
+        kernel->connect_exception_handler();
+
     sim->set_kernel( kernel);
     kernel->load_file( test);
 
@@ -215,7 +217,7 @@ TEST_CASE( "Torture_Test: Stop on trap")
 
 TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", false)->run( 10000) == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", false, true)->run( 10000) == Trap::HALT );
 }
 
 static bool riscv_tt( const std::string& isa, const std::string& name)
@@ -227,8 +229,8 @@ static bool riscv_tt( const std::string& isa, const std::string& name)
 
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin", false)->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin", false)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin", false, true)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin", false, true)->run_no_limit() == Trap::HALT );
     CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple"));
     CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc"));
