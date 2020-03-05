@@ -430,3 +430,11 @@ TEST_CASE( "MARS: unsupported syscall")
     sim->write_cpu_register( v0, 666U);
     CHECK( mars_kernel->execute() == Trap::UNSUPPORTED_SYSCALL);
 }
+
+TEST_CASE( "MARS: unsupported isa")
+{
+    auto sim = Simulator::create_simulator( "mips64", true);
+    auto mars_kernel = create_mars_kernel( std::cin, std::cout, std::cerr);
+    mars_kernel->set_simulator( sim);
+    CHECK_THROWS_AS( mars_kernel->connect_exception_handler(), UnsupportedISA);
+}
