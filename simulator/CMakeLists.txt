@@ -189,14 +189,17 @@ add_library(mipt-mips-src OBJECT
     modules/writeback/writeback.cpp
     modules/writeback/checker/checker.cpp
     simulator.cpp
-    ${RISCV_DIR}/riscv.opcode.gen.h
 )
 
+add_dependencies(mipt-mips-src ${RISCV_DIR}/riscv.opcode.gen.h)
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp $<TARGET_OBJECTS:mipt-mips-src>)
 add_executable(mipt-mips export/standalone/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} $<TARGET_OBJECTS:mipt-mips-src>)
 add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+
+# Symlink for new name
 add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
+add_dependencies(mipt-v mipt-mips)
 
 target_link_libraries(unit-tests mipt-mips-cen64-intf)
 
