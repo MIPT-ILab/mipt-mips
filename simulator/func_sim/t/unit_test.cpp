@@ -186,7 +186,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     CHECK( sim->get_exit_code() == 0);
 }
 
-static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks, bool enable_ehandler= false)
+static auto get_simulator_with_test( const std::string& isa, const std::string& test, bool enable_hooks, bool enable_mars)
 {
     auto sim = Simulator::create_functional_simulator(isa);
     auto mem = FuncMemory::create_default_hierarchied_memory();
@@ -194,11 +194,10 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     if ( enable_hooks)
         sim->enable_driver_hooks();
 
-    auto kernel = Kernel::create_mars_kernel();
+    auto kernel = enable_mars ? Kernel::create_mars_kernel() : Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
-    if ( enable_ehandler)
-        kernel->connect_exception_handler();
+    kernel->connect_exception_handler();
 
     sim->set_kernel( kernel);
     kernel->load_file( test);
@@ -209,8 +208,8 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true)->run( 1) == Trap::BREAKPOINT );
-    auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true)->run( 10000);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true, false)->run( 1) == Trap::BREAKPOINT );
+    auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true, false)->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
@@ -222,7 +221,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls ")
 
 static bool riscv_tt( const std::string& isa, const std::string& name)
 {
-    auto sim = get_simulator_with_test( isa, name, false);
+    auto sim = get_simulator_with_test( isa, name, false, false);
     auto trap = sim->run_no_limit();
     return trap == Trap::HALT && sim->read_cpu_register( 3) == 1;
 }
