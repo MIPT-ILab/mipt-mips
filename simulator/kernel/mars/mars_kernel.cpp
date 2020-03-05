@@ -251,13 +251,9 @@ void MARSKernel::connect_exception_handler()
 {
     auto isa = sim->get_isa();
     if ( isa == "riscv32") 
-    {
         connect_riscv_handler();
-    } else if ( isa == "mars" || isa == "mips32le" || isa == "mips32") 
-    {
+    else if ( isa == "mars" || isa == "mips32le" || isa == "mips32") 
         connect_mars_handler();
-    } else 
-    {
+    else 
         throw UnsupportedISA( isa);
-    }
 }
