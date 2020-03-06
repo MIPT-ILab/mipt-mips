@@ -16,8 +16,10 @@ class Simulator;
 
 std::unique_ptr<Driver> create_mips32_driver( Simulator* sim);
 
+struct IsMIPS { };
+
 template<MIPSVersion version>
-struct MIPS
+struct MIPS : public IsMIPS
 {
     using Register = MIPSRegister;
     using RegisterUInt = MIPSRegisterUInt<version>;
