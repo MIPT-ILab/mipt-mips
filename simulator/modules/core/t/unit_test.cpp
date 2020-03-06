@@ -91,17 +91,17 @@ TEST_CASE( "Perf_Sim: Register size")
     CHECK( CycleAccurateSimulator::create_simulator( "mips64")->sizeof_register() == bytewidth<uint64>);
 }
 
-static auto get_mars32_tt_simulator( bool has_hooks)
+static auto create_mars_sim( const std::string& isa, const std::string& binary_name, std::ostream& kernel_out, bool has_hooks)
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mars");
+    auto sim = CycleAccurateSimulator::create_simulator( isa);
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
-    auto kernel = Kernel::create_mars_kernel();
+    auto kernel = Kernel::create_mars_kernel( std::cin, kernel_out, std::cerr);
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( binary_name);
     sim->set_kernel( kernel);
     if ( has_hooks)
         sim->enable_driver_hooks();
@@ -113,62 +113,41 @@ static auto get_mars32_tt_simulator( bool has_hooks)
 
 TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal")
 {
-    auto sim = get_mars32_tt_simulator( false);
+    std::ostream nullout( nullptr);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips-tt-no-delayed-branches.bin", nullout, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
 TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
 {
-    auto sim = get_mars32_tt_simulator( true);
+    std::ostream nullout( nullptr);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips-tt-no-delayed-branches.bin", nullout, true);
     auto trap = sim->run_no_limit();
     CHECK_FALSE( trap == Trap::NO_TRAP);
     CHECK_FALSE( trap == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
-static auto get_smc_loaded_simulator( bool init_checker)
-{
-    auto sim = CycleAccurateSimulator::create_simulator( "mars");
-    auto mem = FuncMemory::create_default_hierarchied_memory();
-    sim->set_memory( mem);
-
-    auto kernel = Kernel::create_mars_kernel();
-    kernel->set_simulator( sim);
-    kernel->connect_memory( mem);
-    kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-smc.bin");
-    sim->set_kernel( kernel);
-
-    if ( init_checker)
-        sim->init_checker();
-    sim->set_pc( kernel->get_start_pc());
-    return sim;
-}
-
-TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
-{
-    CHECK( get_smc_loaded_simulator( false)->run_no_limit() == Trap::HALT);
-}
-
 TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 {
-    CHECK_THROWS_AS( get_smc_loaded_simulator( true)->run_no_limit(), CheckerMismatch);
+    std::ostream nullout( nullptr);
+    CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips-smc.bin", nullout, false)->run_no_limit(), CheckerMismatch);
 }
 
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "riscv32");
-    auto mem = FuncMemory::create_default_hierarchied_memory();
-    sim->set_memory( mem);
-    auto kernel = Kernel::create_dummy_kernel();
-    kernel->set_simulator( sim);
-    kernel->connect_memory( mem);
-    kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/rv32ui-p-simple");
-    sim->set_kernel( kernel);
-    sim->init_checker();
-    sim->set_pc( kernel->get_start_pc());
+    std::ostream nullout( nullptr);
+    auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32ui-p-simple", nullout, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
+}
+
+TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 breakpoint")
+{
+    std::ostringstream oss;
+    auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32ui-p-ebreak", oss, false);
+    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( sim->get_exit_code() == 0);
+    CHECK( oss.str() == "  Interrupt 3  occurred\n  Exception 3  occurred\n");
 }
