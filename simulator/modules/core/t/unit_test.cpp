@@ -5,7 +5,7 @@
 
 #include <catch.hpp>
 
-#include <kernel/kernel.h>
+#include <kernel/mars/mars_kernel.h>
 #include <modules/core/perf_sim.h>
 #include <modules/writeback/writeback.h>
 
@@ -170,4 +170,24 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
     sim->set_pc( kernel->get_start_pc());
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
+}
+
+TEST_CASE( "Perf_sim: Syscall flushes pipeline")
+{
+    std::istringstream input( "4\n8\n");
+    std::ostringstream output;
+    auto sim = CycleAccurateSimulator::create_simulator( "riscv32");
+    auto mem = FuncMemory::create_default_hierarchied_memory();
+    sim->set_memory( mem);
+    auto kernel = create_mars_kernel( input, output, std::cerr);
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
+    kernel->load_file( TEST_PATH "/rv32-scall");
+    sim->set_kernel( kernel);
+    sim->init_checker();
+    sim->set_pc( kernel->get_start_pc());
+    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( sim->get_exit_code() == 0);
+    CHECK( output.str().compare( "This program calculates the sum of two numbers.\nEnter 1st number: Enter 2nd number: Sum: 12\n") == 0);
 }
