@@ -59,6 +59,7 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle)
 {
     writeback_instruction( *instr, cycle);
+    auto original_trap = instr->trap_type();
     kernel->handle_instruction( instr);
     auto result_trap = driver->handle_trap( *instr);
     checker.driver_step( *instr);
@@ -66,7 +67,7 @@ void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr,
         wp_halt->write( Trap( Trap::BREAKPOINT), cycle);     
     else
         wp_halt->write( result_trap, cycle);
-    if ( result_trap != Trap::NO_TRAP)
+    if ( result_trap != Trap::NO_TRAP || original_trap == Trap::SYSCALL)
         set_target( instr->get_actual_target(), cycle);
 }
 
