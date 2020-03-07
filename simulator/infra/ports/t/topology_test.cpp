@@ -101,7 +101,6 @@ TEST_CASE( "Topology: dump into file from root")
         CHECK( v.second == topology.get_child( "portmap." + v.first));
     }
     CHECK( exp_topology.get_child( "modulemap") == topology.get_child( "modulemap"));
-    CHECK( t.check_if_dumps());
 }
 
 TEST_CASE( "Topology: dump into file from module")

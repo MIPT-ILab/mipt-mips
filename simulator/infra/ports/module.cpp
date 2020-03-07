@@ -115,8 +115,8 @@ void Root::topology_dumping( bool dump, const std::string& filename)
 {
     if ( !dump)
         return;
+
     pt::ptree topology = topology_dumping_impl();
     pt::write_json( filename, topology);
-    sout.enable();
     sout << std::endl << "Module topology dumped into " + filename << std::endl;
 }

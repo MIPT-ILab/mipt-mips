@@ -68,17 +68,23 @@ class SimulatorFactory {
             emplace<T>( name + "be", Endian::big);
     }
 
+    std::string get_supported_isa_message() const
+    {
+        std::ostringstream oss;
+        oss << "Supported ISAs:" << std::endl;
+        for ( const auto& map_name : map)
+            oss << "\t" << map_name.first << std::endl;
+
+        return oss.str();
+    }
+
     auto get_factory( const std::string& name) const try
     {
         return map.at( name).get();
     }
     catch ( const std::out_of_range&)
     {
-        std::cout << "Supported ISAs:" << std::endl;
-        for ( const auto& map_name : map)
-            std::cout << "\t" << map_name.first << std::endl;
-
-        throw InvalidISA( name);
+        throw InvalidISA( name + "\n" + get_supported_isa_message());
     }
 
 public:

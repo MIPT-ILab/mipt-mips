@@ -36,12 +36,10 @@ std::shared_ptr<Kernel> Kernel::create_mars_kernel( std::istream& cin, std::ostr
     return ::create_mars_kernel( cin, cout, cerr);
 }
 
-std::shared_ptr<Kernel> Kernel::create_mars_kernel() {
-    return create_mars_kernel( std::cin, std::cout, std::cerr);
-}
-
 std::shared_ptr<Kernel> Kernel::create_configured_kernel() {
-    return config::use_mars ? create_mars_kernel() : Kernel::create_dummy_kernel();
+    return config::use_mars
+        ? Kernel::create_mars_kernel( std::cin, std::cout, std::cerr)
+        : Kernel::create_dummy_kernel();
 }
 
 Trap Kernel::execute_interactive()

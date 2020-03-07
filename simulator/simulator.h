@@ -21,7 +21,7 @@ struct BearingLost final : Exception {
 
 struct InvalidISA final : Exception
 {
-    explicit InvalidISA(const std::string& isa)
+    explicit InvalidISA( const std::string& isa)
         : Exception("Invalid ISA", isa)
     { }
 };
