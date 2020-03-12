@@ -8,9 +8,9 @@ RISCV_LD?=riscv64-unknown-elf-ld
 LD_FLAGS?=-melf32lriscv --no-relax
 
 # assemble all the object files 
-build_all: rv32-scall.bin
+build_all: rv32-scall
 
-rv32-scall.bin: rv32-scall.o
+rv32-scall: rv32-scall.o
 	@$(RISCV_LD) $(LD_FLAGS) $< -o $@
 	@echo $@ is built
 
