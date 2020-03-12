@@ -63,7 +63,7 @@ public:
     Writeback( Module* parent, Endian endian);
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
-    void init_checker( const FuncMemory& mem, std::string_view isa) { checker.init( endian, mem, kernel.get(), isa); }
+    void init_checker( std::string_view isa) { checker.init( endian, kernel.get(), isa); }
     void set_target( const Target& value, Cycle cycle);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }

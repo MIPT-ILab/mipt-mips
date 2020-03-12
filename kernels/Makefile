@@ -6,8 +6,9 @@ MIPS_AS?=mips-linux-gnu-as
 MIPS_LD?=mips-linux-gnu-ld
 
 RISCV_AS?=riscv64-unknown-elf-as
-AS_FLAGS?=-march=rv32i -mabi=ilp32
 RISCV_LD?=riscv64-unknown-elf-ld
+
+AS_FLAGS?=-march=rv32i -mabi=ilp32
 LD_FLAGS?=-melf32lriscv --no-relax
 
 # assemble all the object files 
@@ -25,7 +26,7 @@ riscv32.bin: riscv32.o
 	@$(RISCV_LD) $(LD_FLAGS) $< -o $@
 	@echo $@ is built
 
-riscv32.o: riscv_exceptions.s
+riscv32.o: riscv_exceptions.s Makefile
 	@$(RISCV_AS) $(AS_FLAGS) $< -o $@
 
 # it is needed to preven make from 

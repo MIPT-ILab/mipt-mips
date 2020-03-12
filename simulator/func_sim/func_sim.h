@@ -72,6 +72,7 @@ class FuncSim : public BasicFuncSim
         Addr get_pc() const final { return pc[0]; }
 
         size_t sizeof_register() const final { return bytewidth<RegisterUInt>; }
+        size_t max_cpu_register() const final { return Register::MAX_REG; }
 
         uint64 read_cpu_register( size_t regno) const final { return read_register( Register::from_cpu_index( regno)); }
         uint64 read_gdb_register( size_t regno) const final;
