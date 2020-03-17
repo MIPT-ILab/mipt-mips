@@ -11,6 +11,11 @@
 #include <mips/mips_register/mips_register.h>
 #include <simulator.h>
 
+#include <boost/iostreams/device/null.hpp>
+#include <boost/iostreams/stream.hpp>
+
+static boost::iostreams::stream<boost::iostreams::null_sink> nullout { boost::iostreams::null_sink{} };
+
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 {
     // Just call a constructor
@@ -163,7 +168,6 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
-    std::ostream nullout( nullptr);
     auto kernel = Kernel::create_mars_kernel( std::cin, nullout, nullout);
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
@@ -209,7 +213,6 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
     if ( enable_hooks)
         sim->enable_driver_hooks();
 
-    std::ostream nullout( nullptr);
     auto kernel = enable_mars
         ? Kernel::create_mars_kernel( std::cin, nullout, nullout)
         : Kernel::create_dummy_kernel();
