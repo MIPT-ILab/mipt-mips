@@ -46,6 +46,8 @@ private:
     void writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle);
     void writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);
+    void set_writeback_target( const Target& value, Cycle cycle);
+    void set_checker_target( const Target& value);
 
     /* Input */
     ReadPort<Instr>* rp_mem_datapath = nullptr;
