@@ -24,6 +24,7 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L10]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L10/Lecture%2010%20-%20Advanced%20Pipelining.pptx?raw=true
 [L11]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L11/Lecture%2011%20-%20Virtual%20Memory.pptx?raw=true
 [L12]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L12/Lecture%2012%20-%20ILP.%20Superscalar.%20OOO%20-%20part%201.pptx?raw=true
+[L13]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L13/Lecture%2013%20-%20OOO%20-%20part%202.pptx?raw=true
 [P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -44,6 +45,7 @@ Date   | Type     | Event
 10 Feb | Lecture  | **L10: Advanced Pipelining**<br>                      • Slides: [no audio][L10]
 17 Feb | Lecture  | **L11: Virtual Memory**<br>                           • Slides: [no audio][L11]
 02 Mar | Lecture  | **L12: ILP. Superscalar. OOO - part 1**<br>           • Slides: [no audio][L12]
+16 Mar | Lecture  | **L13: OOO - part 2**<br>                             • Slides: [no audio][L13]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
