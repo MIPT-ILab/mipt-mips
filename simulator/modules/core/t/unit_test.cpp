@@ -138,12 +138,12 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
     CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips-smc.bin", nullin, nullout, false)->run_no_limit(), CheckerMismatch);
 }
 
-TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace", "[!mayfail]")
+TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
     auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32ui-p-simple", nullin, nullout, false);
-    CHECK( sim->run_no_limit() == Trap::HALT); // FIXME: Unexpected exception CheckerMismatch
+    CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
