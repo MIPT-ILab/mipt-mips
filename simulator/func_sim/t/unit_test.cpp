@@ -34,7 +34,7 @@ static auto run_over_empty_memory( const std::string& isa)
     kernel->set_simulator( sim);
     kernel->connect_memory( m);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     return sim->run( 30);
 }
@@ -55,7 +55,7 @@ TEST_CASE( "FuncSim: get lost without pc")
     kernel->set_simulator( sim);
     kernel->connect_memory( m);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     CHECK_THROWS_AS( sim->run_no_limit(), BearingLost);
     CHECK( sim->get_exit_code() == 0);
@@ -71,7 +71,7 @@ TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init_and_load")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
     CHECK_NOTHROW( sim->set_pc( kernel->get_start_pc()) );
     CHECK( sim->get_exit_code() == 0);
@@ -86,7 +86,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
     sim->set_pc( kernel->get_start_pc());
@@ -108,7 +108,7 @@ TEST_CASE( "Run one instruction: Func_Sim")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
     sim->set_pc( kernel->get_start_pc());
@@ -172,7 +172,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
     sim->set_pc( kernel->get_start_pc());
@@ -191,7 +191,7 @@ TEST_CASE( "Torture_Test: MIPS32 calls without kernel")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
     sim->set_kernel( kernel);
 
     auto start_pc = kernel->get_start_pc();
@@ -229,15 +229,15 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
 
 TEST_CASE( "Torture_Test: Stop on trap")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true, false)->run( 1) == Trap::BREAKPOINT );
-    auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", true, false)->run( 10000);
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", true, false)->run( 1) == Trap::BREAKPOINT );
+    auto trap = get_simulator_with_test("mips32", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", true, false)->run( 10000);
     CHECK( trap != Trap::NO_TRAP );
     CHECK( trap != Trap::HALT );
 }
 
 TEST_CASE( "Torture_Test: MIPS32 calls ")
 {
-    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips-tt-no-delayed-branches.bin", false, true)->run( 10000) == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", false, true)->run( 10000) == Trap::HALT );
 }
 
 static bool riscv_tt( const std::string& isa, const std::string& name, bool enable_mars)
@@ -249,10 +249,10 @@ static bool riscv_tt( const std::string& isa, const std::string& name, bool enab
 
 TEST_CASE( "Torture_Test: integration")
 {
-    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips-tt-no-delayed-branches.bin", false, true)->run_no_limit() == Trap::HALT );
-    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips-tt.bin", false, true)->run_no_limit() == Trap::HALT );
-    CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple", false));
-    CHECK( riscv_tt("riscv32", TEST_PATH "/rv32ui-p-simple", true));
-    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64ui-p-simple", false));
-    CHECK( riscv_tt("riscv64", TEST_PATH "/rv64uc-p-rvc", false));
+    CHECK( get_simulator_with_test("mars",    TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", false, true)->run_no_limit() == Trap::HALT );
+    CHECK( get_simulator_with_test("mips32",  TEST_PATH "/mips/mips-tt.bin", false, true)->run_no_limit() == Trap::HALT );
+    CHECK( riscv_tt("riscv32", TEST_PATH "/riscv/rv32ui-p-simple", false));
+    CHECK( riscv_tt("riscv32", TEST_PATH "/riscv/rv32ui-p-simple", true));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/riscv/rv64ui-p-simple", false));
+    CHECK( riscv_tt("riscv64", TEST_PATH "/riscv/rv64uc-p-rvc", false));
 }

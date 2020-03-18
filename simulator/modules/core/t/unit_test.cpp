@@ -115,7 +115,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
-    auto sim = create_mars_sim( "mars", TEST_PATH "/mips-tt-no-delayed-branches.bin", nullin, nullout, false);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", nullin, nullout, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
@@ -124,7 +124,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
-    auto sim = create_mars_sim( "mars", TEST_PATH "/mips-tt-no-delayed-branches.bin", nullin, nullout, true);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", nullin, nullout, true);
     auto trap = sim->run_no_limit();
     CHECK_FALSE( trap == Trap::NO_TRAP);
     CHECK_FALSE( trap == Trap::HALT);
@@ -135,14 +135,14 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
-    CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips-smc.bin", nullin, nullout, false)->run_no_limit(), CheckerMismatch);
+    CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips/mips-smc.bin", nullin, nullout, false)->run_no_limit(), CheckerMismatch);
 }
 
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
-    auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32ui-p-simple", nullin, nullout, false);
+    auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32ui-p-simple", nullin, nullout, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
@@ -151,7 +151,7 @@ TEST_CASE( "Perf_sim: Syscall flushes pipeline")
 {
     std::istringstream input( "4\n8\n");
     std::ostream nullout( nullptr);
-    auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32-scall", input, nullout, false);
+    auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32-scall", input, nullout, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
 }
 
@@ -159,7 +159,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 breakpoint")
 {
     std::istream nullin( nullptr);
     std::ostringstream oss;
-    auto sim = create_mars_sim( "riscv32", TEST_PATH "/rv32ui-p-ebreak", nullin, oss, false);
+    auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32ui-p-ebreak", nullin, oss, false);
     CHECK( sim->run_no_limit() == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
     CHECK( oss.str() == "  Interrupt 3  occurred\n  Exception 3  occurred\n");
