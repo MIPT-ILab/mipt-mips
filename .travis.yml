@@ -73,7 +73,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 10000000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 10000000 --mars
   - gprof ./mipt-mips gmon.out -p | head -100
   - gprof ./mipt-mips gmon.out -q
   # TODO (pkryukov): run NPM on ARM
@@ -87,7 +87,7 @@ script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
     fi
 
 after_success:
@@ -100,7 +100,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
   - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator > /dev/null
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++

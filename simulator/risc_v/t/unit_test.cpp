@@ -596,3 +596,9 @@ TEST_CASE("RISCV RV128 unshfl")
     }
 }
 
+TEST_CASE("RISCV ecall")
+{
+    RISCVInstr<uint32> instr( "ecall", 0);
+    instr.execute();
+    CHECK( instr.trap_type() == Trap::SYSCALL);
+}

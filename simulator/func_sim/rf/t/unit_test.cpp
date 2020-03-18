@@ -13,22 +13,33 @@ using MIPS32Instr = BaseInstruction<uint32, MIPSRegister>;
 
 static_assert(MIPSRegister::MAX_REG >= 32);
 
-TEST_CASE( "RF: read_write_rf")
+static auto get_filled_rf()
 {
     auto rf = std::make_unique<RF<MIPS32Instr>>();
 
-    // Fill array using write() and check correctness using read()
     for( uint8 i = 0; i < 32; ++i)
     {
         rf->write( MIPSRegister::from_cpu_index(i), i);
 
         // Try to write something in zero register
         rf->write( MIPSRegister::zero(), i);
-
-        // Checks
-        CHECK( rf->read( MIPSRegister::from_cpu_index(i)) == i);
-        CHECK( rf->read( MIPSRegister::zero()) == 0U);
     }
+
+    return rf;
+}
+
+TEST_CASE( "RF: read_write_rf")
+{
+    auto rf = get_filled_rf();
+
+    CHECK( rf->read( MIPSRegister::zero()) == 0U);
+    for ( uint8 i = 1; i < 32; ++i)
+        CHECK( rf->read( MIPSRegister::from_cpu_index(i)) == i);
+}
+
+TEST_CASE( "RF mixed test")
+{
+    auto rf = get_filled_rf();
 
     for( uint8 i = 1; i < 32; ++i)
     {
@@ -72,25 +83,39 @@ TEST_CASE( "RF: read_write_rf")
         rf->write( MIPSRegister::from_cpu_index(i), 0x12345678U, 0xFF0000U);
         CHECK( rf->read( MIPSRegister::from_cpu_index(i)) == 0x348700U);
     }
+}
 
-    // Additional checks for mips_hi_lo
-    // Write 1 to HI and 0 to LO
+TEST_CASE( "MIPS RF: hi/lo")
+{
+    auto rf = std::make_unique<RF<MIPS32Instr>>();
+
     rf->write( MIPSRegister::mips_hi(), 1U);
     rf->write( MIPSRegister::mips_lo(), 0U);
 
     CHECK( rf->read( MIPSRegister::mips_hi()) == 1U);
     CHECK( rf->read( MIPSRegister::mips_lo()) == 0U);
+}
 
-    // Check accumulating writes
+TEST_CASE( "MIPS RF: accumulating subtraction")
+{
+    auto rf = std::make_unique<RF<MIPS32Instr>>();
+    rf->write( MIPSRegister::mips_hi(), 1U);
+    rf->write( MIPSRegister::mips_lo(), 0U);
+
     rf->write( MIPSRegister::mips_hi(), 0U, all_ones<uint32>(), -1 /* subtract */);
     rf->write( MIPSRegister::mips_lo(), 1U, all_ones<uint32>(), -1 /* subtract */);
     CHECK( rf->read( MIPSRegister::mips_hi()) == 0U);
     CHECK( rf->read( MIPSRegister::mips_lo()) == MAX_VAL32);
+}
 
-    // Check accumulating writes
+TEST_CASE( "MIPS RF: accumulating addition")
+{
+    auto rf = std::make_unique<RF<MIPS32Instr>>();
+    rf->write( MIPSRegister::mips_hi(), 0U);
+    rf->write( MIPSRegister::mips_lo(), MAX_VAL32);
+
     rf->write( MIPSRegister::mips_hi(), 0U, all_ones<uint32>(), +1 /* add */);
     rf->write( MIPSRegister::mips_lo(), 1U, all_ones<uint32>(), +1 /* add */);
     CHECK( rf->read( MIPSRegister::mips_hi()) == 1U);
     CHECK( rf->read( MIPSRegister::mips_lo()) == 0U);
 }
-
