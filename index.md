@@ -86,11 +86,8 @@ MIPT | Name | Score | Comments
 616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
-717 | Ivan Startsev | 2 | [#525](https://github.com/MIPT-ILab/mipt-mips/issues/525) |
-717 | Arsen Davtyan | 2 | [#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643) |
-612 | Danil Yarovoy | 2 | [T#4](https://github.com/MIPT-ILab/mips-traces/issues/4) |
-**81?** | **Maxim Davydov** | **1** | **[#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)** |
-516 | Ivan Korostelev | 1 | [#32](https://github.com/MIPT-ILab/mipt-mips/issues/32) |
+
+Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32)).
 
 RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, and Ilya Burtakov.
 
