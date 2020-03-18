@@ -87,7 +87,7 @@ script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
     fi
 
 after_success:
