@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class MARSKernel : public BaseKernel {
@@ -247,12 +248,19 @@ void MARSKernel::connect_mars_handler()
     elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
 }
 
+static bool is_mips_le( std::string_view isa)
+{
+    static std::unordered_set<std::string_view> isas =
+        { "mars", "mars64", "mips32le", "mips32", "mips64", "mips64le" };
+    return isas.count( isa) > 0;
+}
+
 void MARSKernel::connect_exception_handler()
 {
     auto isa = sim->get_isa();
     if ( isa == "riscv32" || isa == "riscv64")
         connect_riscv_handler();
-    else if ( isa == "mars" || isa == "mars64" || isa == "mips32le" || isa == "mips32") 
+    else if ( is_mips_le( isa))
         connect_mars_handler();
     else 
         throw UnsupportedISA( isa);
