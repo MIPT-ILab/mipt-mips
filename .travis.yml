@@ -100,7 +100,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
   - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator > /dev/null
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++
