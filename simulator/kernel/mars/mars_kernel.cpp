@@ -6,12 +6,14 @@
 
 #include "mars_kernel.h"
 
+#include <infra/macro.h>
 #include <kernel/base_kernel.h>
 #include <memory/elf/elf_loader.h>
 
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class MARSKernel : public BaseKernel {
@@ -39,9 +41,12 @@ class MARSKernel : public BaseKernel {
     static const constexpr uint64 first_user_descriptor = 3;
     uint64 next_descriptor = first_user_descriptor;
 
+    void connect_riscv_handler();
+    void connect_mars_handler();
+
 public:
     Trap execute() final;
-    void connect_memory( std::shared_ptr<FuncMemory> m) final;
+    void connect_exception_handler() final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
       : instream( instream), outstream( outstream), errstream( errstream) {}
@@ -228,9 +233,35 @@ void MARSKernel::read_from_file() {
     mem->memcpy_host_to_guest( buffer_ptr, byte_cast( buffer.data()), chars_to_read);
 }
 
-void MARSKernel::connect_memory( std::shared_ptr<FuncMemory> m)
+void MARSKernel::connect_riscv_handler()
 {
-    BaseKernel::connect_memory( m);
+    constexpr Addr TRAP_VECTOR = 0x8'000'0000;
+    sim->write_csr_register( "stvec", TRAP_VECTOR);
+    auto pc = trap_vector_address<Addr>( TRAP_VECTOR);
+    ElfLoader elf_loader( KERNEL_IMAGES "riscv32.bin");
+    elf_loader.load_to( mem.get(), pc - elf_loader.get_text_section_addr());
+}
+
+void MARSKernel::connect_mars_handler()
+{
     ElfLoader elf_loader( KERNEL_IMAGES "mars32_le.bin");
     elf_loader.load_to( mem.get(), 0x8'0000'0180 - elf_loader.get_text_section_addr());
+}
+
+static bool is_mips_le( std::string_view isa)
+{
+    static std::unordered_set<std::string_view> isas =
+        { "mars", "mars64", "mips32le", "mips32", "mips64", "mips64le" };
+    return isas.count( isa) > 0;
+}
+
+void MARSKernel::connect_exception_handler()
+{
+    auto isa = sim->get_isa();
+    if ( isa == "riscv32" || isa == "riscv64")
+        connect_riscv_handler();
+    else if ( is_mips_le( isa))
+        connect_mars_handler();
+    else 
+        throw UnsupportedISA( isa);
 }

@@ -19,12 +19,24 @@ Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "wri
 template<typename ISA>
 void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
 {
-    checker.set_target( value);
+    set_checker_target( value);
+    set_writeback_target( value, cycle);
+}
+
+template<typename ISA>
+void Writeback<ISA>::set_writeback_target( const Target& value, Cycle cycle)
+{
     next_PC = value.address;
     wp_trap->write( true, cycle);
     wp_target->write( value, cycle);
 }
-    
+
+template<typename ISA>
+void Writeback<ISA>::set_checker_target( const Target& value)
+{
+    checker.set_target( value);
+}
+
 template <typename ISA>
 auto Writeback<ISA>::read_instructions( Cycle cycle)
 {
@@ -59,6 +71,7 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle)
 {
     writeback_instruction( *instr, cycle);
+    bool has_syscall = instr->trap_type() == Trap::SYSCALL;
     kernel->handle_instruction( instr);
     auto result_trap = driver->handle_trap( *instr);
     checker.driver_step( *instr);
@@ -68,6 +81,8 @@ void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr,
         wp_halt->write( result_trap, cycle);
     if ( result_trap != Trap::NO_TRAP)
         set_target( instr->get_actual_target(), cycle);
+    if ( has_syscall)
+        set_writeback_target( instr->get_actual_target(), cycle);
 }
 
 template <typename ISA>

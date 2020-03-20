@@ -192,7 +192,11 @@ class FuncMemoryReplicant : public FuncMemory
 {
 public:
     explicit FuncMemoryReplicant( std::shared_ptr<FuncMemory> memory) : primary( std::move( memory)) { }
-    void add_replica( const std::shared_ptr<FuncMemory>& memory) { replicas.emplace_back( memory); }
+    void add_replica( const std::shared_ptr<FuncMemory>& memory)
+    {
+        replicas.emplace_back( memory);
+        primary->duplicate_to( memory);
+    }
 
     size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept final
     {

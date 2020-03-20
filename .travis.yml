@@ -63,7 +63,7 @@ install:
 before_script:
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then npm rebuild node-sass; fi
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_IPO=1 -G "Ninja"
   - cd $TRAVIS_BUILD_DIR/visualizer        && npm install
   - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
   - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
@@ -76,8 +76,8 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
   - ninja mipt-mips unit-tests mipt-v gdb-mips-sim
   - ctest --verbose
-  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
-  - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips-fib.bin -n 500000 --mars
+  - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
+  - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - cd $TRAVIS_BUILD_DIR/visualizer
   - npm run test
   # TODO (pkryukov): GDB build hangs on ARM...
@@ -85,7 +85,7 @@ script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips-tt.bin
+        ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
     fi
 
 after_success:
@@ -93,7 +93,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR/simulator/debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
   - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator > /dev/null
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++

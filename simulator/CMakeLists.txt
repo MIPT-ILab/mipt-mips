@@ -55,6 +55,7 @@ set(TESTS_CPPS
     risc_v/riscv_register/t/unit_test.cpp
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
+    risc_v/t/riscv32_driver_test.cpp
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
     func_sim/driver/t/unit_test.cpp
@@ -171,6 +172,7 @@ add_library(mipt-mips-src OBJECT
     mips/mips_driver.cpp
     risc_v/riscv_register/riscv_register.cpp
     risc_v/riscv_instr.cpp
+    risc_v/riscv_driver.cpp
     export/gdb/gdb_wrapper.cpp
     export/cen64/cen64_wrapper.cpp
     export/cache/runner.cpp
@@ -194,7 +196,10 @@ add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64
 add_executable(mipt-mips export/standalone/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
 add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} $<TARGET_OBJECTS:mipt-mips-src>)
 add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+
+# Symlink for new name
 add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
+add_dependencies(mipt-v mipt-mips)
 
 target_link_libraries(unit-tests mipt-mips-cen64-intf)
 
