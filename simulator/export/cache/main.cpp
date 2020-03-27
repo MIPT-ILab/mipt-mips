@@ -16,7 +16,7 @@ namespace config {
     static AliasedRequiredValue<std::string> file = { "t", "tracename", "file name with trace"};
 
     static AliasedValue<std::string> replacement = { "r", "replacement", "LRU", "Cache replacement scheme"};
-    static AliasedValue<uint32> line_size = { "l", "line_size", 64, "Line size of instruction level 1 cache (in bytes)"};
+    static Value<uint32> line_size = { "line_size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
 class Main : public MainWrapper
