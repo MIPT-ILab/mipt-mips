@@ -32,10 +32,11 @@ build_script:
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests"
+- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
+- if "%build%"=="msvc" move Release\*.exe .
 
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
+- .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
 - ctest -C Release --verbose
