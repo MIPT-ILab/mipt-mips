@@ -28,8 +28,7 @@ struct vr4300 : private PerfSim<MIPS64>
 public:
     vr4300() : PerfSim<MIPS64>( Endian::big, "mips64be")
     {
-         sout.enable();
-	 enable_logging( "cpu");
+         enable_logging( "cpu");
     }
 
     int init( std::shared_ptr<FuncMemory> mem);
