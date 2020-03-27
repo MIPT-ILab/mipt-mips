@@ -71,8 +71,8 @@ add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
 add_custom_command(
-    OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
+    OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/../riscv-bitmanip-opcodes
 )
 
@@ -189,7 +189,7 @@ add_library(mipt-mips-src OBJECT
     modules/writeback/writeback.cpp
     modules/writeback/checker/checker.cpp
     simulator.cpp
-    ${RISCV_DIR}/riscv.opcode.gen.h
+    ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
 )
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp $<TARGET_OBJECTS:mipt-mips-src>)
