@@ -38,5 +38,5 @@ build_script:
 
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
-- ..\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
+- .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
 - ctest -C Release --verbose
