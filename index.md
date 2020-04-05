@@ -19,7 +19,7 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
 [L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L6/Lecture%206%20-%20Pipelining.%20Data%20Hazards.pptx?raw=true
 [L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L7/Lecture%207%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
-[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches.pptx?raw=true
+[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches,%20part%201.pptx?raw=true
 [L9]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L9/Lecture%209%20-%20Caches%2C%20part%202.pptx?raw=true
 [L10]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L10/Lecture%2010%20-%20Advanced%20Pipelining.pptx?raw=true
 [L11]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L11/Lecture%2011%20-%20Virtual%20Memory.pptx?raw=true
