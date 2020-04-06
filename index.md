@@ -49,9 +49,9 @@ Date   | Type     | Event
 17 Feb | Lecture  | **L11: Virtual Memory**<br>                           • Slides: [no audio][L11]
 02 Mar | Lecture  | **L12: Instruction-Level Parallelism.<br> Superscalar. Out-of-Order, part 1**<br> • Slides: [no audio][L12]
 16 Mar | Lecture  | **L13: Out-of-Order, part 2**<br>                     • Slides: [no audio][L13]
-23 Mar | Lecture  | **L14: Out-of-Order, part 3: Loads and Stores**<br>   • Slides: [no audio][L14]
-30 Mar | Lecture  | **L15: Thread-Level Parallelism, part 1**<br>         • Slides: [no audio][L15]
-06 Apr | Lecture  | **L16: Thread-Level Parallelism, part 2**<br>         • Slides: [no audio][L16]
+23 Mar | Online<br>lecture  | **L14: Out-of-Order, part 3: Loads and Stores**<br>   • Slides: [no audio][L14]
+30 Mar | Online<br>lecture  | **L15: Thread-Level Parallelism, part 1**<br>         • Slides: [no audio][L15]
+06 Apr | Online<br>lecture  | **L16: Thread-Level Parallelism, part 2**<br>         • Slides: [no audio][L16]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
