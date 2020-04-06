@@ -47,11 +47,11 @@ Date   | Type     | Event
 07 Dec | Test     | **Final Test 1**<br>
 10 Feb | Lecture  | **L10: Advanced Pipelining**<br>                      • Slides: [no audio][L10]
 17 Feb | Lecture  | **L11: Virtual Memory**<br>                           • Slides: [no audio][L11]
-02 Mar | Lecture  | **L12: Instruction-Level Parallelism. Superscalar. Out-of-Order - part 1**<br>           • Slides: [no audio][L12]
-16 Mar | Lecture  | **L13: Out-of-Order - part 2**<br>                             • Slides: [no audio][L13]
-23 Mar | Lecture  | **L14: Out-of-Order - part 3, loads and stores**<br>           • Slides: [no audio][L14]
-30 Mar | Lecture  | **L15: Thread-Level Parallelism - part 1**<br>                             • Slides: [no audio][L15]
-06 Apr | Lecture  | **L16: THread-Level Parallelism - part 2**<br>                             • Slides: [no audio][L16]
+02 Mar | Lecture  | **L12: Instruction-Level Parallelism.<br> Superscalar. Out-of-Order, part 1**<br> • Slides: [no audio][L12]
+16 Mar | Lecture  | **L13: Out-of-Order, part 2**<br>                     • Slides: [no audio][L13]
+23 Mar | Lecture  | **L14: Out-of-Order, part 3: Loads and Stores**<br>   • Slides: [no audio][L14]
+30 Mar | Lecture  | **L15: Thread-Level Parallelism, part 1**<br>         • Slides: [no audio][L15]
+06 Apr | Lecture  | **L16: Thread-Level Parallelism, part 2**<br>         • Slides: [no audio][L16]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
