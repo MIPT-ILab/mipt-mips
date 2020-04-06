@@ -41,7 +41,8 @@ struct ALU
 
     template<typename I> static
     void check_halt_trap( I* instr) {
-        if ( instr->new_PC == 0)
+        // Handles 'goto nullptr;' and 'while (1);' cases
+        if ( instr->new_PC == 0 || instr->new_PC == instr->PC)
             instr->trap = Trap::HALT;
     }
 
