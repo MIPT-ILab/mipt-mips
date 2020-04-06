@@ -27,6 +27,7 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L13]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L13/Lecture%2013%20-%20OOO%20-%20part%202.pptx?raw=true
 [L14]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L14/Lecture%2014%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
 [L15]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L15/Lecture%2015%20-%20TLP%20-%20part%201.pptx?raw=true
+[L16]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L16/Lecture%2016%20-%20TLP%20-%20part%202%20(Multithreading,%20Synchronization).pptx?raw=true
 [P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -50,6 +51,7 @@ Date   | Type     | Event
 16 Mar | Lecture  | **L13: OOO - part 2**<br>                             • Slides: [no audio][L13]
 23 Mar | Lecture  | **L14: OOO - part 3, loads and stores**<br>           • Slides: [no audio][L14]
 30 Mar | Lecture  | **L15: TLP - part 1**<br>                             • Slides: [no audio][L15]
+06 Apr | Lecture  | **L16: TLP - part 2**<br>                             • Slides: [no audio][L16]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 
