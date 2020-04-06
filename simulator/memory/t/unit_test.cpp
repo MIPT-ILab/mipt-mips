@@ -48,6 +48,12 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
     CHECK_THROWS_AS( ElfLoader( "./1234567890/qwertyuiop"), InvalidElfFile);
 }
 
+TEST_CASE( "Func_memory_init: Process_Correct_ElfInit_BSS")
+{
+    auto ptr = FuncMemory::create_default_hierarchied_memory();
+    CHECK_NOTHROW( ElfLoader( TEST_PATH "/elf/qsort.riscv").load_to( ptr.get()));
+}
+
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
     CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0U /*address of the "__start" label*/);
