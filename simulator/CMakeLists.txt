@@ -17,6 +17,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
 option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
 option(ENABLE_IPO "Enable interprocedural optimizations" OFF)
+option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
+option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -114,6 +116,18 @@ endif()
 if (ENABLE_PROFILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+endif()
+
+if (ENABLE_ASAN)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+endif()
+
+if (ENABLE_UBSAN)
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
+   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=undefined -lgcc_s")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+       set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --rtlib=compiler-rt")
+   endif()
 endif()
 
 if (GDB_SOURCE_PATH)
