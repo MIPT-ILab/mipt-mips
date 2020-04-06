@@ -282,6 +282,17 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
 
+TEST_CASE( "Func_memory: memset")
+{
+    auto mem = FuncMemory::create_plain_memory( 24);
+
+    mem->memset( 0x1000, std::byte{'a'}, 16);
+    mem->memset( 0x1000, std::byte{'b'}, 8);
+
+    CHECK( mem->read<uint8, Endian::little>( 0x1000) == 'b');
+    CHECK( mem->read<uint8, Endian::little>( 0x1008) == 'a');
+}
+
 TEST_CASE( "Func_memory: ZeroMemory")
 {
     ZeroMemory zm;
