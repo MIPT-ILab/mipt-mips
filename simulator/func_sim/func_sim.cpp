@@ -5,15 +5,22 @@
 
 #include "driver/driver.h"
 #include "func_sim.h"
+
 #include <kernel/kernel.h>
+#include <infra/config/config.h>
 
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 
+namespace config {
+    static Value<uint32> ooo_window_size = { "ooo_window_size", 0, "size of OOO window (ROB)"};
+} // namespace config
+
 template <typename ISA>
 FuncSim<ISA>::FuncSim( Endian endian, bool log, std::string_view isa)
     : BasicFuncSim( isa)
+    , ooo_window( config::ooo_window_size)
     , imem( endian)
     , driver( ISA::create_driver( this))
 {
@@ -91,6 +98,7 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
         auto result_trap = driver_step( instr);
         if ( result_trap != Trap::NO_TRAP)
             return result_trap;
+        ooo_window.write_instruction( instr);
     }
     return Trap(Trap::BREAKPOINT);
 }

@@ -62,6 +62,7 @@ set(TESTS_CPPS
     func_sim/traps/t/unit_test.cpp
     func_sim/driver/t/unit_test.cpp
     func_sim/t/unit_test.cpp
+    func_sim/ooo_window/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
@@ -187,6 +188,7 @@ add_library(mipt-mips-src OBJECT
     func_sim/func_sim.cpp
     func_sim/driver/driver.cpp
     func_sim/traps/trap.cpp
+    func_sim/ooo_window/ooo_window.cpp
     mips/mips_instr.cpp
     mips/mips_register/mips_register.cpp
     mips/mips_driver.cpp

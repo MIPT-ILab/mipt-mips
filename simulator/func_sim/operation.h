@@ -234,7 +234,7 @@ public:
     using MyDatapath = Datapath<T>;
     using Register = R;
     using RegisterUInt = T;
-    R get_src_num( size_t index) const { return ( index == 0) ? src1 : src2; }
+    R get_src_num( size_t index) const;
     R get_dst_num()  const { return dst;  }
     R get_dst2_num() const { return dst2; }
 
@@ -250,6 +250,17 @@ protected:
     R dst  = R::zero();
     R dst2 = R::zero();
 };
+
+template<typename T, typename R>
+R BaseInstruction<T, R>::get_src_num( size_t index) const
+{
+    if ( index == 0)
+        return src1;
+    else if ( index == 1)
+        return src2;
+    else
+        return src3;
+}
 
 template<typename T, typename R>
 std::string BaseInstruction<T, R>::generate_disasm() const

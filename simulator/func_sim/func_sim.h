@@ -14,6 +14,7 @@
 #include <infra/exception.h>
 #include <memory/memory.h>
 #include <simulator.h>
+#include <func_sim/ooo_window/ooo_window.h>
 
 #include <memory>
 #include <string>
@@ -35,6 +36,7 @@ class FuncSim : public BasicFuncSim
     using RegisterUInt = typename ISA::RegisterUInt;
 
     private:
+        OOOWindow<FuncInstr> ooo_window;
         RF<FuncInstr> rf;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
