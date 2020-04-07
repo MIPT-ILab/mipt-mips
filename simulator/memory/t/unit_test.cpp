@@ -48,6 +48,12 @@ TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
     CHECK_THROWS_AS( ElfLoader( "./1234567890/qwertyuiop"), InvalidElfFile);
 }
 
+TEST_CASE( "Func_memory_init: Process_Correct_ElfInit_BSS")
+{
+    auto ptr = FuncMemory::create_default_hierarchied_memory();
+    CHECK_NOTHROW( ElfLoader( TEST_PATH "/elf/qsort.riscv").load_to( ptr.get()));
+}
+
 TEST_CASE( "Func_memory: StartPC_Method_Test")
 {
     CHECK( ElfLoader( valid_elf_file).get_startPC() == 0x4000b0U /*address of the "__start" label*/);
@@ -280,6 +286,17 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
 
     CHECK( mem1->dump() == mem2->dump());
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
+}
+
+TEST_CASE( "Func_memory: memset")
+{
+    auto mem = FuncMemory::create_plain_memory( 24);
+
+    mem->memset( 0x1000, std::byte{'a'}, 16);
+    mem->memset( 0x1000, std::byte{'b'}, 8);
+
+    CHECK( mem->read<uint8, Endian::little>( 0x1000) == 'b');
+    CHECK( mem->read<uint8, Endian::little>( 0x1008) == 'a');
 }
 
 TEST_CASE( "Func_memory: ZeroMemory")

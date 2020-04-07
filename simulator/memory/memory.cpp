@@ -50,6 +50,12 @@ void WriteableMemory::write_string_by_size( const std::string& value, Addr addr,
     memcpy_host_to_guest( addr, byte_cast( value.c_str()), size);
 }
 
+void WriteableMemory::memset( Addr dst, std::byte value, size_t size)
+{
+    for ( size_t i = 0; i < size; ++i)
+    	memcpy_host_to_guest( dst + i, &value, 1);
+}
+
 size_t ZeroMemory::memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept
 {
     std::fill_n( dst, size, std::byte{});
