@@ -203,17 +203,17 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sd,     execute_store<I>,  OUT_STORE,  'S', Imm::ADDR,  Src1::RS1,  Src2::RS2,  Dst::ZERO, 8,      64 | 128},
     // Immediate arithmetics
     {'I', instr_addi,   execute_addi<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
-    {'I', instr_slli,   execute_slli<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
-    {'I', instr_srli,   execute_srli<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
-    {'I', instr_srai,   execute_srai<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_slli,   execute_slli<I>,   OUT_ARITHM, '7', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_srli,   execute_srli<I>,   OUT_ARITHM, '7', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'I', instr_srai,   execute_srai<I>,   OUT_ARITHM, '7', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'I', instr_addiw,  execute_addiw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
-    {'I', instr_slliw,  execute_slliw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
-    {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
-    {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
+    {'I', instr_slliw,  execute_slliw<I>,  OUT_ARITHM, '5', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
+    {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, '5', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
+    {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, '5', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
     {'I', instr_addid,  execute_addid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
-    {'I', instr_sllid,  execute_sllid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
-    {'I', instr_srlid,  execute_srlid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
-    {'I', instr_sraid,  execute_sraid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_sllid,  execute_sllid<I>,  OUT_ARITHM, '6', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_srlid,  execute_srlid<I>,  OUT_ARITHM, '6', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_sraid,  execute_sraid<I>,  OUT_ARITHM, '6', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
     // Immediate logic and comparison
     {'I', instr_slti,   execute_slti<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'I', instr_sltiu,  execute_sltiu<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
