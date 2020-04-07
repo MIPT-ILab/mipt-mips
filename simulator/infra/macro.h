@@ -278,8 +278,8 @@ bool is_positive( T value)
     return !is_negative( value) && value != 0;
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_addition_overflow( T_src1 src1, T_src2 src2)
+template<typename T, typename T1, typename T2> static
+auto test_addition_overflow( T1 val1, T2 val2)
 {
     const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
     const bool is_overflow =
@@ -289,8 +289,8 @@ auto test_addition_overflow( T_src1 src1, T_src2 src2)
     return std::pair{ result, is_overflow};
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
+template<typename T, typename T1, typename T2> static
+auto test_subtraction_overflow( T1 val1, T2 val2)
 {
     const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
     const bool is_overflow =
