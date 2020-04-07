@@ -74,8 +74,8 @@ file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/opcodes-*)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} ${RISCV_DIR}/../riscv-bitmanip-opcodes > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES} ${RISCV_DIR}/../riscv-bitmanip-opcodes
+    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES}
 )
 
 if (MSVC)
