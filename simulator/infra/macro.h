@@ -266,33 +266,37 @@ T sign_extension( T value)
     return value;
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_addition_overflow( T_src1 src1, T_src2 src2)
+template<typename T>
+bool is_negative( T value)
 {
-    using T_src1_signed = sign_t<T_src1>;
-    using T_src2_signed = sign_t<T_src2>;
+    return (value & msb_set<T>()) != 0;
+}
 
-    auto val1 = narrow_cast<T_src1_signed>( src1);
-    auto val2 = narrow_cast<T_src2_signed>( src2);
-    auto result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
-    bool is_result_negative = (result & msb_set<T>()) != 0;
+template<typename T>
+bool is_positive( T value)
+{
+    return !is_negative( value) && value != 0;
+}
 
-    bool is_overflow = ( val1 > 0 && val2 > 0 && is_result_negative) || ( val1 < 0 && val2 < 0 && !is_result_negative);
+template<typename T, typename T1, typename T2> static
+auto test_addition_overflow( T1 val1, T2 val2)
+{
+    const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
+    const bool is_overflow =
+        ( is_positive( val1) && is_positive( val2) && is_negative( result)) ||
+        ( is_negative( val1) && is_negative( val2) && is_positive( result));
+
     return std::pair{ result, is_overflow};
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
+template<typename T, typename T1, typename T2> static
+auto test_subtraction_overflow( T1 val1, T2 val2)
 {
-    using T_src1_signed = sign_t<T_src1>;
-    using T_src2_signed = sign_t<T_src2>;
+    const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
+    const bool is_overflow =
+        ( is_positive( val1) && is_negative( val2) && is_negative( result)) ||
+        ( is_negative( val1) && is_positive( val2) && is_positive( result));
 
-    auto val1 = narrow_cast<T_src1_signed>( src1);
-    auto val2 = narrow_cast<T_src2_signed>( src2);
-    auto result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
-    bool is_result_negative = (result & msb_set<T>()) != 0;
-
-    bool is_overflow = ( val1 > 0 && val2 < 0 && is_result_negative) || ( val1 < 0 && val2 > 0 && !is_result_negative);
     return std::pair{ result, is_overflow};
 }
 
