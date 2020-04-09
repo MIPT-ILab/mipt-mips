@@ -43,7 +43,7 @@ before_build:
 build_script:
 - mkdir build
 - cd build
-- cmake ../simulator -G "%CMAKEFILE%"
+- cmake ../simulator -G "%CMAKEFILE%" -DENABLE_COVERAGE=1
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
 - if "%build%"=="msvc" move %configuration%\*.exe .
