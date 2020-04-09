@@ -23,8 +23,6 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory::create_default_hierarchied_memory( )); // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
