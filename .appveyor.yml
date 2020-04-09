@@ -5,6 +5,10 @@ branches:
   only:
   - master
 
+configuration:
+- Debug
+- Release
+
 environment:
   matrix:
   - build: msvc
@@ -19,6 +23,10 @@ environment:
   - build: g++
     platform: x64
     CMAKEFILE: "Ninja"
+    
+install:
+- choco install opencppcoverage
+- choco install codecov
 
 before_build:
 - git submodule update --init
@@ -31,12 +39,14 @@ before_build:
 build_script:
 - mkdir build
 - cd build
-- cmake ../simulator -G "%CMAKEFILE%"
+- cmake ../simulator -G "%CMAKEFILE%" -DCMAKE_BUILD_TYPE=%CONFIGURATION% 
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" move Release\*.exe .
+- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=%CONFIGURATION% /p:Platform=%platform% /nologo /m /verbosity:minimal
+- if "%build%"=="msvc" move %CONFIGURATION%\*.exe .
 
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
 - .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
-- ctest -C Release --verbose
+- ctest -C %CONFIGURATION% --verbose
+- if "%configuration%=="debug" OpenCppCoverage.exe --export_type cobertura:coverage.xml -- ctest -C %CONFIGURATION% -V
+- if "%configuration%=="debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%/simulator
