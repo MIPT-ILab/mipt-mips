@@ -36,14 +36,14 @@ build_script:
 - mkdir build
 - cd build
 - cmake ../simulator -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" move Release\*.exe .
+#- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
+#- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
+#- if "%build%"=="msvc" move Release\*.exe .
 
 test_script:
-- .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
-- .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
-- ctest -C Release --verbose
+#- .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
+#- .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
+#- ctest -C Release --verbose
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Debug /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" -- ctest -C Debug -V
+- if "%build%"=="msvc" OpenCppCoverage.exe --export_type cobertura:coverage.xml --cover_children --modules "*.exe" -- ctest -C Debug -V
 - if "%build%"=="msvc" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%
