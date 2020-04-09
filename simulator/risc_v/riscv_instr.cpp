@@ -29,6 +29,7 @@ template<typename I> auto execute_load = ALU::addr<I>;
 template<typename I> auto execute_store = ALU::store_addr<I>;
 template<typename I> auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
 template<typename I> auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
+template<typename I> auto execute_addid = ALU::riscv_addition_imm<I, uint64>;
 template<typename I> auto execute_slti = ALU::set<I, ALU::lti<I>>;
 template<typename I> auto execute_sltiu = ALU::set<I, ALU::ltiu<I>>;
 template<typename I> auto execute_xori = ALU::xori<I>;
@@ -36,10 +37,13 @@ template<typename I> auto execute_ori = ALU::ori<I>;
 template<typename I> auto execute_andi = ALU::andi<I>;
 template<typename I> auto execute_slli = ALU::sll<I, typename I::RegisterUInt>;
 template<typename I> auto execute_slliw = ALU::sll<I, uint32>;
+template<typename I> auto execute_sllid = ALU::sll<I, uint64>;
 template<typename I> auto execute_srli = ALU::srl<I, typename I::RegisterUInt>;
 template<typename I> auto execute_srliw = ALU::srl<I, uint32>;
+template<typename I> auto execute_srlid = ALU::srl<I, uint64>;
 template<typename I> auto execute_srai = ALU::sra<I, typename I::RegisterUInt>;
 template<typename I> auto execute_sraiw = ALU::sra<I, uint32>;
+template<typename I> auto execute_sraid = ALU::sra<I, uint64>;
 template<typename I> auto execute_add = ALU::riscv_addition<I, typename I::RegisterUInt>;
 template<typename I> auto execute_addw = ALU::riscv_addition<I, uint32>;
 template<typename I> auto execute_sub = ALU::riscv_subtraction<I, typename I::RegisterUInt>;
@@ -206,6 +210,10 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_slliw,  execute_slliw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
     {'I', instr_srliw,  execute_srliw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
     {'I', instr_sraiw,  execute_sraiw<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,      64 | 128},
+    {'I', instr_addid,  execute_addid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_sllid,  execute_sllid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_srlid,  execute_srlid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
+    {'I', instr_sraid,  execute_sraid<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0,           128},
     // Immediate logic and comparison
     {'I', instr_slti,   execute_slti<I>,   OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'I', instr_sltiu,  execute_sltiu<I>,  OUT_ARITHM, 'I', Imm::ARITH, Src1::RS1,  Src2::ZERO, Dst::RD,   0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
