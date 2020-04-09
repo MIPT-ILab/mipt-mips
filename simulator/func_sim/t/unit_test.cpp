@@ -14,7 +14,11 @@
 #include <boost/iostreams/device/null.hpp>
 #include <boost/iostreams/stream.hpp>
 
-static boost::iostreams::stream<boost::iostreams::null_sink> nullout { boost::iostreams::null_sink{} };
+static auto& nullout()
+{
+    static boost::iostreams::stream<boost::iostreams::null_sink> instance{ boost::iostreams::null_sink{} };
+    return instance;
+}
 
 TEST_CASE( "Process_Wrong_Args_Of_Constr: Func_Sim_init")
 {
@@ -168,7 +172,7 @@ TEST_CASE( "Run_SMC_trace: Func_Sim")
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
-    auto kernel = Kernel::create_mars_kernel( std::cin, nullout, nullout);
+    auto kernel = Kernel::create_mars_kernel( std::cin, nullout(), nullout());
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
@@ -214,7 +218,7 @@ static auto get_simulator_with_test( const std::string& isa, const std::string& 
         sim->enable_driver_hooks();
 
     auto kernel = enable_mars
-        ? Kernel::create_mars_kernel( std::cin, nullout, nullout)
+        ? Kernel::create_mars_kernel( std::cin, nullout(), nullout())
         : Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);

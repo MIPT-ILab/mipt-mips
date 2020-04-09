@@ -128,6 +128,7 @@ class DataBypass
         {
             auto idx = num.to_rf_index();
             assert( idx <= scoreboard.size());
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed
             return scoreboard[ idx];
         }
 
@@ -135,6 +136,7 @@ class DataBypass
         {
             auto idx = num.to_rf_index();
             assert( idx <= scoreboard.size());
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed
             return scoreboard[ idx];
         }
 
