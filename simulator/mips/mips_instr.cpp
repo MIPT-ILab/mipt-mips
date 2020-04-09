@@ -693,7 +693,7 @@ static MIPSTableEntry<I> unknown_instruction =
 { "Unknown instruction", mips_unknown<I> , OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
-static MIPSTableEntry<I> nop =
+static MIPSTableEntry<I> instr_nop =
 { "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
@@ -757,7 +757,7 @@ static MIPSTableEntry<I> get_table_entry( uint32 bytes)
     MIPSInstrDecoder instr( bytes);
 
     if ( instr.bytes == 0)
-        return nop<I>;
+        return instr_nop<I>;
 
     switch ( instr.opcode)
     {
@@ -783,7 +783,7 @@ template<typename I>
 static MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 {
     if ( str_opcode == "nop")
-        return nop<I>;
+        return instr_nop<I>;
 
     for ( const auto& map : all_isa_maps<I>)
     {
