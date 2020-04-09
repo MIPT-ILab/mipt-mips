@@ -34,12 +34,6 @@ TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
     CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
-TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
-{
-    auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
-    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
-}
-
 TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 {
     // test behavior when the file name does not exist
