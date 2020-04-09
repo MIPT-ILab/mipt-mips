@@ -45,5 +45,5 @@ test_script:
 - .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
 - ctest -C Release --verbose
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Debug /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" OpenCppCoverage.exe --export_type cobertura:coverage.xml -- ctest -C Debug -V
-- if "%build%"=="msvc" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%/simulator
+- if "%build%"=="msvc" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" -- ctest -C Debug -V
+- if "%build%"=="msvc" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%
