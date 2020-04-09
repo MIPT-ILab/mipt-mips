@@ -247,7 +247,7 @@ TEST_CASE( "Func_memory: Dump")
 TEST_CASE( "Func_memory: Duplicate")
 {
     auto mem1 = FuncMemory::create_default_hierarchied_memory();
-    auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+    auto mem2 = FuncMemory::create_default_hierarchied_memory();
 
     ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
