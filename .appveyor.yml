@@ -46,4 +46,4 @@ test_script:
 - ctest -C Release --verbose
 - if "%configuration%=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Debug /p:Platform=%platform% /nologo /m /verbosity:minimal
 - if "%configuration%=="msvc" OpenCppCoverage.exe --export_type cobertura:coverage.xml -- ctest -C Debug -V
-- if "%configuration%=="debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%/simulator
+- if "%configuration%=="msvc" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%/simulator
