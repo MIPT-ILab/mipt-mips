@@ -301,14 +301,14 @@ TEST_CASE( "Func_memory: memset")
 
 TEST_CASE( "Func_memory: ZeroMemory")
 {
-    ZeroMemory zm;
-    CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
-    CHECK( zm.dump() == "empty memory\n");
+    auto zm = ReadableMemory::create_zero_memory();
+    CHECK( zm->read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm->dump() == "empty memory\n");
 }
 
 TEST_CASE( "Func_memory: String length in zero memory")
 {
-    CHECK( ZeroMemory().strlen(0x10) == 0);
+    CHECK( ReadableMemory::create_zero_memory()->strlen(0x10) == 0);
 }
 
 TEST_CASE( "Zero_memory: Duplicate")
@@ -318,7 +318,7 @@ TEST_CASE( "Zero_memory: Duplicate")
 
     ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
-    ZeroMemory().duplicate_to( mem1); // nop
+    ReadableMemory::create_zero_memory()->duplicate_to( mem1); // nop
 
     check_coherency( mem1.get(), mem2.get(), 0);
 }

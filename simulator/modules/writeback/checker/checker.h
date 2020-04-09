@@ -4,6 +4,9 @@
  * Copyright 2015-2019 MIPT-MIPS
  */
  
+#ifndef CHECKER_H
+#define CHECKER_H
+ 
 #include <func_sim/func_sim.h>
 
 struct CheckerMismatch final : Exception
@@ -28,3 +31,5 @@ private:
     std::shared_ptr<FuncSim<ISA>> sim;
     bool active = false;
 };
+
+#endif // CHECKER_H
