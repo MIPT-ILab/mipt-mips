@@ -3,6 +3,9 @@
  * @author Vyacheslav Kompan kompan.vo@phystech.edu
  * Copyright 2019 MIPT-MIPS
  */
+ 
+#ifndef BASE_KERNEL_H
+#define BASE_KERNEL_H
 
 #include "kernel.h"
 #include "replicant.h"
@@ -22,3 +25,5 @@ public:
     void add_replica_memory( const std::shared_ptr<FuncMemory>& s) override { mem->add_replica( s); }
     void load_file( const std::string& name) override;
 };
+
+#endif // BASE_KERNEL_H

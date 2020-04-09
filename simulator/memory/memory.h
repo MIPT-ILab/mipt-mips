@@ -52,6 +52,8 @@ class WriteableMemory;
 class ReadableMemory : public DestructableMemory
 {
 public:
+    static std::shared_ptr<ReadableMemory> create_zero_memory();
+
     virtual size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
     virtual std::string dump() const = 0;
@@ -87,15 +89,6 @@ void ReadableMemory::load( Instr* instr) const
     instr->load( value);
 }
 
-class ZeroMemory : public ReadableMemory
-{
-public:
-    size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
-    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
-    std::string dump() const final { return std::string( "empty memory\n"); }
-    size_t strlen( Addr /* addr */) const final { return 0; }
-};
-
 class WriteableMemory : public DestructableMemory
 {
 public:
@@ -120,7 +113,7 @@ public:
     void write_string( const std::string& value, Addr addr);
     void write_string_limited( const std::string& value, Addr addr, size_t size);
 
-    void memset( Addr start, std::byte value, size_t size);
+    void memset( Addr addr, std::byte value, size_t size);
 private:
     void write_string_by_size( const std::string& value, Addr addr, size_t size);
 };

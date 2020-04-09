@@ -689,22 +689,22 @@ static const std::vector<const Table<I>*> all_isa_maps =
 };
 
 template<typename I>
-MIPSTableEntry<I> unknown_instruction =
+static MIPSTableEntry<I> unknown_instruction =
 { "Unknown instruction", mips_unknown<I> , OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
-MIPSTableEntry<I> nop =
+static MIPSTableEntry<I> nop =
 { "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, { }, Dst::ZERO, MIPS_I_Instr};
 
 template<typename I>
-MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
+static MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 {
     auto it = table.find( key);
     return it == table.end() ? unknown_instruction<I> : it->second;
 }
 
 template<typename I>
-MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
+static MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
         return get_table_entry( isaMapMOVCI<I>, instr.ft);
@@ -712,7 +712,7 @@ MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
+static MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_s<I>, instr.ft);
@@ -720,7 +720,7 @@ MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
+static MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
         return get_table_entry( isaMapMOVCF_d<I>, instr.ft);
@@ -728,7 +728,7 @@ MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
+static MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.funct)
     {
@@ -738,7 +738,7 @@ MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
+static MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
     {
@@ -752,7 +752,7 @@ MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_table_entry( uint32 bytes)
+static MIPSTableEntry<I> get_table_entry( uint32 bytes)
 {
     MIPSInstrDecoder instr( bytes);
 
@@ -772,7 +772,7 @@ MIPSTableEntry<I> get_table_entry( uint32 bytes)
 }
 
 template<typename M>
-auto find_entry( const M& map, std::string_view name)
+static auto find_entry( const M& map, std::string_view name)
 {
     return std::find_if( map.begin(), map.end(), [name]( const auto& e) {
         return e.second.name == name;
@@ -780,7 +780,7 @@ auto find_entry( const M& map, std::string_view name)
 }
 
 template<typename I>
-MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
+static MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 {
     if ( str_opcode == "nop")
         return nop<I>;
