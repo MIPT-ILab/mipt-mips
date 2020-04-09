@@ -35,7 +35,7 @@ before_build:
 build_script:
 - mkdir build
 - cd build
-- cmake ../simulator -G "%CMAKEFILE%" -DCMAKE_BUILD_TYPE=Release
+- cmake ../simulator -G "%CMAKEFILE%"
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
 - if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
 - if "%build%"=="msvc" move Release\*.exe .
