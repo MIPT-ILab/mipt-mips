@@ -200,6 +200,9 @@ struct RISCVInstrDecoder
     {
         switch (subset) {
         case 'I': return I_imm;
+        case '5': return I_imm & bitmask<uint32>( 5);
+        case '6': return I_imm & bitmask<uint32>( 6);
+        case '7': return I_imm & bitmask<uint32>( 7);
         case 'B': return get_B_immediate();
         case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
         case 'U': return U_imm;
@@ -236,11 +239,14 @@ struct RISCVInstrDecoder
     static R get_immediate( char subset, uint32 value) noexcept
     {
         switch (subset) {
-        case I:
-        case B:
-        case S:          return sign_extension<12, R>( value);
-        case U:
-        case J:          return sign_extension<20, R>( value);
+        case '5':
+        case '6':
+        case '7':        return value & bitmask<R>( log_bitwidth<R>);
+        case 'I':
+        case 'B':
+        case 'S':        return sign_extension<12, R>( value);
+        case 'U':
+        case 'J':        return sign_extension<20, R>( value);
         case C_I:        return sign_extension<6, R>( value);
         case C_J:        return sign_extension<12, R>( value);
         case C_B:        return sign_extension<9, R>( value);

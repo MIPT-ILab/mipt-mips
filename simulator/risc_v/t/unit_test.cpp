@@ -22,7 +22,6 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint32>(0x30200073).get_disasm() == "mret");
     CHECK( RISCVInstr<uint32>(0x30202373).get_disasm() == "csrrs $medeleg, $t1, $zero");
     CHECK( RISCVInstr<uint32>(0x30205073).get_disasm() == "csrrwi $medeleg, $zero, 0x0");
-    CHECK( RISCVInstr<uint128>(0x4070df5b).get_disasm() == "sraid $t5, $ra, 1031");
     CHECK( RISCVInstr<uint32>    (0x4082).get_disasm() == "c_lwsp $ra, 0x0($sp)");
     CHECK( RISCVInstr<uint32>    (0xdf86).get_disasm() == "c_swsp $ra, 0xfc($sp)");
     CHECK( RISCVInstr<uint64>    (0x6082).get_disasm() == "c_ldsp $ra, 0x0($sp)");
@@ -65,6 +64,14 @@ TEST_CASE("RISCV disassembly")
     CHECK( RISCVInstr<uint64>    (0x9e99).get_disasm() == "c_subw $a3, $a4");
     CHECK( RISCVInstr<uint32>    (0x9002).get_disasm() == "c_ebreak");
     CHECK( RISCVInstr<uint32>    (0x0001).get_disasm() == "c_nop");
+}
+
+TEST_CASE("RISCV srai disassembly")
+{
+    CHECK( RISCVInstr<uint32>( 0x4028d713).get_disasm()  == "srai $a4, $a7, 2");
+    CHECK( RISCVInstr<uint64>( 0x4028d713).get_disasm()  == "srai $a4, $a7, 2");
+    CHECK( RISCVInstr<uint64>( 0x4070df1b).get_disasm()  == "sraiw $t5, $ra, 7");
+    CHECK( RISCVInstr<uint128>( 0x4070df5b).get_disasm() == "sraid $t5, $ra, 7");
 }
 
 TEST_CASE("RISCV invalid instruction")
