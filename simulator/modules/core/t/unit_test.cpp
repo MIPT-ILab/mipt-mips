@@ -9,14 +9,20 @@
 #include <modules/core/perf_sim.h>
 #include <modules/writeback/writeback.h>
 
-TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
+static void check_init( const std::string& isa)
 {
     // Just call a constructor
-    auto sim = Simulator::create_simulator( "mips32", false);
+    auto sim = Simulator::create_simulator( isa, false);
     auto mem = FuncMemory::create_default_hierarchied_memory();
     CHECK_NOTHROW( sim->set_memory( mem));
     CHECK( sim->get_exit_code() == 0);
     CHECK( sim->max_cpu_register() >= 32);
+}
+
+TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
+{
+    for ( auto isa : Simulator::get_supported_isa())
+        check_init( isa);
 }
 
 TEST_CASE( "Perf_Sim_init: push a nop")

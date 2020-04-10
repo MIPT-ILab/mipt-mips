@@ -17,6 +17,8 @@
 
 #include "simulator.h"
 
+#include <algorithm>
+
 namespace config {
     static AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
     static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
@@ -72,8 +74,8 @@ class SimulatorFactory {
     {
         std::ostringstream oss;
         oss << "Supported ISAs:" << std::endl;
-        for ( const auto& map_name : map)
-            oss << "\t" << map_name.first << std::endl;
+        for ( const auto& isa : get_supported_isa())
+            oss << "\t" << isa << std::endl;
 
         return oss.str();
     }
@@ -87,7 +89,6 @@ class SimulatorFactory {
         throw InvalidISA( name + "\n" + get_supported_isa_message());
     }
 
-public:
     SimulatorFactory()
     {
         emplace_all_endians<MIPSI>( "mipsI");
@@ -103,6 +104,20 @@ public:
         emplace_all_endians<RISCV128>( "riscv128");
     }
 
+public:
+    static SimulatorFactory& get_instance()
+    {
+        static SimulatorFactory sf;
+        return sf;
+    }
+
+    std::vector<std::string> get_supported_isa() const
+    {
+        std::vector<std::string> result( map.size());
+        std::transform( map.begin(), map.end(), result.begin(), [](const auto& e) { return e.first; });
+        return result;
+    }
+
     auto get_funcsim( const std::string& name, bool log) const
     {
         return get_factory( name)->get_funcsim( log);
@@ -112,14 +127,14 @@ public:
     {
         return get_factory( name)->get_perfsim();
     }
-    
-    static SimulatorFactory& get_instance()
-    {
-        static SimulatorFactory sf;
-        return sf;
-    }
 };
-    
+
+std::vector<std::string>
+Simulator::get_supported_isa()
+{
+    return SimulatorFactory::get_instance().get_supported_isa();
+}
+
 std::shared_ptr<Simulator>
 Simulator::create_simulator( const std::string& isa, bool functional_only, bool log)
 {

@@ -14,6 +14,8 @@
 #include <infra/types.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 struct BearingLost final : Exception {
     BearingLost() : Exception("Bearing lost", "10 nops in a row") { }
@@ -72,6 +74,7 @@ public:
 
     Trap run_no_limit() { return run( MAX_VAL64); }
 
+    static std::vector<std::string> get_supported_isa();
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only, bool log);
     static std::shared_ptr<Simulator> create_simulator( const std::string& isa, bool functional_only);
     static std::shared_ptr<Simulator> create_configured_simulator();
