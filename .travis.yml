@@ -49,7 +49,7 @@ install:
 # Download GDB
   - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
   - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
-  - if [ "$CC" == "clang" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
+  - if [ "$CC" == "clang" ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
   - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
   - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
   - tar -xzf gdb-9.1.tar.gz
