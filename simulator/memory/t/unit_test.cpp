@@ -23,8 +23,6 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory::create_default_hierarchied_memory( )); // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
@@ -33,12 +31,6 @@ TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
 {
     auto ptr = FuncMemory::create_default_hierarchied_memory();
-    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
-}
-
-TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
-{
-    auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
     CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
@@ -255,7 +247,7 @@ TEST_CASE( "Func_memory: Dump")
 TEST_CASE( "Func_memory: Duplicate")
 {
     auto mem1 = FuncMemory::create_default_hierarchied_memory();
-    auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+    auto mem2 = FuncMemory::create_default_hierarchied_memory();
 
     ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
