@@ -4,7 +4,7 @@
  * Copyright 2012-2018 uArchSim iLab project
  */
 
-#include "memory.h"
+#include <memory/memory.h>
 
 #include <sstream>
 #include <vector>
