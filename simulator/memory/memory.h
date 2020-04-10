@@ -22,16 +22,12 @@
 
 struct FuncMemoryBadMapping final : Exception
 {
-    explicit FuncMemoryBadMapping( const std::string& msg)
-        : Exception( "Invalid FuncMemory mapping", msg)
-    { }
+    explicit FuncMemoryBadMapping( const std::string& msg);
 };
 
 struct FuncMemoryOutOfRange final : Exception
 {
-    explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
-        : Exception( "Out of memory range", generate_string( addr, mask))
-    { }
+    explicit FuncMemoryOutOfRange( Addr addr, Addr mask);
 private:
     static std::string generate_string( Addr addr, Addr mask);
 };
@@ -39,12 +35,12 @@ private:
 class DestructableMemory
 {
 public:
-    DestructableMemory() = default;
-    virtual ~DestructableMemory() = default;
-    DestructableMemory( const DestructableMemory&) = default;
-    DestructableMemory( DestructableMemory&&) = default;
-    DestructableMemory& operator=( const DestructableMemory&) = default;
-    DestructableMemory& operator=( DestructableMemory&&) = default;
+    DestructableMemory();
+    virtual ~DestructableMemory();
+    DestructableMemory( const DestructableMemory&) = delete;
+    DestructableMemory( DestructableMemory&&) = delete;
+    DestructableMemory& operator=( const DestructableMemory&) = delete;
+    DestructableMemory& operator=( DestructableMemory&&) = delete;
 };
 
 class WriteableMemory;
