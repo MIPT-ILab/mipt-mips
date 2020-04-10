@@ -9,6 +9,24 @@
 #include <sstream>
 #include <vector>
 
+FuncMemoryBadMapping::FuncMemoryBadMapping( const std::string& msg) :
+    Exception( "Invalid FuncMemory mapping", msg)
+{ }
+
+FuncMemoryOutOfRange::FuncMemoryOutOfRange( Addr addr, Addr mask) :
+    Exception( "Out of memory range", generate_string( addr, mask))
+{ }
+
+std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
+{
+    std::ostringstream oss;
+    oss <<  "address: 0x" << std::hex << addr << "; max address: 0x" << mask;
+    return oss.str();
+}
+
+DestructableMemory::DestructableMemory() = default;
+DestructableMemory::~DestructableMemory() = default;
+
 class ZeroMemory : public ReadableMemory
 {
 public:
@@ -23,12 +41,6 @@ std::shared_ptr<ReadableMemory> ReadableMemory::create_zero_memory()
     return std::make_shared<ZeroMemory>();
 }
 
-std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
-{
-    std::ostringstream oss;
-    oss <<  "address: 0x" << std::hex << addr << "; max address: 0x" << mask;
-    return oss.str();
-}
 
 std::string ReadableMemory::read_string( Addr addr) const
 {
