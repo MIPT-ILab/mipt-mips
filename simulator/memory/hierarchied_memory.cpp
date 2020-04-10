@@ -5,11 +5,11 @@
  * Copyright 2012-2018 uArchSim iLab project
  */
 
-#include "memory.h"
 
 // MIPT-MIPS modules
 #include <infra/macro.h>
 #include <infra/types.h>
+#include <memory/memory.h>
 
 // Generic C++
 #include <cassert>
