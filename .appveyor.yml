@@ -30,7 +30,7 @@ environment:
 
 install:
 - if "%configuration%"=="Debug" choco install opencppcoverage codecov
-- set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;C:\Program Files\OpenCppCoverage;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
 
 before_build:
 - git submodule update --init
