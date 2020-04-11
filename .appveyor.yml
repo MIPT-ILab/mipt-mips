@@ -36,7 +36,6 @@ install:
 
 before_build:
 - git submodule update --init
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
 - if "%platform%"=="x86" set platform=Win32 # oh dear
 
 build_script:
