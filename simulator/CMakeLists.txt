@@ -110,7 +110,7 @@ if (COMPILER_SUPPORTS_MARCH_NATIVE)
 endif()
 
 if (ENABLE_COVERAGE)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DNDEBUG") # exclude 'assert' macro
+    add_definitions(-DNDEBUG) # exclude 'assert' macro
     if (NOT MSVC)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage -g -fno-inline")
         # add_link_options(--coverage)
@@ -218,8 +218,10 @@ add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} 
 add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
 
 # Symlink for new name
-add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
-add_dependencies(mipt-v mipt-mips)
+if (NOT MSVC)
+    add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
+    add_dependencies(mipt-v mipt-mips)
+endif()
 
 target_link_libraries(unit-tests mipt-mips-cen64-intf)
 
