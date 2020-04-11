@@ -10,15 +10,15 @@ environment:
   - build: msvc
     platform: x64
     configuration: Debug
-    CMAKEFILE: "Visual Studio 16 Win64"
+    CMAKEFILE: "Visual Studio 16 2019"
   - build: msvc
     platform: x64
     configuration: Release
-    CMAKEFILE: "Visual Studio 16 Win64"
+    CMAKEFILE: "Visual Studio 16 2019"
   - build: msvc
     platform: Win32
     configuration: Release
-    CMAKEFILE: "Visual Studio 16"
+    CMAKEFILE: "Visual Studio 16 2019"
   - build: g++
     MSYSTEM: mingw64
     configuration: Release
