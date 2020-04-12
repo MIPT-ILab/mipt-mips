@@ -29,7 +29,7 @@ static auto init( const std::string& isa)
 
 TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
 {
-    for ( auto isa : Simulator::get_supported_isa()) {
+    for ( const auto& isa : Simulator::get_supported_isa()) {
         auto sim = init( isa);          
         CHECK( sim->get_exit_code() == 0);
         CHECK( sim->max_cpu_register() >= 32);
