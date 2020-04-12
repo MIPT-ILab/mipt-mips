@@ -27,8 +27,8 @@ matrix:
 
 install:
 - if "%configuration%"=="Debug" choco install opencppcoverage codecov
-- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;C:\msys64\usr\bin\;%PATH%
-- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;C:\msys64\usr\bin\;%PATH%
+- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
+- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
 - set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
 
 before_build:
@@ -38,7 +38,7 @@ build_script:
 - mkdir build && cd build
 - if not "%build%"=="msvc" cmake ../simulator -G Ninja
 - if "%build%"=="msvc"     cmake ../simulator -G "Visual Studio 16 2019" -A %platform% -DENABLE_COVERAGE=1
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
+- if not "%build%"=="msvc" ninja mipt-mips unit-tests cachesim
 - if "%build%"=="msvc"     MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
 - if "%build%"=="msvc"     move %configuration%\*.exe .
 
