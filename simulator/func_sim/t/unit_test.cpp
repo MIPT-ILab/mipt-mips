@@ -90,7 +90,7 @@ TEST_CASE( "Make_A_Step: Func_Sim")
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    kernel->load_file( TEST_PATH "/mips/mips-tt-no-delayed-branches.bin");
+    kernel->load_file( TEST_PATH "/mips/mips-smc.bin");
     sim->set_kernel( kernel);
 
     sim->set_pc( kernel->get_start_pc());

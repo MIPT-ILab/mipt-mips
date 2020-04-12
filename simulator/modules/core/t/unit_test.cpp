@@ -9,35 +9,48 @@
 #include <modules/core/perf_sim.h>
 #include <modules/writeback/writeback.h>
 
-static void check_init( const std::string& isa)
+static auto init( const std::string& isa)
 {
     // Just call a constructor
     auto sim = Simulator::create_simulator( isa, false);
     auto mem = FuncMemory::create_default_hierarchied_memory();
-    CHECK_NOTHROW( sim->set_memory( mem));
-    CHECK( sim->get_exit_code() == 0);
-    CHECK( sim->max_cpu_register() >= 32);
-}
-
-TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
-{
-    for ( auto isa : Simulator::get_supported_isa())
-        check_init( isa);
-}
-
-TEST_CASE( "Perf_Sim_init: push a nop")
-{
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
-    auto mem = FuncMemory::create_default_hierarchied_memory();
-    sim->set_memory( mem);
 
     auto kernel = Kernel::create_dummy_kernel();
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
-    sim->set_kernel( kernel);
 
+    sim->set_kernel( kernel);
+    sim->set_memory( mem);
     sim->init_checker();
+
+    return sim;
+}
+
+TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
+{
+    for ( auto isa : Simulator::get_supported_isa()) {
+        auto sim = init( isa);          
+        CHECK( sim->get_exit_code() == 0);
+        CHECK( sim->max_cpu_register() >= 32);
+    }
+}
+
+TEST_CASE( "Perf_Sim_init: Default configuration")
+{
+    auto sim = Simulator::create_configured_simulator();
+    CHECK( sim->get_isa() == "mars");
+}
+
+TEST_CASE( "Perf_Sim_init: Default configuration and isa")
+{
+    auto sim = Simulator::create_configured_isa_simulator("riscv32");
+    CHECK( sim->get_isa() == "riscv32");
+}
+
+TEST_CASE( "Perf_Sim_init: push a nop")
+{
+    auto sim = init( "mips32");
     sim->set_pc( 0x10);
 
     CHECK_NOTHROW( sim->get_pc() == 0x10);
