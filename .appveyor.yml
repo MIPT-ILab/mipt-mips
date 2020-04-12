@@ -5,9 +5,10 @@ branches:
   only:
   - master
 
-build:
-  - msvc
-  - g++
+environment:
+  matrix:
+  - build: msvc
+  - build: g++
 
 platform:
   - Win32
