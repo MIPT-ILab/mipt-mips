@@ -5,6 +5,8 @@
 
 #include "config.h"
 #include <popl.hpp>
+
+#include <cassert>
 #include <sstream>
 
 namespace config {
@@ -45,15 +47,13 @@ static void add_option( popl::OptionParser* options, std::string_view alias, std
     else
         options->add<popl::Value<T>, popl::Attribute::required>( std::string( alias), std::string( name), std::string( desc), default_value, value);
 }
-catch ( const std::runtime_error& e)
+catch ( const std::exception& e)
 {
-    std::cerr << "Bad option setup for '" << name << "' (" << e.what() << ")" << std::endl;
-    std::terminate();
+    std::cerr << "Bad option setup for '" << name << "' \n" << e.what() << std::endl;
 }
 catch ( ...)
 {
-    std::cerr << "Bad option setup for '" << name << "' ( unknown exception )" << std::endl;
-    std::terminate();
+    assert( false);
 }   
 
 template<typename T, Type type>
