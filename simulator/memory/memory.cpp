@@ -24,8 +24,11 @@ std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
     return oss.str();
 }
 
-DestructableMemory::DestructableMemory() = default;
-DestructableMemory::~DestructableMemory() = default;
+ReadableMemory::ReadableMemory() = default;
+ReadableMemory::~ReadableMemory() = default;
+
+WriteableMemory::WriteableMemory() = default;
+WriteableMemory::~WriteableMemory() = default;
 
 class ZeroMemory : public ReadableMemory
 {

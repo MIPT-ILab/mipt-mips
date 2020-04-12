@@ -172,6 +172,7 @@ include_directories(SYSTEM
         ${Boost_INCLUDE_DIRS})
 
 add_library(mipt-mips-src OBJECT
+    infra/log.cpp
     infra/print128.cpp
     infra/config/main_wrapper.cpp
     infra/config/config.cpp

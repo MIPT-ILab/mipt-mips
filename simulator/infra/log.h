@@ -53,7 +53,7 @@ public:
     Log() : sout( std::cout), serr( std::cerr) { }
 
     // Rule of five
-    virtual ~Log() = default;
+    virtual ~Log();
     Log( const Log&) = delete;
     Log( Log&&) = delete;
     Log& operator=( const Log&) = delete;

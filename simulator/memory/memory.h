@@ -32,22 +32,18 @@ private:
     static std::string generate_string( Addr addr, Addr mask);
 };
 
-class DestructableMemory
-{
-public:
-    DestructableMemory();
-    virtual ~DestructableMemory();
-    DestructableMemory( const DestructableMemory&) = delete;
-    DestructableMemory( DestructableMemory&&) = delete;
-    DestructableMemory& operator=( const DestructableMemory&) = delete;
-    DestructableMemory& operator=( DestructableMemory&&) = delete;
-};
-
 class WriteableMemory;
 
-class ReadableMemory : public DestructableMemory
+class ReadableMemory
 {
 public:
+    ReadableMemory();
+    virtual ~ReadableMemory();
+    ReadableMemory( const ReadableMemory&) = delete;
+    ReadableMemory( ReadableMemory&&) = delete;
+    ReadableMemory& operator=( const ReadableMemory&) = delete;
+    ReadableMemory& operator=( ReadableMemory&&) = delete;
+
     static std::shared_ptr<ReadableMemory> create_zero_memory();
 
     virtual size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept = 0;
@@ -85,9 +81,16 @@ void ReadableMemory::load( Instr* instr) const
     instr->load( value);
 }
 
-class WriteableMemory : public DestructableMemory
+class WriteableMemory
 {
 public:
+    WriteableMemory();
+    virtual ~WriteableMemory();
+    WriteableMemory( const WriteableMemory&) = delete;
+    WriteableMemory( WriteableMemory&&) = delete;
+    WriteableMemory& operator=( const WriteableMemory&) = delete;
+    WriteableMemory& operator=( WriteableMemory&&) = delete;
+
     virtual size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) = 0;
 
     size_t memcpy_host_to_guest_noexcept( Addr dst, const std::byte* src, size_t size) noexcept try
