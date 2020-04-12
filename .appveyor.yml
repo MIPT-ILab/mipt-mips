@@ -5,38 +5,41 @@ branches:
   only:
   - master
 
-environment:
-  matrix:
-  - build: msvc
-    platform: x64
-    configuration: Debug
-  - build: msvc
-    platform: x64
-    configuration: Release
-  - build: msvc
-    platform: Win32
-    configuration: Release
-  - build: g++
-    MSYSTEM: mingw64
-    configuration: Release
-  - build: g++
-    MSYSTEM: mingw32
-    configuration: Release
+build:
+  - msvc
+  - g++
+
+platform:
+  - Win32
+  - x64
+  
+configuration:
+  - Debug
+  - Release
+
+matrix:
+  exclude:
+    - build: g++
+      configuration: Debug
+    - platform: Win32
+      configuration: Debug
 
 install:
 - if "%configuration%"=="Debug" choco install opencppcoverage codecov
-- set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
+- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
+- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\msys64\usr\bin\;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
 
 before_build:
 - git submodule update --init
 
 build_script:
 - mkdir build && cd build
-- if "%build%"=="msvc" cmake ../simulator -G "Visual Studio 16 2019" -A %platform% -DENABLE_COVERAGE=1
 - if not "%build%"=="msvc" cmake ../simulator -G Ninja
+- if "%build%"=="msvc"     cmake ../simulator -G "Visual Studio 16 2019" -A %platform% -DENABLE_COVERAGE=1
 - if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests cachesim"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" move %configuration%\*.exe .
+- if "%build%"=="msvc"     MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
+- if "%build%"=="msvc"     move %configuration%\*.exe .
 
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 100000 --mars
