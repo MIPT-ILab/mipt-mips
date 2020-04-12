@@ -247,6 +247,38 @@ TEST_CASE( "config_parse: Pass help option and invalid option")
     CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
+class CErrWrapper
+{
+public:
+    explicit CErrWrapper( std::ostream& oss)
+        : tmp( std::cerr.rdbuf())
+    {
+        std::cerr.rdbuf( oss.rdbuf());
+    }
+
+    ~CErrWrapper()
+    {
+        std::cerr.rdbuf( tmp);
+    }
+
+    CErrWrapper( const CErrWrapper&) = delete;
+    CErrWrapper( CErrWrapper&&) = delete;
+    CErrWrapper& operator=( const CErrWrapper&) = delete;
+    CErrWrapper& operator=( CErrWrapper&&) = delete;
+
+private:
+    std::streambuf* const tmp;
+};
+
+TEST_CASE( "config_parse: Pass duplicate option")
+{
+    std::ostringstream oss;
+    if (CErrWrapper cerr_wrapper( oss); true)
+        config::AliasedRequiredValue<uint64> { "n", "uint64_config_name", "uint64 config description"};
+
+    CHECK( oss.str() == "Bad option setup for 'uint64_config_name' \nduplicate short option name '-n'\n");
+}
+
 #if 0
 //
 // To check whether providing configuration parser
