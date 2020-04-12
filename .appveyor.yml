@@ -27,9 +27,9 @@ matrix:
 
 install:
 - if "%configuration%"=="Debug" choco install opencppcoverage codecov
-- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
-- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
-- set PATH=C:\projects\deps\ninja;C:\msys64\usr\bin\;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
+- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;C:\msys64\usr\bin\;%PATH%
+- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;C:\msys64\usr\bin\;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
 
 before_build:
 - git submodule update --init
