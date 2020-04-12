@@ -76,6 +76,7 @@ FuncMemory::create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint3
 HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
+    FuncMemory(),
     page_bits( page_bits),
     offset_bits( offset_bits),
     set_bits( addr_bits - offset_bits - page_bits),

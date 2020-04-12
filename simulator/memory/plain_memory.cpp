@@ -31,7 +31,7 @@ FuncMemory::create_plain_memory( uint32 addr_bits)
     return std::make_shared<PlainMemory>( addr_bits);
 }
 
-PlainMemory::PlainMemory( uint32 addr_bits) : arena( 1ULL << addr_bits) { }
+PlainMemory::PlainMemory( uint32 addr_bits) : FuncMemory(), arena( 1ULL << addr_bits) { }
 
 void PlainMemory::duplicate_to( std::shared_ptr<WriteableMemory> target) const
 {
