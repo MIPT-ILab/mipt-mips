@@ -153,7 +153,7 @@ Simulator::create_simulator( const std::string& isa, bool functional_only)
 std::shared_ptr<Simulator>
 Simulator::create_configured_simulator()
 {
-    return create_simulator( config::isa, config::functional_only, config::disassembly_on);
+    return create_configured_isa_simulator( config::isa);
 }
 
 std::shared_ptr<Simulator>

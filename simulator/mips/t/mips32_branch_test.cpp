@@ -727,3 +727,10 @@ TEST_CASE( "MIPS32_instr: j to 4th instr")
     CHECK( !instr.is_likely_branch() );
 }
 
+TEST_CASE( "MIPS32_instr: j loop")
+{
+    MIPS32Instr instr( "j", 0);
+    instr.execute();
+    CHECK( instr.has_trap());
+    CHECK( instr.trap_type() == Trap::HALT);
+}
