@@ -45,6 +45,6 @@ build_script:
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 100000 --mars
 - .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
-- ctest -C %configuration% --verbose
+- if not  "%configuration%"=="Debug" ctest -C %configuration% --verbose
 - if "%configuration%"=="Debug" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "%APPVEYOR_BUILD_FOLDER%\external\*" -- %APPVEYOR_BUILD_FOLDER%\build\unit-tests.exe
 - if "%configuration%"=="Debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%
