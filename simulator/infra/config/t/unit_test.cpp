@@ -273,6 +273,8 @@ private:
 TEST_CASE( "config_parse: Pass duplicate option")
 {
     std::ostringstream oss;
+
+    // NOLINTNEXTLINE(readability-simplify-boolean-expr) https://bugs.llvm.org/show_bug.cgi?id=45507
     if (CErrWrapper cerr_wrapper( oss); true)
         config::AliasedRequiredValue<uint64> { "n", "uint64_config_name", "uint64 config description"};
 
