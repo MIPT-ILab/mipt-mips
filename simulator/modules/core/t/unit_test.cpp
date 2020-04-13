@@ -15,7 +15,7 @@ static auto init( const std::string& isa)
     auto sim = Simulator::create_simulator( isa, false);
     auto mem = FuncMemory::create_default_hierarchied_memory();
 
-    auto kernel = Kernel::create_dummy_kernel();
+    auto kernel = Kernel::create_kernel( false, std::cin, std::cout, std::cerr);
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
@@ -138,7 +138,7 @@ static auto create_mars_sim( const std::string& isa, const std::string& binary_n
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
-    auto kernel = Kernel::create_mars_kernel( kernel_in, kernel_out, std::cerr);
+    auto kernel = Kernel::create_kernel( true, kernel_in, kernel_out, std::cerr);
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();

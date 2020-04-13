@@ -23,7 +23,7 @@ struct Deadlock final : Exception
 };
 
 template <typename ISA>
-class Writeback : public Module
+class Writeback final : public Module
 {
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;

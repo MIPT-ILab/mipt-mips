@@ -43,9 +43,7 @@ static auto create_funcsim( std::string_view isa, std::string_view test, std::st
     if ( kernel_mode == "gdb")
         sim->enable_driver_hooks();
 
-    auto kernel = kernel_mode == "mars"
-        ? Kernel::create_mars_kernel( std::cin, nullout(), nullout())
-        : Kernel::create_dummy_kernel();
+    auto kernel = Kernel::create_kernel( kernel_mode == "mars", std::cin, nullout(), nullout());
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();

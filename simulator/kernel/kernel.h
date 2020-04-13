@@ -19,13 +19,19 @@ struct BadInputValue final : Exception {
     explicit BadInputValue( const std::string& msg) : Exception( "Bad input value", msg) {}
 };
 
+struct BadInteraction final : Exception {
+    BadInteraction() : Exception( "Too may unsuccessful system call attempts, aborting") {}
+};
+
 class Operation;
 
 class Kernel {
 public:
+    Kernel() = delete;
+    explicit Kernel( std::ostream& cerr) : cerr( cerr) { }
+
     static std::shared_ptr<Kernel> create_configured_kernel();
-    static std::shared_ptr<Kernel> create_dummy_kernel();
-    static std::shared_ptr<Kernel> create_mars_kernel( std::istream& cin, std::ostream& cout, std::ostream& cerr);
+    static std::shared_ptr<Kernel> create_kernel( bool is_mars, std::istream& cin, std::ostream& cout, std::ostream& cerr);
 
     virtual void set_simulator( const std::shared_ptr<CPUModel>& s) = 0;
     virtual void connect_memory( std::shared_ptr<FuncMemory> m) = 0;
@@ -38,7 +44,6 @@ public:
     Trap execute_interactive();
     void handle_instruction( Operation* instr);
 
-    Kernel() = default;
     virtual ~Kernel() = default;
     Kernel( const Kernel&) = delete;
     Kernel( Kernel&&) = delete;
@@ -49,6 +54,7 @@ public:
     Addr get_start_pc() const { return start_pc; }
 
 protected:
+    std::ostream& cerr;
     int exit_code = 0;
     Addr start_pc = 0;
 };
