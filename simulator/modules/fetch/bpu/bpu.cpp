@@ -14,6 +14,7 @@
 // C++ generic modules
 #include <map>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 namespace config {
@@ -45,7 +46,7 @@ public:
         tags = CacheTagArray::create( lru, size_in_entries, ways, 4, branch_ip_size_in_bits);
     }
     catch (const CacheTagArrayInvalidSizeException& e) {
-        throw BPInvalidMode(e.what());
+        throw BPInvalidMode( e.what(), "");
     }
 
     /* prediction */
@@ -132,10 +133,13 @@ class BPFactory {
         return my_map;
     }
 
-    void print_map( std::ostream& out) const {
+    std::string print_map() const
+    {
+        std::ostringstream out;
         out << "Supported branch prediction modes:" << std::endl;
         for ( const auto& map_name : map)
             out << "\t" << map_name.first << std::endl;
+        return out.str();
     }
 
 public:
@@ -149,8 +153,7 @@ public:
         if ( it != map.end())
             return it->second->create( lru, size_in_entries, ways, branch_ip_size_in_bits);
 
-        print_map(std::cerr);
-        throw BPInvalidMode( name);
+        throw BPInvalidMode( name, print_map());
     }
 };
 

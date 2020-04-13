@@ -60,5 +60,30 @@ public:
     Log& operator=( Log&&) = delete;
 };
 
+class OStreamWrapper
+{
+public:
+    OStreamWrapper( std::ostream& hide, std::ostream& expose)
+        : ostream( hide)
+        , buffer( hide.rdbuf())
+    {
+        ostream.rdbuf( expose.rdbuf());
+    }
+
+    ~OStreamWrapper()
+    {
+        ostream.rdbuf( buffer);
+    }
+
+    OStreamWrapper( const OStreamWrapper&) = delete;
+    OStreamWrapper( OStreamWrapper&&) = delete;
+    OStreamWrapper& operator=( const OStreamWrapper&) = delete;
+    OStreamWrapper& operator=( OStreamWrapper&&) = delete;
+
+private:
+    std::ostream& ostream;
+    std::streambuf* const buffer;
+};
+
 #endif /* LOG_H */
 
