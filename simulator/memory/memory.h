@@ -118,11 +118,27 @@ private:
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually
-class ReadableAndWritableMemory : public ReadableMemory, public WriteableMemory { };
-
-class FuncMemory : public ReadableAndWritableMemory
+class ReadableAndWriteableMemory : public ReadableMemory, public WriteableMemory
 {
 public:
+    ReadableAndWriteableMemory();
+    ~ReadableAndWriteableMemory() override;
+    ReadableAndWriteableMemory( const ReadableAndWriteableMemory&) = delete;
+    ReadableAndWriteableMemory( ReadableAndWriteableMemory&&) = delete;
+    ReadableAndWriteableMemory& operator=( const ReadableAndWriteableMemory&) = delete;
+    ReadableAndWriteableMemory& operator=( ReadableAndWriteableMemory&&) = delete;
+};
+
+class FuncMemory : public ReadableAndWriteableMemory
+{
+public:
+    FuncMemory();
+    ~FuncMemory() override;
+    FuncMemory( const FuncMemory&) = delete;
+    FuncMemory( FuncMemory&&) = delete;
+    FuncMemory& operator=( const FuncMemory&) = delete;
+    FuncMemory& operator=( FuncMemory&&) = delete;
+
     static std::shared_ptr<FuncMemory> create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
     static std::shared_ptr<FuncMemory> create_default_hierarchied_memory()
     {

@@ -24,11 +24,10 @@ std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
     return oss.str();
 }
 
+ // Write explicitly to solve code coverage issues
+
 ReadableMemory::ReadableMemory() = default;
 ReadableMemory::~ReadableMemory() = default;
-
-WriteableMemory::WriteableMemory() = default;
-WriteableMemory::~WriteableMemory() = default;
 
 class ZeroMemory : public ReadableMemory
 {
@@ -39,11 +38,16 @@ public:
     size_t strlen( Addr /* addr */) const final { return 0; }
 };
 
+size_t ZeroMemory::memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept
+{
+    std::fill_n( dst, size, std::byte{});
+    return size;
+}
+
 std::shared_ptr<ReadableMemory> ReadableMemory::create_zero_memory()
 {
     return std::make_shared<ZeroMemory>();
 }
-
 
 std::string ReadableMemory::read_string( Addr addr) const
 {
@@ -62,6 +66,9 @@ std::string ReadableMemory::read_string_by_size( Addr addr, size_t size) const
     memcpy_guest_to_host( byte_cast( tmp.data()), addr, tmp.size());
     return std::string( tmp.data(), tmp.size()); // but how to move?
 }
+
+WriteableMemory::WriteableMemory() = default;
+WriteableMemory::~WriteableMemory() = default;
 
 void WriteableMemory::write_string( const std::string& value, Addr addr)
 {
@@ -85,8 +92,8 @@ void WriteableMemory::memset( Addr addr, std::byte value, size_t size)
     	memcpy_host_to_guest( addr + i, &value, 1);
 }
 
-size_t ZeroMemory::memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept
-{
-    std::fill_n( dst, size, std::byte{});
-    return size;
-}
+ReadableAndWriteableMemory::ReadableAndWriteableMemory() = default;
+ReadableAndWriteableMemory::~ReadableAndWriteableMemory() = default;
+
+FuncMemory::FuncMemory() = default;
+FuncMemory::~FuncMemory() = default;
