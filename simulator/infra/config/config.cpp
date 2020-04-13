@@ -51,10 +51,6 @@ catch ( const std::exception& e)
 {
     std::cerr << "Bad option setup for '" << name << "' \n" << e.what() << std::endl;
 }
-catch ( ...)
-{
-    assert( false);
-}   
 
 template<typename T, Type type>
 BaseTValue<T, type>::BaseTValue( std::string_view alias, std::string_view name, std::string_view desc, const T& default_value) noexcept
