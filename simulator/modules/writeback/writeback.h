@@ -63,6 +63,14 @@ private:
 
 public:
     Writeback( Module* parent, Endian endian);
+
+    // Keep dtors in the same translation unit
+    ~Writeback() final;
+    Writeback( const Writeback&) = delete;
+    Writeback( Writeback&&) = delete;
+    Writeback& operator=( const Writeback&) = delete;
+    Writeback& operator=( Writeback&&) = delete;
+
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
     void init_checker( std::string_view isa) { checker.init( endian, kernel.get(), isa); }

@@ -16,6 +16,9 @@ Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "wri
     wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_BW);
 }
 
+template <typename ISA>
+Writeback<ISA>::~Writeback() = default;
+
 template<typename ISA>
 void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
 {
