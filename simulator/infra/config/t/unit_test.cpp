@@ -8,6 +8,7 @@
 #include <infra/argv.h>
 #include <infra/config/config.h>
 #include <infra/config/main_wrapper.h>
+#include <infra/log.h>
 #include <infra/macro.h>
 
 #include <sstream>
@@ -247,35 +248,12 @@ TEST_CASE( "config_parse: Pass help option and invalid option")
     CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
 }
 
-class CErrWrapper
-{
-public:
-    explicit CErrWrapper( std::ostream& oss)
-        : tmp( std::cerr.rdbuf())
-    {
-        std::cerr.rdbuf( oss.rdbuf());
-    }
-
-    ~CErrWrapper()
-    {
-        std::cerr.rdbuf( tmp);
-    }
-
-    CErrWrapper( const CErrWrapper&) = delete;
-    CErrWrapper( CErrWrapper&&) = delete;
-    CErrWrapper& operator=( const CErrWrapper&) = delete;
-    CErrWrapper& operator=( CErrWrapper&&) = delete;
-
-private:
-    std::streambuf* const tmp;
-};
-
 TEST_CASE( "config_parse: Pass duplicate option")
 {
     std::ostringstream oss;
 
     // NOLINTNEXTLINE(readability-simplify-boolean-expr) https://bugs.llvm.org/show_bug.cgi?id=45507
-    if (CErrWrapper cerr_wrapper( oss); true)
+    if (OStreamWrapper cerr_wrapper( std::cerr, oss); true)
         config::AliasedRequiredValue<uint64> { "n", "uint64_config_name", "uint64 config description"};
 
     CHECK( oss.str() == "Bad option setup for 'uint64_config_name' \nduplicate short option name '-n'\n");
