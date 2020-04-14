@@ -37,8 +37,6 @@ addons:
     packages:
     - cmake
     - libboost-dev
-    - libctf-dev
-    - libreadline-dev
     - ninja-build
     - nodejs
     - python3
@@ -74,6 +72,7 @@ before_script:
         cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
         cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+        cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
     fi
 
 script:
