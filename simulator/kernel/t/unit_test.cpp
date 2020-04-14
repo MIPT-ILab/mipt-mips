@@ -34,5 +34,5 @@ TEST_CASE( "Kernel: Interactive call")
 {
     CHECK( read_integer( "1337") == 1337);
     CHECK_THROWS_AS( read_integer( "133q"), BadInteraction);
+    CHECK( read_integer( "133q\n133\n") == 133);
 }
-
