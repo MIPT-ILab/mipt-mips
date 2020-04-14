@@ -81,19 +81,6 @@ TEST_CASE( "MARS: read integer")
     CHECK_THROWS_AS( read_integer("13333333333333333333333333333333333333333333333333333"), BadInputValue);
 }
 
-TEST_CASE( "MARS: read bad integer ang fix")
-{
-    std::istringstream input( "133q\n133\n");
-    std::ostringstream out;
-    auto sim = Simulator::create_simulator( "mips64", true);
-    auto mars_kernel = create_mars_kernel( input, out, out);
-    mars_kernel->set_simulator( sim);
-
-    sim->write_cpu_register( v0, 5U); // read integer
-    CHECK( mars_kernel->execute_interactive() == Trap::NO_TRAP);
-    CHECK( sim->read_cpu_register( v0) == 133);
-}
-
 TEST_CASE( "MARS: read string")
 {
     std::istringstream input( "Hello World\n");
