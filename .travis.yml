@@ -78,7 +78,7 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
-  - ninja mipt-mips unit-tests mipt-v gdb-mips-sim cachesim
+  - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
@@ -91,6 +91,8 @@ script:
     fi
   - |
     if [ $GDB_BUILD ]; then
+        cd $TRAVIS_BUILD_DIR/simulator/release
+        ninja gdb-mips-sim
         cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
