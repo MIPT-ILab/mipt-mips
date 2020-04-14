@@ -37,6 +37,7 @@ addons:
     packages:
     - cmake
     - libboost-dev
+    - libreadline-dev
     - ninja-build
     - nodejs
     - python3
