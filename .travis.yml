@@ -63,12 +63,15 @@ before_script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
     fi
-  - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
-  - cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
-  - cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
+  - | # TODO (pkryukov): GDB build hangs on ARM...
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+        cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+        cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+        cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
+        cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+        cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
+        cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
+     fi
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
