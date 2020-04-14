@@ -77,6 +77,7 @@ TEST_CASE("RISCV srai disassembly")
 TEST_CASE("RISCV invalid instruction")
 {
     CHECK( RISCVInstr<uint32>(0x0).get_disasm() == "unknown" );
+    CHECK( RISCVInstr<uint32>(0xf6000053).get_disasm() == "unknown" );
     CHECK( RISCVInstr<uint32>("qwerty", 0x0).get_disasm() == "unknown" );
 }
 
