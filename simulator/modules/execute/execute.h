@@ -6,6 +6,7 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
+#include <func_sim/operation.h>
 #include <modules/core/perf_instr.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
 #include <modules/ports_instance.h>
@@ -16,7 +17,7 @@ class Execute : public Module
     using Register = typename FuncInstr::Register;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename FuncInstr::RegisterUInt;
-    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
+    using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
     private:
         static constexpr const uint8 SRC_REGISTERS_NUM = 2;

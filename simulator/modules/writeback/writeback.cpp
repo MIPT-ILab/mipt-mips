@@ -10,7 +10,7 @@ Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "wri
     rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", PORT_LATENCY);
     rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
 
-    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW);
+    wp_bypass = make_write_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW);
     wp_halt = make_write_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_BW);
     wp_trap = make_write_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_BW);
     wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_BW);
@@ -107,7 +107,7 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
-    wp_bypass->write( std::pair{ instr.get_v_dst(), instr.get_v_dst2()}, cycle);
+    wp_bypass->write( instr.get_v_dst(), cycle);
 
     sout << instr << std::endl;
 

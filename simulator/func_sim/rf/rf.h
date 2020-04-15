@@ -71,7 +71,7 @@ public:
 
     inline void read_source( FuncInstr* instr, size_t index) const
     {
-        instr->set_v_src( read( instr->get_src_num( index)), index);
+        instr->set_v_src(  read( instr->get_src( index)), index);
     }
 
     inline void read_sources( FuncInstr* instr) const
@@ -82,8 +82,8 @@ public:
 
     inline void write_dst( const FuncInstr& instr)
     {
-        write( instr.get_dst_num(),  instr.get_v_dst(),  instr.get_mask(), instr.get_accumulation_type());
-        write( instr.get_dst2_num(), instr.get_v_dst2(), all_ones<RegisterUInt>(), instr.get_accumulation_type());
+        write( instr.get_dst( 0), instr.get_v_dst( 0),  instr.get_mask(), instr.get_accumulation_type());
+        write( instr.get_dst( 1), instr.get_v_dst( 1), all_ones<RegisterUInt>(), instr.get_accumulation_type());
     }
 };
 

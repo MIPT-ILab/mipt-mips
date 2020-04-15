@@ -22,11 +22,11 @@ struct TestData {
         instr.execute();
         if constexpr ( std::is_same_v<T, uint128>) {
             // CATCH cannot handle 128 bit integers, let's check both parts sequentially
-            CHECK( unpack_to<uint64>( instr.get_v_dst())[0] == unpack_to<uint64>( dst)[0]);
-            CHECK( unpack_to<uint64>( instr.get_v_dst())[1] == unpack_to<uint64>( dst)[1]);
+            CHECK( unpack_to<uint64>( instr.get_v_dst( 0))[0] == unpack_to<uint64>( dst)[0]);
+            CHECK( unpack_to<uint64>( instr.get_v_dst( 0))[1] == unpack_to<uint64>( dst)[1]);
         }
         else {
-            CHECK( instr.get_v_dst() == dst);
+            CHECK( instr.get_v_dst( 0) == dst);
         }
     }
 
@@ -95,7 +95,7 @@ struct TestData {
         } \
         memory->load_store( &store); \
         memory->load_store( &load); \
-        CHECK( load.get_v_dst() == ( data)); \
+        CHECK( load.get_v_dst( 0) == ( data)); \
     }
 
 #define TEST_ST_SRC12_BYPASS( n, level1, level2, load, store, data, immediate, address) TEST_ST_OP( n, load, store, data, immediate, address)

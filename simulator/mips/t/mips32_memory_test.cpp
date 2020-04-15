@@ -28,7 +28,7 @@ TEST_CASE( "MIPS32_instr: lb (most significant bit is 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x34);
+    CHECK( instr.get_v_dst( 0) == 0x34);
 }
 
 TEST_CASE( "MIPS32_instr: lb (most significant bit is 1)")
@@ -39,7 +39,7 @@ TEST_CASE( "MIPS32_instr: lb (most significant bit is 1)")
     CHECK( instr.get_mem_addr() == 0x1003);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xffffffab);
+    CHECK( instr.get_v_dst( 0) == 0xffffffab);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -54,7 +54,7 @@ TEST_CASE( "MIPS32_instr: lbu (most significant bit is 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x34);
+    CHECK( instr.get_v_dst( 0) == 0x34);
 }
 
 TEST_CASE( "MIPS32_instr: lbu (most significant bit is 1)")
@@ -65,7 +65,7 @@ TEST_CASE( "MIPS32_instr: lbu (most significant bit is 1)")
     CHECK( instr.get_mem_addr() == 0x1003);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xab);
+    CHECK( instr.get_v_dst( 0) == 0xab);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -80,7 +80,7 @@ TEST_CASE( "MIPS32_instr: lh (most significant bit is 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x1234);
+    CHECK( instr.get_v_dst( 0) == 0x1234);
 }
 
 TEST_CASE( "MIPS32_instr: lh (most significant bit is 1)")
@@ -91,7 +91,7 @@ TEST_CASE( "MIPS32_instr: lh (most significant bit is 1)")
     CHECK( instr.get_mem_addr() == 0x1002);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ABCD);
 }
 
 TEST_CASE( "MIPS32_instr: lh unaligned address trap")
@@ -115,7 +115,7 @@ TEST_CASE( "MIPS32_instr: lhu (most significant bit is 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x1234);
+    CHECK( instr.get_v_dst( 0) == 0x1234);
 }
 
 TEST_CASE( "MIPS32_instr: lhu (most significant bit is 1)")
@@ -126,7 +126,7 @@ TEST_CASE( "MIPS32_instr: lhu (most significant bit is 1)")
     CHECK( instr.get_mem_addr() == 0x1002);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD);
+    CHECK( instr.get_v_dst( 0) == 0xABCD);
 }
 
 TEST_CASE( "MIPS32_instr: lhu unaligned address trap")
@@ -150,7 +150,7 @@ TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 0)")
     CHECK( instr.get_mem_addr() == 0x0ffd);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x3400'0000);
+    CHECK( instr.get_v_dst( 0) == 0x3400'0000);
 }
 
 TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 3)")
@@ -161,7 +161,7 @@ TEST_CASE( "MIPS32_instr: lwl (instr->mem_addr % 4 = 3)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD'1234);
+    CHECK( instr.get_v_dst( 0) == 0xABCD'1234);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -176,7 +176,7 @@ TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD'1234);
+    CHECK( instr.get_v_dst( 0) == 0xABCD'1234);
 }
 
 TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 3)")
@@ -187,7 +187,7 @@ TEST_CASE( "MIPS32_instr: lwr (instr->mem_addr % 4 = 3)")
     CHECK( instr.get_mem_addr() == 0x1003);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xDC56'78AB);
+    CHECK( instr.get_v_dst( 0) == 0xDC56'78AB);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -202,7 +202,7 @@ TEST_CASE( "MIPS32_instr: ll (most significant bit is 0)")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x1234);
+    CHECK( instr.get_v_dst( 0) == 0x1234);
 }
 
 TEST_CASE( "MIPS32_instr: ll (most significant bit is 1)")
@@ -213,7 +213,7 @@ TEST_CASE( "MIPS32_instr: ll (most significant bit is 1)")
     CHECK( instr.get_mem_addr() == 0x1002);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xffff'ABCD);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ABCD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ TEST_CASE( "MIPS32_instr: lw le")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0xABCD'1234);
+    CHECK( instr.get_v_dst( 0) == 0xABCD'1234);
 }
 
 TEST_CASE( "MIPS32_instr: lw be")
@@ -243,7 +243,7 @@ TEST_CASE( "MIPS32_instr: lw be")
     CHECK( instr.get_mem_addr() == 0x1000);
 
     get_plain_memory_with_data()->load_store( &instr);
-    CHECK( instr.get_v_dst() == 0x3412'CDAB);
+    CHECK( instr.get_v_dst( 0) == 0x3412'CDAB);
 }
 ////////////////////////////////////////////////////////////////////////////////
 

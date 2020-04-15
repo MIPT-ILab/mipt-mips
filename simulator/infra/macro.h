@@ -256,14 +256,20 @@ static constexpr T circ_ls( const T& value, size_t shamt)
     return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }
 
+template<typename T>
+T sign_extension( T value, size_t bits)
+{
+    if ( bits < bitwidth<T>) {
+        const T msb = T{ 1} << ( bits - 1);
+        value = ( ( value & bitmask<T>(bits)) ^ msb) - msb;
+    }
+    return value;
+}
+
 template<size_t N, typename T>
 T sign_extension( T value)
 {
-    if constexpr (N < bitwidth<T>) {
-        const T msb = T{ 1} << ( N - 1);
-        value = ( ( value & bitmask<T>(N)) ^ msb) - msb;
-    }
-    return value;
+    return sign_extension(value, N);
 }
 
 template<typename T>

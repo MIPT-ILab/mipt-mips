@@ -75,7 +75,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
 
         if ( has_flush_expired())
         {
-            wp_long_arithmetic_bypass->write( instr.get_dst_v(), cycle);
+            wp_long_arithmetic_bypass->write( instr.get_v_dst(), cycle);
             wp_writeback_datapath->write( instr, cycle);
         }
     }
@@ -100,7 +100,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             auto& port = bypass_source.data_ports.at( bypass_direction);
             RegisterUInt data{};
             while ( port->is_ready( cycle))
-                data = port->read( cycle).first;
+                data = port->read( cycle)[0];
             instr.set_v_src( data, src_index);
         }
         ++src_index;
@@ -119,7 +119,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
     else
     {
         /* bypass data */
-        wp_bypass->write( instr.get_dst_v(), cycle);
+        wp_bypass->write( instr.get_v_dst(), cycle);
 
         if( instr.is_jump())
         {

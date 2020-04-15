@@ -27,7 +27,7 @@ class PerfInstr : public FuncInstr
 public:
     PerfInstr( const FuncInstr& instr, const BPInterface& bp_info) : FuncInstr( instr), bp_data( bp_info) { }
 
-    auto get_dst_v() const { return std::pair{ this->get_v_dst(), this->get_v_dst2()}; }
+    auto get_dst_v() const { return std::pair{ this->get_v_dst( 0), this->get_v_dst( 1)}; }
     
     const auto& get_bp_data() const { return bp_data; }
 
