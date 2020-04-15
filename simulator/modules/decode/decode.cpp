@@ -8,7 +8,7 @@
 #include "decode.h"
 
 namespace config {
-    extern BoundedValue<uint64> long_alu_latency;
+    extern PredicatedValue<uint64> long_alu_latency;
 } // namespace config
 
 template <typename FuncInstr>
