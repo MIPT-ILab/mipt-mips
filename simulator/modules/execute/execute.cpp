@@ -8,7 +8,8 @@
 #include "execute.h"
 
 namespace config {
-    Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
+    PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
+                                                [](uint64 val) { return val >= 2 && val < 64; } };
 } // namespace config
 
 template <typename FuncInstr>
@@ -20,12 +21,6 @@ Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
     wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW);
     rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
     rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
-
-    if (config::long_alu_latency < 2)
-        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be greater than 1");
-    
-    if (config::long_alu_latency > 64)
-        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be less than 64");
 
     wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", last_execution_stage_latency);
