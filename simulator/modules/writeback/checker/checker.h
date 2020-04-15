@@ -23,6 +23,7 @@ template<typename ISA>
 class Checker {
     using FuncInstr = typename ISA::FuncInstr;
 public:
+    void disable() { active = false; }
     void check( const FuncInstr& instr);
     void init( Endian endian, Kernel* kernel, std::string_view isa);
     void set_target( const Target& value);

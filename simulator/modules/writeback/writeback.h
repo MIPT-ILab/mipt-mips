@@ -73,13 +73,13 @@ public:
 
     void clock( Cycle cycle);
     void set_RF( RF<FuncInstr>* value) { rf = value; }
-    void init_checker( std::string_view isa) { checker.init( endian, kernel.get(), isa); }
+    void disable_checker() { checker.disable(); }
     void set_target( const Target& value, Cycle cycle);
     void set_instrs_to_run( uint64 value) { instrs_to_run = value; }
     auto get_executed_instrs() const { return executed_instrs; }
     Addr get_next_PC() const { return next_PC; }
     int get_exit_code() const noexcept;
-    void set_kernel( const std::shared_ptr<Kernel>& k) { kernel = k; }
+    void set_kernel( const std::shared_ptr<Kernel>& k, std::string_view isa);
     void set_driver( std::unique_ptr<Driver> d) { driver = std::move( d); }
     void enable_driver_hooks();
 };

@@ -58,7 +58,7 @@ class FuncSim : public BasicFuncSim
         void set_memory( std::shared_ptr<FuncMemory> memory) final;
         void set_kernel( std::shared_ptr<Kernel> k) final { kernel = std::move( k); }
         void enable_driver_hooks() final;
-        void init_checker() final { };
+        void disable_checker() final { };
         int get_exit_code() const noexcept final;
         FuncInstr step();
         Trap driver_step( const Operation& instr);

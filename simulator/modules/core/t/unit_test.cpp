@@ -22,7 +22,6 @@ static auto init( const std::string& isa)
 
     sim->set_kernel( kernel);
     sim->set_memory( mem);
-    sim->init_checker();
 
     return sim;
 }
@@ -147,7 +146,6 @@ static auto create_mars_sim( const std::string& isa, const std::string& binary_n
     if ( has_hooks)
         sim->enable_driver_hooks();
 
-    sim->init_checker();
     sim->set_pc( kernel->get_start_pc());
     return sim;
 }
@@ -180,6 +178,17 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
     std::ostream nullout( nullptr);
     CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips/mips-smc.bin", nullin, nullout, false)->run_no_limit(), CheckerMismatch);
 }
+
+TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
+{
+    std::istream nullin( nullptr);
+    std::ostream nullout( nullptr);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-smc.bin", nullin, nullout, false);
+    sim->disable_checker();
+    run_silent( sim);
+    CHECK( sim->get_exit_code() == 0);
+}
+
 
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
