@@ -73,7 +73,7 @@ T ReadableMemory::read( Addr addr) const noexcept
 template<typename Instr>
 void ReadableMemory::load( Instr* instr) const
 {
-    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    using DstType = decltype( std::declval<Instr>().get_v_dst( 0));
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
     auto value = instr->get_endian() == Endian::little
         ? read<DstType, Endian::little>( instr->get_mem_addr(), mask)
@@ -166,21 +166,21 @@ private:
 template<typename Instr, Endian endian>
 void FuncMemory::store( const Instr& instr)
 {
-    using SrcType = decltype( std::declval<Instr>().get_v_src2());
+    using SrcType = decltype( std::declval<Instr>().get_v_src( 1));
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is a cricital error");
 
     auto full_mask = bitmask<SrcType>( instr.get_mem_size() * CHAR_BIT);
     if ( ( instr.get_mask() & full_mask) == full_mask) switch ( instr.get_mem_size()) {
-        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src( 1)), instr.get_mem_addr()); break;
         default: assert( false);
     }
     else {
-        masked_write<SrcType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<SrcType, endian>( instr.get_v_src( 1), instr.get_mem_addr(), instr.get_mask());
     }
 }
 

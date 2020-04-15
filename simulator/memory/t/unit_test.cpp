@@ -370,7 +370,7 @@ class DummyStore : public Datapath<uint64> {
             set_type( OUT_STORE);
             mem_addr = a;
             mem_size = 8;
-            v_src2 = 0xABCD'EF12'3456'7890ULL;
+            v_src[1] = 0xABCD'EF12'3456'7890ULL;
         }
         static auto get_endian() { return Endian::little; } 
 };
@@ -387,7 +387,7 @@ TEST_CASE( "Func_memory: Store to 0x100")
     DummyStore store( 0x100);
     auto mem = FuncMemory::create_4M_plain_memory();
     mem->load_store( &store);
-    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src2());
+    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src( 1));
 }
 
 TEST_CASE( "Func_memory Replicant: read and write")

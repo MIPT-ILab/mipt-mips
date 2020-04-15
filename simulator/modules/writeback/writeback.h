@@ -9,6 +9,7 @@
 #include "checker/checker.h"
 
 #include <func_sim/driver/driver.h>
+#include <func_sim/operation.h>
 #include <infra/exception.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
@@ -28,6 +29,8 @@ class Writeback final : public Module
     using FuncInstr = typename ISA::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename ISA::RegisterUInt;
+    using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
+
 private:
     /* Instrumentation */
     uint64 instrs_to_run = 0;
@@ -56,7 +59,7 @@ private:
     ReadPort<bool>* rp_trap = nullptr;
 
     /* Output */
-    WritePort<std::pair<RegisterUInt, RegisterUInt>>* wp_bypass = nullptr;
+    WritePort<InstructionOutput>* wp_bypass = nullptr;
     WritePort<Trap>* wp_halt = nullptr;
     WritePort<bool>* wp_trap = nullptr;
     WritePort<Target>* wp_target = nullptr;

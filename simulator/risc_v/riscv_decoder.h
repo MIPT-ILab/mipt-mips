@@ -17,8 +17,8 @@
 struct Reg
 {
     enum Type : uint8 {
-        RS1, RS2, RS2_COMPR, RD,
-        RS1_3_BITS, RS2_3_BITS, RD_3_BITS,
+        RS1, RS2, RS2_CMP, RD,
+        RS1_3BIT, RS2_3BIT, RD_3BIT,
         CSR, SEPC, MEPC,
         ZERO, SP, RA,
         MAX_REG
@@ -298,10 +298,10 @@ struct RISCVInstrDecoder
         registers[Reg::RS1]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000000'00001111'10000000'00000000));
         registers[Reg::RS2]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000001'11110000'00000000'00000000));
         registers[Reg::CSR]  = RISCVRegister::from_csr_index( apply_mask( raw, 0b11111111'11110000'00000000'00000000));
-        registers[Reg::RS2_COMPR]  = RISCVRegister::from_cpu_index(      apply_mask( raw, 0b00000000'01111100));
-        registers[Reg::RD_3_BITS]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
-        registers[Reg::RS1_3_BITS] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000011'10000000));
-        registers[Reg::RS2_3_BITS] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
+        registers[Reg::RS2_CMP]  = RISCVRegister::from_cpu_index(      apply_mask( raw, 0b00000000'01111100));
+        registers[Reg::RD_3BIT]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
+        registers[Reg::RS1_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000011'10000000));
+        registers[Reg::RS2_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
     }
 };
 

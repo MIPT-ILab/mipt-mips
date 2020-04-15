@@ -92,7 +92,7 @@ TEST_CASE("RISCV add")
     instr.set_v_src( 0x10, 0);
     instr.set_v_src( 0xf, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x1f);
+    CHECK( instr.get_v_dst( 0) == 0x1f);
 }
 
 TEST_CASE("RISCV lui 1")
@@ -101,28 +101,28 @@ TEST_CASE("RISCV lui 1")
 
     RISCVInstr<uint32> instr("lui", 0x1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x1000);
+    CHECK( instr.get_v_dst( 0) == 0x1000);
 }
 
 TEST_CASE("RISCV lui all fs")
 {
     RISCVInstr<uint32> instr("lui", 0xfffff);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'f000ULL);
+    CHECK( instr.get_v_dst( 0) == 0xffff'f000ULL);
 }
 
 TEST_CASE("RISCV lui 80000")
 {
     RISCVInstr<uint64> instr("lui", 0x80000);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'8000'0000ULL);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffff'8000'0000ULL);
 }
 
 TEST_CASE("RISCV-128 lui all fs")
 {
     RISCVInstr<uint64> instr("lui", 0xfffff);
     instr.execute();
-    CHECK( ~instr.get_v_dst() == 0xfff);
+    CHECK( ~instr.get_v_dst( 0) == 0xfff);
 }
 
 TEST_CASE("RISCV sub")
@@ -132,7 +132,7 @@ TEST_CASE("RISCV sub")
     instr.set_v_src( 0x10, 0);
     instr.set_v_src( 0xf, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 1);
+    CHECK( instr.get_v_dst( 0) == 1);
 }
 
 TEST_CASE("RISCV sub print")
@@ -142,7 +142,7 @@ TEST_CASE("RISCV sub print")
     instr.set_v_src( 0xf, 1);
     instr.set_sequence_id( 80);
     instr.execute();
-    CHECK( instr.get_v_dst() == 1);
+    CHECK( instr.get_v_dst( 0) == 1);
     CHECK( instr.string_dump() == "{80}\tsub $a5, $a5, $a4\t [ $a5 = 0x1 ]" );
 
     std::ostringstream oss;
@@ -162,7 +162,7 @@ TEST_CASE( "RISCV lq/sq")
     }
     memory->load_store( &store);
     memory->load_store( &load);
-    CHECK( narrow_cast<uint64>( load.get_v_dst()) == 0xf);
+    CHECK( narrow_cast<uint64>( load.get_v_dst( 0)) == 0xf);
 }
 
 TEST_CASE( "RISCV slo32")
@@ -202,7 +202,7 @@ TEST_CASE("RISCV RV32 orn")
     instr.set_v_src( 0xf7, 0);
     instr.set_v_src( 0xffffef77, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x10ff);
+    CHECK( instr.get_v_dst( 0) == 0x10ff);
 }
 
 TEST_CASE("RISCV RV64 orn")
@@ -211,7 +211,7 @@ TEST_CASE("RISCV RV64 orn")
     instr.set_v_src( 0xf7, 0);
     instr.set_v_src( 0xbfff'ffff'ffff'ef77, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x4000'0000'0000'10ff);
+    CHECK( instr.get_v_dst( 0) == 0x4000'0000'0000'10ff);
 }
 
 TEST_CASE ("RISCV sbext32")
@@ -253,7 +253,7 @@ TEST_CASE( "RISV RV32 pack")
     instr.set_v_src( 0xffff'2222, 0);
     instr.set_v_src( 0x1111'3333, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x3333'2222);
+    CHECK( instr.get_v_dst( 0) == 0x3333'2222);
 }
 
 TEST_CASE( "RISV RV64 pack")
@@ -262,7 +262,7 @@ TEST_CASE( "RISV RV64 pack")
     instr.set_v_src( 0xffff'ffff'2222'2222, 0);
     instr.set_v_src( 0x1111'1111'3333'3333, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x3333'3333'2222'2222);
+    CHECK( instr.get_v_dst( 0) == 0x3333'3333'2222'2222);
 }
 
 TEST_CASE( "RISV RV32 xnor")
@@ -272,7 +272,7 @@ TEST_CASE( "RISV RV32 xnor")
     instr.set_v_src( 0x3000'0000, 0);
     instr.set_v_src( 0xa000'0000, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x6fff'ffff);
+    CHECK( instr.get_v_dst( 0) == 0x6fff'ffff);
 }
 
 TEST_CASE( "RISV RV64 xnor")
@@ -281,7 +281,7 @@ TEST_CASE( "RISV RV64 xnor")
     instr.set_v_src( 0x3000'0000'3000'0000, 0);
     instr.set_v_src( 0xa000'0000'a000'0000, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x6fff'ffff'6fff'ffff);
+    CHECK( instr.get_v_dst( 0) == 0x6fff'ffff'6fff'ffff);
 }
 
 TEST_CASE( "RISCV sro32")
@@ -291,7 +291,7 @@ TEST_CASE( "RISCV sro32")
     instr.set_v_src( 0x8000'c000U, 0);
     instr.set_v_src( 0xf, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'0001);
+    CHECK( instr.get_v_dst( 0) == 0xffff'0001);
 }
 
 TEST_CASE( "RISCV sro32 overflow")
@@ -300,7 +300,7 @@ TEST_CASE( "RISCV sro32 overflow")
     instr.set_v_src( 0x8000'c000U, 0);
     instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffffU);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffffU);
 }
 
 TEST_CASE( "RISCV sro64")
@@ -309,7 +309,7 @@ TEST_CASE( "RISCV sro64")
     instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
     instr.set_v_src( 0x1fU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'0000'0001ULL);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffff'0000'0001ULL);
 }
 
 TEST_CASE( "RISCV sro64 overflow")
@@ -318,7 +318,7 @@ TEST_CASE( "RISCV sro64 overflow")
     instr.set_v_src( 0x8000'0000'c000'0000ULL, 0);
     instr.set_v_src( 0xffU, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xffff'ffff'ffff'ffffULL);
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffff'ffff'ffffULL);
 }
 
 TEST_CASE("RISCV RV32 bfp")
@@ -328,7 +328,7 @@ TEST_CASE("RISCV RV32 bfp")
     instr.set_v_src( 0x5555, 0);
     instr.set_v_src( 0x080400C0, 1); //len = 8, off = 4, data = 1100'0000
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x5C05);
+    CHECK( instr.get_v_dst( 0) == 0x5C05);
 }
 
 TEST_CASE("RISCV RV64 bfp")
@@ -337,7 +337,7 @@ TEST_CASE("RISCV RV64 bfp")
     instr.set_v_src( 0x0000'5555'CCCC'0000, 0);
     instr.set_v_src( 0x081C00C5, 1); //len = 8, off = 28, data = 1100'0101
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x0000'555C'5CCC'0000);
+    CHECK( instr.get_v_dst( 0) == 0x0000'555C'5CCC'0000);
 }
 
 TEST_CASE("RISCV RV32 grev")
@@ -357,7 +357,7 @@ TEST_CASE("RISCV RV32 grev")
         instr.set_v_src( cases[i].src2, 1);
         instr.execute();
         INFO( "Iteration: " << i);
-        CHECK( instr.get_v_dst() == cases[i].dst);
+        CHECK( instr.get_v_dst( 0) == cases[i].dst);
     }
 }
 
@@ -378,7 +378,7 @@ TEST_CASE("RISCV RV64 grev")
         instr.set_v_src( cases[i].src2, 1);
         instr.execute();
         INFO( "Iteration: " << i);
-        CHECK( instr.get_v_dst() == cases[i].dst);
+        CHECK( instr.get_v_dst( 0) == cases[i].dst);
     }
 }
 
@@ -388,7 +388,7 @@ TEST_CASE("RISCV RV32 pcnt")
     RISCVInstr<uint32> instr( "pcnt", 0);
     instr.set_v_src( 0xfff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xc);
+    CHECK( instr.get_v_dst( 0) == 0xc);
 }
 
 TEST_CASE("RISCV RV64 pcnt")
@@ -396,7 +396,7 @@ TEST_CASE("RISCV RV64 pcnt")
     RISCVInstr<uint64> instr( "pcnt", 0);
     instr.set_v_src( 0xfafb'fcfd'feff, 0);
     instr.execute();
-    CHECK( instr.get_v_dst() == 41);
+    CHECK( instr.get_v_dst( 0) == 41);
 }
 
 TEST_CASE("RISCV RV128 pcnt")
@@ -406,7 +406,7 @@ TEST_CASE("RISCV RV128 pcnt")
     RISCVInstr<uint128> instr( "pcnt", 0);
     instr.set_v_src( value, 0);
     instr.execute();
-    CHECK( narrow_cast<size_t>( instr.get_v_dst()) == 82);
+    CHECK( narrow_cast<size_t>( instr.get_v_dst( 0)) == 82);
 }
 
 TEST_CASE ("RISCV RV32 clz")
@@ -575,7 +575,7 @@ TEST_CASE("RISCV RV32 unshfl")
     instr.set_v_src( 0xbf534fdeU, 0);
     instr.set_v_src( 0x07, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0xf17d3bbeU);
+    CHECK( instr.get_v_dst( 0) == 0xf17d3bbeU);
 }
 
 TEST_CASE("RISCV RV64 unshfl")
@@ -584,7 +584,7 @@ TEST_CASE("RISCV RV64 unshfl")
     instr.set_v_src( 0x0138'745b'ffff'acd1ULL, 0);
     instr.set_v_src( 0x16, 1);
     instr.execute();
-    CHECK( instr.get_v_dst() == 0x021c'ffff'56c7'bc85ULL);
+    CHECK( instr.get_v_dst( 0) == 0x021c'ffff'56c7'bc85ULL);
 }
 
 TEST_CASE("RISCV RV128 unshfl")
