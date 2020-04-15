@@ -19,7 +19,6 @@ namespace popl {
 
 namespace config {
 
-
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 void handleArgs( int argc, const char* const argv[], int start_index);
 std::string help();
@@ -144,10 +143,6 @@ struct InvalidOption : Exception
 {
     explicit InvalidOption( const std::string& msg) : Exception( "Invalid option", msg) {}
 };
-
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-void handleArgs( int argc, const char* const argv[], int start_index);
-std::string help();
 
 } // namespace config
 
