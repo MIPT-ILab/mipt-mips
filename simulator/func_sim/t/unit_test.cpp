@@ -53,7 +53,7 @@ static auto create_funcsim( std::string_view isa, std::string_view test, std::st
         kernel->load_file( std::string( test));
 
     sim->set_pc( kernel->get_start_pc());
-    sim->init_checker();
+    sim->disable_checker(); // does nothing
 
     return System{ sim, mem, kernel};
 }
