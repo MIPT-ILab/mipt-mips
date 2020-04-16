@@ -24,6 +24,7 @@ GDBSim::GDBSim( const std::string& isa)
     kernel->set_simulator( cpu);
     kernel->connect_memory( memory);
     kernel->connect_exception_handler();
+    cpu->disable_checker();
 }
 
 bool GDBSim::load( const std::string& filename) const try
