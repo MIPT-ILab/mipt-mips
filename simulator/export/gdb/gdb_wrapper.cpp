@@ -20,11 +20,11 @@ GDBSim::GDBSim( const std::string& isa)
     memory = FuncMemory::create_default_hierarchied_memory();
     kernel = Kernel::create_configured_kernel();
     cpu->set_memory( memory);
-    cpu->set_kernel( kernel);
     kernel->set_simulator( cpu);
     kernel->connect_memory( memory);
     kernel->connect_exception_handler();
-    cpu->disable_checker();
+    cpu->set_kernel( kernel);
+    cpu->disable_checker(); // FIXME(pkryukov): checker should work correctly
 }
 
 bool GDBSim::load( const std::string& filename) const try
