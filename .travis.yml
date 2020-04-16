@@ -35,7 +35,6 @@ addons:
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     update: true
     packages:
-    - babeltrace
     - cmake
     - libboost-dev
     - ninja-build
@@ -69,7 +68,7 @@ before_script:
     fi
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $GDB_BUILD ]; then
-        cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+        cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --enable-libctf --with-python=no
         cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
         cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
