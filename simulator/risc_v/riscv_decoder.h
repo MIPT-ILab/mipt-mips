@@ -225,14 +225,15 @@ struct RISCVInstrDecoder
         case C_LW:   return get_C_LW_immediate();
         case C_LD:   return get_C_LD_immediate();
         case C_LQ:   return get_C_LQ_immediate();
-        case C_S:
-        case C_I:    return get_C_I_immediate();
         case C_J:    return get_C_J_immediate();
         case C_B:    return get_C_B_immediate();
         case C_ADDI4SPN: return get_C_ADDI4SPN_immediate();
         case C_ADDI16SP: return get_C_ADDI16SP_immediate();
-        default:     assert(0); return 0;
+        case C_S:
+        case C_I:    break;
+        default:     assert( false);
         }
+        return get_C_I_immediate();
     }
 
     template<typename R>

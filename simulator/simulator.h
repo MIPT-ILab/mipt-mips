@@ -67,7 +67,7 @@ public:
     virtual Trap run( uint64 instrs_to_run) = 0;
     virtual void set_memory( std::shared_ptr<FuncMemory> m) = 0;
     virtual void set_kernel( std::shared_ptr<Kernel> k) = 0;
-    virtual void init_checker() = 0;
+    virtual void disable_checker() = 0;
     virtual void enable_driver_hooks() = 0;
     virtual int get_exit_code() const noexcept = 0;
     std::string_view get_isa() const final { return isa; }

@@ -16,6 +16,8 @@
 namespace config {
     AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
     AliasedRequiredValue<uint64> uint64_config = { "n", "uint64_config_name", "uint64 config description"};
+    PredicatedValue<uint64> uint64_predicated_config = { "uint64_predicated_config_name", 8, "uint64 config description",
+                                                         [](uint64 val){ return val % 4 == 0; }};
 
     Switch bool_config_1 = { "bool_config_1", "first bool config description"};
     Switch bool_config_2 = { "bool_config_2", "second bool config description"};
@@ -155,6 +157,34 @@ TEST_CASE( "config_parse: Pass_Args_With_Unrecognised_Option")
     };
 
     CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
+}
+
+TEST_CASE( "config_parse:  Pass_Out_Of_Range")
+{
+    std::vector<const char*> argv
+    {
+        "mipt-mips",
+        "-n", "234",
+        "--uint64_predicated_config_name", "9",
+        "--string_config_name", "test.elf",
+        nullptr
+    };
+
+    CHECK_THROWS_AS( handleArgs( argv), config::InvalidOption);
+}
+
+TEST_CASE( "config_parse:  All_Correct")
+{
+    std::vector<const char*> argv
+    {
+        "mipt-mips",
+        "-n", "234",
+        "--uint64_predicated_config_name", "128",
+        "--string_config_name", "test.elf",
+        nullptr
+    };
+
+    CHECK_NOTHROW( handleArgs( argv));
 }
 
 #if 0

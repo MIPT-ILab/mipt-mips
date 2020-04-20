@@ -19,6 +19,13 @@ Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "wri
 template <typename ISA>
 Writeback<ISA>::~Writeback() = default;
 
+template <typename ISA>
+void Writeback<ISA>::set_kernel( const std::shared_ptr<Kernel>& k, std::string_view isa)
+{
+    kernel = k;
+    checker.init( endian, kernel.get(), isa);
+}
+
 template<typename ISA>
 void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
 {

@@ -33,10 +33,10 @@ public:
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
-    void set_kernel( std::shared_ptr<Kernel> k) final { writeback.set_kernel( k); }
+    void set_kernel( std::shared_ptr<Kernel> k) final { writeback.set_kernel( k, get_isa()); }
+    void disable_checker() final { writeback.disable_checker(); }
     void clock() final;
     void enable_driver_hooks() final { writeback.enable_driver_hooks(); }
-    void init_checker() final { writeback.init_checker( get_isa()); }
     void set_writeback_bandwidth( uint32 wb_bandwidth) { decode.set_wb_bandwidth( wb_bandwidth);}
     int get_exit_code() const noexcept final { return writeback.get_exit_code(); }
 
