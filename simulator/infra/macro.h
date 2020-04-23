@@ -260,7 +260,7 @@ template<typename T>
 T sign_extension( T value, size_t bits)
 {
     if ( bits < bitwidth<T>) {
-        const T msb = T{ 1} << ( bits - 1);
+        const T msb = bits == 0 ? 0 : T{ 1} << ( bits - 1);
         value = ( ( value & bitmask<T>(bits)) ^ msb) - msb;
     }
     return value;
