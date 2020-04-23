@@ -27,14 +27,14 @@ static auto init( const std::string& isa)
 }
 
 // Redirect std::cout to /dev/null
-static auto run_silent( std::shared_ptr<Simulator> sim)
+static auto run_silent( const std::shared_ptr<Simulator>& sim)
 {
     std::ostream nullout( nullptr);
     OStreamWrapper cout_wrapper( std::cout, nullout);
     return sim->run_no_limit();
 }
 
-static auto run_silent( std::shared_ptr<Simulator> sim, size_t steps)
+static auto run_silent( const std::shared_ptr<Simulator>& sim, size_t steps)
 {
     std::ostream nullout( nullptr);
     OStreamWrapper cout_wrapper( std::cout, nullout);
