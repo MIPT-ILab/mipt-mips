@@ -23,11 +23,21 @@
 struct FuncMemoryBadMapping final : Exception
 {
     explicit FuncMemoryBadMapping( const std::string& msg);
+    ~FuncMemoryBadMapping();
+    FuncMemoryBadMapping( const FuncMemoryBadMapping&) = delete;
+    FuncMemoryBadMapping( FuncMemoryBadMapping&&) = delete;
+    FuncMemoryBadMapping& operator=( const FuncMemoryBadMapping&) = delete;
+    FuncMemoryBadMapping& operator=( FuncMemoryBadMapping&&) = delete;
 };
 
 struct FuncMemoryOutOfRange final : Exception
 {
     explicit FuncMemoryOutOfRange( Addr addr, Addr mask);
+    ~FuncMemoryOutOfRange();
+    FuncMemoryOutOfRange( const FuncMemoryOutOfRange&) = delete;
+    FuncMemoryOutOfRange( FuncMemoryOutOfRange&&) = delete;
+    FuncMemoryOutOfRange& operator=( const FuncMemoryOutOfRange&) = delete;
+    FuncMemoryOutOfRange& operator=( FuncMemoryOutOfRange&&) = delete;
 private:
     static std::string generate_string( Addr addr, Addr mask);
 };

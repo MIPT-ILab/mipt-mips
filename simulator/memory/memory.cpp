@@ -13,9 +13,13 @@ FuncMemoryBadMapping::FuncMemoryBadMapping( const std::string& msg) :
     Exception( "Invalid FuncMemory mapping", msg)
 { }
 
+FuncMemoryBadMapping::~FuncMemoryBadMapping() = default;
+
 FuncMemoryOutOfRange::FuncMemoryOutOfRange( Addr addr, Addr mask) :
     Exception( "Out of memory range", generate_string( addr, mask))
 { }
+
+FuncMemoryOutOfRange::~FuncMemoryOutOfRange() = default;
 
 std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
 {
