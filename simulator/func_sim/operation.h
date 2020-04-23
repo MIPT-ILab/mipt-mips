@@ -166,10 +166,11 @@ public:
     using RegisterSInt = sign_t<RegisterUInt>;
 
     void set_v_src( const T& value, size_t index) { v_src.at( index) = value; }
-    void set_v_dst( const T& value, size_t index) { v_dst.at( index) = value; }
     T get_v_src( size_t index) const { return v_src.at( index); }
-    T get_v_dst( size_t index) const { return v_dst.at( index); }
-    std::array<T, MAX_DST_NUM> get_v_dst() const { return v_dst; }
+
+    const std::array<T, MAX_DST_NUM>& get_v_dst() const { return v_dst; }
+    void set_v_dst( const T& value, size_t index) { v_dst.at( index) = value; }
+    T get_v_dst( size_t index) const { return get_v_dst().at( index); }
 
     T get_mask() const { return mask; }
     T get_v_imm() const { return v_imm; }
