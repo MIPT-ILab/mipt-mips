@@ -23,7 +23,7 @@
 struct FuncMemoryBadMapping final : Exception
 {
     explicit FuncMemoryBadMapping( const std::string& msg);
-    ~FuncMemoryBadMapping();
+    ~FuncMemoryBadMapping() final;
     FuncMemoryBadMapping( const FuncMemoryBadMapping&) = delete;
     FuncMemoryBadMapping( FuncMemoryBadMapping&&) = delete;
     FuncMemoryBadMapping& operator=( const FuncMemoryBadMapping&) = delete;
@@ -33,7 +33,7 @@ struct FuncMemoryBadMapping final : Exception
 struct FuncMemoryOutOfRange final : Exception
 {
     explicit FuncMemoryOutOfRange( Addr addr, Addr mask);
-    ~FuncMemoryOutOfRange();
+    ~FuncMemoryOutOfRange() final;
     FuncMemoryOutOfRange( const FuncMemoryOutOfRange&) = delete;
     FuncMemoryOutOfRange( FuncMemoryOutOfRange&&) = delete;
     FuncMemoryOutOfRange& operator=( const FuncMemoryOutOfRange&) = delete;

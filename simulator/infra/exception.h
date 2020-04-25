@@ -23,7 +23,7 @@ public:
     { }
 
     Exception() = delete;
-    ~Exception() = default;
+    ~Exception() override = default;
     Exception( const Exception&) = delete;
     Exception( Exception&&) = delete;
     Exception& operator=( const Exception&) = delete;

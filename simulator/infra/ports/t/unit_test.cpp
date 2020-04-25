@@ -8,6 +8,7 @@
 #include <infra/ports/module.h>
 
 extern const Latency* port_latency_ptr;
+static std::string port_latency_to_string = PORT_LATENCY.to_string();
 
 TEST_CASE( "Latency to string")
 {
@@ -15,6 +16,7 @@ TEST_CASE( "Latency to string")
     CHECK( ( 2_lt).to_string() == "2");
     CHECK( PORT_LATENCY.to_string() == "1");
     CHECK( port_latency_ptr->to_string() == "1");
+    CHECK( port_latency_to_string == "1");
 }
 
 struct BaseTestRoot : public Root
