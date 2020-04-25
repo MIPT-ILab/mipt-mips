@@ -7,10 +7,13 @@
 #include <catch.hpp>
 #include <infra/ports/module.h>
 
+static std::string port_latency_to_string = PORT_LATENCY.to_string();
+
 TEST_CASE( "Latency to string")
 {
-    CHECK( (5_cl).to_string() == "5");
-    CHECK( (2_lt).to_string() == "2");
+    CHECK( ( 5_cl).to_string() == "5");
+    CHECK( ( 2_lt).to_string() == "2");
+    CHECK( port_latency_to_string == "1");
 }
 
 struct BaseTestRoot : public Root
