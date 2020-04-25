@@ -85,3 +85,6 @@ void BasicWritePort::base_init( const std::vector<BasicReadPort*>& readers)
 
     initialized_bandwidth = installed_bandwidth;
 }
+
+const Latency* port_latency_ptr = &PORT_LATENCY;
+
