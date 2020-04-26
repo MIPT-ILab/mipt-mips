@@ -32,10 +32,10 @@ struct SomeTopology : public Root
         ReadPort<int>* from_D;
         explicit A( Module* root) : TestModule( root, "A")
         {
-            to_C = make_write_port<int>( "A_to_C", PORT_BW);
-            to_D = make_write_port<int>( "A_to_D", PORT_BW);
-            from_C = make_read_port<int>( "C_to_A", PORT_LATENCY);
-            from_D = make_read_port<int>( "D_to_A", PORT_LATENCY);
+            to_C = make_write_port<int>( "A_to_C", Port::BW);
+            to_D = make_write_port<int>( "A_to_D", Port::BW);
+            from_C = make_read_port<int>( "C_to_A", Port::LATENCY);
+            from_D = make_read_port<int>( "D_to_A", Port::LATENCY);
         }
     };
     struct B : public TestModule {
@@ -45,10 +45,10 @@ struct SomeTopology : public Root
         ReadPort<int>* from_D;
         explicit B( Module* root) : TestModule( root, "B")
         {
-            to_C = make_write_port<int>( "B_to_C", PORT_BW);
-            to_D = make_write_port<int>( "B_to_D", PORT_BW);
-            from_C = make_read_port<int>( "C_to_B", PORT_LATENCY);
-            from_D = make_read_port<int>( "D_to_B", PORT_LATENCY);
+            to_C = make_write_port<int>( "B_to_C", Port::BW);
+            to_D = make_write_port<int>( "B_to_D", Port::BW);
+            from_C = make_read_port<int>( "C_to_B", Port::LATENCY);
+            from_D = make_read_port<int>( "D_to_B", Port::LATENCY);
         }
     };
     struct C : public TestModule {
@@ -58,10 +58,10 @@ struct SomeTopology : public Root
         ReadPort<int>* from_B;
         explicit C( Module* root) : TestModule( root, "C")
         {
-            to_A = make_write_port<int>( "C_to_A", PORT_BW);
-            to_B = make_write_port<int>( "C_to_B", PORT_BW);
-            from_A = make_read_port<int>( "A_to_C", PORT_LATENCY);
-            from_B = make_read_port<int>( "B_to_C", PORT_LATENCY);
+            to_A = make_write_port<int>( "C_to_A", Port::BW);
+            to_B = make_write_port<int>( "C_to_B", Port::BW);
+            from_A = make_read_port<int>( "A_to_C", Port::LATENCY);
+            from_B = make_read_port<int>( "B_to_C", Port::LATENCY);
         }
     };
     struct D : public TestModule {
@@ -71,10 +71,10 @@ struct SomeTopology : public Root
         ReadPort<int>* from_B;
         explicit D( Module* root) : TestModule( root, "D")
         {
-            to_A = make_write_port<int>( "D_to_A", PORT_BW);
-            to_B = make_write_port<int>( "D_to_B", PORT_BW);
-            from_A = make_read_port<int>( "A_to_D", PORT_LATENCY);
-            from_B = make_read_port<int>( "B_to_D", PORT_LATENCY);
+            to_A = make_write_port<int>( "D_to_A", Port::BW);
+            to_B = make_write_port<int>( "D_to_B", Port::BW);
+            from_A = make_read_port<int>( "A_to_D", Port::LATENCY);
+            from_B = make_read_port<int>( "B_to_D", Port::LATENCY);
         }
     };
     A a;

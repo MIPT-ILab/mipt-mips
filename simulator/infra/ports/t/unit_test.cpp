@@ -7,13 +7,11 @@
 #include <catch.hpp>
 #include <infra/ports/module.h>
 
-static std::string port_latency_to_string = PORT_LATENCY.to_string();
-
 TEST_CASE( "Latency to string")
 {
     CHECK( ( 5_cl).to_string() == "5");
     CHECK( ( 2_lt).to_string() == "2");
-    CHECK( port_latency_to_string == "1");
+    CHECK( Port::LATENCY.to_string() == "1");
 }
 
 struct BaseTestRoot : public Root
@@ -27,7 +25,7 @@ TEST_CASE("Ports: no write port")
     {
         TestRoot()
         {
-            make_read_port<int>( "Key", PORT_LATENCY);
+            make_read_port<int>( "Key", Port::LATENCY);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -39,7 +37,7 @@ TEST_CASE("Ports: no read port")
     {
         TestRoot()
         {
-            make_write_port<int>( "Yek", PORT_BW);
+            make_write_port<int>( "Yek", Port::BW);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -51,9 +49,9 @@ TEST_CASE("Ports: two write ports")
     {
         TestRoot()
         {
-            make_read_port<int>( "Key", PORT_LATENCY);
-            make_write_port<int>( "Key", PORT_BW);
-            CHECK_THROWS_AS( make_write_port<int>( "Key", PORT_BW), PortError);
+            make_read_port<int>( "Key", Port::LATENCY);
+            make_write_port<int>( "Key", Port::BW);
+            CHECK_THROWS_AS( make_write_port<int>( "Key", Port::BW), PortError);
         }
     } tr;
 }
@@ -64,8 +62,8 @@ TEST_CASE("Ports: type mismatch")
     {
         TestRoot()
         {
-            make_read_port<int>( "Key", PORT_LATENCY);
-            make_write_port<std::string>( "Key", PORT_BW);
+            make_read_port<int>( "Key", Port::LATENCY);
+            make_write_port<std::string>( "Key", Port::BW);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;
@@ -78,8 +76,8 @@ struct PairOfPorts : public BaseTestRoot
 
     PairOfPorts()
     {
-        rp = make_read_port<int>( "Key", PORT_LATENCY);
-        wp = make_write_port<int>( "Key", PORT_BW);
+        rp = make_read_port<int>( "Key", Port::LATENCY);
+        wp = make_write_port<int>( "Key", Port::BW);
         init_portmap();
     }
 };
