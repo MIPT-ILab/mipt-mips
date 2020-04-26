@@ -235,9 +235,9 @@ void WritePort<T>::add_reader( BasicReadPort* reader)
     destinations.emplace_back( r);
 }
 
-static constexpr const Latency PORT_LATENCY = 1_lt;
-static constexpr const Latency PORT_LONG_LATENCY = 30_lt;
-static constexpr const uint32 PORT_FANOUT = 1;
-static constexpr const uint32 PORT_BW = 1;
+static inline constexpr const Latency PORT_LATENCY = 1_lt;
+static inline constexpr const Latency PORT_LONG_LATENCY = 30_lt;
+static inline constexpr const uint32 PORT_FANOUT = 1;
+static inline constexpr const uint32 PORT_BW = 1;
 
 #endif // PORTS_H
