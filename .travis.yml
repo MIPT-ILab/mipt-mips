@@ -49,10 +49,10 @@ install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-       export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
+       export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.2
        export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
        cd $TRAVIS_BUILD_DIR && mkdir gdb_build
-       wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
+       wget http://ftp.gnu.org/gnu/gdb/gdb-9.2.tar.gz
        tar -xzf gdb-9.1.tar.gz
     fi
   - if [ "$CC" == "clang" ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
