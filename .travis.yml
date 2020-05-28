@@ -65,7 +65,6 @@ install:
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
        tar -xzf $GDB_VER.tar.gz
     fi
-  - if [ "$CC" == "clang" ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
 # Dump CMake version
   - cmake --version
 
@@ -115,10 +114,14 @@ after_success:
         npx nyc --reporter=lcov npm test && npx codecov
         rm * -rf
     fi
-  - cd $TRAVIS_BUILD_DIR/simulator/debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -G "Ninja"
-  - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
+  - |
+    if [ $CXX == clang++ ]l then
+      cd $TRAVIS_BUILD_DIR/simulator/debug
+      cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -G "Ninja"
+      ninja unit-tests && ctest
+      if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
+      bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
+    fi
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         sudo apt-get install clang-tidy-10
