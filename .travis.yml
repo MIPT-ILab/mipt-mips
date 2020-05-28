@@ -33,7 +33,8 @@ addons:
     sources:
     - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
-    update: true
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'  
+    update: true0
     packages:
     - cmake
     - g++-9
