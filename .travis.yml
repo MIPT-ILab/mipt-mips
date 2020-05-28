@@ -33,9 +33,11 @@ addons:
     sources:
     - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'  
     update: true
     packages:
     - cmake
+    - g++-9
     - libboost-dev
     - ninja-build
     - python3
@@ -46,6 +48,12 @@ addons:
     update: true
 
 install:
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 40
+       sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 40
+       sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-9 40
+    fi
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
@@ -113,10 +121,7 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        # Install GCC 8 to have better constexpr in libstdc++
-        sudo apt-get install clang-tidy-10 g++-8
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 40
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 40
+        sudo apt-get install clang-tidy-10
         clang-tidy-10 --version
         cd $TRAVIS_BUILD_DIR/simulator/debug
         run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
