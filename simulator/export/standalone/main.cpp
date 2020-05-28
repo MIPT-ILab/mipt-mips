@@ -41,7 +41,6 @@ int Main::impl( int argc, const char* argv[]) const {
     kernel->load_file( config::binary_filename);
     sim->set_kernel( kernel);
 
-    sim->init_checker();
     sim->set_pc( kernel->get_start_pc());
     sim->run( config::num_steps);
     return sim->get_exit_code();

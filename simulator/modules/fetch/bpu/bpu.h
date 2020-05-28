@@ -18,8 +18,8 @@
 
 struct BPInvalidMode final : Exception
 {
-    explicit BPInvalidMode(const std::string& mode)
-        : Exception("Invalid mode of branch prediction", mode)
+    BPInvalidMode( const std::string& mode, const std::string& all_modes)
+        : Exception("Invalid mode of branch prediction", mode + '\n' + all_modes)
     { }
 };
 

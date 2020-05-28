@@ -7,6 +7,7 @@
 #ifndef PORT_INSTANCE_H
 #define PORT_INSTANCE_H
 
+#include <func_sim/operation.h>
 #include <infra/ports/module.h>
 
 /*

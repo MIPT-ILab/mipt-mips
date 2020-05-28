@@ -21,13 +21,13 @@ PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
     , endian( endian)
     , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)
 {
-    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_LATENCY);
+    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", Port::LATENCY);
 
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
     writeback.set_driver( ISA::create_driver( this));
 
-    set_writeback_bandwidth( PORT_BW);
+    set_writeback_bandwidth( Port::BW);
 
     init_portmap();
     enable_logging( config::units_to_log);

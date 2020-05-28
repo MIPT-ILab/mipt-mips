@@ -9,34 +9,74 @@
 #include <modules/core/perf_sim.h>
 #include <modules/writeback/writeback.h>
 
-TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
+static auto init( const std::string& isa)
 {
     // Just call a constructor
-    auto sim = Simulator::create_simulator( "mips32", false);
+    auto sim = Simulator::create_simulator( isa, false);
     auto mem = FuncMemory::create_default_hierarchied_memory();
-    CHECK_NOTHROW( sim->set_memory( mem));
-    CHECK( sim->get_exit_code() == 0);
-    CHECK( sim->max_cpu_register() >= 32);
+
+    auto kernel = Kernel::create_kernel( false, std::cin, std::cout, std::cerr);
+    kernel->set_simulator( sim);
+    kernel->connect_memory( mem);
+    kernel->connect_exception_handler();
+
+    sim->set_kernel( kernel);
+    sim->set_memory( mem);
+
+    return sim;
+}
+
+// Redirect std::cout to /dev/null
+static auto run_silent( const std::shared_ptr<Simulator>& sim)
+{
+    std::ostream nullout( nullptr);
+    OStreamWrapper cout_wrapper( std::cout, nullout);
+    return sim->run_no_limit();
+}
+
+static auto run_silent( const std::shared_ptr<Simulator>& sim, size_t steps)
+{
+    std::ostream nullout( nullptr);
+    OStreamWrapper cout_wrapper( std::cout, nullout);
+    return sim->run( steps);
+}
+
+TEST_CASE( "Perf_Sim_init: Process_Correct_Args_Of_Constr")
+{
+    for ( const auto& isa : Simulator::get_supported_isa()) {
+        auto sim = init( isa);          
+        CHECK( sim->get_exit_code() == 0);
+        CHECK( sim->max_cpu_register() >= 32);
+    }
+}
+
+TEST_CASE( "Perf_Sim_init: Default configuration")
+{
+    auto sim = Simulator::create_configured_simulator();
+    CHECK( sim->get_isa() == "mars");
+}
+
+TEST_CASE( "Perf_Sim_init: Default configuration and isa")
+{
+    auto sim = Simulator::create_configured_isa_simulator("riscv32");
+    CHECK( sim->get_isa() == "riscv32");
+}
+
+TEST_CASE( "Perf_Sim_init: Set PC")
+{
+    auto sim = init( "mips32");
+    sim->set_pc( 0x10);
+
+    CHECK( sim->get_pc() == 0x10);
 }
 
 TEST_CASE( "Perf_Sim_init: push a nop")
 {
-    auto sim = CycleAccurateSimulator::create_simulator( "mips32");
-    auto mem = FuncMemory::create_default_hierarchied_memory();
-    sim->set_memory( mem);
-
-    auto kernel = Kernel::create_dummy_kernel();
-    kernel->set_simulator( sim);
-    kernel->connect_memory( mem);
-    kernel->connect_exception_handler();
-    sim->set_kernel( kernel);
-
-    sim->init_checker();
+    auto sim = init( "mips32");
     sim->set_pc( 0x10);
 
-    CHECK_NOTHROW( sim->get_pc() == 0x10);
-    CHECK_NOTHROW( sim->run( 1) );
-    CHECK_NOTHROW( sim->get_pc() == 0x14);
+    run_silent( sim, 1);
+    CHECK( sim->get_pc() == 0x18);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -97,7 +137,7 @@ static auto create_mars_sim( const std::string& isa, const std::string& binary_n
     auto mem = FuncMemory::create_default_hierarchied_memory();
     sim->set_memory( mem);
 
-    auto kernel = Kernel::create_mars_kernel( kernel_in, kernel_out, std::cerr);
+    auto kernel = Kernel::create_kernel( true, kernel_in, kernel_out, std::cerr);
     kernel->set_simulator( sim);
     kernel->connect_memory( mem);
     kernel->connect_exception_handler();
@@ -106,7 +146,6 @@ static auto create_mars_sim( const std::string& isa, const std::string& binary_n
     if ( has_hooks)
         sim->enable_driver_hooks();
 
-    sim->init_checker();
     sim->set_pc( kernel->get_start_pc());
     return sim;
 }
@@ -116,7 +155,8 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal")
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
     auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", nullin, nullout, false);
-    CHECK( sim->run_no_limit() == Trap::HALT);
+
+    CHECK( run_silent( sim) == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -124,8 +164,9 @@ TEST_CASE( "Torture_Test: Perf_Sim, MARS 32, Core Universal hooked")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
+    OStreamWrapper cerr_wrapper( std::cout, nullout);
     auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-tt-no-delayed-branches.bin", nullin, nullout, true);
-    auto trap = sim->run_no_limit();
+    auto trap = run_silent( sim);
     CHECK_FALSE( trap == Trap::NO_TRAP);
     CHECK_FALSE( trap == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
@@ -138,12 +179,23 @@ TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithChecker")
     CHECK_THROWS_AS( create_mars_sim( "mars", TEST_PATH "/mips/mips-smc.bin", nullin, nullout, false)->run_no_limit(), CheckerMismatch);
 }
 
+TEST_CASE( "Perf_Sim: Run_SMC_Trace_WithoutChecker")
+{
+    std::istream nullin( nullptr);
+    std::ostream nullout( nullptr);
+    auto sim = create_mars_sim( "mars", TEST_PATH "/mips/mips-smc.bin", nullin, nullout, false);
+    sim->disable_checker();
+    run_silent( sim);
+    CHECK( sim->get_exit_code() == 0);
+}
+
+
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 simple trace")
 {
     std::istream nullin( nullptr);
     std::ostream nullout( nullptr);
     auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32ui-p-simple", nullin, nullout, false);
-    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( run_silent( sim) == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
 }
 
@@ -152,7 +204,7 @@ TEST_CASE( "Perf_sim: Syscall flushes pipeline")
     std::istringstream input( "4\n8\n");
     std::ostream nullout( nullptr);
     auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32-scall", input, nullout, false);
-    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( run_silent( sim) == Trap::HALT);
 }
 
 TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 breakpoint")
@@ -160,7 +212,7 @@ TEST_CASE( "Torture_Test: Perf_Sim, RISC-V 32 breakpoint")
     std::istream nullin( nullptr);
     std::ostringstream oss;
     auto sim = create_mars_sim( "riscv32", TEST_PATH "/riscv/rv32ui-p-ebreak", nullin, oss, false);
-    CHECK( sim->run_no_limit() == Trap::HALT);
+    CHECK( run_silent( sim) == Trap::HALT);
     CHECK( sim->get_exit_code() == 0);
     CHECK( oss.str() == "  Interrupt 3  occurred\n  Exception 3  occurred\n");
 }

@@ -53,11 +53,36 @@ public:
     Log() : sout( std::cout), serr( std::cerr) { }
 
     // Rule of five
-    virtual ~Log() = default;
+    virtual ~Log();
     Log( const Log&) = delete;
     Log( Log&&) = delete;
     Log& operator=( const Log&) = delete;
     Log& operator=( Log&&) = delete;
+};
+
+class OStreamWrapper
+{
+public:
+    OStreamWrapper( std::ostream& hide, std::ostream& expose)
+        : ostream( hide)
+        , buffer( hide.rdbuf())
+    {
+        ostream.rdbuf( expose.rdbuf());
+    }
+
+    ~OStreamWrapper()
+    {
+        ostream.rdbuf( buffer);
+    }
+
+    OStreamWrapper( const OStreamWrapper&) = delete;
+    OStreamWrapper( OStreamWrapper&&) = delete;
+    OStreamWrapper& operator=( const OStreamWrapper&) = delete;
+    OStreamWrapper& operator=( OStreamWrapper&&) = delete;
+
+private:
+    std::ostream& ostream;
+    std::streambuf* const buffer;
 };
 
 #endif /* LOG_H */

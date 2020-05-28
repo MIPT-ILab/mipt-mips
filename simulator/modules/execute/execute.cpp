@@ -8,50 +8,45 @@
 #include "execute.h"
 
 namespace config {
-    Value<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit"};
+    PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
+                                                [](uint64 val) { return val >= 2 && val < 64; } };
 } // namespace config
 
 template <typename FuncInstr>
 Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
     , last_execution_stage_latency( Latency( config::long_alu_latency - 1))
 {
-    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , PORT_BW );
-    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , PORT_BW );
-    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", PORT_BW);
-    rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", PORT_LATENCY);
-    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
+    wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , Port::BW );
+    wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , Port::BW );
+    wp_writeback_datapath = make_write_port<Instr>("EXECUTE_2_WRITEBACK", Port::BW);
+    rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", Port::LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
-    if (config::long_alu_latency < 2)
-        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be greater than 1");
-    
-    if (config::long_alu_latency > 64)
-        throw Exception("Wrong argument! Latency of long arithmetic logic unit should be less than 64");
-
-    wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", PORT_BW);
+    wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", Port::BW);
     rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", last_execution_stage_latency);
 
-    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", PORT_LATENCY);
+    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
 
-    rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", PORT_LATENCY);
-    rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", PORT_LATENCY);
+    rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", Port::LATENCY);
+    rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", Port::LATENCY);
 
-    wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_BW);
-    wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_BW);
+    wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::BW);
+    wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::BW);
 
-    rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::LATENCY);
+    rps_bypass[1].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::LATENCY);
 
-    rps_bypass[0].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::LATENCY);
+    rps_bypass[1].data_ports[1] = make_read_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::LATENCY);
 
-    rps_bypass[0].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", Port::LATENCY);
+    rps_bypass[1].data_ports[2] = make_read_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", Port::LATENCY);
 
-    rps_bypass[0].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", Port::LATENCY);
+    rps_bypass[1].data_ports[3] = make_read_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", Port::LATENCY);
 
-    rps_bypass[0].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
-    rps_bypass[1].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", PORT_LATENCY);
+    rps_bypass[0].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::LATENCY);
+    rps_bypass[1].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::LATENCY);
 }
 
 template <typename FuncInstr>
@@ -80,7 +75,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
 
         if ( has_flush_expired())
         {
-            wp_long_arithmetic_bypass->write( instr.get_dst_v(), cycle);
+            wp_long_arithmetic_bypass->write( instr.get_v_dst(), cycle);
             wp_writeback_datapath->write( instr, cycle);
         }
     }
@@ -105,7 +100,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             auto& port = bypass_source.data_ports.at( bypass_direction);
             RegisterUInt data{};
             while ( port->is_ready( cycle))
-                data = port->read( cycle).first;
+                data = port->read( cycle)[0];
             instr.set_v_src( data, src_index);
         }
         ++src_index;
@@ -124,7 +119,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
     else
     {
         /* bypass data */
-        wp_bypass->write( instr.get_dst_v(), cycle);
+        wp_bypass->write( instr.get_v_dst(), cycle);
 
         if( instr.is_jump())
         {

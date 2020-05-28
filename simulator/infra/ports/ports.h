@@ -56,6 +56,11 @@ class Port : public Log
 public:
     const std::string& get_key() const noexcept { return k; }
 
+    static constexpr const Latency LATENCY = 1_lt;
+    static constexpr const Latency LONG_LATENCY = 30_lt;
+    static constexpr const uint32 FANOUT = 1;
+    static constexpr const uint32 BW = 1;
+
 protected:
     Port( std::shared_ptr<PortMap> port_map, std::string key);
     std::shared_ptr<PortMap> get_port_map() const noexcept { return pm; }
@@ -234,10 +239,5 @@ void WritePort<T>::add_reader( BasicReadPort* reader)
 
     destinations.emplace_back( r);
 }
-
-static constexpr const Latency PORT_LATENCY = 1_lt;
-static constexpr const Latency PORT_LONG_LATENCY = 30_lt;
-static constexpr const uint32 PORT_FANOUT = 1;
-static constexpr const uint32 PORT_BW = 1;
 
 #endif // PORTS_H

@@ -47,12 +47,17 @@ addons:
 
 install:
 # Download GDB
-  - export GDB_DIR=$TRAVIS_BUILD_DIR/gdb-9.1
-  - export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
-  - if [ "$CC" == "clang" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
-  - cd $TRAVIS_BUILD_DIR && mkdir gdb_build
-  - wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.gz
-  - tar -xzf gdb-9.1.tar.gz
+  - | # TODO (pkryukov): GDB build hangs on ARM...
+    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+       export GDB_VER=gdb-9.2
+       export GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
+       export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+       cd $TRAVIS_BUILD_DIR
+       mkdir gdb_build
+       wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
+       tar -xzf $GDB_VER.tar.gz
+    fi
+  - if [ "$CC" == "clang" ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
 # Dump CMake version
   - cmake --version
 
@@ -63,12 +68,15 @@ before_script:
     if [ $TRAVIS_CPU_ARCH == amd64 ]; then
         cd $TRAVIS_BUILD_DIR/visualizer       && npm install
     fi
-  - cd $GDB_BUILD            && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
-  - cd $GDB_BUILD            && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
-  - cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
-  - cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
-  - cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
-  - cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
+  - | # TODO (pkryukov): GDB build hangs on ARM...
+    if [ $GDB_BUILD ]; then
+        cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+        cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+        cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
+        cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+        cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
+        cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
+     fi
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
@@ -82,9 +90,10 @@ script:
         cd $TRAVIS_BUILD_DIR/visualizer
         npm run test
     fi
-  # TODO (pkryukov): GDB build hangs on ARM...
   - |
-    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+    if [ $GDB_BUILD ]; then
+        cd $TRAVIS_BUILD_DIR/simulator/release
+        ninja gdb-mips-sim
         cd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
@@ -98,9 +107,9 @@ after_success:
         rm * -rf
     fi
   - cd $TRAVIS_BUILD_DIR/simulator/debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -G "Ninja"
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -G "Ninja"
   - ninja unit-tests && ctest
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator > /dev/null
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - |
     if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
         # Install GCC 8 to have better constexpr in libstdc++

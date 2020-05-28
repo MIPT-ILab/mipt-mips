@@ -21,7 +21,8 @@ enum class MIPSReg : uint8
     HI, LO, HI_LO
 };
 
-using Dst  = MIPSReg;
+using Dst = MIPSReg;
+using Src = MIPSReg;
 
 static inline bool is_explicit_register( MIPSReg type)
 {
@@ -86,8 +87,7 @@ struct MIPSInstrDecoder
         switch ( type) {
         case MIPSReg::ZERO:   break;
         case MIPSReg::HI:     return MIPSRegister::mips_hi();
-        case MIPSReg::LO:     /* fallthrough */
-        case MIPSReg::HI_LO:  return MIPSRegister::mips_lo();
+        case MIPSReg::LO:     return MIPSRegister::mips_lo();
         case MIPSReg::RA:     return MIPSRegister::return_address();
         case MIPSReg::RS:     return MIPSRegister::from_cpu_index( rs);
         case MIPSReg::RT:     return MIPSRegister::from_cpu_index( rt);

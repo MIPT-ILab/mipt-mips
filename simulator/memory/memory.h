@@ -22,36 +22,40 @@
 
 struct FuncMemoryBadMapping final : Exception
 {
-    explicit FuncMemoryBadMapping( const std::string& msg)
-        : Exception( "Invalid FuncMemory mapping", msg)
-    { }
+    explicit FuncMemoryBadMapping( const std::string& msg);
+    ~FuncMemoryBadMapping() final;
+    FuncMemoryBadMapping( const FuncMemoryBadMapping&) = delete;
+    FuncMemoryBadMapping( FuncMemoryBadMapping&&) = delete;
+    FuncMemoryBadMapping& operator=( const FuncMemoryBadMapping&) = delete;
+    FuncMemoryBadMapping& operator=( FuncMemoryBadMapping&&) = delete;
 };
 
 struct FuncMemoryOutOfRange final : Exception
 {
-    explicit FuncMemoryOutOfRange( Addr addr, Addr mask)
-        : Exception( "Out of memory range", generate_string( addr, mask))
-    { }
+    explicit FuncMemoryOutOfRange( Addr addr, Addr mask);
+    ~FuncMemoryOutOfRange() final;
+    FuncMemoryOutOfRange( const FuncMemoryOutOfRange&) = delete;
+    FuncMemoryOutOfRange( FuncMemoryOutOfRange&&) = delete;
+    FuncMemoryOutOfRange& operator=( const FuncMemoryOutOfRange&) = delete;
+    FuncMemoryOutOfRange& operator=( FuncMemoryOutOfRange&&) = delete;
 private:
     static std::string generate_string( Addr addr, Addr mask);
 };
 
-class DestructableMemory
-{
-public:
-    DestructableMemory() = default;
-    virtual ~DestructableMemory() = default;
-    DestructableMemory( const DestructableMemory&) = default;
-    DestructableMemory( DestructableMemory&&) = default;
-    DestructableMemory& operator=( const DestructableMemory&) = default;
-    DestructableMemory& operator=( DestructableMemory&&) = default;
-};
-
 class WriteableMemory;
 
-class ReadableMemory : public DestructableMemory
+class ReadableMemory
 {
 public:
+    ReadableMemory();
+    virtual ~ReadableMemory();
+    ReadableMemory( const ReadableMemory&) = delete;
+    ReadableMemory( ReadableMemory&&) = delete;
+    ReadableMemory& operator=( const ReadableMemory&) = delete;
+    ReadableMemory& operator=( ReadableMemory&&) = delete;
+
+    static std::shared_ptr<ReadableMemory> create_zero_memory();
+
     virtual size_t memcpy_guest_to_host( std::byte* dst, Addr src, size_t size) const noexcept = 0;
     virtual void duplicate_to( std::shared_ptr<WriteableMemory> target) const = 0;
     virtual std::string dump() const = 0;
@@ -79,7 +83,7 @@ T ReadableMemory::read( Addr addr) const noexcept
 template<typename Instr>
 void ReadableMemory::load( Instr* instr) const
 {
-    using DstType = decltype( std::declval<Instr>().get_v_dst());
+    using DstType = decltype( std::declval<Instr>().get_v_dst( 0));
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
     auto value = instr->get_endian() == Endian::little
         ? read<DstType, Endian::little>( instr->get_mem_addr(), mask)
@@ -87,18 +91,16 @@ void ReadableMemory::load( Instr* instr) const
     instr->load( value);
 }
 
-class ZeroMemory : public ReadableMemory
+class WriteableMemory
 {
 public:
-    size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
-    void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
-    std::string dump() const final { return std::string( "empty memory\n"); }
-    size_t strlen( Addr /* addr */) const final { return 0; }
-};
+    WriteableMemory();
+    virtual ~WriteableMemory();
+    WriteableMemory( const WriteableMemory&) = delete;
+    WriteableMemory( WriteableMemory&&) = delete;
+    WriteableMemory& operator=( const WriteableMemory&) = delete;
+    WriteableMemory& operator=( WriteableMemory&&) = delete;
 
-class WriteableMemory : public DestructableMemory
-{
-public:
     virtual size_t memcpy_host_to_guest( Addr dst, const std::byte* src, size_t size) = 0;
 
     size_t memcpy_host_to_guest_noexcept( Addr dst, const std::byte* src, size_t size) noexcept try
@@ -119,16 +121,34 @@ public:
 
     void write_string( const std::string& value, Addr addr);
     void write_string_limited( const std::string& value, Addr addr, size_t size);
+
+    void memset( Addr addr, std::byte value, size_t size);
 private:
     void write_string_by_size( const std::string& value, Addr addr, size_t size);
 };
 
 // NOLINTNEXTLINE(fuchsia-multiple-inheritance) Both are pure virtual actually
-class ReadableAndWritableMemory : public ReadableMemory, public WriteableMemory { };
-
-class FuncMemory : public ReadableAndWritableMemory
+class ReadableAndWriteableMemory : public ReadableMemory, public WriteableMemory
 {
 public:
+    ReadableAndWriteableMemory();
+    ~ReadableAndWriteableMemory() override;
+    ReadableAndWriteableMemory( const ReadableAndWriteableMemory&) = delete;
+    ReadableAndWriteableMemory( ReadableAndWriteableMemory&&) = delete;
+    ReadableAndWriteableMemory& operator=( const ReadableAndWriteableMemory&) = delete;
+    ReadableAndWriteableMemory& operator=( ReadableAndWriteableMemory&&) = delete;
+};
+
+class FuncMemory : public ReadableAndWriteableMemory
+{
+public:
+    FuncMemory();
+    ~FuncMemory() override;
+    FuncMemory( const FuncMemory&) = delete;
+    FuncMemory( FuncMemory&&) = delete;
+    FuncMemory& operator=( const FuncMemory&) = delete;
+    FuncMemory& operator=( FuncMemory&&) = delete;
+
     static std::shared_ptr<FuncMemory> create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
     static std::shared_ptr<FuncMemory> create_default_hierarchied_memory()
     {
@@ -156,21 +176,21 @@ private:
 template<typename Instr, Endian endian>
 void FuncMemory::store( const Instr& instr)
 {
-    using SrcType = decltype( std::declval<Instr>().get_v_src2());
+    using SrcType = decltype( std::declval<Instr>().get_v_src( 1));
     if ( instr.get_mem_addr() == 0)
         throw Exception("Store data to zero is a cricital error");
 
     auto full_mask = bitmask<SrcType>( instr.get_mem_size() * CHAR_BIT);
     if ( ( instr.get_mask() & full_mask) == full_mask) switch ( instr.get_mem_size()) {
-        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src2()), instr.get_mem_addr()); break;
-        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src2()), instr.get_mem_addr()); break;
+        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
+        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src( 1)), instr.get_mem_addr()); break;
         default: assert( false);
     }
     else {
-        masked_write<SrcType, endian>( instr.get_v_src2(), instr.get_mem_addr(), instr.get_mask());
+        masked_write<SrcType, endian>( instr.get_v_src( 1), instr.get_mem_addr(), instr.get_mask());
     }
 }
 

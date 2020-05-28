@@ -23,8 +23,6 @@ static const uint64 dataSectAddr = 0x4100c0;
 //
 TEST_CASE( "Func_memory_init: Process_Wrong_Args_Of_Constr")
 {
-    CHECK_NOTHROW( FuncMemory::create_default_hierarchied_memory( )); // check memory initialization with default parameters
-    CHECK_NOTHROW( FuncMemory::create_hierarchied_memory( 48, 15, 10)); // check memory initialization with custom parameters
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 64, 15, 32), FuncMemoryBadMapping); // check memory initialization with 4GB bytes page
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48, 32, 10), FuncMemoryBadMapping); // check memory initialization with 4GB pages set
     CHECK_THROWS_AS( FuncMemory::create_hierarchied_memory( 48,  6, 10), FuncMemoryBadMapping); // check memory initialization with 4GB sets
@@ -36,16 +34,16 @@ TEST_CASE( "Func_memory_init: Process_Correct_ElfInit")
     CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
 }
 
-TEST_CASE( "Func_memory_init: Process_Correct_ElfInit custom mapping")
-{
-    auto ptr = FuncMemory::create_hierarchied_memory( 48, 15, 10);
-    CHECK_NOTHROW( ElfLoader( valid_elf_file).load_to( ptr.get()));
-}
-
 TEST_CASE( "Func_memory_init: Process_Wrong_ElfInit")
 {
     // test behavior when the file name does not exist
     CHECK_THROWS_AS( ElfLoader( "./1234567890/qwertyuiop"), InvalidElfFile);
+}
+
+TEST_CASE( "Func_memory_init: Process_Correct_ElfInit_BSS")
+{
+    auto ptr = FuncMemory::create_default_hierarchied_memory();
+    CHECK_NOTHROW( ElfLoader( TEST_PATH "/elf/qsort.riscv").load_to( ptr.get()));
 }
 
 TEST_CASE( "Func_memory: StartPC_Method_Test")
@@ -249,7 +247,7 @@ TEST_CASE( "Func_memory: Dump")
 TEST_CASE( "Func_memory: Duplicate")
 {
     auto mem1 = FuncMemory::create_default_hierarchied_memory();
-    auto mem2 = FuncMemory::create_hierarchied_memory( 48, 15, 10);
+    auto mem2 = FuncMemory::create_default_hierarchied_memory();
 
     ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
@@ -282,16 +280,27 @@ TEST_CASE( "Func_memory: Duplicate Plain Memory")
     check_coherency( mem1.get(), mem2.get(), dataSectAddr - 0x400000);
 }
 
+TEST_CASE( "Func_memory: memset")
+{
+    auto mem = FuncMemory::create_plain_memory( 24);
+
+    mem->memset( 0x1000, std::byte{'a'}, 16);
+    mem->memset( 0x1000, std::byte{'b'}, 8);
+
+    CHECK( mem->read<uint8, Endian::little>( 0x1000) == 'b');
+    CHECK( mem->read<uint8, Endian::little>( 0x1008) == 'a');
+}
+
 TEST_CASE( "Func_memory: ZeroMemory")
 {
-    ZeroMemory zm;
-    CHECK( zm.read<uint32, Endian::big>(0x12355) == 0 );
-    CHECK( zm.dump() == "empty memory\n");
+    auto zm = ReadableMemory::create_zero_memory();
+    CHECK( zm->read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm->dump() == "empty memory\n");
 }
 
 TEST_CASE( "Func_memory: String length in zero memory")
 {
-    CHECK( ZeroMemory().strlen(0x10) == 0);
+    CHECK( ReadableMemory::create_zero_memory()->strlen(0x10) == 0);
 }
 
 TEST_CASE( "Zero_memory: Duplicate")
@@ -301,7 +310,7 @@ TEST_CASE( "Zero_memory: Duplicate")
 
     ElfLoader( valid_elf_file).load_to( mem1.get(), -0x400000);
     mem1->duplicate_to( mem2);
-    ZeroMemory().duplicate_to( mem1); // nop
+    ReadableMemory::create_zero_memory()->duplicate_to( mem1); // nop
 
     check_coherency( mem1.get(), mem2.get(), 0);
 }
@@ -361,7 +370,7 @@ class DummyStore : public Datapath<uint64> {
             set_type( OUT_STORE);
             mem_addr = a;
             mem_size = 8;
-            v_src2 = 0xABCD'EF12'3456'7890ULL;
+            v_src[1] = 0xABCD'EF12'3456'7890ULL;
         }
         static auto get_endian() { return Endian::little; } 
 };
@@ -378,7 +387,7 @@ TEST_CASE( "Func_memory: Store to 0x100")
     DummyStore store( 0x100);
     auto mem = FuncMemory::create_4M_plain_memory();
     mem->load_store( &store);
-    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src2());
+    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src( 1));
 }
 
 TEST_CASE( "Func_memory Replicant: read and write")

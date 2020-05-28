@@ -49,7 +49,7 @@ public:
     void connect_exception_handler() final;
 
     MARSKernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream)
-      : instream( instream), outstream( outstream), errstream( errstream) {}
+      : BaseKernel( errstream), instream( instream), outstream( outstream), errstream( errstream) {}
 };
 
 std::shared_ptr<Kernel> create_mars_kernel( std::istream& instream, std::ostream& outstream, std::ostream& errstream) {

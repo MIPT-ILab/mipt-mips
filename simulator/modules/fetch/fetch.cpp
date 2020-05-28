@@ -18,30 +18,30 @@ namespace config {
 template <typename FuncInstr>
 Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
 {
-    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", PORT_BW);
-    rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", PORT_LATENCY);
+    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", Port::BW);
+    rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", Port::LATENCY);
 
-    rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", PORT_LATENCY);
+    rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", Port::LATENCY);
 
-    wp_target = make_write_port<Target>("TARGET", PORT_BW);
-    rp_target = make_read_port<Target>("TARGET", PORT_LATENCY);
+    wp_target = make_write_port<Target>("TARGET", Port::BW);
+    rp_target = make_read_port<Target>("TARGET", Port::LATENCY);
 
-    wp_hold_pc = make_write_port<Target>("HOLD_PC", PORT_BW);
-    rp_hold_pc = make_read_port<Target>("HOLD_PC", PORT_LATENCY);
+    wp_hold_pc = make_write_port<Target>("HOLD_PC", Port::BW);
+    rp_hold_pc = make_read_port<Target>("HOLD_PC", Port::LATENCY);
 
-    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_LATENCY);
+    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", Port::LATENCY);
 
-    rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", PORT_LATENCY);
+    rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", Port::LATENCY);
 
-    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_BW);
-    rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", PORT_LONG_LATENCY);
+    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", Port::BW);
+    rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", Port::LONG_LATENCY);
 
-    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", PORT_BW);
-    rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", PORT_LATENCY);
+    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", Port::BW);
+    rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", Port::LATENCY);
 
     /* port needed for handling misprediction at decode stage */
-    rp_bp_update_from_decode = make_read_port<BPInterface>("DECODE_2_FETCH", PORT_LATENCY);
-    rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", PORT_LATENCY);
+    rp_bp_update_from_decode = make_read_port<BPInterface>("DECODE_2_FETCH", Port::LATENCY);
+    rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", Port::LATENCY);
 
     bp = BaseBP::create_configured_bp();
     tags = CacheTagArray::create(

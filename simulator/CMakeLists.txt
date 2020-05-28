@@ -17,6 +17,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Export for Clang-Tidy
 option(ENABLE_COVERAGE "Generate coverage for codecov.io" OFF)
 option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
 option(ENABLE_IPO "Enable interprocedural optimizations" OFF)
+option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
+option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -70,10 +72,12 @@ add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests\")
 add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
+file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/opcodes-*)
+
 add_custom_command(
-    OUTPUT ${RISCV_DIR}/riscv.opcode.gen.h
-    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_DIR}/opcodes ${RISCV_DIR}/../riscv-bitmanip-opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/opcodes-rvc-pseudo > ${RISCV_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_DIR}/opcodes ${RISCV_DIR}/opcodes-rvc ${RISCV_DIR}/../riscv-bitmanip-opcodes
+    OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES}
 )
 
 if (MSVC)
@@ -95,6 +99,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wno-unused-command-line-argument")
+endif()
+
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
 if (COMPILER_SUPPORTS_MARCH_NATIVE)
@@ -102,18 +110,30 @@ if (COMPILER_SUPPORTS_MARCH_NATIVE)
 endif()
 
 if (ENABLE_COVERAGE)
-    if (WIN32)
-        message(FATAL_ERROR "CodeCov is not supported for Windows builds")
-    endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -fno-inline -DNDEBUG")
-    # add_link_options(--coverage)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-    link_libraries(gcov)
+    add_definitions(-DNDEBUG) # exclude 'assert' macro
+    if (NOT MSVC)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage -g -fno-inline")
+        # add_link_options(--coverage)
+        set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --coverage")
+        link_libraries(gcov)
+     endif()
 endif()
 
 if (ENABLE_PROFILE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+endif()
+
+if (ENABLE_ASAN AND NOT MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+endif()
+
+if (ENABLE_UBSAN AND NOT MSVC)
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
+   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=undefined -lgcc_s")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+       set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --rtlib=compiler-rt")
+   endif()
 endif()
 
 if (GDB_SOURCE_PATH)
@@ -152,6 +172,7 @@ include_directories(SYSTEM
         ${Boost_INCLUDE_DIRS})
 
 add_library(mipt-mips-src OBJECT
+    infra/log.cpp
     infra/print128.cpp
     infra/config/main_wrapper.cpp
     infra/config/config.cpp
@@ -189,7 +210,7 @@ add_library(mipt-mips-src OBJECT
     modules/writeback/writeback.cpp
     modules/writeback/checker/checker.cpp
     simulator.cpp
-    ${RISCV_DIR}/riscv.opcode.gen.h
+    ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
 )
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp $<TARGET_OBJECTS:mipt-mips-src>)
@@ -198,8 +219,10 @@ add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} 
 add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
 
 # Symlink for new name
-add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
-add_dependencies(mipt-v mipt-mips)
+if (NOT MSVC)
+    add_custom_target(mipt-v ALL COMMAND ${CMAKE_COMMAND} -E create_symlink mipt-mips mipt-v)
+    add_dependencies(mipt-v mipt-mips)
+endif()
 
 target_link_libraries(unit-tests mipt-mips-cen64-intf)
 

@@ -5,7 +5,7 @@
  * Copyright 2018 MIPT-MIPS
  */
 
-#include "memory.h"
+#include <memory/memory.h>
 
 #include <iomanip>
 #include <sstream>

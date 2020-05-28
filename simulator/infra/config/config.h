@@ -19,23 +19,27 @@ namespace popl {
 
 namespace config {
 
-class BaseValue
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-    friend void handleArgs( int argc, const char* const argv[], int start_index);
-    friend std::string help();
-protected:
-    static popl::OptionParser& options();
-};
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+void handleArgs( int argc, const char* const argv[], int start_index);
+std::string help();
 
 enum class Type {
     OPTIONAL,
     REQUIRED,
-    SWITCH
+    SWITCH,
+    PREDICATED
 };
 
+template<typename T> using Predicate = bool(*)(T);
+
+template<typename T>
+static inline Predicate<T> get_null_predicate()
+{
+    return [](T /* ignore */){ return true; };
+}
+
 template<typename T, Type type>
-class BaseTValue : public BaseValue
+class BaseTValue
 {
 public:
     BaseTValue() = delete;
@@ -56,7 +60,11 @@ public:
     }
 
 protected:
-    BaseTValue( std::string_view alias, std::string_view name, std::string_view desc, const T& default_value ) noexcept;
+    BaseTValue( std::string_view alias,
+                std::string_view name,
+                std::string_view desc,
+                const T& default_value,
+                Predicate<T> predicate) noexcept;
 
 private:
     T value = T();
@@ -66,7 +74,7 @@ template<typename T>
 struct AliasedRequiredValue : BaseTValue<T, Type::REQUIRED>
 {
     AliasedRequiredValue( std::string_view alias, std::string_view name, std::string_view desc) noexcept
-        : BaseTValue<T, Type::REQUIRED>( alias, name, desc, T())
+        : BaseTValue<T, Type::REQUIRED>( alias, name, desc, T(), get_null_predicate<T>())
     { }
 };
 
@@ -74,7 +82,7 @@ template<typename T>
 struct AliasedValue : BaseTValue<T, Type::OPTIONAL>
 {
     AliasedValue( std::string_view alias, std::string_view name, const T& val, std::string_view desc) noexcept
-        : BaseTValue<T, Type::OPTIONAL>( alias, name, desc, val)
+        : BaseTValue<T, Type::OPTIONAL>( alias, name, desc, val, get_null_predicate<T>())
     { }
 };
 
@@ -82,14 +90,14 @@ template<>
 struct AliasedValue<std::string> : BaseTValue<std::string, Type::OPTIONAL>
 {
     AliasedValue( std::string_view alias, std::string_view name, std::string_view val, std::string_view desc) noexcept
-        : BaseTValue<std::string, Type::OPTIONAL>( alias, name, desc, std::string( val))
+        : BaseTValue<std::string, Type::OPTIONAL>( alias, name, desc, std::string( val), get_null_predicate<std::string>())
     { }
 };
 
 struct AliasedSwitch : BaseTValue<bool, Type::SWITCH>
 {
     AliasedSwitch( std::string_view alias, std::string_view name, std::string_view desc) noexcept
-        : BaseTValue<bool, Type::SWITCH>( alias, name, desc, false)
+        : BaseTValue<bool, Type::SWITCH>( alias, name, desc, false, get_null_predicate<bool>())
     { }
 };
 
@@ -97,6 +105,14 @@ template<typename T>
 struct Value : AliasedValue<T>
 {
     Value( std::string_view name, const T& val, std::string_view desc) noexcept : AliasedValue<T>( "", name, val, desc) { }
+};
+
+template<typename T>
+struct PredicatedValue : BaseTValue<T, Type::PREDICATED>
+{
+    PredicatedValue( std::string_view name, const T& val, std::string_view desc, Predicate<T> predicate) noexcept
+        : BaseTValue<T, Type::PREDICATED>( "", name, desc, val, predicate)
+    { }
 };
 
 template<>
@@ -127,10 +143,6 @@ struct InvalidOption : Exception
 {
     explicit InvalidOption( const std::string& msg) : Exception( "Invalid option", msg) {}
 };
-
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
-void handleArgs( int argc, const char* const argv[], int start_index);
-std::string help();
 
 } // namespace config
 

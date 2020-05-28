@@ -21,6 +21,13 @@ public:
     explicit Exception( const std::string& message)
         : Exception( "Unqualified exception", message)
     { }
+
+    Exception() = delete;
+    ~Exception() override = default;
+    Exception( const Exception&) = delete;
+    Exception( Exception&&) = delete;
+    Exception& operator=( const Exception&) = delete;
+    Exception& operator=( Exception&&) = delete;
 };
 
 #endif /* EXCEPTION_H */
