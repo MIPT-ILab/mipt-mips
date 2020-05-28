@@ -52,6 +52,7 @@ install:
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 40
        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 40
+       sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-9 40
     fi
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
