@@ -17,8 +17,8 @@
 struct Reg
 {
     enum Type : uint8 {
-        RS1, RS2, RS2_COMPR, RD,
-        RS1_3_BITS, RS2_3_BITS, RD_3_BITS,
+        RS1, RS2, RS2_CMP, RD,
+        RS1_3BIT, RS2_3BIT, RD_3BIT,
         CSR, SEPC, MEPC,
         ZERO, SP, RA,
         MAX_REG
@@ -200,6 +200,9 @@ struct RISCVInstrDecoder
     {
         switch (subset) {
         case 'I': return I_imm;
+        case '5': return I_imm & bitmask<uint32>( 5);
+        case '6': return I_imm & bitmask<uint32>( 6);
+        case '7': return I_imm & bitmask<uint32>( 7);
         case 'B': return get_B_immediate();
         case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
         case 'U': return U_imm;
@@ -222,25 +225,29 @@ struct RISCVInstrDecoder
         case C_LW:   return get_C_LW_immediate();
         case C_LD:   return get_C_LD_immediate();
         case C_LQ:   return get_C_LQ_immediate();
-        case C_S:
-        case C_I:    return get_C_I_immediate();
         case C_J:    return get_C_J_immediate();
         case C_B:    return get_C_B_immediate();
         case C_ADDI4SPN: return get_C_ADDI4SPN_immediate();
         case C_ADDI16SP: return get_C_ADDI16SP_immediate();
-        default:     assert(0); return 0;
+        case C_S:
+        case C_I:    break;
+        default:     assert( false);
         }
+        return get_C_I_immediate();
     }
 
     template<typename R>
     static R get_immediate( char subset, uint32 value) noexcept
     {
         switch (subset) {
-        case I:
-        case B:
-        case S:          return sign_extension<12, R>( value);
-        case U:
-        case J:          return sign_extension<20, R>( value);
+        case '5':
+        case '6':
+        case '7':        return value & bitmask<R>( log_bitwidth<R>);
+        case 'I':
+        case 'B':
+        case 'S':        return sign_extension<12, R>( value);
+        case 'U':
+        case 'J':        return sign_extension<20, R>( value);
         case C_I:        return sign_extension<6, R>( value);
         case C_J:        return sign_extension<12, R>( value);
         case C_B:        return sign_extension<9, R>( value);
@@ -292,10 +299,10 @@ struct RISCVInstrDecoder
         registers[Reg::RS1]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000000'00001111'10000000'00000000));
         registers[Reg::RS2]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000001'11110000'00000000'00000000));
         registers[Reg::CSR]  = RISCVRegister::from_csr_index( apply_mask( raw, 0b11111111'11110000'00000000'00000000));
-        registers[Reg::RS2_COMPR]  = RISCVRegister::from_cpu_index(      apply_mask( raw, 0b00000000'01111100));
-        registers[Reg::RD_3_BITS]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
-        registers[Reg::RS1_3_BITS] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000011'10000000));
-        registers[Reg::RS2_3_BITS] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
+        registers[Reg::RS2_CMP]  = RISCVRegister::from_cpu_index(      apply_mask( raw, 0b00000000'01111100));
+        registers[Reg::RD_3BIT]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
+        registers[Reg::RS1_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000011'10000000));
+        registers[Reg::RS2_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
     }
 };
 

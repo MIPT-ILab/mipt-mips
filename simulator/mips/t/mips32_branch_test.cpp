@@ -67,7 +67,7 @@ TEST_CASE( "MIPS32_instr: bgezal 0, 1 instruction ahead")
     instr.set_v_src( 0, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 
     CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
@@ -81,7 +81,7 @@ TEST_CASE( "MIPS32_instr: bgezal 1, 1 instruction ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezal -1, 1 instruction ahead")
@@ -90,7 +90,7 @@ TEST_CASE( "MIPS32_instr: bgezal -1, 1 instruction ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezal 1, 1024 instructions ahead")
@@ -99,7 +99,7 @@ TEST_CASE( "MIPS32_instr: bgezal 1, 1024 instructions ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezal 1, back to 1024 instruction")
@@ -108,7 +108,7 @@ TEST_CASE( "MIPS32_instr: bgezal 1, back to 1024 instruction")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -121,7 +121,7 @@ TEST_CASE( "MIPS32_instr: bgezall 0, 1 instruction ahead")
     instr.set_v_src( 0, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 
     CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
@@ -135,7 +135,7 @@ TEST_CASE( "MIPS32_instr: bgezall 1, 1 instruction ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezall -1, 1 instruction ahead")
@@ -144,7 +144,7 @@ TEST_CASE( "MIPS32_instr: bgezall -1, 1 instruction ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezall 1, 1024 instructions ahead")
@@ -153,7 +153,7 @@ TEST_CASE( "MIPS32_instr: bgezall 1, 1024 instructions ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bgezall 1, back to 1024 instruction")
@@ -162,7 +162,7 @@ TEST_CASE( "MIPS32_instr: bgezall 1, back to 1024 instruction")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -371,7 +371,7 @@ TEST_CASE( "MIPS32_instr: bltzal 0, 1 instruction ahead")
     instr.set_v_src( 0, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 
     CHECK( instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
@@ -385,7 +385,7 @@ TEST_CASE( "MIPS32_instr: bltzal 1, 1 instruction ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzal -1, 1 instruction ahead")
@@ -394,7 +394,7 @@ TEST_CASE( "MIPS32_instr: bltzal -1, 1 instruction ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzal -1, 1024 instructions ahead")
@@ -403,7 +403,7 @@ TEST_CASE( "MIPS32_instr: bltzal -1, 1024 instructions ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzal -1, back to 1024 instruction")
@@ -412,7 +412,7 @@ TEST_CASE( "MIPS32_instr: bltzal -1, back to 1024 instruction")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -474,7 +474,7 @@ TEST_CASE( "MIPS32_instr: bltzall 0, 1 instruction ahead")
     instr.set_v_src( 0, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 
     CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
@@ -488,7 +488,7 @@ TEST_CASE( "MIPS32_instr: bltzall 1, 1 instruction ahead")
     instr.set_v_src( 1, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzall -1, 1 instruction ahead")
@@ -497,7 +497,7 @@ TEST_CASE( "MIPS32_instr: bltzall -1, 1 instruction ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 8);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzall -1, 1024 instructions ahead")
@@ -506,7 +506,7 @@ TEST_CASE( "MIPS32_instr: bltzall -1, 1024 instructions ahead")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 + 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 
 TEST_CASE( "MIPS32_instr: bltzall -1, back to 1024 instruction")
@@ -515,7 +515,7 @@ TEST_CASE( "MIPS32_instr: bltzall -1, back to 1024 instruction")
     instr.set_v_src( 0xffff'ffff, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == instr.get_PC() + 4 - 1024 * 4);
-    CHECK( instr.get_v_dst()  == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0)  == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -642,7 +642,7 @@ TEST_CASE( "MIPS32_instr: eret")
     instr.set_v_src( 0b1111, 1);
     instr.execute();
     CHECK( instr.get_new_PC() == 0x200);
-    CHECK( instr.get_v_dst() == 0b1011);
+    CHECK( instr.get_v_dst( 0) == 0b1011);
     CHECK( instr.get_delayed_slots() == 0);
 }
 
@@ -654,7 +654,7 @@ TEST_CASE( "MIPS32_instr: jal to 0xfff-th instr")
     MIPS32Instr instr( "jal", 0x0fff);
     instr.execute();
     CHECK( instr.get_new_PC() == 0xfff * 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0) == instr.get_PC() + 8);
 
     CHECK( !instr.is_common_branch() );
     CHECK( instr.is_direct_jump() );
@@ -671,7 +671,7 @@ TEST_CASE( "MIPS32_instr: jalr to 1024th byte")
     instr.set_v_src( 1024, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 1024);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0) == instr.get_PC() + 8);
 
     CHECK( !instr.is_common_branch() );
     CHECK( !instr.is_direct_jump() );
@@ -685,7 +685,7 @@ TEST_CASE( "MIPS32_instr: jalr to 2nd byte (round up to 4th)")
     instr.set_v_src( 2, 0);
     instr.execute();
     CHECK( instr.get_new_PC() == 4);
-    CHECK( instr.get_v_dst() == instr.get_PC() + 8);
+    CHECK( instr.get_v_dst( 0) == instr.get_PC() + 8);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -727,3 +727,10 @@ TEST_CASE( "MIPS32_instr: j to 4th instr")
     CHECK( !instr.is_likely_branch() );
 }
 
+TEST_CASE( "MIPS32_instr: j loop")
+{
+    MIPS32Instr instr( "j", 0);
+    instr.execute();
+    CHECK( instr.has_trap());
+    CHECK( instr.trap_type() == Trap::HALT);
+}

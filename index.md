@@ -19,12 +19,15 @@ Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building
 [L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
 [L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L6/Lecture%206%20-%20Pipelining.%20Data%20Hazards.pptx?raw=true
 [L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L7/Lecture%207%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
-[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches.pptx?raw=true
+[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches,%20part%201.pptx?raw=true
 [L9]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L9/Lecture%209%20-%20Caches%2C%20part%202.pptx?raw=true
 [L10]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L10/Lecture%2010%20-%20Advanced%20Pipelining.pptx?raw=true
 [L11]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L11/Lecture%2011%20-%20Virtual%20Memory.pptx?raw=true
 [L12]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L12/Lecture%2012%20-%20ILP.%20Superscalar.%20OOO%20-%20part%201.pptx?raw=true
 [L13]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L13/Lecture%2013%20-%20OOO%20-%20part%202.pptx?raw=true
+[L14]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L14/Lecture%2014%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
+[L15]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L15/Lecture%2015%20-%20TLP%20-%20part%201.pptx?raw=true
+[L16]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L16/Lecture%2016%20-%20TLP%20-%20part%202%20(Multithreading,%20Synchronization).pptx?raw=true
 [P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -44,8 +47,11 @@ Date   | Type     | Event
 07 Dec | Test     | **Final Test 1**<br>
 10 Feb | Lecture  | **L10: Advanced Pipelining**<br>                      • Slides: [no audio][L10]
 17 Feb | Lecture  | **L11: Virtual Memory**<br>                           • Slides: [no audio][L11]
-02 Mar | Lecture  | **L12: ILP. Superscalar. OOO - part 1**<br>           • Slides: [no audio][L12]
-16 Mar | Lecture  | **L13: OOO - part 2**<br>                             • Slides: [no audio][L13]
+02 Mar | Lecture  | **L12: Instruction-Level Parallelism.<br> Superscalar. Out-of-Order, part 1**<br> • Slides: [no audio][L12]
+16 Mar | Lecture  | **L13: Out-of-Order, part 2**<br>                     • Slides: [no audio][L13]
+23 Mar | Online<br>lecture  | **L14: Out-of-Order, part 3: Loads and Stores**<br>   • Slides: [no audio][L14]
+30 Mar | Online<br>lecture  | **L15: Thread-Level Parallelism, part 1**<br>         • Slides: [no audio][L15]
+06 Apr | Online<br>lecture  | **L16: Thread-Level Parallelism, part 2**<br>         • Slides: [no audio][L16]
 
 You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
 

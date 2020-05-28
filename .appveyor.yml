@@ -1,5 +1,5 @@
 version: "{branch}-ci-{build}"
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 branches:
   only:
@@ -8,34 +8,43 @@ branches:
 environment:
   matrix:
   - build: msvc
-    platform: x86
-    CMAKEFILE: "Visual Studio 15"
-  - build: msvc
-    platform: x64
-    CMAKEFILE: "Visual Studio 15 Win64"
   - build: g++
-    platform: x86
-    CMAKEFILE: "Ninja"
-  - build: g++
-    platform: x64
-    CMAKEFILE: "Ninja"
+
+platform:
+  - Win32
+  - x64
+  
+configuration:
+  - Debug
+  - Release
+
+matrix:
+  exclude:
+    - build: g++
+      configuration: Debug
+    - platform: Win32
+      configuration: Debug
+
+install:
+- if "%configuration%"=="Debug" choco install opencppcoverage codecov
+- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
+- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
 
 before_build:
 - git submodule update --init
-- if "%platform%"=="x86" set MSYSTEM=mingw32
-- if "%platform%"=="x64" set MSYSTEM=mingw64
-- set PATH=C:\projects\deps\ninja;C:\msys64\%MSYSTEM%;C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin\;C:\Libraries\boost_1_67_0;C:\Projects\mipt-mips\mips-linux-gnu\bin;%PATH%
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" -arch=%platform%
-- if "%platform%"=="x86" set platform=Win32 # oh dear
 
 build_script:
-- mkdir build
-- cd build
-- cmake ../simulator -G "%CMAKEFILE%"
-- if not "%build%"=="msvc" bash -lc "cd /c/projects/mipt-mips/build; ninja mipt-mips unit-tests"
-- if "%build%"=="msvc" MSBuild .\mipt-mips.sln /p:Configuration=Release /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc" move Release\mipt-mips.exe mipt-mips.exe
+- mkdir build && cd build
+- if not "%build%"=="msvc" cmake ../simulator -G Ninja
+- if "%build%"=="msvc"     cmake ../simulator -G "Visual Studio 16 2019" -A %platform% -DENABLE_COVERAGE=1
+- if not "%build%"=="msvc" ninja mipt-mips unit-tests cachesim
+- if "%build%"=="msvc"     MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
+- if "%build%"=="msvc"     move %configuration%\*.exe .
 
 test_script:
-- .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 1000000 --mars
-- ctest -C Release --verbose
+- .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 100000 --mars
+- .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
+- if not  "%configuration%"=="Debug" ctest -C %configuration% --verbose
+- if "%configuration%"=="Debug" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "%APPVEYOR_BUILD_FOLDER%\external\*" -- %APPVEYOR_BUILD_FOLDER%\build\unit-tests.exe
+- if "%configuration%"=="Debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%

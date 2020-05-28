@@ -46,8 +46,8 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         bool is_same_checker( const BaseMIPSInstr& rhs) const {
             return is_same(rhs)
                 && this->get_sequence_id() == rhs.get_sequence_id()
-                && (this->dst.is_zero()  || this->v_dst == rhs.v_dst)
-                && (this->dst2.is_zero() || this->v_dst2 == rhs.v_dst2);
+                && (this->get_dst( 0).is_zero() || this->get_v_dst( 0) == rhs.get_v_dst( 0))
+                && (this->get_dst( 1).is_zero() || this->get_v_dst( 1) == rhs.get_v_dst( 1));
         }
 
         std::string get_disasm() const;
@@ -70,15 +70,6 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
         void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
         void init_target();
         static DisasmCache& get_disasm_cache();
-        
-        void set_src( size_t index, MIPSRegister reg) {
-            switch (index) {
-            case 0: this->src1 = reg; break;
-            case 1: this->src2 = reg; break;
-            case 2: this->src3 = reg; break;
-            default: assert(0);
-            }
-        }
 };
 
 #endif //MIPS_INSTR_H

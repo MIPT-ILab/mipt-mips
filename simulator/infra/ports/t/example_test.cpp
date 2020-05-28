@@ -43,10 +43,10 @@ class A : public Module
 public:
     explicit A( Module* root) : Module( root, "A")
     {
-        to_B = make_write_port<int>( "A_to_B", PORT_BW);
-        from_B = make_read_port<int>( "B_to_A", PORT_LATENCY);
-        init = make_read_port<int>( "init_A", PORT_LATENCY);
-        stop = make_write_port<bool>( "stop", PORT_BW);
+        to_B = make_write_port<int>( "A_to_B", Port::BW);
+        from_B = make_read_port<int>( "B_to_A", Port::LATENCY);
+        init = make_read_port<int>( "init_A", Port::LATENCY);
+        stop = make_write_port<bool>( "stop", Port::BW);
     }
 
     void clock( Cycle cycle)
@@ -88,8 +88,8 @@ class B : public Module
 public:
     explicit B(  Module* root) : Module( root, "B")
     {
-        to_A = make_write_port<int>( "B_to_A", PORT_BW);
-        from_A = make_read_port<int>( "A_to_B", PORT_LATENCY);
+        to_A = make_write_port<int>( "B_to_A", Port::BW);
+        from_A = make_read_port<int>( "A_to_B", Port::LATENCY);
     };
 
     void clock( Cycle cycle)
@@ -114,8 +114,8 @@ class TestRoot : public Root
 public:
     TestRoot() : Root( "test-root"), a( this), b( this)
     {
-        init = make_write_port<int>( "init_A", PORT_BW);
-        stop = make_read_port<bool>( "stop", PORT_LATENCY);
+        init = make_write_port<int>( "init_A", Port::BW);
+        stop = make_read_port<bool>( "stop", Port::LATENCY);
         init_portmap();
         CHECK( init->get_fanout() == 1);
 

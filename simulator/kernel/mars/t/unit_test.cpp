@@ -29,14 +29,14 @@ TEST_CASE( "MARS: print integer") {
     CHECK( output.str() == "-1337");
 }
 
-struct System
+struct MARSSystem
 {
     std::shared_ptr<Simulator> sim = nullptr;
     std::shared_ptr<Kernel> mars_kernel = nullptr;
     std::shared_ptr<FuncMemory> mem = nullptr;
 
     template<typename ... KernelArgs>
-    explicit System( KernelArgs&&... args)
+    explicit MARSSystem( KernelArgs&&... args)
         : sim( Simulator::create_simulator( "mips64", true))
         , mars_kernel( create_mars_kernel(std::forward<KernelArgs>(args)...))
         , mem( FuncMemory::create_default_hierarchied_memory())
@@ -51,7 +51,7 @@ TEST_CASE( "MARS: print string")
 {
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( "Hello World!", 0x1000);
 
     sys.sim->write_cpu_register( v0, 4U); // print character
@@ -81,24 +81,11 @@ TEST_CASE( "MARS: read integer")
     CHECK_THROWS_AS( read_integer("13333333333333333333333333333333333333333333333333333"), BadInputValue);
 }
 
-TEST_CASE( "MARS: read bad integer ang fix")
-{
-    std::istringstream input( "133q\n133\n");
-    std::ostringstream out;
-    auto sim = Simulator::create_simulator( "mips64", true);
-    auto mars_kernel = create_mars_kernel( input, out, out);
-    mars_kernel->set_simulator( sim);
-
-    sim->write_cpu_register( v0, 5U); // read integer
-    CHECK( mars_kernel->execute_interactive() == Trap::NO_TRAP);
-    CHECK( sim->read_cpu_register( v0) == 133);
-}
-
 TEST_CASE( "MARS: read string")
 {
     std::istringstream input( "Hello World\n");
     std::ostringstream output;
-    System sys( input, output, output);
+    MARSSystem sys( input, output, output);
     sys.sim->write_cpu_register( v0, 8U); // read string
     sys.sim->write_cpu_register( a0, 0x1000U);
     sys.sim->write_cpu_register( a1, 0x5);
@@ -159,7 +146,7 @@ TEST_CASE( "MARS: read from stdin")
 {
     std::istringstream input( "Lorem Ipsum\n");
     std::ostringstream output;
-    System sys( input, output, output);
+    MARSSystem sys( input, output, output);
 
     sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 0);   // stdin
@@ -173,7 +160,7 @@ TEST_CASE( "MARS: read from stdout")
 {
     std::istringstream input( "Lorem Ipsum\n");
     std::ostringstream output;
-    System sys( input, output, output);
+    MARSSystem sys( input, output, output);
 
     sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 1);   // stdin
@@ -188,7 +175,7 @@ TEST_CASE( "MARS: read from stderr")
 {
     std::istringstream input( "Lorem Ipsum\n");
     std::ostringstream output;
-    System sys( input, output, output);
+    MARSSystem sys( input, output, output);
 
     sys.sim->write_cpu_register( v0, 14U); // read from file
     sys.sim->write_cpu_register( a0, 2);   // stderr
@@ -199,7 +186,7 @@ TEST_CASE( "MARS: read from stderr")
     CHECK( sys.mem->read_string(0x1000U).empty());
 }
 
-static void write_to_descriptor(System* sys, int desc)
+static void write_to_descriptor(MARSSystem* sys, int desc)
 {
     sys->mem->write_string( "Lorem Ipsum", 0x1000);
     sys->sim->write_cpu_register( v0, 15U); // write to file
@@ -211,7 +198,7 @@ static void write_to_descriptor(System* sys, int desc)
 TEST_CASE( "MARS: write to stdout")
 {
     std::ostringstream output;
-    System sys( std::cin, output, output);
+    MARSSystem sys( std::cin, output, output);
     write_to_descriptor(&sys, 1);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( output.str() == "Lorem I");
@@ -220,7 +207,7 @@ TEST_CASE( "MARS: write to stdout")
 TEST_CASE( "MARS: write to stderr")
 {
     std::ostringstream output;
-    System sys( std::cin, output, output);
+    MARSSystem sys( std::cin, output, output);
     write_to_descriptor(&sys, 2);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( output.str() == "Lorem I");
@@ -229,7 +216,7 @@ TEST_CASE( "MARS: write to stderr")
 TEST_CASE( "MARS: write to stdin")
 {
     std::ostringstream output;
-    System sys( std::cin, output, output);
+    MARSSystem sys( std::cin, output, output);
     write_to_descriptor(&sys, 0);
     CHECK( sys.mars_kernel->execute() == Trap::NO_TRAP);
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
@@ -239,7 +226,7 @@ TEST_CASE( "MARS: open non existing file")
 {
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( "/ksagklhfgldg/sgsfgdsfgadg", 0x1000);
     sys.sim->write_cpu_register( v0, 13U); // open file
     sys.sim->write_cpu_register( a0, 0x1000U);
@@ -248,7 +235,7 @@ TEST_CASE( "MARS: open non existing file")
     CHECK( sys.sim->read_cpu_register( v0) == all_ones<uint64>());
 }
 
-static Trap write_buff_to_file( System* sys, uint64 descr,
+static Trap write_buff_to_file( MARSSystem* sys, uint64 descr,
                                 uint64 buff_ptr, uint64 chars_to_write)
 {
     sys->sim->write_cpu_register( v0, 15U); //write to file
@@ -258,7 +245,7 @@ static Trap write_buff_to_file( System* sys, uint64 descr,
     return sys->mars_kernel->execute();
 }
 
-static Trap open_file( System* sys, uint64 filename_ptr, uint64 flags)
+static Trap open_file( MARSSystem* sys, uint64 filename_ptr, uint64 flags)
 {
     sys->sim->write_cpu_register( v0, 13U); // open file
     sys->sim->write_cpu_register( a0, filename_ptr);
@@ -266,7 +253,7 @@ static Trap open_file( System* sys, uint64 filename_ptr, uint64 flags)
     return sys->mars_kernel->execute();
 }
 
-static Trap read_from_file( System* sys, uint64 descr,
+static Trap read_from_file( MARSSystem* sys, uint64 descr,
                             uint64 buff_ptr, uint64 chars_to_read)
 {
     sys->sim->write_cpu_register( v0, 14U); // read from file
@@ -276,7 +263,7 @@ static Trap read_from_file( System* sys, uint64 descr,
     return sys->mars_kernel->execute();
 }
 
-static Trap close_file( System* sys, uint64 descr)
+static Trap close_file( MARSSystem* sys, uint64 descr)
 {
     sys->sim->write_cpu_register( v0, 16U);
     sys->sim->write_cpu_register( a0, descr);
@@ -288,7 +275,7 @@ TEST_CASE( "MARS: open and close a file")
     std::string filename( "tempfile");
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( filename, 0x1000);
 
     auto trap = open_file( &sys, 0x1000, 1); // WRONLY
@@ -305,7 +292,7 @@ TEST_CASE( "MARS: open, write and close file")
     std::string filename( "tempfile");
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( filename, 0x1000);
     sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
 
@@ -326,7 +313,7 @@ TEST_CASE( "MARS: open, read and close a file")
     std::string filename("tempfile");
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( filename, 0x1000);
     sys.mem->write_string( "Lorem Ipsum\n", 0x2000);
 
@@ -368,7 +355,7 @@ TEST_CASE( "MARS: open file with invalid mode")
     std::string filename("tempfile");
     std::ostringstream output;
     std::ostringstream err;
-    System sys( std::cin, output, err);
+    MARSSystem sys( std::cin, output, err);
     sys.mem->write_string( filename, 0x1000);
 
     sys.sim->write_cpu_register( v0, 13U); // open file

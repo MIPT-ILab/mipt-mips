@@ -5,15 +5,25 @@
 template <typename ISA>
 Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "writeback"), endian( endian)
 {
-    rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", PORT_LATENCY);
-    rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", PORT_LATENCY);
-    rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", PORT_LATENCY);
-    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_LATENCY);
+    rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", Port::LATENCY);
+    rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", Port::LATENCY);
+    rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", Port::LATENCY);
+    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
-    wp_bypass = make_write_port<std::pair<RegisterUInt, RegisterUInt>>("WRITEBACK_2_EXECUTE_BYPASS", PORT_BW);
-    wp_halt = make_write_port<Trap>("WRITEBACK_2_CORE_HALT", PORT_BW);
-    wp_trap = make_write_port<bool>("WRITEBACK_2_ALL_FLUSH", PORT_BW);
-    wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", PORT_BW);
+    wp_bypass = make_write_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", Port::BW);
+    wp_halt = make_write_port<Trap>("WRITEBACK_2_CORE_HALT", Port::BW);
+    wp_trap = make_write_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::BW);
+    wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", Port::BW);
+}
+
+template <typename ISA>
+Writeback<ISA>::~Writeback() = default;
+
+template <typename ISA>
+void Writeback<ISA>::set_kernel( const std::shared_ptr<Kernel>& k, std::string_view isa)
+{
+    kernel = k;
+    checker.init( endian, kernel.get(), isa);
 }
 
 template<typename ISA>
@@ -97,7 +107,7 @@ template <typename ISA>
 void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
-    wp_bypass->write( std::pair{ instr.get_v_dst(), instr.get_v_dst2()}, cycle);
+    wp_bypass->write( instr.get_v_dst(), cycle);
 
     sout << instr << std::endl;
 

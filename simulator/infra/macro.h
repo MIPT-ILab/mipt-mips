@@ -256,44 +256,54 @@ static constexpr T circ_ls( const T& value, size_t shamt)
     return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
 }
 
-template<size_t N, typename T>
-T sign_extension( T value)
+template<typename T>
+T sign_extension( T value, size_t bits)
 {
-    if constexpr (N < bitwidth<T>) {
-        const T msb = T{ 1} << ( N - 1);
-        value = ( ( value & bitmask<T>(N)) ^ msb) - msb;
+    if ( bits < bitwidth<T>) {
+        const T msb = bits == 0 ? 0 : T{ 1} << ( bits - 1);
+        value = ( ( value & bitmask<T>(bits)) ^ msb) - msb;
     }
     return value;
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_addition_overflow( T_src1 src1, T_src2 src2)
+template<size_t N, typename T>
+T sign_extension( T value)
 {
-    using T_src1_signed = sign_t<T_src1>;
-    using T_src2_signed = sign_t<T_src2>;
-    using T_signed      = sign_t<T>;
-
-    auto val1 = narrow_cast<T_src1_signed>( src1);
-    auto val2 = narrow_cast<T_src2_signed>( src2);
-    auto result = narrow_cast<T_signed>( val1) + narrow_cast<T_signed>( val2);
-
-    bool is_overflow = ( val1 > 0 && val2 > 0 && result < 0) || ( val1 < 0 && val2 < 0 && result > 0);
-    return std::pair{ narrow_cast<T>( result), is_overflow};
+    return sign_extension(value, N);
 }
 
-template<typename T, typename T_src1, typename T_src2> static
-auto test_subtraction_overflow( T_src1 src1, T_src2 src2)
+template<typename T>
+bool is_negative( T value)
 {
-    using T_src1_signed = sign_t<T_src1>;
-    using T_src2_signed = sign_t<T_src2>;
-    using T_signed      = sign_t<T>;
+    return (value & msb_set<T>()) != 0;
+}
 
-    auto val1 = narrow_cast<T_src1_signed>( src1);
-    auto val2 = narrow_cast<T_src2_signed>( src2);
-    auto result = narrow_cast<T_signed>( val1) - narrow_cast<T_signed>( val2);
+template<typename T>
+bool is_positive( T value)
+{
+    return !is_negative( value) && value != 0;
+}
 
-    bool is_overflow = ( val1 > 0 && val2 < 0 && result < 0) || ( val1 < 0 && val2 > 0 && result > 0);
-    return std::pair{ narrow_cast<T>( result), is_overflow};
+template<typename T, typename T1, typename T2> static
+auto test_addition_overflow( T1 val1, T2 val2)
+{
+    const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
+    const bool is_overflow =
+        ( is_positive( val1) && is_positive( val2) && is_negative( result)) ||
+        ( is_negative( val1) && is_negative( val2) && is_positive( result));
+
+    return std::pair{ result, is_overflow};
+}
+
+template<typename T, typename T1, typename T2> static
+auto test_subtraction_overflow( T1 val1, T2 val2)
+{
+    const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
+    const bool is_overflow =
+        ( is_positive( val1) && is_negative( val2) && is_negative( result)) ||
+        ( is_negative( val1) && is_positive( val2) && is_positive( result));
+
+    return std::pair{ result, is_overflow};
 }
 
 /*

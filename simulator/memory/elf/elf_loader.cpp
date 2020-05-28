@@ -14,10 +14,14 @@
 static void load_elf_section( WriteableMemory* memory, const ELFIO::section& section, AddrDiff offset)
 {
     using namespace std::literals::string_literals;
-    if ( section.get_address() == 0 || section.get_data() == nullptr)
+
+    if ( section.get_address() == 0)
         throw InvalidElfSection( "\""s + section.get_name() + "\""s);
 
-    memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
+    if ( section.get_data() == nullptr) // BSS
+        memory->memset( section.get_address() + offset, std::byte{}, section.get_size());
+    else
+        memory->memcpy_host_to_guest( section.get_address() + offset, byte_cast( section.get_data()), section.get_size());
 }
 
 ElfLoader::ElfLoader( std::string_view filename)

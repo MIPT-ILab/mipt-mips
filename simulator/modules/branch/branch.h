@@ -7,6 +7,7 @@
 #ifndef BRANCH_H
 #define BRANCH_H
 
+#include <func_sim/operation.h>
 #include <modules/core/perf_instr.h>
 #include <modules/ports_instance.h>
 
@@ -17,7 +18,7 @@ class Branch : public Module
 {
     using Instr = PerfInstr<FuncInstr>;
     using RegisterUInt = typename FuncInstr::RegisterUInt;
-    using InstructionOutput = std::pair< RegisterUInt, RegisterUInt>;
+    using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
     private:
         uint64 num_mispredictions = 0;

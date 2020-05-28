@@ -29,14 +29,14 @@ class DataBypass
         // checks whether a source register of an instruction is in the RF
         auto is_in_RF( const Instr& instr, size_t src_index) const noexcept
         {
-            const auto reg_num = instr.get_src_num( src_index);
+            const auto reg_num = instr.get_src( src_index);
             return get_entry( reg_num).current_stage.is_in_RF();
         }
 
         // checks whether a source register of an instruction is bypassible
         auto is_bypassible( const Instr& instr, size_t src_index) const noexcept
         {
-            const auto reg_num = instr.get_src_num( src_index);
+            const auto reg_num = instr.get_src( src_index);
             return get_entry( reg_num).is_bypassible;
         }
 
@@ -56,7 +56,7 @@ class DataBypass
         // in accordance with a current state of the scoreboard
         auto get_bypass_command( const Instr& instr, size_t src_index) const noexcept
         {
-            const auto reg_num = instr.get_src_num( src_index);
+            const auto reg_num = instr.get_src( src_index);
             return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
         }
 
@@ -128,6 +128,7 @@ class DataBypass
         {
             auto idx = num.to_rf_index();
             assert( idx <= scoreboard.size());
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed
             return scoreboard[ idx];
         }
 
@@ -135,6 +136,7 @@ class DataBypass
         {
             auto idx = num.to_rf_index();
             assert( idx <= scoreboard.size());
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed
             return scoreboard[ idx];
         }
 
@@ -209,8 +211,8 @@ void DataBypass<FuncInstr>::trace_new_dst2_register( const Instr& instr, Registe
 template <typename FuncInstr>
 void DataBypass<FuncInstr>::trace_new_instr( const Instr& instr) noexcept
 {
-    const auto& dst  = instr.get_dst_num();
-    const auto& dst2 = instr.get_dst2_num();
+    const auto& dst  = instr.get_dst( 0);
+    const auto& dst2 = instr.get_dst( 1);
 
     writeback_stage_info.operation_latency = get_instruction_latency( instr);
 
