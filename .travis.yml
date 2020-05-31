@@ -41,7 +41,6 @@ addons:
     - libboost-dev
     - ninja-build
     - python3
-    - nodejs
   homebrew:
     packages:
     - ninja
@@ -71,10 +70,6 @@ install:
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_IPO=1 -G "Ninja"
-  - |
-    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        cd $TRAVIS_BUILD_DIR/visualizer       && npm install
-    fi
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $GDB_BUILD ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
@@ -92,12 +87,6 @@ script:
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
-  # TODO (pkryukov): run NPM on ARM
-  - |
-    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        cd $TRAVIS_BUILD_DIR/visualizer
-        npm run test
-    fi
   - |
     if [ $GDB_BUILD ]; then
         cd $TRAVIS_BUILD_DIR/simulator/release
@@ -109,16 +98,11 @@ script:
 
 after_success:
   - |
-    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        cd $TRAVIS_BUILD_DIR/visualizer
-        npx nyc --reporter=lcov npm test && npx codecov
-        rm * -rf
-    fi
-  - |
-    if [ $CXX == clang++ ]l then
+    if [ $CXX == clang++ ] then
       cd $TRAVIS_BUILD_DIR/simulator/debug
       cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -G "Ninja"
-      ninja unit-tests && ctest
+      ninja unit-tests
+      ctest
       if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
       bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
     fi
