@@ -21,8 +21,15 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd visualizer
-    - run: npm install
-    - run: npm test
-    - run: npx nyc --reporter=lcov npm test
-    - run: npx codecov
+    - name: Install dependencies
+      working-directory: visualizer
+      run: npm install
+    - name: Testing
+      working-directory: visualizer
+      run: npm test
+    - name: Testing with coverage 
+      working-directory: visualizer
+      run: npx nyc --reporter=lcov npm test
+    - name: Codecov
+      working-directory: visualizer
+      run: npx codecov
