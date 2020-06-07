@@ -47,6 +47,13 @@ addons:
     update: true
 
 install:
+  - if [[ "${TRAVIS_CPU_ARCH}" == "arm64" ]]; then
+      sudo apt-get install libuv1 rhash libstdc++6;
+      wget https://anaconda.org/conda-forge/cmake/3.17.0/download/linux-aarch64/cmake-3.17.0-h28c56e5_0.tar.bz2;
+      mkdir $HOME/cmake;
+      tar -xjvf cmake-3.17.0-h28c56e5_0.tar.bz2 -C $HOME/cmake;
+      export PATH=$HOME/cmake/bin:$PATH;
+    fi
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 40
