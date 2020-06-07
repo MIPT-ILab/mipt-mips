@@ -142,8 +142,6 @@ struct RISCVTableEntry
     uint32 mem_size;
     uint32 bit_width;
 
-    RISCVTableEntry() = delete;
-
     bool check_print_dst( size_t dst_id) const
     {
         Dst::Type reg = dst.at( dst_id);
