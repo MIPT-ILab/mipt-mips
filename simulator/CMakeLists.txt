@@ -1,10 +1,10 @@
 #! cmake
-#! Build file for the scalar MIPS CPU simulator
+#! Build file for the MIPS-V and MIPT-MIPS simulators
 #! Soshin Konstantin
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.12.4)
 # cmake_minimum_required(VERSION 3.13.5) for add_link_options
 
 project(mipt-mips)
