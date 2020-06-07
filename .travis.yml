@@ -3,7 +3,7 @@ notifications:
 
 language: cpp
 dist: focal
-osx_image: xcode10.1
+osx_image: xcode11.5
 
 branches:
   only:
@@ -39,7 +39,6 @@ addons:
     - cmake
     - libboost-dev
     - ninja-build
-    - python3
   homebrew:
     packages:
     - ninja
