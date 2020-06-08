@@ -3,6 +3,6 @@ extraction:
     prepare:
       packages:
         - g++-10
-     after_prepare:
+    after_prepare:
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 40
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 40
