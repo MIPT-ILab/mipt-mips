@@ -56,21 +56,21 @@ install:
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
        tar -xzf $GDB_VER.tar.gz
     fi
-# Dump CMake version
+  # Dump CMake version
   - cmake --version
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
   - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_IPO=1 -G "Ninja"
   - | # TODO (pkryukov): GDB build hangs on ARM...
-    if [ $GDB_BUILD ]; then
+    if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
         cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
         cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
         cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
         cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
-     fi
+    fi
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
