@@ -47,7 +47,7 @@ addons:
 install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
-    if [ $TRAVIS_CPU_ARCH == amd64 ]; then
+    if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
        export GDB_VER=gdb-9.2
        export GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
        export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
@@ -56,7 +56,7 @@ install:
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
        tar -xzf $GDB_VER.tar.gz
     fi
-# Dump CMake version
+  # Dump CMake version
   - cmake --version
 
 before_script:
@@ -70,7 +70,7 @@ before_script:
         cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
         cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
         cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
-     fi
+    fi
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/release
