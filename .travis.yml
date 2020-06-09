@@ -54,12 +54,9 @@ addons:
 before_install:
   - |
     if [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1"
-        # TODO (pkryukov): GDB build hangs on ARM...
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/$GDB_VER -DGDB_BUILD_PATH=$TRAVIS_BUILD_DIR/gdb_build"
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-9.2
-            GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
-            GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
         fi
     else # Coverage
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
@@ -73,7 +70,7 @@ before_install:
 install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
-    if [ $GDB_BUILD ]; then
+    if [ $GDB_VER ]; then
        cd $TRAVIS_BUILD_DIR
        mkdir gdb_build
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
@@ -82,7 +79,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
-  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -G "Ninja"
   - |
     if [ $GDB_BUILD ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
@@ -97,15 +94,12 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/build
   - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
-  - |
-    if [ -n ${COV+x} ]; then
-      bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
-    fi
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
   - |
-    if [ $GDB_BUILD ]; then
+    if [ $GDB_VER ]; then
         ninja gdb-mips-sim
         pushd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
