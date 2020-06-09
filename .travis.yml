@@ -43,7 +43,8 @@ addons:
     update: true
     packages:
     - clang-tidy-10
-    - cmake
+    - clang++-10
+    - g++-10
     - libboost-dev
     - ninja-build
   homebrew:
@@ -68,8 +69,17 @@ before_install:
     fi
 
 install:
-# Download GDB
-  - | # TODO (pkryukov): GDB build hangs on ARM...
+  - | # Update compilers
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 40
+       sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 40
+       sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-10 40
+       if [ $CXX == clang++ ]; then
+          export CXX=clang++-10
+          export CC=clang-10
+       fi
+    fi
+  - | # Download GDB
     if [ $GDB_VER ]; then
        GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
        GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
