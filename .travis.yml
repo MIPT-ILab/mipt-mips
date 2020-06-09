@@ -68,6 +68,7 @@ before_install:
             COV="llvm-cov gcov"
             if [ $TRAVIS_CPU_ARCH == amd64 ]; then TRAVIS_TIDY=1; fi
         fi
+    fi
 
 install:
 # Download GDB
