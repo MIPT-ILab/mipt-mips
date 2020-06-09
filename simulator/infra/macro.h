@@ -12,81 +12,40 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <bitset>
 #include <climits>
 #include <limits>
 #include <type_traits>
 
-/* Checks if values is power of two */
+// STD proxies, need special uint128 handeling
+
+template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
+template<typename T> static constexpr inline auto popcount( T x) noexcept              { return std::popcount(x); }
+template<typename T> static constexpr inline auto circ_ls( T x, size_t shamt)          { return std::rotl( x, shamt); }
+template<typename T> static constexpr inline auto count_leading_zeroes( T x) noexcept  { return std::countl_zero( x); }
+template<typename T> static constexpr inline auto count_leading_ones( T x) noexcept    { return std::countl_one( x); }
+template<typename T> static constexpr inline auto count_trailing_zeroes( T x) noexcept { return std::countr_zero( x); }
+
+template<typename T> void ignored( const T& /* unused */) noexcept { }
+
+template<typename ... Args> constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
+template<typename ... Args> constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
+
+/* Bit widths of integer types */
+template<typename T> static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
+template<>           inline constexpr size_t bitwidth<uint128> = 128U;
+template<>           inline constexpr size_t bitwidth<int128> = 128U;
+template<typename T> static constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
+template<typename T> static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
+
+/* Bit masks */
+template<typename T> static constexpr inline auto lsb_set()  noexcept { return T{ 1U}; }
+template<typename T> static constexpr inline auto msb_set()  noexcept { return T{ 1U} << (bitwidth<T> - 1); }
+template<typename T> static constexpr inline auto all_ones() noexcept { return (msb_set<T>() - 1U) | msb_set<T>(); }
+
 template<typename T>
-constexpr bool is_power_of_two( const T& n) noexcept { return (n & (n - 1)) == 0; }
-
-/* Ignore return value */
-template<typename T>
-void ignored( const T& /* unused */) noexcept { }
-
-/* Find minimal sizeof */
-template<typename ... Args>
-constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
-
-/* Find maximal sizeof */
-template<typename ... Args>
-constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
-
-/* Bit width of integer type */
-template<typename T>
-static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
-
-/* 128 types have no std::numeric_limits */
-template<> inline constexpr size_t bitwidth<uint128> = 128U;
-template<> inline constexpr size_t bitwidth<int128> = 128U;
-
-/* Byte width of integer type */
-template<typename T>
-static constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
-
-/* Bit width / 2 */
-template<typename T>
-static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
-
-/*
- * Returns value of T type with only the most significant bit set
- * Examples: msb_set<uint8>() -> 0x80
- */
-template <typename T>
-static constexpr T msb_set()
-{
-    return T{ 1U} << (bitwidth<T> - 1);
-}
-
-/*
- * Return value of T with only the lest significant bit set
- * Examples: lsb_set<uint8>() -> 0x01
- */
-template <typename T>
-static constexpr T lsb_set()
-{
-    return 1;
-}
-
-/*
- * Returns a value full on one bits.
- * all_ones<uint8>()  -> 0xFF
- * all_ones<uint32>() -> 0xFFFF'FFFF
- */
-template <typename T>
-static constexpr T all_ones()
-{
-    return (msb_set<T>() - 1U) | msb_set<T>();
-}
-
-/* Returns a bitmask with desired amount of LSB set to '1'
- * Examples: bitmask<uint32>(0)  -> 0x0
- *           bitmask<uint32>(5)  -> 0x1F
- *           bitmask<uint32>(32) -> 0xFFFF'FFFF
- */
-template <typename T>
-static constexpr T bitmask( size_t onecount)
+static constexpr inline auto bitmask( size_t onecount) noexcept
 {
     return onecount != 0 ? all_ones<T>() >> ( bitwidth<T> - onecount) : T{ 0};
 }
@@ -118,58 +77,11 @@ static constexpr inline auto pack_from( std::array<From, N> src) noexcept
     return result;
 }        
 
-// https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
-template<typename T>
-constexpr auto popcount( T x) noexcept
-{
-    static_assert( std::is_integral<T>::value, "popcount works only for integral types");
-    static_assert( std::numeric_limits<T>::radix == 2, "popcount works only for binary types");
-    static_assert( bitwidth<T> <= bitwidth<uint64>, "popcount works only for uint64 and narrower types");
-    return std::bitset<bitwidth<T>>( typename std::make_unsigned<T>::type{ x }).count();
-}
-
-static inline auto popcount( uint128 x) noexcept
-{
-    const auto& u = unpack_to<uint64>( x);
-    return popcount( u[0]) + popcount( u[1]);
-}
 
 template <typename T>
 static constexpr bool has_zero( const T& value)
 {
     return T(~value) != T();
-}
-
-template <typename T>
-static constexpr inline auto count_leading_zeroes( const T& value) noexcept
-{
-    uint8 count = 0;
-    for ( auto mask = msb_set<T>(); mask > 0; mask >>= 1U)
-    {
-        if ( ( value & mask) != 0)
-           break;
-        count++;
-    }
-    return count;
-}
-
-template <typename T>
-static constexpr inline auto count_trailing_zeroes( const T& value) noexcept
-{
-    uint8 count = 0;
-    for ( auto mask = lsb_set<T>(); mask > 0; mask <<= 1U)
-    {
-        if ( ( value & mask) != 0)
-           break;
-        count++;
-    }
-    return count;
-}
-
-template <typename T>
-static constexpr inline auto count_leading_ones( const T& value) noexcept
-{
-    return count_leading_zeroes<T>( ~value);
 }
 
 template <typename T>
@@ -194,32 +106,13 @@ template<> inline constexpr uint16 NO_VAL<uint16> = NO_VAL16;
 template<> inline constexpr uint32 NO_VAL<uint32> = NO_VAL32;
 template<> inline constexpr uint64 NO_VAL<uint64> = NO_VAL64;
 
-template<typename T>
-static constexpr T ones_ls( const T& value, size_t shamt)
-{
-    return ~( ~value << shamt);
-}
-
-template<typename T>
-static constexpr T ones_rs( const T& value, size_t shamt)
-{
 #ifdef _MSC_FULL_VER
-    T result = 0;
-    if constexpr ( std::is_same_v<T, uint128> || _MSC_FULL_VER >= 192328105) {
-        result = ~( ~value >> shamt);
-    }
-    else {
-        // Workaround for Visual Studio bug
-        // https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
-        // TODO (pkryukov): remove once we switch to C++20
-        const volatile auto x = ~value;
-        result = ~( x >> shamt);
-    }
-    return result;
-#else
-    return ~( ~value >> shamt);
+// https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
+static_assert( _MSC_FULL_VER >= 192328105, "Please update Visual Studio to newer version");
 #endif
-}
+
+template<typename T> static constexpr T ones_ls( const T& value, size_t shamt) { return ~( ~value << shamt); }
+template<typename T> static constexpr T ones_rs( const T& value, size_t shamt) { return ~( ~value >> shamt); }
 
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
@@ -247,15 +140,6 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
     return result;
 }
 
-/*Circular left shift*/
-template<typename T>
-static constexpr T circ_ls( const T& value, size_t shamt)
-{
-    if ( shamt == 0 || shamt == bitwidth<T>)
-        return value;
-    return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
-}
-
 template<typename T>
 T sign_extension( T value, size_t bits)
 {
@@ -272,17 +156,8 @@ T sign_extension( T value)
     return sign_extension(value, N);
 }
 
-template<typename T>
-bool is_negative( T value)
-{
-    return (value & msb_set<T>()) != 0;
-}
-
-template<typename T>
-bool is_positive( T value)
-{
-    return !is_negative( value) && value != 0;
-}
+template<typename T> bool is_negative( T value) { return (value & msb_set<T>()) != 0; }
+template<typename T> bool is_positive( T value) { return !is_negative( value) && value != 0; }
 
 template<typename T, typename T1, typename T2> static
 auto test_addition_overflow( T1 val1, T2 val2)
@@ -372,6 +247,51 @@ template<typename T>
 static inline T trap_vector_address( T value)
 {
     return value >> 2U & ~(bitmask<T>( 3));
+}
+
+// uint128 implementations
+
+template<>
+inline auto popcount( uint128 x) noexcept
+{
+    const auto& u = unpack_to<uint64>( x);
+    return popcount( u[0]) + popcount( u[1]);
+}
+
+template<>
+inline constexpr auto is_power_of_two( uint128 value) noexcept
+{
+    const auto& u = unpack_to<uint64>( value);
+    return std::has_single_bit( u[0]) != std::has_single_bit( u[1]);
+}
+
+template<>
+inline constexpr auto count_leading_zeroes( uint128 value) noexcept
+{
+    const auto& u = unpack_to<uint64>( value);
+    return u[1] == 0 ? std::countl_zero(u[0]) + bitwidth<uint64> : std::countl_zero(u[1]);
+}
+
+template<>
+constexpr inline auto count_leading_ones( uint128 value) noexcept
+{
+    const auto& u = unpack_to<uint64>( value);
+    return u[1] == all_ones<uint64>() ? std::countr_zero(u[0]) + bitwidth<uint64> : std::countl_zero(u[1]);
+}
+
+template<>
+inline constexpr auto count_trailing_zeroes( uint128 value) noexcept
+{
+    const auto& u = unpack_to<uint64>( value);
+    return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countl_zero(u[1]);
+}
+
+template<>
+inline constexpr auto circ_ls( uint128 value, size_t shamt)
+{
+    if ( shamt == 0 || shamt == bitwidth<uint128>)
+        return value;
+    return ( value << shamt) | ( value >> ( bitwidth<uint128> - shamt));
 }
 
 #endif
