@@ -21,6 +21,10 @@ arch:
   - amd64
   - arm64
 
+env:
+  - TRAVIS_BUILD_TYPE=Release
+  - TRAVIS_BUILD_TYPE=Coverage
+
 matrix:
   exclude:
     - os: osx
@@ -36,6 +40,7 @@ addons:
     - sourceline: 'ppa:ubuntu-toolchain-r/test'  
     update: true
     packages:
+    - clang-tidy-10
     - cmake
     - libboost-dev
     - ninja-build
@@ -44,10 +49,18 @@ addons:
     - ninja
     update: true
 
+before_install:
+  - |
+    if [ "$TRAVIS_BUILD_TYPE" == "Release"]; then
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1"
+    else
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
+    fi;
+
 install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
-    if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
        export GDB_VER=gdb-9.2
        export GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
        export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
@@ -60,8 +73,8 @@ install:
   - cmake --version
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR/simulator         && mkdir debug release
-  - cd $TRAVIS_BUILD_DIR/simulator/release && cmake .. -DCMAKE_BUILD_TYPE=Release -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_IPO=1 -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
+  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $GDB_BUILD ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
@@ -73,35 +86,28 @@ before_script:
     fi
 
 script:
-  - cd $TRAVIS_BUILD_DIR/simulator/release
+  - cd $TRAVIS_BUILD_DIR/simulator/build
   - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
+  - |
+    if [ "$TRAVIS_BUILD_TYPE" == "Coverage" ] && [ "$CXX" == "clang"]; then
+      if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
+      bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
+    fi
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
   - |
     if [ $GDB_BUILD ]; then
-        cd $TRAVIS_BUILD_DIR/simulator/release
         ninja gdb-mips-sim
-        cd $GDB_BUILD/gdb
+        pushd GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
+        popd
     fi
 
 after_success:
   - |
-    if [ $CXX == clang++ ]; then
-      cd $TRAVIS_BUILD_DIR/simulator/debug
-      cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -G "Ninja"
-      ninja unit-tests
-      ctest
-      if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
-      bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
-    fi
-  - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ]; then
-        sudo apt-get install clang-tidy-10
-        clang-tidy-10 --version
-        cd $TRAVIS_BUILD_DIR/simulator/debug
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_BUILD_TYPE" == "Debug" ]; then
         run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
     fi
