@@ -31,6 +31,8 @@ matrix:
       compiler: gcc
     - os: osx
       arch: arm64
+    - compiler: gcc
+      env: TRAVIS_BUILD_TYPE=Coverage
 
 addons:
   apt:
@@ -90,7 +92,7 @@ script:
   - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
   - |
-    if [ "$TRAVIS_BUILD_TYPE" == "Coverage" ] && [ "$CXX" == "clang"]; then
+    if [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
       if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
       bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
     fi
