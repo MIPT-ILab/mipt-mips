@@ -56,13 +56,13 @@ private:
     {
         uint32 val = 0;
         size_t result = bus_read_word( bus, src, &val);
-        put_value_to_pointer<uint32, Endian::big>( dst, val, size);
+        put_value_to_pointer<uint32, std::endian::big>( dst, val, size);
         return result;
     }
 
     size_t copy_word( Addr dst, const std::byte* src, size_t size) const noexcept
     {
-        auto val = get_value_from_pointer<uint32, Endian::big>( src, size);
+        auto val = get_value_from_pointer<uint32, std::endian::big>( src, size);
         auto dqm = swap_endian( bitmask<uint32>( narrow_cast<uint32>( size * CHAR_BIT)));
         return bus_write_word( bus, dst, val, dqm);
     }

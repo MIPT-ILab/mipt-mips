@@ -26,7 +26,7 @@ struct vr4300 : private PerfSim<MIPS64>
     void write_cause_register( uint64 value) { return write_cpu_register( cause_index, value); }
 
 public:
-    vr4300() : PerfSim<MIPS64>( Endian::big, "mips64be")
+    vr4300() : PerfSim<MIPS64>( std::endian::big, "mips64be")
     {
          enable_logging( "cpu");
     }

@@ -10,7 +10,7 @@
 #include <sstream>
 
 template <typename ISA>
-void Checker<ISA>::init( Endian endian, Kernel* kernel, std::string_view isa)
+void Checker<ISA>::init( std::endian endian, Kernel* kernel, std::string_view isa)
 {
     auto memory = FuncMemory::create_default_hierarchied_memory();
     sim = std::make_shared<FuncSim<ISA>>( endian, false, isa);

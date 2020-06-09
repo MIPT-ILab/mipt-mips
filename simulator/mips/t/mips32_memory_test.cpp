@@ -12,8 +12,8 @@
 static auto get_plain_memory_with_data()
 {
     auto memory = FuncMemory::create_plain_memory(15);
-    memory->write<uint32, Endian::little>( 0xABCD'1234, 0x1000);
-    memory->write<uint32, Endian::little>( 0xBADC'5678, 0x1004);
+    memory->write<uint32, std::endian::little>( 0xABCD'1234, 0x1000);
+    memory->write<uint32, std::endian::little>( 0xBADC'5678, 0x1004);
     return memory;
 }
 
@@ -260,7 +260,7 @@ TEST_CASE( "MIPS32_instr: sb 0x12")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint8, Endian::little>( 0x1000);
+    auto value = memory->read<uint8, std::endian::little>( 0x1000);
     CHECK( value == 0x12);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ TEST_CASE( "MIPS32_instr: sh 0xdead")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint16, Endian::little>( 0x1000);
+    auto value = memory->read<uint16, std::endian::little>( 0x1000);
     CHECK( value == 0xdead);
 }
 
@@ -292,7 +292,7 @@ TEST_CASE( "MIPS32_instr: sh be 0xdead")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint16, Endian::big>( 0x1000);
+    auto value = memory->read<uint16, std::endian::big>( 0x1000);
     CHECK( value == 0xdead);
 }
 
@@ -309,7 +309,7 @@ TEST_CASE( "MIPS32_instr: sw 0xfee1'dead")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint32, Endian::little>( 0x1000);
+    auto value = memory->read<uint32, std::endian::little>( 0x1000);
     CHECK( value == 0xfee1'dead);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -327,7 +327,7 @@ TEST_CASE( "MIPS32_instr: sw be 0xfee1'dead")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint32, Endian::big>( 0x1000);
+    auto value = memory->read<uint32, std::endian::big>( 0x1000);
     CHECK( value == 0xfee1'dead);
 }
 
@@ -344,7 +344,7 @@ TEST_CASE( "MIPS32_instr: swl (instr->mem_addr % 4 = 2)")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    auto value = memory->read<uint32, std::endian::little>( 0x1002);
     CHECK( value == 0xfee1'abcd);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,7 +362,7 @@ TEST_CASE( "MIPS32_instr: swr (instr->mem_addr % 4 = 2)")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint32, Endian::little>( 0x1002);
+    auto value = memory->read<uint32, std::endian::little>( 0x1002);
     CHECK( value == 0x5678'dead);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -381,7 +381,7 @@ TEST_CASE( "MIPS32_instr: sc 0xdead")
 
     auto memory = get_plain_memory_with_data();
     memory->load_store( &instr);
-    auto value = memory->read<uint32, Endian::little>( 0x1001);
+    auto value = memory->read<uint32, std::endian::little>( 0x1001);
     CHECK( value == 0x78ab'dead);
 }
 

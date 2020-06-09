@@ -26,7 +26,7 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         void init_target();
 
     public:
-        static constexpr auto get_endian() { return Endian::little; }
+        static constexpr auto get_endian() { return std::endian::little; }
 
         RISCVInstr() = delete;
         RISCVInstr( uint32 bytes, Addr PC);

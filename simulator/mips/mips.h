@@ -24,7 +24,7 @@ struct MIPS : public IsMIPS
     using Register = MIPSRegister;
     using RegisterUInt = MIPSRegisterUInt<version>;
     using FuncInstr = BaseMIPSInstr<RegisterUInt>;
-    static auto create_instr( uint32 bytes, Endian endian, Addr PC) {
+    static auto create_instr( uint32 bytes, std::endian endian, Addr PC) {
         return FuncInstr( version, endian, bytes, PC);
     }
     static auto create_driver( Simulator* sim) {
