@@ -110,6 +110,6 @@ script:
 
 after_success:
   - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_BUILD_TYPE" == "Debug" ]; then
+    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
         run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
     fi
