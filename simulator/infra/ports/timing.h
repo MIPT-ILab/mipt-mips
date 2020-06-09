@@ -8,24 +8,34 @@
 #ifndef INFRA_TIMING_H
 #define INFRA_TIMING_H
 
+#ifdef __APPLE__
+# define DONT_HAVE_SPACESHIP
+#elif defined(__GNUC__) && __GNUC__ < 10
+# define DONT_HAVE_SPACESHIP
+#endif
+
 #include <infra/macro.h>
 #include <infra/types.h>
 
-#include <boost/operators.hpp>
-
+#include <compare>
 #include <iostream>
 #include <string>
 
 class Cycle;
 class Latency;
 
-class Cycle : public boost::totally_ordered<Cycle>
+class Cycle
 {
     public:
         constexpr explicit Cycle( uint64 value) : value( value) { }
-
+#ifdef DONT_HAVE_SPACESHIP
         constexpr auto operator==( const Cycle& rhs) const { return value == rhs.value; }
+        constexpr auto operator!=( const Cycle& rhs) const { return value != rhs.value; }
         constexpr auto operator<( const Cycle& rhs) const { return value < rhs.value; }
+        constexpr auto operator>=( const Cycle& rhs) const { return value >= rhs.value; }
+#else
+        constexpr auto operator<=>( const Cycle& rhs) const = default;
+#endif
 
         constexpr void inc() { ++value; }
         constexpr explicit operator double() const { return narrow_cast<double>( value); }
@@ -56,13 +66,18 @@ constexpr inline auto operator""_cl( unsigned long long int number) noexcept
     return Cycle( uint64{ number});
 }
 
-class Latency : public boost::totally_ordered<Latency>
+class Latency
 {
     public:
         constexpr explicit Latency( int64 value) : value( value) { }
-
+#ifdef DONT_HAVE_SPACESHIP
         constexpr auto operator==( const Latency& rhs) const { return value == rhs.value; }
+        constexpr auto operator!=( const Latency& rhs) const { return value != rhs.value; }
         constexpr auto operator<( const Latency& rhs) const { return value < rhs.value; }
+#else
+        constexpr auto operator<=>( const Latency& rhs) const = default;
+#endif
+
         constexpr auto operator+( const Latency& rhs) const { return Latency( value + rhs.value); }
         constexpr auto operator-( const Latency& rhs) const { return Latency( value - rhs.value); }
         constexpr auto operator/( int64 number) const { return Latency( value / number); }
