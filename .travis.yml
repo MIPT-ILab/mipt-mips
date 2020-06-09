@@ -71,6 +71,8 @@ install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $GDB_VER ]; then
+       GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+       GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
        cd $TRAVIS_BUILD_DIR
        mkdir gdb_build
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
@@ -81,7 +83,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
   - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -G "Ninja"
   - |
-    if [ $GDB_BUILD ]; then
+    if [ $GDB_VER ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
         cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
