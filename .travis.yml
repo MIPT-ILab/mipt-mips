@@ -98,7 +98,7 @@ script:
   - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
   - |
-    if [ $COV ]; then
+    if [ -z $COV ]; then
       bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
     fi
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
