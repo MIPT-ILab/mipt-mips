@@ -24,6 +24,7 @@ arch:
 env:
   - TRAVIS_BUILD_TYPE=Release
   - TRAVIS_BUILD_TYPE=Coverage
+  - TRAVIS_BUILD_TYPE=Profile
 
 matrix:
   exclude:
@@ -33,6 +34,8 @@ matrix:
       arch: arm64
     - compiler: gcc
       env: TRAVIS_BUILD_TYPE=Coverage
+    - os: osx
+      env: TRAVIS_BUILD_TYPE=Profile
 
 addons:
   apt:
@@ -59,13 +62,15 @@ before_install:
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-9.2
         fi
-    else # Coverage
+    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage"] then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
         COV="gcov"
         if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
             COV="llvm-cov gcov"
             if [ $TRAVIS_CPU_ARCH == amd64 ]; then TRAVIS_TIDY=1; fi
         fi
+    else # Profile
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1"
     fi
 
 install:
@@ -91,7 +96,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
-  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -DENABLE_PROFILE=1 -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - |
     if [ $GDB_VER ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
@@ -104,10 +109,14 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/simulator/build
-  - ninja mipt-mips
+  - ninja unit-tests
+  - ctest --verbose
+  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 10000000 --mars
   - gprof ./mipt-mips gmon.out -p | head -100
   - gprof ./mipt-mips gmon.out -q
+  - ninja mipt-v    && ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
+  - ninja cachesim  && ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
   - |
     if [ $GDB_VER ]; then
         ninja gdb-mips-sim
