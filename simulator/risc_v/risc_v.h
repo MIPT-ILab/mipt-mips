@@ -22,7 +22,7 @@ struct RISCV
     using FuncInstr = RISCVInstr<T>;
     using Register = RISCVRegister;
     using RegisterUInt = T;
-    static auto create_instr( uint32 bytes, Endian /* little */, Addr PC) {
+    static auto create_instr( uint32 bytes, std::endian /* little */, Addr PC) {
         return FuncInstr( bytes, PC);
     }
     static auto create_driver( Simulator* sim) {

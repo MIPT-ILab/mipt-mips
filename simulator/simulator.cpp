@@ -47,8 +47,8 @@ class SimulatorFactory {
     template<typename T>
     struct TBuilder : public Builder {
         const std::string isa;
-        const Endian e;
-        TBuilder( std::string_view isa, Endian e) : isa( isa), e( e) { }
+        const std::endian e;
+        TBuilder( std::string_view isa, std::endian e) : isa( isa), e( e) { }
         std::unique_ptr<Simulator> get_funcsim( bool log) final { return std::make_unique<FuncSim<T>>( e, log, isa); }
         std::unique_ptr<CycleAccurateSimulator> get_perfsim() final { return std::make_unique<PerfSim<T>>( e, isa); }
     };
@@ -56,7 +56,7 @@ class SimulatorFactory {
     std::map<std::string, std::unique_ptr<Builder>> map;
 
     template<typename T>
-    void emplace( std::string_view name, Endian e)
+    void emplace( std::string_view name, std::endian e)
     {
         map.emplace( name, std::make_unique<TBuilder<T>>( name, e));
     }
@@ -64,10 +64,10 @@ class SimulatorFactory {
     template<typename T>
     void emplace_all_endians( std::string name)
     {
-        emplace<T>( name, Endian::little);
-        emplace<T>( name + "le", Endian::little);
+        emplace<T>( name, std::endian::little);
+        emplace<T>( name + "le", std::endian::little);
         if constexpr ( std::is_base_of_v<IsMIPS, T>)
-            emplace<T>( name + "be", Endian::big);
+            emplace<T>( name + "be", std::endian::big);
     }
 
     std::string get_supported_isa_message() const

@@ -21,13 +21,13 @@ extern "C"
 {
     int bus_read_word(const bus_controller *bus, uint32_t address, uint32_t *word)
     {
-        *word = bus->memory->read<uint32, Endian::big>( address);
+        *word = bus->memory->read<uint32, std::endian::big>( address);
         return bytewidth<uint32>;
     }
 
     int bus_write_word(bus_controller *bus, uint32_t address, uint32_t word, uint32_t dqm)
     {
-        bus->memory->masked_write<uint32, Endian::big>( word, address, dqm);
+        bus->memory->masked_write<uint32, std::endian::big>( word, address, dqm);
         return bytewidth<uint32>;
     }
 }
@@ -61,16 +61,16 @@ TEST_CASE( "CEN64Memory: write word" )
 {
     bus_controller bus;
     auto cen64_memory = create_cen64_memory(&bus);
-    cen64_memory->write<uint32, Endian::little>( 0x33445566, 0x11);
-    CHECK( 0x33445566 == cen64_memory->read<uint32, Endian::little>( 0x11));
+    cen64_memory->write<uint32, std::endian::little>( 0x33445566, 0x11);
+    CHECK( 0x33445566 == cen64_memory->read<uint32, std::endian::little>( 0x11));
 }
 
 TEST_CASE( "CEN64Memory: write byte" )
 {
     bus_controller bus;
     auto cen64_memory = create_cen64_memory(&bus);
-    cen64_memory->write<uint8, Endian::little>( 0xAB, 0x11);
-    CHECK( 0xAB == cen64_memory->read<uint8, Endian::little>( 0x11));
+    cen64_memory->write<uint8, std::endian::little>( 0xAB, 0x11);
+    CHECK( 0xAB == cen64_memory->read<uint8, std::endian::little>( 0x11));
 }
 
 TEST_CASE( "CEN64Memory" )

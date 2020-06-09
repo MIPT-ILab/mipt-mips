@@ -63,15 +63,15 @@ public:
     std::string read_string( Addr addr) const;
     std::string read_string_limited( Addr addr, size_t size) const;
 
-    template<typename T, Endian endian> T read( Addr addr) const noexcept;
-    template<typename T, Endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
+    template<typename T, std::endian endian> T read( Addr addr) const noexcept;
+    template<typename T, std::endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
 private:
     std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
-template<typename T, Endian endian>
+template<typename T, std::endian endian>
 T ReadableMemory::read( Addr addr) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) Initialized by memcpy
@@ -85,9 +85,9 @@ void ReadableMemory::load( Instr* instr) const
 {
     using DstType = decltype( std::declval<Instr>().get_v_dst( 0));
     auto mask = bitmask<DstType>( instr->get_mem_size() * CHAR_BIT);
-    auto value = instr->get_endian() == Endian::little
-        ? read<DstType, Endian::little>( instr->get_mem_addr(), mask)
-        : read<DstType, Endian::big>( instr->get_mem_addr(), mask);
+    auto value = instr->get_endian() == std::endian::little
+        ? read<DstType, std::endian::little>( instr->get_mem_addr(), mask)
+        : read<DstType, std::endian::big>( instr->get_mem_addr(), mask);
     instr->load( value);
 }
 
@@ -112,7 +112,7 @@ public:
         return 0;
     }
 
-    template<typename T, Endian endian>
+    template<typename T, std::endian endian>
     void write( T value, Addr addr)
     {
         const auto& bytes = unpack_array<T, endian>( value);
@@ -161,7 +161,7 @@ public:
         return create_plain_memory( 22);
     }
 
-    template<typename T, Endian endian> void masked_write( T value, Addr addr, T mask)
+    template<typename T, std::endian endian> void masked_write( T value, Addr addr, T mask)
     {
         T combined_value = ( value & mask) | ( this->read<T, endian>( addr) & ~mask);
         write<T, endian>( combined_value, addr);
@@ -169,11 +169,11 @@ public:
 
     template<typename Instr> void load_store( Instr* instr);
 private:
-    template<typename Instr, Endian endian> void store( const Instr& instr);
-    template<typename Instr, Endian endian> void masked_store( const Instr& instr);
+    template<typename Instr, std::endian endian> void store( const Instr& instr);
+    template<typename Instr, std::endian endian> void masked_store( const Instr& instr);
 };
 
-template<typename Instr, Endian endian>
+template<typename Instr, std::endian endian>
 void FuncMemory::store( const Instr& instr)
 {
     using SrcType = decltype( std::declval<Instr>().get_v_src( 1));
@@ -201,10 +201,10 @@ void FuncMemory::load_store( Instr* instr)
         load( instr);
     }
     else if ( instr->is_store()) {
-        if ( instr->get_endian() == Endian::little)
-            store<Instr, Endian::little>( *instr);
+        if ( instr->get_endian() == std::endian::little)
+            store<Instr, std::endian::little>( *instr);
         else
-            store<Instr, Endian::big>( *instr);
+            store<Instr, std::endian::big>( *instr);
     }
 }
 

@@ -11,7 +11,7 @@
 #include <infra/types.h>
 #include <memory/memory.h>
 
-template <typename T, Endian endian>
+template <typename T, std::endian endian>
 class ArgvLoader
 {
 public:
