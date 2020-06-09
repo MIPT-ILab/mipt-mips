@@ -270,7 +270,6 @@ struct MIPSTableEntry
     std::vector<Src> src;
     std::vector<Dst> dst;
     MIPSVersionMask versions;
-    MIPSTableEntry() = delete;
 };
 
 template<typename R>

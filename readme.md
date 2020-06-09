@@ -39,11 +39,11 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 
 ## Requirements
 
-We use C++17 features and Boost 1.65.1. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
-* GCC 7
-* Clang 5.0
-* Apple LLVM Version 10.0.0
-* MS Visual Studio 2017 (Boost 1.66 is required)
+We use C++20 features and Boost 1.71. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
+* GCC 9
+* Clang 10.0.0
+* Apple LLVM Version 11.0.3
+* MS Visual Studio 2019
 
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
 
@@ -51,7 +51,7 @@ To work with RISC-V traces, you need to install RISC-V toolchain. Please follow 
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
-Our build system is CMake. You should install CMake 3.10.2 or higher.
+Our build system is CMake. You should install CMake 3.12.5 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
