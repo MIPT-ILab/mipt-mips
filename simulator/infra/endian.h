@@ -12,21 +12,8 @@
 #include "types.h"
 
 #include <array>
+#include <bit>
 #include <climits>
-
-// Replace it with std::endian if C++20 is shipped
-enum class Endian
-{
-#ifdef _WIN32
-    little = 0,
-    big    = 1,
-    native = little
-#else
-    little = __ORDER_LITTLE_ENDIAN__,
-    big    = __ORDER_BIG_ENDIAN__,
-    native = __BYTE_ORDER__
-#endif
-};
 
 // GCC 9 poorly optimizes that stuff: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65424
 // See https://godbolt.org/z/ff-NAF for example
@@ -89,19 +76,19 @@ static inline constexpr auto unpack_array_be( T value) noexcept
     return array;
 }
 
-template<typename T, Endian e>
+template<typename T, std::endian e>
 static constexpr inline auto unpack_array( T value) noexcept
 {
-    if constexpr (e == Endian::little)
+    if constexpr (e == std::endian::little)
         return unpack_array_le<T>( value);
     else
         return unpack_array_be<T>( value);
 }
 
-template<typename T, Endian e>
+template<typename T, std::endian e>
 static inline constexpr auto pack_array( std::array<std::byte, bytewidth<T>> array) noexcept
 {
-    if constexpr (e == Endian::little)
+    if constexpr (e == std::endian::little)
         return pack_array_le<T>( array);
     else
         return pack_array_be<T>( array);
@@ -113,14 +100,14 @@ static inline constexpr T swap_endian( T value) noexcept
     return pack_array_le<T>( unpack_array_be<T>( value)); 
 }
 
-template<typename T, Endian e>
+template<typename T, std::endian e>
 static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size)
 {
     auto array = unpack_array<T, e>(value);
     std::copy( array.begin(), array.begin() + size, buf);
 }
 
-template<typename T, Endian e>
+template<typename T, std::endian e>
 static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size)
 {
     std::array<std::byte, bytewidth<T>> array{};

@@ -12,7 +12,7 @@
 #include <stdexcept>
 
 template <typename ISA>
-FuncSim<ISA>::FuncSim( Endian endian, bool log, std::string_view isa)
+FuncSim<ISA>::FuncSim( std::endian endian, bool log, std::string_view isa)
     : BasicFuncSim( isa)
     , imem( endian)
     , driver( ISA::create_driver( this))

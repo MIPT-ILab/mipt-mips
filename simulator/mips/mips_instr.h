@@ -29,8 +29,8 @@ template<typename R>
 class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 {
     public:
-        BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC);
-        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC );
+        BaseMIPSInstr( MIPSVersion version, std::endian endian, uint32 bytes, Addr PC);
+        BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, std::endian endian, uint32 immediate, Addr PC );
         BaseMIPSInstr() = delete;
 
         auto get_endian() const { return endian; }
@@ -65,7 +65,7 @@ class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 
         const uint32 raw;
         const bool raw_valid = false;
-        const Endian endian;
+        const std::endian endian;
 
         void init( const MIPSTableEntry<typename BaseInstruction<R, MIPSRegister>::MyDatapath>& entry, MIPSVersion version);
         void init_target();

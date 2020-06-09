@@ -15,12 +15,12 @@ template<typename FuncInstr>
 class InstrMemoryIface
 {
 public:
-    explicit InstrMemoryIface( Endian e) : endian( e) { }
+    explicit InstrMemoryIface( std::endian e) : endian( e) { }
     auto fetch( Addr pc) const
     {
-        return endian == Endian::little
-            ? mem->read<uint32, Endian::little>( pc)
-            : mem->read<uint32, Endian::big>( pc);
+        return endian == std::endian::little
+            ? mem->read<uint32, std::endian::little>( pc)
+            : mem->read<uint32, std::endian::big>( pc);
     }
     auto get_endian() const { return endian; }
 
@@ -35,7 +35,7 @@ public:
 
 private:
     std::shared_ptr<ReadableMemory> mem = nullptr;
-    const Endian endian;
+    const std::endian endian;
 };
 
 template<typename ISA>
@@ -43,7 +43,7 @@ class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
 {
 public:
     using Instr = typename ISA::FuncInstr;
-    explicit InstrMemory( Endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
+    explicit InstrMemory( std::endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
     Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->get_endian(), PC); }
 };
 
@@ -57,7 +57,7 @@ class InstrMemoryCached : public InstrMemory<ISA>
     using Instr = typename ISA::FuncInstr;
     InstrCache<Addr, Instr, INSTR_CACHE_CAPACITY, 0x0, all_ones<Addr>()> instr_cache{};
 public:
-    explicit InstrMemoryCached( Endian endian) : InstrMemory<ISA>( endian) { }
+    explicit InstrMemoryCached( std::endian endian) : InstrMemory<ISA>( endian) { }
     Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);

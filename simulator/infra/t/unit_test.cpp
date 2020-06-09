@@ -19,7 +19,7 @@
 #include <sstream>
 
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
-static_assert(Endian::native == Endian::little || Endian::native == Endian::big, "MIPT-MIPS does not support mixed-endian hosts");
+static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
 static_assert(is_power_of_two(1U));
 static_assert(is_power_of_two(2U));
@@ -127,16 +127,16 @@ static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
 static_assert(pack_array_le<uint32>( test_array) == 0x12345678);
 static_assert(pack_array_be<uint32>( test_array) == 0x78563412);
 
-static_assert(unpack_array<uint32, Endian::little>( 0x12345678)[0] == test_array[0]);
-static_assert(unpack_array<uint32, Endian::big>( 0x12345678)[0] == test_array[3]);
+static_assert(unpack_array<uint32, std::endian::little>( 0x12345678)[0] == test_array[0]);
+static_assert(unpack_array<uint32, std::endian::big>( 0x12345678)[0] == test_array[3]);
 
-static_assert(pack_array<uint32, Endian::little>( test_array) == 0x12345678);
-static_assert(pack_array<uint32, Endian::big>( test_array) == 0x78563412);
+static_assert(pack_array<uint32, std::endian::little>( test_array) == 0x12345678);
+static_assert(pack_array<uint32, std::endian::big>( test_array) == 0x78563412);
 
 static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
 static_assert(swap_endian<uint8>(0xFA) == 0xFA);
 
-template<Endian e>
+template<std::endian e>
 static constexpr auto check_to_pointer()
 {
     std::array<std::byte, 2> res{};
@@ -146,23 +146,23 @@ static constexpr auto check_to_pointer()
 
 #if 0 // C++ 20 allows constexpr std::copy
 
-static_assert(get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
-static_assert(get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
-static_assert(check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
-static_assert(check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
-static_assert(check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+static_assert(get_value_from_pointer<uint16, std::endian::little>( test_array.data(), 2) == 0x5678);
+static_assert(get_value_from_pointer<uint16, std::endian::big>( test_array.data(), 2) == 0x7856);
+static_assert(check_to_pointer<std::endian::little>()[0] == std::byte{ 0x56});
+static_assert(check_to_pointer<std::endian::little>()[1] == std::byte{ 0x34});
+static_assert(check_to_pointer<std::endian::big>()[0] == std::byte{ 0x34});
+static_assert(check_to_pointer<std::endian::big>()[1] == std::byte{ 0x56});
 
 #else
 
 TEST_CASE( "Byte swapping pointer access")
 {    
-    CHECK( get_value_from_pointer<uint16, Endian::little>( test_array.data(), 2) == 0x5678);
-    CHECK( get_value_from_pointer<uint16, Endian::big>( test_array.data(), 2) == 0x7856);
-    CHECK( check_to_pointer<Endian::little>()[0] == std::byte{ 0x56});
-    CHECK( check_to_pointer<Endian::little>()[1] == std::byte{ 0x34});
-    CHECK( check_to_pointer<Endian::big>()[0] == std::byte{ 0x34});
-    CHECK( check_to_pointer<Endian::big>()[1] == std::byte{ 0x56});
+    CHECK( get_value_from_pointer<uint16, std::endian::little>( test_array.data(), 2) == 0x5678);
+    CHECK( get_value_from_pointer<uint16, std::endian::big>( test_array.data(), 2) == 0x7856);
+    CHECK( check_to_pointer<std::endian::little>()[0] == std::byte{ 0x56});
+    CHECK( check_to_pointer<std::endian::little>()[1] == std::byte{ 0x34});
+    CHECK( check_to_pointer<std::endian::big>()[0] == std::byte{ 0x34});
+    CHECK( check_to_pointer<std::endian::big>()[1] == std::byte{ 0x56});
 }
 
 #endif

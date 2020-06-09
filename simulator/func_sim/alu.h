@@ -63,7 +63,7 @@ struct ALU
 
     template<typename I> static
     void load_addr_right32( I* instr) {
-        // Endian specific
+        // std::endian specific
         load_addr( instr);
         /* switch (instr->mem_addr % 4) {
            case 0: return 0xFFFF'FFFF;
@@ -77,7 +77,7 @@ struct ALU
 
     template<typename I> static
     void load_addr_left32( I* instr) {
-        // Endian specific
+        // std::endian specific
         load_addr( instr);
         /* switch (instr->mem_addr % 4) {
            case 0: return 0xFF00'0000;

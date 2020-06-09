@@ -3,7 +3,7 @@
 #include <kernel/kernel.h>
 
 template <typename ISA>
-Writeback<ISA>::Writeback( Module* parent, Endian endian) : Module( parent, "writeback"), endian( endian)
+Writeback<ISA>::Writeback( Module* parent, std::endian endian) : Module( parent, "writeback"), endian( endian)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", Port::LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", Port::LATENCY);

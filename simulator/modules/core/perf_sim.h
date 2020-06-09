@@ -29,7 +29,7 @@ class PerfSim : public CycleAccurateSimulator
 public:
     using Register = typename ISA::Register;
     using RegisterUInt = typename ISA::RegisterUInt;
-    explicit PerfSim( Endian endian, std::string_view isa);
+    explicit PerfSim( std::endian endian, std::string_view isa);
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
     void set_memory( std::shared_ptr<FuncMemory> memory) final;
@@ -69,7 +69,7 @@ private:
     /* simulator units */
     RF<FuncInstr> rf;
     std::shared_ptr<FuncMemory> memory;
-    const Endian endian;
+    const std::endian endian;
 
     Fetch<FuncInstr> fetch;
     Decode<FuncInstr> decode;
