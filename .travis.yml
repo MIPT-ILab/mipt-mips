@@ -62,7 +62,7 @@ before_install:
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-9.2
         fi
-    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage"]; then
+    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
         COV="gcov"
         if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
@@ -113,8 +113,7 @@ script:
   - ctest --verbose
   - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 10000000 --mars
-  - gprof ./mipt-mips gmon.out -p | head -100
-  - gprof ./mipt-mips gmon.out -q
+  - gprof ./mipt-mips gmon.out -p | head -
   - ninja mipt-v    && ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ninja cachesim  && ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
   - |
