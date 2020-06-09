@@ -53,31 +53,36 @@ addons:
 
 before_install:
   - |
-    if [ "$TRAVIS_BUILD_TYPE" == "Release"]; then
+    if [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1"
-    else
+        # TODO (pkryukov): GDB build hangs on ARM...
+        if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            GDB_VER=gdb-9.2
+            GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
+            GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+        fi
+    else # Coverage
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
-    fi;
+        COV="gcov"
+        if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
+            COV="llvm-cov gcov"
+            if [ $TRAVIS_CPU_ARCH == amd64 ]; then TRAVIS_TIDY=1; fi
+        fi
 
 install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
-    if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
-       export GDB_VER=gdb-9.2
-       export GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
-       export GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
+    if [ $GDB_BUILD ]; then
        cd $TRAVIS_BUILD_DIR
        mkdir gdb_build
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
        tar -xzf $GDB_VER.tar.gz
     fi
-  # Dump CMake version
-  - cmake --version
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
   - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
-  - | # TODO (pkryukov): GDB build hangs on ARM...
+  - |
     if [ $GDB_BUILD ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
         cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
@@ -92,8 +97,7 @@ script:
   - ninja mipt-mips unit-tests mipt-v cachesim
   - ctest --verbose
   - |
-    if [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
-      if [ "$TRAVIS_OS_NAME" == "linux" ]; then export COV="llvm-cov gcov"; else export COV="gcov"; fi
+    if [ $COV ]; then
       bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
     fi
   - ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
@@ -102,14 +106,11 @@ script:
   - |
     if [ $GDB_BUILD ]; then
         ninja gdb-mips-sim
-        pushd GDB_BUILD/gdb
+        pushd $GDB_BUILD/gdb
         make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         ./gdb -x $TRAVIS_BUILD_DIR/tests/test.gdb --args $TRAVIS_BUILD_DIR/tests/mips/mips-tt.bin
         popd
     fi
 
 after_success:
-  - |
-    if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
-        run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
-    fi
+  - if [ $TRAVIS_TIDY ]; then run-clang-tidy-10.py -header-filter='.*' 2> /dev/null; fi
