@@ -17,7 +17,10 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+#ifndef DONT_HAVE_SPACESHIP
 #include <compare>
+#endif
+
 #include <iostream>
 #include <string>
 
