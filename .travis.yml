@@ -62,7 +62,7 @@ before_install:
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-9.2
         fi
-    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage"] then
+    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage"]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
         COV="gcov"
         if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
