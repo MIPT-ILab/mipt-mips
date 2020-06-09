@@ -54,7 +54,7 @@ addons:
 before_install:
   - |
     if [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DGDB_SOURCE_PATH=$TRAVIS_BUILD_DIR/$GDB_VER -DGDB_BUILD_PATH=$TRAVIS_BUILD_DIR/gdb_build"
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1"
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-9.2
         fi
@@ -71,8 +71,8 @@ install:
 # Download GDB
   - | # TODO (pkryukov): GDB build hangs on ARM...
     if [ $GDB_VER ]; then
-       GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
        GDB_DIR=$TRAVIS_BUILD_DIR/$GDB_VER
+       GDB_BUILD=$TRAVIS_BUILD_DIR/gdb_build
        cd $TRAVIS_BUILD_DIR
        mkdir gdb_build
        wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
@@ -81,7 +81,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
-  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - |
     if [ $GDB_VER ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
