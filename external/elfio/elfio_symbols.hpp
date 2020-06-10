@@ -92,9 +92,8 @@ class symbol_section_accessor_template
             Elf_Word nchain  = *(const Elf_Word*)( hash_section->get_data() +
                                    sizeof( Elf_Word ) );
             Elf_Word val     = elf_hash( (const unsigned char*)name.c_str() );
-
-            Elf_Word y   = *(const Elf_Word*)( hash_section->get_data() +
-                               ( 2 + val % nbucket ) * sizeof( Elf_Word ) );
+            Elf_Word y       = *(const Elf_Word*)( hash_section->get_data() +
+                                ( 2 + val % nbucket ) * sizeof( Elf_Word ) );
             std::string   str;
             get_symbol( y, str, value, size, bind, type, section_index, other );
             while ( str != name && STN_UNDEF != y && y < nchain ) {
@@ -106,8 +105,55 @@ class symbol_section_accessor_template
                 ret = true;
             }
         }
+        else {
+            for ( Elf_Xword i = 0; i < get_symbols_num() && !ret; i++ ) {
+                std::string symbol_name;
+                if ( get_symbol( i, symbol_name, value, size, bind, type,
+                                 section_index, other) ) {
+                    if ( symbol_name == name ) {
+                        ret = true;
+                    }
+                }
+            }
+        }
 
         return ret;
+    }
+
+ //------------------------------------------------------------------------------
+    bool
+    get_symbol( const Elf64_Addr& value,
+                std::string&      name,
+                Elf_Xword&        size,
+                unsigned char&    bind,
+                unsigned char&    type,
+                Elf_Half&         section_index,
+                unsigned char&    other ) const
+    {
+
+
+        const endianess_convertor& convertor = elf_file.get_convertor();
+        section* string_section = elf_file.sections[get_string_table_index()];
+
+        Elf_Xword  idx   = 0;
+        bool       match = false;
+        Elf64_Addr v     = 0;
+
+        if ( elf_file.get_class() == ELFCLASS32 ) {
+            match = generic_search_symbols<Elf32_Sym>([&convertor, &value](const Elf32_Sym* sym) {
+                    return convertor(sym->st_value) == value;
+                }, idx);
+        } else {
+            match = generic_search_symbols<Elf64_Sym>([&convertor, &value](const Elf64_Sym* sym) {
+                    return convertor(sym->st_value) == value;
+                }, idx);
+        }
+
+        if ( match ) {
+            return get_symbol( idx, name, v, size, bind, type, section_index, other );
+        }
+
+        return false;
     }
 
 //------------------------------------------------------------------------------
@@ -203,6 +249,40 @@ class symbol_section_accessor_template
 
 //------------------------------------------------------------------------------
     template< class T >
+    const T*
+    generic_get_symbol_ptr(Elf_Xword index) const {
+        if ( 0 != symbol_section->get_data() && index < get_symbols_num() ) {
+            const T* pSym = reinterpret_cast<const T*>(
+                symbol_section->get_data() +
+                    index * symbol_section->get_entry_size() );
+
+            return pSym;
+        }
+
+        return nullptr;
+    }
+
+//------------------------------------------------------------------------------
+    template< class T >
+    bool
+    generic_search_symbols(std::function<bool(const T*)> match, Elf_Xword& idx) const {
+        for (Elf_Xword i = 0; i < get_symbols_num(); i++){
+            const T* symPtr = generic_get_symbol_ptr<T>(i);
+
+            if (symPtr == nullptr)
+                return false;
+
+            if (match(symPtr)) {
+                idx = i;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+    template< class T >
     bool
     generic_get_symbol( Elf_Xword index,
                         std::string& name, Elf64_Addr& value,
@@ -213,7 +293,7 @@ class symbol_section_accessor_template
     {
         bool ret = false;
 
-        if ( index < get_symbols_num() ) {
+        if ( 0 != symbol_section->get_data() && index < get_symbols_num() ) {
             const T* pSym = reinterpret_cast<const T*>(
                 symbol_section->get_data() +
                     index * symbol_section->get_entry_size() );
