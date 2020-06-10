@@ -13,11 +13,7 @@
 #include <cstdint>
 #include <iostream>
 
-template <typename To, typename From>
-static constexpr To narrow_cast(const From& value)
-{
-    return static_cast<To>( value);
-}
+#define narrow_cast static_cast
 
 // Signed types
 using int8 = int8_t;
