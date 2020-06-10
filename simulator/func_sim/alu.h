@@ -341,7 +341,7 @@ struct ALU
     template<typename I> static
     void bit_field_place( I* instr)
     {
-        using XLENType = typename I::RegisterUInt;
+        using XLENType = I::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
         len = len ? len : 16;
