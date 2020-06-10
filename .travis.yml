@@ -47,6 +47,7 @@ addons:
     packages:
     - clang-tidy-10
     - clang++-10
+    - cmake
     - g++-10
     - libboost-dev
     - ninja-build
