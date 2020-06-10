@@ -1,7 +1,6 @@
 /*
  * alu.h - implementation of all execution units
- * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014-2017 MIPT-MIPS
+ * Copyright 2014-2020 MIPT-MIPS
  */
 
 #ifndef ALU_H
@@ -115,24 +114,24 @@ struct ALU
     template<typename I> static void addr( I* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src[0] + instr->v_imm); }
 
     // Predicate helpers - unary
-    template<typename I> static bool lez( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) <= 0; }
-    template<typename I> static bool gez( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= 0; }
-    template<typename I> static bool ltz( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) < 0; }
-    template<typename I> static bool gtz( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) > 0; }
+    template<typename I> static bool lez( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) <= 0; }
+    template<typename I> static bool gez( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) >= 0; }
+    template<typename I> static bool ltz( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) < 0; }
+    template<typename I> static bool gtz( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) > 0; }
 
     // Predicate helpers - binary
     template<typename I> static bool eq( const I* instr)  { return instr->v_src[0] == instr->v_src[1]; }
     template<typename I> static bool ne( const I* instr)  { return instr->v_src[0] != instr->v_src[1]; }
     template<typename I> static bool geu( const I* instr) { return instr->v_src[0] >= instr->v_src[1]; }
     template<typename I> static bool ltu( const I* instr) { return instr->v_src[0] <  instr->v_src[1]; }
-    template<typename I> static bool ge( const I* instr)  { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename I::RegisterSInt>( instr->v_src[1]); }
-    template<typename I> static bool lt( const I* instr)  { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) <  narrow_cast<typename I::RegisterSInt>( instr->v_src[1]); }
+    template<typename I> static bool ge( const I* instr)  { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<I::RegisterSInt>( instr->v_src[1]); }
+    template<typename I> static bool lt( const I* instr)  { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) <  narrow_cast<I::RegisterSInt>( instr->v_src[1]); }
 
     // Predicate helpers - immediate
     template<typename I> static bool eqi( const I* instr) { return instr->v_src[0] == instr->v_imm; }
     template<typename I> static bool nei( const I* instr) { return instr->v_src[0] != instr->v_imm; }
-    template<typename I> static bool lti( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) < narrow_cast<typename I::RegisterSInt>( instr->v_imm); }
-    template<typename I> static bool gei( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename I::RegisterSInt>( instr->v_imm); }
+    template<typename I> static bool lti( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) < narrow_cast<I::RegisterSInt>( instr->v_imm); }
+    template<typename I> static bool gei( const I* instr) { return narrow_cast<I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<I::RegisterSInt>( instr->v_imm); }
     template<typename I> static bool ltiu( const I* instr) { return instr->v_src[0] < instr->v_imm; }
     template<typename I> static bool geiu( const I* instr) { return instr->v_src[0] >= instr->v_imm; }
 
@@ -279,7 +278,7 @@ struct ALU
     template<typename I, Execute<I> j> static
     void jump_and_link( I* instr)
     {
-        instr->v_dst[0] = narrow_cast<typename I::RegisterUInt>( instr->new_PC); // link
+        instr->v_dst[0] = narrow_cast<I::RegisterUInt>( instr->new_PC); // link
         j( instr);   // jump
     }
 
@@ -287,7 +286,7 @@ struct ALU
     void branch_and_link( I* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst[0] = narrow_cast<typename I::RegisterUInt>( instr->new_PC);
+        instr->v_dst[0] = narrow_cast<I::RegisterUInt>( instr->new_PC);
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
@@ -341,7 +340,7 @@ struct ALU
     template<typename I> static
     void bit_field_place( I* instr)
     {
-        using XLENType = typename I::RegisterUInt;
+        using XLENType = I::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
         len = len ? len : 16;
