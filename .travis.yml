@@ -71,7 +71,7 @@ before_install:
         fi
     else # Profile
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1"
-        TRAVIS_GRPOF=1
+        TRAVIS_GPROF=1
     fi
 
 install:
