@@ -4,8 +4,8 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.12.4)
-# cmake_minimum_required(VERSION 3.13.5) for add_link_options
+cmake_minimum_required(VERSION 3.12.5)
+# cmake_minimum_required(VERSION 3.13.5) # for add_link_options
 
 project(mipt-mips)
 enable_testing()
@@ -138,25 +138,6 @@ if (ENABLE_UBSAN AND NOT MSVC)
    endif()
 endif()
 
-if (GDB_SOURCE_PATH)
-    message("Building GDB integration with ${GDB_SOURCE_PATH}")
-    set(GDB_SIM_SRCS
-            ${GDB_SOURCE_PATH}/sim/common/sim-utils.c
-            ${GDB_SOURCE_PATH}/sim/common/callback.c
-            ${GDB_SOURCE_PATH}/sim/common/sim-io.c
-            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp)
-
-    add_definitions(-DHAVE_CONFIG_H)
-    include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
-    include_directories(SYSTEM
-            ${GDB_BUILD_PATH}/
-            ${GDB_BUILD_PATH}/bfd
-            ${GDB_SOURCE_PATH}/include
-            ${GDB_SOURCE_PATH}/sim/common)
-else ()
-    set(GDB_SIM_SRCS)
-endif ()
-
 if (ENABLE_IPO)
   include(CheckIPOSupported)
   check_ipo_supported(RESULT result)
@@ -215,10 +196,15 @@ add_library(mipt-mips-src OBJECT
     ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
 )
 
-add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp $<TARGET_OBJECTS:mipt-mips-src>)
-add_executable(mipt-mips export/standalone/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
-add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS} $<TARGET_OBJECTS:mipt-mips-src>)
-add_executable(cachesim export/cache/main.cpp $<TARGET_OBJECTS:mipt-mips-src>)
+add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
+add_executable(mipt-mips export/standalone/main.cpp)
+add_executable(unit-tests EXCLUDE_FROM_ALL export/catch/catch.cpp ${TESTS_CPPS})
+add_executable(cachesim export/cache/main.cpp)
+
+target_link_libraries(mipt-mips-cen64-intf mipt-mips-src)
+target_link_libraries(mipt-mips mipt-mips-src)
+target_link_libraries(unit-tests mipt-mips-src)
+target_link_libraries(cachesim mipt-mips-src)
 
 # Symlink for new name
 if (NOT MSVC)
@@ -231,7 +217,23 @@ target_link_libraries(unit-tests mipt-mips-cen64-intf)
 add_test(all_tests unit-tests)
 
 if (GDB_SOURCE_PATH)
-    add_library(gdb-mips-sim STATIC ${GDB_SIM_SRCS} $<TARGET_OBJECTS:mipt-mips-src>)
+    message("Building GDB integration with ${GDB_SOURCE_PATH}")
+
+    add_definitions(-DHAVE_CONFIG_H)
+    include_directories(${CMAKE_CURRENT_LIST_DIR}/export/gdb/)
+    include_directories(SYSTEM
+            ${GDB_BUILD_PATH}/
+            ${GDB_BUILD_PATH}/bfd
+            ${GDB_SOURCE_PATH}/include
+            ${GDB_SOURCE_PATH}/sim/common)
+
+    add_library(gdb-mips-sim STATIC
+            ${GDB_SOURCE_PATH}/sim/common/sim-utils.c
+            ${GDB_SOURCE_PATH}/sim/common/callback.c
+            ${GDB_SOURCE_PATH}/sim/common/sim-io.c
+            ${CMAKE_CURRENT_LIST_DIR}/export/gdb/gdb_interface.cpp)
+  
+    target_link_libraries(gdb-mips-sim mipt-mips-src)
     set_target_properties(gdb-mips-sim PROPERTIES
             PREFIX ""
             SUFFIX ""
