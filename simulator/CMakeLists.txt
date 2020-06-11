@@ -4,8 +4,8 @@
 #! soshinkonstantinv@gmail.com
 #! https://github.com/SoshinK
 
-cmake_minimum_required(VERSION 3.12.5)
-# cmake_minimum_required(VERSION 3.13.5) for add_link_options
+# cmake_minimum_required(VERSION 3.12.5)
+cmake_minimum_required(VERSION 3.13.5) # for add_link_options
 
 project(mipt-mips)
 enable_testing()
