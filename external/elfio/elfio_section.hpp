@@ -46,30 +46,22 @@ class section
     ELFIO_GET_SET_ACCESS_DECL( Elf_Xword,   size               );
     ELFIO_GET_SET_ACCESS_DECL( Elf_Word,    name_string_offset );
     ELFIO_GET_ACCESS_DECL    ( Elf64_Off,   offset             );
-    size_t stream_size;
-    size_t get_stream_size() const
-     {
-	return stream_size;
-     }
-
-    void set_stream_size(size_t value)
-     {
-	stream_size = value;
-     }
 
     virtual const char* get_data() const                                = 0;
     virtual void        set_data( const char* pData, Elf_Word size )    = 0;
     virtual void        set_data( const std::string& data )             = 0;
     virtual void        append_data( const char* pData, Elf_Word size ) = 0;
     virtual void        append_data( const std::string& data )          = 0;
+    virtual size_t      get_stream_size() const                         = 0;
+    virtual void        set_stream_size( size_t value )                 = 0;
 
-  protected:
+protected:
     ELFIO_SET_ACCESS_DECL( Elf64_Off, offset );
     ELFIO_SET_ACCESS_DECL( Elf_Half,  index  );
     
-    virtual void load( std::istream&  f,
+    virtual void load( std::istream&  stream,
                        std::streampos header_offset ) = 0;
-    virtual void save( std::ostream&  f,
+    virtual void save( std::ostream&  stream,
                        std::streampos header_offset,
                        std::streampos data_offset )   = 0;
     virtual bool is_address_initialized() const       = 0;
@@ -235,33 +227,34 @@ class section_impl : public section
     {
         std::fill_n( reinterpret_cast<char*>( &header ), sizeof( header ), '\0' );
 
-	stream.seekg ( 0, stream.end );
-	set_stream_size ( stream.tellg() );
+        stream.seekg ( 0, stream.end );
+        set_stream_size ( stream.tellg() );
 
         stream.seekg( header_offset );
         stream.read( reinterpret_cast<char*>( &header ), sizeof( header ) );
 
 
         Elf_Xword size = get_size();
-	if ( 0 == data && SHT_NULL != get_type() && SHT_NOBITS != get_type() && size < get_stream_size()) {
-	    try {
-		data = new char[size + 1];
-	    } catch (const std::bad_alloc&) {
-		data      = 0;
-		data_size = 0;
-	    }
-	    if ( 0 != size ) {
-		stream.seekg( (*convertor)( header.sh_offset ) );
-		stream.read( data, size );
-		data[size] = 0; //ensure data is ended with 0 to avoid oob read
-		data_size = size;
-	    }
-	}
+        if ( 0 == data && SHT_NULL != get_type() && SHT_NOBITS != get_type() && size < get_stream_size()) {
+            try {
+                data = new char[size + 1];
+            } catch (const std::bad_alloc&) {
+                data      = 0;
+                data_size = 0;
+            }
+
+            if ( ( 0 != size ) && ( 0 != data ) ) {
+                stream.seekg( (*convertor)( header.sh_offset ) );
+                stream.read( data, size );
+                data[size] = 0; // Ensure data is ended with 0 to avoid oob read
+                data_size = size;
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
     void
-    save( std::ostream&  f,
+    save( std::ostream&  stream,
           std::streampos header_offset,
           std::streampos data_offset )
     {
@@ -270,10 +263,10 @@ class section_impl : public section
             header.sh_offset = (*convertor)( header.sh_offset );
         }
 
-        save_header( f, header_offset );
+        save_header( stream, header_offset );
         if ( get_type() != SHT_NOBITS && get_type() != SHT_NULL &&
              get_size() != 0 && data != 0 ) {
-            save_data( f, data_offset );
+            save_data( stream, data_offset );
         }
     }
 
@@ -281,20 +274,32 @@ class section_impl : public section
   private:
 //------------------------------------------------------------------------------
     void
-    save_header( std::ostream&  f,
+    save_header( std::ostream&  stream,
                  std::streampos header_offset ) const
     {
-        f.seekp( header_offset );
-        f.write( reinterpret_cast<const char*>( &header ), sizeof( header ) );
+        stream.seekp( header_offset );
+        stream.write( reinterpret_cast<const char*>( &header ), sizeof( header ) );
     }
 
 //------------------------------------------------------------------------------
     void
-    save_data( std::ostream&  f,
+    save_data( std::ostream&  stream,
                std::streampos data_offset ) const
     {
-        f.seekp( data_offset );
-        f.write( get_data(), get_size() );
+        stream.seekp( data_offset );
+        stream.write( get_data(), get_size() );
+    }
+
+    //------------------------------------------------------------------------------
+    size_t get_stream_size() const
+    {
+        return stream_size;
+    }
+
+    //------------------------------------------------------------------------------
+    void set_stream_size(size_t value)
+    {
+        stream_size = value;
     }
 
 //------------------------------------------------------------------------------
@@ -306,6 +311,7 @@ class section_impl : public section
     Elf_Word                   data_size;
     const endianess_convertor* convertor;
     bool                       is_address_set;
+    size_t                     stream_size;
 };
 
 } // namespace ELFIO
