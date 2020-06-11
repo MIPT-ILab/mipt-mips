@@ -281,28 +281,28 @@ static std::string uint128_to_hex_string(uint128 number)
 {
     std::ostringstream out;
     out << std::hex << std::uppercase << number;
-    return out.str();
+    return std::move( out).str();
 }
 
 static std::string uint128_to_hex_showbase_string(uint128 number)
 {
     std::ostringstream out;
     out << std::showbase << std::hex << std::uppercase << number;
-    return out.str();
+    return std::move( out).str();
 }
 
 static std::string uint128_to_dec_string(uint128 number)
 {
-     std::ostringstream out;
-     out << number;
-     return out.str();
+    std::ostringstream out;
+    out << number;
+    return std::move( out).str();
 }
 
 static std::string uint128_to_oct_string(uint128 number)
 {
-     std::ostringstream out;
-     out << std::oct << number;
-     return out.str();
+    std::ostringstream out;
+    out << std::oct << number;
+    return std::move( out).str();
 }
 
 static std::string str_toupper(std::string s) {

@@ -28,7 +28,7 @@ std::string wrap_shift_operator(const T& value)
 {
     std::ostringstream oss;
     oss << value;
-    return oss.str();
+    return std::move( oss).str();
 }
 
 static void handleArgs( const std::vector<const char*>& argv)
