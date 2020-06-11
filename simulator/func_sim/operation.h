@@ -65,7 +65,7 @@ std::string print_immediate( Imm type, T value)
     case Imm::SHIFT:    oss << ", "   << std::dec << value; break;
     case Imm::NO:       break;
     }
-    return oss.str();
+    return std::move( oss).str();
 }
 
 class Operation
@@ -245,7 +245,7 @@ std::string BaseInstruction<T, R>::generate_disasm() const
         oss << " $" << (this->print_dst.test( 0) ? get_dst( 0) : get_src( 1))
             << print_immediate( Imm::ADDR, this->get_v_imm())
             << "($" << get_src( 0) << ")" << std::dec;
-        return oss.str();
+        return std::move( oss).str();
     }
 
     for ( size_t i = 0; i < MAX_DST_NUM; i++)
@@ -258,7 +258,7 @@ std::string BaseInstruction<T, R>::generate_disasm() const
             oss << ( i > 0 ? ", $" : " $") << get_src( i);
 
     oss << print_immediate( this->imm_print_type, this->get_v_imm());
-    return oss.str();
+    return std::move( oss).str();
 }
 
 template<typename T, typename R>

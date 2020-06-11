@@ -71,7 +71,7 @@ std::string PlainMemory::dump() const
             oss << "addr 0x" << std::distance(arena.begin(), it)
                 << ": data 0x" << uint32( *it) << std::endl;
 
-    return oss.str();
+    return std::move( oss).str();
 }
 
 size_t PlainMemory::strlen( Addr addr) const
