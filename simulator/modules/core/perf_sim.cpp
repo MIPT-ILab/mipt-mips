@@ -16,7 +16,7 @@ namespace config {
 } // namespace config
 
 template <typename ISA>
-PerfSim<ISA>::PerfSim( Endian endian, std::string_view isa)
+PerfSim<ISA>::PerfSim( std::endian endian, std::string_view isa)
     : CycleAccurateSimulator( isa)
     , endian( endian)
     , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)

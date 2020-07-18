@@ -89,24 +89,24 @@ TEST_CASE( "Func_memory: Read_Method_Test")
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // read 4 bytes from the func_mem start addr
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == 0x03020100);
-    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr) == 0x010203);
+    CHECK( func_mem->read<uint32, std::endian::little>( dataSectAddr) == 0x03020100);
+    CHECK( func_mem->read<uint32, std::endian::big>( dataSectAddr) == 0x010203);
 
     // read 3 bytes from the func_mem start addr + 1
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr + 1, 0xFFFFFFULL) == 0x030201);
-    CHECK( func_mem->read<uint32, Endian::big>( dataSectAddr + 1, 0xFFFFFF00ULL) == 0x01020300);
+    CHECK( func_mem->read<uint32, std::endian::little>( dataSectAddr + 1, 0xFFFFFFULL) == 0x030201);
+    CHECK( func_mem->read<uint32, std::endian::big>( dataSectAddr + 1, 0xFFFFFF00ULL) == 0x01020300);
 
     // read 2 bytes from the func_mem start addr + 2
-    CHECK( func_mem->read<uint16, Endian::little>( dataSectAddr + 2) == 0x0302);
-    CHECK( func_mem->read<uint16, Endian::big>( dataSectAddr + 2) == 0x0203);
+    CHECK( func_mem->read<uint16, std::endian::little>( dataSectAddr + 2) == 0x0302);
+    CHECK( func_mem->read<uint16, std::endian::big>( dataSectAddr + 2) == 0x0203);
 
     // read 1 bytes from the func_mem start addr + 3
-    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + 3) == 0x03);
-    CHECK( func_mem->read<uint8, Endian::big>( dataSectAddr + 3) == 0x03);
+    CHECK( func_mem->read<uint8, std::endian::little>( dataSectAddr + 3) == 0x03);
+    CHECK( func_mem->read<uint8, std::endian::big>( dataSectAddr + 3) == 0x03);
 
     // check hadling the situation when read
     // from not initialized or written data
-    CHECK( func_mem->read<uint8, Endian::little>( 0x300000) == 0);
+    CHECK( func_mem->read<uint8, std::endian::little>( 0x300000) == 0);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
@@ -115,19 +115,19 @@ TEST_CASE( "Func_memory: Write_Read_Initialized_Mem_Test")
     ElfLoader( valid_elf_file).load_to( func_mem.get());
 
     // write 1 into the byte pointed by dataSectAddr
-    func_mem->write<uint8, Endian::little>( 1, dataSectAddr);
+    func_mem->write<uint8, std::endian::little>( 1, dataSectAddr);
     uint64 right_ret = 0x03020101; // before write it was 0x03020100
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, std::endian::little>( dataSectAddr) == right_ret);
 
     // write 0x7777 into the two bytes pointed by ( dataSectAddr + 1)
-    func_mem->write<uint16, Endian::little>( 0x7777, dataSectAddr + 1);
+    func_mem->write<uint16, std::endian::little>( 0x7777, dataSectAddr + 1);
     right_ret = 0x03777701; // before write it was 0x03020101
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, std::endian::little>( dataSectAddr) == right_ret);
 
     // write 0x00000000 into the four bytes pointed by dataSectAddr
-    func_mem->write<uint32, Endian::little>( 0x00000000, dataSectAddr);
+    func_mem->write<uint32, std::endian::little>( 0x00000000, dataSectAddr);
     right_ret = 0x00000000; // before write it was 0x03777701
-    CHECK( func_mem->read<uint32, Endian::little>( dataSectAddr) == right_ret);
+    CHECK( func_mem->read<uint32, std::endian::little>( dataSectAddr) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
@@ -138,15 +138,15 @@ TEST_CASE( "Func_memory: Write_Read_Not_Initialized_Mem_Test")
     uint64 write_addr = 0x3FFFFE;
 
     // write 0x03020100 into the four bytes pointed by write_addr
-    func_mem->write<uint32, Endian::little>( 0x03020100, write_addr);
+    func_mem->write<uint32, std::endian::little>( 0x03020100, write_addr);
     uint64 right_ret = 0x0100;
-    CHECK( func_mem->read<uint16, Endian::little>( write_addr) == right_ret);
+    CHECK( func_mem->read<uint16, std::endian::little>( write_addr) == right_ret);
 
     right_ret = 0x0201;
-    CHECK( func_mem->read<uint16, Endian::little>( write_addr + 1) == right_ret);
+    CHECK( func_mem->read<uint16, std::endian::little>( write_addr + 1) == right_ret);
 
     right_ret = 0x0302;
-    CHECK( func_mem->read<uint16, Endian::little>( write_addr + 2) == right_ret);
+    CHECK( func_mem->read<uint16, std::endian::little>( write_addr + 2) == right_ret);
 }
 
 TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
@@ -161,7 +161,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1b")
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, &write_data_1, 1) == 1);
 
     // Check if read correctly
-    CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr) == uint8{ 0xA5});
+    CHECK( func_mem->read<uint8, std::endian::little>( dataSectAddr) == uint8{ 0xA5});
     CHECK( func_mem->memcpy_guest_to_host( &read_data_1, dataSectAddr, 1) == 1);
     CHECK( read_data_1 == write_data_1);
 }
@@ -181,7 +181,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_8b")
 
     // Check if read correctlly
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
+        CHECK( func_mem->read<uint8, std::endian::little>( dataSectAddr + i) == uint8( write_data_8.at(i)));
 
     CHECK( func_mem->memcpy_guest_to_host( read_data_8.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
@@ -203,7 +203,7 @@ TEST_CASE( "Func_memory: Host_Guest_Memcpy_1024b")
 
     CHECK( func_mem->memcpy_host_to_guest_noexcept( dataSectAddr, write_data_1024.data(), size) == size);
     for (size_t i = 0; i < size; i++)
-        CHECK( func_mem->read<uint8, Endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
+        CHECK( func_mem->read<uint8, std::endian::little>( dataSectAddr + i) == uint8( write_data_1024.at( i)));
 
     CHECK( func_mem->memcpy_guest_to_host( read_data_1024.data(), dataSectAddr, size) == size);
     for (size_t i = 0; i < size; i++)
@@ -287,14 +287,14 @@ TEST_CASE( "Func_memory: memset")
     mem->memset( 0x1000, std::byte{'a'}, 16);
     mem->memset( 0x1000, std::byte{'b'}, 8);
 
-    CHECK( mem->read<uint8, Endian::little>( 0x1000) == 'b');
-    CHECK( mem->read<uint8, Endian::little>( 0x1008) == 'a');
+    CHECK( mem->read<uint8, std::endian::little>( 0x1000) == 'b');
+    CHECK( mem->read<uint8, std::endian::little>( 0x1008) == 'a');
 }
 
 TEST_CASE( "Func_memory: ZeroMemory")
 {
     auto zm = ReadableMemory::create_zero_memory();
-    CHECK( zm->read<uint32, Endian::big>(0x12355) == 0 );
+    CHECK( zm->read<uint32, std::endian::big>(0x12355) == 0 );
     CHECK( zm->dump() == "empty memory\n");
 }
 
@@ -318,7 +318,7 @@ TEST_CASE( "Zero_memory: Duplicate")
 TEST_CASE( "Func_memory: String length, no zero bytes")
 {
     auto mem = FuncMemory::create_hierarchied_memory( 1, 0, 0);
-    mem->write<uint16, Endian::big>( 0xABCD, 0x0);
+    mem->write<uint16, std::endian::big>( 0xABCD, 0x0);
     CHECK( mem->strlen( 0x0) == 2);
 }
 
@@ -372,7 +372,7 @@ class DummyStore : public Datapath<uint64> {
             mem_size = 8;
             v_src[1] = 0xABCD'EF12'3456'7890ULL;
         }
-        static auto get_endian() { return Endian::little; } 
+        static auto get_endian() { return std::endian::little; } 
 };
 
 TEST_CASE( "Func_memory: Store to 0")
@@ -387,7 +387,7 @@ TEST_CASE( "Func_memory: Store to 0x100")
     DummyStore store( 0x100);
     auto mem = FuncMemory::create_4M_plain_memory();
     mem->load_store( &store);
-    CHECK( mem->read<uint64, Endian::little>( 0x100) == store.get_v_src( 1));
+    CHECK( mem->read<uint64, std::endian::little>( 0x100) == store.get_v_src( 1));
 }
 
 TEST_CASE( "Func_memory Replicant: read and write")

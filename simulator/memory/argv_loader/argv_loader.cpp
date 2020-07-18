@@ -9,7 +9,7 @@
 #include <cstring>
 #include <infra/exception.h>
 
-template <typename T, Endian endian>
+template <typename T, std::endian endian>
 ArgvLoader<T, endian>::ArgvLoader( const char* const* argv, const char* const* envp)
         : argc( argv != nullptr ? count_argc( argv) : 0)
         , argv( argv)
@@ -17,7 +17,7 @@ ArgvLoader<T, endian>::ArgvLoader( const char* const* argv, const char* const* e
         , offset( 0)
 {}
 
-template <typename T, Endian endian>
+template <typename T, std::endian endian>
 size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     mem->write<T, endian>( narrow_cast<T>( argc), addr + offset);
@@ -44,7 +44,7 @@ size_t ArgvLoader<T, endian>::load_to( const std::shared_ptr<FuncMemory>& mem, A
     return offset;
 }
 
-template<typename T, Endian endian>
+template<typename T, std::endian endian>
 void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     for ( int contents_offset = 0; contents_offset < argc; contents_offset++)
@@ -61,7 +61,7 @@ void ArgvLoader<T, endian>::load_argv_contents( const std::shared_ptr<FuncMemory
     }
 }
 
-template<typename T, Endian endian>
+template<typename T, std::endian endian>
 void ArgvLoader<T, endian>::load_envp_contents( const std::shared_ptr<FuncMemory>& mem, Addr addr)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -79,7 +79,7 @@ void ArgvLoader<T, endian>::load_envp_contents( const std::shared_ptr<FuncMemory
     }
 }
 
-template class ArgvLoader<uint32, Endian::little>;
-template class ArgvLoader<uint32, Endian::big>;
-template class ArgvLoader<uint64, Endian::little>;
-template class ArgvLoader<uint64, Endian::big>;
+template class ArgvLoader<uint32, std::endian::little>;
+template class ArgvLoader<uint32, std::endian::big>;
+template class ArgvLoader<uint64, std::endian::little>;
+template class ArgvLoader<uint64, std::endian::big>;

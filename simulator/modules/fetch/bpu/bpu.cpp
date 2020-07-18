@@ -139,7 +139,7 @@ class BPFactory {
         out << "Supported branch prediction modes:" << std::endl;
         for ( const auto& map_name : map)
             out << "\t" << map_name.first << std::endl;
-        return out.str();
+        return std::move( out).str();
     }
 
 public:

@@ -41,8 +41,8 @@ More details about internals are available on [Wiki](https://github.com/MIPT-ILa
 
 We use C++20 features and Boost 1.71. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
 * GCC 9
-* Clang 7.0.0
-* Apple LLVM Version 10.0.0
+* Clang 10.0.0
+* Apple LLVM Version 11.0.3
 * MS Visual Studio 2019
 
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.

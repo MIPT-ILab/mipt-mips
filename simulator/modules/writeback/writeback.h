@@ -37,7 +37,7 @@ private:
     uint64 executed_instrs = 0;
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
-    const Endian endian;
+    const std::endian endian;
     Checker<ISA> checker;
     std::shared_ptr<Kernel> kernel;
     std::unique_ptr<Driver> driver;
@@ -65,7 +65,7 @@ private:
     WritePort<Target>* wp_target = nullptr;
 
 public:
-    Writeback( Module* parent, Endian endian);
+    Writeback( Module* parent, std::endian endian);
 
     // Keep dtors in the same translation unit
     ~Writeback() final;

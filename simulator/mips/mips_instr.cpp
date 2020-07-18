@@ -806,7 +806,7 @@ static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
 #endif
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 bytes, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::endian endian, uint32 bytes, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( bytes)
     , raw_valid( true)
@@ -826,7 +826,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, Endian endian, uint32 byte
 }
 
 template<typename R>
-BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, Endian endian, uint32 immediate, Addr PC)
+BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, std::endian endian, uint32 immediate, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( 0)
     , endian( endian)
@@ -880,7 +880,7 @@ std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
     this->dump_content( oss, get_disasm());
-    return oss.str();
+    return std::move( oss).str();
 }
 
 template<typename R>
@@ -888,10 +888,10 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     const auto& bytes = endian == Endian::little ? unpack_array<uint32, Endian::little>( raw) : unpack_array<uint32, Endian::big>( raw);
+     const auto& bytes = endian == std::endian::little ? unpack_array<uint32, std::endian::little>( raw) : unpack_array<uint32, std::endian::big>( raw);
      for ( const auto& b : bytes)
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
-     return oss.str();
+     return std::move( oss).str();
 }
 
 template<typename R>

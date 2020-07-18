@@ -25,7 +25,7 @@ std::string FuncMemoryOutOfRange::generate_string( Addr addr, Addr mask)
 {
     std::ostringstream oss;
     oss <<  "address: 0x" << std::hex << addr << "; max address: 0x" << mask;
-    return oss.str();
+    return std::move( oss).str();
 }
 
  // Write explicitly to solve code coverage issues
