@@ -40,6 +40,8 @@ matrix:
 addons:
   apt:
     sources:
+    - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main"
+      key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     - sourceline: "deb https://apt.kitware.com/ubuntu/ focal main"
@@ -48,7 +50,7 @@ addons:
     update: true
     packages:
     - clang-tidy-11
-    - clang++-11
+    - clang++-10
     - cmake
     - g++-10
     - libboost-dev
@@ -85,8 +87,8 @@ install:
        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 40
        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-10 40
        if [ $CXX == clang++ ]; then
-          export CXX=clang++-11
-          export CC=clang-11
+          export CXX=clang++-10
+          export CC=clang-10
        fi
        TRAVIS_CMAKE=/usr/bin/cmake
     fi
