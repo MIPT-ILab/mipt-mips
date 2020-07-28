@@ -6,8 +6,8 @@
  * Copyright 2012-2019 MIPT-MIPS project
  */
 
-#ifndef COMMON__TYPES_H
-#define COMMON__TYPES_H
+#ifndef COMMON_TYPES_H
+#define COMMON_TYPES_H
 
 #include <cstddef>
 #include <cstdint>
@@ -154,4 +154,4 @@ static const uint16 MAX_VAL16 = UINT16_MAX;
 static const uint32 MAX_VAL32 = UINT32_MAX;
 static const uint64 MAX_VAL64 = UINT64_MAX;
 
-#endif // #ifndef COMMON__TYPES_H
+#endif // #ifndef COMMON_TYPES_H
