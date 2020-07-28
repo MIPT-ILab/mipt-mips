@@ -880,7 +880,7 @@ std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
     this->dump_content( oss, get_disasm());
-    return oss.str();
+    return std::move( oss).str();
 }
 
 template<typename R>
@@ -891,7 +891,7 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
      const auto& bytes = endian == std::endian::little ? unpack_array<uint32, std::endian::little>( raw) : unpack_array<uint32, std::endian::big>( raw);
      for ( const auto& b : bytes)
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
-     return oss.str();
+     return std::move( oss).str();
 }
 
 template<typename R>

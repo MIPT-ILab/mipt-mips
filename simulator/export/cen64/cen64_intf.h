@@ -27,8 +27,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef __vr4300_cpu_h__
-#define __vr4300_cpu_h__
+#ifndef _vr4300_cpu_h_
+#define _vr4300_cpu_h_
 
 #include "cen64_rcp_interrupt_mask.h"
 #include <cstddef>

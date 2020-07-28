@@ -33,11 +33,11 @@ THE SOFTWARE.
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <algorithm>
 #include <vector>
 #include <deque>
 #include <iterator>
-#include <typeinfo>
 
 #include <elfio/elf_types.hpp>
 #include <elfio/elfio_utils.hpp>
@@ -61,10 +61,10 @@ get_##FNAME() const                                \
 }                                                  \
 void                                               \
 set_##FNAME( TYPE val )                            \
-{ 						   \
-  if (header) { 			    	   \
+{                          \
+  if (header) {                        \
       header->set_##FNAME( val );                  \
-  } 						   \
+  }                            \
 }                                                  \
 
 namespace ELFIO {
@@ -113,9 +113,9 @@ class elfio
     {
         clean();
 
-	unsigned char e_ident[EI_NIDENT];
-	// Read ELF file signature
-	stream.read( reinterpret_cast<char*>( &e_ident ), sizeof( e_ident ) );
+        unsigned char e_ident[EI_NIDENT];
+        // Read ELF file signature
+        stream.read( reinterpret_cast<char*>( &e_ident ), sizeof( e_ident ) );
 
         // Is it ELF file?
         if ( stream.gcount() != sizeof( e_ident ) ||
@@ -148,9 +148,19 @@ class elfio
 //------------------------------------------------------------------------------
     bool save( const std::string& file_name )
     {
-        std::ofstream f( file_name.c_str(), std::ios::out | std::ios::binary );
+        std::ofstream stream;
+        stream.open( file_name.c_str(), std::ios::out | std::ios::binary );
+        if ( !stream ) {
+            return false;
+        }
 
-        if ( !f || !header) {
+        return save(stream);
+    }
+
+//------------------------------------------------------------------------------
+    bool save( std::ostream &stream )
+    {
+        if ( !stream || !header) {
             return false;
         }
 
@@ -174,11 +184,9 @@ class elfio
         is_still_good = is_still_good && layout_sections_without_segments();
         is_still_good = is_still_good && layout_section_table();
 
-        is_still_good = is_still_good && save_header( f );
-        is_still_good = is_still_good && save_sections( f );
-        is_still_good = is_still_good && save_segments( f );
-
-        f.close();
+        is_still_good = is_still_good && save_header( stream );
+        is_still_good = is_still_good && save_sections( stream );
+        is_still_good = is_still_good && save_segments( stream );
 
         return is_still_good;
     }
@@ -482,13 +490,13 @@ class elfio
     }
 
 //------------------------------------------------------------------------------
-    bool save_header( std::ofstream& f )
+    bool save_header( std::ostream& stream )
     {
-        return header->save( f );
+        return header->save( stream );
     }
 
 //------------------------------------------------------------------------------
-    bool save_sections( std::ofstream& f )
+    bool save_sections( std::ostream& stream )
     {
         for ( unsigned int i = 0; i < sections_.size(); ++i ) {
             section *sec = sections_.at(i);
@@ -497,13 +505,13 @@ class elfio
                 (std::streamoff)header->get_sections_offset() +
                 header->get_section_entry_size() * sec->get_index();
 
-            sec->save(f,headerPosition,sec->get_offset());
+            sec->save(stream,headerPosition,sec->get_offset());
         }
         return true;
     }
 
 //------------------------------------------------------------------------------
-    bool save_segments( std::ofstream& f )
+    bool save_segments( std::ostream& stream )
     {
         for ( unsigned int i = 0; i < segments_.size(); ++i ) {
             segment *seg = segments_.at(i);
@@ -511,7 +519,7 @@ class elfio
             std::streampos headerPosition = header->get_segments_offset()  +
                 header->get_segment_entry_size()*seg->get_index();
 
-            seg->save( f, headerPosition, seg->get_offset() );
+            seg->save( stream, headerPosition, seg->get_offset() );
         }
         return true;
     }
@@ -657,9 +665,7 @@ class elfio
                     header->get_segment_entry_size() * header->get_segments_num();
             }
             // Special case:
-            // Segments which start with the NULL section and have further sections
-            else if ( seg->get_sections_num() > 1
-                      && sections[seg->get_section_index_at( 0 )]->get_type() == SHT_NULL ) {
+            else if ( seg->is_offset_initialized() && seg->get_offset() == 0 ) {
                 seg_start_pos = 0;
                 if ( seg->get_sections_num() ) {
                     segment_memory = segment_filesize = current_file_pos;
@@ -713,10 +719,10 @@ class elfio
                 else if (!section_generated[index] && !sec->is_address_initialized() ) {
                     // If no address has been specified then only the section
                     // alignment constraint has to be matched
-					Elf_Xword align = sec->get_addr_align();
-					if (align == 0) {
-						align = 1;
-					}
+                    Elf_Xword align = sec->get_addr_align();
+                    if (align == 0) {
+                        align = 1;
+                    }
                     Elf64_Off error = current_file_pos % align;
                     secAlign = ( align - error ) % align;
                 }
