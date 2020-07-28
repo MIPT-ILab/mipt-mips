@@ -5,8 +5,8 @@
  * Copyright 2017-2019 MIPT-MIPS
  */
 
-#ifndef COMMON__MACRO_H
-#define COMMON__MACRO_H
+#ifndef COMMON_MACRO_H
+#define COMMON_MACRO_H
 
 #include <infra/types.h>
 
