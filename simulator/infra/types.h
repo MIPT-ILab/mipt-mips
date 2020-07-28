@@ -9,6 +9,8 @@
 #ifndef COMMON_TYPES_H
 #define COMMON_TYPES_H
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -24,65 +26,18 @@ using int8 = int8_t;
 using int16 = int16_t;
 using int32 = int32_t;
 using int64 = int64_t;
+using int128 = boost::multiprecision::int128_t;
 
 // Unsigned types
 using uint8 = uint8_t;
 using uint16 = uint16_t;
 using uint32 = uint32_t;
 using uint64 = uint64_t;
+using uint128 = boost::multiprecision::uint128_t;
 
 // Float types
 using float32 = float;
 using float64 = double;
-
-// Byte casts
-static inline std::byte* byte_cast( char* b)
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
-    return reinterpret_cast<std::byte*>( b);
-}
-
-static inline const std::byte* byte_cast( const char* b)
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
-    return reinterpret_cast<const std::byte*>( b);
-}
-
-static inline std::byte* byte_cast( uint8* b)
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
-    return reinterpret_cast<std::byte*>( b);
-}
-
-static inline const std::byte* byte_cast( const uint8* b)
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
-    return reinterpret_cast<const std::byte*>( b);
-}
-
-// Use native GCC type if available, as Boost <= 1.60 + GCC 7 generate a bug
-#if defined(__GNUC__) && defined(__SIZEOF_INT128__)
-
-#define USE_GNUC_INT128
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-
-using int128 = __int128;
-using uint128 = unsigned __int128;
-
-std::ostream& operator<<(std::ostream& out, uint128 value);
-
-#pragma GCC diagnostic pop
-
-#else // __SIZEOF_INT128__
-
-#include <boost/multiprecision/cpp_int.hpp>
-
-using uint128 = boost::multiprecision::uint128_t;
-using int128 = boost::multiprecision::int128_t;
-
-#endif // __SIZEOF_INT128__
 
 /* Convert signed type to unsigned type */
 template<typename> struct unsign;
@@ -135,6 +90,31 @@ template<> struct halved<uint64>  { using type = uint32; };
 template<> struct halved<uint128> { using type = uint64; };
 
 template<typename T> using halved_t = typename halved<T>::type;
+
+// Byte casts
+static inline std::byte* byte_cast( char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const char* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
+
+static inline std::byte* byte_cast( uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<std::byte*>( b);
+}
+
+static inline const std::byte* byte_cast( const uint8* b)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
+    return reinterpret_cast<const std::byte*>( b);
+}
 
 using Addr = uint64;
 using AddrDiff = int64;

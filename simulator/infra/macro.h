@@ -130,7 +130,7 @@ constexpr auto popcount( T x) noexcept
 
 static inline auto popcount( uint128 x) noexcept
 {
-    const auto& u = unpack_to<uint64>( x);
+    const auto& u = unpack_to<uint64>( std::move( x));
     return popcount( u[0]) + popcount( u[1]);
 }
 
