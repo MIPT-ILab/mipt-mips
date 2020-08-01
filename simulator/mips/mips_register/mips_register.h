@@ -93,7 +93,7 @@ public:
 
 private:
     RegNum value = MIPS_REG_zero;
-    static std::array<std::string_view, MAX_REG> regTable;
+    static const std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr MIPSRegister( RegNum id) : value( id) { }
 };
