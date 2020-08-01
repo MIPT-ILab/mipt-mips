@@ -3,7 +3,7 @@ notifications:
 
 language: cpp
 dist: focal
-osx_image: xcode11.5
+osx_image: xcode12
 
 branches:
   only:
@@ -42,11 +42,14 @@ addons:
     sources:
     - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main"
       key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
+    - sourceline: "deb https://apt.kitware.com/ubuntu/ focal main"
+      key_url: "https://apt.kitware.com/keys/kitware-archive-latest.asc"
     - sourceline: 'ppa:ubuntu-toolchain-r/test'
     update: true
     packages:
     - clang-tidy-10
     - clang++-10
+    - cmake
     - g++-10
     - libboost-dev
     - ninja-build
@@ -76,6 +79,7 @@ before_install:
 
 install:
   - | # Update compilers
+    TRAVIS_CMAKE=cmake
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 40
        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 40
@@ -84,6 +88,7 @@ install:
           export CXX=clang++-10
           export CC=clang-10
        fi
+       TRAVIS_CMAKE=/usr/bin/cmake
     fi
   - | # Download GDB
     if [ $GDB_VER ]; then
@@ -97,7 +102,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR/simulator       && mkdir build
-  - cd $TRAVIS_BUILD_DIR/simulator/build && cmake .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
+  - cd $TRAVIS_BUILD_DIR/simulator/build && $TRAVIS_CMAKE .. $CMAKE_FLAGS -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD -G "Ninja"
   - |
     if [ $GDB_VER ]; then
         cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no

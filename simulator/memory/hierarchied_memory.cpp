@@ -171,7 +171,7 @@ std::string HierarchiedMemory::dump() const
                     oss << "addr 0x" << get_addr( set_it, page_it, byte_it)
                         << ": data 0x" << uint32( *byte_it) << std::endl;
 
-    return oss.str();
+    return std::move( oss).str();
 }
 
 Addr HierarchiedMemory::get_addr(const Mem::const_iterator& set_it, const Set::const_iterator& page_it, const Page::const_iterator& byte_it) const noexcept

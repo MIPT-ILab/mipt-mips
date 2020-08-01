@@ -6,8 +6,8 @@
  * Copyright 2012-2019 uArchSim iLab project
  */
 
-#ifndef FUNC_MEMORY__FUNC_MEMORY_H
-#define FUNC_MEMORY__FUNC_MEMORY_H
+#ifndef FUNC_MEMORY_FUNC_MEMORY_H
+#define FUNC_MEMORY_FUNC_MEMORY_H
 
 #include <infra/endian.h>
 #include <infra/exception.h>
@@ -250,4 +250,4 @@ private:
     std::vector<std::shared_ptr<FuncMemory>> replicas;
 };
 
-#endif // #ifndef FUNC_MEMORY__FUNC_MEMORY_H
+#endif // #ifndef FUNC_MEMORY_FUNC_MEMORY_H
