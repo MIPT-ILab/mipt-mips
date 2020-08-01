@@ -5,7 +5,7 @@
 
 #include "riscv_register.h"
 
-std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
+const std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
 {{
 #define REGISTER(X) # X
 #include "riscv_register.def"
