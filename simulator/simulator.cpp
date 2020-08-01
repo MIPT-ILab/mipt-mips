@@ -20,9 +20,9 @@
 #include <algorithm>
 
 namespace config {
-    static AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
-    static AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
-    static AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
+    static const AliasedValue<std::string> isa = { "I", "isa", "mars", "modeled ISA"};
+    static const AliasedSwitch disassembly_on = { "d", "disassembly", "print disassembly"};
+    static const AliasedSwitch functional_only = { "f", "functional-only", "run functional simulation only"};
 } // namespace config
 
 void CPUModel::duplicate_all_registers_to( CPUModel* model) const

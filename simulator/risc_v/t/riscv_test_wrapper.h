@@ -12,7 +12,11 @@ template<typename T>
 struct TestData {
     const T src1, src2, dst;
 
-    TestData( T src1, T src2, T dst) : src1( src1), src2( src2), dst( dst) { }
+    TestData( T src1, T src2, T dst)
+        : src1( std::move( src1))
+        , src2( std::move( src2))
+        , dst( std::move( dst))
+    { }
 
     void make_test( std::string_view str, uint32 imm)
     {

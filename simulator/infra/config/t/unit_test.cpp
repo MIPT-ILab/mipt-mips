@@ -14,13 +14,13 @@
 #include <sstream>
 
 namespace config {
-    AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
-    AliasedRequiredValue<uint64> uint64_config = { "n", "uint64_config_name", "uint64 config description"};
-    PredicatedValue<uint64> uint64_predicated_config = { "uint64_predicated_config_name", 8, "uint64 config description",
-                                                         [](uint64 val){ return val % 4 == 0; }};
+    const AliasedRequiredValue<std::string> string_config = { "b", "string_config_name", "string config description"};
+    const AliasedRequiredValue<uint64> uint64_config = { "n", "uint64_config_name", "uint64 config description"};
+    const PredicatedValue<uint64> uint64_predicated_config = { "uint64_predicated_config_name", 8, "uint64 config description",
+                                                               [](uint64 val){ return val % 4 == 0; }};
 
-    Switch bool_config_1 = { "bool_config_1", "first bool config description"};
-    Switch bool_config_2 = { "bool_config_2", "second bool config description"};
+    const Switch bool_config_1 = { "bool_config_1", "first bool config description"};
+    const Switch bool_config_2 = { "bool_config_2", "second bool config description"};
 } // namespace config
 
 template<typename T>
