@@ -156,7 +156,6 @@ include_directories(SYSTEM
 
 add_library(mipt-mips-src OBJECT
     infra/log.cpp
-    infra/print128.cpp
     infra/config/main_wrapper.cpp
     infra/config/config.cpp
     infra/ports/module.cpp
