@@ -12,9 +12,9 @@
 #include <simulator.h>
 
 namespace config {
-    static AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
-    static AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
-    static Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
+    static const AliasedRequiredValue<std::string> binary_filename = { "b", "binary", "input binary file"};
+    static const AliasedValue<uint64> num_steps = { "n", "numsteps", MAX_VAL64, "number of instructions to run"};
+    static const Value<std::string> trap_mode = { "trap_mode",  "", "trap handler mode"};
 } // namespace config
 
 class Main : public MainWrapper

@@ -5,7 +5,7 @@
 
 #include "mips_register.h"
 
-std::array<std::string_view, MIPSRegister::MAX_REG> MIPSRegister::regTable =
+const std::array<std::string_view, MIPSRegister::MAX_REG> MIPSRegister::regTable =
 {{
 #define REGISTER(X) # X
 #define CP0_REGISTER(X) # X
