@@ -686,10 +686,10 @@ static const std::vector<const Table<I>*> all_isa_maps =
 };
 
 template<typename I>
-static MIPSTableEntry<I> unknown_instruction = { };
+static const MIPSTableEntry<I> unknown_instruction = { };
 
 template<typename I>
-static MIPSTableEntry<I> instr_nop =
+static const MIPSTableEntry<I> instr_nop =
 { "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, { }, { Dst::ZERO }, MIPS_I_Instr};
 
 template<typename I>
