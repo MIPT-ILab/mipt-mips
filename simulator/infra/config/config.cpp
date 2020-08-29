@@ -11,7 +11,7 @@
 
 namespace config {
 
-static AliasedSwitch help_option = { "h", "help", "print help"};
+static const AliasedSwitch help_option = { "h", "help", "print help"};
 
 static popl::OptionParser& options()
 {

@@ -3,13 +3,9 @@
  * Copyright 2015-2018 MIPT-MIPS
  */
 
-#include <infra/config/config.h>
-
 #include "decode.h"
 
-namespace config {
-    extern PredicatedValue<uint64> long_alu_latency;
-} // namespace config
+#include <modules/execute/execute.h>
 
 template <typename FuncInstr>
 Decode<FuncInstr>::Decode( Module* parent) : Module( parent, "decode")

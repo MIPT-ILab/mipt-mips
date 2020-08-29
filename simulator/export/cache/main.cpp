@@ -11,12 +11,12 @@
 #include <infra/macro.h>
 
 namespace config {
-    static AliasedRequiredValue<uint32> size = { "s", "size", "Size of instruction level 1 cache (in bytes)"};
-    static AliasedRequiredValue<uint32> ways = { "w", "ways", "Amount of ways in instruction level 1 cache"};
-    static AliasedRequiredValue<std::string> file = { "t", "tracename", "file name with trace"};
+    static const AliasedRequiredValue<uint32> size = { "s", "size", "Size of instruction level 1 cache (in bytes)"};
+    static const AliasedRequiredValue<uint32> ways = { "w", "ways", "Amount of ways in instruction level 1 cache"};
+    static const AliasedRequiredValue<std::string> file = { "t", "tracename", "file name with trace"};
 
-    static AliasedValue<std::string> replacement = { "r", "replacement", "LRU", "Cache replacement scheme"};
-    static Value<uint32> line_size = { "line_size", 64, "Line size of instruction level 1 cache (in bytes)"};
+    static const AliasedValue<std::string> replacement = { "r", "replacement", "LRU", "Cache replacement scheme"};
+    static const Value<uint32> line_size = { "line_size", 64, "Line size of instruction level 1 cache (in bytes)"};
 } // namespace config
 
 class Main : public MainWrapper
