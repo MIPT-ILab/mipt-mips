@@ -8,7 +8,7 @@
 #include "execute.h"
 
 namespace config {
-    PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
+    const PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
                                                 [](uint64 val) { return val >= 2 && val < 64; } };
 } // namespace config
 

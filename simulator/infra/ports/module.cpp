@@ -20,6 +20,7 @@ Module::Module( Module* parent, std::string name)
         parent->add_child( this);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::force_enable_logging()
 {  
     sout.enable();
@@ -27,6 +28,7 @@ void Module::force_enable_logging()
         c->force_enable_logging();
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::force_disable_logging()
 {  
     sout.disable();
@@ -34,6 +36,7 @@ void Module::force_disable_logging()
         c->force_disable_logging();
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
 {
     if ( names.count( name) != 0)
@@ -61,6 +64,7 @@ pt::ptree Module::read_ports_dumping() const
     return result;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::module_dumping( pt::ptree* modules) const
 {
     pt::ptree module;
@@ -79,6 +83,7 @@ void Module::modulemap_dumping( pt::ptree* modulemap) const
     modulemap->add_child( name, c_modulemap);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 pt::ptree Module::portmap_dumping() const
 {
     return parent->portmap_dumping();

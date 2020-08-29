@@ -7,9 +7,14 @@
 #define EXECUTE_H
 
 #include <func_sim/operation.h>
+#include <infra/config/config.h>
 #include <modules/core/perf_instr.h>
 #include <modules/decode/bypass/data_bypass_interface.h>
 #include <modules/ports_instance.h>
+
+namespace config {
+    extern const PredicatedValue<uint64> long_alu_latency;
+} // namespace config
 
 template <typename FuncInstr>
 class Execute : public Module
