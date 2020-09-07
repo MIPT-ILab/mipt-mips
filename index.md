@@ -7,7 +7,7 @@ Additionally, it is a supporting project to MIPT lectures on Computer Architectu
 ## Computer Architecture 2020/2021
 
 Lectures are given online each **Monday, 10:45-12:10**.
-A link to join the meeting: [link][https://meet.google.com/fjn-ycma-ucb].
+A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 
 [Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
 [L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
