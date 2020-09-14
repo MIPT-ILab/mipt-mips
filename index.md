@@ -11,11 +11,15 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 
 [Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
 [L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
+[L2]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%202%20-%20ISA%20and%20uArch.pptx?raw=true
+[L3]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%203%20-%20Integrated%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
 :----: | :------: | ------
  7 Sep | Org.     | **Course introduction**<br>                           • Slides: [download][Intro]
  7 Sep | Lecture  | **Layers of Computer Architecture**<br>               • Slides: [download][L1]
+14 Sep | Lecture  | **ISA and uArch**<br>                                 • Slides: [download][L2]
+14 Sep | Lecture  | **Integrated Circuits**<br>                           • Slides: [download][L3]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
