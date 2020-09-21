@@ -54,7 +54,7 @@ static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
  * Examples: msb_set<uint8>() -> 0x80
  */
 template <typename T>
-static constexpr T msb_set()
+static constexpr T msb_set() noexcept
 {
     return T{ 1U} << (bitwidth<T> - 1);
 }
@@ -64,7 +64,7 @@ static constexpr T msb_set()
  * Examples: lsb_set<uint8>() -> 0x01
  */
 template <typename T>
-static constexpr T lsb_set()
+static constexpr T lsb_set() noexcept
 {
     return 1;
 }

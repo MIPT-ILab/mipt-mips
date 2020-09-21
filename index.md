@@ -4,56 +4,24 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 The project is being developed by a group of students under the guidance of Intel employees.
 Additionally, it is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
-## Computer Architecture
+## Computer Architecture 2020/2021
 
-Lectures and seminars are delivered each **Monday 11:30, room 108 of RT building**.
+Lectures are given online each **Monday, 10:45-12:10**.
+A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 
-[Promo]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Promotion.pptx?raw=true
-[Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/Course%20Introduction.pptx?raw=true
-[L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
-[L1 AUDIO]: https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L1/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch%20AUDIO.pptx?raw=true
-[L2]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L2/Lecture%202%20-%20Integrated%20Circuits.%20CMOS.pptx?raw=true
-[L3]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L3/Lecture%203%20-%20Combinational%20%26%20Sequential%20Circuits%20-%20NO%20AUDIO.pptx?raw=true
-[L4]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA.pptx?raw=true
-[L4 AUDIO]: https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L4/Lecture%204%20-%20RISC-V%20ISA%20AUDIO.pptx?raw=true
-[L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L5/Lecture%205%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
-[L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L6/Lecture%206%20-%20Pipelining.%20Data%20Hazards.pptx?raw=true
-[L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L7/Lecture%207%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
-[L8]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L8/Lecture%208%20-%20Caches,%20part%201.pptx?raw=true
-[L9]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L9/Lecture%209%20-%20Caches%2C%20part%202.pptx?raw=true
-[L10]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L10/Lecture%2010%20-%20Advanced%20Pipelining.pptx?raw=true
-[L11]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L11/Lecture%2011%20-%20Virtual%20Memory.pptx?raw=true
-[L12]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L12/Lecture%2012%20-%20ILP.%20Superscalar.%20OOO%20-%20part%201.pptx?raw=true
-[L13]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L13/Lecture%2013%20-%20OOO%20-%20part%202.pptx?raw=true
-[L14]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L14/Lecture%2014%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
-[L15]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L15/Lecture%2015%20-%20TLP%20-%20part%201.pptx?raw=true
-[L16]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/L16/Lecture%2016%20-%20TLP%20-%20part%202%20(Multithreading,%20Synchronization).pptx?raw=true
-[P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2019/P1/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
+[Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
+[L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
+[L2]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%202%20-%20ISA%20and%20uArch.pptx?raw=true
+[L3]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%203%20-%20Integrated%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
 :----: | :------: | ------
-09 Sep | Org.     | **Promotion event**<br>                               • Slides: [russian version][Promo]
-16 Sep | Org.     | **Course introduction**<br>                           • Slides: [russian version][Intro]
-16 Sep | Lecture  | **L1: Layers of Computer Science. ISA and uArch**<br> • Slides: [no audio][L1], [audio][L1 AUDIO]
-23 Sep | Lecture  | **L2: Integrated Circuits. CMOS**<br>                 • Slides: [no audio][L2]
-30 Sep | Lecture  | **L3: Combinational and sequential circuits**<br>     • Slides: [no audio][L3]
-07 Oct | Practice | **P1: Combinational and Sequential Circuits**<br>     • Slides: [no audio][P1]
-14 Oct | Lecture  | **L4: RISC-V ISA**<br>                                • Slides: [no audio][L4], [audio][L4 AUDIO]
-21 Oct | Lecture  | **L5: RISC-V Single-Cycle implementation**<br>        • Slides: [no audio][L5]
-28 Oct | Lecture  | **L6: Pipelining. Data Hazards.**<br>                 • Slides: [no audio][L6]
-11 Nov | Lecture  | **L7: Control Hazards. Branch Prediction.**<br>       • Slides: [no audio][L7]
-25 Nov | Lecture  | **L8: Caches, part 1**<br>                            • Slides: [no audio][L8]
-02 Dec | Lecture  | **L9: Caches, part 2**<br>                            • Slides: [no audio][L9]
-07 Dec | Test     | **Final Test 1**<br>
-10 Feb | Lecture  | **L10: Advanced Pipelining**<br>                      • Slides: [no audio][L10]
-17 Feb | Lecture  | **L11: Virtual Memory**<br>                           • Slides: [no audio][L11]
-02 Mar | Lecture  | **L12: Instruction-Level Parallelism.<br> Superscalar. Out-of-Order, part 1**<br> • Slides: [no audio][L12]
-16 Mar | Lecture  | **L13: Out-of-Order, part 2**<br>                     • Slides: [no audio][L13]
-23 Mar | Online<br>lecture  | **L14: Out-of-Order, part 3: Loads and Stores**<br>   • Slides: [no audio][L14]
-30 Mar | Online<br>lecture  | **L15: Thread-Level Parallelism, part 1**<br>         • Slides: [no audio][L15]
-06 Apr | Online<br>lecture  | **L16: Thread-Level Parallelism, part 2**<br>         • Slides: [no audio][L16]
+ 7 Sep | Org.     | **Course introduction**<br>                           • Slides: [download][Intro]
+ 7 Sep | Lecture  | **Layers of Computer Architecture**<br>               • Slides: [download][L1]
+14 Sep | Lecture  | **ISA and uArch**<br>                                 • Slides: [download][L2]
+14 Sep | Lecture  | **Integrated Circuits**<br>                           • Slides: [download][L3]
 
-You may find lectures of previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2018).
+You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
@@ -79,7 +47,7 @@ MIPT | Name | Score | Comments
 718 | Andrey Agrachev | 13 | [#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626), [#830](https://github.com/MIPT-ILab/mipt-mips/issues/830), [#248](https://github.com/MIPT-ILab/mipt-mips/issues/248), [#879](https://github.com/MIPT-ILab/mipt-mips/issues/879), [#821](https://github.com/MIPT-ILab/mipt-mips/issues/821) |
 714 | Yauheni Sharamed | 13 | [#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724), [#649](https://github.com/MIPT-ILab/mipt-mips/issues/649), [#910](https://github.com/MIPT-ILab/mipt-mips/issues/910), [#925](https://github.com/MIPT-ILab/mipt-mips/issues/925) |
 618 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
-**81?** | **Eric Konks** | **12** | **[#520](https://github.com/MIPT-ILab/mipt-mips/issues/520), [#1140](https://github.com/MIPT-ILab/mipt-mips/issues/1140), [#1257](https://github.com/MIPT-ILab/mipt-mips/issues/1257)**
+81? | Eric Konks | 12 | [#520](https://github.com/MIPT-ILab/mipt-mips/issues/520), [#1140](https://github.com/MIPT-ILab/mipt-mips/issues/1140), [#1257](https://github.com/MIPT-ILab/mipt-mips/issues/1257)
 512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
 711 | Vyacheslav Kompan | 11 | [#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)  |
 715 | Rustem Yunusov | 10 | [#901](https://github.com/MIPT-ILab/mipt-mips/issues/901), [#760](https://github.com/MIPT-ILab/mipt-mips/issues/760), [#614](https://github.com/MIPT-ILab/mipt-mips/issues/614) |
