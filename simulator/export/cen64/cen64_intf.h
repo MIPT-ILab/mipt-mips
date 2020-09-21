@@ -27,8 +27,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef _vr4300_cpu_h_
-#define _vr4300_cpu_h_
+#ifndef VR4300_CPU_H
+#define VR4300_CPU_H
 
 #include "cen64_rcp_interrupt_mask.h"
 #include <cstddef>
@@ -67,4 +67,4 @@ int has_profile_samples(struct vr4300 const *vr4300);
 
 }
 
-#endif
+#endif // VR4300_CPU_H
