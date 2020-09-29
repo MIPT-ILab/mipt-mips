@@ -12,7 +12,7 @@
 #include <memory/elf/elf_loader.h>
 
 namespace config {
-    static Switch use_mars = {"mars", "use MARS syscalls"};
+    static const Switch use_mars = {"mars", "use MARS syscalls"};
 } // namespace config
 
 void BaseKernel::load_file( const std::string& name)

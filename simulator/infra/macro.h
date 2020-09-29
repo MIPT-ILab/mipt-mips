@@ -44,6 +44,44 @@ template<typename T> static constexpr inline auto lsb_set()  noexcept { return T
 template<typename T> static constexpr inline auto msb_set()  noexcept { return T{ 1U} << (bitwidth<T> - 1); }
 template<typename T> static constexpr inline auto all_ones() noexcept { return (msb_set<T>() - 1U) | msb_set<T>(); }
 
+static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
+
+/*
+ * Returns value of T type with only the most significant bit set
+ * Examples: msb_set<uint8>() -> 0x80
+ */
+template <typename T>
+static constexpr T msb_set() noexcept
+{
+    return T{ 1U} << (bitwidth<T> - 1);
+}
+
+/*
+ * Return value of T with only the lest significant bit set
+ * Examples: lsb_set<uint8>() -> 0x01
+ */
+template <typename T>
+static constexpr T lsb_set() noexcept
+{
+    return 1;
+}
+
+/*
+ * Returns a value full on one bits.
+ * all_ones<uint8>()  -> 0xFF
+ * all_ones<uint32>() -> 0xFFFF'FFFF
+ */
+template <typename T>
+static constexpr T all_ones()
+{
+    return (msb_set<T>() - 1U) | msb_set<T>();
+}
+
+/* Returns a bitmask with desired amount of LSB set to '1'
+ * Examples: bitmask<uint32>(0)  -> 0x0
+ *           bitmask<uint32>(5)  -> 0x1F
+ *           bitmask<uint32>(32) -> 0xFFFF'FFFF
+ */
 template<typename T>
 static constexpr inline auto bitmask( size_t onecount) noexcept
 {

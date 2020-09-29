@@ -43,6 +43,7 @@ protected:
     boost::property_tree::ptree topology_dumping_impl() const;
 
 private:
+    // NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
     virtual std::shared_ptr<PortMap> get_portmap() const { return parent->get_portmap(); }
     void force_enable_logging();
     void force_disable_logging();
