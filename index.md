@@ -20,12 +20,12 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 Date   | Type     | Event
 :----: | :------: | ------
  7 Sep | Org.     | **Course introduction**<br>                           • Slides: [download][Intro]
- 7 Sep | Lecture  | **Layers of Computer Architecture**<br>               • Slides: [download][L1]
-14 Sep | Lecture  | **ISA and uArch**<br>                                 • Slides: [download][L2]
-14 Sep | Lecture  | **Integrated Circuits**<br>                           • Slides: [download][L3]
-21 Sep | Lecture  | **CMOS**<br>                                          • Slides: [download][L4]
-21 Sep | Lecture  | **Combinational Circuits**<br>                        • Slides: [download][L5]
-28 Sep | Lecture  | **Sequential Circuits**<br>                           • Slides: [download][L6]
+ 7 Sep | Lecture  | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]
+14 Sep | Lecture  | **L2: ISA and uArch**<br>                                 • Slides: [download][L2]
+14 Sep | Lecture  | **L3: Integrated Circuits**<br>                           • Slides: [download][L3]
+21 Sep | Lecture  | **L4: CMOS**<br>                                          • Slides: [download][L4]
+21 Sep | Lecture  | **L5: Combinational Circuits**<br>                        • Slides: [download][L5]
+28 Sep | Lecture  | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
