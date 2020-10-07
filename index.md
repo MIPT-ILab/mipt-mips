@@ -16,16 +16,18 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L4]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%204%20-%20CMOS.pptx?raw=true
 [L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%205%20-%20Combinational%20Circuits.pptx?raw=true
 [L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%206%20-%20Sequential%20Circuits.pptx?raw=true
+[P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
 :----: | :------: | ------
- 7 Sep | Org.     | **Course introduction**<br>                           • Slides: [download][Intro]
+ 7 Sep | Org.     | **Course introduction**<br>                               • Slides: [download][Intro]
  7 Sep | Lecture  | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]
 14 Sep | Lecture  | **L2: ISA and uArch**<br>                                 • Slides: [download][L2]
 14 Sep | Lecture  | **L3: Integrated Circuits**<br>                           • Slides: [download][L3]
 21 Sep | Lecture  | **L4: CMOS**<br>                                          • Slides: [download][L4]
 21 Sep | Lecture  | **L5: Combinational Circuits**<br>                        • Slides: [download][L5]
 28 Sep | Lecture  | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]
+ 5 Oct | Practice | **P1: Combinational & Sequential Circuits**>br>           • Slides: [download][P1]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
