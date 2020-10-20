@@ -118,7 +118,7 @@ script:
   - ninja unit-tests
   - ctest --verbose
   - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
-  - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 10000000 --mars
+  - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 5000000 --mars
   - if [ $TRAVIS_GPROF ]; then gprof ./mipt-mips gmon.out -p | head -; fi
   - ninja mipt-v    && ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ninja cachesim  && ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
