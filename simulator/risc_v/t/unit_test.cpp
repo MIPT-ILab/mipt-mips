@@ -285,6 +285,47 @@ TEST_CASE( "RISV RV64 xnor")
     CHECK( instr.get_v_dst( 0) == 0x6fff'ffff'6fff'ffff);
 }
 
+TEST_CASE( "RISV RV32 max")
+{
+    CHECK( RISCVInstr<uint32>(0xb2858b3).get_disasm() == "pack $a7, $a6, $a8");
+    RISCVInstr<uint32> instr( "max", 0);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.set_v_src( 0x1111'1111, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'1111);
+
+}
+
+TEST_CASE( "RISV RV64 max")
+{
+    RISCVInstr<uint64> instr( "max", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'1111'3333'3333);
+}
+
+TEST_CASE( "RISV RV32 maxu")
+{
+    CHECK( RISCVInstr<uint32>(0xb2878b3).get_disasm() == "pack $a7, $a6, $a8");
+    RISCVInstr<uint32> instr( "maxu", 0);
+    instr.set_v_src( 0xffff'ffff, 0);
+    instr.set_v_src( 0x1111'1111, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffff);
+
+}
+
+TEST_CASE( "RISV RV64 maxu")
+{
+    RISCVInstr<uint64> instr( "maxu", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0xffff'ffff'2222'2222);
+}
+
+
 TEST_CASE( "RISCV sro32")
 {
     CHECK( RISCVInstr<uint32>( 0x20d65733).get_disasm() == "sro $a4, $a2, $a3");
