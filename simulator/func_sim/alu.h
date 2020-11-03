@@ -246,6 +246,11 @@ struct ALU
 
     // Bit manipulations
     template<typename I, typename T> static void pack( I* instr)  { instr->v_dst[0] = (instr->v_src[0] & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src[1] << (half_bitwidth<T>)); }
+    template<typename I, typename T> static void packh( I* instr) 
+    { 
+        instr->v_dst[0] = (  instr->v_src[0] & (bitmask<T>(1))                     ) | 
+                          ( (instr->v_src[1] & (bitmask<T>(1))) << (bitmask<T>(1)) );
+    }
 
     // Branches
     template<typename I, Predicate<I> p> static
