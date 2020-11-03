@@ -612,10 +612,10 @@ TEST_CASE("RISCV RV32 gorci")
             {1, 0x1, all_ones<uint32>()},
             {0x1252'0391, 0x1, 0xFFFF'0FFF},
     };
-    std::array<uint32, 6> shamts{0x1, 0x2, 0x5, 0xC, 0xFF, 0x3};
+    std::vector<uint32> shamts{0x1, 0x2, 0x5, 0xC, 0xFF, 0x3};
     for(std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
-        cases[i].make_test("gorci", shamts[i]);
+        cases[i].make_test("gorci", shamts.at(i));
     }
 }
 
@@ -629,10 +629,10 @@ TEST_CASE("RISCV RV64 gorci")
             {1,  0xFF, all_ones<uint64>()},
             {0x1252'0391'1234'0987ULL,  0x1, 0xFFFF'0FFF'FFFF'0FFFULL},
     };
-    std::array<uint32, 6> shamts{0x1, 0x2, 0x5, 0xC, 0xFF, 0x3};
+    std::vector<uint32> shamts{0x1, 0x2, 0x5, 0xC, 0xFF, 0x3};
     for(std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
-        cases[i].make_test("gorci", shamts[i]);
+        cases[i].make_test("gorci", shamts.at(i));
     }
 }
 
