@@ -186,6 +186,7 @@ struct ALU
 
     // Circular shifts
     template<typename I> static void rol( I* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void ror( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     // MIPS extra shifts
     template<typename I> static void dsll32( I* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
@@ -227,6 +228,7 @@ struct ALU
   
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
