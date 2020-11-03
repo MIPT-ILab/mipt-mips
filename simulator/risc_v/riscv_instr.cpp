@@ -88,6 +88,7 @@ template<typename I> const auto execute_clmul = ALU::clmul<I, typename I::Regist
 template<typename I> const auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_gorc = ALU::gorc<I>;
+template<typename I> const auto execute_gorci = ALU::gorci<I>;
 template<typename I> const auto execute_grev = ALU::grev<I>;
 template<typename I> const auto execute_orn = ALU::orn<I>;
 template<typename I> const auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
@@ -324,6 +325,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_ror,        execute_ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      execute_clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorc,       execute_gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_gorci,      execute_gorci<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_unshfl,     execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
 };
 
