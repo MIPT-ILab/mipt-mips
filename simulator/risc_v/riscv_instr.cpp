@@ -89,8 +89,6 @@ template<typename I> const auto execute_clz = ALU::clz<I, typename I::RegisterUI
 template<typename I> const auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_gorc = ALU::gorc<I>;
 template<typename I> const auto execute_grev = ALU::grev<I>;
-template<typename I> const auto execute_max = ALU::max<I>;
-template<typename I> const auto execute_max = ALU::maxu<I>;
 template<typename I> const auto execute_orn = ALU::orn<I>;
 template<typename I> const auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
@@ -100,6 +98,8 @@ template<typename I> const auto execute_slo = ALU::slo<I>;
 template<typename I> const auto execute_sro = ALU::sro<I>;
 template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
 template<typename I> const auto execute_xnor = ALU::xnor<I>;
+template<typename I> const auto execute_max = ALU::max<I>;
+template<typename I> const auto execute_max = ALU::maxu<I>;
 
 using Src = Reg;
 using Dst = Reg;
