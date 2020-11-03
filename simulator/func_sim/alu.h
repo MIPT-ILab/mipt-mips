@@ -228,7 +228,7 @@ struct ALU
   
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    template<typename I> static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
     // Conditional moves
     template<typename I> static void movn( I* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
