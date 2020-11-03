@@ -571,7 +571,9 @@ TEST_CASE("RISCV RV64 gorc")
 
 TEST_CASE("RISCV RV32 gorci")
 {
-    CHECK( RISCVInstr<uint32>(0x28D6'5593).get_disasm() == "gorci $a1, $a2, 0x1AC");
+    CHECK( RISCVInstr<uint32>(0x28D6'5593).get_disasm() == "gorci $a1, $a2, 13");
+    CHECK( RISCVInstr<uint32>(0x28F6'5593).get_disasm() == "gorci $a1, $a2, 15");
+    CHECK( RISCVInstr<uint32>(0x29C6'5593).get_disasm() == "gorci $a1, $a2, 28");
     std::vector<TestData<uint32>> cases = {
             {0x1111'0000,  0x1, 0x3333'0000},
             {0x0022'0033,  0x2, 0x00AA'00FF},
