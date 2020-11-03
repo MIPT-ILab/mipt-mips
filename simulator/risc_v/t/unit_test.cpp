@@ -569,6 +569,39 @@ TEST_CASE("RISCV RV64 gorc")
     }
 }
 
+TEST_CASE("RISCV RV32 gorci")
+{
+    CHECK( RISCVInstr<uint32>(0x28D6'5593).get_disasm() == "gorci $a1, $a2, 0x1AC");
+    std::vector<TestData<uint32>> cases = {
+            {0x1111'0000,  0x1, 0x3333'0000},
+            {0x0022'0033,  0x2, 0x00AA'00FF},
+            {0x0C0C'0F0F,  0x5, 0xCCCC'FFFF},
+            {0x8712'4789,  0xC, all_ones<uint32>()},
+            {1,  0xFF, all_ones<uint32>()},
+            {0x1252'0391,  0x3, 0xFFFF'0FFF},
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("gorci");
+    }
+}
+
+TEST_CASE("RISCV RV64 gorci")
+{
+    std::vector<TestData<uint64>> cases = {
+            {0x1111'1111'1111'1111ULL,  0x1, 0x3333'3333'3333'3333ULL},
+            {0x0022'0033'0044'0055ULL,  0x2, 0x00AA'00FF'0055'0055ULL},
+            {0x0C0C'0F0F'0A0A'0B0BULL,  0x5, 0xCCCC'FFFF'FFFF'FFFFULL},
+            {0x8712'4789'1244'1231ULL,  0xC, 0xFFFF'FFFF'7777'3333ULL},
+            {1,  0xFF, all_ones<uint64>()},
+            {0x1252'0391'1234'0987ULL,  0x3, 0xFFFF'0FFF'FFFF'0FFFULL},
+    };
+    for(std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("gorci");
+    }
+}
+
 TEST_CASE("RISCV RV32 unshfl")
 {
     CHECK( RISCVInstr<uint32>(0x091855b3).get_disasm() == "unshfl $a1, $a6, $a7");
