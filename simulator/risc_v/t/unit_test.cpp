@@ -324,7 +324,7 @@ TEST_CASE( "RISCV sro64 overflow")
 
 TEST_CASE("RISCV RV32 bfp")
 {
-    CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
+    CHECK( RISCVInstr<uint32>(0x48F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
     instr.set_v_src( 0x080400C0, 1); //len = 8, off = 4, data = 1100'0000
