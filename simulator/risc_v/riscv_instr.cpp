@@ -94,6 +94,7 @@ template<typename I> const auto execute_orn = ALU::orn<I>;
 template<typename I> const auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_rol = ALU::rol<I>;
+template<typename I> const auto execute_ror = ALU::ror<I>;
 template<typename I> const auto execute_sbext = ALU::sbext<I>;
 template<typename I> const auto execute_slo = ALU::slo<I>;
 template<typename I> const auto execute_sro = ALU::sro<I>;
@@ -321,6 +322,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_clz,        execute_clz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_ctz,        execute_ctz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_rol,        execute_rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_ror,        execute_ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      execute_clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorc,       execute_gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorci,      execute_gorci<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
