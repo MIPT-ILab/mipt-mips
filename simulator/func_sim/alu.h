@@ -1,7 +1,6 @@
 /*
  * alu.h - implementation of all execution units
- * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014-2017 MIPT-MIPS
+ * Copyright 2014-2020 MIPT-MIPS
  */
 
 #ifndef ALU_H
@@ -236,6 +235,18 @@ struct ALU
 
     // Bit manipulations
     template<typename I> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    
+    template<typename I> static 
+    void max( I* instr)
+    { 
+        instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1];
+    }
+    
+    template<typename I> static 
+    void maxu( I* instr)  
+    {
+        instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
+    }
 
     template<typename I, typename T>
     static void clmul( I* instr)
@@ -353,8 +364,8 @@ struct ALU
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
         len = len ? len : 16;
         size_t off = ( narrow_cast<size_t>( instr->v_src[1]) >> 16) & ( XLEN-1);
-        auto mask = circ_ls( bitmask<XLENType>( len), off);
-        auto data = circ_ls( instr->v_src[1], off);
+        auto mask = bitmask<XLENType>( len) << off;
+        auto data = instr->v_src[1] << off;
         instr->v_dst[0] = ( data & mask) | ( instr->v_src[0] & ~mask);
     }
 };
