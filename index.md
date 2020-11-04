@@ -9,16 +9,21 @@ Additionally, it is a supporting project to MIPT lectures on Computer Architectu
 Lectures are given online each **Monday, 10:45-12:10**.
 A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 
-[Intro]:    https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
-[L1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
-[L2]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%202%20-%20ISA%20and%20uArch.pptx?raw=true
-[L3]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%203%20-%20Integrated%20Circuits.pptx?raw=true
-[L4]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%204%20-%20CMOS.pptx?raw=true
-[L5]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%205%20-%20Combinational%20Circuits.pptx?raw=true
-[L6]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%206%20-%20Sequential%20Circuits.pptx?raw=true
-[L7]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%207%20-%20RISC-V%20ISA.pptx?raw=true
-[L7-VIDEO]: https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
-[P1]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
+[Intro]:     https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
+[L1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
+[L2]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%202%20-%20ISA%20and%20uArch.pptx?raw=true
+[L3]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%203%20-%20Integrated%20Circuits.pptx?raw=true
+[L4]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%204%20-%20CMOS.pptx?raw=true
+[L5]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%205%20-%20Combinational%20Circuits.pptx?raw=true
+[L6]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%206%20-%20Sequential%20Circuits.pptx?raw=true
+[L7]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%207%20-%20RISC-V%20ISA.pptx?raw=true
+[L8]:        https://github.com/MIPT-ILab/ca-lectures/raw/master/mipt-mips/2020/Lecture%208%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
+[L9]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%209%20-%20Pipelining.pptx?raw=true
+[L10]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2010%20-%20Data%20Hazards.pptx?raw=true
+[L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
+[L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
+[L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
+[P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
 :----: | :------: | ------
@@ -31,6 +36,9 @@ Date   | Type     | Event
 28 Sep | Lecture  | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]
  5 Oct | Practice | **P1: Combinational & Sequential Circuits**<br>           • Slides: [download][P1]
 12 Oct | Lecture  | **L7: RISC-V ISA**<br>                                    • Slides: [download][L7]<br> • Video: [watch][L7-VIDEO]
+19 Oct | Lecture  | **L8: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L8]<br> • Video: [watch][L8-VIDEO]
+26 Oct | Lecture  | **L9: Pipelining**<br>                                    • Slides: [download][L9]
+ 2 Nov | Lecture  | **L10: Data hazards**<br>                                 • Slides: [download][L10]<br> • Video: [watch][L10-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
@@ -74,7 +82,7 @@ MIPT | Name | Score | Comments
 
 Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32)).
 
-RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, and Ilya Burtakov.
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, and Vladimir Graudt.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
