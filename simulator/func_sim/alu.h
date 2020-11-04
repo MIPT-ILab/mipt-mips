@@ -239,10 +239,10 @@ struct ALU
     
     template<typename I> static void max( I* instr)
     { 
-	instr->v_dst[0] = std::max( static_cast<typename I::RegisterSInt>( instr->v_src[0]), static_cast<typename I::RegisterSInt>( instr->v_src[1]));
+	instr->v_dst[0] = std::max<typename I::RegisterSInt>>(instr->v_src[0], instr->v_src[1]);
     }
     
-    template<typename I> static void maxu( I* instr)  { instr->v_dst[0] = instr->v_src[0] > instr->v_src[1] ? instr->v_src[0] : instr->v_src[1]; }
+    template<typename I> static void maxu( I* instr)  { instr->v_dst[0] = std::max(instr->v_src[0], instr->v_src[1]); }
 
     template<typename I, typename T>
     static void clmul( I* instr)
