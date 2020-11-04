@@ -247,13 +247,20 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
     return result;
 }
 
-/*Circular left shift*/
+/* Circular left shift*/
 template<typename T>
 static constexpr T circ_ls( const T& value, size_t shamt)
 {
     if ( shamt == 0 || shamt == bitwidth<T>)
         return value;
     return ( value << shamt) | ( value >> ( bitwidth<T> - shamt));
+}
+
+/* Circular right shift */
+template<typename T>
+static constexpr T circ_rs( const T& value, size_t shamt)
+{
+    return circ_ls(value, bitwidth<T> - shamt);
 }
 
 template<typename T>
