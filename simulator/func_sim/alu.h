@@ -235,6 +235,18 @@ struct ALU
 
     // Bit manipulations
     template<typename I> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    
+    template<typename I> static 
+    void max( I* instr)
+    { 
+        instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1];
+    }
+    
+    template<typename I> static 
+    void maxu( I* instr)  
+    {
+        instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
+    }
 
     template<typename I, typename T>
     static void clmul( I* instr)
