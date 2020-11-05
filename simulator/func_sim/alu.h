@@ -248,8 +248,8 @@ struct ALU
         instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
     }
 
-    template<typename I, typename T>
-    static void clmul( I* instr)
+    template<typename I, typename T> static
+    void clmul( I* instr)
     {
         instr->v_dst[0] = 0;
         for ( std::size_t index = 0; index < bitwidth<T>; index++)
@@ -258,7 +258,12 @@ struct ALU
     }
 
     // Bit manipulations
-    template<typename I, typename T> static void pack( I* instr)  { instr->v_dst[0] = (instr->v_src[0] & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src[1] << (half_bitwidth<T>)); }
+    template<typename I, typename T> static
+    void pack( I* instr)
+    {
+        auto pack_width = half_bitwidth<T>;
+        instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
+    }
 
     // Branches
     template<typename I, Predicate<I> p> static
