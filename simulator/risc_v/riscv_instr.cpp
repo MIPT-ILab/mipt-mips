@@ -97,12 +97,12 @@ template<typename I> const auto execute_pack = ALU::pack<I, typename I::Register
 template<typename I> const auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
 template<typename I> const auto execute_rol = ALU::rol<I>;
 template<typename I> const auto execute_ror = ALU::ror<I>;
+template<typename I> const auto execute_rori = ALU::rori<I>;
 template<typename I> const auto execute_sbext = ALU::sbext<I>;
 template<typename I> const auto execute_slo = ALU::slo<I>;
 template<typename I> const auto execute_sro = ALU::sro<I>;
 template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
 template<typename I> const auto execute_xnor = ALU::xnor<I>;
-template<typename I> const auto execute_rori = ALU::rori<I>;
 
 using Src = Reg;
 using Dst = Reg;
