@@ -561,29 +561,33 @@ TEST_CASE("RISCV RV64 rori disassembly")
 
 TEST_CASE("RISCV RV32 rori")
 {
-    std::vector<TestData<uint32>> cases {
-        TestData<uint32>( 0x01234567, 0,  0x01234567),
-        TestData<uint32>( 0x01234567, 4,  0x70123456),
-        TestData<uint32>( 0x01234567, 8,  0x67012345),
-        TestData<uint32>( 0x01234567, 31, 0x02468ace),
+    //src2 is zero as it is not used by rori and other immediate instructions
+    std::vector<std::pair<TestData<uint32>, int>> cases {
+        {TestData<uint32>( 0x01234567, 0, 0x01234567),  0},
+        {TestData<uint32>( 0x01234567, 0, 0x70123456),  4},
+        {TestData<uint32>( 0x01234567, 0, 0x67012345),  8},
+        {TestData<uint32>( 0x01234567, 0, 0x02468ace), 31},
+        {TestData<uint32>( 0x01234567, 0, 0x01234567), 32},
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
-        cases[i].make_test("ror");
+        cases[i].first.make_test("rori", cases[i].second);
     }
 }
 
 TEST_CASE("RISCV RV64 rori")
 {
-    std::vector<TestData<uint64>> cases {
-        TestData<uint64>( 0x0123'4567'89ab'cdef, 0,  0x0123'4567'89ab'cdef),
-        TestData<uint64>( 0x0123'4567'89ab'cdef, 4,  0xf012'3456'789a'bcde),
-        TestData<uint64>( 0x0123'4567'89ab'cdef, 8,  0xef01'2345'6789'abcd),
-        TestData<uint64>( 0x0123'4567'89ab'cdef, 63, 0x0246'8acf'1357'9bde),
+    //src2 is zero as it is not used by rori and other immediate instructions
+    std::vector<std::pair<TestData<uint64>, int>> cases {
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0123'4567'89ab'cdef),  0},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0xf012'3456'789a'bcde),  4},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0xef01'2345'6789'abcd),  8},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0246'8acf'1357'9bde), 63},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0123'4567'89ab'cdef), 64},
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
-        cases[i].make_test("ror");
+        cases[i].first.make_test("rori", cases[i].second);
     }
 }
 
