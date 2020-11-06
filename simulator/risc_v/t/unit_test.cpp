@@ -547,6 +547,50 @@ TEST_CASE("RISCV RV64 ror")
     }
 }
 
+TEST_CASE("RISCV RV32 rori disassembly")
+{
+    CHECK( RISCVInstr<uint32>( 0x6007D793).get_disasm() == "rori $a5, $a5, 0");  // 01100 | 0000000 (0)  | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
+    CHECK( RISCVInstr<uint32>( 0x60F7D793).get_disasm() == "rori $a5, $a5, 15"); // 01100 | 0001111 (15) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
+    CHECK( RISCVInstr<uint32>( 0x61F7D793).get_disasm() == "rori $a5, $a5, 31"); // 01100 | 0011111 (31) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
+}
+
+TEST_CASE("RISCV RV64 rori disassembly")
+{
+    CHECK( RISCVInstr<uint64>( 0x63F7D793).get_disasm() == "rori $a5, $a5, 63"); // 01100 | 0111111 (63) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
+}
+
+TEST_CASE("RISCV RV32 rori")
+{
+    //src2 is zero as it is not used by rori and other immediate instructions
+    std::vector<std::pair<TestData<uint32>, int>> cases {
+        {TestData<uint32>( 0x01234567, 0, 0x01234567),  0},
+        {TestData<uint32>( 0x01234567, 0, 0x70123456),  4},
+        {TestData<uint32>( 0x01234567, 0, 0x67012345),  8},
+        {TestData<uint32>( 0x01234567, 0, 0x02468ace), 31},
+        {TestData<uint32>( 0x01234567, 0, 0x01234567), 32},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].first.make_test("rori", cases[i].second);
+    }
+}
+
+TEST_CASE("RISCV RV64 rori")
+{
+    //src2 is zero as it is not used by rori and other immediate instructions
+    std::vector<std::pair<TestData<uint64>, int>> cases {
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0123'4567'89ab'cdef),  0},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0xf012'3456'789a'bcde),  4},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0xef01'2345'6789'abcd),  8},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0246'8acf'1357'9bde), 63},
+        {TestData<uint64>( 0x0123'4567'89ab'cdef, 0, 0x0123'4567'89ab'cdef), 64},
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].first.make_test("rori", cases[i].second);
+    }
+}
+
 TEST_CASE("RISCV RV32 clmul")
 {
     std::vector<TestData<uint32>> cases {
