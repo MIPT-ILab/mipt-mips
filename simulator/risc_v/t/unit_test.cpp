@@ -217,7 +217,7 @@ TEST_CASE("RISCV RV64 orn")
 
 TEST_CASE ("RISCV sbinv32")
 {
-    CHECK( RISCVInstr<uint32>( ).get_disasm() == "sbinv");
+    CHECK( RISCVInstr<uint32>( 0x68111163).get_disasm() == "sbinv $a3, $a2, $a1");
     std::vector<TestData<uint32>> cases {
         TestData<uint32>( 0xabcd, 0, 0xabcd),
         TestData<uint32>( 0xabcd, 33, 0xabcc),
@@ -232,7 +232,7 @@ TEST_CASE ("RISCV sbinv32")
 
 TEST_CASE ("RISCV sbinv64")
 {
-    CHECK( RISCVInstr<uint64>( 0x48e7d7b3).get_disasm() == "sbinv $a5, $a5, $a4");
+    CHECK( RISCVInstr<uint32>( 0x68111163).get_disasm() == "sbinv $a3, $a2, $a1");
     std::vector<TestData<uint64>> cases {
         TestData<uint64>( 0xabcd, 0, 0xabcd),
         TestData<uint64>( 0xabcd, 33, 0x1abcd),
