@@ -31,7 +31,7 @@ matrix:
     - os: osx
       compiler: gcc
     - os: osx
-      arch: arm64
+      arch: arm64-graviton2
     - compiler: gcc
       env: TRAVIS_BUILD_TYPE=Coverage
     - os: osx
