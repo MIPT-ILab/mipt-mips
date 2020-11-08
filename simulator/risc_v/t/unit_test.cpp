@@ -238,7 +238,7 @@ TEST_CASE ("RISCV sbinv64")
         TestData<uint64>( 0x1, 0, 0x0),
         TestData<uint64>( 0x1, 32, 0x100000001),
         TestData<uint64>( 0x1, 64, 0x0),
-	TestData<uint64>( 0x0, 67, 0x8),
+        TestData<uint64>( 0x0, 67, 0x8),
         TestData<uint64>( 0xcf, 6, 0x8f),
         TestData<uint64>( 0x8f, 6, 0xcf)
     };
@@ -527,7 +527,7 @@ TEST_CASE("RISCV RV32 rol")
         TestData<uint32>( 0x01234567, 0,  0x01234567),
         TestData<uint32>( 0x01234567, 4,  0x12345670),
         TestData<uint32>( 0x01234567, 8,  0x23456701),
-	TestData<uint32>( 0x01234567, 32, 0x01234567),
+        TestData<uint32>( 0x01234567, 32, 0x01234567),
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
