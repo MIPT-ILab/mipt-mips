@@ -221,7 +221,7 @@ TEST_CASE ("RISCV sbinv32")
     std::vector<TestData<uint32>> cases {
         TestData<uint32>( 0x1, 0, 0x0),
         TestData<uint32>( 0x1, 32, 0x0),
-        TestData<uint32>( 0x0, 36, 0x8),
+        TestData<uint32>( 0x0, 35, 0x8),
         TestData<uint32>( 0xcf, 6, 0x8f),
         TestData<uint32>( 0x8f, 6, 0xcf)
     };
@@ -238,7 +238,7 @@ TEST_CASE ("RISCV sbinv64")
         TestData<uint64>( 0x1, 0, 0x0),
         TestData<uint64>( 0x1, 32, 0x100000001),
         TestData<uint64>( 0x1, 64, 0x0),
-	TestData<uint64>( 0x0, 68, 0x8),
+	TestData<uint64>( 0x0, 67, 0x8),
         TestData<uint64>( 0xcf, 6, 0x8f),
         TestData<uint64>( 0x8f, 6, 0xcf)
     };
