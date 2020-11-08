@@ -217,12 +217,12 @@ TEST_CASE("RISCV RV64 orn")
 
 TEST_CASE ("RISCV sbinv32")
 {
-    CHECK( RISCVInstr<uint32>( 0x68111163).get_disasm() == "sbinv $a3, $a2, $a1");
+    CHECK( RISCVInstr<uint32>(  0x68e797b3).get_disasm() == "sbinv $a5, $a5, $a4");
     std::vector<TestData<uint32>> cases {
-        TestData<uint32>( 0xabcd, 0, 0xabcd),
-        TestData<uint32>( 0xabcd, 33, 0xabcc),
-        TestData<uint32>( 0xabcd, 7, 0xab8d),
-        TestData<uint32>( 0xab8d, 7, 0xabcd)
+        TestData<uint32>( 0x1, 0, 0x0),
+        TestData<uint32>( 0x1, 32, 0x0),
+        TestData<uint32>( 0xcf, 6, 0x8f),
+        TestData<uint32>( 0x8f, 6, 0xcf)
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
@@ -232,13 +232,13 @@ TEST_CASE ("RISCV sbinv32")
 
 TEST_CASE ("RISCV sbinv64")
 {
-    CHECK( RISCVInstr<uint32>( 0x68111163).get_disasm() == "sbinv $a3, $a2, $a1");
+    CHECK( RISCVInstr<uint32>(  0x68e797b3).get_disasm() == "sbinv $a5, $a5, $a4");
     std::vector<TestData<uint64>> cases {
-        TestData<uint64>( 0xabcd, 0, 0xabcd),
-        TestData<uint64>( 0xabcd, 33, 0x1abcd),
-        TestData<uint64>( 0xabcd, 65, 0xabcc),
-        TestData<uint64>( 0xabcd, 7, 0xab8d),
-        TestData<uint64>( 0xab8d, 8, 0xabcd),
+        TestData<uint64>( 0x1, 0, 0x0),
+        TestData<uint64>( 0x1, 32, 0x100000001),
+        TestData<uint64>( 0x1, 64, 0x0),
+        TestData<uint64>( 0xcf, 6, 0x8f),
+        TestData<uint64>( 0x8f, 6, 0xcf),
     };
     for (std::size_t i = 0; i < cases.size(); i++) {
         INFO( "Iteration: " << i);
