@@ -215,6 +215,37 @@ TEST_CASE("RISCV RV64 orn")
     CHECK( instr.get_v_dst( 0) == 0x4000'0000'0000'10ff);
 }
 
+TEST_CASE ("RISCV sbinv32")
+{
+    CHECK( RISCVInstr<uint32>( ).get_disasm() == "sbinv");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0xabcd, 0, 0xabcd),
+        TestData<uint32>( 0xabcd, 33, 0xabcc),
+        TestData<uint32>( 0xabcd, 7, 0xab8d),
+        TestData<uint32>( 0xab8d, 7, 0xabcd)
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sbinv");
+    }
+}
+
+TEST_CASE ("RISCV sbinv64")
+{
+    CHECK( RISCVInstr<uint64>( 0x48e7d7b3).get_disasm() == "sbinv $a5, $a5, $a4");
+    std::vector<TestData<uint64>> cases {
+        TestData<uint64>( 0xabcd, 0, 0xabcd),
+        TestData<uint64>( 0xabcd, 33, 0x1abcd),
+        TestData<uint64>( 0xabcd, 65, 0xabcc),
+        TestData<uint64>( 0xabcd, 7, 0xab8d),
+        TestData<uint64>( 0xab8d, 8, 0xabcd),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sbinv");
+    }
+}
+
 TEST_CASE ("RISCV sbext32")
 {
     CHECK( RISCVInstr<uint32>( 0x48e7d7b3).get_disasm() == "sbext $a5, $a5, $a4");
