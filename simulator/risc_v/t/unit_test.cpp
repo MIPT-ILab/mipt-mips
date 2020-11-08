@@ -181,6 +181,21 @@ TEST_CASE( "RISCV slo32")
     }
 }
 
+TEST_CASE("RISCV RV32 sloi")
+{
+    CHECK( RISCVInstr<uint32>( 0x20E79793).get_disasm() == "sloi $a5, $a5, 15");
+    std::vector<TestData<uint32>> cases = {
+        TestData<uint32>( 0x1F, 0, 0x1F),
+        TestData<uint32>( 0x17, 2, 0x5F),
+        TestData<uint32>( all_ones<uint32>(), 0xFF, all_ones<uint32<()),
+        TestData<uint32>( 0xAA, 0xFF, bitmask<uint32>(31)),
+    };
+    for(std::size_t i = 0; i < cases.size(), ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sloi");
+    }
+}
+
 TEST_CASE ( "RISCV slo64")
 {
     std::vector<TestData<uint64>> cases = {
@@ -195,6 +210,21 @@ TEST_CASE ( "RISCV slo64")
         cases[i].make_test("slo");
     }
 }
+
+TEST_CASE ( "RISCV RV64 sloi")
+{
+    std::vector<TestData<uint64>> cases = {
+        TestData<uint64>( 0x1F, 0, 0x1F),
+        TestData<uint64>( 0x17, 2, 0x5F),
+        TestData<uint32>( all_ones<uint32>(), 5, bitmask<uint64>(37)),
+        TestData<uint64>( all_ones<uint64>(), 0xFF, all_ones<uint64<()),
+    };
+    for(std::size_t i = 0; i < cases.size(), ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sloi");
+    }
+}
+
 
 TEST_CASE("RISCV RV32 orn")
 {
@@ -316,6 +346,17 @@ TEST_CASE( "RISCV sro32")
     CHECK( instr.get_v_dst( 0) == 0xffff'0001);
 }
 
+TEST_CASE( "RISCV RV32 sroi")
+{
+    CHECK( RISCVInstr<uint32>( 0x28D65593).get_disasm() == "sroi $a2 $a1 13");
+    RISCVInstr<uint32> instr( "sroi", 0);
+    instr.set_v_src( 0x8000000, 0);
+    instr.set_v_src( 0x4, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst(0) == 0xf800000, 0);
+}
+
+
 TEST_CASE( "RISCV sro32 overflow")
 {
     RISCVInstr<uint32> instr( "sro", 0);
@@ -332,6 +373,15 @@ TEST_CASE( "RISCV sro64")
     instr.set_v_src( 0x1fU, 1);
     instr.execute();
     CHECK( instr.get_v_dst( 0) == 0xffff'ffff'0000'0001ULL);
+}
+
+TEST_CASE( "RISCV RV64 sroi")
+{
+    RISCVInstr<uint64> instr( "sroi", 0);
+    instr.set_v_src( 0x82329876ABA01111, 0);
+    instr.set_v_src( 0x1f, 1)
+    instr.execute();
+    CHECK( instr.get_v_dst(0) == 0xffffffff00000001);
 }
 
 TEST_CASE( "RISCV sro64 overflow")
