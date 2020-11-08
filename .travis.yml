@@ -47,8 +47,8 @@ addons:
     - sourceline: 'ppa:ubuntu-toolchain-r/test'
     update: true
     packages:
-    - clang-tidy-11
-    - clang++-11
+    - clang-tools-11
+    - clang-11
     - cmake
     - g++-10
     - libboost-dev
