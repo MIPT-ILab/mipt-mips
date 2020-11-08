@@ -40,8 +40,6 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main"
-      key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     - sourceline: "deb https://apt.kitware.com/ubuntu/ focal main"
       key_url: "https://apt.kitware.com/keys/kitware-archive-latest.asc"
     - sourceline: 'ppa:ubuntu-toolchain-r/test'
