@@ -40,8 +40,6 @@ matrix:
 addons:
   apt:
     sources:
-    - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main"
-      key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
     - sourceline: "deb https://apt.kitware.com/ubuntu/ focal main"
       key_url: "https://apt.kitware.com/keys/kitware-archive-latest.asc"
     - sourceline: 'ppa:ubuntu-toolchain-r/test'
@@ -63,7 +61,7 @@ before_install:
     if [ "$TRAVIS_BUILD_TYPE" == "Release" ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1"
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
-            GDB_VER=gdb-9.2
+            GDB_VER=gdb-10.1
         fi
     elif [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
@@ -110,7 +108,8 @@ before_script:
         cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
         cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
         cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
-        cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make libctf.la
+        cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make ctf-error.h && make libctf.la
+        #                                                                   w/a for GDB 10.1, remove once updated ^~~~~~~~~~~~~~~^
     fi
 
 script:
@@ -118,7 +117,7 @@ script:
   - ninja unit-tests
   - ctest --verbose
   - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
-  - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 10000000 --mars
+  - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 5000000 --mars
   - if [ $TRAVIS_GPROF ]; then gprof ./mipt-mips gmon.out -p | head -; fi
   - ninja mipt-v    && ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
   - ninja cachesim  && ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32

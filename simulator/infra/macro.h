@@ -23,6 +23,7 @@
 template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
 template<typename T> static constexpr inline auto popcount( T x) noexcept              { return std::popcount(x); }
 template<typename T> static constexpr inline auto circ_ls( T x, size_t shamt)          { return std::rotl( x, shamt); }
+template<typename T> static constexpr inline auto circ_rs( T x, size_t shamt)          { return std::rotr( x, shamt); }
 template<typename T> static constexpr inline auto count_leading_zeroes( T x) noexcept  { return std::countl_zero( x); }
 template<typename T> static constexpr inline auto count_leading_ones( T x) noexcept    { return std::countl_one( x); }
 template<typename T> static constexpr inline auto count_trailing_zeroes( T x) noexcept { return std::countr_zero( x); }
@@ -329,6 +330,12 @@ inline constexpr auto circ_ls( uint128 value, size_t shamt)
     if ( shamt == 0 || shamt == bitwidth<uint128>)
         return value;
     return ( value << shamt) | ( value >> ( bitwidth<uint128> - shamt));
+}
+
+template<>
+static constexpr T circ_rs( uint128 value, size_t shamt)
+{
+    return circ_ls(value, bitwidth<uint128> - shamt);
 }
 
 #endif
