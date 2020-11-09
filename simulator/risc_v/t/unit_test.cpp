@@ -187,7 +187,7 @@ TEST_CASE("RISCV RV32 sloi")
     std::vector<TestData<uint32>> cases = {
         TestData<uint32>( 0x1F, 0, 0x1F),
         TestData<uint32>( 0x17, 2, 0x5F),
-        TestData<uint32>( all_ones<uint32>(), 0xFF, all_ones<uint32<()),
+        TestData<uint32>( all_ones<uint32>(), 0xFF, all_ones<uint32>()),
         TestData<uint32>( 0xAA, 0xFF, bitmask<uint32>(31)),
     };
     for(std::size_t i = 0; i < cases.size(), ++i) {
@@ -217,7 +217,7 @@ TEST_CASE ( "RISCV RV64 sloi")
         TestData<uint64>( 0x1F, 0, 0x1F),
         TestData<uint64>( 0x17, 2, 0x5F),
         TestData<uint32>( all_ones<uint32>(), 5, bitmask<uint64>(37)),
-        TestData<uint64>( all_ones<uint64>(), 0xFF, all_ones<uint64<()),
+        TestData<uint64>( all_ones<uint64>(), 0xFF, all_ones<uint64>()),
     };
     for(std::size_t i = 0; i < cases.size(), ++i) {
         INFO( "Iteration: " << i);
@@ -379,7 +379,7 @@ TEST_CASE( "RISCV RV64 sroi")
 {
     RISCVInstr<uint64> instr( "sroi", 0);
     instr.set_v_src( 0x82329876ABA01111, 0);
-    instr.set_v_src( 0x1f, 1)
+    instr.set_v_src( 0x1f, 1);
     instr.execute();
     CHECK( instr.get_v_dst(0) == 0xffffffff00000001);
 }
