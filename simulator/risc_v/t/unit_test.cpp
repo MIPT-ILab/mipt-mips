@@ -190,7 +190,7 @@ TEST_CASE("RISCV RV32 sloi")
         TestData<uint32>( all_ones<uint32>(), 0xFF, all_ones<uint32>()),
         TestData<uint32>( 0xAA, 0xFF, bitmask<uint32>(31)),
     };
-    for(std::size_t i = 0; i < cases.size(), ++i) {
+    for(std::size_t i = 0; i < cases.size(); ++i) {
         INFO( "Iteration: " << i);
         cases[i].make_test("sloi");
     }
@@ -219,7 +219,7 @@ TEST_CASE ( "RISCV RV64 sloi")
         TestData<uint32>( all_ones<uint32>(), 5, bitmask<uint64>(37)),
         TestData<uint64>( all_ones<uint64>(), 0xFF, all_ones<uint64>()),
     };
-    for(std::size_t i = 0; i < cases.size(), ++i) {
+    for(std::size_t i = 0; i < cases.size(); ++i) {
         INFO( "Iteration: " << i);
         cases[i].make_test("sloi");
     }
