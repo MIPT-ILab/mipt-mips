@@ -216,6 +216,18 @@ struct ALU
     template<typename I> static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
 
     template<typename I> static
+    void riscv_shfl( I* instr)
+    {
+	auto dst_value = instr->v_src[0];
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
+     	for ( size_t i = limit ; i > 0; --i){
+            if ( ( instr->v_src[1] >> (i - 1)) & 1U)
+                dst_value = bit_shuffle( dst_value, i - 1);
+        }
+        instr->v_dst[0] = dst_value;
+    }
+    
+    template<typename I> static
     void riscv_unshfl( I* instr)
     {
         auto dst_value = instr->v_src[0];
