@@ -221,9 +221,9 @@ struct ALU
     {
         auto dst_value = instr->v_src[0];
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
-            for ( size_t i = limit ; i > 0; --i)
-                if ( ( instr->v_src[1] >> (i - 1)) & 1U)
-                    dst_value = bit_shuffle( dst_value, i - 1);
+        for ( size_t i = limit ; i > 0; --i)
+            if( ( instr->v_src[1] >> (i - 1)) & 1U)
+                dst_value = bit_shuffle( dst_value, i - 1);
         instr->v_dst[0] = dst_value;
     }
     
