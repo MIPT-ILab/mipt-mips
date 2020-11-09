@@ -186,6 +186,7 @@ struct ALU
     // Circular shifts
     template<typename I> static void rol( I* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
     template<typename I> static void ror( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void rori( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
 
     // MIPS extra shifts
     template<typename I> static void dsll32( I* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
@@ -234,6 +235,7 @@ struct ALU
     template<typename I> static void movz( I* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
 
     // Bit manipulations
+    template<typename I> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<typename I::RegisterUInt>() << shamt_v_src2<typename I::RegisterUInt>( instr)); }
     template<typename I> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
     
     template<typename I> static 
@@ -248,8 +250,8 @@ struct ALU
         instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
     }
 
-    template<typename I, typename T>
-    static void clmul( I* instr)
+    template<typename I, typename T> static
+    void clmul( I* instr)
     {
         instr->v_dst[0] = 0;
         for ( std::size_t index = 0; index < bitwidth<T>; index++)
@@ -258,7 +260,12 @@ struct ALU
     }
 
     // Bit manipulations
-    template<typename I, typename T> static void pack( I* instr)  { instr->v_dst[0] = (instr->v_src[0] & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src[1] << (half_bitwidth<T>)); }
+    template<typename I, typename T> static
+    void pack( I* instr)
+    {
+        auto pack_width = half_bitwidth<T>;
+        instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
+    }
 
     // Branches
     template<typename I, Predicate<I> p> static
