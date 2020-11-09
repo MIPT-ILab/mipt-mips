@@ -250,6 +250,18 @@ struct ALU
         instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
     }
 
+    template<typename I> static 
+    void min( I* instr)
+    {
+        instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1];
+    }
+
+    template<typename I> static 
+    void minu( I* instr)
+    {
+         instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]);
+    }
+
     template<typename I, typename T> static
     void clmul( I* instr)
     {

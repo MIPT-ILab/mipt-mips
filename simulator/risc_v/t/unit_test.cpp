@@ -776,3 +776,32 @@ TEST_CASE("RISCV ecall")
     instr.execute();
     CHECK( instr.trap_type() == Trap::SYSCALL);
 }
+
+
+TEST_CASE("RISCV RV32 min")
+{
+    CHECK( RISCVInstr<uint32>( 0xAE6C633).get_disasm() == "min $a2, $a3, $a4");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0x0123'4567, 0x0222'2222,  0x0123'4567),
+        TestData<uint32>( 0x1111'1111, 0xffff'ffff,  0xffff'ffff),
+        TestData<uint32>( 0xbbbb'bbbb, 0x2222'2222,  0xbbbb'bbbb),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("min");
+    }
+}
+
+TEST_CASE("RISCV RV32 minu")
+{
+    CHECK( RISCVInstr<uint32>( 0xAE6E633).get_disasm() == "minu $a2, $a3, $a4");
+    std::vector<TestData<uint32>> cases {
+        TestData<uint32>( 0x0123'4567, 0x0222'2222,  0x0123'4567),
+        TestData<uint32>( 0x1111'1111, 0xffff'ffff,  0x1111'1111),
+        TestData<uint32>( 0xbbbb'bbbb, 0x2222'2222,  0x2222'2222),
+    };
+    for (std::size_t i = 0; i < cases.size(); i++) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("minu");
+    }
+}
