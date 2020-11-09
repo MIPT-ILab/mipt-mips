@@ -24,6 +24,7 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
+[L11-VIDEO]: https://drive.google.com/file/d/1UCMwKX36BR9Jx1eJseWmI4ykDIjxJ7Kp/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -40,7 +41,7 @@ Date   | Type     | Event
 19 Oct | Lecture  | **L8: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L8]<br> • Video: [watch][L8-VIDEO]
 26 Oct | Lecture  | **L9: Pipelining**<br>                                    • Slides: [download][L9]
  2 Nov | Lecture  | **L10: Data hazards**<br>                                 • Slides: [download][L10]<br> • Video: [watch][L10-VIDEO]
- 9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br>
+ 9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br> • Video: [watch][L11-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
