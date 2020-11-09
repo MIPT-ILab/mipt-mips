@@ -734,6 +734,25 @@ TEST_CASE("RISCV RV64 gorci")
     }
 }
 
+TEST_CASE("RISCV RV32 shfl")
+{
+    CHECK( RISCVInstr<uint32>(0x091815b3).get_disasm() == "shfl $a1, $a6, $a7");
+    RISCVInstr<uint32> instr("shfl", 0);
+    instr.set_v_src( 0x12345678, 0);
+    instr.set_v_src( 0x08, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x12563478);
+}
+
+TEST_CASE("RISCV RV64 shfl")
+{
+    RISCVInstr<uint64> instr("shfl", 0);
+    instr.set_v_src( 0x0123456789abcdef, 0);
+    instr.set_v_src( 0x04, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x021346578a9bcedf);
+}
+
 TEST_CASE("RISCV RV32 unshfl")
 {
     CHECK( RISCVInstr<uint32>(0x091855b3).get_disasm() == "unshfl $a1, $a6, $a7");
