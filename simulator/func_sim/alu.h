@@ -214,7 +214,11 @@ struct ALU
 
     // Bit permutation
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> upstream/master
 =======
     
 >>>>>>> upstream/master
@@ -231,6 +235,7 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
     
+<<<<<<< HEAD
     template<typename I> static
     void riscv_shfl( I* instr)
     {
@@ -242,6 +247,8 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
+=======
+>>>>>>> upstream/master
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
@@ -278,6 +285,7 @@ struct ALU
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     template<typename I> static
     void max( I* instr)
     {
@@ -294,13 +302,20 @@ struct ALU
 =======
     template<typename I> static 
 >>>>>>> upstream/master
+=======
+    template<typename I> static 
+>>>>>>> upstream/master
     void min( I* instr)
     {
         instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1];
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     template<typename I> static
+=======
+    template<typename I> static 
+>>>>>>> upstream/master
 =======
     template<typename I> static 
 >>>>>>> upstream/master
@@ -326,6 +341,7 @@ struct ALU
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     template<typename I, typename T> static
     void packu( I* instr)
@@ -333,6 +349,8 @@ struct ALU
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] >> pack_width) | (( instr->v_src[1] >> pack_width) << pack_width));
     }
+=======
+>>>>>>> upstream/master
 =======
 >>>>>>> upstream/master
 

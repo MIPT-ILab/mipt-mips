@@ -825,6 +825,7 @@ TEST_CASE("RISCV RV32 minu")
     }
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 TEST_CASE("RISCV RV32 packu")
 {
@@ -844,5 +845,7 @@ TEST_CASE("RISCV RV64 packu")
     instr.execute();
     CHECK( instr.get_v_dst( 0) == 0x1111'1111'ffff'ffff);
 }
+=======
+>>>>>>> upstream/master
 =======
 >>>>>>> upstream/master
