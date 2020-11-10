@@ -293,6 +293,21 @@ TEST_CASE("Test uint64 circular left shift")
     CHECK( 0x0B0C'0D0A'0B0C'0D0A == circ_ls( value, 4));
 }
 
+TEST_CASE("Test uint32 circular right shift")
+{
+    uint32 value = 0xA0B0'C0D0;
+    CHECK( value == circ_rs( value, 0));
+    CHECK( value == circ_rs( value, 32));
+    CHECK( 0x0A0B'0C0D == circ_rs( value, 4));
+}
+
+TEST_CASE("Test uint64 circular right shift")
+{
+    uint64 value = 0xA0B0'C0D0'A0B0'C0D0;
+    CHECK( value == circ_rs( value, 0));
+    CHECK( value == circ_rs( value, 64));
+    CHECK( 0x0A0B'0C0D'0A0B'0C0D == circ_rs( value, 4));
+}
 TEST_CASE("Invalid target print")
 {
     std::ostringstream oss;
