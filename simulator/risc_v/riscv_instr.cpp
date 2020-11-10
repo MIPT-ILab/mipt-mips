@@ -105,7 +105,9 @@ template<typename I> const auto execute_sbext = ALU::sbext<I>;
 template<typename I> const auto execute_sbinv = ALU::sbinv<I>;
 template<typename I> const auto execute_shfl = ALU::riscv_shfl<I>;
 template<typename I> const auto execute_slo = ALU::slo<I>;
+template<typename I> const auto execute_sloi = ALU::sloi<I>;
 template<typename I> const auto execute_sro = ALU::sro<I>;
+template<typename I> const auto execute_sroi = ALU::sroi<I>;
 template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
 template<typename I> const auto execute_xnor = ALU::xnor<I>;
 
@@ -343,7 +345,10 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_unshfl,     execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'B', instr_rori,       execute_rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_shfl,       execute_shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sloi,       execute_sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
 };
+
 
 template<typename I>
 const auto& find_entry( uint32 bytes)
