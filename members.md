@@ -13,3 +13,4 @@ List of 2020/2021 MIPT-V project members:
 11. Kirill Kononovich
 12. Ravil Zakiryanov
 13. Daud Paragulgov
+14. Vsevolod Stolyarov
