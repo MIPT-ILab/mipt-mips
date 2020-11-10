@@ -28,6 +28,18 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
+include(ExternalProject)
+set(ELFIO_PREFIX ${CMAKE_HOME_DIRECTORY}/elfio)
+ExternalProject_Add(elfio
+    PREFIX ${ELFIO_PREFIX}
+    GIT_REPOSITORY https://github.com/serge1/ELFIO.git
+    GIT_TAG Release_3.8
+    CONFIGURE_COMMAND cmake -E echo "Skipping configure step."
+    BUILD_COMMAND cmake -E echo "Skipping build step."
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+)
+include_directories(SYSTEM ${ELFIO_PREFIX}/src/elfio)
+
 set(TESTS_CPPS
     infra/t/unit_test.cpp
     infra/cache/t/unit_test.cpp
@@ -191,6 +203,8 @@ add_library(mipt-mips-src OBJECT
     simulator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
 )
+
+add_dependencies(mipt-mips-src elfio)
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)

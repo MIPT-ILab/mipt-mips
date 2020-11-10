@@ -64,7 +64,7 @@ auto riscv_multiplication_high_uu(T x, T y) {
     auto low_part = ( ( ((x0 * y0) >> halfwidth) + (( x0 * y1) & half_mask) + (( x1 * y0) & half_mask) ) >> halfwidth);
     auto high_part = ( ( x1*y1) + (( x0*y1) >> halfwidth) + (( x1*y0) >> halfwidth) );
     auto hi = narrow_cast<UT>( high_part + low_part);
-return hi;
+    return hi;
 }
 
 template<typename T>
@@ -101,7 +101,7 @@ auto riscv_multiplication_high_su(T x, T y) {
                  : UT{x};
     auto hi_abs = riscv_multiplication_high_uu( UT{ x_abs}, UT{ y});
     auto lo_abs = riscv_multiplication_low( UT{ x_abs}, UT{ y});
-    auto result = UT{ hi_abs}; 
+    const auto& result = UT{ hi_abs}; 
     if ( x_is_neg)
         return ( lo_abs == 0)
                  ? narrow_cast<UT>( ~result + 1)
