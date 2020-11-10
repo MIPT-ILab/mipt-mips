@@ -106,8 +106,8 @@ template<typename I> const auto execute_shfl = ALU::riscv_shfl<I>;
 template<typename I> const auto execute_slo = ALU::slo<I>;
 template<typename I> const auto execute_sloi = ALU::sloi<I>;
 template<typename I> const auto execute_sro = ALU::sro<I>;
-template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
 template<typename I> const auto execute_sroi = ALU::sroi<I>;
+template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
 template<typename I> const auto execute_xnor = ALU::xnor<I>;
 
 using Src = Reg;
@@ -347,7 +347,6 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
 };
 
-};
 
 template<typename I>
 const auto& find_entry( uint32 bytes)
