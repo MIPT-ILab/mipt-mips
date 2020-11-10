@@ -181,7 +181,9 @@ struct ALU
     template<typename I, typename T> static void srlv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<typename I, typename T> static void srav( I* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename I> static void slo( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sloi( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
     template<typename I> static void sro( I* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename I> static void sroi( I* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
     template<typename I> static void rol( I* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
