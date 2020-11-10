@@ -213,29 +213,8 @@ struct ALU
     template<typename I> static void xnor( I* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
 
     // Bit permutation
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> upstream/master
-=======
-    
->>>>>>> upstream/master
     template<typename I> static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    
-    template<typename I> static
-    void riscv_shfl( I* instr)
-    {
-        auto dst_value = instr->v_src[0];
-        constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
-        for ( size_t i = limit ; i > 0; --i)
-            if( ( instr->v_src[1] >> (i - 1)) & 1U)
-                dst_value = bit_shuffle( dst_value, i - 1);
-        instr->v_dst[0] = dst_value;
-    }
-    
-<<<<<<< HEAD
+
     template<typename I> static
     void riscv_shfl( I* instr)
     {
@@ -247,8 +226,6 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
-=======
->>>>>>> upstream/master
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
@@ -271,21 +248,7 @@ struct ALU
     // Bit manipulations
     template<typename I> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<typename I::RegisterUInt>() << shamt_v_src2<typename I::RegisterUInt>( instr)); }
     template<typename I> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    
-    template<typename I> static 
-    void max( I* instr)
-    { 
-        instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1];
-    }
-    
-    template<typename I> static 
-    void maxu( I* instr)  
-    {
-        instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
-    }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     template<typename I> static
     void max( I* instr)
     {
@@ -299,26 +262,12 @@ struct ALU
     }
 
     template<typename I> static
-=======
-    template<typename I> static 
->>>>>>> upstream/master
-=======
-    template<typename I> static 
->>>>>>> upstream/master
     void min( I* instr)
     {
         instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1];
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     template<typename I> static
-=======
-    template<typename I> static 
->>>>>>> upstream/master
-=======
-    template<typename I> static 
->>>>>>> upstream/master
     void minu( I* instr)
     {
          instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]);
@@ -340,19 +289,6 @@ struct ALU
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    template<typename I, typename T> static
-    void packu( I* instr)
-    {
-        auto pack_width = half_bitwidth<T>;
-        instr->v_dst[0] = ( instr->v_src[0] >> pack_width) | (( instr->v_src[1] >> pack_width) << pack_width));
-    }
-=======
->>>>>>> upstream/master
-=======
->>>>>>> upstream/master
 
     // Branches
     template<typename I, Predicate<I> p> static
