@@ -215,9 +215,9 @@ struct ALU
     template<typename I> static void xnor( I* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
 
     // Bit permutation
-    
+
     template<typename I> static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    
+
     template<typename I> static
     void riscv_shfl( I* instr)
     {
@@ -228,7 +228,7 @@ struct ALU
                 dst_value = bit_shuffle( dst_value, i - 1);
         instr->v_dst[0] = dst_value;
     }
-    
+
     template<typename I> static
     void riscv_unshfl( I* instr)
     {
@@ -239,7 +239,7 @@ struct ALU
                 dst_value = bit_shuffle( dst_value, i);
         instr->v_dst[0] = dst_value;
     }
-  
+
     // Generalized OR-Combine
     template<typename I> static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
     template<typename I> static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
@@ -251,20 +251,20 @@ struct ALU
     // Bit manipulations
     template<typename I> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<typename I::RegisterUInt>() << shamt_v_src2<typename I::RegisterUInt>( instr)); }
     template<typename I> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    
-    template<typename I> static 
+
+    template<typename I> static
     void max( I* instr)
-    { 
+    {
         instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1];
     }
-    
-    template<typename I> static 
-    void maxu( I* instr)  
+
+    template<typename I> static
+    void maxu( I* instr)
     {
         instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]);
     }
 
-    template<typename I> static 
+    template<typename I> static
     void min( I* instr)
     {
         instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1];
@@ -291,6 +291,13 @@ struct ALU
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
+    }
+
+    template<typename I, typename T> static
+    void packu( I* instr)
+    {
+        auto pack_width = half_bitwidth<T>;
+        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
     }
 
     // Branches

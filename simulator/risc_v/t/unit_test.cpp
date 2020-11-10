@@ -888,3 +888,22 @@ TEST_CASE("RISCV RV32 minu")
         cases[i].make_test("minu");
     }
 }
+
+TEST_CASE("RISCV RV32 packu")
+{
+    CHECK( RISCVInstr<uint32>(0x48D747B3).get_disasm() == "packu $a5, $a4, $a3");
+    RISCVInstr<uint32> instr( "packu", 0);
+    instr.set_v_src( 0xffff'2222, 0);
+    instr.set_v_src( 0x1111'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'ffff);
+}
+
+TEST_CASE("RISCV RV64 packu")
+{
+    RISCVInstr<uint64> instr( "packu", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'1111'ffff'ffff);
+}
