@@ -295,8 +295,8 @@ struct ALU
     void packu( I* instr)
     {
         auto pack_width = half_bitwidth<T>;
-        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask(pack_width) << pack_width)));
-}
+        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
+    }
 
     // Branches
     template<typename I, Predicate<I> p> static
