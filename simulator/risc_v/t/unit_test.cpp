@@ -827,7 +827,7 @@ TEST_CASE("RISCV RV32 minu")
 
 TEST_CASE("RISCV RV32 packu")
 {
-    CHECK( RISCVInstr<uint32>(0x244D60533).get_disasm() == "packu $a0, $a2, $a3");
+    CHECK( RISCVInstr<uint32>(0x48D747B3).get_disasm() == "packu $a5, $a4, $a3");
     RISCVInstr<uint32> instr( "packu", 0);
     instr.set_v_src( 0xffff'2222, 0);
     instr.set_v_src( 0x1111'3333, 1);
