@@ -33,7 +33,7 @@ set(ELFIO_PREFIX ${CMAKE_HOME_DIRECTORY}/elfio)
 ExternalProject_Add(elfio
     PREFIX ${ELFIO_PREFIX}
     GIT_REPOSITORY https://github.com/serge1/ELFIO.git
-    GIT_TAG Release_3.7
+    GIT_TAG Release_3.8
     CONFIGURE_COMMAND cmake -E echo "Skipping configure step."
     BUILD_COMMAND cmake -E echo "Skipping build step."
     INSTALL_COMMAND cmake -E echo "Skipping install step."
