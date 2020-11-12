@@ -181,6 +181,23 @@ TEST_CASE( "RISCV slo32")
     }
 }
 
+TEST_CASE("RISCV RV32 sloi")
+{
+    CHECK( RISCVInstr<uint32>( 0x20E79793).get_disasm() == "sloi $a5, $a5, 14");
+    std::vector<TestData<uint32>> cases = {
+        TestData<uint32>( 0x1F, 0, 0x1F),
+        TestData<uint32>( 0x1C, 0, 0x73),
+        TestData<uint32>( all_ones<uint32>(), 0, all_ones<uint32>()),
+        TestData<uint32>( 0xAA, 0, bitmask<uint32>(31)),
+        TestData<uint32>( 0xFEFA, 0, 0x1FDF5)
+    };
+    std::vector<uint32> shamts{0x0, 0x2, 0x0, 0xFF, 0x1};
+    for(std::size_t i = 0; i < cases.size(); ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sloi", shamts.at(i));
+    }
+}
+
 TEST_CASE ( "RISCV slo64")
 {
     std::vector<TestData<uint64>> cases = {
@@ -195,6 +212,23 @@ TEST_CASE ( "RISCV slo64")
         cases[i].make_test("slo");
     }
 }
+
+TEST_CASE ( "RISCV RV64 sloi")
+{
+    std::vector<TestData<uint64>> cases = {
+        TestData<uint64>( 0x1F, 0, 0x1F),
+        TestData<uint64>( 0x17, 0, 0x5F),
+        TestData<uint64>( all_ones<uint32>(), 0, bitmask<uint64>(37)),
+        TestData<uint64>( all_ones<uint64>(), 0, all_ones<uint64>()),
+        TestData<uint64>( 0x0001'0000'0000'0000, 0,  0x8000000000007),
+    };
+    std::vector<uint32> shamts {0x0, 0x2, 0x5, 0xFF, 0x3};
+    for(std::size_t i = 0; i < cases.size(); ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sloi", shamts.at(i));
+    }
+}
+
 
 TEST_CASE("RISCV RV32 orn")
 {
@@ -349,6 +383,22 @@ TEST_CASE( "RISCV sro32")
     CHECK( instr.get_v_dst( 0) == 0xffff'0001);
 }
 
+TEST_CASE( "RISCV RV32 sroi")
+{
+    CHECK( RISCVInstr<uint32>( 0x20D65593).get_disasm() == "sroi $a1, $a2, 13");
+    std::vector<TestData<uint32>> cases = {
+        TestData<uint32>( 0x0, 0, 0x80000000),
+        TestData<uint32>( 0x0, 0, 0x0),
+        TestData<uint32>( 0x8000'8000, 0, 0xffff'0001),
+        TestData<uint32>( 0x0, 0, 0xffff'C000)
+        };
+    std::vector<uint32> shamts { 0x1, 0x0, 0xf, 0x12};
+    for(std::size_t i = 0; i < cases.size(); ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sroi", shamts.at(i));
+    }
+}
+
 TEST_CASE( "RISCV sro32 overflow")
 {
     RISCVInstr<uint32> instr( "sro", 0);
@@ -365,6 +415,20 @@ TEST_CASE( "RISCV sro64")
     instr.set_v_src( 0x1fU, 1);
     instr.execute();
     CHECK( instr.get_v_dst( 0) == 0xffff'ffff'0000'0001ULL);
+}
+
+TEST_CASE ( "RISCV RV64 sroi")
+{
+    std::vector<TestData<uint64>> cases = {
+        TestData<uint64>( 0x1F, 0, 0x1F),
+        TestData<uint64>( 0x0000'0000'0000'0000, 0, 0xe000'0000'0000'0000),
+        TestData<uint64>( 0x0000'0000'1000'ABCF, 0, 0xFFFF'FFFE'0000'0000)
+    };
+    std::vector<uint32> shamts {0x0, 0x3, 0x1F};
+    for(std::size_t i = 0; i < cases.size(); ++i) {
+        INFO( "Iteration: " << i);
+        cases[i].make_test("sroi", shamts.at(i));
+    }
 }
 
 TEST_CASE( "RISCV sro64 overflow")
@@ -823,4 +887,23 @@ TEST_CASE("RISCV RV32 minu")
         INFO( "Iteration: " << i);
         cases[i].make_test("minu");
     }
+}
+
+TEST_CASE("RISCV RV32 packu")
+{
+    CHECK( RISCVInstr<uint32>(0x48D747B3).get_disasm() == "packu $a5, $a4, $a3");
+    RISCVInstr<uint32> instr( "packu", 0);
+    instr.set_v_src( 0xffff'2222, 0);
+    instr.set_v_src( 0x1111'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'ffff);
+}
+
+TEST_CASE("RISCV RV64 packu")
+{
+    RISCVInstr<uint64> instr( "packu", 0);
+    instr.set_v_src( 0xffff'ffff'2222'2222, 0);
+    instr.set_v_src( 0x1111'1111'3333'3333, 1);
+    instr.execute();
+    CHECK( instr.get_v_dst( 0) == 0x1111'1111'ffff'ffff);
 }

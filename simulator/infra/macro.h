@@ -145,8 +145,8 @@ template<> inline constexpr uint32 NO_VAL<uint32> = NO_VAL32;
 template<> inline constexpr uint64 NO_VAL<uint64> = NO_VAL64;
 
 #ifdef _MSC_FULL_VER
-// https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
-static_assert( _MSC_FULL_VER >= 192328105, "Please update Visual Studio to newer version");
+static_assert(_MSC_FULL_VER >= 192328105, "Update Visual Studio because of the bug: "
+              "https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html");
 #endif
 
 template<typename T> static constexpr T ones_ls( const T& value, size_t shamt) { return ~( ~value << shamt); }
