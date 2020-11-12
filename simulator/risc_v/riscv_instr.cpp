@@ -13,91 +13,103 @@
 #include <sstream>
 #include <vector>
 
-template<typename I> auto do_nothing = ALU::unknown_instruction<I>;
+template<typename I> const auto do_nothing = ALU::unknown_instruction<I>;
 // I
-template<typename I> auto execute_lui = ALU::upper_immediate<I, 12>;
-template<typename I> auto execute_auipc = ALU::auipc<I>;
-template<typename I> auto execute_jal = ALU::jump_and_link<I, ALU::j<I>>;
-template<typename I> auto execute_jalr = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_beq = ALU::branch<I, ALU::eq<I>>;
-template<typename I> auto execute_bne = ALU::branch<I, ALU::ne<I>>;
-template<typename I> auto execute_blt = ALU::branch<I, ALU::lt<I>>;
-template<typename I> auto execute_bge = ALU::branch<I, ALU::ge<I>>;
-template<typename I> auto execute_bltu = ALU::branch<I, ALU::ltu<I>>;
-template<typename I> auto execute_bgeu = ALU::branch<I, ALU::geu<I>>;
-template<typename I> auto execute_load = ALU::addr<I>;
-template<typename I> auto execute_store = ALU::store_addr<I>;
-template<typename I> auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
-template<typename I> auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
-template<typename I> auto execute_addid = ALU::riscv_addition_imm<I, uint64>;
-template<typename I> auto execute_slti = ALU::set<I, ALU::lti<I>>;
-template<typename I> auto execute_sltiu = ALU::set<I, ALU::ltiu<I>>;
-template<typename I> auto execute_xori = ALU::xori<I>;
-template<typename I> auto execute_ori = ALU::ori<I>;
-template<typename I> auto execute_andi = ALU::andi<I>;
-template<typename I> auto execute_slli = ALU::sll<I, typename I::RegisterUInt>;
-template<typename I> auto execute_slliw = ALU::sll<I, uint32>;
-template<typename I> auto execute_sllid = ALU::sll<I, uint64>;
-template<typename I> auto execute_srli = ALU::srl<I, typename I::RegisterUInt>;
-template<typename I> auto execute_srliw = ALU::srl<I, uint32>;
-template<typename I> auto execute_srlid = ALU::srl<I, uint64>;
-template<typename I> auto execute_srai = ALU::sra<I, typename I::RegisterUInt>;
-template<typename I> auto execute_sraiw = ALU::sra<I, uint32>;
-template<typename I> auto execute_sraid = ALU::sra<I, uint64>;
-template<typename I> auto execute_add = ALU::riscv_addition<I, typename I::RegisterUInt>;
-template<typename I> auto execute_addw = ALU::riscv_addition<I, uint32>;
-template<typename I> auto execute_sub = ALU::riscv_subtraction<I, typename I::RegisterUInt>;
-template<typename I> auto execute_subw = ALU::riscv_subtraction<I, uint32>;
-template<typename I> auto execute_sll = ALU::sllv<I, typename I::RegisterUInt>;
-template<typename I> auto execute_sllw = ALU::sllv<I, uint32>;
-template<typename I> auto execute_slt = ALU::set<I, ALU::lt<I>>;
-template<typename I> auto execute_sltu = ALU::set<I, ALU::ltu<I>>;
-template<typename I> auto execute_xor = ALU::xorv<I>;
-template<typename I> auto execute_srl = ALU::srlv<I, typename I::RegisterUInt>;
-template<typename I> auto execute_srlw = ALU::srlv<I, uint32>;
-template<typename I> auto execute_sra = ALU::srav<I, typename I::RegisterUInt>;
-template<typename I> auto execute_sraw = ALU::srav<I, uint32>;
-template<typename I> auto execute_or = ALU::orv<I>;
-template<typename I> auto execute_and = ALU::andv<I>;
+template<typename I> const auto execute_lui = ALU::upper_immediate<I, 12>;
+template<typename I> const auto execute_auipc = ALU::auipc<I>;
+template<typename I> const auto execute_jal = ALU::jump_and_link<I, ALU::j<I>>;
+template<typename I> const auto execute_jalr = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> const auto execute_beq = ALU::branch<I, ALU::eq<I>>;
+template<typename I> const auto execute_bne = ALU::branch<I, ALU::ne<I>>;
+template<typename I> const auto execute_blt = ALU::branch<I, ALU::lt<I>>;
+template<typename I> const auto execute_bge = ALU::branch<I, ALU::ge<I>>;
+template<typename I> const auto execute_bltu = ALU::branch<I, ALU::ltu<I>>;
+template<typename I> const auto execute_bgeu = ALU::branch<I, ALU::geu<I>>;
+template<typename I> const auto execute_load = ALU::addr<I>;
+template<typename I> const auto execute_store = ALU::store_addr<I>;
+template<typename I> const auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
+template<typename I> const auto execute_addid = ALU::riscv_addition_imm<I, uint64>;
+template<typename I> const auto execute_slti = ALU::set<I, ALU::lti<I>>;
+template<typename I> const auto execute_sltiu = ALU::set<I, ALU::ltiu<I>>;
+template<typename I> const auto execute_xori = ALU::xori<I>;
+template<typename I> const auto execute_ori = ALU::ori<I>;
+template<typename I> const auto execute_andi = ALU::andi<I>;
+template<typename I> const auto execute_slli = ALU::sll<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_slliw = ALU::sll<I, uint32>;
+template<typename I> const auto execute_sllid = ALU::sll<I, uint64>;
+template<typename I> const auto execute_srli = ALU::srl<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_srliw = ALU::srl<I, uint32>;
+template<typename I> const auto execute_srlid = ALU::srl<I, uint64>;
+template<typename I> const auto execute_srai = ALU::sra<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_sraiw = ALU::sra<I, uint32>;
+template<typename I> const auto execute_sraid = ALU::sra<I, uint64>;
+template<typename I> const auto execute_add = ALU::riscv_addition<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_addw = ALU::riscv_addition<I, uint32>;
+template<typename I> const auto execute_sub = ALU::riscv_subtraction<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_subw = ALU::riscv_subtraction<I, uint32>;
+template<typename I> const auto execute_sll = ALU::sllv<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_sllw = ALU::sllv<I, uint32>;
+template<typename I> const auto execute_slt = ALU::set<I, ALU::lt<I>>;
+template<typename I> const auto execute_sltu = ALU::set<I, ALU::ltu<I>>;
+template<typename I> const auto execute_xor = ALU::xorv<I>;
+template<typename I> const auto execute_srl = ALU::srlv<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_srlw = ALU::srlv<I, uint32>;
+template<typename I> const auto execute_sra = ALU::srav<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_sraw = ALU::srav<I, uint32>;
+template<typename I> const auto execute_or = ALU::orv<I>;
+template<typename I> const auto execute_and = ALU::andv<I>;
 // System I
-template<typename I> auto execute_ecall = ALU::syscall<I>;
-template<typename I> auto execute_ebreak = ALU::breakpoint<I>;
-template<typename I> auto execute_uret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_sret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_mret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
-template<typename I> auto execute_wfi = do_nothing<I>;
-template<typename I> auto execute_fence = ALU::addr<I>;
-template<typename I> auto execute_csrrw = ALU::csrrw<I>;
-template<typename I> auto execute_csrrs = ALU::csrrs<I>;
-template<typename I> auto execute_csrrc = do_nothing<I>;
-template<typename I> auto execute_csrrwi = ALU::csrrwi<I>;
-template<typename I> auto execute_csrrsi = do_nothing<I>;
-template<typename I> auto execute_csrrci = do_nothing<I>;
+template<typename I> const auto execute_ecall = ALU::syscall<I>;
+template<typename I> const auto execute_ebreak = ALU::breakpoint<I>;
+template<typename I> const auto execute_uret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> const auto execute_sret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> const auto execute_mret = ALU::jump_and_link<I, ALU::riscv_jr<I>>;
+template<typename I> const auto execute_wfi = do_nothing<I>;
+template<typename I> const auto execute_fence = ALU::addr<I>;
+template<typename I> const auto execute_csrrw = ALU::csrrw<I>;
+template<typename I> const auto execute_csrrs = ALU::csrrs<I>;
+template<typename I> const auto execute_csrrc = do_nothing<I>;
+template<typename I> const auto execute_csrrwi = ALU::csrrwi<I>;
+template<typename I> const auto execute_csrrsi = do_nothing<I>;
+template<typename I> const auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> auto execute_mul = RISCVMultALU::mult_l<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulh = RISCVMultALU::mult_h_ss<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhsu = RISCVMultALU::mult_h_su<I, typename I::RegisterUInt>;
-template<typename I> auto execute_mulhu = RISCVMultALU::mult_h_uu<I, typename I::RegisterUInt>;
-template<typename I> auto execute_div = RISCVMultALU::div<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_divu = RISCVMultALU::div<I, typename I::RegisterUInt>;
-template<typename I> auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_mul = RISCVMultALU::mult_l<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_mulh = RISCVMultALU::mult_h_ss<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_mulhsu = RISCVMultALU::mult_h_su<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_mulhu = RISCVMultALU::mult_h_uu<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_div = RISCVMultALU::div<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> const auto execute_divu = RISCVMultALU::div<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
+template<typename I> const auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
 // B
-template<typename I> auto execute_slo = ALU::slo<I>;
-template<typename I> auto execute_orn = ALU::orn<I>;
-template<typename I> auto execute_sbext = ALU::sbext<I>;
-template<typename I> auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
-template<typename I> auto execute_xnor = ALU::xnor<I>;
-template<typename I> auto execute_sro = ALU::sro<I>;
-template<typename I> auto execute_bfp = ALU::bit_field_place<I>;
-template<typename I> auto execute_grev = ALU::grev<I>;
-template<typename I> auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
-template<typename I> auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
-template<typename I> auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
-template<typename I> auto execute_rol = ALU::rol<I>;
-template<typename I> auto execute_clmul = ALU::clmul<I, typename I::RegisterUInt>;
-template<typename I> auto execute_gorc = ALU::gorc<I>;
-template<typename I> auto execute_unshfl = ALU::riscv_unshfl<I>;
+template<typename I> const auto execute_bfp = ALU::bit_field_place<I>;
+template<typename I> const auto execute_clmul = ALU::clmul<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_gorc = ALU::gorc<I>;
+template<typename I> const auto execute_gorci = ALU::gorci<I>;
+template<typename I> const auto execute_grev = ALU::grev<I>;
+template<typename I> const auto execute_max = ALU::max<I>;
+template<typename I> const auto execute_maxu = ALU::maxu<I>;
+template<typename I> const auto execute_min = ALU::min<I>;
+template<typename I> const auto execute_minu = ALU::minu<I>;
+template<typename I> const auto execute_orn = ALU::orn<I>;
+template<typename I> const auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_packu = ALU::packu<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_pcnt = ALU::pcnt<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_rol = ALU::rol<I>;
+template<typename I> const auto execute_ror = ALU::ror<I>;
+template<typename I> const auto execute_rori = ALU::rori<I>;
+template<typename I> const auto execute_sbext = ALU::sbext<I>;
+template<typename I> const auto execute_sbinv = ALU::sbinv<I>;
+template<typename I> const auto execute_shfl = ALU::riscv_shfl<I>;
+template<typename I> const auto execute_slo = ALU::slo<I>;
+template<typename I> const auto execute_sloi = ALU::sloi<I>;
+template<typename I> const auto execute_sro = ALU::sro<I>;
+template<typename I> const auto execute_sroi = ALU::sroi<I>;
+template<typename I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
+template<typename I> const auto execute_xnor = ALU::xnor<I>;
 
 using Src = Reg;
 using Dst = Reg;
@@ -130,16 +142,16 @@ static const RISCVTableEntry<I> invalid_instr = {'I', instr_invalid, do_nothing<
 template<typename I>
 struct RISCVTableEntry
 {
-    char subset;
-    RISCVAutogeneratedTableEntry entry;
-    ALU::Execute<I> function;
-    OperationType type;
-    char immediate_type;
-    Imm immediate_print_type;
-    std::vector<Src::Type> src;
-    std::vector<Dst::Type> dst;
-    uint32 mem_size;
-    uint32 bit_width;
+    char subset = 'I';
+    RISCVAutogeneratedTableEntry entry = instr_invalid;
+    ALU::Execute<I> function = do_nothing<I>;
+    OperationType type = OUT_ARITHM;
+    char immediate_type = ' ';
+    Imm immediate_print_type = Imm::NO;
+    std::vector<Src::Type> src = { Src::ZERO, Src::ZERO };
+    std::vector<Dst::Type> dst = { Dst::ZERO };
+    uint32 mem_size = 0;
+    uint32 bit_width = 32 | 64 | 128; // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977;
 
     bool check_print_dst( size_t dst_id) const
     {
@@ -176,7 +188,7 @@ template<typename I>
 static const std::vector<RISCVTableEntry<I>> cmd_desc =
 {
     /*-------------- I --------------*/
-    {'I', instr_invalid,    do_nothing<I>,     OUT_ARITHM, ' ', Imm::NO,    { Src::ZERO, Src::ZERO }, { Dst::ZERO },          0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    { }, // invalid instruction
     {'I', instr_lui,        execute_lui<I>,    OUT_ARITHM, 'U', Imm::LOGIC, { Src::ZERO, Src::ZERO }, { Dst::RD },            0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'I', instr_auipc,      execute_auipc<I>,  OUT_ARITHM, 'U', Imm::LOGIC, { Src::ZERO, Src::ZERO }, { Dst::RD },            0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     // Jumps and branches
@@ -311,8 +323,10 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_slo,        execute_slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sro,        execute_sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_orn,        execute_orn<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sbinv,      execute_sbinv<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sbext,      execute_sbext<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_pack,       execute_pack<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_packu,      execute_packu<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_xnor,       execute_xnor<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_bfp,        execute_bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_grev,       execute_grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
@@ -320,10 +334,21 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_clz,        execute_clz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_ctz,        execute_ctz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_rol,        execute_rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_ror,        execute_ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      execute_clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_max,        execute_max<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_maxu,       execute_maxu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_min,        execute_min<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_minu,       execute_minu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorc,       execute_gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_gorci,      execute_gorci<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_unshfl,     execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'B', instr_rori,       execute_rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_shfl,       execute_shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sloi,       execute_sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
 };
+
 
 template<typename I>
 const auto& find_entry( uint32 bytes)

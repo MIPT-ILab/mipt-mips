@@ -65,7 +65,7 @@ public:
 
 private:
     RegNum value = RISCV_REG_zero;
-    static std::array<std::string_view, MAX_REG> regTable;
+    static const std::array<std::string_view, MAX_REG> regTable;
 
     explicit constexpr RISCVRegister( RegNum id) noexcept : value( id) {}
     constexpr RISCVRegister() noexcept : RISCVRegister( RISCV_REG_zero) {}

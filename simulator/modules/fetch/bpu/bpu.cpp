@@ -18,10 +18,10 @@
 #include <vector>
 
 namespace config {
-    static Value<std::string> bp_mode = { "bp-mode", "saturating_two_bits", "branch prediction mode"};
-    static Value<std::string> bp_lru = { "bp-lru", "pseudo-LRU", "branch prediction replacement policy"};
-    static Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
-    static Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
+    static const Value<std::string> bp_mode = { "bp-mode", "saturating_two_bits", "branch prediction mode"};
+    static const Value<std::string> bp_lru = { "bp-lru", "pseudo-LRU", "branch prediction replacement policy"};
+    static const Value<uint32> bp_size = { "bp-size", 128, "BTB size in entries"};
+    static const Value<uint32> bp_ways = { "bp-ways", 16, "number of ways in BTB"};
 } // namespace config
 
 template<typename T>
