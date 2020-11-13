@@ -29,8 +29,8 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ../simulator -G Ninja
-        ninja mipt-mipts unit-tests
+        CC=gcc-10 CXX=g++-10 cmake ../simulator
+        make mipt-mipts unit-tests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
