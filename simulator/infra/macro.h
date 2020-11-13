@@ -281,14 +281,14 @@ template<>
 constexpr inline auto count_leading_ones( uint128 value) noexcept
 {
     const auto& u = unpack_to<uint64>( value);
-    return u[1] == all_ones<uint64>() ? std::countr_zero(u[0]) + bitwidth<uint64> : std::countl_zero(u[1]);
+    return u[1] == all_ones<uint64>() ? std::countl_one(u[0]) + bitwidth<uint64> : std::countl_one(u[1]);
 }
 
 template<>
 inline constexpr auto count_trailing_zeroes( uint128 value) noexcept
 {
     const auto& u = unpack_to<uint64>( value);
-    return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countl_zero(u[1]);
+    return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countr_zero(u[1]);
 }
 
 template<>
@@ -300,7 +300,7 @@ inline constexpr auto circ_ls( uint128 value, size_t shamt)
 }
 
 template<>
-static constexpr auto circ_rs( uint128 value, size_t shamt)
+inline constexpr auto circ_rs( uint128 value, size_t shamt)
 {
     return circ_ls(value, bitwidth<uint128> - shamt);
 }
