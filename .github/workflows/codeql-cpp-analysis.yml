@@ -27,8 +27,7 @@ jobs:
 
     - name: Install Boost
       run: |
-        sudo apt-get update
-        sudo apt-get install -yq libboost1.71-dev
+        sudo apt-get install -yq libboost-dev
 
     - name: Build simulator
       run: |
