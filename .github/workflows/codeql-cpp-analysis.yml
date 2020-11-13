@@ -1,4 +1,3 @@
-
 name: "CodeQL"
 
 on:
@@ -28,10 +27,10 @@ jobs:
 
     - name: Build simulator
       run: |
-        - mkdir build
-        - cd build
-        - cmake ../simulator -G Ninja
-        - ninja mipt-mipts unit-tests
+        mkdir build
+        cd build
+        cmake ../simulator -G Ninja
+        ninja mipt-mipts unit-tests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
