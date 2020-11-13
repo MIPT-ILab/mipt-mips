@@ -31,7 +31,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        CC=gcc-10 CXX=g++-10 cmake ../simulator -D Boost_INCLUDE_DIR=/usr/local/share/boost/1.71.0/include
+        CC=gcc-10 CXX=g++-10 cmake ../simulator -D Boost_INCLUDE_DIR=/usr/local/share/boost/1.72.0/include
         make mipt-mips unit-tests
 
     - name: Perform CodeQL Analysis
