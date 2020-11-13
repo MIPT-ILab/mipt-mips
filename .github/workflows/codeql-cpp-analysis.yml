@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  BOOST_ROOT : "/usr/local/share/boost/1.71.0"
+
 jobs:
   analyze:
     name: Analyze
@@ -26,10 +29,6 @@ jobs:
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
-
-    - name: Install Boost
-      run: |
-        sudo apt-get install -yq libboost-dev
 
     - name: Build simulator
       run: |
