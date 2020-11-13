@@ -300,7 +300,7 @@ inline constexpr auto circ_ls( uint128 value, size_t shamt)
 }
 
 template<>
-static constexpr T circ_rs( uint128 value, size_t shamt)
+static constexpr auto circ_rs( uint128 value, size_t shamt)
 {
     return circ_ls(value, bitwidth<uint128> - shamt);
 }
