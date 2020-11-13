@@ -45,8 +45,6 @@ template<typename T> static constexpr inline auto lsb_set()  noexcept { return T
 template<typename T> static constexpr inline auto msb_set()  noexcept { return T{ 1U} << (bitwidth<T> - 1); }
 template<typename T> static constexpr inline auto all_ones() noexcept { return (msb_set<T>() - 1U) | msb_set<T>(); }
 
-static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
-
 /*
  * Returns value of T type with only the most significant bit set
  * Examples: msb_set<uint8>() -> 0x80
