@@ -34,7 +34,7 @@ jobs:
         mkdir build
         cd build
         CC=gcc-10 CXX=g++-10 cmake ../simulator
-        make mipt-mipts unit-tests
+        make mipt-mips unit-tests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
