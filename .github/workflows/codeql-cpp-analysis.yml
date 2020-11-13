@@ -27,12 +27,15 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
+    - name: Install Ninja
+      run: sudo apt-get install ninja-build
+
     - name: Build simulator
       run: |
         mkdir build
         cd build
-        CC=gcc-10 CXX=g++-10 cmake ../simulator -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
-        make mipt-mips unit-tests
+        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
+        ninja mipt-mips unit-tests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
