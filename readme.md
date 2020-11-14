@@ -109,7 +109,7 @@ To build simulator faster, we recommend to [install Ninja](https://github.com/ni
 
 ## Test Coverage Chart!
 
-[![Code Coverage](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/tree.svg)](https://codecov.io/gh/pMIPT-ILab/mipt-mips)
+[![Code Coverage](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/tree.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 
 ## About MIPT-V / MIPT-MIPS
 
