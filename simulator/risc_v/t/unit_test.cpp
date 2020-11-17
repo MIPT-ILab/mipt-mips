@@ -316,7 +316,7 @@ TEST_CASE ("RISCV sbext64")
 
 TEST_CASE( "RISV RV32 pack")
 {
-    CHECK( RISCVInstr<uint32>(0x44d60533).get_disasm() == "pack $a0, $a2, $a3");
+    CHECK( RISCVInstr<uint32>(0x08d64533).get_disasm() == "pack $a0, $a2, $a3");
     RISCVInstr<uint32> instr( "pack", 0);
     instr.set_v_src( 0xffff'2222, 0);
     instr.set_v_src( 0x1111'3333, 1);
@@ -354,7 +354,7 @@ TEST_CASE( "RISV RV64 xnor")
 
 TEST_CASE( "RISV RV32 max")
 {
-    CHECK( RISCVInstr<uint32>(0x0ae7d7b3).get_disasm() == "max $a5, $a5, $a4");
+    CHECK( RISCVInstr<uint32>(0xAE6E633).get_disasm() == "max $a2, $a3, $a4");
     RISCVInstr<uint32> instr( "max", 0);
     instr.set_v_src( 0x1111'1111, 0);
     instr.set_v_src( 0xffff'ffff, 1);
@@ -877,7 +877,7 @@ TEST_CASE("RISCV RV32 min")
 
 TEST_CASE("RISCV RV32 minu")
 {
-    CHECK( RISCVInstr<uint32>( 0xAE6E633).get_disasm() == "minu $a2, $a3, $a4");
+    CHECK( RISCVInstr<uint32>( 0x0ae7d7b3).get_disasm() == "minu $a5, $a5, $a4");
     std::vector<TestData<uint32>> cases {
         TestData<uint32>( 0x0123'4567, 0x0222'2222,  0x0123'4567),
         TestData<uint32>( 0x1111'1111, 0xffff'ffff,  0x1111'1111),
