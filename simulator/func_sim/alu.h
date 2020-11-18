@@ -178,7 +178,7 @@ struct ALU
     template<typename T = RegUInt> static void srav( I* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename T = RegUInt> static void slo( I* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename T = RegUInt> static void sloi( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    template<typename T = RegUInt> static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
     static void sroi( I* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
