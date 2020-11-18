@@ -13,7 +13,9 @@
 #include <sstream>
 #include <vector>
 
-/* Reducing number of ALU instantiations */
+/*  Reducing number of ALU instantiations. ALU modifies
+ * only Datapath, so we do not need different instantiations
+ * for RISCV and MIPS, if register sizes are the same */
 template <typename I>
 using RISCVALU = ALU<Datapath<typename I::RegisterUInt>>;
 
@@ -78,14 +80,14 @@ template<typename I> const auto execute_csrrwi = RISCVALU<I>::csrrwi;
 template<typename I> const auto execute_csrrsi = do_nothing<I>;
 template<typename I> const auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> const auto execute_mul = RISCVMultALU::mult_l<I, typename I::RegisterUInt>;
-template<typename I> const auto execute_mulh = RISCVMultALU::mult_h_ss<I, typename I::RegisterUInt>;
-template<typename I> const auto execute_mulhsu = RISCVMultALU::mult_h_su<I, typename I::RegisterUInt>;
-template<typename I> const auto execute_mulhu = RISCVMultALU::mult_h_uu<I, typename I::RegisterUInt>;
-template<typename I> const auto execute_div = RISCVMultALU::div<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> const auto execute_divu = RISCVMultALU::div<I, typename I::RegisterUInt>;
-template<typename I> const auto execute_rem = RISCVMultALU::rem<I, sign_t<typename I::RegisterUInt>>;
-template<typename I> const auto execute_remu = RISCVMultALU::rem<I, typename I::RegisterUInt>;
+template<typename I> const auto execute_mul    = RISCVMultALU<I>::mult_l;
+template<typename I> const auto execute_mulh   = RISCVMultALU<I>::mult_h_ss;
+template<typename I> const auto execute_mulhsu = RISCVMultALU<I>::mult_h_su;
+template<typename I> const auto execute_mulhu  = RISCVMultALU<I>::mult_h_uu;
+template<typename I> const auto execute_div    = RISCVMultALU<I>::template div<sign_t<typename I::RegisterUInt>>;
+template<typename I> const auto execute_divu   = RISCVMultALU<I>::div;
+template<typename I> const auto execute_rem    = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
+template<typename I> const auto execute_remu   = RISCVMultALU<I>::rem;
 // B
 template<typename I> const auto execute_bfp    = RISCVALU<I>::bit_field_place;
 template<typename I> const auto execute_clmul  = RISCVALU<I>::clmul;

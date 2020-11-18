@@ -17,6 +17,9 @@
 #include <unordered_map>
 #include <vector>
 
+/*  Reducing number of ALU instantiations. ALU modifies
+ * only Datapath, so we do not need different instantiations
+ * for RISCV and MIPS, if register sizes are the same */
 template <typename I>
 using MIPSALU = ALU<Datapath<typename I::RegisterUInt>>;
 
@@ -131,19 +134,19 @@ template<typename I> const auto mips_xori    = MIPSALU<I>::xori;
 template<typename I> const auto mips_unknown = MIPSALU<I>::unknown_instruction;
 
 // Multiplicate/Divide instructions
-template<typename I> const auto mips_madd    = MIPSMultALU::multiplication<I, int32>;
-template<typename I> const auto mips_maddu   = MIPSMultALU::multiplication<I, uint32>;
-template<typename I> const auto mips_msub    = MIPSMultALU::multiplication<I, int32>;
-template<typename I> const auto mips_msubu   = MIPSMultALU::multiplication<I, uint32>;
-template<typename I> const auto mips_dmult   = MIPSMultALU::multiplication<I, int64>;
-template<typename I> const auto mips_dmultu  = MIPSMultALU::multiplication<I, uint64>;
-template<typename I> const auto mips_mul     = MIPSMultALU::multiplication<I, int32>;
-template<typename I> const auto mips_mult    = MIPSMultALU::multiplication<I, int32>;
-template<typename I> const auto mips_multu   = MIPSMultALU::multiplication<I, uint32>;
-template<typename I> const auto mips_ddiv    = MIPSMultALU::division<I, int64>;
-template<typename I> const auto mips_ddivu   = MIPSMultALU::division<I, uint64>;
-template<typename I> const auto mips_div     = MIPSMultALU::division<I, int32>;
-template<typename I> const auto mips_divu    = MIPSMultALU::division<I, uint32>;
+template<typename I> const auto mips_madd    = MIPSMultALU<I>::template multiplication<int32>;
+template<typename I> const auto mips_maddu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<typename I> const auto mips_msub    = MIPSMultALU<I>::template multiplication<int32>;
+template<typename I> const auto mips_msubu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<typename I> const auto mips_dmult   = MIPSMultALU<I>::template multiplication<int64>;
+template<typename I> const auto mips_dmultu  = MIPSMultALU<I>::template multiplication<uint64>;
+template<typename I> const auto mips_mul     = MIPSMultALU<I>::template multiplication<int32>;
+template<typename I> const auto mips_mult    = MIPSMultALU<I>::template multiplication<int32>;
+template<typename I> const auto mips_multu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<typename I> const auto mips_ddiv    = MIPSMultALU<I>::template division<int64>;
+template<typename I> const auto mips_ddivu   = MIPSMultALU<I>::template division<uint64>;
+template<typename I> const auto mips_div     = MIPSMultALU<I>::template division<int32>;
+template<typename I> const auto mips_divu    = MIPSMultALU<I>::template division<uint32>;
 
 // CP1 instructions
 template<typename I> const auto mips_abs_d     = MIPSALU<I>::unknown_instruction;

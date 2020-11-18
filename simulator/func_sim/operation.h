@@ -156,13 +156,19 @@ private:
 template <typename I>
 struct ALU;
 
+template <typename I>
+struct RISCVMultALU;
+
+template <typename I>
+struct MIPSMultALU;
+
 template<typename T>
 class Datapath : public Operation
 {
 public:
     friend ALU<Datapath>;
-    friend struct RISCVMultALU;
-    friend struct MIPSMultALU;
+    friend RISCVMultALU<Datapath>;
+    friend MIPSMultALU<Datapath>;
 
     using Execute = void (*)(Datapath*);
     using RegisterUInt = T;
