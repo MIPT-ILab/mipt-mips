@@ -117,6 +117,7 @@ template<typename I> const auto execute_sroi   = RISCVALU<I>::sroi;
 template<typename I> const auto execute_unshfl = RISCVALU<I>::riscv_unshfl;
 template<typename I> const auto execute_xnor   = RISCVALU<I>::xnor;
 
+
 using Src = Reg;
 using Dst = Reg;
 

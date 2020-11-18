@@ -194,6 +194,11 @@ template<> inline constexpr uint16 NO_VAL<uint16> = NO_VAL16;
 template<> inline constexpr uint32 NO_VAL<uint32> = NO_VAL32;
 template<> inline constexpr uint64 NO_VAL<uint64> = NO_VAL64;
 
+#ifdef _MSC_FULL_VER
+static_assert(_MSC_FULL_VER >= 192328105, "Update Visual Studio because of the bug: "
+              "https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html");
+#endif
+
 template<typename T>
 static constexpr T ones_ls( const T& value, size_t shamt)
 {
@@ -203,22 +208,7 @@ static constexpr T ones_ls( const T& value, size_t shamt)
 template<typename T>
 static constexpr T ones_rs( const T& value, size_t shamt)
 {
-#ifdef _MSC_FULL_VER
-    T result = 0;
-    if constexpr ( std::is_same_v<T, uint128> || _MSC_FULL_VER >= 192328105) {
-        result = ~( ~value >> shamt);
-    }
-    else {
-        // Workaround for Visual Studio bug
-        // https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html
-        // TODO (pkryukov): remove once we switch to C++20
-        const volatile auto x = ~value;
-        result = ~( x >> shamt);
-    }
-    return result;
-#else
     return ~( ~value >> shamt);
-#endif
 }
 
 /*
