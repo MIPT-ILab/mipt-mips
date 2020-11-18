@@ -94,15 +94,26 @@ template<typename I> const auto execute_clmul  = RISCVALU<I>::clmul;
 template<typename I> const auto execute_clz    = RISCVALU<I>::clz;
 template<typename I> const auto execute_ctz    = RISCVALU<I>::ctz;
 template<typename I> const auto execute_gorc   = RISCVALU<I>::gorc;
+template<typename I> const auto execute_gorci  = RISCVALU<I>::gorci;
 template<typename I> const auto execute_grev   = RISCVALU<I>::grev;
+template<typename I> const auto execute_max    = RISCVALU<I>::max;
+template<typename I> const auto execute_maxu   = RISCVALU<I>::maxu;
+template<typename I> const auto execute_min    = RISCVALU<I>::min;
+template<typename I> const auto execute_minu   = RISCVALU<I>::minu;
 template<typename I> const auto execute_orn    = RISCVALU<I>::orn;
 template<typename I> const auto execute_pack   = RISCVALU<I>::pack;
+template<typename I> const auto execute_packu  = RISCVALU<I>::packu;
 template<typename I> const auto execute_pcnt   = RISCVALU<I>::pcnt;
 template<typename I> const auto execute_rol    = RISCVALU<I>::rol;
 template<typename I> const auto execute_ror    = RISCVALU<I>::ror;
+template<typename I> const auto execute_rori   = RISCVALU<I>::rori;
 template<typename I> const auto execute_sbext  = RISCVALU<I>::sbext;
+template<typename I> const auto execute_sbinv  = RISCVALU<I>::sbinv;
+template<typename I> const auto execute_shfl   = RISCVALU<I>::riscv_shfl;
 template<typename I> const auto execute_slo    = RISCVALU<I>::slo;
+template<typename I> const auto execute_sloi   = RISCVALU<I>::sloi;
 template<typename I> const auto execute_sro    = RISCVALU<I>::sro;
+template<typename I> const auto execute_sroi   = RISCVALU<I>::sroi;
 template<typename I> const auto execute_unshfl = RISCVALU<I>::riscv_unshfl;
 template<typename I> const auto execute_xnor   = RISCVALU<I>::xnor;
 
@@ -318,8 +329,10 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_slo,        execute_slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sro,        execute_sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_orn,        execute_orn<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sbinv,      execute_sbinv<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sbext,      execute_sbext<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_pack,       execute_pack<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_packu,      execute_packu<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_xnor,       execute_xnor<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_bfp,        execute_bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_grev,       execute_grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
@@ -329,9 +342,19 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_rol,        execute_rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_ror,        execute_ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      execute_clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_max,        execute_max<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_maxu,       execute_maxu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_min,        execute_min<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_minu,       execute_minu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorc,       execute_gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_gorci,      execute_gorci<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_unshfl,     execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
+    {'B', instr_rori,       execute_rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_shfl,       execute_shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sloi,       execute_sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
 };
+
 
 template<typename I>
 const auto& find_entry( uint32 bytes)

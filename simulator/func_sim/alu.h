@@ -1,7 +1,6 @@
 /*
  * alu.h - implementation of all execution units
- * @author Pavel Kryukov pavel.kryukov@phystech.edu
- * Copyright 2014-2017 MIPT-MIPS
+ * Copyright 2014-2020 MIPT-MIPS
  */
 
 #ifndef ALU_H
@@ -178,11 +177,14 @@ struct ALU
     template<typename T = RegUInt> static void srlv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<typename T = RegUInt> static void srav( I* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename T = RegUInt> static void slo( I* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    template<typename T = RegUInt> static void sloi( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
+    static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    static void sroi( I* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
     static void rol( I* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
     static void ror( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    static void rori( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
 
     // MIPS extra shifts
     static void dsll32( I* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
@@ -210,7 +212,6 @@ struct ALU
 
     // Bit permutation
     static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
-
     static void riscv_unshfl( I* instr)
     {
         auto dst_value = instr->v_src[0];
@@ -220,9 +221,21 @@ struct ALU
                 dst_value = bit_shuffle( dst_value, i);
         instr->v_dst[0] = dst_value;
     }
-  
+
+    static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    static void riscv_shfl( I* instr)
+    {
+        auto dst_value = instr->v_src[0];
+        constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
+        for ( size_t i = limit ; i > 0; --i)
+            if( ( instr->v_src[1] >> (i - 1)) & 1U)
+                dst_value = bit_shuffle( dst_value, i - 1);
+        instr->v_dst[0] = dst_value;
+    }
+
     // Generalized OR-Combine
-    static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename T = RegUInt> static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
     // Conditional moves
     static void movn( I* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
@@ -230,6 +243,13 @@ struct ALU
 
     // Bit manipulations
     static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
+    template<typename T = RegUInt> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
+    template<typename T = RegUInt> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
+
+    static void max( I* instr)  { instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1]; }
+    static void maxu( I* instr) { instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]); }
+    static void min( I* instr)  { instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1]; }
+    static void minu( I* instr) { instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]); }
 
     template <typename T = RegUInt> static
     void clmul( I* instr)
@@ -241,8 +261,19 @@ struct ALU
     }
 
     // Bit manipulations
-    template <typename T = RegUInt>
-    static void pack( I* instr)  { instr->v_dst[0] = (instr->v_src[0] & (bitmask<T>(half_bitwidth<T>))) | (instr->v_src[1] << (half_bitwidth<T>)); }
+    template <typename T = RegUInt> static
+    void pack( I* instr)
+    {
+        auto pack_width = half_bitwidth<T>;
+        instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
+    }
+
+    template <typename T = RegUInt> static
+    void packu( I* instr)
+    {
+        auto pack_width = half_bitwidth<T>;
+        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
+    }
 
     // Branches
     template<Predicate p> static
@@ -336,8 +367,8 @@ struct ALU
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
         len = len ? len : 16;
         size_t off = ( narrow_cast<size_t>( instr->v_src[1]) >> 16) & ( XLEN-1);
-        auto mask = circ_ls( bitmask<XLENType>( len), off);
-        auto data = circ_ls( instr->v_src[1], off);
+        auto mask = bitmask<XLENType>( len) << off;
+        auto data = instr->v_src[1] << off;
         instr->v_dst[0] = ( data & mask) | ( instr->v_src[0] & ~mask);
     }
 };
