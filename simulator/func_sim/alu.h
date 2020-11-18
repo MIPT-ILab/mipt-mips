@@ -222,7 +222,6 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
-    static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
     static void riscv_shfl( I* instr)
     {
         auto dst_value = instr->v_src[0];
