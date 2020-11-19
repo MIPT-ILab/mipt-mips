@@ -27,41 +27,39 @@ template<typename T> static T bit_shuffle( T value, size_t level)
     return result;
 }
 
-template <typename I>
+template <typename Instr>
 struct ALU
 {
     // Generic
-    using Predicate = bool (*)( const I*);
-    using Execute = void (*)( I*);
-    using RegUInt = typename I::RegisterUInt;
+    using Predicate = bool (*)( const Instr*);
+    using Execute = void (*)( Instr*);
 
-    static size_t shamt_imm( const I* instr) { return narrow_cast<size_t>( instr->v_imm); }
-    static size_t shamt_imm_32( const I* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
-    template<typename T = RegUInt> static size_t shamt_v_src2( const I* instr) { return narrow_cast<size_t>( instr->v_src[1] & bitmask<size_t>(log_bitwidth<T>)); }
-    static void move( I* instr)   { instr->v_dst[0] = instr->v_src[0]; }
-    template<Predicate p> static void set( I* instr)  { instr->v_dst[0] = p( instr); }
+    static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
+    static size_t shamt_imm_32( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
+    template<typename T> static size_t shamt_v_src2( const Instr* instr) { return narrow_cast<size_t>( instr->v_src[1] & bitmask<size_t>(log_bitwidth<T>)); }
+    static void move( Instr* instr)   { instr->v_dst[0] = instr->v_src[0]; }
+    template<Predicate p> static void set( Instr* instr)  { instr->v_dst[0] = p( instr); }
 
-    template<typename T = RegUInt> static
-    void check_halt_trap( I* instr) {
+    static void check_halt_trap( Instr* instr) {
         // Handles 'goto nullptr;' and 'while (1);' cases
         if ( instr->new_PC == 0 || instr->new_PC == instr->PC)
             instr->trap = Trap::HALT;
     }
 
-    static void load_addr( I* instr)  { addr( instr); }
+    static void load_addr( Instr* instr)  { addr( instr); }
 
-    static void store_addr( I* instr) {
+    static void store_addr( Instr* instr) {
         addr( instr);
-        instr->mask = bitmask<typename I::RegisterUInt>(instr->mem_size * 8);
+        instr->mask = bitmask<typename Instr::RegisterUInt>(instr->mem_size * 8);
     }
 
-    static void load_addr_aligned( I* instr) {
+    static void load_addr_aligned( Instr* instr) {
         load_addr( instr);
         if ( instr->mem_addr % instr->mem_size != 0)
             instr->trap = Trap::UNALIGNED_LOAD;
     }
 
-    static void load_addr_right32( I* instr) {
+    static void load_addr_right32( Instr* instr) {
         // std::endian specific
         load_addr( instr);
         /* switch (instr->mem_addr % 4) {
@@ -74,7 +72,7 @@ struct ALU
         instr->mask = bitmask<uint32>( ( 4 - instr->mem_addr % 4) * 8);
     }
 
-    static void load_addr_left32( I* instr) {
+    static void load_addr_left32( Instr* instr) {
         // std::endian specific
         load_addr( instr);
         /* switch (instr->mem_addr % 4) {
@@ -84,62 +82,62 @@ struct ALU
            case 3: return 0xFFFF'FFFF;
            }
          */
-        instr->mask = bitmask<typename I::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
+        instr->mask = bitmask<typename Instr::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
         // Actually we read a word LEFT to effective address
         instr->mem_addr -= 3;
     }
 
     // store functions done by analogy with loads
-    static void store_addr_aligned( I* instr) {
+    static void store_addr_aligned( Instr* instr) {
         store_addr( instr);
         if ( instr->mem_addr % instr->mem_size != 0)
             instr->trap = Trap::UNALIGNED_STORE;
     }
 
-    static void store_addr_right32( I* instr) {
+    static void store_addr_right32( Instr* instr) {
         store_addr( instr);
         instr->mask = bitmask<uint32>( ( 4 - instr->mem_addr % 4) * 8);
     }
 
-    static void store_addr_left32( I* instr) {
+    static void store_addr_left32( Instr* instr) {
         store_addr( instr);
-        instr->mask = bitmask<typename I::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
+        instr->mask = bitmask<typename Instr::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
         instr->mem_addr -= 3;
     }
 
-    static void addr( I* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src[0] + instr->v_imm); }
+    static void addr( Instr* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src[0] + instr->v_imm); }
 
     // Predicate helpers - unary
-    static bool lez( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) <= 0; }
-    static bool gez( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= 0; }
-    static bool ltz( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) < 0; }
-    static bool gtz( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) > 0; }
+    static bool lez( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) <= 0; }
+    static bool gez( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= 0; }
+    static bool ltz( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) < 0; }
+    static bool gtz( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) > 0; }
 
     // Predicate helpers - binary
-    static bool eq( const I* instr)  { return instr->v_src[0] == instr->v_src[1]; }
-    static bool ne( const I* instr)  { return instr->v_src[0] != instr->v_src[1]; }
-    static bool geu( const I* instr) { return instr->v_src[0] >= instr->v_src[1]; }
-    static bool ltu( const I* instr) { return instr->v_src[0] <  instr->v_src[1]; }
-    static bool ge( const I* instr)  { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename I::RegisterSInt>( instr->v_src[1]); }
-    static bool lt( const I* instr)  { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) <  narrow_cast<typename I::RegisterSInt>( instr->v_src[1]); }
+    static bool eq( const Instr* instr)  { return instr->v_src[0] == instr->v_src[1]; }
+    static bool ne( const Instr* instr)  { return instr->v_src[0] != instr->v_src[1]; }
+    static bool geu( const Instr* instr) { return instr->v_src[0] >= instr->v_src[1]; }
+    static bool ltu( const Instr* instr) { return instr->v_src[0] <  instr->v_src[1]; }
+    static bool ge( const Instr* instr)  { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename Instr::RegisterSInt>( instr->v_src[1]); }
+    static bool lt( const Instr* instr)  { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) <  narrow_cast<typename Instr::RegisterSInt>( instr->v_src[1]); }
 
     // Predicate helpers - immediate
-    static bool eqi( const I* instr) { return instr->v_src[0] == instr->v_imm; }
-    static bool nei( const I* instr) { return instr->v_src[0] != instr->v_imm; }
-    static bool lti( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) < narrow_cast<typename I::RegisterSInt>( instr->v_imm); }
-    static bool gei( const I* instr) { return narrow_cast<typename I::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename I::RegisterSInt>( instr->v_imm); }
-    static bool ltiu( const I* instr) { return instr->v_src[0] < instr->v_imm; }
-    static bool geiu( const I* instr) { return instr->v_src[0] >= instr->v_imm; }
+    static bool eqi( const Instr* instr) { return instr->v_src[0] == instr->v_imm; }
+    static bool nei( const Instr* instr) { return instr->v_src[0] != instr->v_imm; }
+    static bool lti( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) < narrow_cast<typename Instr::RegisterSInt>( instr->v_imm); }
+    static bool gei( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename Instr::RegisterSInt>( instr->v_imm); }
+    static bool ltiu( const Instr* instr) { return instr->v_src[0] < instr->v_imm; }
+    static bool geiu( const Instr* instr) { return instr->v_src[0] >= instr->v_imm; }
 
     // General addition
-    template<typename T = RegUInt> static void addition( I* instr)     { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1]); }
-    template<typename T = RegUInt> static void subtraction( I* instr)  { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1]); }
-    template<typename T = RegUInt> static void riscv_addition( I* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, typename I::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
-    template<typename T = RegUInt> static void riscv_subtraction( I* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, typename I::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
-    template<typename T = RegUInt> static void addition_imm( I* instr) { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_imm); }
+    template<typename T> static void addition( Instr* instr)     { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1]); }
+    template<typename T> static void subtraction( Instr* instr)  { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1]); }
+    template<typename T> static void riscv_addition( Instr* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, typename Instr::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
+    template<typename T> static void riscv_subtraction( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, typename Instr::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
+    template<typename T> static void addition_imm( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_imm); }
 
-    template<typename T = RegUInt> static
-    void addition_overflow( I* instr)
+    template<typename T> static
+    void addition_overflow( Instr* instr)
     {
         const auto [result, overflow] = test_addition_overflow<T>( instr->v_src[0], instr->v_src[1]);
         if ( overflow)
@@ -148,8 +146,8 @@ struct ALU
             instr->v_dst[0] = result;
     }
 
-    template<typename T = RegUInt> static
-    void addition_overflow_imm( I* instr)
+    template<typename T> static
+    void addition_overflow_imm( Instr* instr)
     {
         const auto [result, overflow] = test_addition_overflow<T>( instr->v_src[0], instr->v_imm);
         if ( overflow)
@@ -159,8 +157,8 @@ struct ALU
     }
 
 
-    template<typename T = RegUInt> static
-    void subtraction_overflow( I* instr)
+    template<typename T> static
+    void subtraction_overflow( Instr* instr)
     {
         const auto [result, overflow] = test_subtraction_overflow<T>( instr->v_src[0], instr->v_src[1]);
         if ( overflow)
@@ -170,49 +168,49 @@ struct ALU
     }
 
     // Shifts
-    template<typename T = RegUInt> static void sll( I* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
-    template<typename T = RegUInt> static void srl( I* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
-    template<typename T = RegUInt> static void sra( I* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<typename T = RegUInt> static void sllv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void srlv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void srav( I* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void slo( I* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void sloi( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<typename T = RegUInt> static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
-    static void sroi( I* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
+    template<typename T> static void sll( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
+    template<typename T> static void srl( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
+    template<typename T> static void sra( Instr* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
+    template<typename T> static void sllv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
+    template<typename T> static void srlv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
+    template<typename T> static void srav( Instr* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
+    template<typename T> static void slo( Instr* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
+    template<typename T> static void sloi( Instr* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
+    template<typename T> static void sro( Instr* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    static void sroi( Instr* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
-    static void rol( I* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    static void ror( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    static void rori( I* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename I::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
+    static void rol( Instr* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
+    static void ror( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
+    static void rori( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
 
     // MIPS extra shifts
-    static void dsll32( I* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
-    static void dsrl32( I* instr) { instr->v_dst[0] = instr->v_src[0] >> shamt_imm_32( instr); }
-    static void dsra32( I* instr) { instr->v_dst[0] = arithmetic_rs( instr->v_src[0], shamt_imm_32( instr)); }
-    template<size_t N> static void upper_immediate( I* instr)  { instr->v_dst[0] = instr->v_imm << N; }
-    static void auipc( I* instr) { upper_immediate<12>( instr); instr->v_dst[0] += instr->PC; }
+    static void dsll32( Instr* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
+    static void dsrl32( Instr* instr) { instr->v_dst[0] = instr->v_src[0] >> shamt_imm_32( instr); }
+    static void dsra32( Instr* instr) { instr->v_dst[0] = arithmetic_rs( instr->v_src[0], shamt_imm_32( instr)); }
+    template<size_t N> static void upper_immediate( Instr* instr)  { instr->v_dst[0] = instr->v_imm << N; }
+    static void auipc( Instr* instr) { upper_immediate<12>( instr); instr->v_dst[0] += instr->PC; }
 
     // Leading zero/ones
-    template<typename T = RegUInt> static void clo( I* instr)  { instr->v_dst[0] = count_leading_ones<T>( instr->v_src[0]); }
-    template<typename T = RegUInt> static void clz( I* instr)  { instr->v_dst[0] = count_leading_zeroes<T>( instr->v_src[0]); }
-    template<typename T = RegUInt> static void ctz( I* instr)  { instr->v_dst[0] = count_trailing_zeroes<T>( instr->v_src[0]); }
-    template<typename T = RegUInt> static void pcnt( I* instr) { instr->v_dst[0] = narrow_cast<T>( popcount( instr->v_src[0])); }
+    template<typename T> static void clo( Instr* instr)  { instr->v_dst[0] = count_leading_ones<T>( instr->v_src[0]); }
+    template<typename T> static void clz( Instr* instr)  { instr->v_dst[0] = count_leading_zeroes<T>( instr->v_src[0]); }
+    template<typename T> static void ctz( Instr* instr)  { instr->v_dst[0] = count_trailing_zeroes<T>( instr->v_src[0]); }
+    template<typename T> static void pcnt( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( popcount( instr->v_src[0])); }
 
     // Logic
-    static void andv( I* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_src[1]; }
-    static void orv( I* instr)   { instr->v_dst[0] = instr->v_src[0] | instr->v_src[1]; }
-    static void xorv( I* instr)  { instr->v_dst[0] = instr->v_src[0] ^ instr->v_src[1]; }
-    static void nor( I* instr)   { instr->v_dst[0] = ~(instr->v_src[0] | instr->v_src[1]); }
-    static void andi( I* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_imm; }
-    static void ori( I* instr)   { instr->v_dst[0] = instr->v_src[0] | instr->v_imm; }
-    static void xori( I* instr)  { instr->v_dst[0] = instr->v_src[0] ^ instr->v_imm; }
-    static void orn( I* instr)   { instr->v_dst[0] = instr->v_src[0] | ~instr->v_src[1]; }
-    static void xnor( I* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
+    static void andv( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_src[1]; }
+    static void orv( Instr* instr)   { instr->v_dst[0] = instr->v_src[0] | instr->v_src[1]; }
+    static void xorv( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] ^ instr->v_src[1]; }
+    static void nor( Instr* instr)   { instr->v_dst[0] = ~(instr->v_src[0] | instr->v_src[1]); }
+    static void andi( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_imm; }
+    static void ori( Instr* instr)   { instr->v_dst[0] = instr->v_src[0] | instr->v_imm; }
+    static void xori( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] ^ instr->v_imm; }
+    static void orn( Instr* instr)   { instr->v_dst[0] = instr->v_src[0] | ~instr->v_src[1]; }
+    static void xnor( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
 
     // Bit permutation
-    static void grev( I* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    static void riscv_unshfl( I* instr)
+    static void grev( Instr* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
+    static void riscv_unshfl( Instr* instr)
     {
         auto dst_value = instr->v_src[0];
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
@@ -222,7 +220,7 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
-    static void riscv_shfl( I* instr)
+    static void riscv_shfl( Instr* instr)
     {
         auto dst_value = instr->v_src[0];
         constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
@@ -233,25 +231,24 @@ struct ALU
     }
 
     // Generalized OR-Combine
-    template<typename T = RegUInt> static void gorc( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
-    static void gorci( I* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
+    template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    static void gorci( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
     // Conditional moves
-    static void movn( I* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
-    static void movz( I* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
+    static void movn( Instr* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
+    static void movz( Instr* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
 
     // Bit manipulations
-    static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<typename I::RegisterUInt>( instr)); }
-    template<typename T = RegUInt> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
-    template<typename T = RegUInt> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
+    template<typename T> static void sbinv( Instr* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
+    template<typename T> static void sbext( Instr* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
 
-    static void max( I* instr)  { instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1]; }
-    static void maxu( I* instr) { instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]); }
-    static void min( I* instr)  { instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1]; }
-    static void minu( I* instr) { instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]); }
+    static void max( Instr* instr)  { instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1]; }
+    static void maxu( Instr* instr) { instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]); }
+    static void min( Instr* instr)  { instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1]; }
+    static void minu( Instr* instr) { instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]); }
 
-    template <typename T = RegUInt> static
-    void clmul( I* instr)
+    template <typename T> static
+    void clmul( Instr* instr)
     {
         instr->v_dst[0] = 0;
         for ( std::size_t index = 0; index < bitwidth<T>; index++)
@@ -260,15 +257,15 @@ struct ALU
     }
 
     // Bit manipulations
-    template <typename T = RegUInt> static
-    void pack( I* instr)
+    template <typename T> static
+    void pack( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 
-    template <typename T = RegUInt> static
-    void packu( I* instr)
+    template <typename T> static
+    void packu( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
@@ -276,7 +273,7 @@ struct ALU
 
     // Branches
     template<Predicate p> static
-    void branch( I* instr)
+    void branch( Instr* instr)
     {
         instr->is_taken_branch = p( instr);
         if ( instr->is_taken_branch) {
@@ -285,34 +282,34 @@ struct ALU
         }
     }
 
-    static void jump( I* instr, Addr target)
+    static void jump( Instr* instr, Addr target)
     {
         instr->is_taken_branch = true;
         instr->new_PC = target;
         check_halt_trap( instr);
     }
 
-    static void j( I* instr) { jump(instr, instr->get_decoded_target()); }
-    static void riscv_jr( I* instr) { jump( instr, narrow_cast<Addr>( instr->v_src[0] + instr->v_imm));; }
+    static void j( Instr* instr) { jump(instr, instr->get_decoded_target()); }
+    static void riscv_jr( Instr* instr) { jump( instr, narrow_cast<Addr>( instr->v_src[0] + instr->v_imm));; }
 
-    static void jr( I* instr) {
+    static void jr( Instr* instr) {
         if (instr->v_src[0] % 4 != 0)
             instr->trap = Trap::UNALIGNED_FETCH;
         jump( instr, align_up<2>(instr->v_src[0]));
     }
 
     template<Execute j> static
-    void jump_and_link( I* instr)
+    void jump_and_link( Instr* instr)
     {
-        instr->v_dst[0] = narrow_cast<typename I::RegisterUInt>( instr->new_PC); // link
+        instr->v_dst[0] = narrow_cast<typename Instr::RegisterUInt>( instr->new_PC); // link
         j( instr);   // jump
     }
 
     template<Predicate p> static
-    void branch_and_link( I* instr)
+    void branch_and_link( Instr* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst[0] = narrow_cast<typename I::RegisterUInt>( instr->new_PC);
+        instr->v_dst[0] = narrow_cast<typename Instr::RegisterUInt>( instr->new_PC);
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
@@ -320,7 +317,7 @@ struct ALU
         }
     }
 
-    static void eret( I* instr)
+    static void eret( Instr* instr)
     {
         // FIXME(pikryukov): That should behave differently for ErrorEPC
         jump( instr, instr->v_src[0]);
@@ -328,40 +325,40 @@ struct ALU
     }
 
     // Traps
-    static void breakpoint( I* instr)   { instr->trap = Trap::BREAKPOINT; }
-    static void syscall   ( I* instr)   { instr->trap = Trap::SYSCALL;    }
-    static void halt( I* instr)   { instr->trap = Trap::HALT; }
-    template<Predicate p> static void trap( I* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
-    static void unknown_instruction( I* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
+    static void breakpoint( Instr* instr)   { instr->trap = Trap::BREAKPOINT; }
+    static void syscall   ( Instr* instr)   { instr->trap = Trap::SYSCALL;    }
+    static void halt( Instr* instr)   { instr->trap = Trap::HALT; }
+    template<Predicate p> static void trap( Instr* instr) { if (p( instr)) instr->trap = Trap::EXPLICIT_TRAP; }
+    static void unknown_instruction( Instr* instr) { instr->trap = Trap::UNKNOWN_INSTRUCTION; }
 
-    static void csrrw( I* instr)
+    static void csrrw( Instr* instr)
     {
         instr->v_dst[0]  = instr->v_src[0]; // CSR <- RS1
         instr->v_dst[1] = instr->v_src[1]; // RD  <- CSR
     }
 
-    static void csrrs( I* instr)
+    static void csrrs( Instr* instr)
     {
         instr->mask   = instr->v_src[0];
-        instr->v_dst[0]  = all_ones<typename I::RegisterUInt>(); // CSR <- 0xffff & RS1
+        instr->v_dst[0]  = all_ones<typename Instr::RegisterUInt>(); // CSR <- 0xffff & RS1
         instr->v_dst[1] = instr->v_src[1]; // RD <- CSR
     }
 
-    static void csrrwi( I* instr)
+    static void csrrwi( Instr* instr)
     {
         instr->v_dst[0]  = instr->v_imm;  // CSR <- RS1
         instr->v_dst[1] = instr->v_src[1]; // RD  <- CSR
     }
 
-    template <typename T = RegUInt> static
-    void riscv_addition_imm( I* instr)
+    template <typename T> static
+    void riscv_addition_imm( Instr* instr)
     {
         instr->v_dst[0] = sign_extension<bitwidth<T>>( instr->v_src[0] + instr->v_imm);
     }
 
-    static void bit_field_place( I* instr)
+    static void bit_field_place( Instr* instr)
     {
-        using XLENType = typename I::RegisterUInt;
+        using XLENType = typename Instr::RegisterUInt;
         size_t XLEN = bitwidth<XLENType>;
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
         len = len ? len : 16;
