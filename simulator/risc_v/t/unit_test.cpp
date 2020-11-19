@@ -128,9 +128,9 @@ TEST_CASE("RISCV disassembly")
 TEST_RV32_RR_OP( 1, add, 0x1f, 0x10, 0xf)
 
 TEST_RV32_IMM_OP( 1, lui, 0x1000, 0, 0x1)
-TEST_RV32_IMM_OP( 2, lui, 0xfffff000ULL, 0, 0xfffff)
+TEST_RV32_IMM_OP( 2, lui, 0xfffff000, 0, 0xfffff)
 TEST_RV64_IMM_OP( 1, lui, 0xffffffff80000000, 0, 0x80000)
-TEST_RV64_IMM_OP( 2, lui, ~0xfff, 0, 0xfffff)
+TEST_RV64_IMM_OP( 2, lui, ~0xfffULL, 0, 0xfffff)
 
 TEST_RV32_RR_OP( 1, sub, 1, 0x10, 0xf)
 
