@@ -27,12 +27,27 @@ template<typename T> static T bit_shuffle( T value, size_t level)
     return result;
 }
 
+template <typename T>
+T bit_field_place(T src1, T src2)
+{
+    using XLENType = T;
+    size_t XLEN = bitwidth<XLENType>;
+    size_t len = ( narrow_cast<size_t>( src2) >> 24) & 15U;
+    len = len ? len : 16;
+    size_t off = ( narrow_cast<size_t>( src2) >> 16) & ( XLEN-1);
+    auto mask = bitmask<XLENType>( len) << off;
+    auto data = src2 << off;
+    return ( data & mask) | ( src1 & ~mask);  
+}
+
 template <typename Instr>
 struct ALU
 {
     // Generic
     using Predicate = bool (*)( const Instr*);
     using Execute = void (*)( Instr*);
+    using RegisterUInt = typename Instr::RegisterUInt;
+    using RegisterSInt = typename Instr::RegisterSInt;
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
     static size_t shamt_imm_32( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
@@ -50,7 +65,7 @@ struct ALU
 
     static void store_addr( Instr* instr) {
         addr( instr);
-        instr->mask = bitmask<typename Instr::RegisterUInt>(instr->mem_size * 8);
+        instr->mask = bitmask<RegisterUInt>(instr->mem_size * 8);
     }
 
     static void load_addr_aligned( Instr* instr) {
@@ -82,7 +97,7 @@ struct ALU
            case 3: return 0xFFFF'FFFF;
            }
          */
-        instr->mask = bitmask<typename Instr::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
+        instr->mask = bitmask<RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
         // Actually we read a word LEFT to effective address
         instr->mem_addr -= 3;
     }
@@ -101,7 +116,7 @@ struct ALU
 
     static void store_addr_left32( Instr* instr) {
         store_addr( instr);
-        instr->mask = bitmask<typename Instr::RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
+        instr->mask = bitmask<RegisterUInt>( ( 1 + instr->mem_addr % 4) * 8) << ( ( 3 - instr->mem_addr % 4) * 8);
         instr->mem_addr -= 3;
     }
 
@@ -132,8 +147,8 @@ struct ALU
     // General addition
     template<typename T> static void addition( Instr* instr)     { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1]); }
     template<typename T> static void subtraction( Instr* instr)  { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1]); }
-    template<typename T> static void riscv_addition( Instr* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, typename Instr::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
-    template<typename T> static void riscv_subtraction( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, typename Instr::RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
+    template<typename T> static void riscv_addition( Instr* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
+    template<typename T> static void riscv_subtraction( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
     template<typename T> static void addition_imm( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_imm); }
 
     template<typename T> static
@@ -155,7 +170,6 @@ struct ALU
         else
             instr->v_dst[0] = result;
     }
-
 
     template<typename T> static
     void subtraction_overflow( Instr* instr)
@@ -180,9 +194,9 @@ struct ALU
     static void sroi( Instr* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
-    static void rol( Instr* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
-    static void ror( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
-    static void rori( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<typename Instr::RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
+    static void rol( Instr* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
+    static void ror( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
+    static void rori( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
 
     // MIPS extra shifts
     static void dsll32( Instr* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
@@ -209,7 +223,7 @@ struct ALU
     static void xnor( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
 
     // Bit permutation
-    static void grev( Instr* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<typename Instr::RegisterUInt>( instr)); }
+    static void grev( Instr* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<RegisterUInt>( instr)); }
     static void riscv_unshfl( Instr* instr)
     {
         auto dst_value = instr->v_src[0];
@@ -301,7 +315,7 @@ struct ALU
     template<Execute j> static
     void jump_and_link( Instr* instr)
     {
-        instr->v_dst[0] = narrow_cast<typename Instr::RegisterUInt>( instr->new_PC); // link
+        instr->v_dst[0] = narrow_cast<RegisterUInt>( instr->new_PC); // link
         j( instr);   // jump
     }
 
@@ -309,7 +323,7 @@ struct ALU
     void branch_and_link( Instr* instr)
     {
         instr->is_taken_branch = p( instr);
-        instr->v_dst[0] = narrow_cast<typename Instr::RegisterUInt>( instr->new_PC);
+        instr->v_dst[0] = narrow_cast<RegisterUInt>( instr->new_PC);
         if ( instr->is_taken_branch)
         {
             instr->new_PC = instr->get_decoded_target();
@@ -340,7 +354,7 @@ struct ALU
     static void csrrs( Instr* instr)
     {
         instr->mask   = instr->v_src[0];
-        instr->v_dst[0]  = all_ones<typename Instr::RegisterUInt>(); // CSR <- 0xffff & RS1
+        instr->v_dst[0]  = all_ones<RegisterUInt>(); // CSR <- 0xffff & RS1
         instr->v_dst[1] = instr->v_src[1]; // RD <- CSR
     }
 
@@ -356,17 +370,7 @@ struct ALU
         instr->v_dst[0] = sign_extension<bitwidth<T>>( instr->v_src[0] + instr->v_imm);
     }
 
-    static void bit_field_place( Instr* instr)
-    {
-        using XLENType = typename Instr::RegisterUInt;
-        size_t XLEN = bitwidth<XLENType>;
-        size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
-        len = len ? len : 16;
-        size_t off = ( narrow_cast<size_t>( instr->v_src[1]) >> 16) & ( XLEN-1);
-        auto mask = bitmask<XLENType>( len) << off;
-        auto data = instr->v_src[1] << off;
-        instr->v_dst[0] = ( data & mask) | ( instr->v_src[0] & ~mask);
-    }
+    static void bit_field_place( Instr* instr) { instr->v_dst[0] = ::bit_field_place(instr->v_src[0], instr->v_src[1]); }
 };
 
 #endif
