@@ -47,7 +47,6 @@ addons:
     packages:
     - clang-tidy-10
     - clang++-10
-    - cmake
     - g++-10
     - libboost-dev
     - ninja-build
@@ -86,7 +85,6 @@ install:
           export CXX=clang++-10
           export CC=clang-10
        fi
-       TRAVIS_CMAKE=/usr/bin/cmake
     fi
   - | # Download GDB
     if [ $GDB_VER ]; then
