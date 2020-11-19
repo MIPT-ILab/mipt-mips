@@ -267,8 +267,10 @@ template<typename I> const auto mips_trunc_w_s = MIPSALU<I>::unknown_instruction
 template<typename I>
 struct MIPSTableEntry
 {
+	using Execute = typename MIPSALU<I>::Execute;
+
     std::string_view name = "Unknown instruction";
-    MIPSALU<I>::Execute function = mips_unknown<I>;
+    Execute function = mips_unknown<I>;
     OperationType operation = OUT_ARITHM;
     uint8 mem_size = 0;
     char imm_type = 'N';
