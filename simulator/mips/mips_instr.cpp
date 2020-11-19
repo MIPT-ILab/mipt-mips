@@ -23,6 +23,10 @@
 template <typename I>
 using MIPSALU = ALU<Datapath<typename I::RegisterUInt>>;
 
+/*  Note. Error "expected primary-expression before '...'"
+ * on GCC means that you forgot temlate keyword after RISCVALU<I>
+ * while refering to template function " */
+
 template<typename I> void do_nothing(I* /* instr */) { }
 template<typename I> const auto mips_add     = MIPSALU<I>::template addition_overflow<uint32>;
 template<typename I> const auto mips_addi    = MIPSALU<I>::template addition_overflow_imm<uint32>;
