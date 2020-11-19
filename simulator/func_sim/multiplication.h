@@ -134,29 +134,31 @@ auto riscv_remainder(T x, T y) {
     return narrow_cast<UT>( x % y);
 }
 
+template <typename Instr>
 struct RISCVMultALU
 {
-    template<typename I, typename T> static void mult_h_uu( I* instr) { instr->v_dst[0] = riscv_multiplication_high_uu<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename I, typename T> static void mult_h_ss( I* instr) { instr->v_dst[0] = riscv_multiplication_high_ss<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename I, typename T> static void mult_h_su( I* instr) { instr->v_dst[0] = riscv_multiplication_high_su<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename I, typename T> static void mult_l( I* instr) { instr->v_dst[0] = riscv_multiplication_low <T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename I, typename T> static void div( I* instr) { instr->v_dst[0] = riscv_division <T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename I, typename T> static void rem( I* instr) { instr->v_dst[0] = riscv_remainder <T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void mult_h_uu( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_uu<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void mult_h_ss( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_ss<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void mult_h_su( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_su<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void mult_l( Instr* instr) { instr->v_dst[0] = riscv_multiplication_low<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void div( Instr* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void rem( Instr* instr) { instr->v_dst[0] = riscv_remainder<T>(instr->v_src[0], instr->v_src[1]); }
 };
 
+template <typename Instr>
 struct MIPSMultALU
 {
-    template<typename I, typename T> static void multiplication( I* instr)
+    template<typename T> static void multiplication( Instr* instr)
     {
         const auto& result = mips_multiplication<T>( instr->v_src[0], instr->v_src[1]);
-        instr->v_dst[0]  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst[1] = narrow_cast<typename I::RegisterUInt>( result.second);
+        instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
+        instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
     }
 
-    template<typename I, typename T> static void division( I* instr)
+    template<typename T> static void division( Instr* instr)
     {
         const auto& result = mips_division<T>( instr->v_src[0], instr->v_src[1]);
-        instr->v_dst[0]  = narrow_cast<typename I::RegisterUInt>( result.first);
-        instr->v_dst[1] = narrow_cast<typename I::RegisterUInt>( result.second);
+        instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
+        instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
     } 
 };
