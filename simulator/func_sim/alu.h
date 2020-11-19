@@ -27,19 +27,6 @@ template<typename T> static T bit_shuffle( T value, size_t level)
     return result;
 }
 
-template <typename T>
-T bit_field_place(T src1, T src2)
-{
-    using XLENType = T;
-    size_t XLEN = bitwidth<XLENType>;
-    size_t len = ( narrow_cast<size_t>( src2) >> 24) & 15U;
-    len = len ? len : 16;
-    size_t off = ( narrow_cast<size_t>( src2) >> 16) & ( XLEN-1);
-    auto mask = bitmask<XLENType>( len) << off;
-    auto data = src2 << off;
-    return ( data & mask) | ( src1 & ~mask);  
-}
-
 template <typename Instr>
 struct ALU
 {
@@ -48,6 +35,9 @@ struct ALU
     using Execute = void (*)( Instr*);
     using RegisterUInt = typename Instr::RegisterUInt;
     using RegisterSInt = typename Instr::RegisterSInt;
+    using XLENType = RegisterUInt;
+    
+    static constexpr size_t XLEN = bitwidth<XLENType>;
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
     static size_t shamt_imm_32( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
@@ -171,6 +161,7 @@ struct ALU
             instr->v_dst[0] = result;
     }
 
+
     template<typename T> static
     void subtraction_overflow( Instr* instr)
     {
@@ -261,7 +252,7 @@ struct ALU
     static void min( Instr* instr)  { instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1]; }
     static void minu( Instr* instr) { instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]); }
 
-    template <typename T> static
+    template<typename T> static
     void clmul( Instr* instr)
     {
         instr->v_dst[0] = 0;
@@ -271,14 +262,14 @@ struct ALU
     }
 
     // Bit manipulations
-    template <typename T> static
+    template<typename T> static
     void pack( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 
-    template <typename T> static
+    template<typename T> static
     void packu( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
@@ -364,13 +355,21 @@ struct ALU
         instr->v_dst[1] = instr->v_src[1]; // RD  <- CSR
     }
 
-    template <typename T> static
+    template<typename T> static
     void riscv_addition_imm( Instr* instr)
     {
         instr->v_dst[0] = sign_extension<bitwidth<T>>( instr->v_src[0] + instr->v_imm);
     }
 
-    static void bit_field_place( Instr* instr) { instr->v_dst[0] = ::bit_field_place(instr->v_src[0], instr->v_src[1]); }
+    static void bit_field_place( Instr* instr)
+    {
+        size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
+        len = len ? len : 16;
+        size_t off = ( narrow_cast<size_t>( instr->v_src[1]) >> 16) & ( XLEN-1);
+        auto mask = bitmask<XLENType>( len) << off;
+        auto data = instr->v_src[1] << off;
+        instr->v_dst[0] = ( data & mask) | ( instr->v_src[0] & ~mask);
+    }
 };
 
 #endif
