@@ -28,4 +28,4 @@ jobs:
       working-directory: visualizer
       run: npx nyc --reporter=lcov npm test
     - name: Codecov
-      uses: codecov/codecov-action@v1.0.7
+      uses: codecov/codecov-action@v1.0.15
