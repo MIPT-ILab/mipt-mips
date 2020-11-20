@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest, macos-latest
+    runs-on: [ ubuntu-latest, macos-latest ]
     steps:
     - name: Install Ninja
       run: sudo apt-get install ninja-build
