@@ -293,7 +293,7 @@ template<>
 inline constexpr auto count_trailing_zeroes( uint128 value) noexcept
 {
     const auto& u = unpack_to<uint64>( value);
-    return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countr_zero(u[1]);
+    return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countr_zero(u[0]);
 }
 
 template<>
