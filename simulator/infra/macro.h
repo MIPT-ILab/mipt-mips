@@ -20,7 +20,12 @@
 
 // STD proxies, need special uint128 handeling
 
+#ifdef  _LIBCPP_VERSION
 template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
+#else
+template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::ispow2( n); }
+#endif
+
 template<typename T> static constexpr inline auto popcount( T x) noexcept              { return std::popcount(x); }
 template<typename T> static constexpr inline auto circ_ls( T x, size_t shamt)          { return std::rotl( x, narrow_cast<int>( shamt)); }
 template<typename T> static constexpr inline auto circ_rs( T x, size_t shamt)          { return std::rotr( x, narrow_cast<int>( shamt)); }
@@ -267,7 +272,7 @@ template<>
 inline constexpr auto is_power_of_two( uint128 value) noexcept
 {
     const auto& u = unpack_to<uint64>( value);
-    return std::has_single_bit( u[0]) != std::has_single_bit( u[1]);
+    return is_power_of_two( u[0]) != is_power_of_two( u[1]);
 }
 
 template<>
