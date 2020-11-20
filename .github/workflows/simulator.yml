@@ -33,12 +33,10 @@ jobs:
         ninja mipt-mips
         
     - name: Run
-      run: |
-        cd build
-        ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
+      run: cd build && ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
 
     - name: Dump profile
-      run: gprof ./mipt-mips gmon.out -p | head -
+      run: cd build && gprof ./mipt-mips gmon.out -p | head -
         
   analyze:
     name: Analyze
