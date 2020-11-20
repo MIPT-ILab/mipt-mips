@@ -269,45 +269,45 @@ inline auto popcount( uint128 x) noexcept
 }
 
 template<>
-inline constexpr auto is_power_of_two( uint128 value) noexcept
+inline constexpr auto is_power_of_two( uint128 n) noexcept
 {
-    const auto& u = unpack_to<uint64>( value);
+    const auto& u = unpack_to<uint64>( std::move( n));
     return is_power_of_two( u[0]) != is_power_of_two( u[1]);
 }
 
 template<>
-inline constexpr auto count_leading_zeroes( uint128 value) noexcept
+inline constexpr auto count_leading_zeroes( uint128 n) noexcept
 {
-    const auto& u = unpack_to<uint64>( value);
+    const auto& u = unpack_to<uint64>( std::move( n));
     return u[1] == 0 ? std::countl_zero(u[0]) + bitwidth<uint64> : std::countl_zero(u[1]);
 }
 
 template<>
-constexpr inline auto count_leading_ones( uint128 value) noexcept
+constexpr inline auto count_leading_ones( uint128 n) noexcept
 {
-    const auto& u = unpack_to<uint64>( value);
+    const auto& u = unpack_to<uint64>( std::move( n));
     return u[1] == all_ones<uint64>() ? std::countl_one(u[0]) + bitwidth<uint64> : std::countl_one(u[1]);
 }
 
 template<>
-inline constexpr auto count_trailing_zeroes( uint128 value) noexcept
+inline constexpr auto count_trailing_zeroes( uint128 n) noexcept
 {
-    const auto& u = unpack_to<uint64>( value);
+    const auto& u = unpack_to<uint64>( std::move( n));
     return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countr_zero(u[0]);
 }
 
 template<>
-inline constexpr auto circ_ls( uint128 value, size_t shamt)
+inline constexpr auto circ_ls( uint128 n, size_t shamt)
 {
     if ( shamt == 0 || shamt == bitwidth<uint128>)
-        return value;
-    return ( value << shamt) | ( value >> ( bitwidth<uint128> - shamt));
+        return n;
+    return ( n << shamt) | ( n >> ( bitwidth<uint128> - shamt));
 }
 
 template<>
-inline constexpr auto circ_rs( uint128 value, size_t shamt)
+inline constexpr auto circ_rs( uint128 n, size_t shamt)
 {
-    return circ_ls(value, bitwidth<uint128> - shamt);
+    return circ_ls( std::move( n), bitwidth<uint128> - shamt);
 }
 
 #endif
