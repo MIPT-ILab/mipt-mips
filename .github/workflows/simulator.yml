@@ -65,16 +65,17 @@ jobs:
       run: |
         mkdir build
         cd build
-        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0
+        CC=clang-10 CXX=clang++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0
         ninja mipt-mips unit-tests
         
     - name: Run
-      run: |
-        cd build
-        ./unit-tests
+      run: cd build && ./unit-tests
 
     - name: Codecov
       uses: codecov/codecov-action@v1.0.15
+    
+    - name: Clang-Tidy
+      run: cd build && run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
