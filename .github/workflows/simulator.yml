@@ -7,6 +7,39 @@ on:
     branches: [ master ]
 
 jobs:
+  profile:
+    name: Profile
+    runs-on: ubuntu-latest
+     
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Install Ninja
+      run: sudo apt-get install ninja-build
+
+    - name: Build simulator
+      run: |
+        mkdir build
+        cd build
+        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1
+        ninja mipt-mips
+        
+    - name: Run
+      run: |
+        cd build
+        ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
+
+    - name: Dump profile
+      run: gprof ./mipt-mips gmon.out -p | head -
+        
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
