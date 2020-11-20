@@ -85,8 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GDB_VER: gdb-10.1
-      GDB_BUILD: $GITHUB_WORKSPACE/gdb_build
-      GDB_DIR: $GITHUB_WORKSPACE/$GDB_VER
+      GDB_BUILD: ${{ github.workspace }}/gdb_build
+      GDB_DIR: ${{ github.workspace }}/$GDB_VER
     strategy:
         fail-fast: false
         matrix:
