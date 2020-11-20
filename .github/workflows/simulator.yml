@@ -9,17 +9,14 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: [ ubuntu-latest, macos-latest ]
+    runs-on: macos-latest
     steps:
-    - name: Install Ninja
-      run: sudo apt-get install ninja-build
-
     - name: Build simulator
       run: |
         mkdir build
         cd build
-        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
-        ninja mipt-mips unit-tests mipt-v cachesim
+        cmake ../simulator -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
+        make mipt-mips unit-tests mipt-v cachesim
 
     - name: Run
       run: |
