@@ -17,7 +17,7 @@ jobs:
         submodules: 'true'
 
     - name: Installing Boost on MacOS
-      if: matrix.os == 'macOS-latest'
+    #  if: matrix.os == 'macOS-latest'
       run: brew install boost
 
     - name: Build simulator
