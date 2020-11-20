@@ -1,5 +1,5 @@
 ---
-Checks: '*,-*braces-around-statements,-llvm-header-guard,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-*-magic-numbers,-cppcoreguidelines-macro-usage,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-*-non-private-member-variables-in-classes'
+Checks: '*,-*braces-around-statements,-llvm-header-guard,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-*-magic-numbers,-cppcoreguidelines-macro-usage,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-*-non-private-member-variables-in-classes,-llvmlibc-*'
 CheckOptions:
   - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
     value: 1
