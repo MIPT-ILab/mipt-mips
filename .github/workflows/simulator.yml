@@ -79,3 +79,55 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+
+  gdb:
+    name: GDB Integration
+    runs-on: ubuntu-latest
+    env:
+      GDB_VER: gdb-10.1
+      GDB_BUILD: $GITHUB_WORKSPACE/gdb_build
+      GDB_DIR: $GITHUB_WORKSPACE/$GDB_VER
+    strategy:
+        fail-fast: false
+        matrix:
+          language: [ 'cpp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Install packages
+      run: sudo apt-get install ninja-build
+
+    - name: Download GDB
+      run: |
+         mkdir $GITHUB_WORKSPACE
+         wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
+         tar -xzf $GDB_VER.tar.gz
+
+    - name: Prepare GDB
+      run: |
+          cd $GDB_BUILD && $GDB_DIR/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
+          cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+          cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && $GDB_DIR/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
+          cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && $GDB_DIR/libdecnumber/configure && make libdecnumber.a
+          cd $GDB_BUILD && mkdir readline     && cd readline     && $GDB_DIR/readline/configure && cd readline && make libreadline.a
+          cd $GDB_BUILD && mkdir libctf       && cd libctf       && $GDB_DIR/libctf/configure --with-system-zlib && make ctf-error.h && make libctf.la
+          #                                                                   w/a for GDB 10.1, remove once updated ^~~~~~~~~~~~~~~^
+
+    - name: Build simulator
+      run: |
+        mkdir build
+        cd build
+        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=$GDB_DIR -DGDB_BUILD_PATH=$GDB_BUILD
+        ninja gdb-mips-sim
+
+    - name: Build GDB
+      run: |
+        cd $GDB_BUILD/gdb
+        make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+        
+    - name: Run GDB
+      run: cd $GDB_BUILD/gdb && ./gdb -x $GITHUB_WORKSPACE/tests/test.gdb --args $GITHUB_WORKSPACE/tests/mips/mips-tt.bin
