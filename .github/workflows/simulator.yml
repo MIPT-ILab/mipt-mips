@@ -103,7 +103,7 @@ jobs:
 
     - name: Download GDB
       run: |
-         mkdir $GITHUB_WORKSPACE
+         mkdir $GDB_BUILD
          wget http://ftp.gnu.org/gnu/gdb/$GDB_VER.tar.gz
          tar -xzf $GDB_VER.tar.gz
 
