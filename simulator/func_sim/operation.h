@@ -153,13 +153,22 @@ private:
     uint64 sequence_id = NO_VAL64;
 };
 
+template <typename I>
+struct ALU;
+
+template <typename I>
+struct RISCVMultALU;
+
+template <typename I>
+struct MIPSMultALU;
+
 template<typename T>
 class Datapath : public Operation
 {
 public:
-    friend struct ALU;
-    friend struct RISCVMultALU;
-    friend struct MIPSMultALU;
+    friend ALU<Datapath>;
+    friend RISCVMultALU<Datapath>;
+    friend MIPSMultALU<Datapath>;
 
     using Execute = void (*)(Datapath*);
     using RegisterUInt = T;
