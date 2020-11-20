@@ -39,6 +39,7 @@ jobs:
         
     - name: Run
       run: |
+        cd build
         ./unit-tests
 
     - name: Codecov
