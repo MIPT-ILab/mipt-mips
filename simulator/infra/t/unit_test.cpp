@@ -310,19 +310,19 @@ TEST_CASE("Find first set")
 
 static_assert( circ_ls<uint32>( 0xA0B0'C0D7, 0)  == 0xA0B0'C0D7);
 static_assert( circ_ls<uint32>( 0xA0B0'C0D7, 32) == 0xA0B0'C0D7);
-static_assert( circ_ls<uint32>( 0xA0B0'C0D7, 4)  == 0x7B0C'0D0A);
+static_assert( circ_ls<uint32>( 0xA0B0'C0D7, 4)  == 0x0B0'C0D7A);
 
 static_assert( circ_ls<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 0)  == 0xA0B0'C0D0'A0B0'C0D7);
-static_assert( circ_ls<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 32) == 0xA0B0'C0D0'A0B0'C0D7);
-static_assert( circ_ls<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x7B0C'0D0A'0B0C'0D0A);
+static_assert( circ_ls<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 32) == 0xA0B0'C0D7'A0B0'C0D0);
+static_assert( circ_ls<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x0B0C'0D0A'0B0C'0D7A);
 
 static_assert( circ_rs<uint32>( 0xA0B0'C0D7, 0)  == 0xA0B0'C0D7);
 static_assert( circ_rs<uint32>( 0xA0B0'C0D7, 32) == 0xA0B0'C0D7);
-static_assert( circ_rs<uint32>( 0xA0B0'C0D7, 4)  == 0x0B0C'0D7A);
+static_assert( circ_rs<uint32>( 0xA0B0'C0D7, 4)  == 0x7A0B'0C0D);
 
 static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 0)  == 0xA0B0'C0D0'A0B0'C0D7);
-static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 32) == 0xA0B0'C0D0'A0B0'C0D7);
-static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x0B0C'0D7A'0B0C'0D7A);
+static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 32) == 0xA0B0'C0D7'A0B0'C0D0);
+static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x7A0B'0C0D'0A0B'0C0D);
 
 TEST_CASE("circular right shift for 128 bit")
 {
