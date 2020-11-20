@@ -21,9 +21,9 @@
 // STD proxies, need special uint128 handeling
 
 #ifdef  _LIBCPP_VERSION
-template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
-#else
 template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::ispow2( n); }
+#else
+template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
 #endif
 
 template<typename T> static constexpr inline auto popcount( T x) noexcept              { return std::popcount(x); }
