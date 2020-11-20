@@ -23,7 +23,6 @@ arch:
 
 env:
   - TRAVIS_BUILD_TYPE=Release
-  - TRAVIS_BUILD_TYPE=Coverage
   - TRAVIS_BUILD_TYPE=Profile
 
 matrix:
@@ -32,8 +31,6 @@ matrix:
       compiler: gcc
     - os: osx
       arch: arm64
-    - compiler: gcc
-      env: TRAVIS_BUILD_TYPE=Coverage
     - os: osx
       env: TRAVIS_BUILD_TYPE=Profile
 
@@ -60,16 +57,12 @@ before_install:
         if [ $TRAVIS_CPU_ARCH == amd64 ] && [ "$TRAVIS_OS_NAME" == "linux" ]; then
             GDB_VER=gdb-10.1
         fi
-    elif [ "$TRAVIS_BUILD_TYPE" == "Coverage" ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0"
-        COV="gcov"
-        if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
-            COV="llvm-cov gcov"
-            if [ $TRAVIS_CPU_ARCH == amd64 ]; then TRAVIS_TIDY=1; fi
-        fi
     else # Profile
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1"
         TRAVIS_GPROF=1
+        if [ $CXX == clang++ ] && [ "$TRAVIS_OS_NAME" == "linux" ] ; then
+            if [ $TRAVIS_CPU_ARCH == amd64 ]; then TRAVIS_TIDY=1; fi
+        fi
     fi
 
 install:
@@ -111,7 +104,6 @@ script:
   - cd $TRAVIS_BUILD_DIR/simulator/build
   - ninja unit-tests
   - ctest --verbose
-  - bash <(curl -s https://codecov.io/bash) -x "${COV}" -p $TRAVIS_BUILD_DIR/simulator -X gcovout
   - ninja mipt-mips && ./mipt-mips -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 5000000 --mars
   - if [ $TRAVIS_GPROF ]; then gprof ./mipt-mips gmon.out -p | head -; fi
   - ninja mipt-v    && ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
