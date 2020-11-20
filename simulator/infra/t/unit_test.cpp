@@ -328,6 +328,10 @@ TEST_CASE("circular right shift for 128 bit")
 {
     CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[0] == 0xAB);
     CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[1] == 0xCD00'0000'0000'0000);
+    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 0))[0] == 0xABCD);
+    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 0))[1] == 0xABCD);
+    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 128))[0] == 0xABCD);
+    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 128))[1] == 0xABCD);
 }
 
 TEST_CASE("Invalid target print")
