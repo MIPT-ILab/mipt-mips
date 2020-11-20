@@ -58,8 +58,8 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - name: Install Ninja
-      run: sudo apt-get install ninja-build
+    - name: Install packages
+      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10
 
     - name: Build simulator
       run: |
