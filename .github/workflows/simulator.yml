@@ -15,7 +15,11 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: 'true'
-    
+
+    - name: Installing Boost on MacOS
+        if: matrix.os == 'macOS-latest'
+        run: brew install boost
+
     - name: Build simulator
       run: |
         mkdir build
