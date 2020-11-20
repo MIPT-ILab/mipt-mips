@@ -327,7 +327,7 @@ static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x7A0B'0C0D'0A0B'0
 TEST_CASE("circular right shift for 128 bit")
 {
     CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[0] == 0xAB);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[1] == 0xCD00'0000'0000'000);
+    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[1] == 0xCD00'0000'0000'0000);
 }
 
 TEST_CASE("Invalid target print")
