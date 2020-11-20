@@ -11,6 +11,11 @@ jobs:
     name: Test
     runs-on: macos-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    
     - name: Build simulator
       run: |
         mkdir build
