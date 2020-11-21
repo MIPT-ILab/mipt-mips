@@ -82,7 +82,7 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10
+      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
 
     - name: Build simulator
       working-directory: simulator
@@ -93,7 +93,7 @@ jobs:
         ninja unit-tests
     
     - name: Debug
-      run: llvm-cov --version
+      run: llvm-cov-10 --version
 
     - name: Run
       working-directory: simulator/build
@@ -101,7 +101,7 @@ jobs:
 
     - name: Codecov
       working-directory: simulator/build
-      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -X gcovout -p ${{ github.workspace }}/simulator
+      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-10 gcov" -X gcovout -p ${{ github.workspace }}/simulator
     
     - name: Clang-Tidy
       working-directory: simulator/build
