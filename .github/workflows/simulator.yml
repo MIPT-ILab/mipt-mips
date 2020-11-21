@@ -28,8 +28,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get install ninja-build
-        echo "::set-env name=CC::gcc-10"
-        echo "::set-env name=CXX::g++-10"
+        echo "CC=gcc-10" >> $GITHUB_ENV
+        echo "CXX=g++-10" >> $GITHUB_ENV
 
     - name: Create CMake dir
       run: mkdir build
