@@ -117,7 +117,7 @@ struct TestData {
 #define TEST_ST_SRC21_BYPASS( n, level1, level2, load, store, data, immediate, address) TEST_ST_OP( n, load, store, data, immediate, address)
         
 #define TEST_DISASM( instr_bytes, output_str, RegisterUInt) \
-    CHECK( RISCVInstr<RegisterUInt>(instr_bytes).get_disasm() == output_str )
+    CHECK( RISCVInstr<RegisterUInt>(instr_bytes).get_disasm() == ( output_str) )
 
 #define TEST_RV32_DISASM(instr_bytes, output_str) TEST_DISASM( instr_bytes, output_str, uint32)
 #define TEST_RV64_DISASM(instr_bytes, output_str) TEST_DISASM( instr_bytes, output_str, uint64)

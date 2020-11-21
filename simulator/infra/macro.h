@@ -10,7 +10,6 @@
 
 #include <infra/types.h>
 
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <climits>
@@ -30,9 +29,6 @@ template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept
 
 template<typename T> void ignored( const T& /* unused */) noexcept { }
 
-template<typename ... Args> constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
-template<typename ... Args> constexpr size_t max_sizeof() noexcept { return (std::max)({sizeof(Args)...}); }
-
 /* Bit widths of integer types */
 template<typename T> static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
 template<>           inline constexpr size_t bitwidth<uint128> = 128U;
@@ -43,7 +39,7 @@ template<typename T> static constexpr size_t log_bitwidth = std::countr_zero(bit
 
 /* Bit masks */
 template<typename T> static constexpr inline auto lsb_set()  noexcept { return T{ 1U}; }
-template<typename T> static constexpr inline auto msb_set()  noexcept { return T{ 1U} << (bitwidth<T> - 1); }
+template<typename T> static constexpr inline auto msb_set()  noexcept { return (lsb_set<T>() << (bitwidth<T> - 1)); }
 template<typename T> static constexpr inline auto all_ones() noexcept { return (msb_set<T>() - 1U) | msb_set<T>(); }
 
 template<typename T> static constexpr T ones_ls( const T& value, size_t shamt) { return ~( ~value << shamt); }

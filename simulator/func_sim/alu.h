@@ -36,9 +36,8 @@ struct ALU
     using Execute = void (*)( Instr*);
     using RegisterUInt = typename Instr::RegisterUInt;
     using RegisterSInt = typename Instr::RegisterSInt;
-    using XLENType = RegisterUInt;
     
-    static constexpr size_t XLEN = bitwidth<XLENType>;
+    static constexpr size_t XLEN = bitwidth<RegisterUInt>;
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
     static size_t shamt_imm_32( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
@@ -114,24 +113,24 @@ struct ALU
     static void addr( Instr* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src[0] + instr->v_imm); }
 
     // Predicate helpers - unary
-    static bool lez( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) <= 0; }
-    static bool gez( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= 0; }
-    static bool ltz( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) < 0; }
-    static bool gtz( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) > 0; }
+    static bool lez( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) <= 0; }
+    static bool gez( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= 0; }
+    static bool ltz( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) < 0; }
+    static bool gtz( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) > 0; }
 
     // Predicate helpers - binary
     static bool eq( const Instr* instr)  { return instr->v_src[0] == instr->v_src[1]; }
     static bool ne( const Instr* instr)  { return instr->v_src[0] != instr->v_src[1]; }
     static bool geu( const Instr* instr) { return instr->v_src[0] >= instr->v_src[1]; }
     static bool ltu( const Instr* instr) { return instr->v_src[0] <  instr->v_src[1]; }
-    static bool ge( const Instr* instr)  { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename Instr::RegisterSInt>( instr->v_src[1]); }
-    static bool lt( const Instr* instr)  { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) <  narrow_cast<typename Instr::RegisterSInt>( instr->v_src[1]); }
+    static bool ge( const Instr* instr)  { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= narrow_cast<RegisterSInt>( instr->v_src[1]); }
+    static bool lt( const Instr* instr)  { return narrow_cast<RegisterSInt>( instr->v_src[0]) <  narrow_cast<RegisterSInt>( instr->v_src[1]); }
 
     // Predicate helpers - immediate
     static bool eqi( const Instr* instr) { return instr->v_src[0] == instr->v_imm; }
     static bool nei( const Instr* instr) { return instr->v_src[0] != instr->v_imm; }
-    static bool lti( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) < narrow_cast<typename Instr::RegisterSInt>( instr->v_imm); }
-    static bool gei( const Instr* instr) { return narrow_cast<typename Instr::RegisterSInt>( instr->v_src[0]) >= narrow_cast<typename Instr::RegisterSInt>( instr->v_imm); }
+    static bool lti( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) < narrow_cast<RegisterSInt>( instr->v_imm); }
+    static bool gei( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= narrow_cast<RegisterSInt>( instr->v_imm); }
     static bool ltiu( const Instr* instr) { return instr->v_src[0] < instr->v_imm; }
     static bool geiu( const Instr* instr) { return instr->v_src[0] >= instr->v_imm; }
 
@@ -186,9 +185,9 @@ struct ALU
     static void sroi( Instr* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
-    static void rol( Instr* instr) { instr->v_dst[0] = circ_ls( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
-    static void ror( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
-    static void rori( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<bitwidth<RegisterUInt>>( instr->v_src[0]), shamt_imm( instr)); }
+    static void rol( Instr* instr) { instr->v_dst[0] = circ_ls( sign_extension<XLEN>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
+    static void ror( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<XLEN>( instr->v_src[0]), shamt_v_src2<RegisterUInt>( instr)); }
+    static void rori( Instr* instr) { instr->v_dst[0] = circ_rs( sign_extension<XLEN>( instr->v_src[0]), shamt_imm( instr)); }
 
     // MIPS extra shifts
     static void dsll32( Instr* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
@@ -219,7 +218,7 @@ struct ALU
     static void riscv_unshfl( Instr* instr)
     {
         auto dst_value = instr->v_src[0];
-        constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
+        constexpr size_t limit = log_bitwidth<RegisterUInt> - 1;
         for ( size_t i = 0; i < limit; ++i)
             if ( ( instr->v_src[1] >> i) & 1U)
                 dst_value = bit_shuffle( dst_value, i);
@@ -229,7 +228,7 @@ struct ALU
     static void riscv_shfl( Instr* instr)
     {
         auto dst_value = instr->v_src[0];
-        constexpr size_t limit = log_bitwidth<decltype( instr->v_src[0])> - 1;
+        constexpr size_t limit = log_bitwidth<RegisterUInt> - 1;
         for ( size_t i = limit ; i > 0; --i)
             if( ( instr->v_src[1] >> (i - 1)) & 1U)
                 dst_value = bit_shuffle( dst_value, i - 1);
@@ -365,9 +364,9 @@ struct ALU
     static void bit_field_place( Instr* instr)
     {
         size_t len = ( narrow_cast<size_t>( instr->v_src[1]) >> 24) & 15U;
-        len = len ? len : 16;
+        len = len > 0 ? len : 16;
         size_t off = ( narrow_cast<size_t>( instr->v_src[1]) >> 16) & ( XLEN-1);
-        auto mask = bitmask<XLENType>( len) << off;
+        auto mask = bitmask<RegisterUInt>( len) << off;
         auto data = instr->v_src[1] << off;
         instr->v_dst[0] = ( data & mask) | ( instr->v_src[0] & ~mask);
     }
