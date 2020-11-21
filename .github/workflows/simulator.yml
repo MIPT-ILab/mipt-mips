@@ -91,9 +91,6 @@ jobs:
         cd build
         cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=1 -DENABLE_UBSAN=1 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
         ninja unit-tests
-    
-    - name: Debug
-      run: llvm-cov-10 --version
 
     - name: Run
       working-directory: simulator/build
