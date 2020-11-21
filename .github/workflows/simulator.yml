@@ -93,7 +93,7 @@ jobs:
         ninja unit-tests
     
     - name: Debug
-      run: find -name "*.gcno"
+      run: llvm-cov --version
 
     - name: Run
       working-directory: simulator/build
