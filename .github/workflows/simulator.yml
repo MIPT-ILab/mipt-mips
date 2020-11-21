@@ -96,7 +96,7 @@ jobs:
       working-directory: simulator/build
       run: |
         ctest --verbose
-        find -name "*.gcov"
+        cat compile_commands.json
 
     - name: Codecov
       working-directory: simulator/build
