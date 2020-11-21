@@ -15,21 +15,12 @@ platform:
   - x64
   
 configuration:
-#  - Debug
   - Release
 
-matrix:
-  exclude:
-    - build: g++
-      configuration: Debug
-    - platform: Win32
-      configuration: Debug
-
 install:
-- if "%configuration%"=="Debug" choco install opencppcoverage codecov
 - if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
 - if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
-- set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
+- set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;%PATH%
 
 before_build:
 - git submodule update --init
@@ -45,6 +36,4 @@ build_script:
 test_script:
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 100000 --mars
 - .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
-- if not  "%configuration%"=="Debug" ctest -C %configuration% --verbose
-- if "%configuration%"=="Debug" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "%APPVEYOR_BUILD_FOLDER%\external\*" -- %APPVEYOR_BUILD_FOLDER%\build\unit-tests.exe
-- if "%configuration%"=="Debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%
+- ctest -C %configuration% --verbose
