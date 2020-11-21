@@ -122,6 +122,7 @@ if (COMPILER_SUPPORTS_MARCH_NATIVE)
 endif()
 
 if (ENABLE_COVERAGE)
+    message(STATUS "Coverage collection enabled")
     add_definitions(-DNDEBUG) # exclude 'assert' macro
     if (NOT MSVC)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage -g -fno-inline")
