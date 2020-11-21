@@ -32,8 +32,8 @@ jobs:
         cd build
         ./unit_tests
         ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
-        ./mipt-v    -b $TRAVIS_BUILD_DIR/tests/mips/mips-fib.bin -n 500000 --mars
-        ./cachesim  -t $TRAVIS_BUILD_DIR/tests/mem_trace.json -s 32768 -w 32
+        ./mipt-v    -b ../tests/mips/mips-fib.bin -n 500000 --mars
+        ./cachesim  -t ../tests/mem_trace.json -s 32768 -w 32
 
   profile:
     name: Profile
