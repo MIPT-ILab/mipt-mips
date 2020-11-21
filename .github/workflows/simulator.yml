@@ -94,7 +94,7 @@ jobs:
 
     - name: Codecov
       working-directory: build
-      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -X gcovout
+      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -X gcovout -p .
     
     - name: Clang-Tidy
       working-directory: build
