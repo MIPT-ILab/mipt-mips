@@ -7,14 +7,37 @@ on:
     branches: [ master ]
 
 jobs:
+  test:
+    name: Test
+    runs-on: macos-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Installing Boost on MacOS
+    #  if: matrix.os == 'macOS-latest'
+      run: brew install boost
+
+    - name: Build simulator
+      run: |
+        mkdir build
+        cd build
+        cmake ../simulator -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
+        make mipt-mips unit-tests mipt-v cachesim
+
+    - name: Run
+      run: |
+        cd build
+        ./unit-tests
+        ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
+        ./mipt-v    -b ../tests/mips/mips-fib.bin -n 500000 --mars
+        ./cachesim  -t ../tests/mem_trace.json -s 32768 -w 32
+
   profile:
     name: Profile
     runs-on: ubuntu-latest
-     
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'cpp' ]
     
     steps:
     - name: Checkout repository
@@ -42,11 +65,6 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'cpp' ]
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -56,7 +74,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        languages: ${{ matrix.language }}
+        languages: 'cpp'
 
     - name: Install packages
       run: sudo apt-get install ninja-build clang++-10 clang-tidy-10
@@ -87,10 +105,6 @@ jobs:
       GDB_VER: gdb-10.1
       GDB_BUILD: ${{ github.workspace }}/gdb_build
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
-    strategy:
-        fail-fast: false
-        matrix:
-          language: [ 'cpp' ]
 
     steps:
     - name: Checkout repository
