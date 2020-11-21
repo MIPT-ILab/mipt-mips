@@ -92,7 +92,7 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v1.0.15
       with:
-        directory: build
+        directory: simulator
     
     - name: Clang-Tidy
       run: cd build && run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
