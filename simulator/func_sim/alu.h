@@ -6,6 +6,7 @@
 #ifndef ALU_H
 #define ALU_H
 
+#include "alu_primitives.h"
 #include "multiplication.h"
 #include "traps/trap.h"
 

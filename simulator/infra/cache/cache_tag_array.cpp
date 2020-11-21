@@ -132,9 +132,9 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 addr_size_in_bits
         )
             : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-            , line_bits( find_first_set( line_size))
+            , line_bits( std::countr_zero( line_size))
             , sets( size_in_bytes / ( ways * line_size))
-            , set_bits( find_first_set( sets) + line_bits)
+            , set_bits( std::countr_zero( sets) + line_bits)
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
         { }
 
