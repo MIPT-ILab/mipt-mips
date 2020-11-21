@@ -89,16 +89,14 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=1 -DENABLE_UBSAN=1 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
         ninja unit-tests
-        
-    - name: Run
-      working-directory: simulator/build
-      run: ./unit-tests
 
     - name: Codecov
       working-directory: simulator/build
-      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -X gcovout -p ${{ github.workspace }}/simulator
+      run: |
+        ./unit-tests
+        bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -X gcovout -p ${{ github.workspace }}/simulator
     
     - name: Clang-Tidy
       working-directory: simulator/build
