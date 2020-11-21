@@ -66,7 +66,10 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-
+    env:
+      CC: clang-10
+      CXX: clang++-10 
+  
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -86,7 +89,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        CC=clang-10 CXX=clang++-10 cmake .. -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
         ninja mipt-mips unit-tests
         
     - name: Run
