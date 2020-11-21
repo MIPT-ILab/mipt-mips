@@ -61,7 +61,7 @@ jobs:
 
     - name: Dump profile
       working-directory: build
-      run: cd build && gprof ./mipt-mips gmon.out -p | head -
+      run: gprof ./mipt-mips gmon.out -p | head -
         
   analyze:
     name: Analyze
