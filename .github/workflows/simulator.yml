@@ -20,13 +20,16 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Installing tools on MacOS
+    - name: Install tools on MacOS
       if: matrix.os == 'macos-latest'
       run: brew install boost ninja
     
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install ninja-build
+      run: |
+        sudo apt-get install ninja-build
+        echo "CC=gcc-10" >> $GITHUB_ENV
+        echo "CXX=g++-10" >> $GITHUB_ENV
 
     - name: Create CMake dir
       run: mkdir build
@@ -166,7 +169,6 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |
-        cd build
         cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=../gdb_build
         ninja gdb-mips-sim
 
