@@ -90,11 +90,11 @@ jobs:
         
     - name: Run
       working-directory: build
-      run: ./unit-tests
+      run: ctest --verbose
 
     - name: Codecov
       working-directory: build
-      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -p ../simulator -X gcovout
+      run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov" -p ${{ github.workspace }}/simulator -X gcovout
     
     - name: Clang-Tidy
       working-directory: build
