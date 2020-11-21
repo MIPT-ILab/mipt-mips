@@ -121,7 +121,6 @@ jobs:
       run: ./unit-tests
 
     - name: Codecov
-      working-directory: build
       run: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-10 gcov" -X gcovout
     
     - name: Clang-Tidy
