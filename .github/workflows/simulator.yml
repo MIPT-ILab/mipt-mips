@@ -91,7 +91,9 @@ jobs:
         
     - name: Run
       working-directory: simulator/build
-      run: ctest --verbose
+      run: |
+        ctest --verbose
+        ls *.gcov
 
     - name: Codecov
       working-directory: simulator/build
