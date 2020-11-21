@@ -73,6 +73,7 @@ set(TESTS_CPPS
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
     func_sim/driver/t/unit_test.cpp
+    func_sim/t/alu_test.cpp
     func_sim/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp

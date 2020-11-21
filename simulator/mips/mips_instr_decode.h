@@ -55,7 +55,7 @@ struct MIPSInstrDecoder
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
     {
-        return ( bytes & mask) >> find_first_set( mask);
+        return ( bytes & mask) >> std::countr_zero( mask);
     }
 
     uint32 get_immediate_value( char type) const
