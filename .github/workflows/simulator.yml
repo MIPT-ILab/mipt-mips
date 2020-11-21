@@ -16,20 +16,20 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Installing Boost on MacOS
+    - name: Installing tools on MacOS
     #  if: matrix.os == 'macOS-latest'
-      run: brew install boost
+      run: brew install boost ninja
 
     - name: Build simulator
       run: |
         mkdir build
         cd build
-        cmake ../simulator -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
-        make mipt-mips unit-tests mipt-v cachesim
+        cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
+        ninja mipt-mips unit-tests mipt-v cachesim
 
     - name: Run
+      working-directory: build
       run: |
-        cd build
         ./unit-tests
         ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
         ./mipt-v    -b ../tests/mips/mips-fib.bin -n 500000 --mars
@@ -56,9 +56,11 @@ jobs:
         ninja mipt-mips
         
     - name: Run
-      run: cd build && ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
+      working-directory: build
+      run: ./mipt-mips -b ../tests/mips/mips-fib.bin -n 5000000 --mars
 
     - name: Dump profile
+      working-directory: build
       run: cd build && gprof ./mipt-mips gmon.out -p | head -
         
   analyze:
@@ -87,13 +89,15 @@ jobs:
         ninja mipt-mips unit-tests
         
     - name: Run
-      run: cd build && ./unit-tests
+      working-directory: build
+      run: ./unit-tests
 
     - name: Codecov
       uses: codecov/codecov-action@v1.0.15
     
     - name: Clang-Tidy
-      run: cd build && run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
+      working-directory: build
+      run: run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
@@ -103,7 +107,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GDB_VER: gdb-10.1
-      GDB_BUILD: ${{ github.workspace }}/gdb_build
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
 
     steps:
@@ -122,6 +125,8 @@ jobs:
          tar -xzf $GDB_VER.tar.gz
 
     - name: Prepare GDB
+      env:
+        GDB_BUILD: ${{ github.workspace }}/gdb_build
       run: |
           cd $GDB_BUILD && ${{ github.workspace }}/$GDB_VER/configure --target=mipsel-unknown-linux --with-system-zlib --with-python=no
           cd $GDB_BUILD && make configure-gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
@@ -135,13 +140,13 @@ jobs:
       run: |
         mkdir build
         cd build
-        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=$GDB_BUILD
+        CC=gcc-10 CXX=g++-10 cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=../gdb_build
         ninja gdb-mips-sim
 
     - name: Build GDB
-      run: |
-        cd $GDB_BUILD/gdb
-        make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
+      working-directory: gdb_build/gdb
+      run: make gdb CFLAGS='-w -O0' CXXFLAGS='-w -O0' MAKEINFO=true > /dev/null
         
     - name: Run GDB
-      run: cd $GDB_BUILD/gdb && ./gdb -x $GITHUB_WORKSPACE/tests/test.gdb --args $GITHUB_WORKSPACE/tests/mips/mips-tt.bin
+      working-directory: gdb_build/gdb
+      run: ./gdb -x $GITHUB_WORKSPACE/tests/test.gdb --args $GITHUB_WORKSPACE/tests/mips/mips-tt.bin
