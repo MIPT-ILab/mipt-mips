@@ -82,7 +82,7 @@ jobs:
       run: sudo apt-get install ninja-build clang++-10 clang-tidy-10
 
     - name: Build simulator
-      working-directory: build
+      working-directory: simulator
       run: |
         mkdir build
         cd build
