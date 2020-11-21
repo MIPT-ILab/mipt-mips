@@ -169,7 +169,6 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |
-        cd build
         cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=../gdb_build
         ninja gdb-mips-sim
 
