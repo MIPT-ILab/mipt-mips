@@ -90,13 +90,11 @@ jobs:
         mkdir build
         cd build
         cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=0 -DENABLE_UBSAN=0 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
-        ninja mipt-mips unit-tests
+        ninja unit-tests
         
     - name: Run
       working-directory: simulator/build
-      run: |
-        ctest --verbose
-        cat compile_commands.json
+      run: ./unit-tests
 
     - name: Codecov
       working-directory: simulator/build
