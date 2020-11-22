@@ -115,7 +115,7 @@ jobs:
           - name: gcc
             cc: gcc-10
             cxx: g++-10
-            gcov: gcov
+            gcov: gcov-10
           - name: llvm
             cc: clang-10
             cxx: clang++-10
