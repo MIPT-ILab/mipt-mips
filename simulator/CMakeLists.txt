@@ -144,6 +144,7 @@ endif()
 
 if (ENABLE_ASAN AND NOT MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -static-libasan")
 endif()
 
 if (ENABLE_UBSAN AND NOT MSVC)
