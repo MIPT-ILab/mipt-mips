@@ -52,13 +52,14 @@ jobs:
       run: mkdir build
 
     - name: Initialize CMake
+      working-directory: build
       if: matrix.os == 'windows-latest'
       run: cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
 
     - name: Initialize CMake
       if: matrix.os != 'windows-latest'
       working-directory: build
-      run: cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0"
+      run: cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
       
     - name: Build
       working-directory: build
