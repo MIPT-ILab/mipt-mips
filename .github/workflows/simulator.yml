@@ -47,14 +47,14 @@ jobs:
     - name: Build with Visual Studio
       working-directory: build
       if: matrix.os == 'windows-latest'
-      run:
+      run: |
         cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
         cmake --build . --config Release
 
     - name: Build on POSIX
       if: matrix.os != 'windows-latest'
       working-directory: build
-      run:
+      run: |
         cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
         ninja mipt-mips unit-tests mipt-v cachesim
 
