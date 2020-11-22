@@ -134,7 +134,7 @@ jobs:
 
     - name: Install packages
       run: |
-        sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
+        sudo apt-get install ninja-build clang++-11 clang-tidy-11 llvm-11
         echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
