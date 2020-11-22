@@ -21,9 +21,6 @@
 static_assert(CHAR_BIT == 8, "MIPT-MIPS supports only 8-bit byte host machines");
 static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, "MIPT-MIPS does not support mixed-endian hosts");
 
-static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
-static_assert(max_sizeof<char, int, uint64>() == sizeof(uint64));
-
 static_assert(bitwidth<int8> == 8);
 static_assert(bitwidth<int16> == 16);
 static_assert(bitwidth<int32> == 32);
@@ -122,28 +119,12 @@ static constexpr auto check_to_pointer()
     return res;
 }
 
-#if 0 // C++ 20 allows constexpr std::copy
-
 static_assert(get_value_from_pointer<uint16, std::endian::little>( test_array.data(), 2) == 0x5678);
 static_assert(get_value_from_pointer<uint16, std::endian::big>( test_array.data(), 2) == 0x7856);
 static_assert(check_to_pointer<std::endian::little>()[0] == std::byte{ 0x56});
 static_assert(check_to_pointer<std::endian::little>()[1] == std::byte{ 0x34});
 static_assert(check_to_pointer<std::endian::big>()[0] == std::byte{ 0x34});
 static_assert(check_to_pointer<std::endian::big>()[1] == std::byte{ 0x56});
-
-#else
-
-TEST_CASE( "Byte swapping pointer access")
-{    
-    CHECK( get_value_from_pointer<uint16, std::endian::little>( test_array.data(), 2) == 0x5678);
-    CHECK( get_value_from_pointer<uint16, std::endian::big>( test_array.data(), 2) == 0x7856);
-    CHECK( check_to_pointer<std::endian::little>()[0] == std::byte{ 0x56});
-    CHECK( check_to_pointer<std::endian::little>()[1] == std::byte{ 0x34});
-    CHECK( check_to_pointer<std::endian::big>()[0] == std::byte{ 0x34});
-    CHECK( check_to_pointer<std::endian::big>()[1] == std::byte{ 0x56});
-}
-
-#endif
 
 static constexpr std::array<const char*, 4> some_argv = {"rm", "-rf", "/", nullptr};
 static_assert( count_argc( some_argv.data()) == 3);

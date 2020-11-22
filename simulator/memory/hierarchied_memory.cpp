@@ -19,7 +19,34 @@
 #include <utility>
 #include <vector>
 
-class HierarchiedMemory : public FuncMemory
+template<typename ... Args> constexpr size_t min_sizeof() noexcept { return (std::min)({sizeof(Args)...}); }
+static_assert(min_sizeof<char, int, uint64>() == sizeof(char));
+
+class HierarchiedMemoryArgumentChecker
+{
+    public:
+        HierarchiedMemoryArgumentChecker( uint32 addr_bits, uint32 page_bits, uint32 offset_bits)
+            : page_bits( page_bits)
+            , offset_bits( offset_bits)
+            , set_bits( addr_bits - offset_bits - page_bits)
+        {
+            using namespace std::literals::string_literals;
+            if ( set_bits >= min_sizeof<uint32, size_t>() * 8)
+                throw FuncMemoryBadMapping("Too many ( 2 ** "s + std::to_string( set_bits) + ") sets");
+
+            if ( page_bits >= min_sizeof<uint32, size_t>() * 8)
+                throw FuncMemoryBadMapping("Too many ( 2 ** "s + std::to_string( page_bits) + ") pages");
+
+            if ( offset_bits >= min_sizeof<uint32, size_t>() * 8)
+                throw FuncMemoryBadMapping("Each page is too large ( 2 ** "s + std::to_string( offset_bits) + " bytes)");
+        }
+    protected:
+        const uint32 page_bits;
+        const uint32 offset_bits;
+        const uint32 set_bits;
+};
+
+class HierarchiedMemory : public FuncMemory, private HierarchiedMemoryArgumentChecker
 {
     public:
         HierarchiedMemory ( uint32 addr_bits, uint32 page_bits, uint32 offset_bits);
@@ -31,10 +58,6 @@ class HierarchiedMemory : public FuncMemory
         void duplicate_to( std::shared_ptr<WriteableMemory> target) const final;
 
     private:
-        const uint32 page_bits;
-        const uint32 offset_bits;
-        const uint32 set_bits;
-
         const Addr addr_mask;
         const Addr offset_mask;
         const Addr page_mask;
@@ -76,9 +99,7 @@ FuncMemory::create_hierarchied_memory( uint32 addr_bits, uint32 page_bits, uint3
 HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
                         uint32 page_bits,
                         uint32 offset_bits) :
-    page_bits( page_bits),
-    offset_bits( offset_bits),
-    set_bits( addr_bits - offset_bits - page_bits),
+    HierarchiedMemoryArgumentChecker( addr_bits, page_bits, offset_bits),
     addr_mask( bitmask<Addr>( std::min<uint32>( addr_bits, bitwidth<Addr>))),
     offset_mask( bitmask<Addr>( offset_bits)),
     page_mask ( bitmask<Addr>( page_bits) << offset_bits),
@@ -87,16 +108,6 @@ HierarchiedMemory::HierarchiedMemory( uint32 addr_bits,
     set_cnt ( 1ULL << set_bits ),
     page_size ( 1ULL << offset_bits)
 {
-    using namespace std::literals::string_literals;
-    if ( set_bits >= min_sizeof<uint32, size_t>() * 8)
-        throw FuncMemoryBadMapping("Too many ("s + std::to_string(set_cnt) + ") sets");
-
-    if ( page_bits >= min_sizeof<uint32, size_t>() * 8)
-        throw FuncMemoryBadMapping("Too many ("s + std::to_string(page_cnt) + ") pages");
-
-    if ( offset_bits >= min_sizeof<uint32, size_t>() * 8)
-        throw FuncMemoryBadMapping("Each page is too large ("s + std::to_string(page_size) + " bytes)");
-
     memory.resize(set_cnt);
 }
 
