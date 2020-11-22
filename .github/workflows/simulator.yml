@@ -42,6 +42,7 @@ jobs:
         echo "CC=gcc" >> $GITHUB_ENV
         echo "CXX=g++" >> $GITHUB_ENV
         echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+        echo "Boost_INCLUDE_PATH=$BOOST_ROOT_1_72_0/include" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build
