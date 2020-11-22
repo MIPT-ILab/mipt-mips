@@ -24,6 +24,8 @@ matrix:
       configuration: Debug
     - platform: Win32
       configuration: Debug
+    - platform: x64
+      configuration: Release
 
 install:
 - if "%configuration%"=="Debug" choco install opencppcoverage codecov

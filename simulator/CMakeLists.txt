@@ -20,6 +20,10 @@ option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
 option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
+if(NOT DEFINED PYTHON3_COMMAND)
+  set(PYTHON3_COMMAND python3)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
@@ -88,7 +92,7 @@ file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/opcodes-*)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    COMMAND ${PYTHON3_COMMAND} ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES}
 )
 
