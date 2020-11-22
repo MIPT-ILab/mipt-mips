@@ -20,7 +20,7 @@ jobs:
           - os: ubuntu-latest
             platform: Win32
           - os: macos-latest
-            platform: x64
+            platform: Win32
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -40,12 +40,6 @@ jobs:
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
         echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
-
-    - name: Install Python3 on Windows
-      uses: actions/setup-python@v2
-      if: matrix.os == 'windows-latest'
-      with:
-        python-version: '3.x'
 
     - name: Create CMake dir
       run: mkdir build
@@ -90,7 +84,9 @@ jobs:
         submodules: 'true'
 
     - name: Install Ninja
-      run: sudo apt-get install ninja-build
+      run: |
+        sudo apt-get install ninja-build
+        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build
@@ -98,7 +94,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |
-        cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1
+        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DENABLE_PROFILE=1
         ninja mipt-mips
         
     - name: Run
@@ -129,7 +125,9 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
+      run: |
+        sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
+        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build
@@ -137,7 +135,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |
-        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=1 -DENABLE_UBSAN=1 -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include
+        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DENABLE_ASAN=1 -DENABLE_UBSAN=1
         ninja unit-tests
 
     - name: Run
@@ -171,7 +169,9 @@ jobs:
         submodules: 'true'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build
+      run: |
+        sudo apt-get install ninja-build
+        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build gdb_build
@@ -196,7 +196,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |
-        cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=../gdb_build
+        cmake ../simulator -G Ninja -DGDB_SOURCE_PATH=../$GDB_VER -DGDB_BUILD_PATH=../gdb_build
         ninja gdb-mips-sim
 
     - name: Build GDB
