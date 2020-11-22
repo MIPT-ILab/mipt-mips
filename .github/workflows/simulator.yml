@@ -33,7 +33,6 @@ jobs:
         sudo apt-get install ninja-build
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
@@ -41,8 +40,6 @@ jobs:
         choco install ninja
         echo "CC=gcc" >> $GITHUB_ENV
         echo "CXX=g++" >> $GITHUB_ENV
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
-        echo "Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include" >> $GITHUB_ENV
 
     - name: Create CMake dir
       run: mkdir build
@@ -50,7 +47,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |       
-        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
+        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0"
         ninja mipt-mips unit-tests mipt-v cachesim
 
     - name: Unit tests
