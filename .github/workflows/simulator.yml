@@ -159,7 +159,7 @@ jobs:
       run: bash <(curl -s https://codecov.io/bash) -x $GCOV -X gcovout
     
     - name: Clang-Tidy
-      if: matrix.config.name == llvm
+      if: matrix.config.name == 'llvm'
       working-directory: build
       run: run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
 
