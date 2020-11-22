@@ -49,14 +49,14 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
-        cmake --build . --config Release
+        MSBuild .\mipt-mips.sln /p:Configuration=Release /nologo /m /verbosity:minimal
 
     - name: Build on POSIX
       if: matrix.os != 'windows-latest'
       working-directory: build
       run: |
         cmake ../simulator -G Ninja -DENABLE_IPO=1
-        MSBuild .\mipt-mips.sln /p:Configuration=Release /nologo /m /verbosity:minimal
+        ninja mipt-mips mipt-v cachesim unit-tests        
 
     - name: Unit tests
       working-directory: build
