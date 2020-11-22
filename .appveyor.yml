@@ -23,7 +23,7 @@ matrix:
     - build: g++
       configuration: Debug
     - platform: Win32
-      configuration: Debug
+      configuration: msvc
     - platform: x64
       configuration: Release
 
