@@ -39,8 +39,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         choco install ninja
-        echo "CC=gcc" >> $GITHUB_ENV
-        echo "CXX=g++" >> $GITHUB_ENV
+        echo "CC=gcc-10" >> $GITHUB_ENV
+        echo "CXX=g++-10" >> $GITHUB_ENV
 
     - name: Install Python3 on Windows
       uses: actions/setup-python@v2
