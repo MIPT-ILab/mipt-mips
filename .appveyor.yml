@@ -25,7 +25,6 @@ matrix:
     - platform: Win32
       configuration: Debug
     - platform: x64
-      build: msvc
       configuration: Release
 
 install:
