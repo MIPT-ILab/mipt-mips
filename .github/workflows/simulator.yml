@@ -49,7 +49,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
-        MSBuild .\mipt-mips.sln /p:Configuration=Release /nologo /m /verbosity:minimal
+        cmake --build . --config Release --target mipt-mips mipt-v cachesim unit-tests  
 
     - name: Build on POSIX
       if: matrix.os != 'windows-latest'
