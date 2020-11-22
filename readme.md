@@ -42,7 +42,7 @@ To work with RISC-V traces, you need to install RISC-V toolchain. Please follow 
 
 To work with MIPS traces, you need to install MIPS binutils. Please follow [our manual](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-binutils) if you are using Linux, OS X, or Windows.
 
-Our build system is CMake. You should install CMake 3.12.5 or higher.
+Our build system is CMake. You should install CMake 3.13.5 or higher.
 Check [our Wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/CMake) to get more details about CMake.
 Users of IDE (Visual Studio, Eclipse, CodeBlocks etc.) may generate project files with CMake as well.
 
