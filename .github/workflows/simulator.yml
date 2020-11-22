@@ -5,6 +5,9 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+    paths:
+      - "simulator/**"
+      - ".github/**"
 
 jobs:
   test:
@@ -30,6 +33,7 @@ jobs:
         sudo apt-get install ninja-build
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
+        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
@@ -44,7 +48,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |       
-        cmake ../simulator -G Ninja -D Boost_INCLUDE_DIR=$BOOST_ROOT_1_72_0/include -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
+        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1
         ninja mipt-mips unit-tests mipt-v cachesim
 
     - name: Unit tests
