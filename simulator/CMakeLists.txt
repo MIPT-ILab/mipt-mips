@@ -19,6 +19,7 @@ option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
 option(ENABLE_IPO "Enable interprocedural optimizations" OFF)
 option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
 option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
+option(PYTHON3_COMMAND "Python3 command" python3)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -89,7 +90,7 @@ file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/opcodes-*)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    COMMAND python3 ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    COMMAND ${PYTHON3_COMMAND} ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
     DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES}
 )
 
