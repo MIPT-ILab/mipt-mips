@@ -129,7 +129,7 @@ if (ENABLE_COVERAGE)
     message(STATUS "Coverage collection enabled")
     add_definitions(-DNDEBUG) # exclude 'assert' macro
     if (NOT MSVC)
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -g -fno-inline")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -g")
         add_link_options(--coverage)
         if (NOT CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
             link_libraries(gcov)
