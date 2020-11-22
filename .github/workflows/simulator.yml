@@ -25,7 +25,9 @@ jobs:
 
     - name: Install tools on MacOS
       if: matrix.os == 'macos-latest'
-      run: brew install boost ninja
+      run: |
+        brew install boost ninja
+        echo "PYTHON3_COMMAND=python3" >> $GITHUB_ENV
     
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -34,6 +36,7 @@ jobs:
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
         echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+        echo "PYTHON3_COMMAND=python3" >> $GITHUB_ENV
 
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
@@ -41,6 +44,7 @@ jobs:
         choco install ninja
         echo "CC=gcc" >> $GITHUB_ENV
         echo "CXX=g++" >> $GITHUB_ENV
+        echo "PYTHON3_COMMAND=python" >> $GITHUB_ENV
 
     - name: Install Python3 on Windows
       uses: actions/setup-python@v2
@@ -54,7 +58,7 @@ jobs:
     - name: Build simulator
       working-directory: build
       run: |       
-        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
+        cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND="$env:PYTHON3_COMMAND"
         ninja mipt-mips unit-tests mipt-v cachesim
 
     - name: Unit tests
