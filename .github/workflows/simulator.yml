@@ -41,6 +41,7 @@ jobs:
         choco install ninja
         echo "CC=gcc" >> $GITHUB_ENV
         echo "CXX=g++" >> $GITHUB_ENV
+        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build
