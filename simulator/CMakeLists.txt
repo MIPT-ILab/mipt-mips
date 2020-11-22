@@ -144,9 +144,9 @@ endif()
 
 if (ENABLE_UBSAN AND NOT MSVC)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
-   add_link_options(-fsanitize=undefined -lgcc_s)
+   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=undefined -lgcc_s")
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-       add_link_options(--rtlib=compiler-rt)
+       set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --rtlib=compiler-rt")
    endif()
 endif()
 
