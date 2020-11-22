@@ -99,12 +99,6 @@ static constexpr inline auto pack_from( std::array<From, N> src) noexcept
     return result;
 }        
 
-template <typename T>
-static constexpr bool has_zero( const T& value)
-{
-    return T(~value) != T();
-}
-
 template<typename T>
 static inline T trap_vector_address( T value)
 {
