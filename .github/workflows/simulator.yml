@@ -35,13 +35,6 @@ jobs:
         echo "CXX=g++-10" >> $GITHUB_ENV
         echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
-    - name: Install tools on Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install ninja
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
-
     - name: Install Python3 on Windows
       uses: actions/setup-python@v2
       if: matrix.os == 'windows-latest'
@@ -54,7 +47,7 @@ jobs:
     - name: Initialize CMake
       working-directory: build
       if: matrix.os == 'windows-latest'
-      run: cmake ../simulator -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
+      run: cmake ../simulator -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
 
     - name: Initialize CMake
       if: matrix.os != 'windows-latest'
