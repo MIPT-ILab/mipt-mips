@@ -19,8 +19,11 @@ option(ENABLE_PROFILE "Generate coverage for gprof" OFF)
 option(ENABLE_IPO "Enable interprocedural optimizations" OFF)
 option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
 option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
-option(PYTHON3_COMMAND "Python3 command" python3)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
+
+if(NOT DEFINED PYTHON3_COMMAND)
+  set(PYTHON3_COMMAND python3)
+endif()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
