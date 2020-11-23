@@ -89,10 +89,11 @@ void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr,
         wp_halt->write( Trap( Trap::BREAKPOINT), cycle);     
     else
         wp_halt->write( result_trap, cycle);
-    if ( result_trap != Trap::NO_TRAP)
-        set_target( instr->get_actual_target(), cycle);
+
     if ( has_syscall)
         set_writeback_target( instr->get_actual_target(), cycle);
+    else if ( result_trap != Trap::NO_TRAP)
+        set_target( instr->get_actual_target(), cycle);
 }
 
 template <typename ISA>
