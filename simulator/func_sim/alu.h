@@ -11,6 +11,7 @@
 #include "traps/trap.h"
 
 #include <infra/macro.h>
+#include <infra/uint128.h>
 
 #include <array>
 #include <tuple>

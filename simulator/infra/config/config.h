@@ -9,7 +9,7 @@
 #include <infra/exception.h>
 #include <infra/types.h>
 
-#include <iostream>
+#include <iosfwd>
 #include <map>
 #include <string>
 
@@ -52,11 +52,7 @@ public:
     
     friend std::ostream& operator<<( std::ostream& out, const BaseTValue& rhs)
     {
-        if constexpr (std::is_same<T, bool>())
-            out << std::boolalpha << rhs.value << std::noboolalpha;
-        else
-            out << std::dec << rhs.value;
-        return out;
+        return rhs.dump( out);
     }
 
 protected:
@@ -67,6 +63,8 @@ protected:
                 Predicate<T> predicate) noexcept;
 
 private:
+    std::ostream& dump( std::ostream& out) const;
+
     T value = T();
 };
     

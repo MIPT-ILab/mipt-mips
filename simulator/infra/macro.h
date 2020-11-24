@@ -31,8 +31,6 @@ template<typename T> void ignored( const T& /* unused */) noexcept { }
 
 /* Bit widths of integer types */
 template<typename T> static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
-template<>           inline constexpr size_t bitwidth<uint128> = 128U;
-template<>           inline constexpr size_t bitwidth<int128> = 128U;
 template<typename T> static constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
 template<typename T> static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
 template<typename T> static constexpr size_t log_bitwidth = std::countr_zero(bitwidth<T>);

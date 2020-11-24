@@ -8,8 +8,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <iostream>
-#include <ostream>
+#include <iosfwd>
 
 class LogOstream
 {
@@ -50,7 +49,7 @@ public:
     mutable LogOstream sout;
     mutable LogOstream serr;
 
-    Log() : sout( std::cout), serr( std::cerr) { }
+    Log();
 
     // Rule of five
     virtual ~Log();
@@ -63,17 +62,8 @@ public:
 class OStreamWrapper
 {
 public:
-    OStreamWrapper( std::ostream& hide, std::ostream& expose)
-        : ostream( hide)
-        , buffer( hide.rdbuf())
-    {
-        ostream.rdbuf( expose.rdbuf());
-    }
-
-    ~OStreamWrapper()
-    {
-        ostream.rdbuf( buffer);
-    }
+    OStreamWrapper( std::ostream& hide, std::ostream& expose);
+    ~OStreamWrapper();
 
     OStreamWrapper( const OStreamWrapper&) = delete;
     OStreamWrapper( OStreamWrapper&&) = delete;

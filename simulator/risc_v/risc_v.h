@@ -11,6 +11,7 @@
 
 #include <func_sim/driver/driver.h>
 #include <infra/types.h>
+#include <infra/uint128.h>
 
 class Simulator;
 
