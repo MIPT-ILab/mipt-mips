@@ -7,6 +7,8 @@
 #include <catch.hpp>
 #include <kernel/replicant.h>
 
+#include <iostream>
+
 TEST_CASE( "Replicant: set_target + get_pc")
 {
     auto sim1 = Simulator::create_functional_simulator( "mips32");
