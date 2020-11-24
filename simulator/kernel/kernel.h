@@ -12,7 +12,7 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
-#include <iofwds>
+#include <iosfwd>
 #include <memory>
 
 struct BadInputValue final : Exception {
