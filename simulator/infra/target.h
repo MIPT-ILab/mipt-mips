@@ -8,6 +8,7 @@
 #define TARGET_H
 
 #include <infra/types.h>
+#include <iostream>
 
 /*
  * Target is an input interface for Fetch module

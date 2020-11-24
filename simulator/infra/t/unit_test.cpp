@@ -13,6 +13,7 @@
 #include <infra/log.h>
 #include <infra/macro.h>
 #include <infra/target.h>
+#include <infra/uint128.h>
 
 #include <cctype>
 #include <memory>

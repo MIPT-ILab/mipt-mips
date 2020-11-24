@@ -9,11 +9,8 @@
 #ifndef COMMON_TYPES_H
 #define COMMON_TYPES_H
 
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 
 template <typename To, typename From>
 static constexpr To narrow_cast(const From& value)
@@ -26,14 +23,12 @@ using int8 = int8_t;
 using int16 = int16_t;
 using int32 = int32_t;
 using int64 = int64_t;
-using int128 = boost::multiprecision::int128_t;
 
 // Unsigned types
 using uint8 = uint8_t;
 using uint16 = uint16_t;
 using uint32 = uint32_t;
 using uint64 = uint64_t;
-using uint128 = boost::multiprecision::uint128_t;
 
 // Float types
 using float32 = float;
@@ -45,12 +40,10 @@ template<> struct unsign<int8>    { using type = uint8; };
 template<> struct unsign<int16>   { using type = uint16; };
 template<> struct unsign<int32>   { using type = uint32; };
 template<> struct unsign<int64>   { using type = uint64; };
-template<> struct unsign<int128>  { using type = uint128; };
 template<> struct unsign<uint8>   { using type = uint8; };
 template<> struct unsign<uint16>  { using type = uint16; };
 template<> struct unsign<uint32>  { using type = uint32; };
 template<> struct unsign<uint64>  { using type = uint64; };
-template<> struct unsign<uint128> { using type = uint128; };
 
 template<typename T> using unsign_t = typename unsign<T>::type;
 
@@ -60,7 +53,6 @@ template<> struct sign<uint8>   { using type = int8; };
 template<> struct sign<uint16>  { using type = int16; };
 template<> struct sign<uint32>  { using type = int32; };
 template<> struct sign<uint64>  { using type = int64; };
-template<> struct sign<uint128> { using type = int128; };
 
 template<typename T> using sign_t = typename sign<T>::type;
 
@@ -69,12 +61,10 @@ template<typename> struct doubled;
 template<> struct doubled<uint8>   { using type = uint16; };
 template<> struct doubled<uint16>  { using type = uint32; };
 template<> struct doubled<uint32>  { using type = uint64; };
-template<> struct doubled<uint64>  { using type = uint128; };
 
 template<> struct doubled<int8>    { using type = int16;  };
 template<> struct doubled<int16>   { using type = int32;  };
 template<> struct doubled<int32>   { using type = int64;  };
-template<> struct doubled<int64>   { using type = int128;  };
 
 template<typename T> using doubled_t = typename doubled<T>::type;
 
@@ -87,7 +77,6 @@ template<typename> struct halved;
 template<> struct halved<uint16>  { using type = uint8; };
 template<> struct halved<uint32>  { using type = uint16; };
 template<> struct halved<uint64>  { using type = uint32; };
-template<> struct halved<uint128> { using type = uint64; };
 
 template<typename T> using halved_t = typename halved<T>::type;
 
