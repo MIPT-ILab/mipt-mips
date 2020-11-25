@@ -11,6 +11,8 @@
 #include <infra/config/config.h>
 #include <memory/elf/elf_loader.h>
 
+#include <iostream>
+
 namespace config {
     static const Switch use_mars = {"mars", "use MARS syscalls"};
 } // namespace config

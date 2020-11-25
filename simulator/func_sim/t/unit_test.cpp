@@ -14,6 +14,8 @@
 #include <boost/iostreams/device/null.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <iostream>
+
 static auto& nullout()
 {
     static boost::iostreams::stream<boost::iostreams::null_sink> instance{ boost::iostreams::null_sink{} };

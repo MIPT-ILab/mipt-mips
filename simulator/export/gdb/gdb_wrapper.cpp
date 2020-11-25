@@ -13,6 +13,8 @@
 #include <memory/memory.h>
 #include <simulator.h>
 
+#include <iostream>
+
 GDBSim::GDBSim( const std::string& isa)
 {
     cpu = Simulator::create_configured_isa_simulator( isa);
