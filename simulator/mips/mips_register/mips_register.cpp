@@ -5,6 +5,13 @@
 
 #include "mips_register.h"
 
+#include <iostream>
+
+std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
+{
+    return out << rhs.dump();
+}
+
 const std::array<std::string_view, MIPSRegister::MAX_REG> MIPSRegister::regTable =
 {{
 #define REGISTER(X) # X

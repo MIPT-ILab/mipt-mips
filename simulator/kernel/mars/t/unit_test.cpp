@@ -10,6 +10,7 @@
 #include <catch.hpp>
 
 #include <cstdio>
+#include <iostream>
 #include <sstream>
 
 static const uint8 v0 = 2;
