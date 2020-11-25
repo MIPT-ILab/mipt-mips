@@ -27,4 +27,4 @@ std::ostream& operator<<( std::ostream& os, const Latency& latency)
 std::istream& operator>>( std::istream& is, Latency& latency)
 {
     return is >> latency.value;
-0
+}
