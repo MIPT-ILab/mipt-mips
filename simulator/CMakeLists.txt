@@ -175,10 +175,12 @@ include_directories(SYSTEM
 
 add_library(mipt-mips-src OBJECT
     infra/log.cpp
+    infra/target.cpp
     infra/config/main_wrapper.cpp
     infra/config/config.cpp
     infra/ports/module.cpp
     infra/ports/ports.cpp
+    infra/ports/timing.cpp
     infra/cache/cache_tag_array.cpp
     infra/replacement/cache_replacement.cpp
     memory/memory.cpp
@@ -203,6 +205,7 @@ add_library(mipt-mips-src OBJECT
     modules/ports_instance.cpp
     modules/fetch/fetch.cpp
     modules/fetch/bpu/bpu.cpp
+    modules/fetch/bpu/bp_interface.cpp
     modules/decode/decode.cpp
     modules/execute/execute.cpp
     modules/mem/mem.cpp

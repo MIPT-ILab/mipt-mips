@@ -10,6 +10,8 @@
 #include <infra/target.h>
 #include <infra/types.h>
 
+#include <iosfwd>
+
 /*the structure of data sent from memory to fetch stage */
 struct BPInterface {
     Addr pc = NO_VAL32;
@@ -26,13 +28,7 @@ struct BPInterface {
         , is_hit( is_hit)
     { }
 
-    friend std::ostream& operator<<( std::ostream& out, const BPInterface& info)
-    {
-        return out << "{ pc=0x" << std::hex << info.pc
-                   << ", target=0x" << info.target
-                   << ( info.is_taken ? ", T" : ", NT")
-                   << ( info.is_hit ? ", hit " : ", miss ") << '}' << std::dec;
-    }
+    friend std::ostream& operator<<( std::ostream& out, const BPInterface& info);
 };
 
 #endif // BP_INTERFACE_H_
