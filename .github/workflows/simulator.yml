@@ -245,8 +245,7 @@ jobs:
         cmake --build . --config Debug --target unit-tests     
 
     - name: Unit tests
-      working-directory: build/Release
-      run: OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "$GITHUB_WORKSPACE\external\*" -- .\unit-tests.exe
+      run: OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources ".\external\*" -- .\build\Release\unit-tests.exe
 
     - name: Codecov
       run: codecov -f coverage.xml --root .
