@@ -11,7 +11,7 @@
 
 #include <array>
 #include <cassert>
-#include <iostream>
+#include <iosfwd>
 #include <string_view>
 #include <utility>
 
@@ -36,10 +36,7 @@ public:
         return regTable.at( value);
     }
 
-    friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs)
-    {
-        return out << rhs.dump();
-    }
+    friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs);
 
     bool is_zero()       const { return value == MIPS_REG_zero; }
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }

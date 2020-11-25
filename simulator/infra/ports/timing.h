@@ -12,7 +12,7 @@
 #include <infra/types.h>
 
 #include <compare>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 
 class Cycle;
@@ -33,14 +33,8 @@ class Cycle
         constexpr Cycle   operator-( const Latency& latency) const;
         constexpr Latency operator-( const Cycle& cycle) const;
 
-        friend std::ostream& operator<<( std::ostream& os, const Cycle& cycle)
-        {
-            return os << cycle.value;
-        }
-        friend std::istream& operator>>( std::istream& is, Cycle& cycle)
-        {
-            return is >> cycle.value;
-        }
+        friend std::ostream& operator<<( std::ostream& os, const Cycle& cycle);
+
         std::string to_string() const { return std::to_string( value); }
 
     private:
@@ -64,14 +58,7 @@ class Latency
         constexpr auto operator/( int64 number) const { return Latency( value / number); }
         constexpr auto operator*( int64 number) const { return Latency( value * number); }
 
-        friend std::ostream& operator<<( std::ostream& os, const Latency& latency)
-        {
-            return os << latency.value;
-        }
-        friend std::istream& operator>>( std::istream& is, Latency& latency)
-        {
-            return is >> latency.value;
-        }
+        friend std::ostream& operator<<( std::ostream& os, const Latency& latency);
 
         friend constexpr inline Cycle Cycle::operator+( const Latency& latency) const;
         friend constexpr inline Cycle Cycle::operator-( const Latency& latency) const;
