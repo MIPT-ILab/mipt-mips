@@ -7,6 +7,7 @@
 #include <catch.hpp>
 #include <kernel/kernel.h>
 
+#include <iostream>
 #include <sstream>
 
 TEST_CASE( "Kernel: Execute nothing")

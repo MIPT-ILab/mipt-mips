@@ -12,6 +12,7 @@
 #include <memory/memory.h>
 
 // Generic C++
+#include <algorithm>
 #include <cassert>
 #include <iomanip>
 #include <iostream>

@@ -119,6 +119,9 @@ public:
         memcpy_host_to_guest( addr, bytes.data(), bytes.size());
     }
 
+    template<typename T, std::endian endian>
+    void write_integer( T value, Addr addr, size_t size);
+
     void write_string( const std::string& value, Addr addr);
     void write_string_limited( const std::string& value, Addr addr, size_t size);
 
@@ -181,17 +184,10 @@ void FuncMemory::store( const Instr& instr)
         throw Exception("Store data to zero is a cricital error");
 
     auto full_mask = bitmask<SrcType>( instr.get_mem_size() * CHAR_BIT);
-    if ( ( instr.get_mask() & full_mask) == full_mask) switch ( instr.get_mem_size()) {
-        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
-        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
-        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
-        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( instr.get_v_src( 1)), instr.get_mem_addr()); break;
-        case 16: write<uint128, endian>( narrow_cast<uint128>( instr.get_v_src( 1)), instr.get_mem_addr()); break;
-        default: assert( false);
-    }
-    else {
+    if ( ( instr.get_mask() & full_mask) == full_mask)
+        write_integer<SrcType, endian>( instr.get_v_src( 1), instr.get_mem_addr(), instr.get_mem_size());
+    else
         masked_write<SrcType, endian>( instr.get_v_src( 1), instr.get_mem_addr(), instr.get_mask());
-    }
 }
 
 template<typename Instr>

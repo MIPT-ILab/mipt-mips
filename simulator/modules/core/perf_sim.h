@@ -17,11 +17,7 @@
 #include <modules/writeback/writeback.h>
 #include <simulator.h>
 
-#include <array>
 #include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 
 template <typename ISA>
 class PerfSim : public CycleAccurateSimulator

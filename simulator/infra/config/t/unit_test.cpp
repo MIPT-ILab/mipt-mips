@@ -11,6 +11,7 @@
 #include <infra/log.h>
 #include <infra/macro.h>
 
+#include <iostream>
 #include <sstream>
 
 namespace config {

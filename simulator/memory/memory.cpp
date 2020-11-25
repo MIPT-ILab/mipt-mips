@@ -4,6 +4,7 @@
  * Copyright 2012-2018 uArchSim iLab project
  */
 
+#include <infra/uint128.h>
 #include <memory/memory.h>
 
 #include <sstream>
@@ -96,8 +97,34 @@ void WriteableMemory::memset( Addr addr, std::byte value, size_t size)
     	memcpy_host_to_guest( addr + i, &value, 1);
 }
 
+template<typename T, std::endian endian> void
+WriteableMemory::write_integer( T value, Addr addr, size_t size)
+{
+    switch ( size) {
+        case 1:  write<uint8, endian>  ( narrow_cast<uint8>  ( value), addr); break;
+        case 2:  write<uint16, endian> ( narrow_cast<uint16> ( value), addr); break;
+        case 4:  write<uint32, endian> ( narrow_cast<uint32> ( value), addr); break;
+        case 8:  write<uint64, endian> ( narrow_cast<uint64> ( value), addr); break;
+        case 16: write<uint128, endian>( narrow_cast<uint128>( value), addr); break;
+        default: assert( false);
+    }
+}
+
+template void WriteableMemory::write_integer<uint8, std::endian::little>(uint8, Addr, size_t);
+template void WriteableMemory::write_integer<uint16, std::endian::little>(uint16, Addr, size_t);
+template void WriteableMemory::write_integer<uint32, std::endian::little>(uint32, Addr, size_t);
+template void WriteableMemory::write_integer<uint64, std::endian::little>(uint64, Addr, size_t);
+template void WriteableMemory::write_integer<uint128, std::endian::little>(uint128, Addr, size_t);
+
+template void WriteableMemory::write_integer<uint8, std::endian::big>(uint8, Addr, size_t);
+template void WriteableMemory::write_integer<uint16, std::endian::big>(uint16, Addr, size_t);
+template void WriteableMemory::write_integer<uint32, std::endian::big>(uint32, Addr, size_t);
+template void WriteableMemory::write_integer<uint64, std::endian::big>(uint64, Addr, size_t);
+template void WriteableMemory::write_integer<uint128, std::endian::big>(uint128, Addr, size_t);
+
 ReadableAndWriteableMemory::ReadableAndWriteableMemory() = default;
 ReadableAndWriteableMemory::~ReadableAndWriteableMemory() = default;
 
 FuncMemory::FuncMemory() = default;
 FuncMemory::~FuncMemory() = default;
+

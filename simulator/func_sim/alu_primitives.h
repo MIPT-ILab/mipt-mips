@@ -5,6 +5,7 @@
 
 #include <infra/macro.h>
 #include <infra/types.h>
+#include <infra/uint128.h>
 
 #include <bit>
 

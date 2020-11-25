@@ -7,6 +7,7 @@
 #include <popl.hpp>
 
 #include <cassert>
+#include <iostream>
 #include <sstream>
 
 namespace config {
@@ -62,6 +63,16 @@ BaseTValue<T, type>::BaseTValue( std::string_view alias, std::string_view name, 
     // Workaround for Visual Studio bug
     // https://developercommunity.visualstudio.com/content/problem/846216/false-positive-c4297-for-constructor.html
     add_option<T, type>( alias, name, desc, default_value, predicate, &value);
+}
+
+template<typename T, Type type>
+std::ostream& BaseTValue<T, type>::dump( std::ostream& out) const
+{
+    if constexpr (std::is_same<T, bool>())
+        out << std::boolalpha << value << std::noboolalpha;
+    else
+        out << std::dec << value;
+    return out;
 }
 
 template class BaseTValue<std::string, Type::OPTIONAL>;

@@ -9,6 +9,7 @@
 
 #include <func_sim/operation.h>
 #include <infra/ports/module.h>
+#include <infra/uint128.h>
 
 /*
  * Let's describe the black magic occuring here. The problem of Port
