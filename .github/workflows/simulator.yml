@@ -245,6 +245,7 @@ jobs:
         cmake --build . --config Debug --target unit-tests     
 
     - name: Unit tests
+      shell: cmd
       run: call "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources ".\external\*" -- .\build\Debug\unit-tests.exe
 
     - name: Codecov
