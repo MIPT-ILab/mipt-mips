@@ -34,7 +34,6 @@ class Cycle
         constexpr Latency operator-( const Cycle& cycle) const;
 
         friend std::ostream& operator<<( std::ostream& os, const Cycle& cycle);
-        friend std::istream& operator>>( std::istream& is, Cycle& cycle);
 
         std::string to_string() const { return std::to_string( value); }
 
@@ -60,7 +59,6 @@ class Latency
         constexpr auto operator*( int64 number) const { return Latency( value * number); }
 
         friend std::ostream& operator<<( std::ostream& os, const Latency& latency);
-        friend std::istream& operator>>( std::istream& is, Latency& latency);
 
         friend constexpr inline Cycle Cycle::operator+( const Latency& latency) const;
         friend constexpr inline Cycle Cycle::operator-( const Latency& latency) const;
