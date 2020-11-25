@@ -220,3 +220,33 @@ jobs:
     - name: Run GDB
       working-directory: gdb_build/gdb
       run: ./gdb -x $GITHUB_WORKSPACE/tests/test.gdb --args $GITHUB_WORKSPACE/tests/mips/mips-tt.bin
+
+  cobertura:
+    name: CoberturaCoverage
+    needs: [test]
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Install tools
+      run: choco install opencppcoverage codecov
+
+    - name: Create CMake dir
+      run: mkdir build
+
+    - name: Build with Visual Studio
+      working-directory: build
+      run: |
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
+        cmake --build . --config Debug --target unit-tests     
+
+    - name: Unit tests
+      working-directory: build/Release
+      run: OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "$GITHUB_WORKSPACE\external\*" -- .\unit-tests.exe
+
+    - name: Codecov
+      run: codecov -f coverage.xml --root .
