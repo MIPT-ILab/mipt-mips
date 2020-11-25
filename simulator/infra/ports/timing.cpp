@@ -14,17 +14,7 @@ std::ostream& operator<<( std::ostream& os, const Cycle& cycle)
     return os << cycle.value;
 }
 
-std::istream& operator>>( std::istream& is, Cycle& cycle)
-{
-    return is >> cycle.value;
-}
-
 std::ostream& operator<<( std::ostream& os, const Latency& latency)
 {
     return os << latency.value;
-}
-
-std::istream& operator>>( std::istream& is, Latency& latency)
-{
-    return is >> latency.value;
 }
