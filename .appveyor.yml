@@ -5,48 +5,22 @@ branches:
   only:
   - master
 
-environment:
-  matrix:
-  - build: msvc
-  - build: g++
-
 platform:
-  - Win32
-  - x64
-  
-configuration:
-  - Debug
-  - Release
-
-matrix:
-  exclude:
-    - build: g++
-      configuration: Debug
-    - platform: Win32
-      build: msvc
-    - platform: x64
-      configuration: Release
+  - mingw32
+  - mingw64
 
 install:
-- if "%configuration%"=="Debug" choco install opencppcoverage codecov
-- if "%platform%"=="Win32" set PATH=C:\msys64\mingw32;C:\msys64\mingw32\bin;%PATH%
-- if "%platform%"=="x64" set PATH=C:\msys64\mingw64;C:\msys64\mingw64\bin;%PATH%
-- set PATH=C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;C:\Program Files\OpenCppCoverage;%PATH%
+- set PATH=C:\msys64\%platform%;C:\msys64\%platform%\bin;C:\projects\deps\ninja;C:\Libraries\boost_1_71_0;%PATH%
 
 before_build:
 - git submodule update --init
 
 build_script:
 - mkdir build && cd build
-- if not "%build%"=="msvc" cmake ../simulator -G Ninja
-- if "%build%"=="msvc"     cmake ../simulator -G "Visual Studio 16 2019" -A %platform% -DENABLE_COVERAGE=1
-- if not "%build%"=="msvc" ninja mipt-mips unit-tests cachesim
-- if "%build%"=="msvc"     MSBuild .\mipt-mips.sln /p:Configuration=%configuration% /p:Platform=%platform% /nologo /m /verbosity:minimal
-- if "%build%"=="msvc"     move %configuration%\*.exe .
+- cmake ../simulator -G Ninja
+- ninja mipt-mips unit-tests cachesim
 
 test_script:
+- .\unit-tests
 - .\mipt-mips -b ..\tests\mips\mips-fib.bin -n 100000 --mars
 - .\cachesim -t ..\tests\mem_trace.json -s 32768 -w 32
-- if not  "%configuration%"=="Debug" ctest -C %configuration% --verbose
-- if "%configuration%"=="Debug" OpenCppCoverage.exe --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "%APPVEYOR_BUILD_FOLDER%\external\*" -- %APPVEYOR_BUILD_FOLDER%\build\unit-tests.exe
-- if "%configuration%"=="Debug" codecov -f coverage.xml --root %APPVEYOR_BUILD_FOLDER%
