@@ -247,7 +247,7 @@ jobs:
 
     - name: Unit tests
       shell: cmd
-      run: call "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --excluded_sources "external\*" -- .\build\Debug\unit-tests.exe
+      run: call "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" --export_type cobertura:coverage.xml --modules "*.exe" --excluded_line_regex "\s*\}.*" --sources "simulator\*" -- .\build\Debug\unit-tests.exe
 
     - name: Codecov
       run: codecov -f coverage.xml --root .
