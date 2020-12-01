@@ -28,6 +28,8 @@ Automatically generated pipeline visualization:
 
 More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
 
+For frequently asked questions, [look here](https://github.com/MIPT-ILab/mipt-mips/issues?q=label%3Afaq)
+
 ## Requirements
 
 We use C++20 features and Boost 1.71. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
