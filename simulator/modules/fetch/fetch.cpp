@@ -180,6 +180,9 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
     Instr instr( memory->fetch_instr( target.address), bp_info);
     instr.set_sequence_id( target.sequence_id);
 
+    /* instruction unique id initialization */
+    instr.set_instruction_id(curr_id++);
+
     /* set next target according to prediction */
     wp_target->write( instr.get_predicted_target(), cycle);
 
@@ -188,6 +191,11 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
 
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);
+
+    /* JSON dump of Fetch-stage of executing operation */
+    if (jsonout_enabled)
+        (jsonout()) << ",\n\t{ \"type\": \"Record\", \"id\": " << instr.get_instruction_id() << ", \"disassembly\": \"" << instr.generate_disasm() << "\" }" <<
+        ",\n\t{ \"type\": \"Event\", \"id\": " << instr.get_instruction_id() << ", \"cycle\": " << cycle << ", \"stage\": 0 }";
 }
 
 #include <mips/mips.h>
