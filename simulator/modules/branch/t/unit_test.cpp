@@ -8,6 +8,8 @@
 #include <modules/branch/branch.h>
 #include <modules/t/test_instr.h>
 
+namespace {
+
 /* Emulates all modules, which can communicate with Branch */
 class BranchTestingEnvironment : public Module {
 public:
@@ -66,7 +68,7 @@ auto create_branch( Addr pc, Addr new_pc, Addr target, bool is_taken)
 
 
 const Addr pc = 100;		// PC of a branch
-const Addr new_pc = pc + 4;	
+const Addr new_pc = pc + 4;
 const uint32 shift = 40; // shift, if branch is taken
 
 const auto cl_arrange = 0_cl;	// setting environment
@@ -111,3 +113,5 @@ TEST_CASE( "trap", "[branch_module_test]")
 	CHECK( !t.env.rp_bp_update->is_ready( cl_assert));
 	CHECK( !t.env.rp_bypass->is_ready( cl_assert));
 }
+
+} // end of anonymous namespace
