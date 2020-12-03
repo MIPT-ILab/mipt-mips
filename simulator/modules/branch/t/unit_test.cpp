@@ -1,12 +1,18 @@
+/**
+ * Unit tests for Branch module
+ * @author Graudt Vladimir
+ * Copyright 2020 MIPT-MIPS
+ */
+
 #include <catch.hpp>
 #include <modules/branch/branch.h>
-#include <risc_v/riscv_instr.h>
+#include <modules/t/test_instr.h>
 
-template <typename FuncInstr>
-class BranchTestingEnvironment : public Root {
+/* Emulates all modules, which can communicate with Branch */
+class BranchTestingEnvironment : public Module {
 public:
-    using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename FuncInstr::RegisterUInt;
+    using Instr = PerfInstr<BranchTestInstr>;
+    using RegisterUInt = typename BranchTestInstr::RegisterUInt;
     using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
 	ReadPort<bool> *rp_flush_all = nullptr;
@@ -22,13 +28,20 @@ public:
 
 	ReadPort<bool> *rp_bypassing_unit_flush_notify = nullptr;
 
-	BranchTestingEnvironment();
-	void config() { init_portmap(); }
+	BranchTestingEnvironment( Module *parent);
 };
 
-template <typename FuncInstr>
-BranchTestingEnvironment<FuncInstr>::BranchTestingEnvironment() :
-	Root( "branch_testing_environment")
+/* Provides communication between Branch and Environment */
+struct BranchTester : public Root {
+	Branch<BranchTestInstr> branch;
+	BranchTestingEnvironment env;
+
+	BranchTester() : Root( "branch_tester"), branch( this), env( this)
+		{ init_portmap(); }
+};
+
+BranchTestingEnvironment::BranchTestingEnvironment(Module *parent) :
+	Module( parent, "branch_testing_environment")
 {
 	rp_flush_all = make_read_port<bool>( "BRANCH_2_ALL_FLUSH", Port::LATENCY);
 	wp_trap = make_write_port<bool>( "WRITEBACK_2_ALL_FLUSH", Port::BW);
@@ -43,60 +56,58 @@ BranchTestingEnvironment<FuncInstr>::BranchTestingEnvironment() :
 	rp_bypassing_unit_flush_notify = make_read_port<bool>( "BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", Port::LATENCY);
 }
 
-/* Creates initialized riscv PerfInstr for tests */
-template <typename T>
-auto riscv_branch( std::string_view name, uint32 immediate, Addr PC, bool is_taken, bool is_hit)
+auto create_branch( Addr pc, Addr new_pc, Addr target, bool is_taken)
 {
-	RISCVInstr<T> func_instr( name, immediate, PC);
-	BPInterface bpi( PC, is_taken, func_instr.get_decoded_target(), is_hit);
-	
-	return PerfInstr<RISCVInstr<T>>( func_instr, bpi);
-}
+	BranchTestInstr func_instr( pc, new_pc, target);
+	BPInterface bpi( pc, is_taken, target, false); // is_hit is not used in tests
 
-template <typename T>
-auto riscv_taken_branch( std::string_view name, uint32 immediate, Addr PC)
-{
-	return riscv_branch<T>( name, immediate, PC, true, false); // is_hit is not used in tests
-}
-
-template <typename T>
-auto riscv_not_taken_branch( std::string_view name, uint32 immediate, Addr PC)
-{
-	return riscv_branch<T>( name, immediate, PC, false, false); // is_hit is not used in tests
+	return PerfInstr<BranchTestInstr>( func_instr, bpi);
 }
 
 
-template <typename FuncInstr>
-auto get_configured_branch_and_env()
-{
-	using Env = BranchTestingEnvironment<FuncInstr>;
-	using Branch = Branch<FuncInstr>;
-
-	/*  Cannot return Environment and Branch without pointer,
-	 * because both copy and move constructor are deleted */
-	auto env = std::make_unique<Env>();
-	auto branch = std::make_unique<Branch>(env.get());
-	env->config();
-
-	return std::make_pair<std::unique_ptr<Branch>, std::unique_ptr<Env>>(std::move(branch), std::move(env));
-}
-
-const Addr PC = 100; // PC of a branch
-const uint32 imm = 40; // imm, stored in branch instruction
+const Addr pc = 100;		// PC of a branch
+const Addr new_pc = pc + 4;	
+const uint32 shift = 40; // shift, if branch is taken
 
 const auto cl_arrange = 0_cl;	// setting environment
 const auto cl_act     = 1_cl;	// running branch module
 const auto cl_assert  = 2_cl;	// checking results
 
-TEMPLATE_TEST_CASE( "riscv beq", "[branch_module_test]", uint32, uint64, uint128)
+const auto taken_forward_branch      = create_branch(pc, new_pc, pc + shift, true);
+const auto taken_backward_branch     = create_branch(pc, new_pc, pc - shift, true);
+const auto not_taken_forward_branch  = create_branch(pc, new_pc, pc + shift, false);
+const auto not_taken_backward_branch = create_branch(pc, new_pc, pc - shift, false);
+
+using instr_ptr_t = const PerfInstr<BranchTestInstr> *;
+
+TEST_CASE( "branches", "[branch_module_test]")
 {
-	auto [branch, env] = get_configured_branch_and_env<RISCVInstr<TestType>>();
+	BranchTester t;
+	instr_ptr_t instr = nullptr;
 
-	auto instr = riscv_taken_branch<TestType>( "beq", PC, imm);
-	env->wp_datapath->write( instr, cl_arrange);
+	SECTION( "taken_forward_branch")      { instr = &taken_forward_branch; }
+	SECTION( "taken_backward_branch")     { instr = &taken_backward_branch; }
+	SECTION( "not_taken_forward_branch")  { instr = &not_taken_forward_branch; }
+	SECTION( "not_taken_backward_branch") { instr = &not_taken_backward_branch; }
 
-	branch->clock( cl_act);
+	t.env.wp_datapath->write( *instr, cl_arrange);
 
-	CHECK( env->rp_bp_update->is_ready( cl_assert));
-	CHECK( env->rp_bypass->is_ready( cl_assert));
+	t.branch.clock( cl_act);
+
+	CHECK( t.env.rp_bp_update->is_ready( cl_assert));
+	CHECK( t.env.rp_bypass->is_ready( cl_assert));
+}
+
+TEST_CASE( "trap", "[branch_module_test]")
+{
+	BranchTester t;
+	auto instr = taken_forward_branch;
+
+	t.env.wp_datapath->write( instr, cl_arrange);
+	t.env.wp_trap->write(true, cl_arrange);
+
+	t.branch.clock( cl_act);
+
+	CHECK( !t.env.rp_bp_update->is_ready( cl_assert));
+	CHECK( !t.env.rp_bypass->is_ready( cl_assert));
 }
