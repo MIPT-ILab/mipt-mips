@@ -16,5 +16,5 @@ public:
         { target = branch_target; }
 };
 
-inline std::ostream&
+inline constexpr std::ostream&
 operator <<( std::ostream& os, const BranchTestInstr&) { return os; }
