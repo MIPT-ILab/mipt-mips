@@ -9,11 +9,11 @@
 
 class BranchTestInstr : public Datapath<uint32> {
 public:
-	using RegisterUInt = uint32;
+    using RegisterUInt = uint32;
 
-	BranchTestInstr(Addr pc, Addr new_pc, Addr branch_target) :
-		Datapath<uint32>(pc, new_pc)
-		{ target = branch_target; }
+    BranchTestInstr( Addr pc, Addr new_pc, Addr branch_target) :
+        Datapath<uint32>(pc, new_pc)
+        { target = branch_target; }
 };
 
 inline std::ostream&
