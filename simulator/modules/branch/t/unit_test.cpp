@@ -17,7 +17,7 @@ public:
     using RegisterUInt = typename BranchTestInstr::RegisterUInt;
     using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
-	ReadPort<bool> *rp_flush_all = nullptr;
+	ReadPort<bool> *rp_flush = nullptr;
 	WritePort<bool> *wp_trap = nullptr;
 
 	ReadPort<Target> *rp_flush_target = nullptr;
@@ -45,7 +45,7 @@ struct BranchTester : public Root {
 BranchTestingEnvironment::BranchTestingEnvironment(Module *parent) :
 	Module( parent, "branch_testing_environment")
 {
-	rp_flush_all = make_read_port<bool>( "BRANCH_2_ALL_FLUSH", Port::LATENCY);
+	rp_flush = make_read_port<bool>( "BRANCH_2_ALL_FLUSH", Port::LATENCY);
 	wp_trap = make_write_port<bool>( "WRITEBACK_2_ALL_FLUSH", Port::BW);
 
 	rp_flush_target = make_read_port<Target>( "BRANCH_2_FETCH_TARGET", Port::LATENCY);
