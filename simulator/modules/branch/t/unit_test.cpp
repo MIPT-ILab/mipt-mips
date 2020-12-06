@@ -120,7 +120,7 @@ TEST_CASE( "correctly predicted branch", "[branch_module]")
     CHECK( t.branch.get_jumps_num() == 0);
 }
 
-TEST_CASE( "mispredicted branch", "[branch_module_test]")
+TEST_CASE( "mispredicted branch", "[branch_module]")
 {
     BranchTester t;
     InstrPtr instr = nullptr;
@@ -148,7 +148,7 @@ TEST_CASE( "mispredicted branch", "[branch_module_test]")
     CHECK( actual_target.sequence_id == instr->get_sequence_id() + 1);
 }
 
-TEST_CASE( "bypass check", "[branch_module_test]")
+TEST_CASE( "bypass check", "[branch_module]")
 {
     BranchTester t;
     auto instr = taken_and_predicted_branch;
@@ -169,7 +169,7 @@ TEST_CASE( "bypass check", "[branch_module_test]")
     }
 }
 
-TEST_CASE( "trap received", "[branch_module_test]")
+TEST_CASE( "trap received", "[branch_module]")
 {
     BranchTester t;
     InstrPtr instr = nullptr;
