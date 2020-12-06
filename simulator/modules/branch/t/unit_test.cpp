@@ -147,6 +147,27 @@ TEST_CASE( "mispredicted branch", "[branch_module_test]")
     CHECK( actual_target.sequence_id == instr->get_sequence_id() + 1);
 }
 
+TEST_CASE( "bypass check", "[branch_module_test]")
+{
+    BranchTester t;
+    auto instr = taken_and_predicted_branch;
+    std::array<uint32, MAX_DST_NUM> dsts;
+
+    std::iota(dsts.begin(), dsts.end(), 228);
+    for ( int i = 0; i < MAX_DST_NUM; ++i)
+        instr.set_v_dst(dsts[i], i);
+    t.env.wp_datapath->write( instr, cl_arrange);
+
+    t.branch.clock( cl_act);
+
+    CHECK_PORT_READY( t.env.rp_bypass);
+    auto bypass_data = t.env.rp_bypass->read( cl_assert);
+    for ( int i = 0; i < MAX_DST_NUM; ++i) {
+        INFO( "i = " << i);
+        CHECK( bypass_data[i] == dsts[i]);
+    }
+}
+
 TEST_CASE( "trap received", "[branch_module_test]")
 {
     BranchTester t;
