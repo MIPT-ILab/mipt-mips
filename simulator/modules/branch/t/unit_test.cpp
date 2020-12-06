@@ -189,4 +189,11 @@ TEST_CASE( "trap received", "[branch_module]")
     CHECK_PORT_NOT_READY( t.env.rp_bypass);
 }
 
+TEST_CASE( "instruction dump", "[branch_module]")
+{
+    std::ostringstream oss;
+    oss << BranchTestInstr( 0, 0, 0, false);
+    CHECK( oss.str() == "BranchTestInstr");
+}
+
 } // end of Test namespace
