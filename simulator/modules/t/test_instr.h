@@ -19,5 +19,5 @@ public:
     }
 };
 
-inline constexpr std::ostream&
-operator <<( std::ostream& os, const BranchTestInstr&) { return os; }
+inline std::ostream&
+operator <<( std::ostream& os, const BranchTestInstr&) { return os << "BranchTestInstr"; }
