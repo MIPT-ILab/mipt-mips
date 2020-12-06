@@ -80,6 +80,7 @@ set(TESTS_CPPS
     func_sim/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
+    modules/branch/t/unit_test.cpp
     export/gdb/t/unit_test.cpp
     export/cache/t/unit_test.cpp
 )
