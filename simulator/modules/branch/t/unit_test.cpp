@@ -7,6 +7,7 @@
 #include <catch.hpp>
 #include <modules/branch/branch.h>
 #include <modules/t/test_instr.h>
+#include <numeric>
 
 namespace Test {
 
