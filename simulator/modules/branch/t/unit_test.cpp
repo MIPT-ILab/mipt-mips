@@ -58,10 +58,11 @@ BranchTestingEnvironment::BranchTestingEnvironment(Module *parent) :
     rp_bypassing_unit_flush_notify = make_read_port<bool>( "BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", Port::LATENCY);
 }
 
-auto create_branch( Addr pc, Addr new_pc, Addr target, bool is_taken)
+auto create_branch( Addr pc, Addr new_pc, Addr branch_target,
+    bool should_be_taken, bool predicted_as_taken)
 {
-    BranchTestInstr func_instr( pc, new_pc, target);
-    BPInterface bpi( pc, is_taken, target, false); // is_hit is not used in tests
+    BranchTestInstr func_instr( pc, (should_be_taken) ? branch_target : new_pc, branch_target, should_be_taken);
+    BPInterface bpi( pc, predicted_as_taken, (predicted_as_taken) ? branch_target : new_pc, true);
 
     return PerfInstr<BranchTestInstr>( func_instr, bpi);
 }
@@ -69,49 +70,101 @@ auto create_branch( Addr pc, Addr new_pc, Addr target, bool is_taken)
 
 const Addr pc = 100; // PC of a branch
 const Addr new_pc = pc + 4;
-const uint32 shift = 40; // shift, if branch is taken
+const Addr target = pc + 400; // target, if branch is taken
 
 const auto cl_arrange = 0_cl;   // setting environment
 const auto cl_act     = 1_cl;   // running branch module
 const auto cl_assert  = 2_cl;   // checking results
 
-const auto taken_forward_branch      = create_branch(pc, new_pc, pc + shift, true);
-const auto taken_backward_branch     = create_branch(pc, new_pc, pc - shift, true);
-const auto not_taken_forward_branch  = create_branch(pc, new_pc, pc + shift, false);
-const auto not_taken_backward_branch = create_branch(pc, new_pc, pc - shift, false);
+const auto taken_and_predicted_branch    = create_branch(pc, new_pc, target, true, true);
+const auto taken_and_npredicted_branch   = create_branch(pc, new_pc, target, true, false);
+const auto ntaken_and_predicted_branch   = create_branch(pc, new_pc, target, false, true);
+const auto ntaken_and_npredicted_branch  = create_branch(pc, new_pc, target, false, false);
 
 using InstrPtr = const PerfInstr<BranchTestInstr> *;
 
-TEST_CASE( "branches", "[branch_module_test]")
+TEST_CASE( "Branch::is_misprediction()", "[branch_module]")
 {
     BranchTester t;
-    InstrPtr instr = nullptr;
-    
-    SECTION( "taken_forward_branch")      { instr = &taken_forward_branch; }
-    SECTION( "taken_backward_branch")     { instr = &taken_backward_branch; }
-    SECTION( "not_taken_forward_branch")  { instr = &not_taken_forward_branch; }
-    SECTION( "not_taken_backward_branch") { instr = &not_taken_backward_branch; }
+    CHECK( !t.branch.is_misprediction( taken_and_predicted_branch, taken_and_predicted_branch.get_bp_data()));
+    CHECK( t.branch.is_misprediction( taken_and_npredicted_branch, taken_and_npredicted_branch.get_bp_data()));
+    CHECK( t.branch.is_misprediction( ntaken_and_predicted_branch, ntaken_and_predicted_branch.get_bp_data()));
+    CHECK( !t.branch.is_misprediction( ntaken_and_npredicted_branch, ntaken_and_npredicted_branch.get_bp_data()));
+}
+
+#define CHECK_PORT_READY( port) CHECK( ( port)->is_ready( cl_assert))
+#define CHECK_PORT_NOT_READY( port) CHECK( !( port)->is_ready( cl_assert))
+#define CHECK_PORT_READY_AND_TRUE( port) CHECK_PORT_READY( port); CHECK( ( port)->read( cl_assert) == true)
+#define CHECK_PORT_NOT_READY_OR_FALSE( port) CHECK( (!(port)->is_ready( cl_assert) || ( port)->read( cl_assert) == false))
+
+TEST_CASE( "correctly predicted branch", "[branch_module]")
+{
+    BranchTester t;
+    InstrPtr instr = &taken_and_predicted_branch;
+
+    SECTION( "taken_and_predicted_branch") { instr = &taken_and_predicted_branch; }
+    SECTION( "ntaken_and_npredicted_branch") { instr = &ntaken_and_npredicted_branch; }
 
     t.env.wp_datapath->write( *instr, cl_arrange);
 
     t.branch.clock( cl_act);
 
-    CHECK( t.env.rp_bp_update->is_ready( cl_assert));
-    CHECK( t.env.rp_bypass->is_ready( cl_assert));
+    CHECK_PORT_READY( t.env.rp_datapath);
+    CHECK_PORT_READY( t.env.rp_bp_update);
+    CHECK_PORT_READY( t.env.rp_bypass);
+    CHECK_PORT_NOT_READY( t.env.rp_flush_target);
+    CHECK_PORT_NOT_READY_OR_FALSE( t.env.rp_flush);
+    CHECK_PORT_NOT_READY_OR_FALSE( t.env.rp_bypassing_unit_flush_notify);
+    CHECK( t.branch.get_mispredictions_num() == 0);
+    CHECK( t.branch.get_jumps_num() == 0);
 }
 
-TEST_CASE( "trap", "[branch_module_test]")
+TEST_CASE( "mispredicted branch", "[branch_module_test]")
 {
     BranchTester t;
-    auto instr = taken_forward_branch;
+    InstrPtr instr = nullptr;
+    Addr expected_target;
 
-    t.env.wp_datapath->write( instr, cl_arrange);
+    SECTION( "taken_and_npredicted_branch") { instr = &taken_and_npredicted_branch; expected_target = target; }
+    SECTION( "ntaken_and_predicted_branch") { instr = &ntaken_and_predicted_branch; expected_target = new_pc; }
+
+    t.env.wp_datapath->write( *instr, cl_arrange);
+
+    t.branch.clock( cl_act);
+
+    CHECK_PORT_READY( t.env.rp_datapath);
+    CHECK_PORT_READY( t.env.rp_bp_update);
+    CHECK_PORT_READY( t.env.rp_bypass);
+    CHECK_PORT_READY( t.env.rp_flush);
+    CHECK_PORT_READY( t.env.rp_flush_target);
+    CHECK_PORT_READY_AND_TRUE( t.env.rp_bypassing_unit_flush_notify);
+    CHECK( t.branch.get_mispredictions_num() == 1);
+    CHECK( t.branch.get_jumps_num() == 0);
+
+    auto actual_target = t.env.rp_flush_target->read( cl_assert);
+    CHECK( actual_target.valid);
+    CHECK( actual_target.address == expected_target);
+    CHECK( actual_target.sequence_id == instr->get_sequence_id() + 1);
+}
+
+TEST_CASE( "trap received", "[branch_module_test]")
+{
+    BranchTester t;
+    InstrPtr instr = nullptr;
+   
+    SECTION( "taken_and_predicted_branch") { instr = &taken_and_predicted_branch; }
+    SECTION( "taken_and_npredicted_branch") { instr = &taken_and_npredicted_branch; }
+    SECTION( "ntaken_and_predicted_branch") { instr = &ntaken_and_predicted_branch; }
+    SECTION( "ntaken_and_npredicted_branch") { instr = &ntaken_and_npredicted_branch; }
+
+    t.env.wp_datapath->write( *instr, cl_arrange);
     t.env.wp_trap->write(true, cl_arrange);
 
     t.branch.clock( cl_act);
 
-    CHECK( !t.env.rp_bp_update->is_ready( cl_assert));
-    CHECK( !t.env.rp_bypass->is_ready( cl_assert));
+    CHECK_PORT_NOT_READY( t.env.rp_datapath);
+    CHECK_PORT_NOT_READY( t.env.rp_bp_update);
+    CHECK_PORT_NOT_READY( t.env.rp_bypass);
 }
 
 } // end of Test namespace

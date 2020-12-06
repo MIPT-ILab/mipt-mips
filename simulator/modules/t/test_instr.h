@@ -11,9 +11,12 @@ class BranchTestInstr : public Datapath<uint32> {
 public:
     using RegisterUInt = uint32;
 
-    BranchTestInstr( Addr pc, Addr new_pc, Addr branch_target) :
+    BranchTestInstr( Addr pc, Addr new_pc, Addr branch_target, bool is_taken) :
         Datapath<uint32>(pc, new_pc)
-        { target = branch_target; }
+    {
+    	target = branch_target;
+    	is_taken_branch = is_taken;
+    }
 };
 
 inline constexpr std::ostream&

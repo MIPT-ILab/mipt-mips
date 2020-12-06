@@ -46,7 +46,7 @@ class Branch : public Module
         auto get_mispredictions_num() const { return num_mispredictions; }
         auto get_jumps_num() const { return num_jumps; }
 
-        bool is_misprediction( const Instr& instr, const BPInterface& bp_data) const
+        static bool is_misprediction( const Instr& instr, const BPInterface& bp_data)
         {
             if ( !bp_data.is_hit)
                 if ( ( instr.is_common_branch() && instr.is_taken())
