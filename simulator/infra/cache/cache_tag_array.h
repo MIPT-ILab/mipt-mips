@@ -23,8 +23,8 @@ struct CacheTagArrayInvalidSizeException final : Exception
 class CacheTagArray : public Log
 {
 public:
-    virtual uint32 set( Addr addr) const = 0;
-    virtual Addr tag( Addr addr) const = 0;
+    virtual uint32 set( Addr addr) const = 0; // получить номер сета
+    virtual Addr tag( Addr addr) const = 0; // получить тэг
 
     /**
      * Mark that the block containing the byte with the given address

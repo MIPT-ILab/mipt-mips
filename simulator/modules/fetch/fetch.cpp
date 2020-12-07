@@ -188,6 +188,27 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
 
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);
+
+    prefetch(target.address);
+}
+
+template<typename FuncInstr>
+void Fetch<FuncInstr>::prefetch(Addr requested_addr)
+{
+    uint32 line_size = uint32(config::instruction_cache_line_size); // длина линии
+    size_t line_bits = std::countr_zero(line_size); // количество битов у смещения
+
+    Addr addr_mask = bitmask<Addr>( line_bits); // битовая маска для извлечения значения смещения
+    Addr offset = requested_addr & addr_mask; // смещение
+
+    Addr next_line_addr = requested_addr + line_size; // адрес, который будет в следующей линии
+    uint32 fetchahead_distance = line_size / 2; // устанавливаем fetchahead
+
+   /* если линии в кеше нет и fetchahead дистигнут, записываем линию в кеш */
+   if (offset >= (line_size - fetchahead_distance) && !tags->lookup( next_line_addr))
+   {
+       tags->write( next_line_addr);
+   }
 }
 
 #include <mips/mips.h>

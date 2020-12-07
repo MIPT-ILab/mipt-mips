@@ -40,7 +40,7 @@ class InfiniteCacheTagArray : public CacheTagArray
     private:
         std::vector<Addr> tags;
 
-        // hash tabe to lookup tags in O(1)
+        // hash table to lookup tags in O(1)
         google::dense_hash_map<Addr, int32> lookup_helper;
         const int32 impossible_key = INT32_MAX;
 };
@@ -132,10 +132,10 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 addr_size_in_bits
         )
             : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-            , line_bits( std::countr_zero( line_size))
+            , line_bits( std::countr_zero( line_size)) // количество нулей, считая справа, у длины линии; оно количество битов смещения
             , sets( size_in_bytes / ( ways * line_size))
-            , set_bits( std::countr_zero( sets) + line_bits)
-            , addr_mask( bitmask<Addr>( addr_size_in_bits))
+            , set_bits( std::countr_zero( sets) + line_bits) //
+            , addr_mask( bitmask<Addr>( addr_size_in_bits)) // 111...11b - единиц столько, сколько передали
         { }
 
         auto get_line_bits() const noexcept { return line_bits; }
@@ -192,7 +192,7 @@ class SimpleCacheTagArray : public CacheTagArraySize
         // tags storage
         std::vector<std::vector<Tag>> tags;
 
-        // hash tabe to lookup tags in O(1)
+        // hash table to lookup tags in O(1)
         std::vector<google::dense_hash_map<Addr, int32>> lookup_helper;
         const int32 impossible_key = INT32_MAX;
         std::unique_ptr<ReplacementModule> replacement_module = nullptr;
@@ -210,7 +210,7 @@ SimpleCacheTagArray::SimpleCacheTagArray(
 {
     replacement_module = std::make_unique<ReplacementModule>( sets, ways, repl_policy);
 
-    //theese are spicial dense_hash_map requirements
+    // these are special dense_hash_map requirements
     for (uint32 i = 0; i < sets; i++) {
         lookup_helper[i].set_empty_key( impossible_key);
         lookup_helper[i].set_deleted_key( impossible_key - 1);
@@ -225,7 +225,7 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module->touch( num_set, way);
+        replacement_module->touch( num_set, way); // для политики замещения, наверно (обновляет текущий адрес)
     }
 
     return lookup_result;
@@ -233,8 +233,8 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
 
 std::pair<bool, int32> SimpleCacheTagArray::read_no_touch( Addr addr) const
 {
-    const uint32 num_set = set( addr);
-    const Addr   num_tag = tag( addr);
+    const uint32 num_set = set( addr); // получить номер сета
+    const Addr   num_tag = tag( addr); // получить тэг
 
     const auto& result = lookup_helper[ num_set].find( num_tag);
     return ( result != lookup_helper[ num_set].end())
@@ -247,8 +247,8 @@ int32 SimpleCacheTagArray::write( Addr addr)
     const Addr new_tag = tag( addr);
 
     // get cache coordinates
-    const uint32 num_set = set( addr);
-    const auto way = narrow_cast<int32>( replacement_module->update( num_set));
+    const uint32 num_set = set( addr); // номер сета от текущего адреса
+    const auto way = narrow_cast<int32>( replacement_module->update( num_set)); // номер канала от текущего адреса
 
     // get an old tag
     auto& entry = tags[ num_set][ way];
