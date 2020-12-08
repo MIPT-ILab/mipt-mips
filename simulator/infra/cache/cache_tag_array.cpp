@@ -132,10 +132,10 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 addr_size_in_bits
         )
             : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-            , line_bits( std::countr_zero( line_size)) // количество нулей, считая справа, у длины линии; оно количество битов смещения
+            , line_bits( std::countr_zero( line_size)) // the number of offset bits
             , sets( size_in_bytes / ( ways * line_size))
-            , set_bits( std::countr_zero( sets) + line_bits) //
-            , addr_mask( bitmask<Addr>( addr_size_in_bits)) // 111...11b - единиц столько, сколько передали
+            , set_bits( std::countr_zero( sets) + line_bits)
+            , addr_mask( bitmask<Addr>( addr_size_in_bits))
         { }
 
         auto get_line_bits() const noexcept { return line_bits; }
@@ -225,7 +225,7 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module->touch( num_set, way); // для политики замещения, наверно (обновляет текущий адрес)
+        replacement_module->touch( num_set, way); // for substitution policy (updates the current address)
     }
 
     return lookup_result;
@@ -233,8 +233,8 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
 
 std::pair<bool, int32> SimpleCacheTagArray::read_no_touch( Addr addr) const
 {
-    const uint32 num_set = set( addr); // получить номер сета
-    const Addr   num_tag = tag( addr); // получить тэг
+    const uint32 num_set = set( addr);
+    const Addr   num_tag = tag( addr);
 
     const auto& result = lookup_helper[ num_set].find( num_tag);
     return ( result != lookup_helper[ num_set].end())
@@ -247,8 +247,8 @@ int32 SimpleCacheTagArray::write( Addr addr)
     const Addr new_tag = tag( addr);
 
     // get cache coordinates
-    const uint32 num_set = set( addr); // номер сета от текущего адреса
-    const auto way = narrow_cast<int32>( replacement_module->update( num_set)); // номер канала от текущего адреса
+    const uint32 num_set = set( addr);
+    const auto way = narrow_cast<int32>( replacement_module->update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];

@@ -189,23 +189,23 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);
 
-    prefetch(target.address);
+    if ( prefetch_enabled) { prefetch( target.address); } // prefetch if enabled
 }
 
 template<typename FuncInstr>
 void Fetch<FuncInstr>::prefetch(Addr requested_addr)
 {
-    uint32 line_size = uint32(config::instruction_cache_line_size); // длина линии
-    size_t line_bits = std::countr_zero(line_size); // количество битов у смещения
+    uint32 line_size = uint32(config::instruction_cache_line_size); // line size
+    size_t line_bits = std::countr_zero(line_size); // number of offset bits
 
-    Addr addr_mask = bitmask<Addr>( line_bits); // битовая маска для извлечения значения смещения
-    Addr offset = requested_addr & addr_mask; // смещение
+    Addr addr_mask = bitmask<Addr>( line_bits); // bit mask to extract the offset value
+    Addr offset = requested_addr & addr_mask; // offset
 
-    Addr next_line_addr = requested_addr + line_size; // адрес, который будет в следующей линии
-    uint32 fetchahead_distance = line_size / 2; // устанавливаем fetchahead
+    Addr next_line_addr = requested_addr + line_size; // the address that will be on the next line
+    uint32 fetchahead_distance = fetchahead_size; // setting the fetchahead
 
-   /* если линии в кеше нет и fetchahead дистигнут, записываем линию в кеш */
-   if (offset >= (line_size - fetchahead_distance) && !tags->lookup( next_line_addr))
+   /* if the fetchahead is reached and there is no line in the cache, write the line to the cache */
+   if ( offset >= (line_size - fetchahead_distance) && !tags->lookup( next_line_addr))
    {
        tags->write( next_line_addr);
    }
