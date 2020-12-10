@@ -26,9 +26,9 @@ Key microarchitecture features:
 Automatically generated pipeline visualization:
 [![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/mipt-mips/tree/master/visualizer)
 
-More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/)
+More details about internals are available on [Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/Home/).
 
-For frequently asked questions, [look here](https://github.com/MIPT-ILab/mipt-mips/issues?q=label%3Afaq)
+For questions, use our [Discussions](https://github.com/MIPT-ILab/mipt-mips/discussions) page.
 
 ## Requirements
 
