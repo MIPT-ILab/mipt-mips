@@ -17,6 +17,8 @@ namespace config {
     static const AliasedSwitch prefetch = { "p", "prefetch", "cache prefetching" };
     // command line argument for fetchahead distance size
     static const Value<uint32> fetchahead_distance = { "fetchahead-size", 32, "fetchahead distance size"};
+    // command line argument for prefetch type
+    static const Value<std::string> prefetch_method = {"prefetch-method", "wrong_path", "Type of prefetching method"};
 } // namespace config
 
 template <typename ISA>
@@ -36,7 +38,7 @@ PerfSim<ISA>::PerfSim( std::endian endian, std::string_view isa)
     init_portmap();
     enable_logging( config::units_to_log);
     topology_dumping( config::topology_dump, "topology.json");
-    enable_prefetch( config::prefetch, config::fetchahead_distance); // register data
+    enable_prefetch( config::prefetch, config::fetchahead_distance, config::prefetch_method); // register data
 }
 
 template <typename ISA>
@@ -118,6 +120,7 @@ void PerfSim<ISA>::dump_statistics() const
     // info to output about prefetch
     std::string is_prefetch = (config::prefetch) ? "yes" : "no";
     uint32 fetchahead_distance = config::fetchahead_distance;
+    std::string prefetch_type = (config::prefetch_method == "wrong_path") ? "wrong path" : "next line";
     
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
@@ -130,6 +133,7 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "            detected on branch stage - " << branch_mispredict_rate << "%"
               << std::endl << "prefetch:   " << is_prefetch
               << ((config::prefetch) ? "\nfetchahead: " + std::to_string(fetchahead_distance) : "")
+              << ((config::prefetch) ? "\nprefetch method: " + prefetch_type : "")
               << std::endl << "****************************"
               << std::endl;
 }

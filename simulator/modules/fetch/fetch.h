@@ -62,7 +62,10 @@ private:
     void clock_instr_cache( Cycle cycle);
     void save_flush( Cycle cycle);
 
-    void prefetch(Addr requested_addr);
+    bool is_wrong_path = false;
+    void prefetch_next_line(Addr requested_addr);
+//    void next_line_prefetch(Target target);
+//    void wrong_path(Target target);
 };
 
 #endif

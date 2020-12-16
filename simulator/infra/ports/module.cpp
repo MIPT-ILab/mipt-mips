@@ -49,12 +49,13 @@ void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
 }
 
 // enable-prefetch function implementation
-void Module::enable_prefetch(bool key, uint32 fetchahead_size)
+void Module::enable_prefetch(bool key, uint32 fetchahead_size, std::string prefetch_method)
 {
     prefetch_enabled = key;
     this->fetchahead_size = fetchahead_size;
+    this->prefetch_method = prefetch_method;
     for ( const auto& c : children)
-        c->enable_prefetch(key, fetchahead_size);
+        c->enable_prefetch(key, fetchahead_size, prefetch_method);
 }
 
 pt::ptree Module::write_ports_dumping() const
