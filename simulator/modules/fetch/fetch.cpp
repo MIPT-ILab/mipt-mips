@@ -67,15 +67,27 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
                                                                 rp_flush_target_from_decode->read( cycle) : Target();
     const Target branch_target   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : Target();
 
+    if (prefetch_enabled && prefetch_method == "wrong_path")
+    {
+        is_wrong_path = false;
+    }
+
     /* Multiplexing */
     if ( external_target.valid)
         return external_target;
 
-    if( flushed_target.valid)
+    if ( flushed_target.valid)
         return flushed_target;
 
-    if( flushed_target_from_decode.valid)
+    if ( flushed_target_from_decode.valid)
+    {
+        if (prefetch_enabled && prefetch_method == "wrong_path") // prefetch wrong path if prefetch enabled and defined
+        {
+            is_wrong_path = true;
+            tags->write( flushed_target_from_decode.address);
+        }
         return flushed_target_from_decode;
+    }
 
     if ( !is_stall && branch_target.valid)
         return branch_target;
@@ -189,11 +201,14 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
     /* sending to decode */
     wp_datapath->write( std::move( instr), cycle);
 
-    if ( prefetch_enabled) { prefetch( target.address); } // prefetch if enabled
+    if ( prefetch_enabled && !is_wrong_path)  // prefetch next line if enabled and wrong path isn't used
+    {
+        prefetch_next_line(target.address);
+    }
 }
 
 template<typename FuncInstr>
-void Fetch<FuncInstr>::prefetch(Addr requested_addr)
+void Fetch<FuncInstr>::prefetch_next_line(Addr requested_addr)
 {
     uint32 line_size = uint32(config::instruction_cache_line_size); // line size
     size_t line_bits = std::countr_zero(line_size); // number of offset bits
@@ -219,4 +234,3 @@ template class Fetch<BaseMIPSInstr<uint64>>;
 template class Fetch<RISCVInstr<uint32>>;
 template class Fetch<RISCVInstr<uint64>>;
 template class Fetch<RISCVInstr<uint128>>;
-

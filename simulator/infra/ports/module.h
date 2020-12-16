@@ -42,9 +42,10 @@ protected:
     void enable_logging_impl( const std::unordered_set<std::string>& names);
     boost::property_tree::ptree topology_dumping_impl() const;
 
-    void enable_prefetch(bool key, uint32 fetchahead_size); // enable-prefetch function initialization
+    void enable_prefetch(bool key, uint32 fetchahead_size, std::string prefetch_method); // enable-prefetch function initialization
     bool prefetch_enabled = false; // boolean value that represents that prefetch is enabled/disabled
     uint32 fetchahead_size; // value of fetchahead distance size
+    std::string prefetch_method; // value of prefetch method
 
 private:
     // NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
