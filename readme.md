@@ -1,3 +1,8 @@
+[![Contributors](https://img.shields.io/github/contributors/mipt-ilab/mipt-mips?label=Contributors)](https://github.com/MIPT-ILab/mipt-mips/graphs/contributors)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/alerts/)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:cpp)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:javascript)
+
 # MIPT-V / MIPT-MIPS
 
 MIPT-V / MIPT-MIPS is a pre-silicon simulator of MIPS and RISC-V CPU. It measures _performance_ of program running on CPU, thus taking best features of RTL and common functional simulation:
