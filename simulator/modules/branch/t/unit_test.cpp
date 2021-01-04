@@ -156,7 +156,8 @@ TEST_CASE( "bypass check", "[branch_module]")
 
     std::iota(dsts.begin(), dsts.end(), 228);
     for ( int i = 0; i < MAX_DST_NUM; ++i)
-        instr.set_v_dst(dsts[i], i);
+        instr.set_v_dst(dsts.at(i), i);
+
     t.env.wp_datapath->write( instr, cl_arrange);
 
     t.branch.clock( cl_act);
@@ -165,7 +166,7 @@ TEST_CASE( "bypass check", "[branch_module]")
     auto bypass_data = t.env.rp_bypass->read( cl_assert);
     for ( int i = 0; i < MAX_DST_NUM; ++i) {
         INFO( "i = " << i);
-        CHECK( bypass_data[i] == dsts[i]);
+        CHECK( bypass_data.at( i) == dsts.at( i));
     }
 }
 
