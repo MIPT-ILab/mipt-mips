@@ -124,7 +124,7 @@ TEST_CASE( "mispredicted branch", "[branch_module]")
 {
     BranchTester t;
     InstrPtr instr = nullptr;
-    Addr expected_target;
+    Addr expected_target = NO_VAL<Addr>;
 
     SECTION( "taken_and_npredicted_branch") { instr = &taken_and_npredicted_branch; expected_target = target; }
     SECTION( "ntaken_and_predicted_branch") { instr = &ntaken_and_predicted_branch; expected_target = new_pc; }
@@ -152,7 +152,7 @@ TEST_CASE( "bypass check", "[branch_module]")
 {
     BranchTester t;
     auto instr = taken_and_predicted_branch;
-    std::array<uint32, MAX_DST_NUM> dsts;
+    std::array<uint32, MAX_DST_NUM> dsts = {};
 
     std::iota(dsts.begin(), dsts.end(), 228);
     for ( int i = 0; i < MAX_DST_NUM; ++i)
