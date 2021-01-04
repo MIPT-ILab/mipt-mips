@@ -73,8 +73,8 @@ void Branch<FuncInstr>::clock( Cycle cycle)
 
 
 #include <mips/mips.h>
-#include <risc_v/risc_v.h>
 #include <modules/t/test_instr.h>
+#include <risc_v/risc_v.h>
 
 template class Branch<BaseMIPSInstr<uint32>>;
 template class Branch<BaseMIPSInstr<uint64>>;
