@@ -31,7 +31,7 @@ public:
 
     ReadPort<bool> *rp_bypassing_unit_flush_notify = nullptr;
 
-    BranchTestingEnvironment( Module *parent);
+    explicit BranchTestingEnvironment( Module *parent);
 };
 
 /* Provides communication between Branch and Environment */
