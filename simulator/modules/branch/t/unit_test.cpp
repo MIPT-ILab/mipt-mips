@@ -196,4 +196,4 @@ TEST_CASE( "instruction dump", "[branch_module]")
     CHECK( oss.str() == "BranchTestInstr");
 }
 
-} // end of Test namespace
+} // namespace Test
