@@ -20,4 +20,4 @@ public:
 };
 
 inline std::ostream&
-operator <<( std::ostream& os, const BranchTestInstr&) { return os << "BranchTestInstr"; }
+operator <<( std::ostream& os, const BranchTestInstr& /* unused */) { return os << "BranchTestInstr"; }
