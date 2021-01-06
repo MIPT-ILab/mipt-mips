@@ -60,7 +60,7 @@ BranchTestingEnvironment::BranchTestingEnvironment(Module *parent) :
 }
 
 auto create_branch( Addr pc, Addr new_pc, Addr branch_target,
-    bool should_be_taken, bool predicted_as_taken)
+    bool should_be_taken, bool predicted_as_taken) noexcept
 {
     BranchTestInstr func_instr( pc, (should_be_taken) ? branch_target : new_pc, branch_target, should_be_taken);
     BPInterface bpi( pc, predicted_as_taken, (predicted_as_taken) ? branch_target : new_pc, true);
