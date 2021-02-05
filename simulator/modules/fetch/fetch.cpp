@@ -194,7 +194,7 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
 
     /* JSON dump of Fetch-stage of executing operation */
     if (jsonout_enabled)
-        (jsonout()) << ",\n\t{ \"type\": \"Record\", \"id\": " << instr.get_instruction_id() << ", \"disassembly\": \"" << instr.generate_disasm() << "\" }" <<
+        (jsonout()) << ",\n\t{ \"type\": \"Record\", \"id\": " << instr.get_instruction_id() << ", \"disassembly\": \"" << instr.get_disasm() << "\" }" <<
         ",\n\t{ \"type\": \"Event\", \"id\": " << instr.get_instruction_id() << ", \"cycle\": " << cycle << ", \"stage\": 0 }";
 }
 
