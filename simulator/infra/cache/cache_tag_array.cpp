@@ -225,7 +225,7 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module->touch( num_set, way); // for substitution policy (updates the current address)
+        replacement_module->touch( num_set, way); // for replacement policy (updates the current address)
     }
 
     return lookup_result;

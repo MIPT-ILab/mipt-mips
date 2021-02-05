@@ -13,12 +13,6 @@
 namespace config {
     static const AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
     static const Switch topology_dump = { "tdump", "module topology dump into topology.json" };
-    // command line flag argument for enable/disable prefetch
-    static const AliasedSwitch prefetch = { "p", "prefetch", "cache prefetching" };
-    // command line argument for fetchahead distance size
-    static const Value<uint32> fetchahead_distance = { "fetchahead-size", 32, "fetchahead distance size"};
-    // command line argument for prefetch type
-    static const Value<std::string> prefetch_method = {"prefetch-method", "wrong_path", "Type of prefetching method"};
 } // namespace config
 
 template <typename ISA>
@@ -38,7 +32,6 @@ PerfSim<ISA>::PerfSim( std::endian endian, std::string_view isa)
     init_portmap();
     enable_logging( config::units_to_log);
     topology_dumping( config::topology_dump, "topology.json");
-    enable_prefetch( config::prefetch, config::fetchahead_distance, config::prefetch_method); // register data
 }
 
 template <typename ISA>
@@ -117,10 +110,6 @@ void PerfSim<ISA>::dump_statistics() const
     auto simips = executed_instrs / time;
     auto decode_mispredict_rate = 1.0 * get_rate( decode.get_jumps_num(), decode.get_mispredictions_num());
     auto branch_mispredict_rate = 1.0 * get_rate( branch.get_jumps_num(), branch.get_mispredictions_num());
-    // info to output about prefetch
-    std::string is_prefetch = (config::prefetch) ? "yes" : "no";
-    uint32 fetchahead_distance = config::fetchahead_distance;
-    std::string prefetch_type = (config::prefetch_method == "wrong_path") ? "wrong path" : "next line";
     
     std::cout << std::endl << "****************************"
               << std::endl << "instrs:     " << executed_instrs
@@ -131,9 +120,6 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl << "instr size: " << sizeof(Instr) << " bytes"
               << std::endl << "mispredict: detected on decode stage - " << decode_mispredict_rate << "%"
               << std::endl << "            detected on branch stage - " << branch_mispredict_rate << "%"
-              << std::endl << "prefetch:   " << is_prefetch
-              << ((config::prefetch) ? "\nfetchahead: " + std::to_string(fetchahead_distance) : "")
-              << ((config::prefetch) ? "\nprefetch method: " + prefetch_type : "")
               << std::endl << "****************************"
               << std::endl;
 }

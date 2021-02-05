@@ -62,6 +62,11 @@ private:
     void clock_instr_cache( Cycle cycle);
     void save_flush( Cycle cycle);
 
+    void enable_prefetch(bool key, uint32 fetchahead_size, std::string prefetch_method); // enable-prefetch function initialization
+    bool prefetch_enabled = false; // boolean value that represents that prefetch is enabled/disabled
+    uint32 _fetchahead_size; // value of fetchahead distance size
+    std::string _prefetch_method; // value of prefetch method
+
     bool is_wrong_path = false;
     void prefetch_next_line(Addr requested_addr);
 };

@@ -13,6 +13,10 @@ namespace config {
     static const Value<uint32> instruction_cache_size = { "icache-size", 2048, "Size of instruction level 1 cache (in bytes)"};
     static const Value<uint32> instruction_cache_ways = { "icache-ways", 4, "Amount of ways in instruction level 1 cache"};
     static const Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
+    /* Prefetch parameters */
+    static const AliasedSwitch prefetch = { "p", "prefetch", "A Instruction cache prefetching"};
+    static const Value<uint32> fetchahead_distance = { "fetchahead-size", 32, "fetchahead distance size"};
+    static const Value<std::string> prefetch_method = { "prefetch-method", "wrong_path", "Type of a Instruction prefetching method"};
 } // namespace config
 
 template <typename FuncInstr>
@@ -51,6 +55,8 @@ Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
         config::instruction_cache_line_size,
         32
     );
+
+    enable_prefetch( config::prefetch, config::fetchahead_distance, config::prefetch_method);
 }
 
 template <typename FuncInstr>
@@ -67,10 +73,8 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
                                                                 rp_flush_target_from_decode->read( cycle) : Target();
     const Target branch_target   = rp_target->is_ready( cycle) ? rp_target->read( cycle) : Target();
 
-    if (prefetch_enabled && prefetch_method == "wrong_path")
-    {
+    if ( prefetch_enabled && _prefetch_method == "wrong_path")
         is_wrong_path = false;
-    }
 
     /* Multiplexing */
     if ( external_target.valid)
@@ -81,7 +85,7 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
 
     if ( flushed_target_from_decode.valid)
     {
-        if (prefetch_enabled && prefetch_method == "wrong_path") // prefetch wrong path if prefetch enabled and defined
+        if ( prefetch_enabled && _prefetch_method == "wrong_path") // prefetch wrong path if prefetch enabled and defined
         {
             is_wrong_path = true;
             tags->write( flushed_target_from_decode.address);
@@ -202,28 +206,32 @@ void Fetch<FuncInstr>::clock( Cycle cycle)
     wp_datapath->write( std::move( instr), cycle);
 
     if ( prefetch_enabled && !is_wrong_path)  // prefetch next line if enabled and wrong path isn't used
-    {
         prefetch_next_line(target.address);
-    }
 }
 
 template<typename FuncInstr>
-void Fetch<FuncInstr>::prefetch_next_line(Addr requested_addr)
+void Fetch<FuncInstr>::prefetch_next_line( Addr requested_addr)
 {
-    uint32 line_size = uint32(config::instruction_cache_line_size); // line size
+    uint32 line_size(config::instruction_cache_line_size); // line size
     size_t line_bits = std::countr_zero(line_size); // number of offset bits
 
     Addr addr_mask = bitmask<Addr>( line_bits); // bit mask to extract the offset value
     Addr offset = requested_addr & addr_mask; // offset
 
     Addr next_line_addr = requested_addr + line_size; // the address that will be on the next line
-    uint32 fetchahead_distance = fetchahead_size; // setting the fetchahead
+    uint32 fetchahead_distance = _fetchahead_size; // setting the fetchahead
 
    /* if the fetchahead is reached and there is no line in the cache, write the line to the cache */
    if ( offset >= (line_size - fetchahead_distance) && !tags->lookup( next_line_addr))
-   {
        tags->write( next_line_addr);
-   }
+}
+
+template<typename FuncInstr>
+void Fetch<FuncInstr>::enable_prefetch( bool key, uint32 fetchahead_size, std::string prefetch_method)
+{
+    prefetch_enabled = key;
+    _fetchahead_size = fetchahead_size;
+    _prefetch_method = prefetch_method;
 }
 
 #include <mips/mips.h>
