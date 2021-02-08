@@ -22,11 +22,13 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L10]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2010%20-%20Data%20Hazards.pptx?raw=true
 [L11]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2011%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
 [L12]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2012%20-%20Advanced%20Pipelining.pptx?raw=true
+[L13]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2013%20-%20Caches%2C%20part%201.pptx?raw=true
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
 [L11-VIDEO]: https://drive.google.com/file/d/1UCMwKX36BR9Jx1eJseWmI4ykDIjxJ7Kp/view?usp=sharing
 [L12-VIDEO]: https://drive.google.com/file/d/1PlGlKrJ7FkMLR-GX5TfhQDc6W0ttjLv3/view?usp=sharing
+[L13-VIDEO]: https://drive.google.com/file/d/1sOfYuI5sdzcnMC6TptBTJwPALNHFxaCZ/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -45,6 +47,7 @@ Date   | Type     | Event
  2 Nov | Lecture  | **L10: Data hazards**<br>                                 • Slides: [download][L10]<br> • Video: [watch][L10-VIDEO]
  9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br> • Video: [watch][L11-VIDEO]
 23 Nov | Lecture  | **L12: Advanced pipelining**<br>                          • Slides: [download][L12]<br> • Video: [watch][L12-VIDEO]
+ 8 Feb | Lecture  | **L13: Caches, part 1**<br>                               • Slides: [download][L13]<br> • Video: [watch][L13-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
@@ -66,26 +69,27 @@ In addition, repository contains a lot of useful [Wiki manuals](https://github.c
 
 ## Students Contribution Score
 
-MIPT | Name | Score | Comments
+Group | Name | Score | Comments
 :----: |:---- | ------------------------------ | ------------------------------
-611 | Denis Los | 19 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31), [#20](https://github.com/MIPT-ILab/mipt-mips/issues/20) |
-718 | Andrey Agrachev | 13 | [#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626), [#830](https://github.com/MIPT-ILab/mipt-mips/issues/830), [#248](https://github.com/MIPT-ILab/mipt-mips/issues/248), [#879](https://github.com/MIPT-ILab/mipt-mips/issues/879), [#821](https://github.com/MIPT-ILab/mipt-mips/issues/821) |
-714 | Yauheni Sharamed | 13 | [#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724), [#649](https://github.com/MIPT-ILab/mipt-mips/issues/649), [#910](https://github.com/MIPT-ILab/mipt-mips/issues/910), [#925](https://github.com/MIPT-ILab/mipt-mips/issues/925) |
-618 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
-81? | Eric Konks | 12 | [#520](https://github.com/MIPT-ILab/mipt-mips/issues/520), [#1140](https://github.com/MIPT-ILab/mipt-mips/issues/1140), [#1257](https://github.com/MIPT-ILab/mipt-mips/issues/1257)
-512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
-711 | Vyacheslav Kompan | 11 | [#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)  |
-715 | Rustem Yunusov | 10 | [#901](https://github.com/MIPT-ILab/mipt-mips/issues/901), [#760](https://github.com/MIPT-ILab/mipt-mips/issues/760), [#614](https://github.com/MIPT-ILab/mipt-mips/issues/614) |
-712 | Egor Bova | 10 | ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#235](https://github.com/MIPT-ILab/mipt-mips/issues/235), [#461](https://github.com/MIPT-ILab/mipt-mips/issues/461) |
-717 | Vsevolod Pukhov | 9 | [#589](https://github.com/MIPT-ILab/mipt-mips/issues/589), ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#602](https://github.com/MIPT-ILab/mipt-mips/issues/602), [#130](https://github.com/MIPT-ILab/mipt-mips/issues/130) |
-711 | Yan Logovskiy | 9 | [#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383), [#506](https://github.com/MIPT-ILab/mipt-mips/issues/506), ¼[#613](https://github.com/MIPT-ILab/mipt-mips/issues/613) |
-616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
-616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
-616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
-616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
-518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
-91? | Vladimir Graudt | 2 | [#1410](https://github.com/MIPT-ILab/mipt-mips/issues/1410), [#1409](https://github.com/MIPT-ILab/mipt-mips/issues/1409)
+MIPT-611 | Denis Los | 19 | [#98](https://github.com/MIPT-ILab/mipt-mips/issues/98), [#99](https://github.com/MIPT-ILab/mipt-mips/issues/99), [#77](https://github.com/MIPT-ILab/mipt-mips/issues/77), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#225](https://github.com/MIPT-ILab/mipt-mips/issues/225), [#221](https://github.com/MIPT-ILab/mipt-mips/issues/221), [#70](https://github.com/MIPT-ILab/mipt-mips/issues/70), [#31](https://github.com/MIPT-ILab/mipt-mips/issues/31), [#20](https://github.com/MIPT-ILab/mipt-mips/issues/20) |
+MIPT-718 | Andrey Agrachev | 13 | [#563](https://github.com/MIPT-ILab/mipt-mips/issues/563), [#465](https://github.com/MIPT-ILab/mipt-mips/issues/465), ¼[#626](https://github.com/MIPT-ILab/mipt-mips/issues/626), [#830](https://github.com/MIPT-ILab/mipt-mips/issues/830), [#248](https://github.com/MIPT-ILab/mipt-mips/issues/248), [#879](https://github.com/MIPT-ILab/mipt-mips/issues/879), [#821](https://github.com/MIPT-ILab/mipt-mips/issues/821) |
+MIPT-714 | Yauheni Sharamed | 13 | [#599](https://github.com/MIPT-ILab/mipt-mips/issues/599), [#724](https://github.com/MIPT-ILab/mipt-mips/issues/724), [#649](https://github.com/MIPT-ILab/mipt-mips/issues/649), [#910](https://github.com/MIPT-ILab/mipt-mips/issues/910), [#925](https://github.com/MIPT-ILab/mipt-mips/issues/925) |
+MIPT-618 | Alexander Misevich | 13 | [#37](https://github.com/MIPT-ILab/mipt-mips/issues/37), [#216](https://github.com/MIPT-ILab/mipt-mips/issues/216), [#201](https://github.com/MIPT-ILab/mipt-mips/issues/201), [#246](https://github.com/MIPT-ILab/mipt-mips/issues/246), [#124](https://github.com/MIPT-ILab/mipt-mips/issues/124), [#18](https://github.com/MIPT-ILab/mipt-mips/issues/18), [#283](https://github.com/MIPT-ILab/mipt-mips/issues/283), [#277](https://github.com/MIPT-ILab/mipt-mips/issues/277) |
+MIPT-81? | Eric Konks | 12 | [#520](https://github.com/MIPT-ILab/mipt-mips/issues/520), [#1140](https://github.com/MIPT-ILab/mipt-mips/issues/1140), [#1257](https://github.com/MIPT-ILab/mipt-mips/issues/1257)
+MIPT-512 | George Korepanov | 12 | [#28](https://github.com/MIPT-ILab/mipt-mips/issues/28), [#48](https://github.com/MIPT-ILab/mipt-mips/issues/48), [#49](https://github.com/MIPT-ILab/mipt-mips/issues/49), [#26](https://github.com/MIPT-ILab/mipt-mips/issues/26), [#60](https://github.com/MIPT-ILab/mipt-mips/issues/60), [#45](https://github.com/MIPT-ILab/mipt-mips/issues/45), [#73](https://github.com/MIPT-ILab/mipt-mips/issues/73) |
+MIPT-711 | Vyacheslav Kompan | 11 | [#354](https://github.com/MIPT-ILab/mipt-mips/issues/354), [#662](https://github.com/MIPT-ILab/mipt-mips/issues/662), [#122](https://github.com/MIPT-ILab/mipt-mips/issues/122), ½[#290](https://github.com/MIPT-ILab/mipt-mips/issues/290)  |
+MIPT-715 | Rustem Yunusov | 10 | [#901](https://github.com/MIPT-ILab/mipt-mips/issues/901), [#760](https://github.com/MIPT-ILab/mipt-mips/issues/760), [#614](https://github.com/MIPT-ILab/mipt-mips/issues/614) |
+MIPT-712 | Egor Bova | 10 | ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#235](https://github.com/MIPT-ILab/mipt-mips/issues/235), [#461](https://github.com/MIPT-ILab/mipt-mips/issues/461) |
+MIPT-717 | Vsevolod Pukhov | 9 | [#589](https://github.com/MIPT-ILab/mipt-mips/issues/589), ½[#530](https://github.com/MIPT-ILab/mipt-mips/issues/530), [#602](https://github.com/MIPT-ILab/mipt-mips/issues/602), [#130](https://github.com/MIPT-ILab/mipt-mips/issues/130) |
+MIPT-711 | Yan Logovskiy | 9 | [#91](https://github.com/MIPT-ILab/mipt-mips/issues/91), [#92](https://github.com/MIPT-ILab/mipt-mips/issues/92), [⅓#383](https://github.com/MIPT-ILab/mipt-mips/issues/383), [#506](https://github.com/MIPT-ILab/mipt-mips/issues/506), ¼[#613](https://github.com/MIPT-ILab/mipt-mips/issues/613) |
+MIPT-616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/issues/147), [#87](https://github.com/MIPT-ILab/mipt-mips/issues/87), [#93](https://github.com/MIPT-ILab/mipt-mips/issues/93), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+**MIPT-91?** | **Vladimir Graudt** | **6** | **[#1410](https://github.com/MIPT-ILab/mipt-mips/issues/1410), [#1409](https://github.com/MIPT-ILab/mipt-mips/issues/1409), [#512](https://github.com/MIPT-ILab/mipt-mips/issues/512)**
+MIPT-616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
+MIPT-616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
+**[BSUIR](https://www.bsuir.by/en/)** | **Andrei Karpyza** | **4** | **[#356](https://github.com/MIPT-ILab/mipt-mips/issues/356)** |
+MIPT-616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
+MIPT-518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
+MIPT-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
 
 Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32))
 
