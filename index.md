@@ -23,12 +23,14 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L11]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2011%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
 [L12]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2012%20-%20Advanced%20Pipelining.pptx?raw=true
 [L13]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2013%20-%20Caches%2C%20part%201.pptx?raw=true
+[L14]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2014%20-%20Caches%2C%20part%202.pptx?raw=true
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
 [L11-VIDEO]: https://drive.google.com/file/d/1UCMwKX36BR9Jx1eJseWmI4ykDIjxJ7Kp/view?usp=sharing
 [L12-VIDEO]: https://drive.google.com/file/d/1PlGlKrJ7FkMLR-GX5TfhQDc6W0ttjLv3/view?usp=sharing
 [L13-VIDEO]: https://drive.google.com/file/d/1sOfYuI5sdzcnMC6TptBTJwPALNHFxaCZ/view?usp=sharing
+[L14-VIDEO]: https://drive.google.com/file/d/1ZJm1iFeBG47pk65VMo9vFJlWBCDIEykx/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -48,6 +50,7 @@ Date   | Type     | Event
  9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br> • Video: [watch][L11-VIDEO]
 23 Nov | Lecture  | **L12: Advanced pipelining**<br>                          • Slides: [download][L12]<br> • Video: [watch][L12-VIDEO]
  8 Feb | Lecture  | **L13: Caches, part 1**<br>                               • Slides: [download][L13]<br> • Video: [watch][L13-VIDEO]
+15 Feb | Lecture  | **L14: Caches, part 2**<br>                               • Slides: [download][L14]<br> • Video: [watch][L14-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
