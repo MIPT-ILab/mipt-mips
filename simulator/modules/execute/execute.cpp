@@ -6,6 +6,7 @@
 #include <infra/config/config.h>
 
 #include "execute.h"
+#include <modules/core/perf_sim.h>
 
 namespace config {
     const PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
@@ -121,11 +122,11 @@ void Execute<FuncInstr>::clock( Cycle cycle)
         /* bypass data */
         wp_bypass->write( instr.get_v_dst(), cycle);
 
-        if( instr.is_jump())
+        if ( instr.is_jump())
         {
             wp_branch_datapath->write( std::move( instr) ,cycle);
         }
-        else if( instr.is_mem_stage_required())
+        else if ( instr.is_mem_stage_required() || config::unified_pipeline)
         {
             wp_mem_datapath->write( std::move( instr) ,cycle);
         }

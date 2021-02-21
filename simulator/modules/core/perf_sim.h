@@ -15,9 +15,14 @@
 #include <modules/mem/mem.h>
 #include <modules/ports_instance.h>
 #include <modules/writeback/writeback.h>
+#include <infra/config/config.h>
 #include <simulator.h>
 
 #include <chrono>
+
+namespace config {
+    extern const AliasedSwitch unified_pipeline;
+} // namespace config
 
 template <typename ISA>
 class PerfSim : public CycleAccurateSimulator
