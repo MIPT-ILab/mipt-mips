@@ -5,7 +5,6 @@
 
 #include "mem.h"
 #include <memory/memory.h>
-#include <modules/core/perf_sim.h>
 
 template <typename FuncInstr>
 Mem<FuncInstr>::Mem( Module* parent) : Module( parent, "mem")
@@ -42,20 +41,17 @@ void Mem<FuncInstr>::clock( Cycle cycle)
     }
 
     auto instr = rp_datapath->read( cycle);
+    sout << instr;
 
-    if ( !instr.is_mem_stage_required())
-    {
-        /* if unified_pipeline is enabled, there can be instructions,
-         * which do nothing on memory stage. Only dumping them */
-        assert( config::unified_pipeline);
-        sout << instr << " { unified pipeline }\n";
-    }
-    else
-    {
-        /* perform required loads and stores */
+    /* perform required loads and stores */
+    /* if unified_pipeline is enabled, there can be instructions,
+     * which do nothing on memory stage. Only dumping them */
+    if ( instr.is_mem_stage_required())
         memory->load_store( &instr);
-    }
-    
+    else
+       sout << " { unified pipeline }";
+    sout << std::endl;
+
     /* bypass data */
     wp_bypass->write( instr.get_v_dst(), cycle);
     
