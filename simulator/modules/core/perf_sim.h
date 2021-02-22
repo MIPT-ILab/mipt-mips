@@ -20,10 +20,6 @@
 
 #include <chrono>
 
-namespace config {
-    extern const AliasedSwitch unified_pipeline;
-} // namespace config
-
 template <typename ISA>
 class PerfSim : public CycleAccurateSimulator
 {

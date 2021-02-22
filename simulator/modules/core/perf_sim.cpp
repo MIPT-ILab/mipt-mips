@@ -13,7 +13,6 @@
 namespace config {
     static const AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
     static const Switch topology_dump = { "tdump", "module topology dump into topology.json" };
-    const AliasedSwitch unified_pipeline = { "u", "unified-pipeline", "enable unified pipeline"};
 } // namespace config
 
 template <typename ISA>

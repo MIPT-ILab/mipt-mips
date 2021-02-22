@@ -11,6 +11,7 @@
 namespace config {
     const PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
                                                 [](uint64 val) { return val >= 2 && val < 64; } };
+    const AliasedSwitch unified_pipeline = { "u", "unified-pipeline", "enable unified pipeline"};
 } // namespace config
 
 template <typename FuncInstr>
