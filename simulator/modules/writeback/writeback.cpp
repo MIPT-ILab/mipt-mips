@@ -2,11 +2,15 @@
 
 #include <kernel/kernel.h>
 
+namespace config {
+    const AliasedSwitch unified_pipeline = { "u", "unified-pipeline", "enable unified pipeline"};
+} // namespace config
+
 template <typename ISA>
 Writeback<ISA>::Writeback( Module* parent, std::endian endian) : Module( parent, "writeback"), endian( endian)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", Port::LATENCY);
-    rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", Port::LATENCY);
+    rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", ( config::unified_pipeline) ? 2_lt : 1_lt);
     rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", Port::LATENCY);
     rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 

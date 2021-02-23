@@ -11,7 +11,6 @@
 namespace config {
     const PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",
                                                 [](uint64 val) { return val >= 2 && val < 64; } };
-    const AliasedSwitch unified_pipeline = { "u", "unified-pipeline", "enable unified pipeline"};
 } // namespace config
 
 template <typename FuncInstr>
@@ -127,7 +126,7 @@ void Execute<FuncInstr>::clock( Cycle cycle)
         {
             wp_branch_datapath->write( std::move( instr) ,cycle);
         }
-        else if ( instr.is_mem_stage_required() || config::unified_pipeline)
+        else if ( instr.is_mem_stage_required())
         {
             wp_mem_datapath->write( std::move( instr) ,cycle);
         }
