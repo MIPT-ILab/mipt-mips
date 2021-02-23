@@ -6,7 +6,6 @@
 #include <infra/config/config.h>
 
 #include "execute.h"
-#include <modules/core/perf_sim.h>
 
 namespace config {
     const PredicatedValue<uint64> long_alu_latency = { "long-alu-latency", 3, "Latency of long arithmetic logic unit",

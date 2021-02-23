@@ -15,7 +15,6 @@
 #include <modules/mem/mem.h>
 #include <modules/ports_instance.h>
 #include <modules/writeback/writeback.h>
-#include <infra/config/config.h>
 #include <simulator.h>
 
 #include <chrono>

@@ -41,16 +41,11 @@ void Mem<FuncInstr>::clock( Cycle cycle)
     }
 
     auto instr = rp_datapath->read( cycle);
-    sout << instr;
+
+    sout << instr << std::endl;
 
     /* perform required loads and stores */
-    /* if unified_pipeline is enabled, there can be instructions,
-     * which do nothing on memory stage. Only dumping them */
-    if ( instr.is_mem_stage_required())
-        memory->load_store( &instr);
-    else
-       sout << " { unified pipeline }";
-    sout << std::endl;
+    memory->load_store( &instr);
 
     /* bypass data */
     wp_bypass->write( instr.get_v_dst(), cycle);
