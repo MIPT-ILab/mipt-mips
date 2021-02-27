@@ -108,7 +108,7 @@ void Writeback<ISA>::writeback_bubble( Cycle cycle)
     if (cycle >= last_writeback_cycle + 100_lt) {
         /* If will be throwed Deadlock - we need to close brackets in the logs-file */
         if (jsonout_enabled)
-            (jsonout()) << "\n]\n";
+            (jsonout()) << "\n]]\n";
         throw Deadlock("");
     }
 }

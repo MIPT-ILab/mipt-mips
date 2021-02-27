@@ -113,7 +113,7 @@ auto get_rate( int total, float64 piece)
 template<typename ISA>
 void PerfSim<ISA>::start_dump_json() {
     if (jsonout_enabled)
-        (jsonout()) << "[\n" <<
+        (jsonout()) << "[[\n" <<
         "\t{ \"type\": \"Stage\", \"id\": 0, \"description\": \"Fetch\" },\n" <<
         "\t{ \"type\": \"Stage\", \"id\": 1, \"description\": \"Decode\" },\n" <<
         "\t{ \"type\": \"Stage\", \"id\": 2, \"description\": \"Execute\" },\n" <<
@@ -124,7 +124,7 @@ void PerfSim<ISA>::start_dump_json() {
 template<typename ISA>
 void PerfSim<ISA>::stop_dump_json() {
     if (jsonout_enabled) {
-        (jsonout()) << "\n]\n";
+        (jsonout()) << "\n]]\n";
         jsonout().close();
     }
 }
