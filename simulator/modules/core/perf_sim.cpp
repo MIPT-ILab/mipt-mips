@@ -123,8 +123,10 @@ void PerfSim<ISA>::start_dump_json() {
 
 template<typename ISA>
 void PerfSim<ISA>::stop_dump_json() {
-    if (jsonout_enabled)
+    if (jsonout_enabled) {
         (jsonout()) << "\n]\n";
+        jsonout().close();
+    }
 }
 
 template<typename ISA>
