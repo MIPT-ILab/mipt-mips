@@ -111,6 +111,7 @@ The project is mentored by [Kirill Korolev](https://github.com/kkorolev), and [O
 Additional repositories:
 * [Interactive MIPS traces](https://github.com/MIPT-ILab/mips-traces)
 * [Interactive RISC-V traces](https://github.com/MIPT-ILab/riscv-mars-examples)
+* [Pipeline Visualizer](https://github.com/MIPT-ILab/PipelineVis)
 * [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
 * _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
