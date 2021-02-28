@@ -31,6 +31,7 @@ Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
     rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", Port::LATENCY);
 
     wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::BW);
+    wp_unified_pipeline_bypass = make_write_port<InstructionOutput>("UNIFIED_PIPELINE_2_EXECUTE_BYPASS", Port::BW);
     wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::BW);
 
     rps_bypass[0].data_ports[0] = make_read_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::LATENCY);
@@ -47,6 +48,9 @@ Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
 
     rps_bypass[0].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::LATENCY);
     rps_bypass[1].data_ports[4] = make_read_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::LATENCY);
+
+    rps_bypass[0].data_ports[5] = make_read_port<InstructionOutput>("UNIFIED_PIPELINE_2_EXECUTE_BYPASS", 2_lt);
+    rps_bypass[1].data_ports[5] = make_read_port<InstructionOutput>("UNIFIED_PIPELINE_2_EXECUTE_BYPASS", 2_lt);
 }
 
 template <typename FuncInstr>
@@ -120,6 +124,8 @@ void Execute<FuncInstr>::clock( Cycle cycle)
     {
         /* bypass data */
         wp_bypass->write( instr.get_v_dst(), cycle);
+        if ( config::unified_pipeline)
+            wp_unified_pipeline_bypass->write( instr.get_v_dst(), cycle);
 
         if ( instr.is_jump())
         {
@@ -134,6 +140,10 @@ void Execute<FuncInstr>::clock( Cycle cycle)
             wp_writeback_datapath->write( std::move( instr), cycle);
         }
     }
+
+    if ( config::unified_pipeline
+        && (rps_bypass[0].data_ports[5]->is_ready( cycle) || rps_bypass[1].data_ports[5]->is_ready( cycle)))
+        sout << "buffer  --- some instruction is waiting due to unified pipeline ---\n";
 }
 
 

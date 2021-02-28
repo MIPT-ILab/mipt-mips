@@ -19,7 +19,7 @@ public:
 
     void inc() noexcept { value = value + 1_lt; }
 
-    static constexpr const size_t BYPASSING_STAGES_NUMBER = 5;
+    static constexpr const size_t BYPASSING_STAGES_NUMBER = 6;
 
     void set_to_stage( Latency v) noexcept { value = v; }
     void set_to_first_execution_stage() noexcept
@@ -46,6 +46,12 @@ public:
         bypass_direction = 4;
     }
 
+    void set_to_unified_pipeline_buffer_stage() noexcept
+    {
+        set_to_stage( UNIFIED_PIPELINE_BUFFER_STAGE);
+        bypass_direction = 5;
+    }
+
     void set_to_in_RF() noexcept
     {
         set_to_stage( IN_RF_STAGE);
@@ -63,16 +69,18 @@ private:
     size_t bypass_direction = 0;
     Latency value = IN_RF_STAGE;
     
-    // EXECUTE_0  - 0                              | Bypassing stage
+    // EXECUTE_0               - 0                              | Bypassing stage
     //  .......
-    // EXECUTE_N  - last_execution_stage_value     | Bypassing stage
-    // MEM        - MAX_VAL8 - 2                   | Bypassing stage
-    // BRANCH     - MAX_VAL8 - 2                   | Bypassing stage
-    // WRITEBACK  - MAX_VAL8 - 1                   | Bypassing stage
-    // IN_RF      - MAX_VAL8
+    // EXECUTE_N               - last_execution_stage_value     | Bypassing stage
+    // MEM                     - MAX_VAL8 - 2                   | Bypassing stage
+    // BRANCH                  - MAX_VAL8 - 2                   | Bypassing stage
+    // UNIFIED_PIPELINE_BUFFER - MAX_VAL8 - 2                   | Bypassing stage
+    // WRITEBACK               - MAX_VAL8 - 1                   | Bypassing stage
+    // IN_RF                   - MAX_VAL8
 
     static constexpr const Latency IN_RF_STAGE  = Latency( MAX_VAL8);
     static constexpr const Latency MEM_OR_BRANCH_STAGE    = IN_RF_STAGE - 2_lt;
+    static constexpr const Latency UNIFIED_PIPELINE_BUFFER_STAGE = IN_RF_STAGE - 2_lt;
     static constexpr const Latency WB_STAGE     = IN_RF_STAGE - 1_lt;
 };
 

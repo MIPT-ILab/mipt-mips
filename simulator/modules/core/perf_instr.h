@@ -8,10 +8,15 @@
 
 #include <infra/types.h>
 #include <modules/fetch/bpu/bp_interface.h>
+#include <infra/config/config.h>
 
 #include <utility>
 
 struct CheckerMismatch;
+
+namespace config {
+    extern const AliasedSwitch unified_pipeline;
+} // namespace config
 
 template <typename FuncInstr>
 class PerfInstr : public FuncInstr
