@@ -96,6 +96,7 @@ MIPT-616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/
 MIPT-616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 MIPT-616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
 **[BSUIR](https://www.bsuir.by/en/)** | **Alex Kulsha** | **5** | **[#356](https://github.com/MIPT-ILab/mipt-mips/issues/356)** |
+**BSUIR** | **Vladislav Zhuravski** | **4** | **[1448](https://github.com/MIPT-ILab/mipt-mips/issues/1448)** |
 **BSUIR** | **Andrei Karpyza** | **4** | **[#355](https://github.com/MIPT-ILab/mipt-mips/issues/355)** |
 MIPT-616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 MIPT-518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
