@@ -40,7 +40,7 @@ class InfiniteCacheTagArray : public CacheTagArray
     private:
         std::vector<Addr> tags;
 
-        // hash tabe to lookup tags in O(1)
+        // hash table to lookup tags in O(1)
         google::dense_hash_map<Addr, int32> lookup_helper;
         const int32 impossible_key = INT32_MAX;
 };
@@ -132,7 +132,7 @@ class CacheTagArraySize : public CacheTagArraySizeCheck
             uint32 addr_size_in_bits
         )
             : CacheTagArraySizeCheck( size_in_bytes, ways, line_size, addr_size_in_bits)
-            , line_bits( std::countr_zero( line_size))
+            , line_bits( std::countr_zero( line_size)) // the number of offset bits
             , sets( size_in_bytes / ( ways * line_size))
             , set_bits( std::countr_zero( sets) + line_bits)
             , addr_mask( bitmask<Addr>( addr_size_in_bits))
@@ -192,7 +192,7 @@ class SimpleCacheTagArray : public CacheTagArraySize
         // tags storage
         std::vector<std::vector<Tag>> tags;
 
-        // hash tabe to lookup tags in O(1)
+        // hash table to lookup tags in O(1)
         std::vector<google::dense_hash_map<Addr, int32>> lookup_helper;
         const int32 impossible_key = INT32_MAX;
         std::unique_ptr<ReplacementModule> replacement_module = nullptr;
@@ -210,7 +210,7 @@ SimpleCacheTagArray::SimpleCacheTagArray(
 {
     replacement_module = std::make_unique<ReplacementModule>( sets, ways, repl_policy);
 
-    //theese are spicial dense_hash_map requirements
+    // these are special dense_hash_map requirements
     for (uint32 i = 0; i < sets; i++) {
         lookup_helper[i].set_empty_key( impossible_key);
         lookup_helper[i].set_deleted_key( impossible_key - 1);
@@ -225,7 +225,7 @@ std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
     if ( is_hit)
     {
         uint32 num_set = set( addr);
-        replacement_module->touch( num_set, way);
+        replacement_module->touch( num_set, way); // for replacement policy (updates the current address)
     }
 
     return lookup_result;

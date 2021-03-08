@@ -53,7 +53,7 @@ private:
     WritePort<Target>* wp_long_latency_pc_holder = nullptr;
     WritePort<bool>* wp_hit_or_miss = nullptr;
 
-    /* port needed for habdling misprediction at decode stage */
+    /* port needed for handling misprediction at decode stage */
     ReadPort<Target>* rp_flush_target_from_decode = nullptr;
 
     Target get_target( Cycle cycle);
@@ -61,6 +61,19 @@ private:
     void clock_bp( Cycle cycle);
     void clock_instr_cache( Cycle cycle);
     void save_flush( Cycle cycle);
+
+    uint32 _fetchahead_size; // value of fetchahead distance size
+    std::string _prefetch_method; // value of prefetch method
+
+    bool is_wrong_path = false;
+    void prefetch_next_line(Addr requested_addr);
+};
+
+struct PrefetchMethodException final : Exception
+{
+    explicit PrefetchMethodException( const std::string& msg)
+            : Exception( "Invalid prefetch method name", msg)
+    { }
 };
 
 #endif
