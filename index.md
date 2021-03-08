@@ -23,12 +23,18 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L11]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2011%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
 [L12]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2012%20-%20Advanced%20Pipelining.pptx?raw=true
 [L13]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2013%20-%20Caches%2C%20part%201.pptx?raw=true
+[L14]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2014%20-%20Caches%2C%20part%202.pptx?raw=true
+[L15]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2015%20-%20Caches%2C%20part%203.pptx?raw=true
+[L16]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2016%20-%20Virtual%20Memory.pptx?raw=true
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
 [L11-VIDEO]: https://drive.google.com/file/d/1UCMwKX36BR9Jx1eJseWmI4ykDIjxJ7Kp/view?usp=sharing
 [L12-VIDEO]: https://drive.google.com/file/d/1PlGlKrJ7FkMLR-GX5TfhQDc6W0ttjLv3/view?usp=sharing
 [L13-VIDEO]: https://drive.google.com/file/d/1sOfYuI5sdzcnMC6TptBTJwPALNHFxaCZ/view?usp=sharing
+[L14-VIDEO]: https://drive.google.com/file/d/1ZJm1iFeBG47pk65VMo9vFJlWBCDIEykx/view?usp=sharing
+[L15-VIDEO]: https://drive.google.com/file/d/1AYhWqXkcvT_vN6yxiVsPSz62I1ysfhjE/view?usp=sharing
+[L16-VIDEO]: https://drive.google.com/file/d/1qZDI3H3kwWf8CO8RebRHb4zh4zibmDgP/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -47,7 +53,10 @@ Date   | Type     | Event
  2 Nov | Lecture  | **L10: Data hazards**<br>                                 • Slides: [download][L10]<br> • Video: [watch][L10-VIDEO]
  9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br> • Video: [watch][L11-VIDEO]
 23 Nov | Lecture  | **L12: Advanced pipelining**<br>                          • Slides: [download][L12]<br> • Video: [watch][L12-VIDEO]
- 8 Feb | Lecture  | **L13: Caches, part 1**<br>                               • Slides: [download][L13]<br> • Video: [watch][L13-VIDEO]
+ 8 Feb | Lecture  | **L13: Caches, part 1/3**<br>                             • Slides: [download][L13]<br> • Video: [watch][L13-VIDEO]
+15 Feb | Lecture  | **L14: Caches, part 2/3**<br>                             • Slides: [download][L14]<br> • Video: [watch][L14-VIDEO]
+22 Feb | Lecture  | **L15: Caches, part 3/3**<br>                             • Slides: [download][L15]<br> • Video: [watch][L15-VIDEO]
+ 1 Mar | Lecture  | **L16: Virtual memory**<br>                               • Slides: [download][L16]<br> • Video: [watch][L16-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
 
@@ -86,7 +95,8 @@ MIPT-616 | Kirill Nedostoev | 9 | [#147](https://github.com/MIPT-ILab/mipt-mips/
 **MIPT-91?** | **Vladimir Graudt** | **6** | **[#1410](https://github.com/MIPT-ILab/mipt-mips/issues/1410), [#1409](https://github.com/MIPT-ILab/mipt-mips/issues/1409), [#512](https://github.com/MIPT-ILab/mipt-mips/issues/512)**
 MIPT-616 | Alexander Timofeev | 5 | [#69](https://github.com/MIPT-ILab/mipt-mips/issues/69), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132), [#215](https://github.com/MIPT-ILab/mipt-mips/issues/215), [#214](https://github.com/MIPT-ILab/mipt-mips/issues/214) |
 MIPT-616 | Konstantin Soshin | 5 | [#165](https://github.com/MIPT-ILab/mipt-mips/issues/165) |
-**[BSUIR](https://www.bsuir.by/en/)** | **Andrei Karpyza** | **4** | **[#356](https://github.com/MIPT-ILab/mipt-mips/issues/356)** |
+**[BSUIR](https://www.bsuir.by/en/)** | **Alex Kulsha** | **5** | **[#356](https://github.com/MIPT-ILab/mipt-mips/issues/356)** |
+**BSUIR** | **Andrei Karpyza** | **4** | **[#355](https://github.com/MIPT-ILab/mipt-mips/issues/355)** |
 MIPT-616 | Andrew Sultan | 4 | [#282](https://github.com/MIPT-ILab/mipt-mips/issues/282), [#132](https://github.com/MIPT-ILab/mipt-mips/issues/132) |
 MIPT-518 | Alexander Seppar | 4 | [fc526cb8](https://github.com/MIPT-ILab/ca-lectures/commit/fc526cb8f59bc6d9a399f453b417afc45c21012e), [#25](https://github.com/MIPT-ILab/mipt-mips/issues/25), [#52](https://github.com/MIPT-ILab/mipt-mips/issues/52) |
 MIPT-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/issues/152), [T#3](https://github.com/MIPT-ILab/mips-traces/issues/3) |
@@ -104,6 +114,7 @@ The project is mentored by [Kirill Korolev](https://github.com/kkorolev), and [O
 Additional repositories:
 * [Interactive MIPS traces](https://github.com/MIPT-ILab/mips-traces)
 * [Interactive RISC-V traces](https://github.com/MIPT-ILab/riscv-mars-examples)
+* [Pipeline Visualizer](https://github.com/MIPT-ILab/PipelineVis)
 * [Lectures storage](https://github.com/MIPT-ILab/ca-lectures)
 * [MIPS-MIPS-CEN64](https://github.com/MIPT-ILab/cen64)
 * _[Branches imported from GoogleCode SVN](https://github.com/MIPT-ILab/mipt-mips-old-branches)_
