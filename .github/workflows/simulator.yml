@@ -37,9 +37,21 @@ jobs:
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install ninja-build libboost-dev libboost-all-dev
+        sudo apt-get install ninja-build libboost-dev
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
+
+    - name: Install tools on Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        BOOST_ROOT=$(echo ${{github.workspace}}/3rdparty/boost | sed 's/\\/\//g')
+        mkdir -p $BOOST_ROOT
+        curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
+        cd $BOOST_ROOT && cp -r boost_*/* .
+        rm -rf boost_*/* download.tar.bz2 download.tar
+      shell: bash
 
     - name: Create CMake dir
       run: mkdir build
@@ -48,7 +60,7 @@ jobs:
       working-directory: build
       if: matrix.os == 'windows-latest'
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\3rdparty\boost" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
         cmake --build . --config Release --target mipt-mips cachesim unit-tests 
         move Release\*.exe .
 
