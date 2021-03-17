@@ -50,8 +50,8 @@ jobs:
         7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar.bz2 -y -bd
         7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar -y -bd
         cd %BOOST_ROOT%
-        copy boost_*\* .
-        del boost_*\* download.tar.bz2 download.tar
+        move boost_*\* .
+        del download.*
 
     - name: Create CMake dir
       run: mkdir build
