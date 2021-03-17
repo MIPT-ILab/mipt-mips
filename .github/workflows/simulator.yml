@@ -44,12 +44,11 @@ jobs:
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
       run: |
-        set BOOST_ROOT=${{github.workspace}}\3rdparty\boost
-        mkdir %BOOST_ROOT%
-        curl --progress-bar --location --output %BOOST_ROOT%\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
-        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar.bz2 -y -bd
-        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar -y -bd
-        cd %BOOST_ROOT%
+        mkdir boost
+        curl --progress-bar --location --output boost\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -oboost x boost\download.tar.bz2 -y -bd
+        7z -oboost x boost\download.tar -y -bd
+        cd boost
         move boost_*\* .
         del download.*
 
@@ -60,7 +59,7 @@ jobs:
       working-directory: build
       if: matrix.os == 'windows-latest'
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\3rdparty\boost" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\boost" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
         cmake --build . --config Release --target mipt-mips cachesim unit-tests 
         move Release\*.exe .
 
