@@ -44,14 +44,14 @@ jobs:
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
       run: |
-        BOOST_ROOT=$(echo ${{github.workspace}}/3rdparty/boost | sed 's/\\/\//g')
-        mkdir -p $BOOST_ROOT
-        curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
-        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
-        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
-        cd $BOOST_ROOT && cp -r boost_*/* .
-        rm -rf boost_*/* download.tar.bz2 download.tar
-      shell: bash
+        BOOST_ROOT=${{github.workspace}}\3rdparty\boost
+        mkdir %BOOST_ROOT%
+        curl --progress-bar --location --output %BOOST_ROOT%\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar.bz2 -y -bd
+        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar -y -bd
+        cd %BOOST_ROOT%
+        copy -r boost_*\* .
+        del boost_*/* download.tar.bz2 download.tar
 
     - name: Create CMake dir
       run: mkdir build
