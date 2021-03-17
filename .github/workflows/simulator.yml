@@ -37,10 +37,9 @@ jobs:
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install ninja-build
+        sudo apt-get install ninja-build libboost-dev libboost-all-dev
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
 
     - name: Create CMake dir
       run: mkdir build
