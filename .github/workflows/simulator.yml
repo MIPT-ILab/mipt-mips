@@ -37,10 +37,20 @@ jobs:
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install ninja-build
+        sudo apt-get install ninja-build libboost-dev
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+
+    - name: Install tools on Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir boost
+        curl --progress-bar --location --output boost\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -oboost x boost\download.tar.bz2 -y -bd
+        7z -oboost x boost\download.tar -y -bd
+        cd boost
+        move boost_*\* .
+        del download.*
 
     - name: Create CMake dir
       run: mkdir build
@@ -49,7 +59,7 @@ jobs:
       working-directory: build
       if: matrix.os == 'windows-latest'
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\boost" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
         cmake --build . --config Release --target mipt-mips cachesim unit-tests 
         move Release\*.exe .
 
@@ -84,10 +94,8 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Install Ninja
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+    - name: Install Ninja and Boost
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -134,9 +142,7 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: |
-        sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10 libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -184,9 +190,7 @@ jobs:
         submodules: 'true'
 
     - name: Install packages
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build gdb_build
@@ -236,13 +240,23 @@ jobs:
     - name: Install tools
       run: choco install opencppcoverage codecov
 
+    - name: Install tools on Windows
+      run: |
+        mkdir boost
+        curl --progress-bar --location --output boost\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -oboost x boost\download.tar.bz2 -y -bd
+        7z -oboost x boost\download.tar -y -bd
+        cd boost
+        move boost_*\* .
+        del download.*
+
     - name: Create CMake dir
       run: mkdir build
 
     - name: Build with Visual Studio
       working-directory: build
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\boost" -DPYTHON3_COMMAND=python
         cmake --build . --config Debug --target unit-tests     
 
     - name: Unit tests
