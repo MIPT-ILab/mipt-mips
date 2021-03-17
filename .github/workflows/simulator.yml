@@ -44,7 +44,7 @@ jobs:
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
       run: |
-        BOOST_ROOT=${{github.workspace}}\3rdparty\boost
+        set BOOST_ROOT=${{github.workspace}}\3rdparty\boost
         mkdir %BOOST_ROOT%
         curl --progress-bar --location --output %BOOST_ROOT%\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
         7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar.bz2 -y -bd
@@ -95,10 +95,8 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Install Ninja
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+    - name: Install Ninja and Boost
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -145,9 +143,7 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: |
-        sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10 libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -195,9 +191,7 @@ jobs:
         submodules: 'true'
 
     - name: Install packages
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build gdb_build
@@ -246,6 +240,17 @@ jobs:
 
     - name: Install tools
       run: choco install opencppcoverage codecov
+
+    - name: Install Boost on Windows
+      run: |
+        set BOOST_ROOT=${{github.workspace}}\3rdparty\boost
+        mkdir %BOOST_ROOT%
+        curl --progress-bar --location --output %BOOST_ROOT%\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar.bz2 -y -bd
+        7z -o%BOOST_ROOT% x %BOOST_ROOT%\download.tar -y -bd
+        cd %BOOST_ROOT%
+        copy -r boost_*\* .
+        del boost_*/* download.tar.bz2 download.tar
 
     - name: Create CMake dir
       run: mkdir build
