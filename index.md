@@ -29,6 +29,7 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L17]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2017%20-%20ILP.%20Superscalar.%20OOO%20-%20part%201.pptx?raw=true
 [L18]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2018%20-%20OOO%20-%20part%202.pptx?raw=true
 [L19]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2019%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
+[L20]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2020%20-%20Introduction%20to%20Software%20Development.pptx?raw=true
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
@@ -41,6 +42,7 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L17-VIDEO]: https://drive.google.com/file/d/1O1FR49W744vYbSI9h--JKvaaHnEH2lUQ/view?usp=sharing
 [L18-VIDEO]: https://drive.google.com/file/d/14RmD57ppQLJBlE4e9Aujnu2lNr2j8SIE/view?usp=sharing
 [L19-VIDEO]: https://drive.google.com/file/d/13MRpnt_MVITdCvsZEFH_zUc8uD6_6QIX/view?usp=sharing
+[L20-VIDEO]: https://drive.google.com/file/d/1unBU5rmZhRLt4W9G1mIocH7NL4HQvQFu/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -66,6 +68,7 @@ Date   | Type     | Event
 15 Mar | Lecture  | **L17: ILP. Superscalar. OOO - part 1**<br>               • Slides: [download][L17]<br> • Video: [watch][L17-VIDEO]
 22 Mar | Lecture  | **L18: OOO - part 2**<br>                                 • Slides: [download][L18]<br> • Video: [watch][L18-VIDEO]
 29 Mar | Lecture  | **L19: OOO - part 3, loads and stores**<br>               • Slides: [download][L19]<br> • Video: [watch][L19-VIDEO]
+ 5 Apr | Lecture  | **L20: Introduction to Software Development**<br>         • Slides: [download][L20]<br> • Video: [watch][L20-VIDEO]
 
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
