@@ -31,6 +31,7 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L19]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2019%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
 [L20]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2020%20-%20Introduction%20to%20Software%20Development.pptx?raw=true
 [L21]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2021%20-%20TLP%20-%20part%201.pptx?raw=true
+[L22]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2022%20-%20TLP%20-%20part%202%20(Multithreading%2C%20Synchronization).pptx?raw=true
 [L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
 [L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
 [L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
@@ -45,6 +46,7 @@ A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
 [L19-VIDEO]: https://drive.google.com/file/d/13MRpnt_MVITdCvsZEFH_zUc8uD6_6QIX/view?usp=sharing
 [L20-VIDEO]: https://drive.google.com/file/d/1unBU5rmZhRLt4W9G1mIocH7NL4HQvQFu/view?usp=sharing
 [L21-VIDEO]: https://drive.google.com/file/d/1Jogk5m2QnAp84LS9dOfSe-Q2cepckWWk/view?usp=sharing
+[L22-VIDEO]: https://drive.google.com/file/d/1-_DC4k9u8g4Zt90rd89hTx4lT5iL65Oy/view?usp=sharing
 [P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
 
 Date   | Type     | Event
@@ -72,6 +74,7 @@ Date   | Type     | Event
 29 Mar | Lecture  | **L19: OOO - part 3, loads and stores**<br>               • Slides: [download][L19]<br> • Video: [watch][L19-VIDEO]
  5 Apr | Lecture  | **L20: Introduction to Software Development**<br>         • Slides: [download][L20]<br> • Video: [watch][L20-VIDEO]
 12 Apr | Lecture  | **L21: TLP (part 1)**<br>                                 • Slides: [download][L21]<br> • Video: [watch][L21-VIDEO]
+19 Apr | Lecture  | **L22: TLP (part 2)**<br>                                 • Slides: [download][L22]<br> • Video: [watch][L22-VIDEO]
 
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
