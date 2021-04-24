@@ -248,7 +248,7 @@ TEST_CASE ("RISCV sbext64")
 
 TEST_CASE( "RISV RV32 pack")
 {
-    CHECK( RISCVInstr<uint32>(0x44d60533).get_disasm() == "pack $a0, $a2, $a3");
+    CHECK( RISCVInstr<uint32>(0x08d64533).get_disasm() == "pack $a0, $a2, $a3");
     RISCVInstr<uint32> instr( "pack", 0);
     instr.set_v_src( 0xffff'2222, 0);
     instr.set_v_src( 0x1111'3333, 1);
@@ -323,7 +323,7 @@ TEST_CASE( "RISCV sro64 overflow")
 
 TEST_CASE("RISCV RV32 bfp")
 {
-    CHECK( RISCVInstr<uint32>(0x08F77833).get_disasm() == "bfp $a6, $a4, $a5");
+    CHECK( RISCVInstr<uint32>(0x48F77833).get_disasm() == "bfp $a6, $a4, $a5");
     RISCVInstr<uint32> instr( "bfp", 0);
     instr.set_v_src( 0x5555, 0);
     instr.set_v_src( 0x080400C0, 1); //len = 8, off = 4, data = 1100'0000
