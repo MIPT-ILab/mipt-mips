@@ -180,7 +180,7 @@ jobs:
     env:
       CC: gcc-10
       CXX: g++-10
-      GDB_VER: gdb-10.1
+      GDB_VER: gdb-10.2
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
 
     steps:
