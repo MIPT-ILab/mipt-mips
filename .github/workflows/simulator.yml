@@ -209,8 +209,7 @@ jobs:
           cd $GDB_BUILD && mkdir opcodes      && cd opcodes      && ${{ github.workspace }}/$GDB_VER/opcodes/configure --target=mipsel-unknown-linux && make libopcodes.a
           cd $GDB_BUILD && mkdir libdecnumber && cd libdecnumber && ${{ github.workspace }}/$GDB_VER/libdecnumber/configure && make libdecnumber.a
           cd $GDB_BUILD && mkdir readline     && cd readline     && ${{ github.workspace }}/$GDB_VER/readline/configure && cd readline && make libreadline.a
-          cd $GDB_BUILD && mkdir libctf       && cd libctf       && ${{ github.workspace }}/$GDB_VER/libctf/configure --with-system-zlib && make ctf-error.h && make libctf.la
-          #                                                                                             w/a for GDB 10.1, remove once updated ^~~~~~~~~~~~~~~^
+          cd $GDB_BUILD && mkdir libctf       && cd libctf       && ${{ github.workspace }}/$GDB_VER/libctf/configure --with-system-zlib && make libctf.la
 
     - name: Build simulator
       working-directory: build
