@@ -46,6 +46,7 @@ class Execute : public Module
         WritePort<Instr>* wp_writeback_datapath = nullptr;
         WritePort<Instr>* wp_long_latency_execution_unit = nullptr;
         WritePort<InstructionOutput>* wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_unified_pipeline_bypass = nullptr;
         WritePort<InstructionOutput>* wp_long_arithmetic_bypass = nullptr;
 
         Latency flush_expiration_latency = 0_lt;

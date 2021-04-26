@@ -102,6 +102,10 @@ class DataBypass
                 {
                     next_stage_after_first_execution_stage.set_to_mem_stage();
                 }
+                else if ( config::unified_pipeline)
+                {
+                    next_stage_after_first_execution_stage.set_to_unified_pipeline_buffer_stage();
+                } 
                 else
                 {
                     next_stage_after_first_execution_stage.set_to_writeback();

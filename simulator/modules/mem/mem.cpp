@@ -42,9 +42,11 @@ void Mem<FuncInstr>::clock( Cycle cycle)
 
     auto instr = rp_datapath->read( cycle);
 
+    sout << instr << std::endl;
+
     /* perform required loads and stores */
     memory->load_store( &instr);
-    
+
     /* bypass data */
     wp_bypass->write( instr.get_v_dst(), cycle);
     

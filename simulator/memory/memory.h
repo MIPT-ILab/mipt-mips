@@ -193,10 +193,12 @@ void FuncMemory::store( const Instr& instr)
 template<typename Instr>
 void FuncMemory::load_store( Instr* instr)
 {
-    if ( instr->is_load()) {
+    if ( instr->is_load())
+    {
         load( instr);
     }
-    else if ( instr->is_store()) {
+    else if ( instr->is_store())
+    {
         if ( instr->get_endian() == std::endian::little)
             store<Instr, std::endian::little>( *instr);
         else
