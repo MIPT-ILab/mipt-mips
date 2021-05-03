@@ -142,7 +142,7 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10 libboost-dev
+      run: sudo apt-get install ninja-build clang++-12 clang-tidy-12 llvm-12 libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
