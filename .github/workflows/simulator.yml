@@ -126,9 +126,9 @@ jobs:
             cxx: g++-10
             gcov: gcov-10
           - name: llvm
-            cc: clang-10
-            cxx: clang++-10
-            gcov: "llvm-cov-10 gcov"
+            cc: clang-12
+            cxx: clang++-12
+            gcov: "llvm-cov-12 gcov"
 
     steps:
     - name: Checkout repository
@@ -168,7 +168,7 @@ jobs:
     - name: Clang-Tidy
       if: matrix.config.name == 'llvm'
       working-directory: build
-      run: run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
+      run: run-clang-tidy-12.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
