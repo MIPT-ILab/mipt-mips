@@ -161,9 +161,7 @@ jobs:
       run: ./unit-tests
 
     - name: Codecov
-      env:
-        GCOV: ${{ matrix.config.gcov }}
-      run: bash <(curl -s https://codecov.io/bash) -x $GCOV -X gcovout
+      run: bash <(curl -s https://codecov.io/bash) -x "${{ matrix.config.gcov }}" -X gcovout
     
     - name: Clang-Tidy
       if: matrix.config.name == 'llvm'
