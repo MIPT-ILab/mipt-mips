@@ -1,5 +1,29 @@
 ---
-Checks: '*,-*braces-around-statements,-llvm-header-guard,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-statically-constructed-objects,-*-magic-numbers,-cppcoreguidelines-macro-usage,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-*-non-private-member-variables-in-classes,-llvmlibc-*'
+Checks: >
+  *,
+  -abseil-*,
+  -altera-*,
+  -clang-analyzer-osx.*,
+  -concurrency-*,
+  -google-objc-*,
+  -linuxkernel-*,
+  -llvmlibc-*,
+  -mpi-*,
+  -objc-*,
+  -openmp-*,
+  -zircon-*,
+  -*-braces-around-statements,
+  -*-magic-numbers,
+  -*-non-private-member-variables-in-classes,
+  -fuchsia-default-arguments-calls,
+  -fuchsia-overloaded-operator,
+  -fuchsia-statically-constructed-objects,
+  -cppcoreguidelines-macro-usage,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -llvm-header-guard,
+  -readability-function-cognitive-complexity
+
 CheckOptions:
   - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
     value: 1
