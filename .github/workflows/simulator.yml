@@ -126,9 +126,9 @@ jobs:
             cxx: g++-10
             gcov: gcov-10
           - name: llvm
-            cc: clang-11
-            cxx: clang++-11
-            gcov: "llvm-cov-11 gcov"
+            cc: clang-12
+            cxx: clang++-12
+            gcov: "llvm-cov-12 gcov"
 
     steps:
     - name: Checkout repository
@@ -142,7 +142,7 @@ jobs:
         languages: 'cpp'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build clang++-11 clang-tidy-11 llvm-11 libboost-dev
+      run: sudo apt-get install ninja-build clang++-12 clang-tidy-12 llvm-12 libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -166,7 +166,7 @@ jobs:
     - name: Clang-Tidy
       if: matrix.config.name == 'llvm'
       working-directory: build
-      run: run-clang-tidy-11.py -header-filter='.*' 2> /dev/null
+      run: run-clang-tidy-12.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
