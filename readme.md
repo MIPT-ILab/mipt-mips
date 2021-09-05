@@ -1,7 +1,6 @@
 [![Contributors](https://img.shields.io/github/contributors/mipt-ilab/mipt-mips?label=Contributors)](https://github.com/MIPT-ILab/mipt-mips/graphs/contributors)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/alerts/)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/alerts/)c
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:cpp)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:javascript)
 
 # MIPT-V / MIPT-MIPS
 
@@ -29,7 +28,7 @@ Key microarchitecture features:
 * Interstage data bypassing
 
 ### Topology visualization:
-[![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/mipt-mips/tree/master/visualizer)
+[![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/PipelineFlowchartVis)
 
 ### Pipeline diagrams:
 [![Pipeline](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/visualizer.png)](https://github.com/MIPT-ILab/PipelineVis)
