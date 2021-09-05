@@ -74,7 +74,7 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x20E797B3, "slo $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x20E79793, "sloi $a5, $a5, 14");
     TEST_RV32_DISASM  ( 0x411865b3, "orn $a1, $a6, $a7");
-    TEST_RV32_DISASM  ( 0x68e797b3, "sbinv $a5, $a5, $a4");
+    TEST_RV32_DISASM  ( 0x68e797b3, "binv $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x4028d713, "srai $a4, $a7, 2");
     TEST_RV64_DISASM  ( 0x4028d713, "srai $a4, $a7, 2");
     TEST_RV64_DISASM  ( 0x4070df1b, "sraiw $t5, $ra, 7");
@@ -85,10 +85,10 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x20E797B3, "slo $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x20E79793, "sloi $a5, $a5, 14");
     TEST_RV32_DISASM  ( 0x411865b3, "orn $a1, $a6, $a7");
-    TEST_RV32_DISASM  ( 0x68e797b3, "sbinv $a5, $a5, $a4");        
-    TEST_RV32_DISASM  ( 0x68e797b3, "sbinv $a5, $a5, $a4");
-    TEST_RV32_DISASM  ( 0x48e7d7b3, "sbext $a5, $a5, $a4");
-    TEST_RV64_DISASM  ( 0x48e7d7b3, "sbext $a5, $a5, $a4");
+    TEST_RV32_DISASM  ( 0x68e797b3, "binv $a5, $a5, $a4");        
+    TEST_RV32_DISASM  ( 0x68e797b3, "binv $a5, $a5, $a4");
+    TEST_RV32_DISASM  ( 0x48e7d7b3, "bext $a5, $a5, $a4");
+    TEST_RV64_DISASM  ( 0x48e7d7b3, "bext $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x08d64533, "pack $a0, $a2, $a3");
     TEST_RV32_DISASM  ( 0x40e6c633, "xnor $a2, $a3, $a4");
     TEST_RV32_DISASM  ( 0xAE6E633,  "max $a2, $a3, $a4");
@@ -97,7 +97,7 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x20D65593, "sroi $a1, $a2, 13");
     TEST_RV32_DISASM  ( 0x48F77833, "bfp $a6, $a4, $a5");
     TEST_RV32_DISASM  ( 0x68D655B3, "grev $a1, $a2, $a3");
-    TEST_RV32_DISASM  ( 0x60281593, "pcnt $a1, $a6, $sp");
+    TEST_RV32_DISASM  ( 0x60281593, "cpop $a1, $a6, $sp");
     TEST_RV32_DISASM  ( 0x60079793, "clz $a5, $a5");
     TEST_RV32_DISASM  ( 0x60179793, "ctz $a5, $a5");
     TEST_RV32_DISASM  ( 0x60E797B3, "rol $a5, $a5, $a4");
@@ -160,30 +160,30 @@ TEST_RV64_IMM_OP( 5, sloi, 0x8000000000007, 0x0001000000000000, 0x3)
 TEST_RV32_RR_OP( 1, orn, 0x10ff, 0xf7, 0xffffef77)
 TEST_RV64_RR_OP( 1, orn, 0x40000000000010ff, 0xf7, 0xbfffffffffffef77)
 
-TEST_RV32_RR_OP( 1, sbinv, 0x0, 0x1, 0)
-TEST_RV32_RR_OP( 2, sbinv, 0x0, 0x1, 32)
-TEST_RV32_RR_OP( 3, sbinv, 0x8, 0x0, 35)
-TEST_RV32_RR_OP( 4, sbinv, 0x8f, 0xcf, 6)
-TEST_RV32_RR_OP( 5, sbinv, 0xcf, 0x8f, 6)
+TEST_RV32_RR_OP( 1, binv, 0x0, 0x1, 0)
+TEST_RV32_RR_OP( 2, binv, 0x0, 0x1, 32)
+TEST_RV32_RR_OP( 3, binv, 0x8, 0x0, 35)
+TEST_RV32_RR_OP( 4, binv, 0x8f, 0xcf, 6)
+TEST_RV32_RR_OP( 5, binv, 0xcf, 0x8f, 6)
 
-TEST_RV64_RR_OP( 1, sbinv, 0x0, 0x1, 0)
-TEST_RV64_RR_OP( 2, sbinv, 0x100000001, 0x1, 32)
-TEST_RV64_RR_OP( 3, sbinv, 0x0, 0x1, 64)
-TEST_RV64_RR_OP( 4, sbinv, 0x8, 0x0, 67)
-TEST_RV64_RR_OP( 5, sbinv, 0x8f, 0xcf, 6)
-TEST_RV64_RR_OP( 6, sbinv, 0xcf, 0x8f, 6)
+TEST_RV64_RR_OP( 1, binv, 0x0, 0x1, 0)
+TEST_RV64_RR_OP( 2, binv, 0x100000001, 0x1, 32)
+TEST_RV64_RR_OP( 3, binv, 0x0, 0x1, 64)
+TEST_RV64_RR_OP( 4, binv, 0x8, 0x0, 67)
+TEST_RV64_RR_OP( 5, binv, 0x8f, 0xcf, 6)
+TEST_RV64_RR_OP( 6, binv, 0xcf, 0x8f, 6)
 
-TEST_RV32_RR_OP( 1, sbext, 0x1, 0xf, 1)
-TEST_RV32_RR_OP( 2, sbext, 0x1, all_ones<uint32>(), 31)
-TEST_RV32_RR_OP( 3, sbext, 0x1, 0x6eda, 4)
-TEST_RV32_RR_OP( 4, sbext, 0x0, 0x6eca, 4)
-TEST_RV32_RR_OP( 5, sbext, 0x1, 0xD00, 8)
+TEST_RV32_RR_OP( 1, bext, 0x1, 0xf, 1)
+TEST_RV32_RR_OP( 2, bext, 0x1, all_ones<uint32>(), 31)
+TEST_RV32_RR_OP( 3, bext, 0x1, 0x6eda, 4)
+TEST_RV32_RR_OP( 4, bext, 0x0, 0x6eca, 4)
+TEST_RV32_RR_OP( 5, bext, 0x1, 0xD00, 8)
 
-TEST_RV64_RR_OP( 1, sbext, 0x1, 0xf, 1)
-TEST_RV64_RR_OP( 2, sbext, 0x1, all_ones<uint64>(), 56)
-TEST_RV64_RR_OP( 3, sbext, 0x1, 0x6eda, 4)
-TEST_RV64_RR_OP( 4, sbext, 0x0, 0x6eca, 4)
-TEST_RV64_RR_OP( 5, sbext, 0x1, 0xD00, 8)
+TEST_RV64_RR_OP( 1, bext, 0x1, 0xf, 1)
+TEST_RV64_RR_OP( 2, bext, 0x1, all_ones<uint64>(), 56)
+TEST_RV64_RR_OP( 3, bext, 0x1, 0x6eda, 4)
+TEST_RV64_RR_OP( 4, bext, 0x0, 0x6eca, 4)
+TEST_RV64_RR_OP( 5, bext, 0x1, 0xD00, 8)
 
 TEST_RV32_RR_OP( 1, pack, 0x33332222, 0xffff2222, 0x11113333)
 TEST_RV64_RR_OP( 1, pack, 0x3333333322222222, 0xffffffff22222222, 0x1111111133333333)
@@ -226,9 +226,9 @@ TEST_RV64_RR_OP( 5, grev, 0xC480E6A2D591F7B3, 0x0123456789ABCDEF, 0xF)
 TEST_RV64_RR_OP( 6, grev, 0xE6A2C480F7B3D591, 0x0123456789ABCDEF, 0x1F)
 TEST_RV64_RR_OP( 7, grev, 0xF7B3D591E6A2C480, 0x0123456789ABCDEF, 0x3F)
 
-TEST_RV32_RR_OP( 1, pcnt, 0xc, 0xfff, 0)
-TEST_RV64_RR_OP( 1, pcnt, 41, 0xfafbfcfdfeff, 0)
-TEST_RV128_RR_OP( 1, pcnt, 82, ( ( static_cast<uint128>(0xfafbfcfdfeff) << 64) | static_cast<uint128>(0xfafbfcfdfeff)), 0)
+TEST_RV32_RR_OP( 1, cpop, 0xc, 0xfff, 0)
+TEST_RV64_RR_OP( 1, cpop, 41, 0xfafbfcfdfeff, 0)
+TEST_RV128_RR_OP( 1, cpop, 82, ( ( static_cast<uint128>(0xfafbfcfdfeff) << 64) | static_cast<uint128>(0xfafbfcfdfeff)), 0)
 
 TEST_RV32_RR_OP( 1, clz, 32, 0, 0)
 TEST_RV32_RR_OP( 2, clz, 0, all_ones<uint32>(), 0)
