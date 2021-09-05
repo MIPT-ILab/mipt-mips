@@ -93,9 +93,12 @@ template<typename I> const auto execute_divu = RISCVMultALU<I>::template div<typ
 template<typename I> const auto execute_rem = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
 template<typename I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
 // B
+template<typename I> const auto execute_bext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
 template<typename I> const auto execute_bfp = RISCVALU<I>::bit_field_place;
+template<typename I> const auto execute_binv = RISCVALU<I>::template sbinv<typename I::RegisterUInt>;
 template<typename I> const auto execute_clmul = RISCVALU<I>::template clmul<typename I::RegisterUInt>;
 template<typename I> const auto execute_clz = RISCVALU<I>::template clz<typename I::RegisterUInt>;
+template<typename I> const auto execute_cpop = RISCVALU<I>::template pcnt<typename I::RegisterUInt>;
 template<typename I> const auto execute_ctz = RISCVALU<I>::template ctz<typename I::RegisterUInt>;
 template<typename I> const auto execute_gorc = RISCVALU<I>::template gorc<typename I::RegisterUInt>;
 template<typename I> const auto execute_gorci = RISCVALU<I>::gorci;
@@ -107,12 +110,9 @@ template<typename I> const auto execute_minu = RISCVALU<I>::minu;
 template<typename I> const auto execute_orn = RISCVALU<I>::orn;
 template<typename I> const auto execute_pack = RISCVALU<I>::template pack<typename I::RegisterUInt>;
 template<typename I> const auto execute_packu = RISCVALU<I>::template packu<typename I::RegisterUInt>;
-template<typename I> const auto execute_pcnt = RISCVALU<I>::template pcnt<typename I::RegisterUInt>;
 template<typename I> const auto execute_rol = RISCVALU<I>::rol;
 template<typename I> const auto execute_ror = RISCVALU<I>::ror;
 template<typename I> const auto execute_rori = RISCVALU<I>::rori;
-template<typename I> const auto execute_sbext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
-template<typename I> const auto execute_sbinv = RISCVALU<I>::template sbinv<typename I::RegisterUInt>;
 template<typename I> const auto execute_shfl = RISCVALU<I>::riscv_shfl;
 template<typename I> const auto execute_slo = RISCVALU<I>::template slo<typename I::RegisterUInt>;
 template<typename I> const auto execute_sloi = RISCVALU<I>::template sloi<typename I::RegisterUInt>;
@@ -336,14 +336,14 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_slo,        execute_slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sro,        execute_sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_orn,        execute_orn<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_sbinv,      execute_sbinv<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_sbext,      execute_sbext<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_binv,       execute_binv<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_bext,       execute_bext<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_pack,       execute_pack<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_packu,      execute_packu<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_xnor,       execute_xnor<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_bfp,        execute_bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_grev,       execute_grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_pcnt,       execute_pcnt<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_cpop,       execute_cpop<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clz,        execute_clz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_ctz,        execute_ctz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_rol,        execute_rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
