@@ -4,80 +4,21 @@ This project is a part of [MIPT ILab](https://mipt-ilab.github.io/) activity at 
 The project is being developed by a group of students under the guidance of Intel employees.
 Additionally, it is a supporting project to MIPT lectures on Computer Architecture and Software Development courses.
 
-## Computer Architecture 2020/2021
+## Computer Architecture 2021/2022
 
-Lectures are given online each **Monday, 10:45-12:10**.
-A link to join the meeting: [link](https://meet.google.com/fjn-ycma-ucb).
+Lectures are given each **Monday at 10:45-12:10**.
+In-person lectures are given in **room 108 of RT building** in MIPT.
+Online lectures are given via Google Meet, a link to join the conference: [link](https://meet.google.com/gpj-uunt-zfg).
 
-[Intro]:     https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Course%20Introduction.pptx?raw=true
-[L1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%201%20-%20Layers%20of%20Computer%20Architecture.%20ISA%20and%20uArch.pptx?raw=true
-[L2]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%202%20-%20ISA%20and%20uArch.pptx?raw=true
-[L3]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%203%20-%20Integrated%20Circuits.pptx?raw=true
-[L4]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%204%20-%20CMOS.pptx?raw=true
-[L5]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%205%20-%20Combinational%20Circuits.pptx?raw=true
-[L6]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%206%20-%20Sequential%20Circuits.pptx?raw=true
-[L7]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%207%20-%20RISC-V%20ISA.pptx?raw=true
-[L8]:        https://github.com/MIPT-ILab/ca-lectures/raw/master/mipt-mips/2020/Lecture%208%20-%20RISC-V%20Single-Cycle%20implementation.pptx?raw=true
-[L9]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%209%20-%20Pipelining.pptx?raw=true
-[L10]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2010%20-%20Data%20Hazards.pptx?raw=true
-[L11]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2011%20-%20Control%20Hazards.%20Branch%20Prediction.pptx?raw=true
-[L12]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2012%20-%20Advanced%20Pipelining.pptx?raw=true
-[L13]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2013%20-%20Caches%2C%20part%201.pptx?raw=true
-[L14]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2014%20-%20Caches%2C%20part%202.pptx?raw=true
-[L15]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2015%20-%20Caches%2C%20part%203.pptx?raw=true
-[L16]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2016%20-%20Virtual%20Memory.pptx?raw=true
-[L17]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2017%20-%20ILP.%20Superscalar.%20OOO%20-%20part%201.pptx?raw=true
-[L18]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2018%20-%20OOO%20-%20part%202.pptx?raw=true
-[L19]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2019%20-%20OOO%20part%203,%20loads%20and%20stores%20(Load-Store%20Architecture).pptx?raw=true
-[L20]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2020%20-%20Introduction%20to%20Software%20Development.pptx?raw=true
-[L21]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2021%20-%20TLP%20-%20part%201.pptx?raw=true
-[L22]:       https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Lecture%2022%20-%20TLP%20-%20part%202%20(Multithreading%2C%20Synchronization).pptx?raw=true
-[L7-VIDEO]:  https://drive.google.com/file/d/1ITi6EVFnVs2rUZxU5_IurgNNUN0WI6TC/view?usp=sharing
-[L8-VIDEO]:  https://drive.google.com/file/d/1uk1dXSwToPq2yj0leAvXCVwpYBcntXjv/view?usp=sharing
-[L10-VIDEO]: https://drive.google.com/file/d/1-Z7IkpZVhrrMSNu-OFcXcr-XpXUP9OmK/view?usp=sharing
-[L11-VIDEO]: https://drive.google.com/file/d/1UCMwKX36BR9Jx1eJseWmI4ykDIjxJ7Kp/view?usp=sharing
-[L12-VIDEO]: https://drive.google.com/file/d/1PlGlKrJ7FkMLR-GX5TfhQDc6W0ttjLv3/view?usp=sharing
-[L13-VIDEO]: https://drive.google.com/file/d/1sOfYuI5sdzcnMC6TptBTJwPALNHFxaCZ/view?usp=sharing
-[L14-VIDEO]: https://drive.google.com/file/d/1ZJm1iFeBG47pk65VMo9vFJlWBCDIEykx/view?usp=sharing
-[L15-VIDEO]: https://drive.google.com/file/d/1AYhWqXkcvT_vN6yxiVsPSz62I1ysfhjE/view?usp=sharing
-[L16-VIDEO]: https://drive.google.com/file/d/1qZDI3H3kwWf8CO8RebRHb4zh4zibmDgP/view?usp=sharing
-[L17-VIDEO]: https://drive.google.com/file/d/1O1FR49W744vYbSI9h--JKvaaHnEH2lUQ/view?usp=sharing
-[L18-VIDEO]: https://drive.google.com/file/d/14RmD57ppQLJBlE4e9Aujnu2lNr2j8SIE/view?usp=sharing
-[L19-VIDEO]: https://drive.google.com/file/d/13MRpnt_MVITdCvsZEFH_zUc8uD6_6QIX/view?usp=sharing
-[L20-VIDEO]: https://drive.google.com/file/d/1unBU5rmZhRLt4W9G1mIocH7NL4HQvQFu/view?usp=sharing
-[L21-VIDEO]: https://drive.google.com/file/d/1Jogk5m2QnAp84LS9dOfSe-Q2cepckWWk/view?usp=sharing
-[L22-VIDEO]: https://drive.google.com/file/d/1-_DC4k9u8g4Zt90rd89hTx4lT5iL65Oy/view?usp=sharing
-[P1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2020/Practice%201%20-%20Combinational%20and%20Sequential%20Circuits.pptx?raw=true
+[Intro]:     https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/01_Course_Introduction.pptx?raw=true
+[L1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/02_Lecture1-Layers_of_Computer_Architecture.pptx?raw=true
 
-Date   | Type     | Event
-:----: | :------: | ------
- 7 Sep | Org.     | **Course introduction**<br>                               • Slides: [download][Intro]
- 7 Sep | Lecture  | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]
-14 Sep | Lecture  | **L2: ISA and uArch**<br>                                 • Slides: [download][L2]
-14 Sep | Lecture  | **L3: Integrated Circuits**<br>                           • Slides: [download][L3]
-21 Sep | Lecture  | **L4: CMOS**<br>                                          • Slides: [download][L4]
-21 Sep | Lecture  | **L5: Combinational Circuits**<br>                        • Slides: [download][L5]
-28 Sep | Lecture  | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]
- 5 Oct | Practice | **P1: Combinational & Sequential Circuits**<br>           • Slides: [download][P1]
-12 Oct | Lecture  | **L7: RISC-V ISA**<br>                                    • Slides: [download][L7]<br> • Video: [watch][L7-VIDEO]
-19 Oct | Lecture  | **L8: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L8]<br> • Video: [watch][L8-VIDEO]
-26 Oct | Lecture  | **L9: Pipelining**<br>                                    • Slides: [download][L9]
- 2 Nov | Lecture  | **L10: Data hazards**<br>                                 • Slides: [download][L10]<br> • Video: [watch][L10-VIDEO]
- 9 Nov | Lecture  | **L11: Control Hazards. Branch Prediction**<br>           • Slides: [download][L11]<br> • Video: [watch][L11-VIDEO]
-23 Nov | Lecture  | **L12: Advanced pipelining**<br>                          • Slides: [download][L12]<br> • Video: [watch][L12-VIDEO]
- 8 Feb | Lecture  | **L13: Caches, part 1/3**<br>                             • Slides: [download][L13]<br> • Video: [watch][L13-VIDEO]
-15 Feb | Lecture  | **L14: Caches, part 2/3**<br>                             • Slides: [download][L14]<br> • Video: [watch][L14-VIDEO]
-22 Feb | Lecture  | **L15: Caches, part 3/3**<br>                             • Slides: [download][L15]<br> • Video: [watch][L15-VIDEO]
- 1 Mar | Lecture  | **L16: Virtual memory**<br>                               • Slides: [download][L16]<br> • Video: [watch][L16-VIDEO]
-15 Mar | Lecture  | **L17: ILP. Superscalar. OOO - part 1**<br>               • Slides: [download][L17]<br> • Video: [watch][L17-VIDEO]
-22 Mar | Lecture  | **L18: OOO - part 2**<br>                                 • Slides: [download][L18]<br> • Video: [watch][L18-VIDEO]
-29 Mar | Lecture  | **L19: OOO - part 3, loads and stores**<br>               • Slides: [download][L19]<br> • Video: [watch][L19-VIDEO]
- 5 Apr | Lecture  | **L20: Introduction to Software Development**<br>         • Slides: [download][L20]<br> • Video: [watch][L20-VIDEO]
-12 Apr | Lecture  | **L21: TLP (part 1)**<br>                                 • Slides: [download][L21]<br> • Video: [watch][L21-VIDEO]
-19 Apr | Lecture  | **L22: TLP (part 2)**<br>                                 • Slides: [download][L22]<br> • Video: [watch][L22-VIDEO]
+Date        | Type     | Event
+:---------: | :------: | ------
+ 13.09.2021 | Org.     | **Course introduction**<br>                               • Slides: [download][Intro]
+ 13.09.2021 | Lecture  | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]<br>• Audio: TBD
 
-
-You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2019).
+You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
 Instructions to use downloaded material can be found on [wiki page](https://github.com/MIPT-ILab/mipt-mips/wiki/Instructions-to-use-downloaded-lectures).
 
