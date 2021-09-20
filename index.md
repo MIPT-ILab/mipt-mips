@@ -10,13 +10,20 @@ Lectures are given each **Monday at 10:45-12:10**.
 In-person lectures are given in **room 108 of RT building** in MIPT.
 Online lectures are given via Google Meet, a link to join the conference: [link](https://meet.google.com/gpj-uunt-zfg).
 
-[Intro]:     https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/01_Course_Introduction.pptx?raw=true
-[L1]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/02_Lecture1-Layers_of_Computer_Architecture.pptx?raw=true
+[Intro]:      https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/01_Course_Introduction.pptx?raw=true
+[L1]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/02_Lecture1-Layers_of_Computer_Architecture.pptx?raw=true
+[L2]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/03_Lecture2-ISA_and_uArch.pptx?raw=true
+[L3]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/04-Lecture3-Integrated_Circuits.pptx?raw=true
 
-Date        | Type     | Event
-:---------: | :------: | ------
- 13.09.2021 | Org.     | **Course introduction**<br>                               • Slides: [download][Intro]
- 13.09.2021 | Lecture  | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]<br>• Audio: TBD
+[L1-VIDEO]:   https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
+[L2-3-VIDEO]: https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
+
+Date        | Type          | Event
+:---------: | :-----------: | ------
+ 13.09.2021 | Org.          | **Course introduction**<br>                               • Slides: [download][Intro]
+ 13.09.2021 | Lecture: Arch | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]<br>• Recording: [warch][L1-VIDEO]
+ 20.09.2021 | Lecture: Arch | **L2: ISA and uArch**<br>                                 • Slides: [download][L2]<br>• Recording: [warch][L2-3-VIDEO]
+ 20.09.2021 | Lecture: Arch | **L3: Integrated Circuits**<br>                           • Slides: [download][L3]<br>• Recording: [warch][L2-3-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
