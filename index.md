@@ -17,6 +17,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L4]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/05_Lecture4-CMOS.pptx?raw=true
 [L5]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/06_Lecture5-Combinational_Circuits.pptx?raw=true
 [L6]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/07_Lecture6-Sequential_Circuits.pptx?raw=true
+[P1]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/08_Practice1-Combinational_and_Sequential_Circuits.pptx?raw=true
 
 [L1-VIDEO]:   https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]: https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
@@ -32,6 +33,7 @@ Date        | Type          | Event
  27.09.2021 | Lecture: Arch | **L4: CMOS**<br>                                          • Slides: [download][L4]<br>• Recording: [watch][L4-5-VIDEO]
  27.09.2021 | Lecture: Arch | **L5: Combinational Circuits**<br>                        • Slides: [download][L5]<br>• Recording: [watch][L4-5-VIDEO]
  04.10.2021 | Lecture: Arch | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]<br>• Recording: [watch][L6-VIDEO]
+ 11.10.2021 | Practice      | **P1: Combinational and Seqientional Circuits**<br>       • Slides: [download][P1]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
