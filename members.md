@@ -6,3 +6,4 @@ List of 2021/2022 MIPT-V project members:
 5. Matrenin Vasilii
 6. Panferov Ivan
 7. Radkin Kirill
+8. Michael Bargatin
