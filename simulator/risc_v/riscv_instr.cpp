@@ -93,6 +93,7 @@ template<typename I> const auto execute_divu = RISCVMultALU<I>::template div<typ
 template<typename I> const auto execute_rem = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
 template<typename I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
 // B
+template<typename I> const auto execute_add_uw = RISCVALU<I>::template add_uw<typename I::RegisterUInt>;
 template<typename I> const auto execute_bext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
 template<typename I> const auto execute_bfp = RISCVALU<I>::bit_field_place;
 template<typename I> const auto execute_binv = RISCVALU<I>::template sbinv<typename I::RegisterUInt>;
@@ -360,6 +361,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_shfl,       execute_shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_sloi,       execute_sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_add_uw,     execute_add_uw<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0,      64   },
 };
 
 
