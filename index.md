@@ -29,7 +29,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L7-VIDEO-1]: https://drive.google.com/file/d/10fAg6R7_N1iJ8Cu-Y287HVMAHqdS53CC/view?usp=sharing
 [L7-VIDEO-2]: https://drive.google.com/file/d/1M3SduIwO-4uVddKNqMzWzWuJOpjlNd6-/view?usp=sharing
 [L8-VIDEO]:   https://drive.google.com/file/d/1BokZMMdoygl6v46S2P688V-ygA1J1CJ4/view?usp=sharing
-[L9-VIDEO]:   https://drive.google.com/file/d/
+[L9-VIDEO]:   https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
