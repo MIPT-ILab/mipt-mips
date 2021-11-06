@@ -262,6 +262,8 @@ struct ALU
                 instr->v_dst[0] ^= instr->v_src[0] << index;
     }
 
+    template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+
     // Bit manipulations
     template<typename T> static
     void pack( Instr* instr)
