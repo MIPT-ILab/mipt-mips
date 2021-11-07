@@ -29,7 +29,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L7-VIDEO-1]: https://drive.google.com/file/d/10fAg6R7_N1iJ8Cu-Y287HVMAHqdS53CC/view?usp=sharing
 [L7-VIDEO-2]: https://drive.google.com/file/d/1M3SduIwO-4uVddKNqMzWzWuJOpjlNd6-/view?usp=sharing
 [L8-VIDEO]:   https://drive.google.com/file/d/1BokZMMdoygl6v46S2P688V-ygA1J1CJ4/view?usp=sharing
-[L9-VIDEO]:   https://drive.google.com/file/d/
+[L9-VIDEO]:   https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -91,7 +91,7 @@ MIPT-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/is
 
 Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32))
 
-RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, and Vladimir Graudt.
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, Vladimir Graudt, and Roman Glaz.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
