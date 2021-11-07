@@ -240,6 +240,9 @@ struct ALU
     template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
     static void gorci( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
+    // OR Combine
+    static void orc_b( Instr* instr ) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], 7); }
+
     // Conditional moves
     static void movn( Instr* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
     static void movz( Instr* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
