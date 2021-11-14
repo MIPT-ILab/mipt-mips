@@ -266,6 +266,7 @@ struct ALU
     }
 
     template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+    template<typename T> static void bclr  ( Instr* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
 
     // Bit manipulations
     template<typename T> static
