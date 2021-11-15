@@ -240,7 +240,7 @@ struct ALU
     template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
 
     // OR Combine
-    static constexpr size_t gorci_orc_b_shamt = 7;
+    static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
     static void orc_b( Instr* instr ) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt); }
 
     // Conditional moves
