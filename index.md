@@ -21,6 +21,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L7]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/09_Lecture7-Version_Control_System.pptx?raw=true
 [L8]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/10_Lecture8-RISC-V_ISA.pptx?raw=true
 [L9]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/11_Lecture9-RISC-V_Single-Cycle_implementation.pptx?raw=true
+[L10]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/12_Lecture10-Pipelining.pptx?raw=true
 
 [L1-VIDEO]:   https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]: https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
@@ -30,6 +31,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L7-VIDEO-2]: https://drive.google.com/file/d/1M3SduIwO-4uVddKNqMzWzWuJOpjlNd6-/view?usp=sharing
 [L8-VIDEO]:   https://drive.google.com/file/d/1BokZMMdoygl6v46S2P688V-ygA1J1CJ4/view?usp=sharing
 [L9-VIDEO]:   https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
+[L10-VIDEO]:  https://drive.google.com/file/d/1jUuWDCjKw-WeZGVDpx1O7XRPsWl0FVex/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -44,6 +46,7 @@ Date        | Type                  | Event
  18.10.2021 | Lecture:<br>Soft Dev  | **L7: Version Control System**<br>                        • Slides: [download][L7]<br>• Recording: [watch][L7-VIDEO-1]<br>• Git demo: [watch][L7-VIDEO-2]
  25.10.2021 | Lecture:<br>Comp Arch | **L8: RISC-V ISA**<br>                                    • Slides: [download][L8]<br>• Recording: [watch][L8-VIDEO]
  01.11.2021 | Lecture:<br>Comp Arch | **L9: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L9]<br>• Recording: [watch][L9-VIDEO]
+ 08.11.2021 | Lecture:<br>Comp Arch | **L10: Pipelining**<br>                                   • Slides: [download][L10]<br>• Recording: [watch][L10-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
