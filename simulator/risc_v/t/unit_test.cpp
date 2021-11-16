@@ -111,9 +111,6 @@ TEST_CASE("RISCV disassembly")
                                                           // issue is #1507
     TEST_RV64_DISASM  ( 0x63F7D793, "rori $a5, $a5, 63"); // 01100 | 0111111 (63) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x28D655B3, "gorc $a1, $a2, $a3");
-    TEST_RV32_DISASM  ( 0x28D65593, "gorci $a1, $a2, 13");
-    TEST_RV32_DISASM  ( 0x28F65593, "gorci $a1, $a2, 15");
-    TEST_RV32_DISASM  ( 0x29C65593, "gorci $a1, $a2, 28");
     TEST_RV32_DISASM  ( 0x484F9D93, "bclri $s11, $t6, 4");
     TEST_RV64_DISASM  ( 0x4A4F9D93, "bclri $s11, $t6, 36");
     TEST_RV32_DISASM  ( 0x2878d513, "orc_b $a0, $a7");
