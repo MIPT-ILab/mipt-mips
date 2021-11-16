@@ -37,7 +37,7 @@ struct ALU
     using Execute = void (*)( Instr*);
     using RegisterUInt = typename Instr::RegisterUInt;
     using RegisterSInt = typename Instr::RegisterSInt;
-    
+
     static constexpr size_t XLEN = bitwidth<RegisterUInt>;
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
@@ -262,6 +262,8 @@ struct ALU
                 instr->v_dst[0] ^= instr->v_src[0] << index;
     }
 
+    template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+
     // Bit manipulations
     template<typename T> static
     void pack( Instr* instr)
@@ -275,6 +277,14 @@ struct ALU
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
+    }
+
+    template<typename T> static
+    void bclri( Instr* instr )
+    {
+        size_t index = shamt_imm( instr) & (XLEN - 1);
+        size_t mask = ~(static_cast<size_t>( 1) << index);
+        instr->v_dst[0] = instr->v_src[0] & mask;
     }
 
     // Branches

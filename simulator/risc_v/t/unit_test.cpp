@@ -112,11 +112,14 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x28D65593, "gorci $a1, $a2, 13");
     TEST_RV32_DISASM  ( 0x28F65593, "gorci $a1, $a2, 15");
     TEST_RV32_DISASM  ( 0x29C65593, "gorci $a1, $a2, 28");
+    TEST_RV32_DISASM  ( 0x484F9D93, "bclri $s11, $t6, 4");
+    TEST_RV64_DISASM  ( 0x4A4F9D93, "bclri $s11, $t6, 36");
     TEST_RV32_DISASM  ( 0x091815b3, "shfl $a1, $a6, $a7");
     TEST_RV32_DISASM  ( 0x091855b3, "unshfl $a1, $a6, $a7");
     TEST_RV32_DISASM  ( 0xAE6C633,  "min $a2, $a3, $a4");
     TEST_RV32_DISASM  ( 0x0ae7d7b3, "minu $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x48D747B3, "packu $a5, $a4, $a3");
+    TEST_RV64_DISASM  ( 0x8D707BB,  "add_uw $a5, $a4, $a3"); // 0000100 | 01101 ($a3) | 01110 ($a4) | 000 | 01111 ($a5) | 0111011
 
     SECTION ("RISCV invalid instruction") {
         TEST_RV32_DISASM ( 0x0, "unknown" );
@@ -328,6 +331,13 @@ TEST_RV64_IMM_OP( 4, gorci, 0xFFFFFFFF77773333, 0x8712478912441231,  0xC)
 TEST_RV64_IMM_OP( 5, gorci, all_ones<uint64>(), 1,  0xFF)
 TEST_RV64_IMM_OP( 6, gorci, 0xFFFF0FFFFFFF0FFF, 0x1252039112340987,  0x3)
 
+TEST_RV32_IMM_OP( 1, bclri, 0x7FFFFFFF, all_ones<uint32>(), 0x1F) // 31 bit cleared (max bit)
+TEST_RV32_IMM_OP( 2, bclri, 0xFFFFFFFE, all_ones<uint32>(), 0x00) // 0 bit cleared (min bit)
+TEST_RV32_IMM_OP( 3, bclri, 0xFFFDFFFF, all_ones<uint32>(), 0x11) // 17 bit cleared
+TEST_RV64_IMM_OP( 1, bclri, 0x7FFFFFFFFFFFFFFF, all_ones<uint64>(), 0x3F) // 63 bit cleared (max bit)
+TEST_RV64_IMM_OP( 2, bclri, 0xFFFFFFFFFFFFFFFE, all_ones<uint64>(), 0x00) // 0 bit cleared (min bit)
+TEST_RV64_IMM_OP( 3, bclri, 0xFFFFFFFFFFFDFFFF, all_ones<uint64>(), 0x11) // 17 bit cleared
+
 TEST_RV32_RR_OP( 1, shfl, 0x12563478, 0x12345678, 0x08)
 TEST_RV64_RR_OP( 1, shfl, 0x021346578a9bcedf, 0x0123456789abcdef, 0x04)
 
@@ -352,6 +362,10 @@ TEST_RV32_RR_OP( 3, minu, 0x22222222, 0xbbbbbbbb, 0x22222222)
 
 TEST_RV32_RR_OP( 1, packu, 0x1111ffff, 0xffff2222, 0x11113333)
 TEST_RV64_RR_OP( 1, packu, 0x11111111ffffffff, 0xffffffff22222222, 0x1111111133333333)
+
+TEST_RV64_RR_OP( 1, add_uw, 0x12344321b5a69788, 0xabababab82736455, 0x1234432133333333)
+TEST_RV64_RR_OP( 2, add_uw, 0x1111111233333332, 0x11111111ffffffff, 0x1111111133333333) // 32 bits overflow
+TEST_RV64_RR_OP( 3, add_uw, 0x01010102222221ce, 0xffffffffffffffac, 0x0101010122222222) // 64 bits overflow
 
 
 TEST_CASE("RISCV bytes dump")
