@@ -289,8 +289,8 @@ struct ALU
     template<typename T> static
     void bclri( Instr* instr )
     {
-        size_t index = shamt_imm( instr) & (XLEN - 1);
-        size_t mask = ~(static_cast<size_t>( 1) << index);
+        uint64_t index = shamt_imm( instr) & (XLEN - 1);
+        uint64_t mask = ~(static_cast<uint64_t>( 1) << index);
         instr->v_dst[0] = instr->v_src[0] & mask;
     }
 
