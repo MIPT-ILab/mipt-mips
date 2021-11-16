@@ -238,7 +238,10 @@ struct ALU
 
     // Generalized OR-Combine
     template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
-    static void gorci( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
+
+    // OR Combine
+    static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
+    static void orc_b( Instr* instr ) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt); }
 
     // Conditional moves
     static void movn( Instr* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
@@ -263,6 +266,10 @@ struct ALU
     }
 
     template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+  
+    template<typename T> static void bclr  ( Instr* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
+
+    template<typename T> static void bseti( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] | (lsb_set<T>() << (shamt_imm (instr) & (XLEN - 1))); }
 
     // Bit manipulations
     template<typename T> static
@@ -286,6 +293,8 @@ struct ALU
         size_t mask = ~(static_cast<size_t>( 1) << index);
         instr->v_dst[0] = instr->v_src[0] & mask;
     }
+
+    static void bset( Instr* instr) { instr->v_dst[0] = instr->v_src[0] | (lsb_set<RegisterUInt>() << shamt_v_src2<RegisterUInt>(instr)); }
 
     // Branches
     template<Predicate p> static
