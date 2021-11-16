@@ -125,6 +125,9 @@ TEST_CASE("RISCV disassembly")
                                                           // isssue is #1508 
     TEST_RV64_DISASM  ( 0x48D717B3,  "bclr $a5, $a4, $a3"); // 0100100 | 01101 ($a3) | 01110 ($a4) | 001 | 01111 ($a5) | 0110011
 
+    TEST_RV32_DISASM  ( 0x28F716B3,  "bset $a3, $a4, $a5");
+    TEST_RV64_DISASM  ( 0x28D717B3,  "bset $a5, $a4, $a3");
+
     SECTION ("RISCV invalid instruction") {
         TEST_RV32_DISASM ( 0x0, "unknown" );
         TEST_RV32_DISASM ( 0xf6000053, "unknown" );
@@ -413,6 +416,18 @@ TEST_RV64_RR_OP(  7, bclr, 0xffbfffffffffffff, 0xffffffffffffffff, 0x00000000000
 TEST_RV64_RR_OP(  8, bclr, 0x0000000000000000, 0x0040000000000000, 0x0000000000000076) // overflow test
 TEST_RV64_RR_OP(  9, bclr, 0x7fffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff) // overflow test
 TEST_RV64_RR_OP( 10, bclr, 0x0000000000000000, 0x8000000000000000, 0xffffffffffffffff) // overflow test
+
+TEST_RV32_RR_OP( 1, bset, 0x00000010, 0x00000000, 0x4)
+TEST_RV32_RR_OP( 2, bset, 0xFFFFFFF1, 0xFFFFFFF0, 0x0)
+TEST_RV32_RR_OP( 3, bset, 0xFFFFFFF3, 0xFFFFFFF1, 0x1)
+TEST_RV32_RR_OP( 4, bset, 0x00000002, 0x00000000, 0xFFFFFF01) // overflow test
+TEST_RV32_RR_OP( 5, bset, 0x00010000, 0x00000000, 0xFFFFFFF0) // overflow test
+
+TEST_RV64_RR_OP( 1, bset, 0x0000000000000100, 0x0000000000000000, 0x8)
+TEST_RV64_RR_OP( 2, bset, 0x0000000000008000, 0x0000000000000000, 0xF)
+TEST_RV64_RR_OP( 3, bset, 0xFFFFFFFFFFFFFFF4, 0xFFFFFFFFFFFFFFF0, 0x2)
+TEST_RV64_RR_OP( 4, bset, 0xAAAAAAAAAAAAAAA2, 0xAAAAAAAAAAAAAAA0, 0xFFFFFFFFFFFFFF01) // overflow test
+TEST_RV64_RR_OP( 5, bset, 0x1111111111111100, 0x1111111111111000, 0xFFFFFFFFFFFFFF08) // overflow test
 
 TEST_CASE("RISCV bytes dump")
 {

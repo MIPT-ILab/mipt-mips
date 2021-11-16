@@ -285,6 +285,8 @@ struct ALU
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
     }
 
+    static void bset( Instr* instr) { instr->v_dst[0] = instr->v_src[0] | (lsb_set<RegisterUInt>() << shamt_v_src2<RegisterUInt>(instr)); }
+
     // Branches
     template<Predicate p> static
     void branch( Instr* instr)
