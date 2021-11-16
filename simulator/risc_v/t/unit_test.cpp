@@ -107,6 +107,8 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x6007D793, "rori $a5, $a5, 0");  // 01100 | 0000000 (0)  | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x60F7D793, "rori $a5, $a5, 15"); // 01100 | 0001111 (15) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x61F7D793, "rori $a5, $a5, 31"); // 01100 | 0011111 (31) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
+    TEST_RV32_DISASM  ( 0x65F7D793, "rori $a5, $a5, 31"); // this test should not be passed because shamt[5] bit is 1 (for more info see specification for rori)
+                                                          // issue is #1507
     TEST_RV64_DISASM  ( 0x63F7D793, "rori $a5, $a5, 63"); // 01100 | 0111111 (63) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x28D655B3, "gorc $a1, $a2, $a3");
     TEST_RV32_DISASM  ( 0x2878d513, "orc_b $a0, $a7");
@@ -116,6 +118,11 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x0ae7d7b3, "minu $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x48D747B3, "packu $a5, $a4, $a3");
     TEST_RV64_DISASM  ( 0x8D707BB,  "add_uw $a5, $a4, $a3"); // 0000100 | 01101 ($a3) | 01110 ($a4) | 000 | 01111 ($a5) | 0111011
+
+    TEST_RV64_DISASM  ( 0x28179713, "bseti $a4, $a5, 1");
+    TEST_RV32_DISASM  ( 0x28269793, "bseti $a5, $a3, 2");
+    TEST_RV32_DISASM  ( 0x2A269793, "bseti $a5, $a3, 2"); // this test should not be passed because shamt[5] bit is 1 (for more info see specification for bseti)
+                                                          // isssue is #1508 
     TEST_RV64_DISASM  ( 0x48D717B3,  "bclr $a5, $a4, $a3"); // 0100100 | 01101 ($a3) | 01110 ($a4) | 001 | 01111 ($a5) | 0110011
 
     SECTION ("RISCV invalid instruction") {
@@ -374,6 +381,17 @@ TEST_RV64_RR_OP( 1, add_uw, 0x12344321b5a69788, 0xabababab82736455, 0x1234432133
 TEST_RV64_RR_OP( 2, add_uw, 0x1111111233333332, 0x11111111ffffffff, 0x1111111133333333) // 32 bits overflow
 TEST_RV64_RR_OP( 3, add_uw, 0x01010102222221ce, 0xffffffffffffffac, 0x0101010122222222) // 64 bits overflow
 
+
+TEST_RV64_IMM_OP ( 1, bseti, 0x4, 0x0, 0x2)
+TEST_RV64_IMM_OP ( 2, bseti, 0x100000000, 0x0, 0x20)
+TEST_RV64_IMM_OP ( 3, bseti, 0x200000000000000, 0x0, 0x39)
+TEST_RV64_IMM_OP ( 4, bseti, 0x8000000000000000, 0x0, 0x7F) //overflow test
+
+TEST_RV32_IMM_OP ( 1, bseti, 0x8, 0x0, 0x3)
+TEST_RV32_IMM_OP ( 2, bseti, 0x800000, 0x0, 0x17)
+TEST_RV32_IMM_OP ( 3, bseti, 0x20, 0x0, 0x5)
+TEST_RV32_IMM_OP ( 4, bseti, 0x80000000, 0x0, 0x3F) //overflow test
+
 TEST_RV32_RR_OP(  1, bclr, 0xfffffff0, 0xfffffff1, 0x00000000)
 TEST_RV32_RR_OP(  2, bclr, 0xfffffff1, 0xfffffff1, 0x00000002)
 TEST_RV32_RR_OP(  3, bclr, 0xffdfffff, 0xffffffff, 0x00000015)
@@ -395,7 +413,6 @@ TEST_RV64_RR_OP(  7, bclr, 0xffbfffffffffffff, 0xffffffffffffffff, 0x00000000000
 TEST_RV64_RR_OP(  8, bclr, 0x0000000000000000, 0x0040000000000000, 0x0000000000000076) // overflow test
 TEST_RV64_RR_OP(  9, bclr, 0x7fffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff) // overflow test
 TEST_RV64_RR_OP( 10, bclr, 0x0000000000000000, 0x8000000000000000, 0xffffffffffffffff) // overflow test
-
 
 TEST_CASE("RISCV bytes dump")
 {
