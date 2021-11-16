@@ -360,9 +360,11 @@ TEST_RV64_RR_OP( 15, orc_b, all_ones<uint64>(), all_ones<uint64>(), 0)
 TEST_RV32_IMM_OP( 1, bclri, 0x7FFFFFFF, all_ones<uint32>(), 0x1F) // 31 bit cleared (max bit)
 TEST_RV32_IMM_OP( 2, bclri, 0xFFFFFFFE, all_ones<uint32>(), 0x00) // 0 bit cleared (min bit)
 TEST_RV32_IMM_OP( 3, bclri, 0xFFFDFFFF, all_ones<uint32>(), 0x11) // 17 bit cleared
+TEST_RV32_IMM_OP( 4, bclri, 0xFFFDFFFF, 0xFFFDFFFF, 0x11) // Cleared already zero bit.
 TEST_RV64_IMM_OP( 1, bclri, 0x7FFFFFFFFFFFFFFF, all_ones<uint64>(), 0x3F) // 63 bit cleared (max bit)
 TEST_RV64_IMM_OP( 2, bclri, 0xFFFFFFFFFFFFFFFE, all_ones<uint64>(), 0x00) // 0 bit cleared (min bit)
 TEST_RV64_IMM_OP( 3, bclri, 0xFFFFFFFFFFFDFFFF, all_ones<uint64>(), 0x11) // 17 bit cleared
+TEST_RV64_IMM_OP( 4, bclri, 0xFFFFFFFFFFFDFFFF, 0xFFFFFFFFFFFDFFFF, 0x11) // Cleared already zero bit.
 
 TEST_RV32_RR_OP( 1, shfl, 0x12563478, 0x12345678, 0x08)
 TEST_RV64_RR_OP( 1, shfl, 0x021346578a9bcedf, 0x0123456789abcdef, 0x04)
