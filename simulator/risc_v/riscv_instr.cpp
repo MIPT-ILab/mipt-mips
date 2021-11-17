@@ -117,6 +117,7 @@ template<typename I> const auto execute_packu = RISCVALU<I>::template packu<type
 template<typename I> const auto execute_rol = RISCVALU<I>::rol;
 template<typename I> const auto execute_ror = RISCVALU<I>::ror;
 template<typename I> const auto execute_rori = RISCVALU<I>::rori;
+template<typename I> const auto execute_sext_b = RISCVALU<I>::template sext_b<typename I::RegisterUInt>;
 template<typename I> const auto execute_shfl = RISCVALU<I>::riscv_shfl;
 template<typename I> const auto execute_slo = RISCVALU<I>::template slo<typename I::RegisterUInt>;
 template<typename I> const auto execute_sloi = RISCVALU<I>::template sloi<typename I::RegisterUInt>;
@@ -367,7 +368,8 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_add_uw,     execute_add_uw<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0,      64   },
     {'B', instr_bclr,       execute_bclr<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
     {'B', instr_bseti,      execute_bseti<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO},  { Dst::RD},  0, 32 | 64   },
-    {'B', instr_bset,       execute_bset<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   }
+    {'B', instr_bset,       execute_bset<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_sext_b,     execute_sext_b<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   }
 };
 
 
