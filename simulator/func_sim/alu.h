@@ -37,7 +37,7 @@ struct ALU
     using Execute = void (*)( Instr*);
     using RegisterUInt = typename Instr::RegisterUInt;
     using RegisterSInt = typename Instr::RegisterSInt;
-    
+
     static constexpr size_t XLEN = bitwidth<RegisterUInt>;
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
@@ -266,6 +266,7 @@ struct ALU
     }
 
     template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+  
     template<typename T> static void bclr  ( Instr* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
     template<typename T> static void bseti( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] | (lsb_set<T>() << (shamt_imm (instr) & (XLEN - 1))); }
     template<typename T> static void sext_b( Instr* instr) { instr->v_dst[0] = sign_extension<T>(instr->v_src[0], 8); }
@@ -283,6 +284,13 @@ struct ALU
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
+    }
+
+    static void bclri( Instr* instr )
+    {
+        auto index = shamt_imm( instr) & (XLEN - 1);
+        auto mask = ~(lsb_set<RegisterUInt>() << index);
+        instr->v_dst[0] = instr->v_src[0] & mask;
     }
 
     static void bset( Instr* instr) { instr->v_dst[0] = instr->v_src[0] | (lsb_set<RegisterUInt>() << shamt_v_src2<RegisterUInt>(instr)); }
