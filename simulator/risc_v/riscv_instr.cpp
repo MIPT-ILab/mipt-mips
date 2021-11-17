@@ -111,6 +111,7 @@ template<typename I> const auto execute_minu = RISCVALU<I>::minu;
 template<typename I> const auto execute_orn = RISCVALU<I>::orn;
 template<typename I> const auto execute_pack = RISCVALU<I>::template pack<typename I::RegisterUInt>;
 template<typename I> const auto execute_packu = RISCVALU<I>::template packu<typename I::RegisterUInt>;
+template<typename I> const auto execute_rev8 = RISCVALU<I>::template rev8<typename I::RegisterUInt>;
 template<typename I> const auto execute_rol = RISCVALU<I>::rol;
 template<typename I> const auto execute_ror = RISCVALU<I>::ror;
 template<typename I> const auto execute_rori = RISCVALU<I>::rori;
@@ -344,6 +345,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_xnor,       execute_xnor<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_bfp,        execute_bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_grev,       execute_grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_rev8,       execute_rev8<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO},  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_cpop,       execute_cpop<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clz,        execute_clz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_ctz,        execute_ctz<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },

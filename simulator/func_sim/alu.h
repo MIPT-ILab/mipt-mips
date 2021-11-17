@@ -236,6 +236,19 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
+    static void rev8( Instr* instr)
+    {
+        size_t j = XLEN - 1;
+        size_t input = instr->v_src[0];
+        size_t output = 0;
+        for (size_t i = 0; i <= XLEN - 8; i += 8) {
+            (char) output [i/8] = (char) input [j/8];
+            j -= 8;
+        }
+
+        instr->v_dst[0] = output;
+    }
+
     // Generalized OR-Combine
     template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
     static void gorci( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }

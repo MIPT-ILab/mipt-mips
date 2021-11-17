@@ -118,6 +118,8 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x0ae7d7b3, "minu $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x48D747B3, "packu $a5, $a4, $a3");
     TEST_RV64_DISASM  ( 0x8D707BB,  "add_uw $a5, $a4, $a3"); // 0000100 | 01101 ($a3) | 01110 ($a4) | 000 | 01111 ($a5) | 0111011
+    TEST_RV32_DISASM  ( 0x6986D713, "rev8 $a3, $a4"); // 011010011000 | 01101 ($a3) | 101 | 01110 ($a4) | 0010011
+    TEST_RV64_DISASM  ( 0x6B86D713, "rev8 $a3, $a4"); // 011010111000 | 01101 ($a3) | 101 | 01110 ($a4) | 0010011
 
     SECTION ("RISCV invalid instruction") {
         TEST_RV32_DISASM ( 0x0, "unknown" );
@@ -358,6 +360,11 @@ TEST_RV64_RR_OP( 1, add_uw, 0x12344321b5a69788, 0xabababab82736455, 0x1234432133
 TEST_RV64_RR_OP( 2, add_uw, 0x1111111233333332, 0x11111111ffffffff, 0x1111111133333333) // 32 bits overflow
 TEST_RV64_RR_OP( 3, add_uw, 0x01010102222221ce, 0xffffffffffffffac, 0x0101010122222222) // 64 bits overflow
 
+TEST_RV32_RR_OP(1, rev8, 0x02000000, 0x2, 0x0);
+TEST_RV32_RR_OP(2, rev8, 0x78563412, 0x12345678, 0x0);
+
+TEST_RV64_RR_OP(1, rev8, 0x7856341278563412, 0x1234567812345678, 0x0);
+TEST_RV32_RR_OP(2, rev8, 0x0200000000000000, 0x2, 0x0);
 
 TEST_CASE("RISCV bytes dump")
 {
