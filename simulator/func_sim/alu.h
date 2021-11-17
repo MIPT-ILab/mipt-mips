@@ -288,8 +288,8 @@ struct ALU
 
     static void bclri( Instr* instr )
     {
-        size_t index = shamt_imm( instr) & (XLEN - 1);
-        RegisterUInt mask = ~(static_cast<RegisterUInt>( 1) << index);
+        auto index = shamt_imm( instr) & (XLEN - 1);
+        auto mask = ~(lsb_set<RegisterUInt>() << index);
         instr->v_dst[0] = instr->v_src[0] & mask;
     }
 

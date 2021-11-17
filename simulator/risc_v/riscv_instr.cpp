@@ -94,10 +94,10 @@ template<typename I> const auto execute_rem = RISCVMultALU<I>::template rem<sign
 template<typename I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
 // B
 template<typename I> const auto execute_add_uw = RISCVALU<I>::template add_uw<typename I::RegisterUInt>;
-template<typename I> const auto execute_bseti = RISCVALU<I>::template bseti<typename I::RegisterUInt>;
 template<typename I> const auto execute_bclr = RISCVALU<I>::template bclr<typename I::RegisterUInt>;
 template<typename I> const auto execute_bclri = RISCVALU<I>::bclri;
 template<typename I> const auto execute_bset = RISCVALU<I>::bset;
+template<typename I> const auto execute_bseti = RISCVALU<I>::template bseti<typename I::RegisterUInt>;
 template<typename I> const auto execute_bext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
 template<typename I> const auto execute_bfp = RISCVALU<I>::bit_field_place;
 template<typename I> const auto execute_binv = RISCVALU<I>::template sbinv<typename I::RegisterUInt>;
