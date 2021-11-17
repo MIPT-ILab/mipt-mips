@@ -111,6 +111,8 @@ TEST_CASE("RISCV disassembly")
                                                           // issue is #1507
     TEST_RV64_DISASM  ( 0x63F7D793, "rori $a5, $a5, 63"); // 01100 | 0111111 (63) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x28D655B3, "gorc $a1, $a2, $a3");
+    TEST_RV32_DISASM  ( 0x484F9D93, "bclri $s11, $t6, 4");
+    TEST_RV64_DISASM  ( 0x4A4F9D93, "bclri $s11, $t6, 36");
     TEST_RV32_DISASM  ( 0x2878d513, "orc_b $a0, $a7");
     TEST_RV32_DISASM  ( 0x091815b3, "shfl $a1, $a6, $a7");
     TEST_RV32_DISASM  ( 0x091855b3, "unshfl $a1, $a6, $a7");
@@ -355,6 +357,22 @@ TEST_RV64_RR_OP( 13, orc_b, 0x000000FFFF000000, 0x0000008007000000, 0)
 TEST_RV64_RR_OP( 14, orc_b, all_ones<uint64>(), 0x1111111111111111, 0)
 TEST_RV64_RR_OP( 15, orc_b, all_ones<uint64>(), all_ones<uint64>(), 0)
 
+TEST_RV32_IMM_OP( 1, bclri, 0x7FFFFFFF, all_ones<uint32>(), 0x1F) // 31 bit cleared (max bit)
+TEST_RV32_IMM_OP( 2, bclri, 0xFFFFFFFE, all_ones<uint32>(), 0x00) // 0 bit cleared (min bit)
+TEST_RV32_IMM_OP( 3, bclri, 0xFFFDFFFF, all_ones<uint32>(), 0x11) // 17 bit cleared
+TEST_RV32_IMM_OP( 4, bclri, 0xFFFDFFFF, 0xFFFDFFFF, 0x11) // Cleared already zero bit.
+// Same checks.
+TEST_RV64_IMM_OP( 1, bclri, 0x7FFFFFFFFFFFFFFF, all_ones<uint64>(), 0x3F)
+TEST_RV64_IMM_OP( 2, bclri, 0xFFFFFFFFFFFFFFFE, all_ones<uint64>(), 0x00)
+TEST_RV64_IMM_OP( 3, bclri, 0xFFFFFFFFFFFDFFFF, all_ones<uint64>(), 0x11)
+TEST_RV64_IMM_OP( 4, bclri, 0xFFFFFFFFFFFDFFFF, 0xFFFFFFFFFFFDFFFF, 0x11)
+// Same checks.
+TEST_RV128_IMM_OP( 1, bclri, (uint128{ 0x7FFFFFFFFFFFFFFF} << 64), (uint128{ all_ones<uint64>()} << 64), 0x7F)
+TEST_RV128_IMM_OP( 2, bclri, uint128{ 0xFFFFFFFFFFFFFFFE}, uint128{ all_ones<uint64>()}, 0x00)
+TEST_RV128_IMM_OP( 3, bclri, (uint128{ 0xFFFFFFFFFFFDFFFF} << 64), (uint128{ all_ones<uint64>()} << 64), 0x51)
+TEST_RV128_IMM_OP( 4, bclri, uint128{ 0x7FFFFFFFFFFFFFFF}, uint128{ 0x7FFFFFFFFFFFFFFF}, 0x3F)
+
+
 TEST_RV32_RR_OP( 1, shfl, 0x12563478, 0x12345678, 0x08)
 TEST_RV64_RR_OP( 1, shfl, 0x021346578a9bcedf, 0x0123456789abcdef, 0x04)
 
@@ -383,7 +401,6 @@ TEST_RV64_RR_OP( 1, packu, 0x11111111ffffffff, 0xffffffff22222222, 0x11111111333
 TEST_RV64_RR_OP( 1, add_uw, 0x12344321b5a69788, 0xabababab82736455, 0x1234432133333333)
 TEST_RV64_RR_OP( 2, add_uw, 0x1111111233333332, 0x11111111ffffffff, 0x1111111133333333) // 32 bits overflow
 TEST_RV64_RR_OP( 3, add_uw, 0x01010102222221ce, 0xffffffffffffffac, 0x0101010122222222) // 64 bits overflow
-
 
 TEST_RV64_IMM_OP ( 1, bseti, 0x4, 0x0, 0x2)
 TEST_RV64_IMM_OP ( 2, bseti, 0x100000000, 0x0, 0x20)
