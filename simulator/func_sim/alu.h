@@ -286,11 +286,10 @@ struct ALU
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
     }
 
-    template<typename T> static
-    void bclri( Instr* instr )
+    static void bclri( Instr* instr )
     {
-        uint64_t index = shamt_imm( instr) & (XLEN - 1);
-        uint64_t mask = ~(static_cast<uint64_t>( 1) << index);
+        size_t index = shamt_imm( instr) & (XLEN - 1);
+        RegisterUInt mask = ~(static_cast<RegisterUInt>( 1) << index);
         instr->v_dst[0] = instr->v_src[0] & mask;
     }
 

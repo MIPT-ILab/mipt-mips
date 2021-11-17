@@ -96,6 +96,7 @@ template<typename I> const auto execute_remu = RISCVMultALU<I>::template rem<typ
 template<typename I> const auto execute_add_uw = RISCVALU<I>::template add_uw<typename I::RegisterUInt>;
 template<typename I> const auto execute_bseti = RISCVALU<I>::template bseti<typename I::RegisterUInt>;
 template<typename I> const auto execute_bclr = RISCVALU<I>::template bclr<typename I::RegisterUInt>;
+template<typename I> const auto execute_bclri = RISCVALU<I>::bclri;
 template<typename I> const auto execute_bset = RISCVALU<I>::bset;
 template<typename I> const auto execute_bext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
 template<typename I> const auto execute_bfp = RISCVALU<I>::bit_field_place;
@@ -105,7 +106,6 @@ template<typename I> const auto execute_clz = RISCVALU<I>::template clz<typename
 template<typename I> const auto execute_cpop = RISCVALU<I>::template pcnt<typename I::RegisterUInt>;
 template<typename I> const auto execute_ctz = RISCVALU<I>::template ctz<typename I::RegisterUInt>;
 template<typename I> const auto execute_gorc = RISCVALU<I>::template gorc<typename I::RegisterUInt>;
-template<typename I> const auto execute_bclri = RISCVALU<I>::template bclri<typename I::RegisterUInt>;
 template<typename I> const auto execute_orc_b = RISCVALU<I>::orc_b;
 template<typename I> const auto execute_grev = RISCVALU<I>::grev;
 template<typename I> const auto execute_max = RISCVALU<I>::max;
@@ -360,7 +360,6 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_minu,       execute_minu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_gorc,       execute_gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_orc_b,      execute_orc_b<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_bclri,      execute_bclri<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_unshfl,     execute_unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128}, // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
     {'B', instr_rori,       execute_rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_shfl,       execute_shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
@@ -368,6 +367,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_sroi,       execute_sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_add_uw,     execute_add_uw<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0,      64   },
     {'B', instr_bclr,       execute_bclr<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_bclri,      execute_bclri<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_bseti,      execute_bseti<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO},  { Dst::RD},  0, 32 | 64   },
     {'B', instr_bset,       execute_bset<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   }
 };
