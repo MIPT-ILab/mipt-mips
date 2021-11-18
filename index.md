@@ -94,7 +94,7 @@ MIPT-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/is
 
 Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32))
 
-RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, Vladimir Graudt, Roman Glaz, Michael Bargatin, Andrey Vyazovtsev, Kirill Radkin, Ivan Panferov and Vasilii Matrenin.
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, Vladimir Graudt, Roman Glaz, Michael Bargatin, Andrey Vyazovtsev, Kirill Radkin, Ivan Panferov, Vasilii Matrenin, and Aleksey Otrashchenko.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
