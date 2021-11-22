@@ -23,6 +23,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L9]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/11_Lecture9-RISC-V_Single-Cycle_implementation.pptx?raw=true
 [L10]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/12_Lecture10-Pipelining.pptx?raw=true
 [L11]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/13_Lecture11-Data_Hazards.pptx?raw=true
+[L12]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/14_Lecture12-Control_Hazards._Branch_Prediction.pptx?raw=true
 
 [L1-VIDEO]:   https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]: https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
@@ -34,6 +35,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L9-VIDEO]:   https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
 [L10-VIDEO]:  https://drive.google.com/file/d/1jUuWDCjKw-WeZGVDpx1O7XRPsWl0FVex/view?usp=sharing
 [L11-VIDEO]:  https://drive.google.com/file/d/1emZmWURJaWEVO17jXgzTOBTwnWHdzqtN/view?usp=sharing
+[L12-VIDEO]:  .
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -50,6 +52,7 @@ Date        | Type                  | Event
  01.11.2021 | Lecture:<br>Comp Arch | **L9: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L9]<br>• Recording: [watch][L9-VIDEO]
  08.11.2021 | Lecture:<br>Comp Arch | **L10: Pipelining**<br>                                   • Slides: [download][L10]<br>• Recording: [watch][L10-VIDEO]
  15.11.2021 | Lecture:<br>Comp Arch | **L11: Data Hazards**<br>                                 • Slides: [download][L11]<br>• Recording: [watch][L11-VIDEO]
+ 22.11.2021 | Lecture:<br>Comp Arch | **L12: Control Hazards. Branch Prediction**<br>           • Slides: [download][L12]<br>• Recording: [watch][L12-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
