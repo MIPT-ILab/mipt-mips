@@ -22,16 +22,23 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L8]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/10_Lecture8-RISC-V_ISA.pptx?raw=true
 [L9]:         https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/11_Lecture9-RISC-V_Single-Cycle_implementation.pptx?raw=true
 [L10]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/12_Lecture10-Pipelining.pptx?raw=true
+[L11]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/13_Lecture11-Data_Hazards.pptx?raw=true
+[L12]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/14_Lecture12-Control_Hazards._Branch_Prediction.pptx?raw=true
+[L13]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/15_Lecture13_Code_Form.pptx?raw=true
+[L14]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/16_Lecture14_Unit_Testing_TDD.pptx?raw=true
 
-[L1-VIDEO]:   https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
-[L2-3-VIDEO]: https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
-[L4-5-VIDEO]: https://drive.google.com/file/d/1bg5ekynKRHd-mmtWVuP5a8xDxXZvQ2tu/view?usp=sharing
-[L6-VIDEO]:   https://drive.google.com/file/d/1qzWVphd04erHKZNGZHta2gc81KjY5vrn/view?usp=sharing
-[L7-VIDEO-1]: https://drive.google.com/file/d/10fAg6R7_N1iJ8Cu-Y287HVMAHqdS53CC/view?usp=sharing
-[L7-VIDEO-2]: https://drive.google.com/file/d/1M3SduIwO-4uVddKNqMzWzWuJOpjlNd6-/view?usp=sharing
-[L8-VIDEO]:   https://drive.google.com/file/d/1BokZMMdoygl6v46S2P688V-ygA1J1CJ4/view?usp=sharing
-[L9-VIDEO]:   https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
-[L10-VIDEO]:  https://drive.google.com/file/d/1jUuWDCjKw-WeZGVDpx1O7XRPsWl0FVex/view?usp=sharing
+[L1-VIDEO]:     https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
+[L2-3-VIDEO]:   https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
+[L4-5-VIDEO]:   https://drive.google.com/file/d/1bg5ekynKRHd-mmtWVuP5a8xDxXZvQ2tu/view?usp=sharing
+[L6-VIDEO]:     https://drive.google.com/file/d/1qzWVphd04erHKZNGZHta2gc81KjY5vrn/view?usp=sharing
+[L7-VIDEO-1]:   https://drive.google.com/file/d/10fAg6R7_N1iJ8Cu-Y287HVMAHqdS53CC/view?usp=sharing
+[L7-VIDEO-2]:   https://drive.google.com/file/d/1M3SduIwO-4uVddKNqMzWzWuJOpjlNd6-/view?usp=sharing
+[L8-VIDEO]:     https://drive.google.com/file/d/1BokZMMdoygl6v46S2P688V-ygA1J1CJ4/view?usp=sharing
+[L9-VIDEO]:     https://drive.google.com/file/d/11Wm2_mcg0yOT2H4rHv9ED4m4BgbXdTS2/view?usp=sharing
+[L10-VIDEO]:    https://drive.google.com/file/d/1jUuWDCjKw-WeZGVDpx1O7XRPsWl0FVex/view?usp=sharing
+[L11-VIDEO]:    https://drive.google.com/file/d/1emZmWURJaWEVO17jXgzTOBTwnWHdzqtN/view?usp=sharing
+[L12-VIDEO]:    https://drive.google.com/file/d/1pNRX1q_CatZ-Z4ZBJ7EGoef2hhA7LzcT/view?usp=sharing
+[L13-14-VIDEO]: https://drive.google.com/file/d/1Az8UoSlV93FUZqAIGuWvLDdpCRI5RFXf/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -47,6 +54,10 @@ Date        | Type                  | Event
  25.10.2021 | Lecture:<br>Comp Arch | **L8: RISC-V ISA**<br>                                    • Slides: [download][L8]<br>• Recording: [watch][L8-VIDEO]
  01.11.2021 | Lecture:<br>Comp Arch | **L9: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L9]<br>• Recording: [watch][L9-VIDEO]
  08.11.2021 | Lecture:<br>Comp Arch | **L10: Pipelining**<br>                                   • Slides: [download][L10]<br>• Recording: [watch][L10-VIDEO]
+ 15.11.2021 | Lecture:<br>Comp Arch | **L11: Data Hazards**<br>                                 • Slides: [download][L11]<br>• Recording: [watch][L11-VIDEO]
+ 22.11.2021 | Lecture:<br>Comp Arch | **L12: Control Hazards. Branch Prediction**<br>           • Slides: [download][L12]<br>• Recording: [watch][L12-VIDEO]
+ 29.11.2021 | Lecture:<br>Soft Dev  | **L13: Code Form**<br>                                    • Slides: [download][L13]<br>• Recording: [watch][L13-14-VIDEO]
+ 29.11.2021 | Lecture:<br>Soft Dev  | **L13: Unit Testing. TDD.**<br>                           • Slides: [download][L14]<br>• Recording: [watch][L13-14-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
@@ -94,7 +105,7 @@ MIPT-614 | Alexey Steksov | 3 | [#152](https://github.com/MIPT-ILab/mipt-mips/is
 
 Minor contributors: Ivan Startsev ([#525](https://github.com/MIPT-ILab/mipt-mips/issues/525)), Arsen Davtyan ([#660](https://github.com/MIPT-ILab/mipt-mips/issues/660), [#643](https://github.com/MIPT-ILab/mipt-mips/issues/643)), Danil Yarovoy ([T#4](https://github.com/MIPT-ILab/mips-traces/issues/4)), Maxim Davydov ([#1096](https://github.com/MIPT-ILab/mipt-mips/issues/1096)), Ivan Korostelev ([#32](https://github.com/MIPT-ILab/mipt-mips/issues/32))
 
-RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, Vladimir Graudt, Roman Glaz, Michael Bargatin, Andrey Vyazovtsev, Kirill Radkin, Ivan Panferov and Vasilii Matrenin.
+RISC-V **B** instructions are delivered by Kirill Chemrov, Yaroslav Okatev, Alexandr Vinogradov, Airat Nazmiev, Roman Zlobin, Igor Bulatov, Daniel Kofanov, Nikolay Zernov, Nikita Gorbachev, Vladimir Prokhorov, Eric Konks, Maxim Davydov, Ilya Burtakov, Alexey Shcherbakov, Anton Okley, Egor Titov, Eugene Naydanov, Mihail Fedorov, Vasilii Zaitsev, Ravil Zakiryanov, Ivan Burtakov, Vladimir Graudt, Roman Glaz, Michael Bargatin, Andrey Vyazovtsev, Kirill Radkin, Ivan Panferov, Vasilii Matrenin, and Aleksey Otrashchenko.
 
 List of [Upcoming contributions](https://github.com/MIPT-ILab/mipt-mips/issues/assigned/*)
 
