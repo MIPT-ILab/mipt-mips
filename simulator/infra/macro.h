@@ -21,11 +21,7 @@ static_assert(_MSC_FULL_VER >= 192328105, "Update Visual Studio because of the b
               "https://developercommunity.visualstudio.com/content/problem/833637/wrong-compilation-for-ones-right-shift.html");
 #endif
 
-#ifdef  _LIBCPP_VERSION
-template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::ispow2( n); }
-#else
 template<typename T> static constexpr inline auto is_power_of_two( T n) noexcept       { return std::has_single_bit( n); }
-#endif
 
 template<typename T> void ignored( const T& /* unused */) noexcept { }
 
