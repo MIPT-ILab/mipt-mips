@@ -27,14 +27,14 @@ bool is_positive( Unsigned auto value) { return !is_negative( value) && value !=
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
  */
-constexpr auto arithmetic_rs( Unsigned auto value, size_t shamt) -> decltype(value)
+template<Unsigned T>
+constexpr T arithmetic_rs( T value, size_t shamt)
 {
     using ST = sign_t<decltype(value)>;
     // NOLINTNEXTLINE(hicpp-signed-bitwise) C++20 clearly defines this
     return sign_cast<ST>( value) >> shamt;
 }
 
-template<>
 inline uint128 arithmetic_rs( uint128 value, size_t shamt)
 {
     return is_positive( value) ? value >> shamt : ones_rs( value, shamt);
