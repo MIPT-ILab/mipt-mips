@@ -43,7 +43,7 @@ auto mips_division(T x, T y) {
 template<typename T>
 auto riscv_multiplication_low(T x, T y) {
     using UT = unsign_t<T>;
-    return narrow_cast<UT>( x * y & all_ones<UT>());
+    return narrow_cast<UT>( x * y);
 }
 
 // For RISCV-128bit result of multiplication is 256 bit type,
@@ -112,10 +112,10 @@ template<typename T>
 auto riscv_division(T x, T y) {
     using UT = unsign_t<T>;
     if ( y == 0)
-        return narrow_cast<UT>( all_ones<UT>());
+        return all_ones<UT>();
 
-    if ( is_signed_division_overflow(x, y))
-        return narrow_cast<UT>( msb_set<UT>());
+    if ( is_signed_division_overflow( x, y))
+        return msb_set<UT>();
 
     return narrow_cast<UT>( x / y);
 }
