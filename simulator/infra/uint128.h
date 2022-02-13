@@ -17,10 +17,10 @@
 using int128  = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
 
-template<> constexpr bool is_wide_integer_v<int128> = true;
-template<> constexpr bool is_wide_integer_v<uint128> = true;
+template<> inline constexpr bool is_wide_integer_v<int128> = true;
+template<> inline constexpr bool is_wide_integer_v<uint128> = true;
 
-template<> constexpr bool is_wide_signed_integer_v<int128> = true;
+template<> inline constexpr bool is_wide_signed_integer_v<int128> = true;
 
 template<> struct unsign<uint128>  { using type = uint128; };
 template<> struct unsign<int128>   { using type = uint128; };
