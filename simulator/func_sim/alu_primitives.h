@@ -16,34 +16,28 @@ constexpr auto count_leading_zeroes( Unsigned auto x) noexcept  { return std::co
 constexpr auto count_leading_ones( Unsigned auto x) noexcept    { return std::countl_one( x); }
 constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::countr_zero( x); }
 
+template<typename T> bool is_negative( T value) { return (value & msb_set<T>()) != 0; }
+template<typename T> bool is_positive( T value) { return !is_negative( value) && value != 0; }
+
+bool is_negative( Unsigned auto value) { return (value & msb_set<decltype(value)>()) != 0; }
+bool is_positive( Unsigned auto value) { return !is_negative( value) && value != 0; }
+
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
  */
-template <typename T>
-static constexpr T arithmetic_rs( const T& value, size_t shamt)
+constexpr auto arithmetic_rs( Unsigned auto value, size_t shamt) -> decltype(value)
 {
     using ST = sign_t<T>;
-    T result = 0;
-    // Result of shifting right a signed value is implementation defined,
-    // but for the most of cases it does arithmetic right shift
-    // Let's check what our implementation does and reuse it if it is OK
-    // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    if constexpr ( !std::is_same_v<T, uint128> && ( ST{ -2} >> 1U) == ST{ -1})
-        // Compiler does arithmetic shift for signed values, trust it
-        // Clang warns about implementation defined code, but we ignore that
-        // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        result = sign_cast<ST>(value) >> shamt;
-    else if ( ( value & msb_set<T>()) == 0)
-        result = value >> shamt;        // just shift if MSB is zero
-    else
-        result = ones_rs( value, shamt);
-    return result;
+    // NOLINTNEXTLINE(hicpp-signed-bitwise) C++20 clearly defines this
+    return sign_cast<ST>( value) >> shamt;
 }
 
-bool is_negative( Unsigned auto value) { return (value & msb_set<decltype(value)>()) != 0; }
-bool is_positive( Unsigned auto value) { return !is_negative( value) && value != 0; }
+inline uint128 arithmetic_rs( uint128 value, size_t shamt)
+{
+    return is_positive( value) ? value >> shamt : ones_rs( value, shamt);
+}
 
 template<typename T, typename T1, typename T2> static
 auto test_addition_overflow( T1 val1, T2 val2)
