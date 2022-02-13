@@ -44,14 +44,6 @@ static_assert(std::is_same_v<int16, sign_t<uint16>>);
 static_assert(std::is_same_v<int32, sign_t<uint32>>);
 static_assert(std::is_same_v<int64, sign_t<uint64>>);
 
-static_assert(bitwidth<doubled_t<int8>> == 2 * bitwidth<int8>);
-static_assert(bitwidth<doubled_t<int16>> == 2 * bitwidth<int16>);
-static_assert(bitwidth<doubled_t<int32>> == 2 * bitwidth<int32>);
-
-static_assert(bitwidth<doubled_t<uint8>> == 2 * bitwidth<uint8>);
-static_assert(bitwidth<doubled_t<uint16>> == 2 * bitwidth<uint16>);
-static_assert(bitwidth<doubled_t<uint32>> == 2 * bitwidth<uint32>);
-
 static_assert(all_ones<uint8>()  == 0xFFULL);
 static_assert(all_ones<uint16>() == 0xFFFFULL);
 static_assert(all_ones<uint32>() == 0xFFFF'FFFFULL);
@@ -97,20 +89,20 @@ static_assert(log_bitwidth<uint64> == 6);
 
 static constexpr std::array<std::byte, 4> test_array = {{std::byte{0x78}, std::byte{0x56}, std::byte{0x34}, std::byte{0x12}}};
 
-static_assert(unpack_array_le<uint32>( 0x12345678)[0] == test_array[0]);
-static_assert(unpack_array_be<uint32>( 0x12345678)[0] == test_array[3]);
+static_assert(unpack_array_le( uint32{0x12345678})[0] == test_array[0]);
+static_assert(unpack_array_be( uint32{0x12345678})[0] == test_array[3]);
 
-static_assert(pack_array_le<uint32>( test_array) == 0x12345678);
-static_assert(pack_array_be<uint32>( test_array) == 0x78563412);
+static_assert(pack_array_le( test_array) == 0x12345678);
+static_assert(pack_array_be( test_array) == 0x78563412);
 
-static_assert(unpack_array<uint32, std::endian::little>( 0x12345678)[0] == test_array[0]);
-static_assert(unpack_array<uint32, std::endian::big>( 0x12345678)[0] == test_array[3]);
+static_assert(unpack_array<std::endian::little>( uint32{0x12345678})[0] == test_array[0]);
+static_assert(unpack_array<std::endian::big>( uint32{0x12345678})[0] == test_array[3]);
 
-static_assert(pack_array<uint32, std::endian::little>( test_array) == 0x12345678);
-static_assert(pack_array<uint32, std::endian::big>( test_array) == 0x78563412);
+static_assert(pack_array<std::endian::little>( test_array) == 0x12345678);
+static_assert(pack_array<std::endian::big>( test_array) == 0x78563412);
 
-static_assert(swap_endian<uint32>(0xFAFBFCFD) == 0xFDFCFBFA);
-static_assert(swap_endian<uint8>(0xFA) == 0xFA);
+static_assert(swap_endian(uint32{0xFAFBFCFD}) == 0xFDFCFBFA);
+static_assert(swap_endian(uint8{0xFA}) == 0xFA);
 
 template<std::endian e>
 static constexpr auto check_to_pointer()

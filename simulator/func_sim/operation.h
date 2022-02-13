@@ -50,8 +50,7 @@ enum class Imm : uint8
     JUMP, JUMP_REL
 };
 
-template<typename T>
-std::string print_immediate( Imm type, T value)
+std::string print_immediate( Imm type, Unsigned auto value)
 {
     std::ostringstream oss;
     switch ( type)
@@ -162,7 +161,7 @@ struct RISCVMultALU;
 template <typename I>
 struct MIPSMultALU;
 
-template<typename T>
+template<Unsigned T>
 class Datapath : public Operation
 {
 public:
@@ -206,14 +205,14 @@ private:
     bool memory_complete = false;
 };
 
-template<typename T>
+template<Unsigned T>
 void Datapath<T>::execute()
 {
     executor(this);
     complete = true;
 }
 
-template<typename T>
+template<Unsigned T>
 void Datapath<T>::load( const T& value)
 {
     memory_complete = true;
@@ -221,7 +220,7 @@ void Datapath<T>::load( const T& value)
     set_v_dst( is_unsigned_load() ? value : sign_extension_for_load(value), 0);
 }
 
-template<typename T, typename R>
+template<Unsigned T, typename R>
 class BaseInstruction : public Datapath<T>
 {
 public:
@@ -243,7 +242,7 @@ protected:
     std::array<R, MAX_DST_NUM> dst = { R::zero(), R::zero() };
 };
 
-template<typename T, typename R>
+template<Unsigned T, typename R>
 std::string BaseInstruction<T, R>::generate_disasm() const
 {
     std::ostringstream oss;
@@ -270,7 +269,7 @@ std::string BaseInstruction<T, R>::generate_disasm() const
     return std::move( oss).str();
 }
 
-template<typename T, typename R>
+template<Unsigned T, typename R>
 std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std::string& disasm) const
 {
     if ( this->PC != 0)

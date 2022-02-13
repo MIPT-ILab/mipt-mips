@@ -16,11 +16,12 @@
 #include <array>
 #include <tuple>
 
-template<size_t N, typename T>
-T align_up(T value) { return ((value + bitmask<T>(N)) >> N) << N; }
+template<size_t N>
+auto align_up(Unsigned auto value) { return ((value + bitmask<decltype(value)>(N)) >> N) << N; }
 
-template<typename T> static T bit_shuffle( T value, size_t level)
+static auto bit_shuffle( Unsigned auto value, size_t level)
 {
+    using T = decltype(value);
     const auto maskL = shuffle_mask<T, 2>( level);
     const auto maskR = shuffle_mask<T, 1>( level);
     const auto shamt = size_t{ 1} << ( level);
@@ -42,7 +43,7 @@ struct ALU
 
     static size_t shamt_imm( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm); }
     static size_t shamt_imm_32( const Instr* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
-    template<typename T> static size_t shamt_v_src2( const Instr* instr) { return narrow_cast<size_t>( instr->v_src[1] & bitmask<size_t>(log_bitwidth<T>)); }
+    template<Unsigned T> static size_t shamt_v_src2( const Instr* instr) { return narrow_cast<size_t>( instr->v_src[1] & bitmask<size_t>(log_bitwidth<T>)); }
     static void move( Instr* instr)   { instr->v_dst[0] = instr->v_src[0]; }
     template<Predicate p> static void set( Instr* instr)  { instr->v_dst[0] = p( instr); }
 
@@ -136,13 +137,13 @@ struct ALU
     static bool geiu( const Instr* instr) { return instr->v_src[0] >= instr->v_imm; }
 
     // General addition
-    template<typename T> static void addition( Instr* instr)     { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1]); }
-    template<typename T> static void subtraction( Instr* instr)  { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1]); }
-    template<typename T> static void riscv_addition( Instr* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
-    template<typename T> static void riscv_subtraction( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
-    template<typename T> static void addition_imm( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_imm); }
+    template<Unsigned T> static void addition( Instr* instr)     { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1]); }
+    template<Unsigned T> static void subtraction( Instr* instr)  { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1]); }
+    template<Unsigned T> static void riscv_addition( Instr* instr)     { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_src[1])); }
+    template<Unsigned T> static void riscv_subtraction( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>, RegisterUInt>(narrow_cast<T>( instr->v_src[0]) - narrow_cast<T>( instr->v_src[1])); }
+    template<Unsigned T> static void addition_imm( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( instr->v_src[0]) + narrow_cast<T>( instr->v_imm); }
 
-    template<typename T> static
+    template<Unsigned T> static
     void addition_overflow( Instr* instr)
     {
         const auto [result, overflow] = test_addition_overflow<T>( instr->v_src[0], instr->v_src[1]);
@@ -152,7 +153,7 @@ struct ALU
             instr->v_dst[0] = result;
     }
 
-    template<typename T> static
+    template<Unsigned T> static
     void addition_overflow_imm( Instr* instr)
     {
         const auto [result, overflow] = test_addition_overflow<T>( instr->v_src[0], instr->v_imm);
@@ -163,7 +164,7 @@ struct ALU
     }
 
 
-    template<typename T> static
+    template<Unsigned T> static
     void subtraction_overflow( Instr* instr)
     {
         const auto [result, overflow] = test_subtraction_overflow<T>( instr->v_src[0], instr->v_src[1]);
@@ -174,15 +175,15 @@ struct ALU
     }
 
     // Shifts
-    template<typename T> static void sll( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
-    template<typename T> static void srl( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
+    template<Unsigned T> static void sll( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
+    template<Unsigned T> static void srl( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
     template<Unsigned T> static void sra( Instr* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<typename T> static void sllv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
-    template<typename T> static void srlv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void sllv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void srlv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
     template<Unsigned T> static void srav( Instr* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<typename T> static void slo( Instr* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<typename T> static void sloi( Instr* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<typename T> static void sro( Instr* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void slo( Instr* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void sloi( Instr* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
+    template<Unsigned T> static void sro( Instr* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
     static void sroi( Instr* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
 
     // Circular shifts
@@ -198,10 +199,10 @@ struct ALU
     static void auipc( Instr* instr) { upper_immediate<12>( instr); instr->v_dst[0] += instr->PC; }
 
     // Leading zero/ones
-    template<typename T> static void clo( Instr* instr)  { instr->v_dst[0] = count_leading_ones<T>( instr->v_src[0]); }
-    template<typename T> static void clz( Instr* instr)  { instr->v_dst[0] = count_leading_zeroes<T>( instr->v_src[0]); }
-    template<typename T> static void ctz( Instr* instr)  { instr->v_dst[0] = count_trailing_zeroes<T>( instr->v_src[0]); }
-    template<typename T> static void pcnt( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( popcount( instr->v_src[0])); }
+    template<Unsigned T> static void clo( Instr* instr)  { instr->v_dst[0] = count_leading_ones<T>( instr->v_src[0]); }
+    template<Unsigned T> static void clz( Instr* instr)  { instr->v_dst[0] = count_leading_zeroes<T>( instr->v_src[0]); }
+    template<Unsigned T> static void ctz( Instr* instr)  { instr->v_dst[0] = count_trailing_zeroes<T>( instr->v_src[0]); }
+    template<Unsigned T> static void pcnt( Instr* instr) { instr->v_dst[0] = narrow_cast<T>( popcount( instr->v_src[0])); }
 
     // Logic
     static void andv( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_src[1]; }
@@ -237,7 +238,7 @@ struct ALU
     }
 
     // Generalized OR-Combine
-    template<typename T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void gorc( Instr* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<T>( instr)); }
 
     // OR Combine
     static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
@@ -248,15 +249,15 @@ struct ALU
     static void movz( Instr* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
 
     // Bit manipulations
-    template<typename T> static void sbinv( Instr* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
-    template<typename T> static void sbext( Instr* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void sbinv( Instr* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void sbext( Instr* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
 
     static void max( Instr* instr)  { instr->v_dst[0] = instr->v_src[ge( instr) ? 0 : 1]; }
     static void maxu( Instr* instr) { instr->v_dst[0] = std::max( instr->v_src[0], instr->v_src[1]); }
     static void min( Instr* instr)  { instr->v_dst[0] = instr->v_src[lt( instr) ? 0 : 1]; }
     static void minu( Instr* instr) { instr->v_dst[0] = std::min( instr->v_src[0], instr->v_src[1]); }
 
-    template<typename T> static
+    template<Unsigned T> static
     void clmul( Instr* instr)
     {
         instr->v_dst[0] = 0;
@@ -265,21 +266,21 @@ struct ALU
                 instr->v_dst[0] ^= instr->v_src[0] << index;
     }
 
-    template<typename T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+    template<Unsigned T> static void add_uw( Instr* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
   
-    template<typename T> static void bclr  ( Instr* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
-    template<typename T> static void bseti( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] | (lsb_set<T>() << (shamt_imm (instr) & (XLEN - 1))); }
-    template<typename T> static void sext_b( Instr* instr) { instr->v_dst[0] = sign_extension<T>(instr->v_src[0], bitwidth<char>); }
+    template<Unsigned T> static void bclr  ( Instr* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void bseti( Instr* instr)  { instr->v_dst[0] = instr->v_src[0] | (lsb_set<T>() << (shamt_imm (instr) & (XLEN - 1))); }
+    template<Unsigned T> static void sext_b( Instr* instr) { instr->v_dst[0] = sign_extension<T>(instr->v_src[0], bitwidth<char>); }
 
     // Bit manipulations
-    template<typename T> static
+    template<Unsigned T> static
     void pack( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
         instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 
-    template<typename T> static
+    template<Unsigned T> static
     void packu( Instr* instr)
     {
         auto pack_width = half_bitwidth<T>;
@@ -374,7 +375,7 @@ struct ALU
         instr->v_dst[1] = instr->v_src[1]; // RD  <- CSR
     }
 
-    template<typename T> static
+    template<Unsigned T> static
     void riscv_addition_imm( Instr* instr)
     {
         instr->v_dst[0] = sign_extension<bitwidth<T>>( instr->v_src[0] + instr->v_imm);

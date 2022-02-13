@@ -22,12 +22,8 @@ template<> inline constexpr bool is_wide_integer_v<uint128> = true;
 
 template<> inline constexpr bool is_wide_signed_integer_v<int128> = true;
 
-template<> struct unsign<uint128>  { using type = uint128; };
-template<> struct unsign<int128>   { using type = uint128; };
-template<> struct sign<uint128>    { using type = int128;  };
-template<> struct doubled<uint64>  { using type = uint128; };
-template<> struct doubled<int64>   { using type = int128;  };
-template<> struct halved<uint128>  { using type = uint64;  };
+template<> struct unsigned_integer<128> { using type = uint128; };
+template<> struct signed_integer<128>   { using type = int128; };
 template<> inline constexpr size_t bitwidth<uint128> = 128U;
 template<> inline constexpr size_t bitwidth<int128> = 128U;
 

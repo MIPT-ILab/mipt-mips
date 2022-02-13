@@ -18,11 +18,10 @@
 // GCC 9 poorly optimizes that stuff: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65424
 // See https://godbolt.org/z/ff-NAF for example
 
-template<typename T>
-static inline constexpr
-std::enable_if_t<std::is_same_v<T, unsign_t<T>>, T>
-pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
+template<size_t N>
+constexpr auto pack_array_le( std::array<std::byte, N> array) noexcept
 {
+    using T = unsigned_integer_t<N * CHAR_BIT>;
     T value{};
     size_t shift = 0;
     for ( const auto& el : array) {
@@ -34,11 +33,10 @@ pack_array_le( std::array<std::byte, bytewidth<T>> array) noexcept
     return value;
 }
 
-template<typename T>
-static inline constexpr
-std::enable_if_t<std::is_same_v<T, unsign_t<T>>, T>
-pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
+template<size_t N>
+constexpr auto pack_array_be( std::array<std::byte, N> array) noexcept
 {
+    using T = unsigned_integer_t<N * CHAR_BIT>;
     T value{};
     size_t shift = (array.size() - 1) * CHAR_BIT;
     for ( const auto& el : array) {
@@ -50,10 +48,9 @@ pack_array_be( std::array<std::byte, bytewidth<T>> array) noexcept
     return value;
 }
 
-template<typename T>
-static inline constexpr auto unpack_array_le( T value) noexcept
+constexpr auto unpack_array_le( Unsigned auto value) noexcept
 {
-    std::array<std::byte, bytewidth<T>> array{};
+    std::array<std::byte, bytewidth<decltype(value)>> array{};
     size_t shift = 0;
     for ( auto& el: array) {
         el = std::byte( uint8( value >> shift));
@@ -63,10 +60,9 @@ static inline constexpr auto unpack_array_le( T value) noexcept
     return array;
 }
 
-template<typename T>
-static inline constexpr auto unpack_array_be( T value) noexcept
+constexpr auto unpack_array_be( Unsigned auto value) noexcept
 {
-    std::array<std::byte, bytewidth<T>> array{};
+    std::array<std::byte, bytewidth<decltype(value)>> array{};
     size_t shift = (array.size() - 1) * CHAR_BIT;
     for ( auto& el: array) {
         el = std::byte( uint8( value >> shift));
@@ -76,44 +72,43 @@ static inline constexpr auto unpack_array_be( T value) noexcept
     return array;
 }
 
-template<typename T, std::endian e>
-static constexpr inline auto unpack_array( T value) noexcept
+template<std::endian e>
+constexpr auto unpack_array( Unsigned auto value) noexcept
 {
     if constexpr (e == std::endian::little)
-        return unpack_array_le<T>( value);
+        return unpack_array_le( value);
     else
-        return unpack_array_be<T>( value);
+        return unpack_array_be( value);
 }
 
-template<typename T, std::endian e>
-static inline constexpr auto pack_array( std::array<std::byte, bytewidth<T>> array) noexcept
+template<std::endian e, std::size_t N>
+constexpr auto pack_array( std::array<std::byte, N> array) noexcept
 {
     if constexpr (e == std::endian::little)
-        return pack_array_le<T>( array);
+        return pack_array_le( array);
     else
-        return pack_array_be<T>( array);
+        return pack_array_be( array);
 }
 
-template<typename T>
-static inline constexpr T swap_endian( T value) noexcept
+constexpr auto swap_endian( Unsigned auto value) noexcept
 {
-    return pack_array_le<T>( unpack_array_be<T>( value)); 
+    return pack_array_le( unpack_array_be( value)); 
 }
 
-template<typename T, std::endian e>
-static inline void constexpr put_value_to_pointer( std::byte* buf, T value, size_t size)
+template<Unsigned T, std::endian e>
+constexpr void put_value_to_pointer( std::byte* buf, T value, size_t size)
 {
-    auto array = unpack_array<T, e>(value);
+    auto array = unpack_array<e>(value);
     std::copy( array.begin(), array.begin() + size, buf);
 }
 
-template<typename T, std::endian e>
+template<Unsigned T, std::endian e>
 static inline constexpr T get_value_from_pointer( const std::byte* buf, size_t size)
 {
     std::array<std::byte, bytewidth<T>> array{};
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     std::copy( buf, buf + size, array.begin());
-    return pack_array<T, e>( array);
+    return pack_array<e>( array);
 }
 
 #endif // ENDIAN_H
