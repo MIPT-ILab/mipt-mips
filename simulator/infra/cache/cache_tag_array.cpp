@@ -59,7 +59,7 @@ int32 InfiniteCacheTagArray::write( Addr addr)
     if ( result.first)
         return result.second;
 
-    auto way = narrow_cast<int32>( tags.size());
+    auto way = sign_cast<int32>( tags.size());
     tags.emplace_back( addr);
     lookup_helper.emplace( addr, way);
 
@@ -248,7 +248,7 @@ int32 SimpleCacheTagArray::write( Addr addr)
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = narrow_cast<int32>( replacement_module->update( num_set));
+    const auto way = sign_cast<int32>( replacement_module->update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];

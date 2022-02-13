@@ -82,7 +82,7 @@ Trap MARSKernel::execute () {
 }
 
 void MARSKernel::print_integer() {
-    auto value = narrow_cast<int64>( sim->read_cpu_register( a0));
+    auto value = sign_cast<int64>( sim->read_cpu_register( a0));
     outstream << value;
 }
 
@@ -108,7 +108,7 @@ void MARSKernel::read_integer() {
 }
 
 void MARSKernel::print_character() {
-    outstream << narrow_cast<char>( sim->read_cpu_register( a0));
+    outstream << narrow_cast<unsigned char>( sim->read_cpu_register( a0));
 }
 
 void MARSKernel::read_character() {

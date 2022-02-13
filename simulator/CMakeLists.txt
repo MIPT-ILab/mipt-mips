@@ -99,7 +99,10 @@ add_custom_command(
 
 if (MSVC)
     # Warning 4244 is required to reduce excessive narrow casting
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4244 ")
+    #
+    # Warning 4100 is disabled due to VS bug
+    # https://developercommunity.visualstudio.com/t/w4100-with-concept-parameter/1662465
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4244 /wd4100 ")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")

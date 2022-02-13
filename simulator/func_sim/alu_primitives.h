@@ -9,14 +9,14 @@
 
 #include <bit>
 
-template<typename T> static constexpr inline auto popcount( T x) noexcept              { return std::popcount(x); }
-template<typename T> static constexpr inline auto circ_ls( T x, size_t shamt)          { return std::rotl( x, narrow_cast<int>( shamt)); }
-template<typename T> static constexpr inline auto circ_rs( T x, size_t shamt)          { return std::rotr( x, narrow_cast<int>( shamt)); }
-template<typename T> static constexpr inline auto count_leading_zeroes( T x) noexcept  { return std::countl_zero( x); }
-template<typename T> static constexpr inline auto count_leading_ones( T x) noexcept    { return std::countl_one( x); }
-template<typename T> static constexpr inline auto count_trailing_zeroes( T x) noexcept { return std::countr_zero( x); }
+constexpr auto popcount( Unsigned auto x) noexcept              { return std::popcount(x); }
+constexpr auto circ_ls( Unsigned auto x, size_t shamt)          { return std::rotl( x, sign_cast<int>( shamt)); }
+constexpr auto circ_rs( Unsigned auto x, size_t shamt)          { return std::rotr( x, sign_cast<int>( shamt)); }
+constexpr auto count_leading_zeroes( Unsigned auto x) noexcept  { return std::countl_zero( x); }
+constexpr auto count_leading_ones( Unsigned auto x) noexcept    { return std::countl_one( x); }
+constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::countr_zero( x); }
 
-/*
+/*  
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
@@ -34,7 +34,7 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
         // Compiler does arithmetic shift for signed values, trust it
         // Clang warns about implementation defined code, but we ignore that
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        result = narrow_cast<ST>(value) >> shamt;
+        result = sign_cast<ST>(value) >> shamt;
     else if ( ( value & msb_set<T>()) == 0)
         result = value >> shamt;        // just shift if MSB is zero
     else
@@ -42,8 +42,8 @@ static constexpr T arithmetic_rs( const T& value, size_t shamt)
     return result;
 }
 
-template<typename T> bool is_negative( T value) { return (value & msb_set<T>()) != 0; }
-template<typename T> bool is_positive( T value) { return !is_negative( value) && value != 0; }
+bool is_negative( Unsigned auto value) { return (value & msb_set<decltype(value)>()) != 0; }
+bool is_positive( Unsigned auto value) { return !is_negative( value) && value != 0; }
 
 template<typename T, typename T1, typename T2> static
 auto test_addition_overflow( T1 val1, T2 val2)
@@ -139,28 +139,28 @@ inline auto popcount( uint128 x) noexcept
 }
 
 template<>
-inline constexpr auto count_leading_zeroes( uint128 x) noexcept
+constexpr auto count_leading_zeroes( uint128 x) noexcept
 {
     const auto& u = unpack_to<uint64>( std::move( x));
     return u[1] == 0 ? std::countl_zero(u[0]) + bitwidth<uint64> : std::countl_zero(u[1]);
 }
 
 template<>
-constexpr inline auto count_leading_ones( uint128 x) noexcept
+constexpr auto count_leading_ones( uint128 x) noexcept
 {
     const auto& u = unpack_to<uint64>( std::move( x));
     return u[1] == all_ones<uint64>() ? std::countl_one(u[0]) + bitwidth<uint64> : std::countl_one(u[1]);
 }
 
 template<>
-inline constexpr auto count_trailing_zeroes( uint128 x) noexcept
+constexpr auto count_trailing_zeroes( uint128 x) noexcept
 {
     const auto& u = unpack_to<uint64>( std::move( x));
     return u[0] == 0 ? std::countr_zero(u[1]) + bitwidth<uint64> : std::countr_zero(u[0]);
 }
 
 template<>
-inline constexpr auto circ_ls( uint128 x, size_t shamt)
+constexpr auto circ_ls( uint128 x, size_t shamt)
 {
     if ( shamt == 0 || shamt == bitwidth<uint128>)
         return x;
@@ -168,7 +168,7 @@ inline constexpr auto circ_ls( uint128 x, size_t shamt)
 }
 
 template<>
-inline constexpr auto circ_rs( uint128 x, size_t shamt)
+constexpr auto circ_rs( uint128 x, size_t shamt)
 {
     return circ_ls( std::move( x), bitwidth<uint128> - shamt);
 }
