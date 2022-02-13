@@ -34,6 +34,7 @@ constexpr auto arithmetic_rs( Unsigned auto value, size_t shamt) -> decltype(val
     return sign_cast<ST>( value) >> shamt;
 }
 
+template<>
 inline uint128 arithmetic_rs( uint128 value, size_t shamt)
 {
     return is_positive( value) ? value >> shamt : ones_rs( value, shamt);
