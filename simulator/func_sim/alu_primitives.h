@@ -29,7 +29,7 @@ bool is_positive( Unsigned auto value) { return !is_negative( value) && value !=
  */
 constexpr auto arithmetic_rs( Unsigned auto value, size_t shamt) -> decltype(value)
 {
-    using ST = sign_t<T>;
+    using ST = sign_t<decltype(value)>;
     // NOLINTNEXTLINE(hicpp-signed-bitwise) C++20 clearly defines this
     return sign_cast<ST>( value) >> shamt;
 }
