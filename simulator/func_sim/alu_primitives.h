@@ -16,7 +16,7 @@ constexpr auto count_leading_zeroes( Unsigned auto x) noexcept  { return std::co
 constexpr auto count_leading_ones( Unsigned auto x) noexcept    { return std::countl_one( x); }
 constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::countr_zero( x); }
 
-/*  
+/*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
  * 0xF0 sra 2 -> 0xFC
