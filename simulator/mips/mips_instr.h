@@ -25,7 +25,7 @@ struct MIPSTableEntry;
 template <typename Key, typename Value, size_t CAPACITY, Key INVALID_KEY, Key DELETED_KEY>
 class InstrCache;
 
-template<typename R>
+template<Unsigned R>
 class BaseMIPSInstr : public BaseInstruction<R, MIPSRegister>
 {
     public:

@@ -395,7 +395,7 @@ const auto& find_entry( std::string_view name)
     return invalid_instr<I>;
 }
 
-template<typename T>
+template<Unsigned T>
 RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4), instr( bytes)
 {
@@ -414,7 +414,7 @@ RISCVInstr<T>::RISCVInstr( uint32 bytes, Addr PC)
 }
 
 
-template<typename T>
+template<Unsigned T>
 RISCVInstr<T>::RISCVInstr( std::string_view name, uint32 immediate, Addr PC)
     : BaseInstruction<T, RISCVRegister>( PC, PC + 4)
 {
@@ -425,7 +425,7 @@ RISCVInstr<T>::RISCVInstr( std::string_view name, uint32 immediate, Addr PC)
     init_target();
 }
 
-template<typename T>
+template<Unsigned T>
 void RISCVInstr<T>::init_target()
 {
     if ( this->is_branch())
@@ -434,7 +434,7 @@ void RISCVInstr<T>::init_target()
         this->target = this->PC + sign_extension<20>( narrow_cast<Addr>( this->v_imm));
 }
 
-template<typename T>
+template<Unsigned T>
 void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
 {
     if (entry.subset == 'C')
@@ -454,13 +454,13 @@ void RISCVInstr<T>::init( const RISCVTableEntry<MyDatapath>& entry)
             this->print_src.set( i);
 }
 
-template<typename T>
+template<Unsigned T>
 std::string RISCVInstr<T>::get_disasm() const
 {
     return this->generate_disasm();
 }
 
-template<typename R>
+template<Unsigned R>
 std::string RISCVInstr<R>::string_dump() const
 {
     std::ostringstream oss;
@@ -468,7 +468,7 @@ std::string RISCVInstr<R>::string_dump() const
     return oss.str();
 }
 
-template<typename R>
+template<Unsigned R>
 std::string RISCVInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;

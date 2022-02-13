@@ -8,6 +8,7 @@
 #define OPERATION_H
 
 #include <func_sim/traps/trap.h>
+#include <func_sim/register.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -220,7 +221,7 @@ void Datapath<T>::load( const T& value)
     set_v_dst( is_unsigned_load() ? value : sign_extension_for_load(value), 0);
 }
 
-template<Unsigned T, typename R>
+template<Unsigned T, Register R>
 class BaseInstruction : public Datapath<T>
 {
 public:
@@ -242,7 +243,7 @@ protected:
     std::array<R, MAX_DST_NUM> dst = { R::zero(), R::zero() };
 };
 
-template<Unsigned T, typename R>
+template<Unsigned T, Register R>
 std::string BaseInstruction<T, R>::generate_disasm() const
 {
     std::ostringstream oss;
@@ -269,7 +270,7 @@ std::string BaseInstruction<T, R>::generate_disasm() const
     return std::move( oss).str();
 }
 
-template<Unsigned T, typename R>
+template<Unsigned T, Register R>
 std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std::string& disasm) const
 {
     if ( this->PC != 0)

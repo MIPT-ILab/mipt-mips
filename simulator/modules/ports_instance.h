@@ -36,8 +36,8 @@
 
 struct BPInterface;
 class Target;
-template<typename T> class BaseMIPSInstr;
-template<typename T> class RISCVInstr;
+template<Unsigned T> class BaseMIPSInstr;
+template<Unsigned T> class RISCVInstr;
 template<typename T> class PerfInstr;
 class MIPSRegister;
 class RISCVRegister;

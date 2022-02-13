@@ -284,8 +284,8 @@ struct MIPSTableEntry
     MIPSVersionMask versions = MIPS_I_Instr;
 };
 
-template<typename R>
-using Table = std::unordered_map<uint32, MIPSTableEntry<R>>;
+template<typename I>
+using Table = std::unordered_map<uint32, MIPSTableEntry<I>>;
 
 //unordered map for R-instructions
 template<typename I>
@@ -816,7 +816,7 @@ static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
               "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
 #endif
 
-template<typename R>
+template<Unsigned R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::endian endian, uint32 bytes, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( bytes)
@@ -836,7 +836,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::endian endian, uint32
     init_target();
 }
 
-template<typename R>
+template<Unsigned R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcode, std::endian endian, uint32 immediate, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
     , raw( 0)
@@ -848,7 +848,7 @@ BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::string_view str_opcod
     init_target();
 }
 
-template<typename R>
+template<Unsigned R>
 void BaseMIPSInstr<R>::init_target()
 {
     if ( this->is_branch())
@@ -857,7 +857,7 @@ void BaseMIPSInstr<R>::init_target()
         this->target = ( this->PC & 0xf0000000) | ( this->v_imm << 2U);
 }
 
-template<typename R>
+template<Unsigned R>
 void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersion version)
 {
     this->imm_print_type = entry.imm_print_type;
@@ -879,14 +879,14 @@ void BaseMIPSInstr<R>::init( const MIPSTableEntry<MyDatapath>& entry, MIPSVersio
     this->new_PC += this->delayed_slots * 4;
 }
 
-template<typename R>
+template<Unsigned R>
 typename BaseMIPSInstr<R>::DisasmCache& BaseMIPSInstr<R>::get_disasm_cache()
 {
     static DisasmCache instance;
     return instance;
 }
 
-template<typename R>
+template<Unsigned R>
 std::string BaseMIPSInstr<R>::string_dump() const
 {
     std::ostringstream oss;
@@ -894,7 +894,7 @@ std::string BaseMIPSInstr<R>::string_dump() const
     return std::move( oss).str();
 }
 
-template<typename R>
+template<Unsigned R>
 std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
@@ -905,7 +905,7 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
      return std::move( oss).str();
 }
 
-template<typename R>
+template<Unsigned R>
 std::string BaseMIPSInstr<R>::get_disasm() const
 {
     if ( !raw_valid)
