@@ -97,12 +97,12 @@ catch (...) {
 
 int GDBSim::memory_read( std::byte* dst, Addr src, size_t length) const
 {
-    return narrow_cast<int>( memory->memcpy_guest_to_host( dst, src, length));
+    return sign_cast<int>( memory->memcpy_guest_to_host( dst, src, length));
 }
 
 int GDBSim::memory_write( Addr dst, const std::byte* src, size_t length) const
 {
-    return narrow_cast<int>( memory->memcpy_host_to_guest_noexcept( dst, src, length));
+    return sign_cast<int>( memory->memcpy_host_to_guest_noexcept( dst, src, length));
 }
 
 int GDBSim::read_register(int regno, std::byte* buf, int length) const
@@ -141,7 +141,7 @@ int GDBSimVector::allocate_new( const std::string& isa, const char* const* argv)
     st.emplace_back( GDBSim( isa));
     auto id = st.size() - 1;
     std::cout << "MIPT-MIPS: simulator instance created, id " << id << std::endl;
-    return narrow_cast<int>( id);
+    return sign_cast<int>( id);
 }
 catch (const std::exception &e) {
     std::cerr << "MIPT-MIPS: simulator is not initialized:\n\t" << e.what() << std::endl;

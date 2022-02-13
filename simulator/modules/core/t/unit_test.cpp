@@ -100,7 +100,7 @@ TEST_CASE( "Perf_Sim: signed register R/W")
 {
     auto sim = CycleAccurateSimulator::create_simulator( "mips32");
     sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
-    CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
+    CHECK( sign_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
     CHECK( sim->get_exit_code() == 0);
 }
 

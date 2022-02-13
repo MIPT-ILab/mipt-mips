@@ -59,9 +59,9 @@ std::string print_immediate( Imm type, T value)
     case Imm::ADDR:     oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC:    oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:     oss <<  " 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP_REL: oss <<    " " << std::dec << narrow_cast<int16>(value); break;
-    case Imm::TRAP:     oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
-    case Imm::ARITH:    oss << ", "   << std::dec << narrow_cast<int16>(value); break;
+    case Imm::JUMP_REL: oss <<    " " << std::dec << sign_cast<int16>(value); break;
+    case Imm::TRAP:     oss << ", 0x" << std::hex << sign_cast<int16>(value) << std::dec; break;
+    case Imm::ARITH:    oss << ", "   << std::dec << sign_cast<int16>(value); break;
     case Imm::SHIFT:    oss << ", "   << std::dec << value; break;
     case Imm::NO:       break;
     }

@@ -7,16 +7,14 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
-template<typename T>
-constexpr bool is_signed_division_overflow(T x, T y)
+constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x))
 {
-    if constexpr (std::is_same<T, unsign_t<T>>()) {
-        (void)x; (void)y;
-        return false;
-    }
-    else {
-        return y == -1 && x == narrow_cast<T>(msb_set<unsign_t<T>>());
-    }
+    return false;
+}
+
+constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
+{
+    return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
 }
 
 template<typename T>

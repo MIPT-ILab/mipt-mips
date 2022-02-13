@@ -114,24 +114,24 @@ struct ALU
     static void addr( Instr* instr) { instr->mem_addr = narrow_cast<Addr>( instr->v_src[0] + instr->v_imm); }
 
     // Predicate helpers - unary
-    static bool lez( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) <= 0; }
-    static bool gez( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= 0; }
-    static bool ltz( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) < 0; }
-    static bool gtz( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) > 0; }
+    static bool lez( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) <= 0; }
+    static bool gez( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) >= 0; }
+    static bool ltz( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) < 0; }
+    static bool gtz( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) > 0; }
 
     // Predicate helpers - binary
     static bool eq( const Instr* instr)  { return instr->v_src[0] == instr->v_src[1]; }
     static bool ne( const Instr* instr)  { return instr->v_src[0] != instr->v_src[1]; }
     static bool geu( const Instr* instr) { return instr->v_src[0] >= instr->v_src[1]; }
     static bool ltu( const Instr* instr) { return instr->v_src[0] <  instr->v_src[1]; }
-    static bool ge( const Instr* instr)  { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= narrow_cast<RegisterSInt>( instr->v_src[1]); }
-    static bool lt( const Instr* instr)  { return narrow_cast<RegisterSInt>( instr->v_src[0]) <  narrow_cast<RegisterSInt>( instr->v_src[1]); }
+    static bool ge( const Instr* instr)  { return sign_cast<RegisterSInt>( instr->v_src[0]) >= sign_cast<RegisterSInt>( instr->v_src[1]); }
+    static bool lt( const Instr* instr)  { return sign_cast<RegisterSInt>( instr->v_src[0]) <  sign_cast<RegisterSInt>( instr->v_src[1]); }
 
     // Predicate helpers - immediate
     static bool eqi( const Instr* instr) { return instr->v_src[0] == instr->v_imm; }
     static bool nei( const Instr* instr) { return instr->v_src[0] != instr->v_imm; }
-    static bool lti( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) < narrow_cast<RegisterSInt>( instr->v_imm); }
-    static bool gei( const Instr* instr) { return narrow_cast<RegisterSInt>( instr->v_src[0]) >= narrow_cast<RegisterSInt>( instr->v_imm); }
+    static bool lti( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) < sign_cast<RegisterSInt>( instr->v_imm); }
+    static bool gei( const Instr* instr) { return sign_cast<RegisterSInt>( instr->v_src[0]) >= sign_cast<RegisterSInt>( instr->v_imm); }
     static bool ltiu( const Instr* instr) { return instr->v_src[0] < instr->v_imm; }
     static bool geiu( const Instr* instr) { return instr->v_src[0] >= instr->v_imm; }
 
@@ -176,10 +176,10 @@ struct ALU
     // Shifts
     template<typename T> static void sll( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
     template<typename T> static void srl( Instr* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
-    template<typename T> static void sra( Instr* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
+    template<Unsigned T> static void sra( Instr* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
     template<typename T> static void sllv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
     template<typename T> static void srlv( Instr* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
-    template<typename T> static void srav( Instr* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
+    template<Unsigned T> static void srav( Instr* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename T> static void slo( Instr* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
     template<typename T> static void sloi( Instr* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
     template<typename T> static void sro( Instr* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
