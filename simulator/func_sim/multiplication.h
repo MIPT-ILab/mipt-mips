@@ -19,7 +19,6 @@ constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
 
 template<Integer T>
 inline auto mips_multiplication(T x, T y) {
-    using T   = decltype(x);
     using UT  = unsign_t<T>;
     using UT2 = doubled_t<UT>;
     using T2  = sign_t<UT2>;
