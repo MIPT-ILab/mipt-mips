@@ -156,7 +156,7 @@ struct MIPSMultALU
 {
     template<typename T> static void multiplication( Instr* instr)
     {
-        const auto& result = mips_multiplication<T>( instr->v_src[0], instr->v_src[1]);
+        const auto& result = mips_multiplication( instr->v_src[0], instr->v_src[1]);
         instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
         instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
     }
