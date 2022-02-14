@@ -17,17 +17,8 @@ constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
     return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
 }
 
-inline auto mips_multiplication(Unsigned auto x, decltype(x) y) {
-    using T  = decltype(x);
-    using T2 = doubled_t<T>;
-    T2 value = T2{ x} * T2{ y};
-
-    auto lo = narrow_cast<T>( value);
-    auto hi = narrow_cast<T>( value >> bitwidth<T>);
-    return std::pair{ lo, hi};
-}
-
-inline auto mips_multiplication(Signed auto x, decltype(x) y) {
+template<Integer T>
+inline auto mips_multiplication(T x, T y) {
     using T   = decltype(x);
     using UT  = unsign_t<T>;
     using UT2 = doubled_t<UT>;
@@ -156,7 +147,7 @@ struct MIPSMultALU
 {
     template<typename T> static void multiplication( Instr* instr)
     {
-        const auto& result = mips_multiplication( T{ instr->v_src[0]}, T{ instr->v_src[1]});
+        const auto& result = mips_multiplication<T>( instr->v_src[0]}, instr->v_src[1]});
         instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
         instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
     }
