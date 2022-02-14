@@ -36,8 +36,6 @@ public:
     static constexpr const size_t MAX_REG = MAX_VAL_RegNum;
     static const size_t popular_reg_shift = size_t( RISCV_REG_s0);
 
-    friend std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs);
-
     std::string_view dump()        const { return regTable.at( value); }
     bool is_zero()                 const { return value == RISCV_REG_zero; }
     static constexpr bool is_mips_hi() { return false; }

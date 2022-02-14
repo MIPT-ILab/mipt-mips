@@ -9,6 +9,8 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+#include <func_sim/register.h>
+
 #include <array>
 #include <cassert>
 #include <iosfwd>
@@ -35,8 +37,6 @@ public:
     {
         return regTable.at( value);
     }
-
-    friend std::ostream& operator<<( std::ostream& out, const MIPSRegister& rhs);
 
     bool is_zero()       const { return value == MIPS_REG_zero; }
     bool is_mips_hi()    const { return value == MIPS_REG_hi; }

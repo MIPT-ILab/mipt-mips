@@ -5,12 +5,7 @@
 
 #include "riscv_register.h"
 
-#include <iostream>
-
-std::ostream& operator<<( std::ostream& out, const RISCVRegister& rhs)
-{
-    return out << rhs.dump();
-}
+#include <stdexcept>
 
 const std::array<std::string_view, RISCVRegister::MAX_REG> RISCVRegister::regTable =
 {{
