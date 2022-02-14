@@ -899,7 +899,7 @@ std::string BaseMIPSInstr<R>::bytes_dump() const
 {
      std::ostringstream oss;
      oss << "Bytes:" << std::hex;
-     const auto& bytes = endian == std::endian::little ? unpack_array<uint32, std::endian::little>( raw) : unpack_array<uint32, std::endian::big>( raw);
+     const auto& bytes = endian == std::endian::little ? unpack_array<std::endian::little>( raw) : unpack_array<std::endian::big>( raw);
      for ( const auto& b : bytes)
          oss << " 0x" << std::setfill( '0') << std::setw( 2) << static_cast<uint16>( b);
      return std::move( oss).str();

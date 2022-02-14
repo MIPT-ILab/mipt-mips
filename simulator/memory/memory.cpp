@@ -97,7 +97,7 @@ void WriteableMemory::memset( Addr addr, std::byte value, size_t size)
     	memcpy_host_to_guest( addr + i, &value, 1);
 }
 
-template<typename T, std::endian endian> void
+template<Unsigned T, std::endian endian> void
 WriteableMemory::write_integer( T value, Addr addr, size_t size)
 {
     switch ( size) {

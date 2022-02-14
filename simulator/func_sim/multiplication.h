@@ -17,11 +17,11 @@ constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
     return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
 }
 
-template<typename T>
-auto mips_multiplication(T x, T y) {
-    using UT = unsign_t<T>;
-    using T2 = doubled_t<T>;
-    using UT2 = unsign_t<T2>;
+template<Integer T>
+inline auto mips_multiplication(T x, T y) {
+    using UT  = unsign_t<T>;
+    using UT2 = doubled_t<UT>;
+    using T2  = sign_t<UT2>;
     auto value = narrow_cast<UT2>(T2{ x} * T2{ y});
 
     auto lo = narrow_cast<UT>( value);
@@ -29,7 +29,7 @@ auto mips_multiplication(T x, T y) {
     return std::pair{ lo, hi};
 }
 
-template<typename T>
+template<Integer T>
 auto mips_division(T x, T y) {
     using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
     if ( y == 0 || is_signed_division_overflow(x, y))
@@ -38,7 +38,7 @@ auto mips_division(T x, T y) {
     return ReturnType(x / y, x % y);
 }
 
-template<typename T>
+template<Integer T>
 auto riscv_multiplication_low(T x, T y) {
     using UT = unsign_t<T>;
     return narrow_cast<UT>( x * y);
@@ -48,7 +48,7 @@ auto riscv_multiplication_low(T x, T y) {
 // which is not defined in ABI.
 // So, we have to use Karatsuba algorithm to get high register of 
 // multiplication result for unsigned*unsigned.
-template<typename T>
+template<Integer T>
 auto riscv_multiplication_high_uu(T x, T y) {
     uint8 halfwidth = bitwidth<T>/2;
     using UT = unsign_t<T>;
@@ -63,7 +63,7 @@ auto riscv_multiplication_high_uu(T x, T y) {
     return hi;
 }
 
-template<typename T>
+template<Integer T>
 auto riscv_multiplication_high_ss(T x, T y) {
     using UT = unsign_t<T>;
     auto x_is_neg = x >> (bitwidth<T> - 1);
@@ -88,7 +88,7 @@ auto riscv_multiplication_high_ss(T x, T y) {
     return result;
 }
 
-template<typename T>
+template<Integer T>
 auto riscv_multiplication_high_su(T x, T y) {
     using UT = unsign_t<T>;
     auto x_is_neg = x >> (bitwidth<T> - 1);
@@ -106,7 +106,7 @@ auto riscv_multiplication_high_su(T x, T y) {
     return narrow_cast<UT>( hi_abs);
 }
 
-template<typename T>
+template<Integer T>
 auto riscv_division(T x, T y) {
     using UT = unsign_t<T>;
     if ( y == 0)
@@ -118,7 +118,7 @@ auto riscv_division(T x, T y) {
     return narrow_cast<UT>( x / y);
 }
 
-template<typename T>
+template<Integer T>
 auto riscv_remainder(T x, T y) {
     using UT = unsign_t<T>;
     if ( y == 0)

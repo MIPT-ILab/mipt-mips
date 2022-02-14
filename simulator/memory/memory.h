@@ -63,21 +63,21 @@ public:
     std::string read_string( Addr addr) const;
     std::string read_string_limited( Addr addr, size_t size) const;
 
-    template<typename T, std::endian endian> T read( Addr addr) const noexcept;
-    template<typename T, std::endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
+    template<Unsigned T, std::endian endian> T read( Addr addr) const noexcept;
+    template<Unsigned T, std::endian endian> T read( Addr addr, T mask) const noexcept { return read<T, endian>( addr) & mask; }
 protected:
     template<typename Instr> void load( Instr* instr) const;
 private:
     std::string read_string_by_size( Addr addr, size_t size) const;
 };
 
-template<typename T, std::endian endian>
+template<Unsigned T, std::endian endian>
 T ReadableMemory::read( Addr addr) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init) Initialized by memcpy
     std::array<std::byte, bytewidth<T>> bytes;
     memcpy_guest_to_host( bytes.data(), addr, bytes.size());
-    return pack_array<T, endian>( bytes);
+    return pack_array<endian>( bytes);
 }
 
 template<typename Instr>
@@ -112,14 +112,14 @@ public:
         return 0;
     }
 
-    template<typename T, std::endian endian>
+    template<Unsigned T, std::endian endian>
     void write( T value, Addr addr)
     {
-        const auto& bytes = unpack_array<T, endian>( value);
+        const auto& bytes = unpack_array<endian>( value);
         memcpy_host_to_guest( addr, bytes.data(), bytes.size());
     }
 
-    template<typename T, std::endian endian>
+    template<Unsigned T, std::endian endian>
     void write_integer( T value, Addr addr, size_t size);
 
     void write_string( const std::string& value, Addr addr);

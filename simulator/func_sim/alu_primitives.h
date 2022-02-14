@@ -40,8 +40,8 @@ inline uint128 arithmetic_rs( uint128 value, size_t shamt)
     return is_positive( value) ? value >> shamt : ones_rs( value, shamt);
 }
 
-template<typename T, typename T1, typename T2> static
-auto test_addition_overflow( T1 val1, T2 val2)
+template<typename T> static
+auto test_addition_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
     const bool is_overflow =
@@ -51,8 +51,8 @@ auto test_addition_overflow( T1 val1, T2 val2)
     return std::pair{ result, is_overflow};
 }
 
-template<typename T, typename T1, typename T2> static
-auto test_subtraction_overflow( T1 val1, T2 val2)
+template<typename T> static
+auto test_subtraction_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
     const bool is_overflow =
@@ -100,9 +100,9 @@ static constexpr T shuffle_mask( size_t density)
     return result;
 }
 
-template<typename T>
-static inline T gen_reverse( T value, size_t shamt)
+static inline auto gen_reverse( Unsigned auto value, size_t shamt)
 {
+    using T = decltype(value);
     for ( size_t i = 0; i < log_bitwidth<T>; ++i) {
         const auto shift = 1U << i;
         if ( ( shamt & shift) != 0)
@@ -112,9 +112,9 @@ static inline T gen_reverse( T value, size_t shamt)
     return value;
 }
 
-template<typename T>
-static inline T gen_or_combine( T value, size_t shamt)
+static inline auto gen_or_combine( Unsigned auto value, size_t shamt)
 {
+    using T = decltype(value);
     for ( size_t i = 0; i < log_bitwidth<T>; ++i) {
         const auto shift = 1U << i;
         if ( ( shamt & shift) != 0)
