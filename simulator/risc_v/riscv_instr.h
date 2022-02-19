@@ -13,7 +13,7 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
-template<typename I>
+template<Executable I>
 struct RISCVTableEntry;
 
 template <Unsigned T>

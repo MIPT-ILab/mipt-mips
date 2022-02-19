@@ -102,9 +102,14 @@ static constexpr To narrow_cast(const Integer auto& value)
 }
 
 template <Signed To>
-static constexpr To sign_cast(const Unsigned auto& value)
+static constexpr To sign_cast( const Unsigned auto& value)
 {
     return static_cast<To>( value);
+}
+
+static constexpr auto signify( const Unsigned auto& value)
+{
+    return sign_cast<sign_t<std::decay_t<decltype(value)>>>( value);
 }
 
 using Addr = uint64;

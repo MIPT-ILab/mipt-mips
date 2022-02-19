@@ -27,4 +27,11 @@ template<> struct signed_integer<128>   { using type = int128; };
 template<> inline constexpr size_t bitwidth<uint128> = 128U;
 template<> inline constexpr size_t bitwidth<int128> = 128U;
 
+inline int128 signify( uint128 value)
+{
+    const uint128 no_sign = value & ~msb_set<uint128>();
+    const int128 abs = int128{ no_sign};
+    return value != no_sign ? -abs : abs;
+}
+
 #endif // #ifndef COMMON_TYPES_H
