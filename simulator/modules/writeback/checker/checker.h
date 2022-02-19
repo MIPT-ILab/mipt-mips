@@ -19,9 +19,9 @@ struct CheckerMismatch final : Exception
     { }
 };
 
-template<typename ISA>
+template<ISA I>
 class Checker {
-    using FuncInstr = typename ISA::FuncInstr;
+    using FuncInstr = typename I::FuncInstr;
 public:
     void disable() { active = false; }
     void check( const FuncInstr& instr);
@@ -29,7 +29,7 @@ public:
     void set_target( const Target& value);
     void driver_step( const FuncInstr& instr);
 private:
-    std::shared_ptr<FuncSim<ISA>> sim;
+    std::shared_ptr<FuncSim<I>> sim;
     bool active = false;
 };
 
