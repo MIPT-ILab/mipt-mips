@@ -9,33 +9,33 @@
 
 #include <sstream>
 
-template <typename ISA>
-void Checker<ISA>::init( std::endian endian, Kernel* kernel, std::string_view isa)
+template <ISA I>
+void Checker<I>::init( std::endian endian, Kernel* kernel, std::string_view isa)
 {
     auto memory = FuncMemory::create_default_hierarchied_memory();
-    sim = std::make_shared<FuncSim<ISA>>( endian, false, isa);
+    sim = std::make_shared<FuncSim<I>>( endian, false, isa);
     sim->set_memory( memory);
     kernel->add_replica_simulator( sim);
     kernel->add_replica_memory( memory);
     active = true;
 }
 
-template <typename ISA>
-void Checker<ISA>::set_target( const Target& value)
+template <ISA I>
+void Checker<I>::set_target( const Target& value)
 {
     if ( active)
         sim->set_target( value);
 }
 
-template <typename ISA>
-void Checker<ISA>::driver_step( const FuncInstr& instr)
+template <ISA I>
+void Checker<I>::driver_step( const FuncInstr& instr)
 {
     if ( active)
         sim->driver_step( instr);
 }
 
-template <typename ISA>
-void Checker<ISA>::check( const FuncInstr& instr)
+template <ISA I>
+void Checker<I>::check( const FuncInstr& instr)
 {
     if (!active)
         return;

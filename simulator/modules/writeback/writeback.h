@@ -23,12 +23,12 @@ struct Deadlock final : Exception
     { }
 };
 
-template <typename ISA>
+template <ISA I>
 class Writeback final : public Module
 {
-    using FuncInstr = typename ISA::FuncInstr;
+    using FuncInstr = typename I::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename I::RegisterUInt;
     using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
 private:
@@ -38,7 +38,7 @@ private:
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
     const std::endian endian;
-    Checker<ISA> checker;
+    Checker<I> checker;
     std::shared_ptr<Kernel> kernel;
     std::unique_ptr<Driver> driver;
 
@@ -46,8 +46,8 @@ private:
     RF<FuncInstr>* rf = nullptr;
 
     auto read_instructions( Cycle cycle);
-    void writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle);
-    void writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle);
+    void writeback_instruction( const Writeback<I>::Instr& instr, Cycle cycle);
+    void writeback_instruction_system( Writeback<I>::Instr* instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);
     void set_writeback_target( const Target& value, Cycle cycle);
     void set_checker_target( const Target& value);

@@ -19,12 +19,12 @@
 
 #include <chrono>
 
-template <typename ISA>
+template <ISA I>
 class PerfSim : public CycleAccurateSimulator
 {
 public:
-    using Register = typename ISA::Register;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using Register = typename I::Register;
+    using RegisterUInt = typename I::RegisterUInt;
     explicit PerfSim( std::endian endian, std::string_view isa);
     Trap run( uint64 instrs_to_run) final;
     void set_target( const Target& target) final;
@@ -56,7 +56,7 @@ public:
     PerfSim operator=( PerfSim&&) = delete;
     ~PerfSim() override = default;
 private:
-    using FuncInstr = typename ISA::FuncInstr;
+    using FuncInstr = typename I::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
 
     Cycle curr_cycle = 0_cl;
@@ -72,7 +72,7 @@ private:
     Execute<FuncInstr> execute;
     Mem<FuncInstr> mem;
     Branch<FuncInstr> branch;
-    Writeback<ISA> writeback;
+    Writeback<I> writeback;
 
     /* ports */
     ReadPort<Trap>* rp_halt = nullptr;

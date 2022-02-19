@@ -11,25 +11,25 @@
 #include <sstream>
 #include <stdexcept>
 
-template <typename ISA>
-FuncSim<ISA>::FuncSim( std::endian endian, bool log, std::string_view isa)
+template <ISA I>
+FuncSim<I>::FuncSim( std::endian endian, bool log, std::string_view isa)
     : BasicFuncSim( isa)
     , imem( endian)
-    , driver( ISA::create_driver( this))
+    , driver( I::create_driver( this))
 {
     if ( log)
         sout.enable();
 }
 
-template <typename ISA>
-void FuncSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
+template <ISA I>
+void FuncSim<I>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     mem = std::move( m);
     imem.set_memory( mem);
 }
 
-template <typename ISA>
-void FuncSim<ISA>::update_and_check_nop_counter( const FuncInstr& instr)
+template <ISA I>
+void FuncSim<I>::update_and_check_nop_counter( const FuncInstr& instr)
 {
     if ( instr.is_nop())
         ++nops_in_a_row;
@@ -40,8 +40,8 @@ void FuncSim<ISA>::update_and_check_nop_counter( const FuncInstr& instr)
         throw BearingLost();
 }
 
-template <typename ISA>
-typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
+template <ISA I>
+typename FuncSim<I>::FuncInstr FuncSim<I>::step()
 {
     FuncInstr instr = imem.fetch_instr( pc[0]);
     instr.set_sequence_id(sequence_id);
@@ -55,8 +55,8 @@ typename FuncSim<ISA>::FuncInstr FuncSim<ISA>::step()
     return instr;
 }
 
-template <typename ISA>
-void FuncSim<ISA>::update_pc( const FuncInstr& instr)
+template <ISA I>
+void FuncSim<I>::update_pc( const FuncInstr& instr)
 {
     auto current_pc = pc[0];
     for (size_t i = 0; i < instr.get_delayed_slots(); ++i) {
@@ -74,14 +74,14 @@ void FuncSim<ISA>::update_pc( const FuncInstr& instr)
     }
 }
 
-template <typename ISA>
-Trap FuncSim<ISA>::driver_step( const Operation& instr)
+template <ISA I>
+Trap FuncSim<I>::driver_step( const Operation& instr)
 {
     return driver->handle_trap( instr);
 }
 
-template <typename ISA>
-Trap FuncSim<ISA>::run( uint64 instrs_to_run)
+template <ISA I>
+Trap FuncSim<I>::run( uint64 instrs_to_run)
 {
     nops_in_a_row = 0;
     for ( uint64 i = 0; i < instrs_to_run; ++i) {
@@ -95,8 +95,8 @@ Trap FuncSim<ISA>::run( uint64 instrs_to_run)
     return Trap(Trap::BREAKPOINT);
 }
 
-template <typename ISA>
-uint64 FuncSim<ISA>::read_gdb_register( size_t regno) const
+template <ISA I>
+uint64 FuncSim<I>::read_gdb_register( size_t regno) const
 {
     if ( regno == Register::get_gdb_pc_index())
         return get_pc();
@@ -104,8 +104,8 @@ uint64 FuncSim<ISA>::read_gdb_register( size_t regno) const
     return read_register( Register::from_gdb_index( regno));
 }
 
-template <typename ISA>
-void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
+template <ISA I>
+void FuncSim<I>::write_gdb_register( size_t regno, uint64 value)
 {
     if ( regno == Register::get_gdb_pc_index())
         set_pc( value);
@@ -113,14 +113,14 @@ void FuncSim<ISA>::write_gdb_register( size_t regno, uint64 value)
         write_register( Register::from_gdb_index( regno), value);
 }
 
-template <typename ISA>
-int FuncSim<ISA>::get_exit_code() const noexcept
+template <ISA I>
+int FuncSim<I>::get_exit_code() const noexcept
 {
     return kernel->get_exit_code();
 }
 
-template <typename ISA>
-void FuncSim<ISA>::enable_driver_hooks()
+template <ISA I>
+void FuncSim<I>::enable_driver_hooks()
 {
     driver = Driver::create_hooked_driver( driver.get());
 }

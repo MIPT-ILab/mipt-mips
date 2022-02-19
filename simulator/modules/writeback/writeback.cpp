@@ -2,8 +2,8 @@
 
 #include <kernel/kernel.h>
 
-template <typename ISA>
-Writeback<ISA>::Writeback( Module* parent, std::endian endian) : Module( parent, "writeback"), endian( endian)
+template <ISA I>
+Writeback<I>::Writeback( Module* parent, std::endian endian) : Module( parent, "writeback"), endian( endian)
 {
     rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", Port::LATENCY);
     rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", Port::LATENCY);
@@ -16,39 +16,39 @@ Writeback<ISA>::Writeback( Module* parent, std::endian endian) : Module( parent,
     wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", Port::BW);
 }
 
-template <typename ISA>
-Writeback<ISA>::~Writeback() = default;
+template <ISA I>
+Writeback<I>::~Writeback() = default;
 
-template <typename ISA>
-void Writeback<ISA>::set_kernel( const std::shared_ptr<Kernel>& k, std::string_view isa)
+template <ISA I>
+void Writeback<I>::set_kernel( const std::shared_ptr<Kernel>& k, std::string_view isa)
 {
     kernel = k;
     checker.init( endian, kernel.get(), isa);
 }
 
-template<typename ISA>
-void Writeback<ISA>::set_target( const Target& value, Cycle cycle)
+template<ISA I>
+void Writeback<I>::set_target( const Target& value, Cycle cycle)
 {
     set_checker_target( value);
     set_writeback_target( value, cycle);
 }
 
-template<typename ISA>
-void Writeback<ISA>::set_writeback_target( const Target& value, Cycle cycle)
+template<ISA I>
+void Writeback<I>::set_writeback_target( const Target& value, Cycle cycle)
 {
     next_PC = value.address;
     wp_trap->write( true, cycle);
     wp_target->write( value, cycle);
 }
 
-template<typename ISA>
-void Writeback<ISA>::set_checker_target( const Target& value)
+template<ISA I>
+void Writeback<I>::set_checker_target( const Target& value)
 {
     checker.set_target( value);
 }
 
-template <typename ISA>
-auto Writeback<ISA>::read_instructions( Cycle cycle)
+template <ISA I>
+auto Writeback<I>::read_instructions( Cycle cycle)
 {
     auto ports = { rp_branch_datapath, rp_mem_datapath, rp_execute_datapath };
     std::vector<Instr> result;
@@ -60,8 +60,8 @@ auto Writeback<ISA>::read_instructions( Cycle cycle)
     return result;
 }
 
-template <typename ISA>
-void Writeback<ISA>::clock( Cycle cycle)
+template <ISA I>
+void Writeback<I>::clock( Cycle cycle)
 {
     sout << "wb      cycle " << std::dec << cycle << ": ";
     if ( rp_trap->is_ready( cycle) && rp_trap->read( cycle)) {
@@ -77,8 +77,8 @@ void Writeback<ISA>::clock( Cycle cycle)
         writeback_instruction_system( &instr, cycle);
 }
 
-template <typename ISA>
-void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle)
+template <ISA I>
+void Writeback<I>::writeback_instruction_system( Writeback<I>::Instr* instr, Cycle cycle)
 {
     writeback_instruction( *instr, cycle);
     bool has_syscall = instr->trap_type() == Trap::SYSCALL;
@@ -96,16 +96,16 @@ void Writeback<ISA>::writeback_instruction_system( Writeback<ISA>::Instr* instr,
         set_target( instr->get_actual_target(), cycle);
 }
 
-template <typename ISA>
-void Writeback<ISA>::writeback_bubble( Cycle cycle)
+template <ISA I>
+void Writeback<I>::writeback_bubble( Cycle cycle)
 {
     sout << "bubble\n";
     if ( cycle >= last_writeback_cycle + 100_lt)
         throw Deadlock( "");
 }
 
-template <typename ISA>
-void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle)
+template <ISA I>
+void Writeback<I>::writeback_instruction( const Writeback<I>::Instr& instr, Cycle cycle)
 {
     rf->write_dst( instr);
     wp_bypass->write( instr.get_v_dst(), cycle);
@@ -118,14 +118,14 @@ void Writeback<ISA>::writeback_instruction( const Writeback<ISA>::Instr& instr, 
     next_PC = instr.get_actual_target().address;
 }
 
-template <typename ISA>
-int Writeback<ISA>::get_exit_code() const noexcept
+template <ISA I>
+int Writeback<I>::get_exit_code() const noexcept
 {
     return 0;
 }
 
-template <typename ISA>
-void Writeback<ISA>::enable_driver_hooks()
+template <ISA I>
+void Writeback<I>::enable_driver_hooks()
 {
     driver = Driver::create_hooked_driver( driver.get());
 }
