@@ -24,7 +24,6 @@ constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::co
 template<Unsigned T>
 constexpr T arithmetic_rs( T value, size_t shamt)
 {
-    // NOLINTNEXTLINE(hicpp-signed-bitwise) C++20 clearly defines this
     return signify( value) >> shamt;
 }
 
