@@ -263,7 +263,6 @@ struct RISCVInstrDecoder
 
     static constexpr uint32 apply_mask(uint32 bytes, uint32 mask) noexcept
     {
-        // NOLINTNEXTLINE(hicpp-signed-bitwise) rhs must be positive
         return ( bytes & mask) >> std::countr_zero( mask);
     }
 

@@ -1,6 +1,7 @@
 ---
 Checks: >
   *,
+  -android,
   -abseil-*,
   -altera-*,
   -clang-analyzer-osx.*,
@@ -22,7 +23,10 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-use-nodiscard,
   -llvm-header-guard,
-  -readability-function-cognitive-complexity
+  -readability-function-cognitive-complexity,
+  -hicpp-signed-bitwise,
+  android-cloexec-open,
+  android-cloexec-fopen
 
 CheckOptions:
   - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
