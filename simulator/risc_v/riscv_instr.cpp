@@ -74,14 +74,14 @@ template<Executable I> const auto execute_csrrwi = ALU::csrrwi<I>;
 template<Executable I> const auto execute_csrrsi = do_nothing<I>;
 template<Executable I> const auto execute_csrrci = do_nothing<I>;
 // M
-template<Executable I> const auto execute_mul = RISCVMultALU<I>::template mult_l<typename I::RegisterUInt>;
-template<Executable I> const auto execute_mulh = RISCVMultALU<I>::template mult_h_ss<typename I::RegisterUInt>;
-template<Executable I> const auto execute_mulhsu = RISCVMultALU<I>::template mult_h_su<typename I::RegisterUInt>;
-template<Executable I> const auto execute_mulhu = RISCVMultALU<I>::template mult_h_uu<typename I::RegisterUInt>;
-template<Executable I> const auto execute_div = RISCVMultALU<I>::template div<sign_t<typename I::RegisterUInt>>;
-template<Executable I> const auto execute_divu = RISCVMultALU<I>::template div<typename I::RegisterUInt>;
-template<Executable I> const auto execute_rem = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
-template<Executable I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
+template<Executable I> const auto execute_mul = RISCVMultALU::mult_l<I>;
+template<Executable I> const auto execute_mulh = RISCVMultALU::mult_h_ss<I>;
+template<Executable I> const auto execute_mulhsu = RISCVMultALU::mult_h_su<I>;
+template<Executable I> const auto execute_mulhu = RISCVMultALU::mult_h_uu<I>;
+template<Executable I> const auto execute_div = RISCVMultALU::div<sign_t<typename I::RegisterUInt>, I>;
+template<Executable I> const auto execute_divu = RISCVMultALU::div<typename I::RegisterUInt, I>;
+template<Executable I> const auto execute_rem = RISCVMultALU::rem<sign_t<typename I::RegisterUInt>, I>;
+template<Executable I> const auto execute_remu = RISCVMultALU::rem<typename I::RegisterUInt, I>;
 // B
 template<Executable I> const auto execute_add_uw = ALU::add_uw<I, typename I::RegisterUInt>;
 template<Executable I> const auto execute_bclr = ALU::bclr<I, typename I::RegisterUInt>;

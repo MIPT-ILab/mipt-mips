@@ -128,19 +128,19 @@ template<Executable I> const auto mips_xori    = ALU::xori<I>;
 template<Executable I> const auto mips_unknown = ALU::unknown_instruction<I>;
 
 // Multiplicate/Divide instructions
-template<Executable I> const auto mips_madd    = MIPSMultALU<I>::template multiplication<int32>;
-template<Executable I> const auto mips_maddu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<Executable I> const auto mips_msub    = MIPSMultALU<I>::template multiplication<int32>;
-template<Executable I> const auto mips_msubu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<Executable I> const auto mips_dmult   = MIPSMultALU<I>::template multiplication<int64>;
-template<Executable I> const auto mips_dmultu  = MIPSMultALU<I>::template multiplication<uint64>;
-template<Executable I> const auto mips_mul     = MIPSMultALU<I>::template multiplication<int32>;
-template<Executable I> const auto mips_mult    = MIPSMultALU<I>::template multiplication<int32>;
-template<Executable I> const auto mips_multu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<Executable I> const auto mips_ddiv    = MIPSMultALU<I>::template division<int64>;
-template<Executable I> const auto mips_ddivu   = MIPSMultALU<I>::template division<uint64>;
-template<Executable I> const auto mips_div     = MIPSMultALU<I>::template division<int32>;
-template<Executable I> const auto mips_divu    = MIPSMultALU<I>::template division<uint32>;
+template<Executable I> const auto mips_madd    = MIPSMultALU::multiplication<int32, I>;
+template<Executable I> const auto mips_maddu   = MIPSMultALU::multiplication<uint32, I>;
+template<Executable I> const auto mips_msub    = MIPSMultALU::multiplication<int32, I>;
+template<Executable I> const auto mips_msubu   = MIPSMultALU::multiplication<uint32, I>;
+template<Executable I> const auto mips_dmult   = MIPSMultALU::multiplication<int64, I>;
+template<Executable I> const auto mips_dmultu  = MIPSMultALU::multiplication<uint64, I>;
+template<Executable I> const auto mips_mul     = MIPSMultALU::multiplication<int32, I>;
+template<Executable I> const auto mips_mult    = MIPSMultALU::multiplication<int32, I>;
+template<Executable I> const auto mips_multu   = MIPSMultALU::multiplication<uint32, I>;
+template<Executable I> const auto mips_ddiv    = MIPSMultALU::division<int64, I>;
+template<Executable I> const auto mips_ddivu   = MIPSMultALU::division<uint64, I>;
+template<Executable I> const auto mips_div     = MIPSMultALU::division<int32, I>;
+template<Executable I> const auto mips_divu    = MIPSMultALU::division<uint32, I>;
 
 // CP1 instructions
 template<Executable I> const auto mips_abs_d     = mips_unknown<I>;
