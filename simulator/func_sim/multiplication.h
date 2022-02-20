@@ -38,72 +38,52 @@ auto mips_division(T x, T y) {
     return ReturnType(x / y, x % y);
 }
 
-template<Integer T>
-auto riscv_multiplication_low(T x, T y) {
-    using UT = unsign_t<T>;
-    return narrow_cast<UT>( x * y);
-}
-
 // For RISCV-128bit result of multiplication is 256 bit type,
 // which is not defined in ABI.
 // So, we have to use Karatsuba algorithm to get high register of 
 // multiplication result for unsigned*unsigned.
-template<Integer T>
-auto riscv_multiplication_high_uu(T x, T y) {
+auto riscv_multiplication_high_uu(Unsigned auto x, decltype(x) y) {
+    using T = decltype(x);
     uint8 halfwidth = bitwidth<T>/2;
-    using UT = unsign_t<T>;
-    auto half_mask = narrow_cast<UT>( all_ones<UT>() >> halfwidth);
-    auto x1 = narrow_cast<UT>( x >> halfwidth);
-    auto x0 = narrow_cast<UT>( x & half_mask);
-    auto y1 = narrow_cast<UT>( y >> halfwidth);
-    auto y0 = narrow_cast<UT>( y & half_mask);
+    auto half_mask = narrow_cast<T>( all_ones<T>() >> halfwidth);
+    auto x1 = narrow_cast<T>( x >> halfwidth);
+    auto x0 = narrow_cast<T>( x & half_mask);
+    auto y1 = narrow_cast<T>( y >> halfwidth);
+    auto y0 = narrow_cast<T>( y & half_mask);
     auto low_part = ( ( ((x0 * y0) >> halfwidth) + (( x0 * y1) & half_mask) + (( x1 * y0) & half_mask) ) >> halfwidth);
     auto high_part = ( ( x1*y1) + (( x0*y1) >> halfwidth) + (( x1*y0) >> halfwidth) );
-    auto hi = narrow_cast<UT>( high_part + low_part);
-    return hi;
+    return high_part + low_part;
 }
 
-template<Integer T>
-auto riscv_multiplication_high_ss(T x, T y) {
-    using UT = unsign_t<T>;
-    auto x_is_neg = x >> (bitwidth<T> - 1);
-    auto y_is_neg = y >> (bitwidth<T> - 1);
+auto riscv_multiplication_high_ss(Unsigned auto x, decltype(x) y) {
+    bool x_is_neg = signify(x) < 0;
+    bool y_is_neg = signify(y) < 0;
     auto result_is_neg = x_is_neg ^ y_is_neg;
     auto x_abs = ( x_is_neg) 
-                 ? ~( UT{ x} - 1)
-                 : UT{x};
+                 ? ~(x - 1)
+                 : x;
     auto y_abs = ( y_is_neg) 
-                 ? ~( UT{ y} - 1)
-                 : UT{y};
-    auto hi_abs = riscv_multiplication_high_uu( UT{ x_abs}, UT{ y_abs});
-    auto lo_abs = riscv_multiplication_low( UT{ x_abs}, UT{ y_abs});
-    auto result = UT{ hi_abs}; 
-    if( result_is_neg)
-        result = ( lo_abs == 0)
-                 ? narrow_cast<UT>( ~result + 1)
-                 : narrow_cast<UT>( ~result);
-    else
-        result = narrow_cast<UT>( hi_abs);
-        
-    return result;
+                 ? ~(y - 1)
+                 : y;
+    auto hi_abs = riscv_multiplication_high_uu( x_abs, y_abs);
+    auto lo_abs = x_abs * y_abs;
+    if ( result_is_neg)
+        return lo_abs == 0 ? ~hi_abs + 1 : ~hi_abs;
+
+    return hi_abs;
 }
 
-template<Integer T>
-auto riscv_multiplication_high_su(T x, T y) {
-    using UT = unsign_t<T>;
-    auto x_is_neg = x >> (bitwidth<T> - 1);
+auto riscv_multiplication_high_su(Unsigned auto x, decltype(x) y) {
+    bool x_is_neg = signify(x) < 0;
     auto x_abs = ( x_is_neg) 
-                 ? ~( UT{ x} - 1)
-                 : UT{x};
-    auto hi_abs = riscv_multiplication_high_uu( UT{ x_abs}, UT{ y});
-    auto lo_abs = riscv_multiplication_low( UT{ x_abs}, UT{ y});
-    const auto& result = UT{ hi_abs}; 
+                 ? ~( x - 1)
+                 : x;
+    auto hi_abs = riscv_multiplication_high_uu( x_abs, y);
+    auto lo_abs = x_abs * y; 
     if ( x_is_neg)
-        return ( lo_abs == 0)
-                 ? narrow_cast<UT>( ~result + 1)
-                 : narrow_cast<UT>( ~result);
+        return lo_abs == 0 ? ~hi_abs + 1 : ~hi_abs;
 
-    return narrow_cast<UT>( hi_abs);
+    return hi_abs;
 }
 
 template<Integer T>
@@ -130,31 +110,31 @@ auto riscv_remainder(T x, T y) {
     return narrow_cast<UT>( x % y);
 }
 
-template <typename Instr>
 struct RISCVMultALU
 {
-    template<typename T> static void mult_h_uu( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_uu<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void mult_h_ss( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_ss<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void mult_h_su( Instr* instr) { instr->v_dst[0] = riscv_multiplication_high_su<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void mult_l( Instr* instr) { instr->v_dst[0] = riscv_multiplication_low<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void div( Instr* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void rem( Instr* instr) { instr->v_dst[0] = riscv_remainder<T>(instr->v_src[0], instr->v_src[1]); }
+    static void mult_h_uu( Executable auto* instr) { instr->v_dst[0] = riscv_multiplication_high_uu(instr->v_src[0], instr->v_src[1]); }
+    static void mult_h_ss( Executable auto* instr) { instr->v_dst[0] = riscv_multiplication_high_ss(instr->v_src[0], instr->v_src[1]); }
+    static void mult_h_su( Executable auto* instr) { instr->v_dst[0] = riscv_multiplication_high_su(instr->v_src[0], instr->v_src[1]); }
+    static void mult_l( Executable auto* instr) { instr->v_dst[0] = instr->v_src[0] * instr->v_src[1]; }
+    template<typename T> static void div( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void rem( Executable auto* instr) { instr->v_dst[0] = riscv_remainder<T>(instr->v_src[0], instr->v_src[1]); }
 };
 
-template <typename Instr>
 struct MIPSMultALU
 {
-    template<typename T> static void multiplication( Instr* instr)
+    template<typename T> static void multiplication( Executable auto* instr)
     {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
         const auto& result = mips_multiplication<T>( instr->v_src[0], instr->v_src[1]);
-        instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
-        instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
+        instr->v_dst[0] = narrow_cast<UInt>( result.first);
+        instr->v_dst[1] = narrow_cast<UInt>( result.second);
     }
 
-    template<typename T> static void division( Instr* instr)
+    template<typename T> static void division( Executable auto* instr)
     {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
         const auto& result = mips_division<T>( instr->v_src[0], instr->v_src[1]);
-        instr->v_dst[0]  = narrow_cast<typename Instr::RegisterUInt>( result.first);
-        instr->v_dst[1] = narrow_cast<typename Instr::RegisterUInt>( result.second);
+        instr->v_dst[0] = narrow_cast<UInt>( result.first);
+        instr->v_dst[1] = narrow_cast<UInt>( result.second);
     } 
 };
