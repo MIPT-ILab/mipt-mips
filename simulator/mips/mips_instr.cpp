@@ -793,19 +793,6 @@ static MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
     return unknown_instruction<I>;
 }
 
-static_assert(std::is_trivially_destructible<BaseMIPSInstr<uint32>>::value,
-              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-static_assert(std::is_trivially_destructible<BaseMIPSInstr<uint64>>::value,
-              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-// Visual Studio implements is_trivially copyable in a buggy way
-// https://developercommunity.visualstudio.com/content/problem/170883/msvc-type-traits-stdis-trivial-is-bugged.html
-#ifdef __GNUC__
-static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint32>>::value,
-              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-static_assert(std::is_trivially_copyable<BaseMIPSInstr<uint64>>::value,
-              "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-#endif
-
 template<Unsigned R>
 BaseMIPSInstr<R>::BaseMIPSInstr( MIPSVersion version, std::endian endian, uint32 bytes, Addr PC)
     : BaseInstruction<R, MIPSRegister>( PC, PC + 4)
@@ -913,3 +900,8 @@ std::string BaseMIPSInstr<R>::get_disasm() const
 
 template class BaseMIPSInstr<uint32>;
 template class BaseMIPSInstr<uint64>;
+
+static_assert(std::is_trivially_destructible_v<BaseMIPSInstr<uint32>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+static_assert(std::is_trivially_destructible_v<BaseMIPSInstr<uint64>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+static_assert(std::is_trivially_copyable_v<BaseMIPSInstr<uint32>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
+static_assert(std::is_trivially_copyable_v<BaseMIPSInstr<uint64>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
