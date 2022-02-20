@@ -75,7 +75,10 @@ struct MIPSMultALU
 {
     template<typename T> static void multiplication( Executable auto* instr)
     {
-        std::tie( instr->v_dst[0], instr->v_dst[1]) = ::multiplication<T, T>( instr->v_src[0], instr->v_src[1]);
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        const auto& result = ::multiplication<T>( instr->v_src[0], instr->v_src[1]);
+        instr->v_dst[0] = narrow_cast<UInt>( result.first);
+        instr->v_dst[1] = narrow_cast<UInt>( result.second);
     }
 
     template<typename T> static void division( Executable auto* instr)
