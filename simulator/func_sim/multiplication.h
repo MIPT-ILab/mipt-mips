@@ -7,16 +7,6 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
-constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x))
-{
-    return false;
-}
-
-constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
-{
-    return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
-}
-
 template<Integer T1, Integer T2>
 inline auto multiplication(T1 x, T2 y) requires (bitwidth<T1> == bitwidth<T2>) {
     using UT  = unsigned_integer_t<bitwidth<T1>>;
@@ -27,37 +17,36 @@ inline auto multiplication(T1 x, T2 y) requires (bitwidth<T1> == bitwidth<T2>) {
     return std::pair{ narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T1>)};
 }
 
+constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x))
+{
+    return false;
+}
+
+constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
+{
+    return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
+}
+
 template<Integer T>
 auto mips_division(T x, T y) {
-    using ReturnType = std::pair<unsign_t<T>, unsign_t<T>>;
+    using Pair = std::pair<unsign_t<T>, unsign_t<T>>;
     if ( y == 0 || is_signed_division_overflow(x, y))
-        return ReturnType{};
+        return Pair{};
 
-    return ReturnType(x / y, x % y);
+    return Pair( x / y, x % y);
 }
 
 template<Integer T>
 auto riscv_division(T x, T y) {
-    using UT = unsign_t<T>;
+    using UT   = unsigned_integer_t<bitwidth<T>>;
+    using Pair = std::pair<UT, UT>;
     if ( y == 0)
-        return all_ones<UT>();
+        return Pair{ all_ones<UT>(), narrow_cast<UT>( x)};
 
     if ( is_signed_division_overflow( x, y))
-        return msb_set<UT>();
+        return Pair{ msb_set<UT>(), UT{}};
 
-    return narrow_cast<UT>( x / y);
-}
-
-template<Integer T>
-auto riscv_remainder(T x, T y) {
-    using UT = unsign_t<T>;
-    if ( y == 0)
-        return narrow_cast<UT>( x);
-
-    if ( is_signed_division_overflow(x, y))
-        return narrow_cast<UT>( 0);
-
-    return narrow_cast<UT>( x % y);
+    return Pair( x / y, x % y);
 }
 
 struct RISCVMultALU
@@ -67,8 +56,8 @@ struct RISCVMultALU
     static void mult_h_su( Executable auto* instr) { instr->v_dst[0] = multiplication( signify( instr->v_src[0]), instr->v_src[1]).second; }
     static void mult_l( Executable auto* instr) { instr->v_dst[0] = instr->v_src[0] * instr->v_src[1]; }
 
-    template<typename T> static void div( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]); }
-    template<typename T> static void rem( Executable auto* instr) { instr->v_dst[0] = riscv_remainder<T>(instr->v_src[0], instr->v_src[1]); }
+    template<typename T> static void div( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).first; }
+    template<typename T> static void rem( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).second; }
 };
 
 struct MIPSMultALU
