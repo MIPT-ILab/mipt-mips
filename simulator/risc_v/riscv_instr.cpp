@@ -13,119 +13,109 @@
 #include <sstream>
 #include <vector>
 
-/*  Reducing number of ALU instantiations. ALU modifies
- * only Datapath, so we do not need different instantiations
- * for RISCV and MIPS, if register sizes are the same */
-template <typename I>
-using RISCVALU = ALU<Datapath<typename I::RegisterUInt>>;
-
-/*  Note. Error "expected primary-expression before '...'"
- * on GCC means that you forgot temlate keyword after RISCVALU<I>
- * while refering to template function " */
-
-template<typename I> const auto do_nothing = RISCVALU<I>::unknown_instruction;
+template<Executable I> const auto do_nothing = ALU::unknown_instruction<I>;
 // I
-template<typename I> const auto execute_lui = RISCVALU<I>::template upper_immediate<12>;
-template<typename I> const auto execute_auipc = RISCVALU<I>::auipc;
-template<typename I> const auto execute_jal = RISCVALU<I>::template jump_and_link<RISCVALU<I>::j>;
-template<typename I> const auto execute_jalr = RISCVALU<I>::template jump_and_link<RISCVALU<I>::riscv_jr>;
-template<typename I> const auto execute_beq = RISCVALU<I>::template branch<RISCVALU<I>::eq>;
-template<typename I> const auto execute_bne = RISCVALU<I>::template branch<RISCVALU<I>::ne>;
-template<typename I> const auto execute_blt = RISCVALU<I>::template branch<RISCVALU<I>::lt>;
-template<typename I> const auto execute_bge = RISCVALU<I>::template branch<RISCVALU<I>::ge>;
-template<typename I> const auto execute_bltu = RISCVALU<I>::template branch<RISCVALU<I>::ltu>;
-template<typename I> const auto execute_bgeu = RISCVALU<I>::template branch<RISCVALU<I>::geu>;
-template<typename I> const auto execute_load = RISCVALU<I>::addr;
-template<typename I> const auto execute_store = RISCVALU<I>::store_addr;
-template<typename I> const auto execute_addi = RISCVALU<I>::template riscv_addition_imm<typename I::RegisterUInt>;
-template<typename I> const auto execute_addiw = RISCVALU<I>::template riscv_addition_imm<uint32>;
-template<typename I> const auto execute_addid = RISCVALU<I>::template riscv_addition_imm<uint64>;
-template<typename I> const auto execute_slti = RISCVALU<I>::template set<RISCVALU<I>::lti>;
-template<typename I> const auto execute_sltiu = RISCVALU<I>::template set<RISCVALU<I>::ltiu>;
-template<typename I> const auto execute_xori = RISCVALU<I>::xori;
-template<typename I> const auto execute_ori = RISCVALU<I>::ori;
-template<typename I> const auto execute_andi = RISCVALU<I>::andi;
-template<typename I> const auto execute_slli = RISCVALU<I>::template sll<typename I::RegisterUInt>;
-template<typename I> const auto execute_slliw = RISCVALU<I>::template sll<uint32>;
-template<typename I> const auto execute_sllid = RISCVALU<I>::template sll<uint64>;
-template<typename I> const auto execute_srli = RISCVALU<I>::template srl<typename I::RegisterUInt>;
-template<typename I> const auto execute_srliw = RISCVALU<I>::template srl<uint32>;
-template<typename I> const auto execute_srlid = RISCVALU<I>::template srl<uint64>;
-template<typename I> const auto execute_srai = RISCVALU<I>::template sra<typename I::RegisterUInt>;
-template<typename I> const auto execute_sraiw = RISCVALU<I>::template sra<uint32>;
-template<typename I> const auto execute_sraid = RISCVALU<I>::template sra<uint64>;
-template<typename I> const auto execute_add = RISCVALU<I>::template riscv_addition<typename I::RegisterUInt>;
-template<typename I> const auto execute_addw = RISCVALU<I>::template riscv_addition<uint32>;
-template<typename I> const auto execute_sub = RISCVALU<I>::template riscv_subtraction<typename I::RegisterUInt>;
-template<typename I> const auto execute_subw = RISCVALU<I>::template riscv_subtraction<uint32>;
-template<typename I> const auto execute_sll = RISCVALU<I>::template sllv<typename I::RegisterUInt>;
-template<typename I> const auto execute_sllw = RISCVALU<I>::template sllv<uint32>;
-template<typename I> const auto execute_slt = RISCVALU<I>::template set<RISCVALU<I>::lt>;
-template<typename I> const auto execute_sltu = RISCVALU<I>::template set<RISCVALU<I>::ltu>;
-template<typename I> const auto execute_xor = RISCVALU<I>::xorv;
-template<typename I> const auto execute_srl = RISCVALU<I>::template srlv<typename I::RegisterUInt>;
-template<typename I> const auto execute_srlw = RISCVALU<I>::template srlv<uint32>;
-template<typename I> const auto execute_sra = RISCVALU<I>::template srav<typename I::RegisterUInt>;
-template<typename I> const auto execute_sraw = RISCVALU<I>::template srav<uint32>;
-template<typename I> const auto execute_or = RISCVALU<I>::orv;
-template<typename I> const auto execute_and = RISCVALU<I>::andv;
+template<Executable I> const auto execute_lui = ALU::upper_immediate<12, I>;
+template<Executable I> const auto execute_auipc = ALU::auipc<I>;
+template<Executable I> const auto execute_jal = ALU::jump_and_link<I, ALU::j>;
+template<Executable I> const auto execute_jalr = ALU::jump_and_link<I, ALU::riscv_jr>;
+template<Executable I> const auto execute_beq = ALU::branch<I, &I::eq>;
+template<Executable I> const auto execute_bne = ALU::branch<I, &I::ne>;
+template<Executable I> const auto execute_blt = ALU::branch<I, &I::lt>;
+template<Executable I> const auto execute_bge = ALU::branch<I, &I::ge>;
+template<Executable I> const auto execute_bltu = ALU::branch<I, &I::ltu>;
+template<Executable I> const auto execute_bgeu = ALU::branch<I, &I::geu>;
+template<Executable I> const auto execute_load = ALU::addr<I>;
+template<Executable I> const auto execute_store = ALU::store_addr<I>;
+template<Executable I> const auto execute_addi = ALU::riscv_addition_imm<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_addiw = ALU::riscv_addition_imm<I, uint32>;
+template<Executable I> const auto execute_addid = ALU::riscv_addition_imm<I, uint64>;
+template<Executable I> const auto execute_slti = ALU::set<I, &I::lti>;
+template<Executable I> const auto execute_sltiu = ALU::set<I, &I::ltiu>;
+template<Executable I> const auto execute_xori = ALU::xori<I>;
+template<Executable I> const auto execute_ori = ALU::ori<I>;
+template<Executable I> const auto execute_andi = ALU::andi<I>;
+template<Executable I> const auto execute_slli = ALU::sll<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_slliw = ALU::sll<I, uint32>;
+template<Executable I> const auto execute_sllid = ALU::sll<I, uint64>;
+template<Executable I> const auto execute_srli = ALU::srl<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_srliw = ALU::srl<I, uint32>;
+template<Executable I> const auto execute_srlid = ALU::srl<I, uint64>;
+template<Executable I> const auto execute_srai = ALU::sra<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sraiw = ALU::sra<I, uint32>;
+template<Executable I> const auto execute_sraid = ALU::sra<I, uint64>;
+template<Executable I> const auto execute_add = ALU::riscv_addition<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_addw = ALU::riscv_addition<I, uint32>;
+template<Executable I> const auto execute_sub = ALU::riscv_subtraction<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_subw = ALU::riscv_subtraction<I, uint32>;
+template<Executable I> const auto execute_sll = ALU::sllv<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sllw = ALU::sllv<I, uint32>;
+template<Executable I> const auto execute_slt = ALU::set<I, &I::lt>;
+template<Executable I> const auto execute_sltu = ALU::set<I, &I::ltu>;
+template<Executable I> const auto execute_xor = ALU::xorv<I>;
+template<Executable I> const auto execute_srl = ALU::srlv<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_srlw = ALU::srlv<I, uint32>;
+template<Executable I> const auto execute_sra = ALU::srav<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sraw = ALU::srav<I, uint32>;
+template<Executable I> const auto execute_or = ALU::orv<I>;
+template<Executable I> const auto execute_and = ALU::andv<I>;
 // System I
-template<typename I> const auto execute_ecall = RISCVALU<I>::syscall;
-template<typename I> const auto execute_ebreak = RISCVALU<I>::breakpoint;
-template<typename I> const auto execute_uret = RISCVALU<I>::template jump_and_link<RISCVALU<I>::riscv_jr>;
-template<typename I> const auto execute_sret = RISCVALU<I>::template jump_and_link<RISCVALU<I>::riscv_jr>;
-template<typename I> const auto execute_mret = RISCVALU<I>::template jump_and_link<RISCVALU<I>::riscv_jr>;
-template<typename I> const auto execute_wfi = do_nothing<I>;
-template<typename I> const auto execute_fence = RISCVALU<I>::addr;
-template<typename I> const auto execute_csrrw = RISCVALU<I>::csrrw;
-template<typename I> const auto execute_csrrs = RISCVALU<I>::csrrs;
-template<typename I> const auto execute_csrrc = do_nothing<I>;
-template<typename I> const auto execute_csrrwi = RISCVALU<I>::csrrwi;
-template<typename I> const auto execute_csrrsi = do_nothing<I>;
-template<typename I> const auto execute_csrrci = do_nothing<I>;
+template<Executable I> const auto execute_ecall = ALU::syscall<I>;
+template<Executable I> const auto execute_ebreak = ALU::breakpoint<I>;
+template<Executable I> const auto execute_uret = ALU::jump_and_link<I, ALU::riscv_jr>;
+template<Executable I> const auto execute_sret = ALU::jump_and_link<I, ALU::riscv_jr>;
+template<Executable I> const auto execute_mret = ALU::jump_and_link<I, ALU::riscv_jr>;
+template<Executable I> const auto execute_wfi = do_nothing<I>;
+template<Executable I> const auto execute_fence = ALU::addr<I>;
+template<Executable I> const auto execute_csrrw = ALU::csrrw<I>;
+template<Executable I> const auto execute_csrrs = ALU::csrrs<I>;
+template<Executable I> const auto execute_csrrc = do_nothing<I>;
+template<Executable I> const auto execute_csrrwi = ALU::csrrwi<I>;
+template<Executable I> const auto execute_csrrsi = do_nothing<I>;
+template<Executable I> const auto execute_csrrci = do_nothing<I>;
 // M
-template<typename I> const auto execute_mul = RISCVMultALU<I>::template mult_l<typename I::RegisterUInt>;
-template<typename I> const auto execute_mulh = RISCVMultALU<I>::template mult_h_ss<typename I::RegisterUInt>;
-template<typename I> const auto execute_mulhsu = RISCVMultALU<I>::template mult_h_su<typename I::RegisterUInt>;
-template<typename I> const auto execute_mulhu = RISCVMultALU<I>::template mult_h_uu<typename I::RegisterUInt>;
-template<typename I> const auto execute_div = RISCVMultALU<I>::template div<sign_t<typename I::RegisterUInt>>;
-template<typename I> const auto execute_divu = RISCVMultALU<I>::template div<typename I::RegisterUInt>;
-template<typename I> const auto execute_rem = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
-template<typename I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
+template<Executable I> const auto execute_mul = RISCVMultALU<I>::template mult_l<typename I::RegisterUInt>;
+template<Executable I> const auto execute_mulh = RISCVMultALU<I>::template mult_h_ss<typename I::RegisterUInt>;
+template<Executable I> const auto execute_mulhsu = RISCVMultALU<I>::template mult_h_su<typename I::RegisterUInt>;
+template<Executable I> const auto execute_mulhu = RISCVMultALU<I>::template mult_h_uu<typename I::RegisterUInt>;
+template<Executable I> const auto execute_div = RISCVMultALU<I>::template div<sign_t<typename I::RegisterUInt>>;
+template<Executable I> const auto execute_divu = RISCVMultALU<I>::template div<typename I::RegisterUInt>;
+template<Executable I> const auto execute_rem = RISCVMultALU<I>::template rem<sign_t<typename I::RegisterUInt>>;
+template<Executable I> const auto execute_remu = RISCVMultALU<I>::template rem<typename I::RegisterUInt>;
 // B
-template<typename I> const auto execute_add_uw = RISCVALU<I>::template add_uw<typename I::RegisterUInt>;
-template<typename I> const auto execute_bclr = RISCVALU<I>::template bclr<typename I::RegisterUInt>;
-template<typename I> const auto execute_bclri = RISCVALU<I>::bclri;
-template<typename I> const auto execute_bset = RISCVALU<I>::bset;
-template<typename I> const auto execute_bseti = RISCVALU<I>::template bseti<typename I::RegisterUInt>;
-template<typename I> const auto execute_bext = RISCVALU<I>::template sbext<typename I::RegisterUInt>;
-template<typename I> const auto execute_bfp = RISCVALU<I>::bit_field_place;
-template<typename I> const auto execute_binv = RISCVALU<I>::template sbinv<typename I::RegisterUInt>;
-template<typename I> const auto execute_clmul = RISCVALU<I>::template clmul<typename I::RegisterUInt>;
-template<typename I> const auto execute_clz = RISCVALU<I>::template clz<typename I::RegisterUInt>;
-template<typename I> const auto execute_cpop = RISCVALU<I>::template pcnt<typename I::RegisterUInt>;
-template<typename I> const auto execute_ctz = RISCVALU<I>::template ctz<typename I::RegisterUInt>;
-template<typename I> const auto execute_gorc = RISCVALU<I>::template gorc<typename I::RegisterUInt>;
-template<typename I> const auto execute_orc_b = RISCVALU<I>::orc_b;
-template<typename I> const auto execute_grev = RISCVALU<I>::grev;
-template<typename I> const auto execute_max = RISCVALU<I>::max;
-template<typename I> const auto execute_maxu = RISCVALU<I>::maxu;
-template<typename I> const auto execute_min = RISCVALU<I>::min;
-template<typename I> const auto execute_minu = RISCVALU<I>::minu;
-template<typename I> const auto execute_orn = RISCVALU<I>::orn;
-template<typename I> const auto execute_pack = RISCVALU<I>::template pack<typename I::RegisterUInt>;
-template<typename I> const auto execute_packu = RISCVALU<I>::template packu<typename I::RegisterUInt>;
-template<typename I> const auto execute_rol = RISCVALU<I>::rol;
-template<typename I> const auto execute_ror = RISCVALU<I>::ror;
-template<typename I> const auto execute_rori = RISCVALU<I>::rori;
-template<typename I> const auto execute_sext_b = RISCVALU<I>::template sext_b<typename I::RegisterUInt>;
-template<typename I> const auto execute_shfl = RISCVALU<I>::riscv_shfl;
-template<typename I> const auto execute_slo = RISCVALU<I>::template slo<typename I::RegisterUInt>;
-template<typename I> const auto execute_sloi = RISCVALU<I>::template sloi<typename I::RegisterUInt>;
-template<typename I> const auto execute_sro = RISCVALU<I>::template sro<typename I::RegisterUInt>;
-template<typename I> const auto execute_sroi = RISCVALU<I>::sroi;
-template<typename I> const auto execute_unshfl = RISCVALU<I>::riscv_unshfl;
-template<typename I> const auto execute_xnor = RISCVALU<I>::xnor;
+template<Executable I> const auto execute_add_uw = ALU::add_uw<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_bclr = ALU::bclr<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_bclri = ALU::bclri<I>;
+template<Executable I> const auto execute_bset = ALU::bset<I>;
+template<Executable I> const auto execute_bseti = ALU::bseti<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_bext = ALU::sbext<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_bfp = ALU::bit_field_place<I>;
+template<Executable I> const auto execute_binv = ALU::sbinv<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_clmul = ALU::clmul<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_clz = ALU::clz<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_cpop = ALU::pcnt<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_ctz = ALU::ctz<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_gorc = ALU::gorc<I>;
+template<Executable I> const auto execute_orc_b = ALU::orc_b<I>;
+template<Executable I> const auto execute_grev = ALU::grev<I>;
+template<Executable I> const auto execute_max = ALU::max<I>;
+template<Executable I> const auto execute_maxu = ALU::maxu<I>;
+template<Executable I> const auto execute_min = ALU::min<I>;
+template<Executable I> const auto execute_minu = ALU::minu<I>;
+template<Executable I> const auto execute_orn = ALU::orn<I>;
+template<Executable I> const auto execute_pack = ALU::pack<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_packu = ALU::packu<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_rol = ALU::rol<I>;
+template<Executable I> const auto execute_ror = ALU::ror<I>;
+template<Executable I> const auto execute_rori = ALU::rori<I>;
+template<Executable I> const auto execute_sext_b = ALU::sext_b<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_shfl = ALU::riscv_shfl<I>;
+template<Executable I> const auto execute_slo = ALU::slo<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sloi = ALU::sloi<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sro = ALU::sro<I, typename I::RegisterUInt>;
+template<Executable I> const auto execute_sroi = ALU::sroi<I>;
+template<Executable I> const auto execute_unshfl = ALU::riscv_unshfl<I>;
+template<Executable I> const auto execute_xnor = ALU::xnor<I>;
 
 
 using Src = Reg;
@@ -153,13 +143,13 @@ static const RISCVAutogeneratedTableEntry instr_ ## name = { #name, match, mask 
 
 static const RISCVAutogeneratedTableEntry instr_invalid = { "unknown", 0x0, 0xffff };
 
-template<typename I>
+template<Executable I>
 static const RISCVTableEntry<I> invalid_instr = {'I', instr_invalid, do_nothing<I>, OUT_ARITHM, ' ', Imm::NO, { Src::ZERO, Src::ZERO }, { Dst::ZERO }, 0, 32 | 64 | 128}; // NOLINT(hicpp-signed-bitwise) https://bugs.llvm.org/show_bug.cgi?id=44977
 
-template<typename I>
+template<Executable I>
 struct RISCVTableEntry
 {
-    using Execute = typename RISCVALU<I>::Execute;
+    using Execute = void (*)(I*);
 
     char subset = 'I';
     RISCVAutogeneratedTableEntry entry = instr_invalid;
@@ -203,7 +193,7 @@ struct RISCVTableEntry
     }
 };
 
-template<typename I>
+template<Executable I>
 static const std::vector<RISCVTableEntry<I>> cmd_desc =
 {
     /*-------------- I --------------*/
@@ -375,7 +365,7 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
 };
 
 
-template<typename I>
+template<Executable I>
 const auto& find_entry( uint32 bytes)
 {
     for ( const auto& e : cmd_desc<I>)
@@ -385,7 +375,7 @@ const auto& find_entry( uint32 bytes)
     return invalid_instr<I>;
 }
 
-template<typename I>
+template<Executable I>
 const auto& find_entry( std::string_view name)
 {
     for ( const auto& e : cmd_desc<I>)

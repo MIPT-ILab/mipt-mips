@@ -16,12 +16,6 @@ constexpr auto count_leading_zeroes( Unsigned auto x) noexcept  { return std::co
 constexpr auto count_leading_ones( Unsigned auto x) noexcept    { return std::countl_one( x); }
 constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::countr_zero( x); }
 
-template<typename T> bool is_negative( T value) { return (value & msb_set<T>()) != 0; }
-template<typename T> bool is_positive( T value) { return !is_negative( value) && value != 0; }
-
-bool is_negative( Unsigned auto value) { return (value & msb_set<decltype(value)>()) != 0; }
-bool is_positive( Unsigned auto value) { return !is_negative( value) && value != 0; }
-
 /*
  * Performs an arithmetic right shift, i.e. shift with progapating
  * the most significant bit.
@@ -30,14 +24,14 @@ bool is_positive( Unsigned auto value) { return !is_negative( value) && value !=
 template<Unsigned T>
 constexpr T arithmetic_rs( T value, size_t shamt)
 {
-    using ST = sign_t<decltype(value)>;
     // NOLINTNEXTLINE(hicpp-signed-bitwise) C++20 clearly defines this
-    return sign_cast<ST>( value) >> shamt;
+    return signify( value) >> shamt;
 }
 
+// Boost.Multiprecision does not define right shift for signed values.
 inline uint128 arithmetic_rs( uint128 value, size_t shamt)
 {
-    return is_positive( value) ? value >> shamt : ones_rs( value, shamt);
+    return signify( value) > 0 ? value >> shamt : ones_rs( value, shamt);
 }
 
 template<typename T> static
@@ -45,8 +39,8 @@ auto test_addition_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
     const bool is_overflow =
-        ( is_positive( val1) && is_positive( val2) && is_negative( result)) ||
-        ( is_negative( val1) && is_negative( val2) && is_positive( result));
+        ( signify( val1) > 0 && signify( val2) > 0 && signify( result) < 0) ||
+        ( signify( val1) < 0 && signify( val2) < 0 && signify( result) > 0);
 
     return std::pair{ result, is_overflow};
 }
@@ -56,8 +50,8 @@ auto test_subtraction_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
     const bool is_overflow =
-        ( is_positive( val1) && is_negative( val2) && is_negative( result)) ||
-        ( is_negative( val1) && is_positive( val2) && is_positive( result));
+        ( signify( val1) > 0 && signify( val2) < 0 && signify( result) < 0) ||
+        ( signify( val1) < 0 && signify( val2) > 0 && signify( result) > 0);
 
     return std::pair{ result, is_overflow};
 }

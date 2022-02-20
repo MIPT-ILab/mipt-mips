@@ -154,9 +154,6 @@ private:
 };
 
 template <typename I>
-struct ALU;
-
-template <typename I>
 struct RISCVMultALU;
 
 template <typename I>
@@ -166,7 +163,7 @@ template<Unsigned T>
 class Datapath : public Operation
 {
 public:
-    friend ALU<Datapath>;
+    friend struct ALU;
     friend RISCVMultALU<Datapath>;
     friend MIPSMultALU<Datapath>;
 
@@ -190,6 +187,28 @@ public:
 
     void load( const T& value);
     void execute();
+
+    // Predicate helpers - unary
+    bool ltz() const { return signify( v_src[0]) < 0; }
+    bool gtz() const { return signify( v_src[0]) > 0; }
+    bool lez() const { return signify( v_src[0]) <= 0; }
+    bool gez() const { return signify( v_src[0]) >= 0; }
+
+    // Predicate helpers - binary
+    bool eq()  const { return v_src[0] == v_src[1]; }
+    bool ne()  const { return v_src[0] != v_src[1]; }
+    bool geu() const { return v_src[0] >= v_src[1]; }
+    bool ltu() const { return v_src[0] <  v_src[1]; }
+    bool ge()  const { return signify( v_src[0]) >= signify( v_src[1]); }
+    bool lt()  const { return signify( v_src[0]) <  signify( v_src[1]); }
+
+    // Predicate helpers - immediate
+    bool eqi() const { return v_src[0] == v_imm; }
+    bool nei() const { return v_src[0] != v_imm; }
+    bool lti() const { return signify( v_src[0]) < signify( v_imm); }
+    bool gei() const { return signify( v_src[0]) >= signify( v_imm); }
+    bool ltiu() const { return v_src[0] < v_imm; }
+    bool geiu() const { return v_src[0] >= v_imm; }
 
 protected:
     Datapath(Addr pc, Addr new_pc) : Operation(pc, new_pc) {}
@@ -220,6 +239,9 @@ void Datapath<T>::load( const T& value)
     assert( is_load());
     set_v_dst( is_unsigned_load() ? value : sign_extension_for_load(value), 0);
 }
+
+template<typename T>
+concept Executable = std::is_same_v<Datapath<typename T::RegisterUInt>, T>;
 
 template<Unsigned T, Register R>
 class BaseInstruction : public Datapath<T>

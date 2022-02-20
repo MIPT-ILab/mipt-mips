@@ -17,261 +17,251 @@
 #include <unordered_map>
 #include <vector>
 
-/*  Reducing number of ALU instantiations. ALU modifies
- * only Datapath, so we do not need different instantiations
- * for RISCV and MIPS, if register sizes are the same */
-template <typename I>
-using MIPSALU = ALU<Datapath<typename I::RegisterUInt>>;
-
-/*  Note. Error "expected primary-expression before '...'"
- * on GCC means that you forgot temlate keyword after RISCVALU<I>
- * while refering to template function " */
-
-template<typename I> void do_nothing(I* /* instr */) { }
-template<typename I> const auto mips_add     = MIPSALU<I>::template addition_overflow<uint32>;
-template<typename I> const auto mips_addi    = MIPSALU<I>::template addition_overflow_imm<uint32>;
-template<typename I> const auto mips_addiu   = MIPSALU<I>::template addition_imm<uint32>;
-template<typename I> const auto mips_addu    = MIPSALU<I>::template addition<uint32>;
-template<typename I> const auto mips_and     = MIPSALU<I>::andv;
-template<typename I> const auto mips_andi    = MIPSALU<I>::andi;
-template<typename I> const auto mips_beq     = MIPSALU<I>::template branch<MIPSALU<I>::eq>;
-template<typename I> const auto mips_beql    = MIPSALU<I>::template branch<MIPSALU<I>::eq>;
-template<typename I> const auto mips_bgez    = MIPSALU<I>::template branch<MIPSALU<I>::gez>;
-template<typename I> const auto mips_bgezal  = MIPSALU<I>::template branch_and_link<MIPSALU<I>::gez>;
-template<typename I> const auto mips_bgezall = MIPSALU<I>::template branch_and_link<MIPSALU<I>::gez>;
-template<typename I> const auto mips_bgezl   = MIPSALU<I>::template branch<MIPSALU<I>::gez>;
-template<typename I> const auto mips_bgtz    = MIPSALU<I>::template branch<MIPSALU<I>::gtz>;
-template<typename I> const auto mips_bgtzl   = MIPSALU<I>::template branch<MIPSALU<I>::gtz>;
-template<typename I> const auto mips_blez    = MIPSALU<I>::template branch<MIPSALU<I>::lez>;
-template<typename I> const auto mips_blezl   = MIPSALU<I>::template branch<MIPSALU<I>::lez>;
-template<typename I> const auto mips_bltz    = MIPSALU<I>::template branch<MIPSALU<I>::ltz>;
-template<typename I> const auto mips_bltzal  = MIPSALU<I>::template branch_and_link<MIPSALU<I>::ltz>;
-template<typename I> const auto mips_bltzall = MIPSALU<I>::template branch_and_link<MIPSALU<I>::ltz>;
-template<typename I> const auto mips_bltzl   = MIPSALU<I>::template branch<MIPSALU<I>::ltz>;
-template<typename I> const auto mips_bne     = MIPSALU<I>::template branch<MIPSALU<I>::ne>;
-template<typename I> const auto mips_bnel    = MIPSALU<I>::template branch<MIPSALU<I>::ne>;
-template<typename I> const auto mips_break   = MIPSALU<I>::breakpoint;
-template<typename I> const auto mips_clo     = MIPSALU<I>::template clo<uint32>;
-template<typename I> const auto mips_clz     = MIPSALU<I>::template clz<uint32>;
-template<typename I> const auto mips_dadd    = MIPSALU<I>::template addition_overflow<uint64>;
-template<typename I> const auto mips_daddi   = MIPSALU<I>::template addition_overflow_imm<uint64>;
-template<typename I> const auto mips_daddiu  = MIPSALU<I>::template addition_imm<uint64>;
-template<typename I> const auto mips_daddu   = MIPSALU<I>::template addition<uint64>;
-template<typename I> const auto mips_dclo    = MIPSALU<I>::template clo<uint64>;
-template<typename I> const auto mips_dclz    = MIPSALU<I>::template clz<uint64>;
-template<typename I> const auto mips_dsll    = MIPSALU<I>::template sll<uint64>;
-template<typename I> const auto mips_dsll32  = MIPSALU<I>::dsll32;
-template<typename I> const auto mips_dsllv   = MIPSALU<I>::template sllv<uint64>;
-template<typename I> const auto mips_dsra    = MIPSALU<I>::template sra<uint64>;
-template<typename I> const auto mips_dsra32  = MIPSALU<I>::dsra32;
-template<typename I> const auto mips_dsrav   = MIPSALU<I>::template srav<uint64>;
-template<typename I> const auto mips_dsrl    = MIPSALU<I>::template srl<uint64>;
-template<typename I> const auto mips_dsrl32  = MIPSALU<I>::dsrl32;
-template<typename I> const auto mips_dsrlv   = MIPSALU<I>::template srlv<uint64>;
-template<typename I> const auto mips_dsub    = MIPSALU<I>::template subtraction_overflow<uint64>;
-template<typename I> const auto mips_dsubu   = MIPSALU<I>::template subtraction<uint64>;
-template<typename I> const auto mips_eret    = MIPSALU<I>::eret;
-template<typename I> const auto mips_j       = MIPSALU<I>::j;
-template<typename I> const auto mips_jal     = MIPSALU<I>::template jump_and_link<MIPSALU<I>::j>;
-template<typename I> const auto mips_jalr    = MIPSALU<I>::template jump_and_link<MIPSALU<I>::jr>;
-template<typename I> const auto mips_jr      = MIPSALU<I>::jr;
-template<typename I> const auto mips_lb      = MIPSALU<I>::load_addr;
-template<typename I> const auto mips_lbu     = MIPSALU<I>::load_addr;
-template<typename I> const auto mips_ld      = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_ldl     = MIPSALU<I>::load_addr;
-template<typename I> const auto mips_ldr     = MIPSALU<I>::load_addr;
-template<typename I> const auto mips_lh      = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_lhu     = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_ll      = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_lui     = MIPSALU<I>::template upper_immediate<16>;
-template<typename I> const auto mips_lw      = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_lwl     = MIPSALU<I>::load_addr_left32;
-template<typename I> const auto mips_lwr     = MIPSALU<I>::load_addr_right32;
-template<typename I> const auto mips_lwu     = MIPSALU<I>::load_addr_aligned;
-template<typename I> const auto mips_mfc0    = MIPSALU<I>::move;
-template<typename I> const auto mips_mfhi    = MIPSALU<I>::move;
-template<typename I> const auto mips_mflo    = MIPSALU<I>::move;
-template<typename I> const auto mips_movn    = MIPSALU<I>::movn;
-template<typename I> const auto mips_movz    = MIPSALU<I>::movz;
-template<typename I> const auto mips_mtc0    = MIPSALU<I>::move;
-template<typename I> const auto mips_mthi    = MIPSALU<I>::move;
-template<typename I> const auto mips_mtlo    = MIPSALU<I>::move;
-template<typename I> const auto mips_nor     = MIPSALU<I>::nor;
-template<typename I> const auto mips_or      = MIPSALU<I>::orv;
-template<typename I> const auto mips_ori     = MIPSALU<I>::ori;
-template<typename I> const auto mips_sb      = MIPSALU<I>::store_addr;
-template<typename I> const auto mips_sc      = MIPSALU<I>::store_addr_aligned;
-template<typename I> const auto mips_sd      = MIPSALU<I>::store_addr_aligned;
-template<typename I> const auto mips_sdl     = MIPSALU<I>::store_addr;
-template<typename I> const auto mips_sdr     = MIPSALU<I>::store_addr;
-template<typename I> const auto mips_sh      = MIPSALU<I>::store_addr_aligned;
-template<typename I> const auto mips_sll     = MIPSALU<I>::template sll<uint32>;
-template<typename I> const auto mips_sllv    = MIPSALU<I>::template sllv<uint32>;
-template<typename I> const auto mips_slt     = MIPSALU<I>::template set<MIPSALU<I>::lt>;
-template<typename I> const auto mips_slti    = MIPSALU<I>::template set<MIPSALU<I>::lti>;
-template<typename I> const auto mips_sltiu   = MIPSALU<I>::template set<MIPSALU<I>::ltiu>;
-template<typename I> const auto mips_sltu    = MIPSALU<I>::template set<MIPSALU<I>::ltu>;
-template<typename I> const auto mips_sra     = MIPSALU<I>::template sra<uint32>;
-template<typename I> const auto mips_srav    = MIPSALU<I>::template srav<uint32>;
-template<typename I> const auto mips_srl     = MIPSALU<I>::template srl<uint32>;
-template<typename I> const auto mips_srlv    = MIPSALU<I>::template srlv<uint32>;
-template<typename I> const auto mips_sub     = MIPSALU<I>::template subtraction_overflow<uint32>;
-template<typename I> const auto mips_subu    = MIPSALU<I>::template subtraction<uint32>;
-template<typename I> const auto mips_sw      = MIPSALU<I>::store_addr_aligned;
-template<typename I> const auto mips_swl     = MIPSALU<I>::store_addr_left32;
-template<typename I> const auto mips_swr     = MIPSALU<I>::store_addr_right32;
-template<typename I> const auto mips_syscall = MIPSALU<I>::syscall;
-template<typename I> const auto mips_teq     = MIPSALU<I>::template trap<MIPSALU<I>::eq>;
-template<typename I> const auto mips_teqi    = MIPSALU<I>::template trap<MIPSALU<I>::eqi>;
-template<typename I> const auto mips_tge     = MIPSALU<I>::template trap<MIPSALU<I>::ge>;
-template<typename I> const auto mips_tgei    = MIPSALU<I>::template trap<MIPSALU<I>::gei>;
-template<typename I> const auto mips_tgeiu   = MIPSALU<I>::template trap<MIPSALU<I>::geiu>;
-template<typename I> const auto mips_tgeu    = MIPSALU<I>::template trap<MIPSALU<I>::geu>;
-template<typename I> const auto mips_tlt     = MIPSALU<I>::template trap<MIPSALU<I>::lt>;
-template<typename I> const auto mips_tlti    = MIPSALU<I>::template trap<MIPSALU<I>::lti>;
-template<typename I> const auto mips_tltiu   = MIPSALU<I>::template trap<MIPSALU<I>::ltiu>;
-template<typename I> const auto mips_tltu    = MIPSALU<I>::template trap<MIPSALU<I>::ltu>;
-template<typename I> const auto mips_tne     = MIPSALU<I>::template trap<MIPSALU<I>::ne>;
-template<typename I> const auto mips_tnei    = MIPSALU<I>::template trap<MIPSALU<I>::nei>;
-template<typename I> const auto mips_xor     = MIPSALU<I>::xorv;
-template<typename I> const auto mips_xori    = MIPSALU<I>::xori;
-template<typename I> const auto mips_unknown = MIPSALU<I>::unknown_instruction;
+template<Executable I> void do_nothing(I* /* instr */) { }
+template<Executable I> const auto mips_add     = ALU::addition_overflow<I, uint32>;
+template<Executable I> const auto mips_addi    = ALU::addition_overflow_imm<I, uint32>;
+template<Executable I> const auto mips_addiu   = ALU::addition_imm<I, uint32>;
+template<Executable I> const auto mips_addu    = ALU::addition<I, uint32>;
+template<Executable I> const auto mips_and     = ALU::andv<I>;
+template<Executable I> const auto mips_andi    = ALU::andi<I>;
+template<Executable I> const auto mips_beq     = ALU::branch<I, &I::eq>;
+template<Executable I> const auto mips_beql    = ALU::branch<I, &I::eq>;
+template<Executable I> const auto mips_bgez    = ALU::branch<I, &I::gez>;
+template<Executable I> const auto mips_bgezal  = ALU::branch_and_link<I, &I::gez>;
+template<Executable I> const auto mips_bgezall = ALU::branch_and_link<I, &I::gez>;
+template<Executable I> const auto mips_bgezl   = ALU::branch<I, &I::gez>;
+template<Executable I> const auto mips_bgtz    = ALU::branch<I, &I::gtz>;
+template<Executable I> const auto mips_bgtzl   = ALU::branch<I, &I::gtz>;
+template<Executable I> const auto mips_blez    = ALU::branch<I, &I::lez>;
+template<Executable I> const auto mips_blezl   = ALU::branch<I, &I::lez>;
+template<Executable I> const auto mips_bltz    = ALU::branch<I, &I::ltz>;
+template<Executable I> const auto mips_bltzal  = ALU::branch_and_link<I, &I::ltz>;
+template<Executable I> const auto mips_bltzall = ALU::branch_and_link<I, &I::ltz>;
+template<Executable I> const auto mips_bltzl   = ALU::branch<I, &I::ltz>;
+template<Executable I> const auto mips_bne     = ALU::branch<I, &I::ne>;
+template<Executable I> const auto mips_bnel    = ALU::branch<I, &I::ne>;
+template<Executable I> const auto mips_break   = ALU::breakpoint<I>;
+template<Executable I> const auto mips_clo     = ALU::clo<I, uint32>;
+template<Executable I> const auto mips_clz     = ALU::clz<I, uint32>;
+template<Executable I> const auto mips_dadd    = ALU::addition_overflow<I, uint64>;
+template<Executable I> const auto mips_daddi   = ALU::addition_overflow_imm<I, uint64>;
+template<Executable I> const auto mips_daddiu  = ALU::addition_imm<I, uint64>;
+template<Executable I> const auto mips_daddu   = ALU::addition<I, uint64>;
+template<Executable I> const auto mips_dclo    = ALU::clo<I, uint64>;
+template<Executable I> const auto mips_dclz    = ALU::clz<I, uint64>;
+template<Executable I> const auto mips_dsll    = ALU::sll<I, uint64>;
+template<Executable I> const auto mips_dsll32  = ALU::dsll32<I>;
+template<Executable I> const auto mips_dsllv   = ALU::sllv<I, uint64>;
+template<Executable I> const auto mips_dsra    = ALU::sra<I, uint64>;
+template<Executable I> const auto mips_dsra32  = ALU::dsra32<I>;
+template<Executable I> const auto mips_dsrav   = ALU::srav<I, uint64>;
+template<Executable I> const auto mips_dsrl    = ALU::srl<I, uint64>;
+template<Executable I> const auto mips_dsrl32  = ALU::dsrl32<I>;
+template<Executable I> const auto mips_dsrlv   = ALU::srlv<I, uint64>;
+template<Executable I> const auto mips_dsub    = ALU::subtraction_overflow<I, uint64>;
+template<Executable I> const auto mips_dsubu   = ALU::subtraction<I, uint64>;
+template<Executable I> const auto mips_eret    = ALU::eret<I>;
+template<Executable I> const auto mips_j       = ALU::j<I>;
+template<Executable I> const auto mips_jal     = ALU::jump_and_link<I, ALU::j>;
+template<Executable I> const auto mips_jalr    = ALU::jump_and_link<I, ALU::jr>;
+template<Executable I> const auto mips_jr      = ALU::jr<I>;
+template<Executable I> const auto mips_lb      = ALU::load_addr<I>;
+template<Executable I> const auto mips_lbu     = ALU::load_addr<I>;
+template<Executable I> const auto mips_ld      = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_ldl     = ALU::load_addr<I>;
+template<Executable I> const auto mips_ldr     = ALU::load_addr<I>;
+template<Executable I> const auto mips_lh      = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_lhu     = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_ll      = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_lui     = ALU::upper_immediate<16, I>;
+template<Executable I> const auto mips_lw      = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_lwl     = ALU::load_addr_left32<I>;
+template<Executable I> const auto mips_lwr     = ALU::load_addr_right32<I>;
+template<Executable I> const auto mips_lwu     = ALU::load_addr_aligned<I>;
+template<Executable I> const auto mips_mfc0    = ALU::move<I>;
+template<Executable I> const auto mips_mfhi    = ALU::move<I>;
+template<Executable I> const auto mips_mflo    = ALU::move<I>;
+template<Executable I> const auto mips_movn    = ALU::movn<I>;
+template<Executable I> const auto mips_movz    = ALU::movz<I>;
+template<Executable I> const auto mips_mtc0    = ALU::move<I>;
+template<Executable I> const auto mips_mthi    = ALU::move<I>;
+template<Executable I> const auto mips_mtlo    = ALU::move<I>;
+template<Executable I> const auto mips_nor     = ALU::nor<I>;
+template<Executable I> const auto mips_or      = ALU::orv<I>;
+template<Executable I> const auto mips_ori     = ALU::ori<I>;
+template<Executable I> const auto mips_sb      = ALU::store_addr<I>;
+template<Executable I> const auto mips_sc      = ALU::store_addr_aligned<I>;
+template<Executable I> const auto mips_sd      = ALU::store_addr_aligned<I>;
+template<Executable I> const auto mips_sdl     = ALU::store_addr<I>;
+template<Executable I> const auto mips_sdr     = ALU::store_addr<I>;
+template<Executable I> const auto mips_sh      = ALU::store_addr_aligned<I>;
+template<Executable I> const auto mips_sll     = ALU::sll<I, uint32>;
+template<Executable I> const auto mips_sllv    = ALU::sllv<I, uint32>;
+template<Executable I> const auto mips_slt     = ALU::set<I, &I::lt>;
+template<Executable I> const auto mips_slti    = ALU::set<I, &I::lti>;
+template<Executable I> const auto mips_sltiu   = ALU::set<I, &I::ltiu>;
+template<Executable I> const auto mips_sltu    = ALU::set<I, &I::ltu>;
+template<Executable I> const auto mips_sra     = ALU::sra<I, uint32>;
+template<Executable I> const auto mips_srav    = ALU::srav<I, uint32>;
+template<Executable I> const auto mips_srl     = ALU::srl<I, uint32>;
+template<Executable I> const auto mips_srlv    = ALU::srlv<I, uint32>;
+template<Executable I> const auto mips_sub     = ALU::subtraction_overflow<I, uint32>;
+template<Executable I> const auto mips_subu    = ALU::subtraction<I, uint32>;
+template<Executable I> const auto mips_sw      = ALU::store_addr_aligned<I>;
+template<Executable I> const auto mips_swl     = ALU::store_addr_left32<I>;
+template<Executable I> const auto mips_swr     = ALU::store_addr_right32<I>;
+template<Executable I> const auto mips_syscall = ALU::syscall<I>;
+template<Executable I> const auto mips_teq     = ALU::trap<I, &I::eq>;
+template<Executable I> const auto mips_teqi    = ALU::trap<I, &I::eqi>;
+template<Executable I> const auto mips_tge     = ALU::trap<I, &I::ge>;
+template<Executable I> const auto mips_tgei    = ALU::trap<I, &I::gei>;
+template<Executable I> const auto mips_tgeiu   = ALU::trap<I, &I::geiu>;
+template<Executable I> const auto mips_tgeu    = ALU::trap<I, &I::geu>;
+template<Executable I> const auto mips_tlt     = ALU::trap<I, &I::lt>;
+template<Executable I> const auto mips_tlti    = ALU::trap<I, &I::lti>;
+template<Executable I> const auto mips_tltiu   = ALU::trap<I, &I::ltiu>;
+template<Executable I> const auto mips_tltu    = ALU::trap<I, &I::ltu>;
+template<Executable I> const auto mips_tne     = ALU::trap<I, &I::ne>;
+template<Executable I> const auto mips_tnei    = ALU::trap<I, &I::nei>;
+template<Executable I> const auto mips_xor     = ALU::xorv<I>;
+template<Executable I> const auto mips_xori    = ALU::xori<I>;
+template<Executable I> const auto mips_unknown = ALU::unknown_instruction<I>;
 
 // Multiplicate/Divide instructions
-template<typename I> const auto mips_madd    = MIPSMultALU<I>::template multiplication<int32>;
-template<typename I> const auto mips_maddu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<typename I> const auto mips_msub    = MIPSMultALU<I>::template multiplication<int32>;
-template<typename I> const auto mips_msubu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<typename I> const auto mips_dmult   = MIPSMultALU<I>::template multiplication<int64>;
-template<typename I> const auto mips_dmultu  = MIPSMultALU<I>::template multiplication<uint64>;
-template<typename I> const auto mips_mul     = MIPSMultALU<I>::template multiplication<int32>;
-template<typename I> const auto mips_mult    = MIPSMultALU<I>::template multiplication<int32>;
-template<typename I> const auto mips_multu   = MIPSMultALU<I>::template multiplication<uint32>;
-template<typename I> const auto mips_ddiv    = MIPSMultALU<I>::template division<int64>;
-template<typename I> const auto mips_ddivu   = MIPSMultALU<I>::template division<uint64>;
-template<typename I> const auto mips_div     = MIPSMultALU<I>::template division<int32>;
-template<typename I> const auto mips_divu    = MIPSMultALU<I>::template division<uint32>;
+template<Executable I> const auto mips_madd    = MIPSMultALU<I>::template multiplication<int32>;
+template<Executable I> const auto mips_maddu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<Executable I> const auto mips_msub    = MIPSMultALU<I>::template multiplication<int32>;
+template<Executable I> const auto mips_msubu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<Executable I> const auto mips_dmult   = MIPSMultALU<I>::template multiplication<int64>;
+template<Executable I> const auto mips_dmultu  = MIPSMultALU<I>::template multiplication<uint64>;
+template<Executable I> const auto mips_mul     = MIPSMultALU<I>::template multiplication<int32>;
+template<Executable I> const auto mips_mult    = MIPSMultALU<I>::template multiplication<int32>;
+template<Executable I> const auto mips_multu   = MIPSMultALU<I>::template multiplication<uint32>;
+template<Executable I> const auto mips_ddiv    = MIPSMultALU<I>::template division<int64>;
+template<Executable I> const auto mips_ddivu   = MIPSMultALU<I>::template division<uint64>;
+template<Executable I> const auto mips_div     = MIPSMultALU<I>::template division<int32>;
+template<Executable I> const auto mips_divu    = MIPSMultALU<I>::template division<uint32>;
 
 // CP1 instructions
-template<typename I> const auto mips_abs_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_abs_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_add_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_add_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_bc1f      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_bc1t      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_bc1fl     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_bc1tl     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_f_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_f_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_un_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_un_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_eq_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_eq_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ueq_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ueq_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_olt_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_olt_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ult_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ult_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ole_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ole_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ule_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ule_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_sf_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_sf_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngle_d  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngle_s  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_seq_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_seq_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngl_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngl_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_lt_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_lt_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_nge_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_nge_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_le_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_le_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngt_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_c_ngt_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ceil_l_d  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ceil_l_s  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ceil_w_d  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ceil_w_s  = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cfc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ctc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_d_l   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_d_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_d_w   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_s_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_s_l   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_s_w   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_l_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_l_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_w_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_cvt_w_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_div_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_div_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_dmfc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_dmtc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_floor_l_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_floor_l_s = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_floor_w_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_floor_w_s = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ldc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_lwc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_ldxc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_lwxc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mfc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_madd_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_madd_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mov_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mov_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movf      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movf_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movf_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movn_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movn_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movt      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movt_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movt_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movz_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_movz_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_msub_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_msub_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mtc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mul_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_mul_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_neg_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_neg_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_nmadd_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_nmadd_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_nmsub_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_nmsub_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_recip_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_recip_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_round_l_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_round_l_s = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_round_w_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_round_w_s = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_rsqrt_d   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_rsqrt_s   = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sdc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sdxc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sqrt_d    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sqrt_s    = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sub_d     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_sub_s     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_swc1      = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_swxc1     = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_trunc_l_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_trunc_l_s = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_trunc_w_d = MIPSALU<I>::unknown_instruction;
-template<typename I> const auto mips_trunc_w_s = MIPSALU<I>::unknown_instruction;
+template<Executable I> const auto mips_abs_d     = mips_unknown<I>;
+template<Executable I> const auto mips_abs_s     = mips_unknown<I>;
+template<Executable I> const auto mips_add_d     = mips_unknown<I>;
+template<Executable I> const auto mips_add_s     = mips_unknown<I>;
+template<Executable I> const auto mips_bc1f      = mips_unknown<I>;
+template<Executable I> const auto mips_bc1t      = mips_unknown<I>;
+template<Executable I> const auto mips_bc1fl     = mips_unknown<I>;
+template<Executable I> const auto mips_bc1tl     = mips_unknown<I>;
+template<Executable I> const auto mips_c_f_d     = mips_unknown<I>;
+template<Executable I> const auto mips_c_f_s     = mips_unknown<I>;
+template<Executable I> const auto mips_c_un_d    = mips_unknown<I>;
+template<Executable I> const auto mips_c_un_s    = mips_unknown<I>;
+template<Executable I> const auto mips_c_eq_d    = mips_unknown<I>;
+template<Executable I> const auto mips_c_eq_s    = mips_unknown<I>;
+template<Executable I> const auto mips_c_ueq_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ueq_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_olt_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_olt_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ult_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ult_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ole_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ole_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ule_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ule_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_sf_d    = mips_unknown<I>;
+template<Executable I> const auto mips_c_sf_s    = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngle_d  = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngle_s  = mips_unknown<I>;
+template<Executable I> const auto mips_c_seq_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_seq_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngl_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngl_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_lt_d    = mips_unknown<I>;
+template<Executable I> const auto mips_c_lt_s    = mips_unknown<I>;
+template<Executable I> const auto mips_c_nge_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_nge_s   = mips_unknown<I>;
+template<Executable I> const auto mips_c_le_d    = mips_unknown<I>;
+template<Executable I> const auto mips_c_le_s    = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngt_d   = mips_unknown<I>;
+template<Executable I> const auto mips_c_ngt_s   = mips_unknown<I>;
+template<Executable I> const auto mips_ceil_l_d  = mips_unknown<I>;
+template<Executable I> const auto mips_ceil_l_s  = mips_unknown<I>;
+template<Executable I> const auto mips_ceil_w_d  = mips_unknown<I>;
+template<Executable I> const auto mips_ceil_w_s  = mips_unknown<I>;
+template<Executable I> const auto mips_cfc1      = mips_unknown<I>;
+template<Executable I> const auto mips_ctc1      = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_d_l   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_d_s   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_d_w   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_s_d   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_s_l   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_s_w   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_l_d   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_l_s   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_w_d   = mips_unknown<I>;
+template<Executable I> const auto mips_cvt_w_s   = mips_unknown<I>;
+template<Executable I> const auto mips_div_d     = mips_unknown<I>;
+template<Executable I> const auto mips_div_s     = mips_unknown<I>;
+template<Executable I> const auto mips_dmfc1     = mips_unknown<I>;
+template<Executable I> const auto mips_dmtc1     = mips_unknown<I>;
+template<Executable I> const auto mips_floor_l_d = mips_unknown<I>;
+template<Executable I> const auto mips_floor_l_s = mips_unknown<I>;
+template<Executable I> const auto mips_floor_w_d = mips_unknown<I>;
+template<Executable I> const auto mips_floor_w_s = mips_unknown<I>;
+template<Executable I> const auto mips_ldc1      = mips_unknown<I>;
+template<Executable I> const auto mips_lwc1      = mips_unknown<I>;
+template<Executable I> const auto mips_ldxc1     = mips_unknown<I>;
+template<Executable I> const auto mips_lwxc1     = mips_unknown<I>;
+template<Executable I> const auto mips_mfc1      = mips_unknown<I>;
+template<Executable I> const auto mips_madd_d    = mips_unknown<I>;
+template<Executable I> const auto mips_madd_s    = mips_unknown<I>;
+template<Executable I> const auto mips_mov_d     = mips_unknown<I>;
+template<Executable I> const auto mips_mov_s     = mips_unknown<I>;
+template<Executable I> const auto mips_movf      = mips_unknown<I>;
+template<Executable I> const auto mips_movf_d    = mips_unknown<I>;
+template<Executable I> const auto mips_movf_s    = mips_unknown<I>;
+template<Executable I> const auto mips_movn_d    = mips_unknown<I>;
+template<Executable I> const auto mips_movn_s    = mips_unknown<I>;
+template<Executable I> const auto mips_movt      = mips_unknown<I>;
+template<Executable I> const auto mips_movt_d    = mips_unknown<I>;
+template<Executable I> const auto mips_movt_s    = mips_unknown<I>;
+template<Executable I> const auto mips_movz_d    = mips_unknown<I>;
+template<Executable I> const auto mips_movz_s    = mips_unknown<I>;
+template<Executable I> const auto mips_msub_d    = mips_unknown<I>;
+template<Executable I> const auto mips_msub_s    = mips_unknown<I>;
+template<Executable I> const auto mips_mtc1      = mips_unknown<I>;
+template<Executable I> const auto mips_mul_d     = mips_unknown<I>;
+template<Executable I> const auto mips_mul_s     = mips_unknown<I>;
+template<Executable I> const auto mips_neg_d     = mips_unknown<I>;
+template<Executable I> const auto mips_neg_s     = mips_unknown<I>;
+template<Executable I> const auto mips_nmadd_d   = mips_unknown<I>;
+template<Executable I> const auto mips_nmadd_s   = mips_unknown<I>;
+template<Executable I> const auto mips_nmsub_d   = mips_unknown<I>;
+template<Executable I> const auto mips_nmsub_s   = mips_unknown<I>;
+template<Executable I> const auto mips_recip_d   = mips_unknown<I>;
+template<Executable I> const auto mips_recip_s   = mips_unknown<I>;
+template<Executable I> const auto mips_round_l_d = mips_unknown<I>;
+template<Executable I> const auto mips_round_l_s = mips_unknown<I>;
+template<Executable I> const auto mips_round_w_d = mips_unknown<I>;
+template<Executable I> const auto mips_round_w_s = mips_unknown<I>;
+template<Executable I> const auto mips_rsqrt_d   = mips_unknown<I>;
+template<Executable I> const auto mips_rsqrt_s   = mips_unknown<I>;
+template<Executable I> const auto mips_sdc1      = mips_unknown<I>;
+template<Executable I> const auto mips_sdxc1     = mips_unknown<I>;
+template<Executable I> const auto mips_sqrt_d    = mips_unknown<I>;
+template<Executable I> const auto mips_sqrt_s    = mips_unknown<I>;
+template<Executable I> const auto mips_sub_d     = mips_unknown<I>;
+template<Executable I> const auto mips_sub_s     = mips_unknown<I>;
+template<Executable I> const auto mips_swc1      = mips_unknown<I>;
+template<Executable I> const auto mips_swxc1     = mips_unknown<I>;
+template<Executable I> const auto mips_trunc_l_d = mips_unknown<I>;
+template<Executable I> const auto mips_trunc_l_s = mips_unknown<I>;
+template<Executable I> const auto mips_trunc_w_d = mips_unknown<I>;
+template<Executable I> const auto mips_trunc_w_s = mips_unknown<I>;
 
-template<typename I>
+template<Executable I>
 struct MIPSTableEntry
 {
-	using Execute = typename MIPSALU<I>::Execute;
+	using Execute = void (*)(I*);
 
     std::string_view name = "Unknown instruction";
     Execute function = mips_unknown<I>;
@@ -284,11 +274,11 @@ struct MIPSTableEntry
     MIPSVersionMask versions = MIPS_I_Instr;
 };
 
-template<typename I>
+template<Executable I>
 using Table = std::unordered_map<uint32, MIPSTableEntry<I>>;
 
 //unordered map for R-instructions
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapR =
 {
     // **************** R INSTRUCTIONS ****************
@@ -367,7 +357,7 @@ static const Table<I> isaMapR =
 };
 
 //unordered map for RI-instructions
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapRI =
 {
     // Branches
@@ -390,7 +380,7 @@ static const Table<I> isaMapRI =
 };
 
 //unordered map for I-instructions and J-instructions
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapIJ =
 {
     // Direct jumps
@@ -452,7 +442,7 @@ static const Table<I> isaMapIJ =
     {0x3F, { "sd",   mips_sd<I>,   OUT_STORE, 8, 'I', Imm::ADDR, { Src::RS, Src::RT }, { Dst::ZERO }, MIPS_III_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapMIPS32 =
 {
     // Advanced multiplication
@@ -468,20 +458,20 @@ static const Table<I> isaMapMIPS32 =
     {0x25, { "dclo", mips_dclo<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RS }, { Dst::RD }, MIPS_64_Instr} }
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP0_rs =
 {
     {0x00, { "mfc0",  mips_mfc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::CP0_RD }, { Dst::RT },     MIPS_I_Instr} },
     {0x04, { "mtc0",  mips_mtc0<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT },     { Dst::CP0_RD }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP0_funct =
 {
     {0x18, { "eret",  mips_eret<I>, OUT_R_JUMP, 0, 'N', Imm::NO, { Src::EPC, Src::SR }, { Dst::SR }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1 =
 {
     // Moves from Floating Point
@@ -495,7 +485,7 @@ static const Table<I> isaMapCOP1 =
     {0x06, { "ctc1",  mips_ctc1<I>,  OUT_FPU, 0, 'N', Imm::NO, { Src::RT }, { Dst::FS }, MIPS_III_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1_s =
 {
     // Formatted basic instructions
@@ -547,7 +537,7 @@ static const Table<I> isaMapCOP1_s =
     {0x3F, { "c.ngt.s",   mips_c_ngt_s<I>,   OUT_FPU, 0, 'N', Imm::NO, { Src::FS, Src::FT }, { Dst::FCSR }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1_d =
 {
     // Formatted basic instructions
@@ -600,7 +590,7 @@ static const Table<I> isaMapCOP1_d =
     {0x3F, { "c.ngt.d",   mips_c_ngt_d<I>,   OUT_FPU, 0, 'N', Imm::NO, { Src::FS, Src::FT }, { Dst::FCSR }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1_l =
 {
     // Converts
@@ -608,7 +598,7 @@ static const Table<I> isaMapCOP1_l =
     {0x21, { "cvt.d.l", mips_cvt_d_l<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::FS }, { Dst::FD }, MIPS_III_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1_w =
 {
     // Converts
@@ -616,7 +606,7 @@ static const Table<I> isaMapCOP1_w =
     {0x21, { "cvt.d.w", mips_cvt_d_w<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::FS }, { Dst::FD }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1I =
 {
     // Branches
@@ -626,7 +616,7 @@ static const Table<I> isaMapCOP1I =
     {0x3, { "bc1tl", mips_bc1tl<I>, OUT_BRANCH, 0, 'I', Imm::ARITH, { Src::FCSR }, { Dst::ZERO }, MIPS_I_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapCOP1X =
 {
     // Loads
@@ -652,7 +642,7 @@ static const Table<I> isaMapCOP1X =
     {0x39, { "nmsub.d", mips_nmsub_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::FR, Src::FS, Src::FT }, { Dst::FD }, MIPS_IV_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapMOVCI =
 {
     // Moves on FP condition
@@ -660,7 +650,7 @@ static const Table<I> isaMapMOVCI =
     {0x1, { "movt",  mips_movt<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::RS, Src::FCSR }, { Dst::RD }, MIPS_IV_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapMOVCF_d =
 {
     // Moves on FP condition
@@ -668,7 +658,7 @@ static const Table<I> isaMapMOVCF_d =
     {0x1, { "movt.d",  mips_movt_d<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::FS, Src::FCSR }, { Dst::FD }, MIPS_IV_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const Table<I> isaMapMOVCF_s =
 {
     // Moves on FP condition
@@ -676,7 +666,7 @@ static const Table<I> isaMapMOVCF_s =
     {0x1, { "movt.s",  mips_movt_s<I>, OUT_FPU, 0, 'N', Imm::NO, { Src::FS, Src::FCSR }, { Dst::FD }, MIPS_IV_Instr} },
 };
 
-template<typename I>
+template<Executable I>
 static const std::vector<const Table<I>*> all_isa_maps =
 {
     &isaMapR<I>,
@@ -697,21 +687,21 @@ static const std::vector<const Table<I>*> all_isa_maps =
     &isaMapMOVCF_d<I>
 };
 
-template<typename I>
+template<Executable I>
 static const MIPSTableEntry<I> unknown_instruction = { };
 
-template<typename I>
+template<Executable I>
 static const MIPSTableEntry<I> instr_nop =
 { "nop" , do_nothing<I>, OUT_ARITHM, 0, 'N', Imm::NO, { }, { Dst::ZERO }, MIPS_I_Instr};
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_table_entry( const Table<I>& table, uint32 key)
 {
     auto it = table.find( key);
     return it == table.end() ? unknown_instruction<I> : it->second;
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x1)
@@ -719,7 +709,7 @@ static MIPSTableEntry<I> get_opcode_special_entry( const MIPSInstrDecoder& instr
     return get_table_entry( isaMapR<I>, instr.funct);
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
@@ -727,7 +717,7 @@ static MIPSTableEntry<I> get_COP1_s_entry( const MIPSInstrDecoder& instr)
     return get_table_entry( isaMapCOP1_s<I>, instr.funct);
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
 {
     if ( instr.funct == 0x11)
@@ -735,7 +725,7 @@ static MIPSTableEntry<I> get_COP1_d_entry( const MIPSInstrDecoder& instr)
     return get_table_entry( isaMapCOP1_d<I>,  instr.funct);
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.funct)
@@ -745,7 +735,7 @@ static MIPSTableEntry<I> get_cp0_entry( const MIPSInstrDecoder& instr)
     }
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
 {
     switch ( instr.fmt)
@@ -759,7 +749,7 @@ static MIPSTableEntry<I> get_cp1_entry( const MIPSInstrDecoder& instr)
     }
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_table_entry( uint32 bytes)
 {
     MIPSInstrDecoder instr( bytes);
@@ -787,7 +777,7 @@ static auto find_entry( const M& map, std::string_view name)
     });
 }
 
-template<typename I>
+template<Executable I>
 static MIPSTableEntry<I> get_table_entry( std::string_view str_opcode)
 {
     if ( str_opcode == "nop")
