@@ -41,7 +41,7 @@ class Cycle
         uint64 value;
 };
 
-// NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
+// NOLINTNEXTLINE(google-runtime-int) https://github.com/llvm/llvm-project/issues/25214
 constexpr inline auto operator""_cl( unsigned long long int number) noexcept
 {
     return Cycle( uint64{ number});
@@ -51,6 +51,7 @@ class Latency
 {
     public:
         constexpr explicit Latency( int64 value) : value( value) { }
+        // NOLINTNEXTLINE(modernize-use-nullptr) https://github.com/llvm/llvm-project/issues/53961
         constexpr auto operator<=>( const Latency& rhs) const = default;
 
         constexpr auto operator+( const Latency& rhs) const { return Latency( value + rhs.value); }
@@ -69,7 +70,7 @@ class Latency
         int64 value;
 };
 
-// NOLINTNEXTLINE(google-runtime-int) https://bugs.llvm.org/show_bug.cgi?id=24840
+// NOLINTNEXTLINE(google-runtime-int) https://github.com/llvm/llvm-project/issues/25214
 constexpr inline auto operator""_lt( unsigned long long int number) noexcept
 {
     return Latency( sign_cast<int64>( number));

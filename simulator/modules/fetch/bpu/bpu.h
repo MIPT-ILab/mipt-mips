@@ -43,9 +43,9 @@ public:
     BPInterface get_bp_info( Addr PC) const
     {
         if ( is_hit( PC))
-            return BPInterface( PC, is_taken( PC), get_target( PC), true);
+            return { PC, is_taken( PC), get_target( PC), true};
 
-        return BPInterface( PC, false, PC + 4, false);
+        return { PC, false, PC + 4, false };
     }
 
     virtual ~BaseBP() = default;

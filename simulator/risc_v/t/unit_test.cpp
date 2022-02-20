@@ -10,6 +10,12 @@
 #include <memory/memory.h>
 #include <risc_v/riscv_instr.h>
 
+TEST_CASE("RISCV invalid instruction") {
+    TEST_RV32_DISASM ( 0x0, "unknown" );
+    TEST_RV32_DISASM ( 0xf6000053, "unknown" );
+    CHECK( RISCVInstr<uint32>("qwerty", 0x0).get_disasm() == "unknown" );
+}
+
 TEST_CASE("RISCV disassembly")
 {
     TEST_RV32_DISASM  ( 0x00000597, "auipc $a1, 0x0");
@@ -22,48 +28,7 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x30200073, "mret");
     TEST_RV32_DISASM  ( 0x30202373, "csrrs $medeleg, $t1, $zero");
     TEST_RV32_DISASM  ( 0x30205073, "csrrwi $medeleg, $zero, 0x0");
-    TEST_RV32_DISASM  ( 0x4082,     "c_lwsp $ra, 0x0($sp)");
-    TEST_RV32_DISASM  ( 0xdf86,     "c_swsp $ra, 0xfc($sp)");
-    TEST_RV64_DISASM  ( 0x6082,     "c_ldsp $ra, 0x0($sp)");
-    TEST_RV64_DISASM  ( 0xff86,     "c_sdsp $ra, 0x1f8($sp)");
-    TEST_RV128_DISASM ( 0x30fe,     "c_lqsp $ra, 0x3f0($sp)");
-    TEST_RV128_DISASM ( 0xb686,     "c_sqsp $ra, 0x360($sp)");
-    TEST_RV32_DISASM  ( 0x4110,     "c_lw $a2, 0x0($a0)");
-    TEST_RV64_DISASM  ( 0x6298,     "c_ld $a4, 0x0($a3)");
-    TEST_RV64_DISASM  ( 0xfefc,     "c_sd $a5, 0xf8($a3)");
-    TEST_RV32_DISASM  ( 0xdefc,     "c_sw $a5, 0x7c($a3)");
-    TEST_RV128_DISASM ( 0x36d8,     "c_lq $a4, 0x1a0($a3)");
-    TEST_RV128_DISASM ( 0xaebc,     "c_sq $a5, 0x150($a3)");
-    TEST_RV32_DISASM  ( 0xb001,     "c_j -2048");
-    TEST_RV32_DISASM  ( 0x2ffd,     "c_jal 2046");
-    TEST_RV32_DISASM  ( 0x8882,     "c_jr $a7");
-    TEST_RV32_DISASM  ( 0x9582,     "c_jalr $a1");
-    TEST_RV32_DISASM  ( 0xd281,     "c_beqz $a3, -256");
-    TEST_RV32_DISASM  ( 0xeffd,     "c_bnez $a5, 254");
-    TEST_RV32_DISASM  ( 0x48fd,     "c_li $a7, 31");
-    TEST_RV32_DISASM  ( 0x6405,     "c_lui $s0, 0x1");
-    TEST_RV32_DISASM  ( 0x647d,     "c_lui $s0, 0x1f");
-    TEST_RV32_DISASM  ( 0x7401,     "c_lui $s0, 0xffffffe0");
-    TEST_RV32_DISASM  ( 0x747d,     "c_lui $s0, 0xffffffff");
-    TEST_RV32_DISASM  ( 0x1681,     "c_addi $a3, -32");
-    TEST_RV64_DISASM  ( 0x3681,     "c_addiw $a3, -32");
-    TEST_RV32_DISASM  ( 0x7101,     "c_addi16sp $sp, -512");
-    TEST_RV32_DISASM  ( 0x617d,     "c_addi16sp $sp, 496");
-    TEST_RV32_DISASM  ( 0x1ff4,     "c_addi4spn $a3, $sp, 1020");
-    TEST_RV32_DISASM  ( 0x0054,     "c_addi4spn $a3, $sp, 4");
-    TEST_RV32_DISASM  ( 0x0586,     "c_slli $a1, 1");
-    TEST_RV32_DISASM  ( 0x82fd,     "c_srli $a3, 31");
-    TEST_RV32_DISASM  ( 0x8709,     "c_srai $a4, 2");
-    TEST_RV32_DISASM  ( 0x8bbd,     "c_andi $a5, 15");
-    TEST_RV32_DISASM  ( 0x88a2,     "c_mv $a7, $s0");
-    TEST_RV32_DISASM  ( 0x8df1,     "c_and $a1, $a2");
-    TEST_RV32_DISASM  ( 0x8e55,     "c_or $a2, $a3");
-    TEST_RV32_DISASM  ( 0x8eb9,     "c_xor $a3, $a4");
-    TEST_RV32_DISASM  ( 0x8f1d,     "c_sub $a4, $a5");
-    TEST_RV64_DISASM  ( 0x9d31,     "c_addw $a0, $a2");
-    TEST_RV64_DISASM  ( 0x9e99,     "c_subw $a3, $a4");
-    TEST_RV32_DISASM  ( 0x9002,     "c_ebreak");
-    TEST_RV32_DISASM  ( 0x0001,     "c_nop");
+
     TEST_RV32_DISASM  ( 0x4028d713, "srai $a4, $a7, 2");
     TEST_RV64_DISASM  ( 0x4028d713, "srai $a4, $a7, 2");
     TEST_RV64_DISASM  ( 0x4070df1b, "sraiw $t5, $ra, 7");
@@ -82,6 +47,11 @@ TEST_CASE("RISCV disassembly")
     TEST_RV32_DISASM  ( 0x00b505b3, "add $a1, $a0, $a1");
     TEST_RV32_DISASM  ( 0x204002b7, "lui $t0, 0x20400");
     TEST_RV32_DISASM  ( 0x40e787b3, "sub $a5, $a5, $a4");
+}
+
+
+TEST_CASE("RISC-V bit manipulation disassembly")
+{
     TEST_RV32_DISASM  ( 0x20E797B3, "slo $a5, $a5, $a4");
     TEST_RV32_DISASM  ( 0x20E79793, "sloi $a5, $a5, 14");
     TEST_RV32_DISASM  ( 0x411865b3, "orn $a1, $a6, $a7");
@@ -132,12 +102,52 @@ TEST_CASE("RISCV disassembly")
 
     TEST_RV32_DISASM  ( 0x60471793,  "sext_b $a5, $a4");  // 0110000 | 00100 | 01110($a4) | 001 | 01111 ($a5) | 0010011
     TEST_RV64_DISASM  ( 0x60469793,  "sext_b $a5, $a3");  // 0110000 | 00100 | 01101($a3) | 001 | 01111 ($a5) | 0010011
+}
 
-    SECTION ("RISCV invalid instruction") {
-        TEST_RV32_DISASM ( 0x0, "unknown" );
-        TEST_RV32_DISASM ( 0xf6000053, "unknown" );
-        CHECK( RISCVInstr<uint32>("qwerty", 0x0).get_disasm() == "unknown" );       
-    }
+TEST_CASE("RISC-V compressed disassembly")
+{
+    TEST_RV32_DISASM  ( 0x4082,     "c_lwsp $ra, 0x0($sp)");
+    TEST_RV32_DISASM  ( 0xdf86,     "c_swsp $ra, 0xfc($sp)");
+    TEST_RV64_DISASM  ( 0x6082,     "c_ldsp $ra, 0x0($sp)");
+    TEST_RV64_DISASM  ( 0xff86,     "c_sdsp $ra, 0x1f8($sp)");
+    TEST_RV128_DISASM ( 0x30fe,     "c_lqsp $ra, 0x3f0($sp)");
+    TEST_RV128_DISASM ( 0xb686,     "c_sqsp $ra, 0x360($sp)");
+    TEST_RV32_DISASM  ( 0x4110,     "c_lw $a2, 0x0($a0)");
+    TEST_RV64_DISASM  ( 0x6298,     "c_ld $a4, 0x0($a3)");
+    TEST_RV64_DISASM  ( 0xfefc,     "c_sd $a5, 0xf8($a3)");
+    TEST_RV32_DISASM  ( 0xdefc,     "c_sw $a5, 0x7c($a3)");
+    TEST_RV128_DISASM ( 0x36d8,     "c_lq $a4, 0x1a0($a3)");
+    TEST_RV128_DISASM ( 0xaebc,     "c_sq $a5, 0x150($a3)");
+    TEST_RV32_DISASM  ( 0xb001,     "c_j -2048");
+    TEST_RV32_DISASM  ( 0x2ffd,     "c_jal 2046");
+    TEST_RV32_DISASM  ( 0x8882,     "c_jr $a7");
+    TEST_RV32_DISASM  ( 0x9582,     "c_jalr $a1");
+    TEST_RV32_DISASM  ( 0xd281,     "c_beqz $a3, -256");
+    TEST_RV32_DISASM  ( 0xeffd,     "c_bnez $a5, 254");
+    TEST_RV32_DISASM  ( 0x48fd,     "c_li $a7, 31");
+    TEST_RV32_DISASM  ( 0x6405,     "c_lui $s0, 0x1");
+    TEST_RV32_DISASM  ( 0x647d,     "c_lui $s0, 0x1f");
+    TEST_RV32_DISASM  ( 0x7401,     "c_lui $s0, 0xffffffe0");
+    TEST_RV32_DISASM  ( 0x747d,     "c_lui $s0, 0xffffffff");
+    TEST_RV32_DISASM  ( 0x1681,     "c_addi $a3, -32");
+    TEST_RV64_DISASM  ( 0x3681,     "c_addiw $a3, -32");
+    TEST_RV32_DISASM  ( 0x7101,     "c_addi16sp $sp, -512");
+    TEST_RV32_DISASM  ( 0x617d,     "c_addi16sp $sp, 496");
+    TEST_RV32_DISASM  ( 0x1ff4,     "c_addi4spn $a3, $sp, 1020");
+    TEST_RV32_DISASM  ( 0x0054,     "c_addi4spn $a3, $sp, 4");
+    TEST_RV32_DISASM  ( 0x0586,     "c_slli $a1, 1");
+    TEST_RV32_DISASM  ( 0x82fd,     "c_srli $a3, 31");
+    TEST_RV32_DISASM  ( 0x8709,     "c_srai $a4, 2");
+    TEST_RV32_DISASM  ( 0x8bbd,     "c_andi $a5, 15");
+    TEST_RV32_DISASM  ( 0x88a2,     "c_mv $a7, $s0");
+    TEST_RV32_DISASM  ( 0x8df1,     "c_and $a1, $a2");
+    TEST_RV32_DISASM  ( 0x8e55,     "c_or $a2, $a3");
+    TEST_RV32_DISASM  ( 0x8eb9,     "c_xor $a3, $a4");
+    TEST_RV32_DISASM  ( 0x8f1d,     "c_sub $a4, $a5");
+    TEST_RV64_DISASM  ( 0x9d31,     "c_addw $a0, $a2");
+    TEST_RV64_DISASM  ( 0x9e99,     "c_subw $a3, $a4");
+    TEST_RV32_DISASM  ( 0x9002,     "c_ebreak");
+    TEST_RV32_DISASM  ( 0x0001,     "c_nop");
 }
 
 TEST_RV32_RR_OP( 1, add, 0x1f, 0x10, 0xf)

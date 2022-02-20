@@ -41,7 +41,7 @@ std::shared_ptr<Kernel> Kernel::create_kernel( bool is_mars, std::istream& cin, 
 
 std::shared_ptr<Kernel> Kernel::create_configured_kernel()
 {
-    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks) https://bugs.llvm.org/show_bug.cgi?id=45514
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks) https://github.com/llvm/llvm-project/issues/44859
     return Kernel::create_kernel( config::use_mars, std::cin, std::cout, std::cerr);
 }
 
