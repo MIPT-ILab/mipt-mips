@@ -196,7 +196,7 @@ struct ALU
     template<Executable I, Unsigned T> static void clo( I* instr)  { instr->v_dst[0] = count_leading_ones<T>( instr->v_src[0]); }
     template<Executable I, Unsigned T> static void clz( I* instr)  { instr->v_dst[0] = count_leading_zeroes<T>( instr->v_src[0]); }
     template<Executable I, Unsigned T> static void ctz( I* instr)  { instr->v_dst[0] = count_trailing_zeroes<T>( instr->v_src[0]); }
-    template<Executable I, Unsigned T> static void pcnt( I* instr) { instr->v_dst[0] = narrow_cast<T>( popcount( instr->v_src[0])); }
+    static void pcnt( Executable auto* instr) { instr->v_dst[0] = popcount( instr->v_src[0]); }
 
     // Logic
     static void andv( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[0] & instr->v_src[1]; }
@@ -210,7 +210,7 @@ struct ALU
     static void xnor( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[0] ^ ~instr->v_src[1]; }
 
     // Bit permutation
-    static void riscv_unshfl( Executable auto* instr)
+    static void unshfl( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         auto dst_value = instr->v_src[0];
@@ -221,7 +221,7 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
-    static void riscv_shfl( Executable auto* instr)
+    static void shfl( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         auto dst_value = instr->v_src[0];
@@ -246,55 +246,80 @@ struct ALU
     }
 
     // OR Combine
-    static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
-    static void orc_b( Executable auto* instr ) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt); }
+    static void orc_b( Executable auto* instr )
+    {
+        static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
+        instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt);
+    }
 
     // Conditional moves
     static void movn( Executable auto* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
     static void movz( Executable auto* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
 
     // Bit manipulations
-    template<Executable I, Unsigned T> static void sbinv( I* instr) { instr->v_dst[0] = instr->v_src[0] ^ ( lsb_set<T>() << shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void sbext( I* instr) { instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<T>( instr)); }
+    static void binv( Executable auto* instr)
+    {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        instr->v_dst[0] = instr->v_src[0] ^ ( UInt{ 1} << shamt_v_src2<UInt>( instr));
+    }
+    static void bext( Executable auto* instr)
+    {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<UInt>( instr));
+    }
 
     static void max( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[ instr->ge()  ? 0 : 1]; }
     static void maxu( Executable auto* instr) { instr->v_dst[0] = instr->v_src[ instr->geu() ? 0 : 1]; }
     static void min( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[ instr->lt()  ? 0 : 1]; }
     static void minu( Executable auto* instr) { instr->v_dst[0] = instr->v_src[ instr->ltu() ? 0 : 1]; }
 
-    template<Executable I, Unsigned T> static
-    void clmul( I* instr)
+    static void clmul( Executable auto* instr)
     {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
         instr->v_dst[0] = 0;
-        for ( std::size_t index = 0; index < bitwidth<T>; index++)
+        for ( std::size_t index = 0; index < bitwidth<UInt>; index++)
             if ( ( instr->v_src[1] >> index) & 1U)
                 instr->v_dst[0] ^= instr->v_src[0] << index;
     }
 
-    template<Executable I, Unsigned T> static void add_uw( I* instr) { instr->v_dst[0] = instr->v_src[1] + ( bitmask<T>(32) & instr->v_src[0]); }
+    static void add_uw( Executable auto* instr)
+    {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        instr->v_dst[0] = instr->v_src[1] + ( bitmask<UInt>(32) & instr->v_src[0]);
+    }
   
-    template<Executable I, Unsigned T> static void bclr( I* instr) { instr->v_dst[0] = instr->v_src[0] & ~( lsb_set<T>() << shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void bseti( I* instr)
+    static void bclr( Executable auto* instr)
+    {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        instr->v_dst[0] = instr->v_src[0] & ~( UInt{1} << shamt_v_src2<UInt>( instr));
+    }
+
+    static void bseti( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         static constexpr auto XLEN = bitwidth<UInt>;
-        instr->v_dst[0] = instr->v_src[0] | (lsb_set<T>() << (shamt_imm (instr) & (XLEN - 1)));
+        instr->v_dst[0] = instr->v_src[0] | ( UInt{1} << (shamt_imm (instr) & (XLEN - 1)));
     }
-    template<Executable I, Unsigned T> static void sext_b( I* instr) { instr->v_dst[0] = sign_extension<T>(instr->v_src[0], bitwidth<char>); }
+
+    static void sext_b( Executable auto* instr)
+    {
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        instr->v_dst[0] = sign_extension<UInt>( instr->v_src[0], bitwidth<char>);
+    }
 
     // Bit manipulations
-    template<Executable I, Unsigned T> static
-    void pack( I* instr)
+    static void pack( Executable auto* instr)
     {
-        auto pack_width = half_bitwidth<T>;
-        instr->v_dst[0] = ( instr->v_src[0] & bitmask<T>( pack_width)) | ( instr->v_src[1] << pack_width);
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        auto pack_width = half_bitwidth<UInt>;
+        instr->v_dst[0] = ( instr->v_src[0] & bitmask<UInt>( pack_width)) | ( instr->v_src[1] << pack_width);
     }
 
-    template<Executable I, Unsigned T> static
-    void packu( I* instr)
+    static void packu( Executable auto* instr)
     {
-        auto pack_width = half_bitwidth<T>;
-        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<T>(pack_width) << pack_width)));
+        using UInt = std::decay_t<decltype(instr->v_src[0])>;
+        auto pack_width = half_bitwidth<UInt>;
+        instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<UInt>(pack_width) << pack_width)));
     }
 
     static void bclri( Executable auto* instr )
@@ -398,13 +423,13 @@ struct ALU
         instr->v_dst[1] = instr->v_src[1]; // RD  <- CSR
     }
 
-    template<Executable I, Unsigned T> static
+    template<Executable I, Unsigned T = typename I::RegisterUInt> static
     void riscv_addition_imm( I* instr)
     {
         instr->v_dst[0] = sign_extension<bitwidth<T>>( instr->v_src[0] + instr->v_imm);
     }
 
-    static void bit_field_place( Executable auto* instr)
+    static void bfp( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         static constexpr auto XLEN = bitwidth<UInt>;
