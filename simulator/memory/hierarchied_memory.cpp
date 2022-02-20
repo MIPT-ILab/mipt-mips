@@ -47,6 +47,7 @@ class HierarchiedMemoryArgumentChecker
         const uint32 set_bits;
 };
 
+// NOLINTNEXTLINE(fuchsia-multiple-inheritance)
 class HierarchiedMemory : public FuncMemory, private HierarchiedMemoryArgumentChecker
 {
     public:

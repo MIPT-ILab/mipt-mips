@@ -75,6 +75,7 @@ void Module::module_dumping( pt::ptree* modules) const
         c->module_dumping( modules);
 }
 
+// NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::modulemap_dumping( pt::ptree* modulemap) const
 {
     pt::ptree c_modulemap;

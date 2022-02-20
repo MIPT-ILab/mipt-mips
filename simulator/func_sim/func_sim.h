@@ -8,8 +8,8 @@
 #define FUNC_SIM_H
 
 #include "instr_memory.h"
-#include "rf/rf.h"
 #include "isa.h"
+#include "rf/rf.h"
 
 #include <infra/config/config.h>
 #include <infra/exception.h>

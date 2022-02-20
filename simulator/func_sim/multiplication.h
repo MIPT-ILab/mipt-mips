@@ -17,7 +17,7 @@ inline auto multiplication(T1 x, T2 y) requires (bitwidth<T1> == bitwidth<T2>) {
     return std::pair{ narrow_cast<UT>( value), narrow_cast<UT>( value >> bitwidth<T1>)};
 }
 
-constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x))
+constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x) /*unused*/)
 {
     return false;
 }

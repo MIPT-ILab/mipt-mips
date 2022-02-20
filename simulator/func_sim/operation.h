@@ -7,8 +7,8 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <func_sim/traps/trap.h>
 #include <func_sim/register.h>
+#include <func_sim/traps/trap.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
@@ -105,7 +105,7 @@ public:
 
     int8 get_accumulation_type() const
     {
-        return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
+        return (operation == OUT_R_ACCUM) ? int8{ 1} : (operation == OUT_R_SUBTR) ? int8{ -1} : int8{ 0};
     }
     Trap trap_type() const { return trap; }
 

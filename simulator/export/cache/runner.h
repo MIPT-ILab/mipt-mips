@@ -19,10 +19,10 @@ struct CacheRunnerResults
     uint64 hits = 0;
     uint64 compulsory_misses = 0;
 
-    auto get_hit_rate() const noexcept  { return accesses == 0 ? 0 : double( hits) / accesses; }
+    auto get_hit_rate() const noexcept  { return accesses == 0 ? 0 : double( hits) / double( accesses); }
     auto get_miss_rate() const noexcept { return 1 - get_hit_rate(); }
     auto get_misses() const noexcept { return accesses - hits; }
-    auto get_compulsory_miss_subrate() const noexcept { return get_misses() == 0 ? 0 : double( compulsory_misses) / get_misses(); }
+    auto get_compulsory_miss_subrate() const noexcept { return get_misses() == 0 ? 0. : double( compulsory_misses) / double( get_misses()); }
 
     friend std::ostream& operator<<( std::ostream& out, const CacheRunnerResults& rhs);
 };

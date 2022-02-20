@@ -7,6 +7,8 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
+#include <infra/types.h>
+
 #include <concepts>
 #include <ostream>
 #include <string_view>
