@@ -7,7 +7,7 @@
  
 #include <catch.hpp>
 
-#include <func_sim/alu_primitives.h>
+#include <func_sim/alu/alu.h>
 
 static_assert(is_power_of_two(1U));
 static_assert(is_power_of_two(2U));
@@ -23,9 +23,6 @@ static_assert(count_leading_zeroes<uint64>(0x0) == 64);
 static_assert(count_leading_zeroes<uint8>(uint8{ 0xFF}) == 0);
 static_assert(count_leading_zeroes<uint32>(~uint32{ 0}) == 0);
 static_assert(count_leading_zeroes<uint64>(~uint64{ 0}) == 0);
-
-static_assert( arithmetic_rs<uint64>( 0xA, 1) == 0x5);
-static_assert( arithmetic_rs<uint64>( msb_set<uint64>(), 3) == ones_rs<uint64>( msb_set<uint64>(), 3));
 
 static_assert( interleaved_mask<uint32>(0) == 0x5555'5555);
 static_assert( interleaved_mask<uint32>(1) == 0x3333'3333);
@@ -117,10 +114,10 @@ static_assert( circ_rs<uint64>( 0xA0B0'C0D0'A0B0'C0D7, 4)  == 0x7A0B'0C0D'0A0B'0
 
 TEST_CASE("circular right shift for 128 bit")
 {
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[0] == 0xAB);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 8))[1] == 0xCD00'0000'0000'0000);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 0))[0] == 0xABCD);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 0))[1] == 0);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 128))[0] == 0xABCD);
-    CHECK( unpack_to<uint64>( circ_rs<uint128>( 0xABCD, 128))[1] == 0x0);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 8))[0] == 0xAB);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 8))[1] == 0xCD00'0000'0000'0000);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 0))[0] == 0xABCD);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 0))[1] == 0);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 128))[0] == 0xABCD);
+    CHECK( unpack_to<uint64>( circ_rs(uint128{ 0xABCD}, 128))[1] == 0x0);
 }
