@@ -67,9 +67,9 @@ std::string ReadableMemory::read_string_limited( Addr addr, size_t size) const
 
 std::string ReadableMemory::read_string_by_size( Addr addr, size_t size) const
 {
-    std::vector<char> tmp( size);
+    std::string tmp( size, '\0');
     memcpy_guest_to_host( byte_cast( tmp.data()), addr, tmp.size());
-    return std::string( tmp.data(), tmp.size()); // but how to move?
+    return tmp;
 }
 
 WriteableMemory::WriteableMemory() = default;
