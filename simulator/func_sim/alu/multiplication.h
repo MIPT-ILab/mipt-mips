@@ -4,6 +4,7 @@
 * Copyright 2014-2019 MIPT-MIPS
 */
 
+#include <func_sim/operation.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 

@@ -6,7 +6,7 @@
 #include "riscv_decoder.h"
 #include "riscv_instr.h"
 
-#include <func_sim/alu.h>
+#include <func_sim/alu/alu.h>
 #include <func_sim/operation.h>
 
 #include <iomanip>
@@ -122,19 +122,19 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'I', instr_sd,         ALU::store_addr<I>,  OUT_STORE,  'S', Imm::ADDR,  { Src::RS1,  Src::RS2 },  { Dst::ZERO },          8,      64 | 128},
     // Immediate arithmetics
     {'I', instr_addi,       ALU::riscv_addition_imm<I>,            OUT_ARITHM, 'I', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
-    {'I', instr_slli,       ALU::sll<I, typename I::RegisterUInt>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
-    {'I', instr_srli,       ALU::srl<I, typename I::RegisterUInt>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
-    {'I', instr_srai,       ALU::sra<I, typename I::RegisterUInt>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
+    {'I', instr_slli,       Shifter::sll<I>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
+    {'I', instr_srli,       Shifter::srl<I>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
+    {'I', instr_srai,       Shifter::sra<I>, OUT_ARITHM, '7', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 32 | 64 | 128},
     // Immediate arithmetics - RV64 specific
     {'I', instr_addiw,      ALU::riscv_addition_imm<I, uint32>,  OUT_ARITHM, 'I', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
-    {'I', instr_slliw,      ALU::sll<I, uint32>,                 OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
-    {'I', instr_srliw,      ALU::srl<I, uint32>,                 OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
-    {'I', instr_sraiw,      ALU::sra<I, uint32>,                 OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
+    {'I', instr_slliw,      Shifter::sll<I, uint32>,             OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
+    {'I', instr_srliw,      Shifter::srl<I, uint32>,             OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
+    {'I', instr_sraiw,      Shifter::sra<I, uint32>,             OUT_ARITHM, '5', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 64 | 128},
     // Immediate arithmetics - RV128 specific
     {'I', instr_addid,      ALU::riscv_addition_imm<I, uint64>,  OUT_ARITHM, 'I', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
-    {'I', instr_sllid,      ALU::sll<I, uint64>,                 OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
-    {'I', instr_srlid,      ALU::srl<I, uint64>,                 OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
-    {'I', instr_sraid,      ALU::sra<I, uint64>,                 OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
+    {'I', instr_sllid,      Shifter::sll<I, uint64>,             OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
+    {'I', instr_srlid,      Shifter::srl<I, uint64>,             OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
+    {'I', instr_sraid,      Shifter::sra<I, uint64>,              OUT_ARITHM, '6', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD }, 0, 128},
     // Immediate logic and comparison
     {'I', instr_slti,       ALU::set<I, &I::lti>,   OUT_ARITHM, 'I', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD },            0, 32 | 64 | 128},
     {'I', instr_sltiu,      ALU::set<I, &I::ltiu>,  OUT_ARITHM, 'I', Imm::ARITH, { Src::RS1,  Src::ZERO }, { Dst::RD },            0, 32 | 64 | 128},
@@ -144,15 +144,15 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     // Register-register arithmetics
     {'I', instr_add,        ALU::riscv_addition<I, typename I::RegisterUInt>   , OUT_ARITHM, ' ', Imm::NO, { Src::RS1,  Src::RS2 },  { Dst::RD },    0, 32 | 64 | 128},
     {'I', instr_sub,        ALU::riscv_subtraction<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128},
-    {'I', instr_sll,        ALU::sllv<I, typename I::RegisterUInt>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
-    {'I', instr_sra,        ALU::srav<I, typename I::RegisterUInt>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
-    {'I', instr_srl,        ALU::srlv<I, typename I::RegisterUInt>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
+    {'I', instr_sll,        Shifter::sllv<I>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
+    {'I', instr_sra,        Shifter::srav<I>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
+    {'I', instr_srl,        Shifter::srlv<I>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD },           0, 32 | 64 | 128},
     // Regist-register arithmetics - RV64 specific
     {'I', instr_addw,       ALU::riscv_addition<I, uint32>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
     {'I', instr_subw,       ALU::riscv_subtraction<I, uint32>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
-    {'I', instr_sllw,       ALU::sllv<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
-    {'I', instr_sraw,       ALU::srav<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
-    {'I', instr_srlw,       ALU::srlv<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
+    {'I', instr_sllw,       Shifter::sllv<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
+    {'I', instr_sraw,       Shifter::srav<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
+    {'I', instr_srlw,       Shifter::srlv<I, uint32>,              OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0,      64 | 128},
     // Register-register logic and comparison
     {'I', instr_slt,        ALU::set<I, &I::lt>,    OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128},
     {'I', instr_sltu,       ALU::set<I, &I::ltu>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1,  Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128},
@@ -210,9 +210,9 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     // Immediate arithmetics
     {'C', instr_c_addi16sp, ALU::riscv_addition_imm<I>,   OUT_ARITHM, ImmediateType::C_ADDI16SP, Imm::ARITH,   { Src::SP,       Src::ZERO }, { Dst::SP },       0, 32 | 64 | 128},
     {'C', instr_c_addi,     ALU::riscv_addition_imm<I>,   OUT_ARITHM, ImmediateType::C_I,        Imm::ARITH,   { Src::RD,       Src::ZERO }, { Dst::RD },       0, 32 | 64 | 128},
-    {'C', instr_c_srli,     ALU::srl<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RS1_3BIT, Src::ZERO }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128},
-    {'C', instr_c_srai,     ALU::sra<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RS1_3BIT, Src::ZERO }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128},
-    {'C', instr_c_slli,     ALU::sll<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RD,       Src::ZERO }, { Dst::RD },       0, 32 | 64 | 128},
+    {'C', instr_c_srli,     Shifter::srl<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RS1_3BIT, Src::ZERO }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128},
+    {'C', instr_c_srai,     Shifter::sra<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RS1_3BIT, Src::ZERO }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128},
+    {'C', instr_c_slli,     Shifter::sll<I, typename I::RegisterUInt>, OUT_ARITHM, ImmediateType::C_S, Imm::ARITH, { Src::RD,       Src::ZERO }, { Dst::RD },       0, 32 | 64 | 128},
     {'C', instr_c_addi4spn, ALU::riscv_addition_imm<I>,          OUT_ARITHM, ImmediateType::C_ADDI4SPN, Imm::ARITH, { Src::SP, Src::ZERO }, { Dst::RD_3BIT },   0, 32 | 64      },
     {'C', instr_c_addiw,    ALU::riscv_addition_imm<I, uint32>,  OUT_ARITHM, ImmediateType::C_I,        Imm::ARITH, { Src::RD, Src::ZERO }, { Dst::RD },        0,      64 | 128},
     // Constant-Generation
@@ -233,39 +233,40 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'C', instr_c_and,      ALU::andv<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1_3BIT, Src::RS2_3BIT }, { Dst::RS1_3BIT }, 0, 32 | 64 | 128},
     /*-------------- B --------------*/
     // Bit manipulation
-    {'B', instr_slo,        ALU::slo<I, typename I::RegisterUInt>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
-    {'B', instr_sro,        ALU::sro<I, typename I::RegisterUInt>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
-    {'B', instr_sloi,       ALU::sloi<I, typename I::RegisterUInt>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_orn,        ALU::orn<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_binv,       ALU::binv<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_bext,       ALU::bext<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_pack,       ALU::pack<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_packu,      ALU::packu<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_xnor,       ALU::xnor<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_bfp,        ALU::bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_grev,       ALU::grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_cpop,       ALU::pcnt<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_rol,        ALU::rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_ror,        ALU::ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      ALU::clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_max,        ALU::max<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_maxu,       ALU::maxu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_min,        ALU::min<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_minu,       ALU::minu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_gorc,       ALU::gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_orc_b,      ALU::orc_b<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64      },
     {'B', instr_unshfl,     ALU::unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128},
-    {'B', instr_rori,       ALU::rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_shfl,       ALU::shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_sroi,       ALU::sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_add_uw,     ALU::add_uw<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0,      64   },
-    {'B', instr_bclr,       ALU::bclr<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
-    {'B', instr_bclri,      ALU::bclri<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
-    {'B', instr_bseti,      ALU::bseti<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO},  { Dst::RD},  0, 32 | 64   },
-    {'B', instr_bset,       ALU::bset<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
-    {'B', instr_sext_b,     ALU::sext_b<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
     {'B', instr_clz,        ALU::clz<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64 },
-    {'B', instr_ctz,        ALU::ctz<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64 }
+    {'B', instr_ctz,        ALU::ctz<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64 },
+    {'B', instr_sext_b,     ALU::sext_b<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+
+    {'B', instr_slo,        Shifter::slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
+    {'B', instr_sro,        Shifter::sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
+    {'B', instr_sloi,       Shifter::sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_grev,       Shifter::grev<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_gorc,       Shifter::gorc<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_orc_b,      Shifter::orc_b<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64    },
+    {'B', instr_rol,        Shifter::rol<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_ror,        Shifter::ror<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_rori,       Shifter::rori<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_sroi,       Shifter::sroi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_bclr,       Shifter::bclr<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_bclri,      Shifter::bclri<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_bseti,      Shifter::bseti<I>,  OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO},  { Dst::RD},  0, 32 | 64   },
+    {'B', instr_bset,       Shifter::bset<I>,   OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64   },
+    {'B', instr_binv,       Shifter::binv<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_bext,       Shifter::bext<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      }
 };
 
 

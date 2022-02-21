@@ -7,7 +7,7 @@
 #include "mips_instr.h"
 #include "mips_instr_decode.h"
 
-#include <func_sim/alu.h>
+#include <func_sim/alu/alu.h>
 #include <infra/instrcache/instr_cache.h>
 #include <infra/macro.h>
 #include <infra/types.h>
@@ -44,15 +44,15 @@ static const Table<I> isaMapR =
 {
     // **************** R INSTRUCTIONS ****************
     // Constant shifts
-    {0x0, { "sll",  ALU::sll<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
+    {0x0, { "sll",  Shifter::sll<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
 //  {0x1, { "movci"
-    {0x2, { "srl",  ALU::srl<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
-    {0x3, { "sra",  ALU::sra<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
+    {0x2, { "srl",  Shifter::srl<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
+    {0x3, { "sra",  Shifter::sra<I, uint32>,  OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_I_Instr} },
     // Variable shifts
-    {0x4, { "sllv", ALU::sllv<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
+    {0x4, { "sllv", Shifter::sllv<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
 //  {0x5
-    {0x6, { "srlv", ALU::srlv<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
-    {0x7, { "srav", ALU::srav<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
+    {0x6, { "srlv", Shifter::srlv<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
+    {0x7, { "srav", Shifter::srav<I, uint32>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_I_Instr} },
     // Indirect branches
     {0x8, { "jr",   ALU::jr<I>,                     OUT_R_JUMP, 0, 'N', Imm::NO, { Src::RS }, { Dst::ZERO }, MIPS_I_Instr} },
     {0x9, { "jalr", ALU::jump_and_link<I, ALU::jr>, OUT_R_JUMP, 0, 'N', Imm::NO, { Src::RS }, { Dst::RD },   MIPS_I_Instr} },
@@ -68,9 +68,9 @@ static const Table<I> isaMapR =
     {0x12, { "mflo", ALU::move<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::LO }, { Dst::RD }, MIPS_I_Instr} },
     {0x13, { "mtlo", ALU::move<I>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RS }, { Dst::LO }, MIPS_I_Instr} },
     // Doubleword variable shifts
-    {0x14, { "dsllv", ALU::sllv<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
-    {0x16, { "dsrlv", ALU::srlv<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
-    {0x17, { "dsrav", ALU::srav<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
+    {0x14, { "dsllv", Shifter::sllv<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
+    {0x16, { "dsrlv", Shifter::srlv<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
+    {0x17, { "dsrav", Shifter::srav<I, uint64>, OUT_ARITHM, 0, 'N', Imm::NO, { Src::RT, Src::RS }, { Dst::RD }, MIPS_III_Instr} },
     // Multiplication/Division
     {0x18, { "mult",   MIPSMultALU::multiplication<int32, I>,  OUT_DIVMULT, 0, 'N', Imm::NO, { Src::RS, Src::RT }, { Dst::LO, Dst::HI }, MIPS_I_Instr} },
     {0x19, { "multu",  MIPSMultALU::multiplication<uint32, I>, OUT_DIVMULT, 0, 'N', Imm::NO, { Src::RS, Src::RT }, { Dst::LO, Dst::HI }, MIPS_I_Instr} },
@@ -109,12 +109,12 @@ static const Table<I> isaMapR =
     {0x36, { "tne",  ALU::trap<I, &I::ne>,  OUT_TRAP, 0, 'N', Imm::NO, { Src::RS, Src::RT }, { Dst::ZERO }, MIPS_II_Instr} },
 //  {0x37
     // Doubleword shifts
-    {0x38, { "dsll",   ALU::sll<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
-    {0x3A, { "dsrl",   ALU::srl<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
-    {0x3B, { "dsra",   ALU::sra<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
-    {0x3C, { "dsll32", ALU::dsll32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
-    {0x3E, { "dsrl32", ALU::dsrl32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
-    {0x3F, { "dsra32", ALU::dsra32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} }
+    {0x38, { "dsll",   Shifter::sll<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
+    {0x3A, { "dsrl",   Shifter::srl<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
+    {0x3B, { "dsra",   Shifter::sra<I, uint64>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
+    {0x3C, { "dsll32", Shifter::dsll32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
+    {0x3E, { "dsrl32", Shifter::dsrl32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} },
+    {0x3F, { "dsra32", Shifter::dsra32<I>, OUT_ARITHM, 0, 'S', Imm::SHIFT, { Src::RT }, { Dst::RD }, MIPS_III_Instr} }
 };
 
 //unordered map for RI-instructions

@@ -8,8 +8,9 @@
 
 #include "alu_primitives.h"
 #include "multiplication.h"
-#include "traps/trap.h"
+#include "shifter.h"
 
+#include <func_sim/traps/trap.h>
 #include <infra/macro.h>
 #include <infra/uint128.h>
 
@@ -34,14 +35,6 @@ struct ALU
 {
     // Generic
     static void move( Executable auto* instr)   { instr->v_dst[0] = instr->v_src[0]; }
-
-    static size_t shamt_imm( const Executable auto* instr) { return narrow_cast<size_t>( instr->v_imm); }
-    static size_t shamt_imm_32( const Executable auto* instr) { return narrow_cast<size_t>( instr->v_imm) + 32U; }
-
-    template<Unsigned T> static
-    size_t shamt_v_src2( const Executable auto* instr) {
-        return narrow_cast<size_t>( instr->v_src[1] & bitmask<size_t>(log_bitwidth<T>));
-    }
 
     template<Executable Instr, bool (Instr::* p)() const> static void set( Instr* instr)  { instr->v_dst[0] = (instr->*p)(); }
 
@@ -160,35 +153,6 @@ struct ALU
             instr->v_dst[0] = result;
     }
 
-    // Shifts
-    template<Executable I, Unsigned T> static void sll( I* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_imm( instr)); }
-    template<Executable I, Unsigned T> static void srl( I* instr)  { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_imm( instr)); }
-    template<Executable I, Unsigned T> static void sra( I* instr)  { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<Executable I, Unsigned T> static void sllv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) << shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void srlv( I* instr) { instr->v_dst[0] = sign_extension<bitwidth<T>>( ( instr->v_src[0] & all_ones<T>()) >> shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void srav( I* instr) { instr->v_dst[0] = arithmetic_rs( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void slo( I* instr)  { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_v_src2<T>( instr)); }
-    template<Executable I, Unsigned T> static void sloi( I* instr) { instr->v_dst[0] = ones_ls( sign_extension<bitwidth<T>>( instr->v_src[0]), shamt_imm( instr)); }
-    template<Executable I, Unsigned T> static void sro( I* instr)  { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_v_src2<T>( instr)); }
-    static void sroi( Executable auto* instr) { instr->v_dst[0] = ones_rs( instr->v_src[0], shamt_imm( instr)); }
-
-    // Circular shifts
-    static void rol( Executable auto* instr) {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = circ_ls( instr->v_src[0], shamt_v_src2<UInt>( instr));
-    }
-    static void ror( Executable auto* instr) {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = circ_rs( instr->v_src[0], shamt_v_src2<UInt>( instr));
-    }
-    static void rori( Executable auto* instr) {
-        instr->v_dst[0] = circ_rs( instr->v_src[0], shamt_imm( instr));
-    }
-
-    // MIPS extra shifts
-    static void dsll32( Executable auto* instr) { instr->v_dst[0] = instr->v_src[0] << shamt_imm_32( instr); }
-    static void dsrl32( Executable auto* instr) { instr->v_dst[0] = instr->v_src[0] >> shamt_imm_32( instr); }
-    static void dsra32( Executable auto* instr) { instr->v_dst[0] = arithmetic_rs( instr->v_src[0], shamt_imm_32( instr)); }
     template<size_t N> static void upper_immediate( Executable auto* instr)  { instr->v_dst[0] = instr->v_imm << N; }
     static void auipc( Executable auto* instr) { upper_immediate<12>( instr); instr->v_dst[0] += instr->PC; }
 
@@ -232,41 +196,9 @@ struct ALU
         instr->v_dst[0] = dst_value;
     }
 
-    // Generalized OR-Combine and reverse
-    static void gorc( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2<UInt>( instr));
-    }
-
-    static void grev( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2<UInt>( instr));
-    }
-
-    // OR Combine
-    static void orc_b( Executable auto* instr )
-    {
-        static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
-        instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt);
-    }
-
     // Conditional moves
     static void movn( Executable auto* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
     static void movz( Executable auto* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
-
-    // Bit manipulations
-    static void binv( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = instr->v_src[0] ^ ( UInt{ 1} << shamt_v_src2<UInt>( instr));
-    }
-    static void bext( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = 1U & ( instr->v_src[0] >> shamt_v_src2<UInt>( instr));
-    }
 
     static void max( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[ instr->ge()  ? 0 : 1]; }
     static void maxu( Executable auto* instr) { instr->v_dst[0] = instr->v_src[ instr->geu() ? 0 : 1]; }
@@ -286,19 +218,6 @@ struct ALU
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         instr->v_dst[0] = instr->v_src[1] + ( bitmask<UInt>(32) & instr->v_src[0]);
-    }
-  
-    static void bclr( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = instr->v_src[0] & ~( UInt{1} << shamt_v_src2<UInt>( instr));
-    }
-
-    static void bseti( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        static constexpr auto XLEN = bitwidth<UInt>;
-        instr->v_dst[0] = instr->v_src[0] | ( UInt{1} << (shamt_imm (instr) & (XLEN - 1)));
     }
 
     static void sext_b( Executable auto* instr)
@@ -320,21 +239,6 @@ struct ALU
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         auto pack_width = half_bitwidth<UInt>;
         instr->v_dst[0] = ( (instr->v_src[0] >> pack_width) | (instr->v_src[1] & (bitmask<UInt>(pack_width) << pack_width)));
-    }
-
-    static void bclri( Executable auto* instr )
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        static constexpr auto XLEN = bitwidth<UInt>;
-        auto index = shamt_imm( instr) & (XLEN - 1);
-        auto mask = ~(lsb_set<UInt>() << index);
-        instr->v_dst[0] = instr->v_src[0] & mask;
-    }
-
-    static void bset( Executable auto* instr)
-    {
-        using UInt = std::decay_t<decltype(instr->v_src[0])>;
-        instr->v_dst[0] = instr->v_src[0] | (lsb_set<UInt>() << shamt_v_src2<UInt>( instr));
     }
 
     // Branches

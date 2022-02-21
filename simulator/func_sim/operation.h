@@ -158,6 +158,7 @@ class Datapath : public Operation
 {
 public:
     friend struct ALU;
+    friend struct Shifter;
     friend struct RISCVMultALU;
     friend struct MIPSMultALU;
 
