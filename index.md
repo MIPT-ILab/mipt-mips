@@ -26,6 +26,9 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L12]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/14_Lecture12-Control_Hazards._Branch_Prediction.pptx?raw=true
 [L13]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/15_Lecture13_Code_Form.pptx?raw=true
 [L14]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/16_Lecture14_Unit_Testing_TDD.pptx?raw=true
+[L15]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/17_Lecture15_Caches_part1.pptx?raw=true
+[L16]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/18_Lecture16_Caches_part2.pptx?raw=true
+[L17]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/19_Lecture17_Caches_part3.pptx?raw=true
 
 [L1-VIDEO]:     https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]:   https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
@@ -57,7 +60,10 @@ Date        | Type                  | Event
  15.11.2021 | Lecture:<br>Comp Arch | **L11: Data Hazards**<br>                                 • Slides: [download][L11]<br>• Recording: [watch][L11-VIDEO]
  22.11.2021 | Lecture:<br>Comp Arch | **L12: Control Hazards. Branch Prediction**<br>           • Slides: [download][L12]<br>• Recording: [watch][L12-VIDEO]
  29.11.2021 | Lecture:<br>Soft Dev  | **L13: Code Form**<br>                                    • Slides: [download][L13]<br>• Recording: [watch][L13-14-VIDEO]
- 29.11.2021 | Lecture:<br>Soft Dev  | **L13: Unit Testing. TDD.**<br>                           • Slides: [download][L14]<br>• Recording: [watch][L13-14-VIDEO]
+ 29.11.2021 | Lecture:<br>Soft Dev  | **L14: Unit Testing. TDD.**<br>                           • Slides: [download][L14]<br>• Recording: [watch][L13-14-VIDEO]
+ 07.02.2022 | Lecture:<br>Comp Arch | **L15: Caches, part 1**<br>                               • Slides: [download][L15]
+ 14.02.2022 | Lecture:<br>Comp Arch | **L16: Caches, part 2**<br>                               • Slides: [download][L16]
+ 21.02.2022 | Lecture:<br>Comp Arch | **L17: Caches, part 3**<br>                               • Slides: [download][L17]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
