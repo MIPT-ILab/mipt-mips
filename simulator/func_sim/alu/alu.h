@@ -203,7 +203,7 @@ struct ALU
     template<Executable Instr, bool (Instr::* p)() const>
     static void choose( Executable auto* instr)
     {
-        // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed to be in bounds
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed to be in bounds
         instr->v_dst[0] = instr->v_src[ (instr->*p)() ? 0 : 1];
     }
 
