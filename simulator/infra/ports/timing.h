@@ -73,7 +73,7 @@ class Latency
 // NOLINTNEXTLINE(google-runtime-int) https://github.com/llvm/llvm-project/issues/25214
 constexpr inline auto operator""_lt( unsigned long long int number) noexcept
 {
-    return Latency( sign_cast<int64>( number));
+    return Latency( signify( number));
 }
 
 constexpr inline auto operator*( int64 number, const Latency& latency) { return latency * number; }

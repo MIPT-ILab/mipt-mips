@@ -96,20 +96,19 @@ static inline const std::byte* byte_cast( const uint8* b)
 }
 
 template <Unsigned To>
-static constexpr To narrow_cast(const Integer auto& value)
+static constexpr To narrow_cast(Integer auto value)
 {
     return static_cast<To>( value);
 }
 
-template <Signed To>
-static constexpr To sign_cast( const Unsigned auto& value)
+constexpr int intify( Unsigned auto value)
 {
-    return static_cast<To>( value);
+    return static_cast<int>( value);
 }
 
-static constexpr auto signify( const Unsigned auto& value)
+static constexpr auto signify( Unsigned auto value)
 {
-    return sign_cast<sign_t<std::decay_t<decltype(value)>>>( value);
+    return static_cast<sign_t<decltype(value)>>( value);
 }
 
 using Addr = uint64;

@@ -75,14 +75,14 @@ Trap MARSKernel::execute () {
         case 14: read_from_file(); break;
         case 15: write_to_file(); break;
         case 16: close_file(); break;
-        case 17: exit_code = sim->read_cpu_register( a0); return Trap( Trap::HALT);
+        case 17: exit_code = intify( sim->read_cpu_register( a0)); return Trap( Trap::HALT);
         default: return Trap( Trap::UNSUPPORTED_SYSCALL);
     }
     return Trap( Trap::NO_TRAP);
 }
 
 void MARSKernel::print_integer() {
-    auto value = sign_cast<int64>( sim->read_cpu_register( a0));
+    auto value = intify( sim->read_cpu_register( a0));
     outstream << value;
 }
 

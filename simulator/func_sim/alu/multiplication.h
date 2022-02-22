@@ -25,7 +25,7 @@ constexpr bool is_signed_division_overflow(Unsigned auto x, decltype(x) /*unused
 
 constexpr bool is_signed_division_overflow(Signed auto x, decltype(x) y)
 {
-    return y == -1 && x == sign_cast<decltype(x)>(msb_set<unsign_t<decltype(x)>>());
+    return y == -1 && x == signify( msb_set<unsign_t<decltype(x)>>());
 }
 
 template<Integer T>

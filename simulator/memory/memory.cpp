@@ -39,7 +39,7 @@ class ZeroMemory : public ReadableMemory
 public:
     size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
-    std::string dump() const final { return std::string( "empty memory\n"); }
+    std::string dump() const final { return "empty memory\n"; }
     size_t strlen( Addr /* addr */) const final { return 0; }
 };
 

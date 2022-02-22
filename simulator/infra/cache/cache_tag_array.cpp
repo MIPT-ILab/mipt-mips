@@ -53,13 +53,13 @@ std::pair<bool, int32> InfiniteCacheTagArray::read_no_touch( Addr addr) const
         : std::pair{ true, res->second };
 }
 
-int32 InfiniteCacheTagArray::write( Addr addr)
+int InfiniteCacheTagArray::write( Addr addr)
 {
     auto result = read_no_touch( addr);
     if ( result.first)
         return result.second;
 
-    auto way = sign_cast<int32>( tags.size());
+    auto way = intify( tags.size());
     tags.emplace_back( addr);
     lookup_helper.emplace( addr, way);
 
@@ -242,13 +242,13 @@ std::pair<bool, int32> SimpleCacheTagArray::read_no_touch( Addr addr) const
            : std::pair{ false, -1};
 }
 
-int32 SimpleCacheTagArray::write( Addr addr)
+int SimpleCacheTagArray::write( Addr addr)
 {
     const Addr new_tag = tag( addr);
 
     // get cache coordinates
     const uint32 num_set = set( addr);
-    const auto way = sign_cast<int32>( replacement_module->update( num_set));
+    const auto way = intify( replacement_module->update( num_set));
 
     // get an old tag
     auto& entry = tags[ num_set][ way];

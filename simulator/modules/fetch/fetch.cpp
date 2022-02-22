@@ -157,7 +157,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
     {
         save_flush( cycle);
         clock_instr_cache( cycle);
-        return Target();
+        return {};
     }
 
     /* getting PC */
@@ -165,7 +165,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
 
     /* push bubble */
     if ( !target.valid)
-        return Target();
+        return {};
 
     /* hit or miss */
     auto is_hit = tags->lookup( target.address);
@@ -178,7 +178,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
 
     /* send PC to cache*/
     wp_long_latency_pc_holder->write( target, cycle);
-    return Target();
+    return {};
 }
 
 
