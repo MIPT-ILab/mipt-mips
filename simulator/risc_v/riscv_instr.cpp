@@ -240,17 +240,18 @@ static const std::vector<RISCVTableEntry<I>> cmd_desc =
     {'B', instr_bfp,        ALU::bfp<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_cpop,       ALU::pcnt<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_clmul,      ALU::clmul<I>,  OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_max,        ALU::max<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_maxu,       ALU::maxu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_min,        ALU::min<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
-    {'B', instr_minu,       ALU::minu<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_unshfl,     ALU::unshfl<I>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 | 128},
     {'B', instr_shfl,       ALU::shfl<I>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
     {'B', instr_add_uw,     ALU::add_uw<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::RS2 },  { Dst::RD }, 0,      64   },
     {'B', instr_clz,        ALU::clz<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64 },
     {'B', instr_ctz,        ALU::ctz<I, typename I::RegisterUInt>, OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64 },
     {'B', instr_sext_b,     ALU::sext_b<I>, OUT_ARITHM, ' ', Imm::NO,    { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },
-
+    // Minimum and maximum
+    {'B', instr_max,        ALU::choose<I, &I::ge>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_maxu,       ALU::choose<I, &I::geu>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_min,        ALU::choose<I, &I::lt>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    {'B', instr_minu,       ALU::choose<I, &I::ltu>,   OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64      },
+    // Shifts and related
     {'B', instr_slo,        Shifter::slo<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
     {'B', instr_sro,        Shifter::sro<I>,    OUT_ARITHM, ' ', Imm::NO, { Src::RS1, Src::RS2 },  { Dst::RD }, 0, 32 | 64 },
     {'B', instr_sloi,       Shifter::sloi<I>,   OUT_ARITHM, '7', Imm::ARITH, { Src::RS1, Src::ZERO }, { Dst::RD }, 0, 32 | 64   },

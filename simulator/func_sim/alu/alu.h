@@ -200,10 +200,12 @@ struct ALU
     static void movn( Executable auto* instr)  { move( instr); if (instr->v_src[1] == 0) instr->mask = 0; }
     static void movz( Executable auto* instr)  { move( instr); if (instr->v_src[1] != 0) instr->mask = 0; }
 
-    static void max( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[ instr->ge()  ? 0 : 1]; }
-    static void maxu( Executable auto* instr) { instr->v_dst[0] = instr->v_src[ instr->geu() ? 0 : 1]; }
-    static void min( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[ instr->lt()  ? 0 : 1]; }
-    static void minu( Executable auto* instr) { instr->v_dst[0] = instr->v_src[ instr->ltu() ? 0 : 1]; }
+    template<Executable Instr, bool (Instr::* p)() const>
+    static void choose( Executable auto* instr)
+    {
+        // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) Guaranteed to be in bounds
+        instr->v_dst[0] = instr->v_src[ (instr->*p)() ? 0 : 1];
+    }
 
     static void clmul( Executable auto* instr)
     {

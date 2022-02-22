@@ -55,7 +55,7 @@ is_start_section( const ELFIO::symbol_section_accessor& symbols, ELFIO::Elf_Xwor
     ELFIO::Elf_Half section_index = 0;
     unsigned char other = 0;
     symbols.get_symbol( id, name, value, size, bind, type, section_index, other);
-    return std::pair( name == "__start" || name == "_start", value);
+    return { name == "__start" || name == "_start", value};
 }
 
 Addr ElfLoader::get_startPC() const

@@ -15,8 +15,8 @@
  * 0xF0 sra 2 -> 0xFC
  */
 template<Unsigned T> constexpr T arithmetic_rs( T value, size_t shamt) { return signify( value) >> shamt; }
-template<Unsigned T> constexpr T circ_ls( T x, size_t shamt) { return std::rotl( x, sign_cast<int>( shamt)); }
-template<Unsigned T> constexpr T circ_rs( T x, size_t shamt) { return std::rotr( x, sign_cast<int>( shamt)); }
+template<Unsigned T> constexpr T circ_ls( T x, size_t shamt) { return std::rotl( x, intify( shamt)); }
+template<Unsigned T> constexpr T circ_rs( T x, size_t shamt) { return std::rotr( x, intify( shamt)); }
 
 // Boost.Multiprecision does not define right shift for signed values.
 inline uint128 arithmetic_rs( uint128 value, size_t shamt)

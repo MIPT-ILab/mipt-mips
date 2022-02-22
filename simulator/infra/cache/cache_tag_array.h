@@ -37,7 +37,7 @@ public:
      *
      * Returns # of updated way
      */
-    virtual int32 write( Addr addr) = 0;
+    virtual int write( Addr addr) = 0;
 
     /**
      * Returns true and way if the byte with the given address is stored in the cache,
