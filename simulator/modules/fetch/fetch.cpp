@@ -104,7 +104,7 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
     if ( hold_target.valid)
         return hold_target;
 
-    return Target();
+    return {};
 }
 
 template <typename FuncInstr>

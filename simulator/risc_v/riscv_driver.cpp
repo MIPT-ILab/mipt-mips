@@ -21,8 +21,10 @@ public:
     {
         auto trap = instr.trap_type();
         cpu->write_csr_register( "scause", trap.to_riscv_format());
+        // NOLINTNEXTLINE(misc-redundant-expression): https://github.com/llvm/llvm-project/issues/54011
         if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
             return trap;
+
         auto tvec = cpu->read_csr_register( "stvec");
         auto pc = trap_vector_address<Addr>( cpu->read_csr_register( "stvec")); 
         cpu->write_csr_register( "sepc", instr.get_PC());

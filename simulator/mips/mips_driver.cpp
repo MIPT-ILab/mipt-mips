@@ -17,6 +17,7 @@ public:
     Trap handle_trap( const Operation& instr) const final
     {
         auto trap = instr.trap_type();
+        // NOLINTNEXTLINE(misc-redundant-expression): https://github.com/llvm/llvm-project/issues/54011
         if ( trap == Trap::NO_TRAP || trap == Trap::HALT)
             return trap;
 
