@@ -44,7 +44,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L11-VIDEO]:    https://drive.google.com/file/d/1emZmWURJaWEVO17jXgzTOBTwnWHdzqtN/view?usp=sharing
 [L12-VIDEO]:    https://drive.google.com/file/d/1pNRX1q_CatZ-Z4ZBJ7EGoef2hhA7LzcT/view?usp=sharing
 [L13-14-VIDEO]: https://drive.google.com/file/d/1Az8UoSlV93FUZqAIGuWvLDdpCRI5RFXf/view?usp=sharing
-[L18-VIDEO]:    https://drive.google.com/file/d/1wIHTeHZckuN2MUPH5cZd5i99Kmr2ckpE/view?usp=sharing
+[L19-VIDEO]:    https://drive.google.com/file/d/1wIHTeHZckuN2MUPH5cZd5i99Kmr2ckpE/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -68,7 +68,7 @@ Date        | Type                  | Event
  14.02.2022 | Lecture:<br>Comp Arch | **L16: Caches, part 2**<br>                               • Slides: [download][L16]
  21.02.2022 | Lecture:<br>Comp Arch | **L17: Caches, part 3**<br>                               • Slides: [download][L17]
  28.02.2022 | Lecture:<br>Comp Arch | **L18: Virtual memory**<br>                               • Slides: [download][L18]
- 14.03.2022 | Lecture:<br>Comp Arch | **L19: Advanced Pipelining. ILP. Superscalar. OOO - part 1**<br> • Slides: [download][L19]<br>• Recording: [watch][L18-VIDEO]
+ 14.03.2022 | Lecture:<br>Comp Arch | **L19: Advanced Pipelining. ILP. Superscalar. OOO - part 1**<br> • Slides: [download][L19]<br>• Recording: [watch][L19-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
