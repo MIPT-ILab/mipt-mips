@@ -70,7 +70,7 @@ Date        | Type                  | Event
  21.02.2022 | Lecture:<br>Comp Arch | **L17: Caches, part 3**<br>                               • Slides: [download][L17]
  28.02.2022 | Lecture:<br>Comp Arch | **L18: Virtual memory**<br>                               • Slides: [download][L18]
  14.03.2022 | Lecture:<br>Comp Arch | **L19: Advanced Pipelining. ILP. Superscalar. OOO - part 1**<br> • Slides: [download][L19]<br>• Recording: [watch][L19-VIDEO]
- 21.03.2022 | Lecture:<br>Comp Arch | **L20: OOO - part 2**<br>                                 • Slides: [download][L19]
+ 21.03.2022 | Lecture:<br>Comp Arch | **L20: OOO - part 2**<br>                                 • Slides: [download][L20]
  
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
