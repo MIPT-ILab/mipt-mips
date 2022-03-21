@@ -31,7 +31,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L17]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/19_Lecture17_Caches_part3.pptx?raw=true
 [L18]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/20_Lecture18-Virtual_memory.pptx?raw=true
 [L19]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/21_Lecture19-Advanced_Pipelining._ILP._Superscalar._OOO_part1.pptx?raw=true
-[L19]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/22_Lecture20-OOO_part2.pptx?raw=true
+[L20]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/22_Lecture20-OOO_part2.pptx?raw=true
 
 [L1-VIDEO]:     https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]:   https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
