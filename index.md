@@ -46,35 +46,39 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L11-VIDEO]:    https://drive.google.com/file/d/1emZmWURJaWEVO17jXgzTOBTwnWHdzqtN/view?usp=sharing
 [L12-VIDEO]:    https://drive.google.com/file/d/1pNRX1q_CatZ-Z4ZBJ7EGoef2hhA7LzcT/view?usp=sharing
 [L13-14-VIDEO]: https://drive.google.com/file/d/1Az8UoSlV93FUZqAIGuWvLDdpCRI5RFXf/view?usp=sharing
+[L15-VIDEO-1]:  https://drive.google.com/file/d/1yFe-D0LvTJFkj7hTtSS7XneDhgZcwvfa/view?usp=sharing
+[L15-VIDEO-2]:  https://drive.google.com/file/d/1D9pC5N8Ive0RBWB8v3YcBGuDGF0SFFjw/view?usp=sharing
+[L16-VIDEO]:    https://drive.google.com/file/d/1ko7Mv7Ty7hfrT1574s_6yTNn8udpiXuA/view?usp=sharing
+[L17-VIDEO-1]:  https://drive.google.com/file/d/16QlVlrRIQiD8-e5chfi5NBVc_X3BWF2B/view?usp=sharing
 [L19-VIDEO]:    https://drive.google.com/file/d/1wIHTeHZckuN2MUPH5cZd5i99Kmr2ckpE/view?usp=sharing
 [L20-VIDEO]:    https://drive.google.com/file/d/1XdJnHkcKspt7emPNWEW76Sws6VR-yVAw/view?usp=sharing
 [L21-VIDEO]:    https://drive.google.com/file/d/1kfp3kKBBmysbUw_vWn5v_ViuSYAvNvU-/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
- 13.09.2021 | Org.                  | **Course introduction**<br>                               • Slides: [download][Intro]
- 13.09.2021 | Lecture:<br>Comp Arch | **L1: Layers of Computer Architecture**<br>               • Slides: [download][L1]<br>• Recording: [watch][L1-VIDEO]
- 20.09.2021 | Lecture:<br>Comp Arch | **L2: ISA and uArch**<br>                                 • Slides: [download][L2]<br>• Recording: [watch][L2-3-VIDEO]
- 20.09.2021 | Lecture:<br>Comp Arch | **L3: Integrated Circuits**<br>                           • Slides: [download][L3]<br>• Recording: [watch][L2-3-VIDEO]
- 27.09.2021 | Lecture:<br>Comp Arch | **L4: CMOS**<br>                                          • Slides: [download][L4]<br>• Recording: [watch][L4-5-VIDEO]
- 27.09.2021 | Lecture:<br>Comp Arch | **L5: Combinational Circuits**<br>                        • Slides: [download][L5]<br>• Recording: [watch][L4-5-VIDEO]
- 04.10.2021 | Lecture:<br>Comp Arch | **L6: Sequential Circuits**<br>                           • Slides: [download][L6]<br>• Recording: [watch][L6-VIDEO]
- 11.10.2021 | Practice              | **P1: Combinational and Seqientional Circuits**<br>       • Slides: [download][P1]
- 18.10.2021 | Lecture:<br>Soft Dev  | **L7: Version Control System**<br>                        • Slides: [download][L7]<br>• Recording: [watch][L7-VIDEO-1]<br>• Git demo: [watch][L7-VIDEO-2]
- 25.10.2021 | Lecture:<br>Comp Arch | **L8: RISC-V ISA**<br>                                    • Slides: [download][L8]<br>• Recording: [watch][L8-VIDEO]
- 01.11.2021 | Lecture:<br>Comp Arch | **L9: RISC-V Single-Cycle implementation**<br>            • Slides: [download][L9]<br>• Recording: [watch][L9-VIDEO]
- 08.11.2021 | Lecture:<br>Comp Arch | **L10: Pipelining**<br>                                   • Slides: [download][L10]<br>• Recording: [watch][L10-VIDEO]
- 15.11.2021 | Lecture:<br>Comp Arch | **L11: Data Hazards**<br>                                 • Slides: [download][L11]<br>• Recording: [watch][L11-VIDEO]
- 22.11.2021 | Lecture:<br>Comp Arch | **L12: Control Hazards. Branch Prediction**<br>           • Slides: [download][L12]<br>• Recording: [watch][L12-VIDEO]
- 29.11.2021 | Lecture:<br>Soft Dev  | **L13: Code Form**<br>                                    • Slides: [download][L13]<br>• Recording: [watch][L13-14-VIDEO]
- 29.11.2021 | Lecture:<br>Soft Dev  | **L14: Unit Testing. TDD.**<br>                           • Slides: [download][L14]<br>• Recording: [watch][L13-14-VIDEO]
- 07.02.2022 | Lecture:<br>Comp Arch | **L15: Caches, part 1**<br>                               • Slides: [download][L15]
- 14.02.2022 | Lecture:<br>Comp Arch | **L16: Caches, part 2**<br>                               • Slides: [download][L16]
- 21.02.2022 | Lecture:<br>Comp Arch | **L17: Caches, part 3**<br>                               • Slides: [download][L17]
- 28.02.2022 | Lecture:<br>Comp Arch | **L18: Virtual memory**<br>                               • Slides: [download][L18]
+ 13.09.2021 | Org.                  | **Course introduction**<br>                                      • Slides: [download][Intro]
+ 13.09.2021 | Lecture:<br>Comp Arch | **L1: Layers of Computer Architecture**<br>                      • Slides: [download][L1]<br>• Recording: [watch][L1-VIDEO]
+ 20.09.2021 | Lecture:<br>Comp Arch | **L2: ISA and uArch**<br>                                        • Slides: [download][L2]<br>• Recording: [watch][L2-3-VIDEO]
+ 20.09.2021 | Lecture:<br>Comp Arch | **L3: Integrated Circuits**<br>                                  • Slides: [download][L3]<br>• Recording: [watch][L2-3-VIDEO]
+ 27.09.2021 | Lecture:<br>Comp Arch | **L4: CMOS**<br>                                                 • Slides: [download][L4]<br>• Recording: [watch][L4-5-VIDEO]
+ 27.09.2021 | Lecture:<br>Comp Arch | **L5: Combinational Circuits**<br>                               • Slides: [download][L5]<br>• Recording: [watch][L4-5-VIDEO]
+ 04.10.2021 | Lecture:<br>Comp Arch | **L6: Sequential Circuits**<br>                                  • Slides: [download][L6]<br>• Recording: [watch][L6-VIDEO]
+ 11.10.2021 | Practice              | **P1: Combinational and Seqientional Circuits**<br>              • Slides: [download][P1]
+ 18.10.2021 | Lecture:<br>Soft Dev  | **L7: Version Control System**<br>                               • Slides: [download][L7]<br>• Recording: [watch][L7-VIDEO-1]<br>• Git demo: [watch][L7-VIDEO-2]
+ 25.10.2021 | Lecture:<br>Comp Arch | **L8: RISC-V ISA**<br>                                           • Slides: [download][L8]<br>• Recording: [watch][L8-VIDEO]
+ 01.11.2021 | Lecture:<br>Comp Arch | **L9: RISC-V Single-Cycle implementation**<br>                   • Slides: [download][L9]<br>• Recording: [watch][L9-VIDEO]
+ 08.11.2021 | Lecture:<br>Comp Arch | **L10: Pipelining**<br>                                          • Slides: [download][L10]<br>• Recording: [watch][L10-VIDEO]
+ 15.11.2021 | Lecture:<br>Comp Arch | **L11: Data Hazards**<br>                                        • Slides: [download][L11]<br>• Recording: [watch][L11-VIDEO]
+ 22.11.2021 | Lecture:<br>Comp Arch | **L12: Control Hazards. Branch Prediction**<br>                  • Slides: [download][L12]<br>• Recording: [watch][L12-VIDEO]
+ 29.11.2021 | Lecture:<br>Soft Dev  | **L13: Code Form**<br>                                           • Slides: [download][L13]<br>• Recording: [watch][L13-14-VIDEO]
+ 29.11.2021 | Lecture:<br>Soft Dev  | **L14: Unit Testing. TDD.**<br>                                  • Slides: [download][L14]<br>• Recording: [watch][L13-14-VIDEO]
+ 07.02.2022 | Lecture:<br>Comp Arch | **L15: Caches, part 1**<br>                                      • Slides: [download][L15]<br>• Recording: [half 1][L15-VIDEO-1], [half 2][L15-VIDEO-2]
+ 14.02.2022 | Lecture:<br>Comp Arch | **L16: Caches, part 2**<br>                                      • Slides: [download][L16]<br>• Recording: [watch][L16-VIDEO]
+ 21.02.2022 | Lecture:<br>Comp Arch | **L17: Caches, part 3**<br>                                      • Slides: [download][L17]<br>• Recording: [half 1][L17-VIDEO-1]
+ 28.02.2022 | Lecture:<br>Comp Arch | **L18: Virtual memory**<br>                                      • Slides: [download][L18]
  14.03.2022 | Lecture:<br>Comp Arch | **L19: Advanced Pipelining. ILP. Superscalar. OOO - part 1**<br> • Slides: [download][L19]<br>• Recording: [watch][L19-VIDEO]
- 21.03.2022 | Lecture:<br>Comp Arch | **L20: OOO - part 2**<br>                                 • Slides: [download][L20]<br>• Recording: [watch][L20-VIDEO]
- 28.03.2022 | Lecture:<br>Comp Arch | **L21: OOO - part 3. Load-Store Architecture**<br>        • Slides: [download][L21]<br>• Recording: [watch][L21-VIDEO]
+ 21.03.2022 | Lecture:<br>Comp Arch | **L20: OOO - part 2**<br>                                        • Slides: [download][L20]<br>• Recording: [watch][L20-VIDEO]
+ 28.03.2022 | Lecture:<br>Comp Arch | **L21: OOO - part 3. Load-Store Architecture**<br>               • Slides: [download][L21]<br>• Recording: [watch][L21-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
