@@ -33,6 +33,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L19]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/21_Lecture19-Advanced_Pipelining._ILP._Superscalar._OOO_part1.pptx?raw=true
 [L20]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/22_Lecture20-OOO_part2.pptx?raw=true
 [L21]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/23_Lecture21-OOO_%20part3,_loads_and_stores_(Load-Store_Architecture).pptx?raw=true
+[L22]:        https://github.com/MIPT-ILab/ca-lectures/blob/master/mipt-mips/2021/24_Lecture22-TLP._SMT.pptx?raw=true
 
 [L1-VIDEO]:     https://drive.google.com/file/d/1ikTyzpeURzdPHIdQI1CVLCgdTRCRq3NH/view?usp=sharing
 [L2-3-VIDEO]:   https://drive.google.com/file/d/1Rw2NIbYRREL4dL835NcyvXlOi6ziXNr6/view?usp=sharing
@@ -53,6 +54,7 @@ Online lectures are given via Google Meet, a link to join the conference: [link]
 [L19-VIDEO]:    https://drive.google.com/file/d/1wIHTeHZckuN2MUPH5cZd5i99Kmr2ckpE/view?usp=sharing
 [L20-VIDEO]:    https://drive.google.com/file/d/1XdJnHkcKspt7emPNWEW76Sws6VR-yVAw/view?usp=sharing
 [L21-VIDEO]:    https://drive.google.com/file/d/1kfp3kKBBmysbUw_vWn5v_ViuSYAvNvU-/view?usp=sharing
+[L22-VIDEO]:    https://drive.google.com/file/d/1cnOxsy1pgyvSCqzhmEVh78gJvY_egGhk/view?usp=sharing
 
 Date        | Type                  | Event
 :---------: | :-------------------: | ------
@@ -79,6 +81,7 @@ Date        | Type                  | Event
  14.03.2022 | Lecture:<br>Comp Arch | **L19: Advanced Pipelining. ILP. Superscalar. OOO - part 1**<br> • Slides: [download][L19]<br>• Recording: [watch][L19-VIDEO]
  21.03.2022 | Lecture:<br>Comp Arch | **L20: OOO - part 2**<br>                                        • Slides: [download][L20]<br>• Recording: [watch][L20-VIDEO]
  28.03.2022 | Lecture:<br>Comp Arch | **L21: OOO - part 3. Load-Store Architecture**<br>               • Slides: [download][L21]<br>• Recording: [watch][L21-VIDEO]
+ 11.04.2022 | Lecture:<br>Comp Arch | **L22: TLP. SMT**<br>                                            • Slides: [download][L22]<br>• Recording: [watch][L22-VIDEO]
 
 You may find lectures from the previous year [in our archive](https://github.com/MIPT-ILab/mipt-mips/wiki/Lectures-on-Computer-Architecture-in-2020).
 
