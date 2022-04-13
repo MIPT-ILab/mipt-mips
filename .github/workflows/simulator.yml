@@ -122,9 +122,9 @@ jobs:
             cxx: g++-10
             gcov: gcov-10
           - name: llvm
-            cc: clang-13
-            cxx: clang++-13
-            gcov: "llvm-cov-13 gcov"
+            cc: clang-14
+            cxx: clang++-14
+            gcov: "llvm-cov-14 gcov"
 
     steps:
     - name: Checkout repository
@@ -137,13 +137,13 @@ jobs:
       with:
         languages: 'cpp'
 
-    - name: Install LLVM 13
+    - name: Install LLVM 14
       if: matrix.config.name == 'llvm'
       run: |
         sudo wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        sudo add-apt-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main'
+        sudo add-apt-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main'
         sudo apt update -y
-        sudo apt-get install clang++-13 clang-tidy-13 llvm-13
+        sudo apt-get install clang++-14 clang-tidy-14 llvm-14
 
     - name: Install packages
       run: sudo apt-get install ninja-build libboost-dev
@@ -171,7 +171,7 @@ jobs:
       if: matrix.config.name == 'llvm'
       working-directory: build
       continue-on-error: true
-      run: run-clang-tidy-13.py -header-filter='.*' 2> /dev/null
+      run: run-clang-tidy-14.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
       if: matrix.config.name == 'gcc'
