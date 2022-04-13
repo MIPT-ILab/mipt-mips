@@ -75,7 +75,7 @@ private:
     Writeback<I> writeback;
 
     /* ports */
-    ReadPort<Trap>* rp_halt = nullptr;
+    ReadPort<Trap>* rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", Port::LATENCY);
 
     void clock_tree( Cycle cycle);
     void dump_statistics() const;

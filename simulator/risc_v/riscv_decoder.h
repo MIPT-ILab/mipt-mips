@@ -236,7 +236,7 @@ struct RISCVInstrDecoder
         return get_C_I_immediate();
     }
 
-    template<typename R>
+    template<Unsigned R>
     static R get_immediate( char subset, uint32 value) noexcept
     {
         switch (subset) {

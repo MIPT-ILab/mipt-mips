@@ -9,13 +9,7 @@
 template <typename FuncInstr>
 Mem<FuncInstr>::Mem( Module* parent) : Module( parent, "mem")
 {
-    wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", Port::BW);
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", Port::LATENCY);
-    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
-    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
-
-    wp_bypass = make_write_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", Port::BW);
 }
 
 template <typename FuncInstr>
