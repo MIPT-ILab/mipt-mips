@@ -17,7 +17,7 @@ class Simulator;
 
 std::unique_ptr<Driver> create_riscv32_driver( Simulator* sim);
 
-template <typename T>
+template<Unsigned T>
 struct RISCV
 {
     using FuncInstr = RISCVInstr<T>;

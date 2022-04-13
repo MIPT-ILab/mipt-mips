@@ -9,7 +9,7 @@
 #include <memory/memory.h>
 #include <risc_v/riscv_instr.h>
 
-template<typename T>
+template<Unsigned T>
 struct TestData {
     const T src1, src2, dst;
 

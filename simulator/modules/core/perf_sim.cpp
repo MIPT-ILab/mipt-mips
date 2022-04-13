@@ -21,8 +21,6 @@ PerfSim<I>::PerfSim( std::endian endian, std::string_view isa)
     , endian( endian)
     , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)
 {
-    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", Port::LATENCY);
-
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
     writeback.set_driver( I::create_driver( this));

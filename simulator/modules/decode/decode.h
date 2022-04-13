@@ -41,23 +41,28 @@ private:
     std::unique_ptr<BypassingUnit> bypassing_unit = nullptr;
 
     /* Inputs */
-    ReadPort<Instr>* rp_datapath = nullptr;
-    ReadPort<Instr>* rp_stall_datapath = nullptr;
-    ReadPort<bool>* rp_flush = nullptr;
-    ReadPort<Instr>* rp_bypassing_unit_notify = nullptr;
-    ReadPort<bool>* rp_bypassing_unit_flush_notify = nullptr;
-    ReadPort<bool>* rp_flush_fetch = nullptr;
-    ReadPort<bool>* rp_trap = nullptr;
+    ReadPort<Instr>* rp_datapath = make_read_port<Instr>("FETCH_2_DECODE", Port::LATENCY);
+    ReadPort<Instr>* rp_stall_datapath = make_read_port<Instr>("DECODE_2_DECODE", Port::LATENCY);
+    ReadPort<bool>* rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
+    ReadPort<Instr>* rp_bypassing_unit_notify = make_read_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", Port::LATENCY);
+    ReadPort<bool>* rp_bypassing_unit_flush_notify = make_read_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", Port::LATENCY);
+    ReadPort<bool>* rp_flush_fetch = make_read_port<bool>("DECODE_2_FETCH_FLUSH", Port::LATENCY);
+    ReadPort<bool>* rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
     /* Outputs */
-    WritePort<Instr>* wp_datapath = nullptr;
-    WritePort<Instr>* wp_stall_datapath = nullptr;
-    WritePort<bool>* wp_stall = nullptr;
-    WritePort<Instr>* wp_bypassing_unit_notify = nullptr;
-    WritePort<BPInterface>* wp_bp_update = nullptr;
-    std::array<WritePort<BypassCommand>*, SRC_REGISTERS_NUM> wps_command;
-    WritePort<bool>* wp_flush_fetch = nullptr;
-    WritePort<Target>* wp_flush_target = nullptr;
+    WritePort<Instr>* wp_datapath = make_write_port<Instr>("DECODE_2_EXECUTE", Port::BW);
+    WritePort<Instr>* wp_stall_datapath = make_write_port<Instr>("DECODE_2_DECODE", Port::BW);
+    WritePort<bool>* wp_stall = make_write_port<bool>("DECODE_2_FETCH_STALL", Port::BW);
+    WritePort<Instr>* wp_bypassing_unit_notify = make_write_port<Instr>("DECODE_2_BYPASSING_UNIT_NOTIFY", Port::BW);
+    WritePort<BPInterface>* wp_bp_update = make_write_port<BPInterface>("DECODE_2_FETCH", Port::BW);
+    WritePort<bool>* wp_flush_fetch = make_write_port<bool>("DECODE_2_FETCH_FLUSH", Port::BW);
+    WritePort<Target>* wp_flush_target = make_write_port<Target>("DECODE_2_FETCH_TARGET", Port::BW);
+
+    std::array<WritePort<BypassCommand>*, SRC_REGISTERS_NUM> wps_command =
+    {
+        make_write_port<BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND", Port::BW),
+        make_write_port<BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND", Port::BW)
+    };      
 };
 
 

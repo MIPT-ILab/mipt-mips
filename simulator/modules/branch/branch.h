@@ -24,21 +24,19 @@ class Branch : public Module
         uint64 num_mispredictions = 0;
         uint64 num_jumps          = 0;
 
-        ReadPort<Instr>* rp_datapath = nullptr;
-        WritePort<Instr>* wp_datapath = nullptr;
+        ReadPort<Instr>* rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", Port::LATENCY);
+        WritePort<Instr>* wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , Port::BW );
 
-        WritePort<bool>* wp_flush_all = nullptr;
-        ReadPort<bool>* rp_flush = nullptr;
-        ReadPort<bool>* rp_trap = nullptr;
+        WritePort<bool>* wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", Port::BW);
+        ReadPort<bool>* rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
+        ReadPort<bool>* rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
-        WritePort<Target>* wp_flush_target = nullptr;
-        WritePort<BPInterface>* wp_bp_update = nullptr;
+        WritePort<Target>* wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", Port::BW);
+        WritePort<BPInterface>* wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", Port::BW);
 
-        ReadPort<Instr>* rp_recive_datapath_from_mem = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::BW);
 
-        WritePort<InstructionOutput>* wp_bypass = nullptr;
-
-        WritePort<bool>* wp_bypassing_unit_flush_notify = nullptr;
+        WritePort<bool>* wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", Port::BW);
 
     public:
         explicit Branch( Module* parent);
