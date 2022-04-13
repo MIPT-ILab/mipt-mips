@@ -19,7 +19,7 @@ MainWrapper::MainWrapper( std::string_view desc)
     : MainWrapper( desc, std::cout, std::cerr)
 { }
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+// NOLINTNEXTLINE(*-avoid-c-arrays)
 int MainWrapper::run( int argc, const char* argv[]) const try {
     return impl( argc, argv);
 }
