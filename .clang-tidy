@@ -269,7 +269,6 @@ Checks: >
     readability-duplicate-include,
     readability-else-after-return,
     readability-function-size,
-    readability-identifier-length,
     readability-identifier-naming,
     readability-implicit-bool-conversion,
     readability-inconsistent-declaration-parameter-name,
