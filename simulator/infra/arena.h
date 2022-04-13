@@ -14,9 +14,6 @@
 #include <cstdlib>
 #include <memory>
 
-// WARNING
-// This is not a RAII class. You have to destroy objects manually!
-
 template<typename T>
 class Arena
 {

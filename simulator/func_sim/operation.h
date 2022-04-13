@@ -236,7 +236,7 @@ void Datapath<T>::load( const T& value)
 }
 
 template<typename T>
-concept Executable = std::is_same_v<Datapath<typename T::RegisterUInt>, T>;
+concept Executable = std::is_base_of_v<Datapath<typename T::RegisterUInt>, T>;
 
 template<Unsigned T, Register R>
 class BaseInstruction : public Datapath<T>

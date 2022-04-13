@@ -35,7 +35,7 @@ class Execute : public Module
         ReadPort<bool>* rp_trap = nullptr;
 
         struct BypassPorts {
-            ReadPort<BypassCommand<Register>>* command_port;
+            ReadPort<BypassCommand>* command_port;
             std::array<ReadPort<InstructionOutput>*, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
         };
         std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;

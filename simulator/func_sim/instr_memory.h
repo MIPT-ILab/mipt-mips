@@ -11,7 +11,7 @@
 #include <infra/types.h>
 #include <memory/memory.h>
 
-template<typename FuncInstr>
+template<Executable FuncInstr>
 class InstrMemoryIface
 {
 public:

@@ -55,7 +55,7 @@ private:
     WritePort<bool>* wp_stall = nullptr;
     WritePort<Instr>* wp_bypassing_unit_notify = nullptr;
     WritePort<BPInterface>* wp_bp_update = nullptr;
-    std::array<WritePort<BypassCommand<Register>>*, SRC_REGISTERS_NUM> wps_command;
+    std::array<WritePort<BypassCommand>*, SRC_REGISTERS_NUM> wps_command;
     WritePort<bool>* wp_flush_fetch = nullptr;
     WritePort<Target>* wp_flush_target = nullptr;
 };

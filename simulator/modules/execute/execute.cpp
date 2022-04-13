@@ -27,8 +27,8 @@ Execute<FuncInstr>::Execute( Module* parent) : Module( parent, "execute")
 
     rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
 
-    rps_bypass[0].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC1_COMMAND", Port::LATENCY);
-    rps_bypass[1].command_port = make_read_port<BypassCommand<Register>>("DECODE_2_EXECUTE_SRC2_COMMAND", Port::LATENCY);
+    rps_bypass[0].command_port = make_read_port<BypassCommand>("DECODE_2_EXECUTE_SRC1_COMMAND", Port::LATENCY);
+    rps_bypass[1].command_port = make_read_port<BypassCommand>("DECODE_2_EXECUTE_SRC2_COMMAND", Port::LATENCY);
 
     wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::BW);
     wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::BW);

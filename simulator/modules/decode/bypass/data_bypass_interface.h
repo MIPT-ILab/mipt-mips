@@ -76,8 +76,6 @@ private:
     static constexpr const Latency WB_STAGE     = IN_RF_STAGE - 1_lt;
 };
 
-
-template<typename Register>
 class BypassCommand
 {
 public:
