@@ -14,7 +14,7 @@ constexpr auto count_leading_zeroes( Unsigned auto x) noexcept  { return std::co
 constexpr auto count_leading_ones( Unsigned auto x) noexcept    { return std::countl_one( x); }
 constexpr auto count_trailing_zeroes( Unsigned auto x) noexcept { return std::countr_zero( x); }
 
-template<typename T> static
+template<Unsigned T> static
 auto test_addition_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) + narrow_cast<T>( val2);
@@ -25,7 +25,7 @@ auto test_addition_overflow( Unsigned auto val1, Unsigned auto val2)
     return std::pair{ result, is_overflow};
 }
 
-template<typename T> static
+template<Unsigned T> static
 auto test_subtraction_overflow( Unsigned auto val1, Unsigned auto val2)
 {
     const T result = narrow_cast<T>( val1) - narrow_cast<T>( val2);
@@ -42,7 +42,7 @@ auto test_subtraction_overflow( Unsigned auto val1, Unsigned auto val2)
  * 1 -> 0x3333'3333 (0011001100...)
  * 2 -> 0x0F0F'0F0F (0000111100...)
  */
-template<typename T>
+template<Unsigned T>
 static constexpr T interleaved_mask( size_t density)
 {
     T result{};
@@ -63,7 +63,7 @@ static constexpr T interleaved_mask( size_t density)
  * 1 -> 0x0C0C'0C0C (0011'0000'00...)
  * 2 -> 0x00F0'00F0
  */
-template<typename T, size_t shift>
+template<Unsigned T, size_t shift>
 static constexpr T shuffle_mask( size_t density)
 {
     T result{};

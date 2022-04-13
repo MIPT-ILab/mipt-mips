@@ -57,13 +57,13 @@ struct RISCVMultALU
     static void mult_h_su( Executable auto* instr) { instr->v_dst[0] = multiplication( signify( instr->v_src[0]), instr->v_src[1]).second; }
     static void mult_l( Executable auto* instr) { instr->v_dst[0] = instr->v_src[0] * instr->v_src[1]; }
 
-    template<typename T> static void div( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).first; }
-    template<typename T> static void rem( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).second; }
+    template<Integer T> static void div( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).first; }
+    template<Integer T> static void rem( Executable auto* instr) { instr->v_dst[0] = riscv_division<T>(instr->v_src[0], instr->v_src[1]).second; }
 };
 
 struct MIPSMultALU
 {
-    template<typename T> static void multiplication( Executable auto* instr)
+    template<Integer T> static void multiplication( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         const auto& result = ::multiplication<T, T>( instr->v_src[0], instr->v_src[1]);
@@ -71,7 +71,7 @@ struct MIPSMultALU
         instr->v_dst[1] = narrow_cast<UInt>( result.second);
     }
 
-    template<typename T> static void division( Executable auto* instr)
+    template<Integer T> static void division( Executable auto* instr)
     {
         using UInt = std::decay_t<decltype(instr->v_src[0])>;
         const auto& result = mips_division<T>( instr->v_src[0], instr->v_src[1]);

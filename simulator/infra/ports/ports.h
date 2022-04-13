@@ -160,7 +160,7 @@ public:
     bool is_ready( Cycle cycle) noexcept
     {
         cleanup_stale_data( cycle);
-        return !queue.empty() && std::get<Cycle>(queue.front()) == cycle;
+        return !queue.empty() && std::get<Cycle>( queue.front()) == cycle;
     }
 
     T read( Cycle cycle)
@@ -183,7 +183,7 @@ private:
     void cleanup_stale_data( Cycle cycle) noexcept
     {
         update_last_cycle( cycle);
-        while ( !queue.empty() && std::get<Cycle>(queue.front()) < cycle)
+        while ( !queue.empty() && std::get<Cycle>( queue.front()) < cycle)
            queue.pop();
     }
 
@@ -191,7 +191,7 @@ private:
 
     T pop_front() noexcept(std::is_nothrow_copy_constructible<T>::value)
     {
-        T tmp( std::move( std::get<T>(queue.front())));
+        T tmp( std::move( std::get<T>( queue.front())));
         queue.pop();
         return tmp;
     }

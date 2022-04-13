@@ -41,7 +41,7 @@ template<Unsigned T> class RISCVInstr;
 template<typename T> class PerfInstr;
 class MIPSRegister;
 class RISCVRegister;
-template<typename T> class BypassCommand;
+class BypassCommand;
 
 #define PORT_TOKEN(x) \
     extern template class PortQueue<std::pair<x, Cycle>>; \

@@ -662,8 +662,3 @@ std::string BaseMIPSInstr<R>::get_disasm() const
 
 template class BaseMIPSInstr<uint32>;
 template class BaseMIPSInstr<uint64>;
-
-static_assert(std::is_trivially_destructible_v<BaseMIPSInstr<uint32>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-static_assert(std::is_trivially_destructible_v<BaseMIPSInstr<uint64>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-static_assert(std::is_trivially_copyable_v<BaseMIPSInstr<uint32>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
-static_assert(std::is_trivially_copyable_v<BaseMIPSInstr<uint64>>, "For performance reasons, BaseMIPSInstr should not contain non-trivial members");
