@@ -252,7 +252,7 @@ static bool is_mips_le( std::string_view isa)
 {
     static std::unordered_set<std::string_view> isas =
         { "mars", "mars64", "mips32le", "mips32", "mips64", "mips64le" };
-    return isas.count( isa) > 0;
+    return isas.contains( isa);
 }
 
 void MARSKernel::connect_exception_handler()

@@ -19,7 +19,10 @@ namespace config {
 } // namespace config
 
 template <typename FuncInstr>
-Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
+Fetch<FuncInstr>::Fetch( Module* parent)
+    : Module( parent, "fetch")
+    , _fetchahead_size( config::fetchahead_distance)
+    , _prefetch_method( config::prefetch_method)
 {
     bp = BaseBP::create_configured_bp();
     tags = CacheTagArray::create(
@@ -29,9 +32,6 @@ Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
         config::instruction_cache_line_size,
         32
     );
-
-    _fetchahead_size = config::fetchahead_distance;
-    _prefetch_method = config::prefetch_method;
 
     if ( _prefetch_method != "next-line" && _prefetch_method != "wrong-path" && _prefetch_method != "no-prefetch")
         throw PrefetchMethodException("\"" + _prefetch_method +

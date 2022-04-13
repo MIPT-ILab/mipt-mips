@@ -60,7 +60,7 @@ void CommonCacheRunner::account_access( Addr addr, CacheRunnerResults* result)
 void CommonCacheRunner::account_miss( Addr addr, CacheRunnerResults* result)
 {
     cache->write( addr);
-    if ( history.count( addr) == 0) {
+    if ( !history.contains( addr)) {
         ++result->compulsory_misses;
         history.insert( addr);
     }
