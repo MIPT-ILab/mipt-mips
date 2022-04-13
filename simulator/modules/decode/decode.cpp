@@ -8,9 +8,10 @@
 #include <modules/execute/execute.h>
 
 template <typename FuncInstr>
-Decode<FuncInstr>::Decode( Module* parent) : Module( parent, "decode")
+Decode<FuncInstr>::Decode( Module* parent)
+    : Module( parent, "decode")
+    , bypassing_unit( std::make_unique<BypassingUnit>( config::long_alu_latency))
 {
-    bypassing_unit = std::make_unique<BypassingUnit>( config::long_alu_latency);
 }
 
 template <typename FuncInstr>

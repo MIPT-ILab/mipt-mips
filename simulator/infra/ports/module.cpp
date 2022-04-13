@@ -39,9 +39,9 @@ void Module::force_disable_logging()
 // NOLINTNEXTLINE(misc-no-recursion) Recursive, but must be finite
 void Module::enable_logging_impl( const std::unordered_set<std::string>& names)
 {
-    if ( names.count( name) != 0)
+    if ( names.contains( name))
         force_enable_logging();
-    else if ( names.count( '!' + name) != 0)
+    else if ( names.contains( '!' + name))
         force_disable_logging();;
 
     for ( const auto& c : children)
