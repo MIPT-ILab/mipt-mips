@@ -15,7 +15,8 @@ namespace config {
     static const Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
     /* Prefetch parameters */
     static const Value<uint32> fetchahead_distance = { "fetchahead-size", 32, "Fetchahead distance size"};
-    static const Value<std::string> prefetch_method = { "prefetch-method", "wrong-path", "Type of a Instruction prefetching method"};
+    static const PredicatedValue<std::string> prefetch_method = { "prefetch-method", "wrong-path", "Type of a Instruction prefetching method",
+        []( std::string x) { return x == "next-line" && x == "wrong-path" && x == "no-prefetch"; } };
 } // namespace config
 
 template <typename FuncInstr>
@@ -32,10 +33,6 @@ Fetch<FuncInstr>::Fetch( Module* parent)
         config::instruction_cache_line_size,
         32
     );
-
-    if ( _prefetch_method != "next-line" && _prefetch_method != "wrong-path" && _prefetch_method != "no-prefetch")
-        throw PrefetchMethodException("\"" + _prefetch_method +
-            "\" prefetch method is not defined, supported methods are:\nnext-line\nwrong-path\nno-prefetch\n");
 }
 
 template <typename FuncInstr>
