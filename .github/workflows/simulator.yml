@@ -245,7 +245,9 @@ jobs:
         submodules: 'true'
 
     - name: Install tools
-      run: choco install opencppcoverage codecov
+      run: |
+        choco install opencppcoverage codecov
+        pip3 install pyyaml
 
     - name: Install tools on Windows
       run: |
