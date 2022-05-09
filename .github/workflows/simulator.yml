@@ -38,7 +38,7 @@ jobs:
         echo "CXX=g++-10" >> $GITHUB_ENV
 
     - name: Install Python dependencies
-      run: sudo pip3 install pyyaml
+      run: pip3 install pyyaml
 
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
