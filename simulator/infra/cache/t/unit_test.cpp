@@ -113,12 +113,12 @@ TEST_CASE( "Check infinite CacheTagArray model with multiple sets")
     auto test_tags = CacheTagArray::create( "infinite", cache_size * 4, cache_ways, cache_line_size, addr_size_in_bits);
 
     //make sure that addresses have same sets
-    for ( uint32 i = 0; i < cache_ways + 1; i++)
+    for ( Addr i = 0; i < cache_ways + 1; i++)
     {
         CHECK ( test_tags->set( i * 0x10000000) == 0);
         test_tags->write( i * 0x10000000);
     }
     //make sure that there was no replacement
-    for ( uint32 i = 0; i < cache_ways + 1; i++)
-        CHECK( test_tags->lookup( i * 0x10000000) == true);
+    for ( Addr i = 0; i < cache_ways + 1; i++)
+        CHECK( test_tags->lookup( i * 0x10000000));
 }

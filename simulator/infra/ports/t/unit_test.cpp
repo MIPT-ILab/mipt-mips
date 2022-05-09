@@ -63,7 +63,7 @@ TEST_CASE("Ports: type mismatch")
         TestRoot()
         {
             make_read_port<int>( "Key", Port::LATENCY);
-            make_write_port<std::string>( "Key", Port::BW);
+            make_write_port<unsigned>( "Key", Port::BW);
             CHECK_THROWS_AS( init_portmap(), PortError);
         }
     } tr;

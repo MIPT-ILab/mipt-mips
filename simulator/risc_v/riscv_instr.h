@@ -13,10 +13,10 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
-template<typename I>
+template<Executable I>
 struct RISCVTableEntry;
 
-template <typename T>
+template <Unsigned T>
 class RISCVInstr : public BaseInstruction<T, RISCVRegister>
 {
     private:
@@ -57,7 +57,7 @@ class RISCVInstr : public BaseInstruction<T, RISCVRegister>
         std::string bytes_dump() const;
 };
 
-template <typename T>
+template <Unsigned T>
 static inline std::ostream& operator<<( std::ostream& out, const RISCVInstr<T>& rhs)
 {
     return out << rhs.string_dump();

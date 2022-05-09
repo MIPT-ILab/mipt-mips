@@ -17,17 +17,15 @@ namespace config {
     static const AliasedSwitch json_dump = { "j", "json-dump", "json logs in .\\logs.json" };
 } // namespace config
 
-template <typename ISA>
-PerfSim<ISA>::PerfSim( std::endian endian, std::string_view isa)
+template <ISA I>
+PerfSim<I>::PerfSim( std::endian endian, std::string_view isa)
     : CycleAccurateSimulator( isa)
     , endian( endian)
     , fetch( this), decode( this), execute( this), mem( this), branch( this), writeback( this, endian)
 {
-    rp_halt = make_read_port<Trap>("WRITEBACK_2_CORE_HALT", Port::LATENCY);
-
     decode.set_RF( &rf);
     writeback.set_RF( &rf);
-    writeback.set_driver( ISA::create_driver( this));
+    writeback.set_driver( I::create_driver( this));
 
     set_writeback_bandwidth( Port::BW);
 
@@ -38,30 +36,30 @@ PerfSim<ISA>::PerfSim( std::endian endian, std::string_view isa)
     enable_json_logging(config::json_dump);
 }
 
-template <typename ISA>
-void PerfSim<ISA>::set_memory( std::shared_ptr<FuncMemory> m)
+template <ISA I>
+void PerfSim<I>::set_memory( std::shared_ptr<FuncMemory> m)
 {
     memory = m;
-    auto imemory = std::make_unique<InstrMemoryCached<ISA>>( endian);
+    auto imemory = std::make_unique<InstrMemoryCached<I>>( endian);
     imemory->set_memory( m);
     fetch.set_memory( std::move( imemory));
     mem.set_memory( m);
 }
 
-template <typename ISA>
-void PerfSim<ISA>::set_target( const Target& target)
+template <ISA I>
+void PerfSim<I>::set_target( const Target& target)
 {
     writeback.set_target( target, curr_cycle);
 }
 
-template<typename ISA>
-Addr PerfSim<ISA>::get_pc() const
+template<ISA I>
+Addr PerfSim<I>::get_pc() const
 {
     return writeback.get_next_PC();
 }
 
-template<typename ISA>
-Trap PerfSim<ISA>::run( uint64 instrs_to_run)
+template<ISA I>
+Trap PerfSim<I>::run( uint64 instrs_to_run)
 {
     /* start json dump strings */
     start_dump_json();
@@ -83,15 +81,15 @@ Trap PerfSim<ISA>::run( uint64 instrs_to_run)
     return current_trap;
 }
 
-template<typename ISA>
-void PerfSim<ISA>::clock()
+template<ISA I>
+void PerfSim<I>::clock()
 {
     clock_tree( curr_cycle);
     curr_cycle.inc();
 }
 
-template<typename ISA>
-void PerfSim<ISA>::clock_tree( Cycle cycle)
+template<ISA I>
+void PerfSim<I>::clock_tree( Cycle cycle)
 {
     fetch.clock( cycle);
     decode.clock( cycle);
@@ -110,8 +108,8 @@ auto get_rate( int total, float64 piece)
 }
 
 /* standard lines loggers implementation */
-template<typename ISA>
-void PerfSim<ISA>::start_dump_json() {
+template<ISA I>
+void PerfSim<I>::start_dump_json() {
     if (jsonout_enabled)
         (jsonout()) << "[[\n" <<
         "\t{ \"type\": \"Stage\", \"id\": 0, \"description\": \"Fetch\" },\n" <<
@@ -121,16 +119,16 @@ void PerfSim<ISA>::start_dump_json() {
         "\t{ \"type\": \"Stage\", \"id\": 4, \"description\": \"Writeback\" }";
 }
 
-template<typename ISA>
-void PerfSim<ISA>::stop_dump_json() {
+template<ISA I>
+void PerfSim<I>::stop_dump_json() {
     if (jsonout_enabled) {
         (jsonout()) << "\n]]\n";
         jsonout().close();
     }
 }
 
-template<typename ISA>
-void PerfSim<ISA>::dump_statistics() const
+template<ISA I>
+void PerfSim<I>::dump_statistics() const
 {
     auto executed_instrs = writeback.get_executed_instrs();
     auto now_time = std::chrono::high_resolution_clock::now();
@@ -154,8 +152,8 @@ void PerfSim<ISA>::dump_statistics() const
               << std::endl;
 }
 
-template <typename ISA>
-uint64 PerfSim<ISA>::read_gdb_register( size_t regno) const
+template <ISA I>
+uint64 PerfSim<I>::read_gdb_register( size_t regno) const
 {
     if ( regno == Register::get_gdb_pc_index())
         return get_pc();
@@ -163,8 +161,8 @@ uint64 PerfSim<ISA>::read_gdb_register( size_t regno) const
     return read_register( Register::from_gdb_index( regno));
 }
 
-template <typename ISA>
-void PerfSim<ISA>::write_gdb_register( size_t regno, uint64 value)
+template <ISA I>
+void PerfSim<I>::write_gdb_register( size_t regno, uint64 value)
 {
     if ( regno == Register::get_gdb_pc_index())
         set_pc( value);

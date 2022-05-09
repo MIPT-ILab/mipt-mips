@@ -20,7 +20,9 @@ option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
 option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
-if(NOT DEFINED PYTHON3_COMMAND)
+if(DEFINED ENV{PYTHON3_COMMAND})
+  set(PYTHON3_COMMAND $ENV{PYTHON3_COMMAND})
+else()
   set(PYTHON3_COMMAND python3)
 endif()
 
@@ -42,6 +44,17 @@ ExternalProject_Add(elfio
     INSTALL_COMMAND cmake -E echo "Skipping install step."
 )
 include_directories(SYSTEM ${ELFIO_PREFIX}/src/elfio)
+
+set(SPARSEHASH_PREFIX ${CMAKE_HOME_DIRECTORY}/sparsehash)
+ExternalProject_Add(sparsehash
+    PREFIX ${SPARSEHASH_PREFIX}
+    GIT_REPOSITORY https://github.com/sparsehash/sparsehash-c11
+    GIT_TAG v2.11.1
+    CONFIGURE_COMMAND cmake -E echo "Skipping configure step."
+    BUILD_COMMAND cmake -E echo "Skipping build step."
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+)
+include_directories(SYSTEM ${SPARSEHASH_PREFIX}/src/sparsehash)
 
 set(TESTS_CPPS
     infra/t/unit_test.cpp
@@ -73,10 +86,10 @@ set(TESTS_CPPS
     risc_v/t/unit_test.cpp
     risc_v/t/riscv64_test.cpp
     risc_v/t/riscv32_driver_test.cpp
+    func_sim/alu/t/unit_test.cpp
+    func_sim/driver/t/unit_test.cpp
     func_sim/rf/t/unit_test.cpp
     func_sim/traps/t/unit_test.cpp
-    func_sim/driver/t/unit_test.cpp
-    func_sim/t/alu_test.cpp
     func_sim/t/unit_test.cpp
     modules/fetch/bpu/t/unit_test.cpp
     modules/core/t/unit_test.cpp
@@ -89,24 +102,22 @@ add_definitions(-DTEST_PATH=\"${CMAKE_CURRENT_LIST_DIR}/../tests\")
 add_definitions(-DKERNEL_IMAGES=\"${CMAKE_CURRENT_LIST_DIR}/../kernels/\")
 
 set(RISCV_DIR ${CMAKE_CURRENT_LIST_DIR}/../riscv-opcodes)
-file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/opcodes-*)
+file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/rv* ${RISCV_DIR}/unratified/rv*)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    COMMAND ${PYTHON3_COMMAND} ${RISCV_DIR}/parse_opcodes -c ${RISCV_OPCODES} > ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-    DEPENDS ${RISCV_DIR}/parse_opcodes ${RISCV_OPCODES}
+    COMMAND ${PYTHON3_COMMAND} ${RISCV_DIR}/parse.py -c "rv*" "unratified/rv*"
+    COMMAND ${CMAKE_COMMAND} -E copy encoding.out.h ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    WORKING_DIRECTORY ${RISCV_DIR}
+    DEPENDS ${RISCV_DIR}/parse.py ${RISCV_OPCODES}
 )
 
 if (MSVC)
-    # /Zc:rvalueCast is a workaround for VS non-standard behavior, see
-    # https://developercommunity.visualstudio.com/content/problem/457095/cannot-bind-temporary-int-object-to-an-rvalue-refe.html
-    #
-    # -D_SCL_SECURE_NO_WARNINGS is a workaround for Boost warning, see
-    # https://docs.microsoft.com/en-us/cpp/standard-library/scl-secure-no-warnings?view=vs-2019
-    # https://lists.boost.org/Archives/boost/2008/09/141771.php
-    #
     # Warning 4244 is required to reduce excessive narrow casting
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /Zc:rvalueCast -D_SCL_SECURE_NO_WARNINGS /wd4244 ")
+    #
+    # Warning 4100 is disabled due to VS bug
+    # https://developercommunity.visualstudio.com/t/w4100-with-concept-parameter/1662465
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /wd4244 /wd4100 ")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wold-style-cast -Wvla -Werror")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
@@ -219,6 +230,7 @@ add_library(mipt-mips-src OBJECT
 )
 
 add_dependencies(mipt-mips-src elfio)
+add_dependencies(mipt-mips-src sparsehash)
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)

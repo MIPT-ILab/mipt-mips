@@ -10,6 +10,5 @@ PORT_TOKEN(PerfInstr<BaseMIPSInstr<uint64>>)
 PORT_TOKEN(PerfInstr<RISCVInstr<uint32>>)
 PORT_TOKEN(PerfInstr<RISCVInstr<uint64>>)
 PORT_TOKEN(PerfInstr<RISCVInstr<uint128>>)
-PORT_TOKEN(BypassCommand<MIPSRegister>)
-PORT_TOKEN(BypassCommand<RISCVRegister>)
+PORT_TOKEN(BypassCommand)
 #undef COMMA

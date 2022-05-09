@@ -1,15 +1,10 @@
-List of 2020/2021 MIPT-V project members:
+List of 2021/2022 MIPT-V project members:
 1. Kirill Korolev
-1. Pavel Kryukov
-2. Alexey Shcherbakov
-3. Anton Okley
-4. Vasilii Zaitsev
-5. Ruslan Zaripov
-6. Ivan Borisenkov
-7. Vladimir Graudt
-8. Egor Titov
-9. Eugene Naydanov
-10. Mihail Fedorov
-11. Kirill Kononovich
-12. Ravil Zakiryanov
-13. Daud Paragulgov
+2. Roman Glaz
+3. Denis Shuvalov
+4. Andrey Vyazovtsev
+5. Vasilii Matrenin
+6. Ivan Panferov
+7. Kirill Radkin
+8. Michael Bargatin
+9. Aleksey Otrashchenko

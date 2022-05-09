@@ -9,14 +9,23 @@
 #ifndef COMMON_TYPES_H
 #define COMMON_TYPES_H
 
+#include <climits>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
-template <typename To, typename From>
-static constexpr To narrow_cast(const From& value)
-{
-    return static_cast<To>( value);
-}
+template<typename T> constexpr bool is_wide_integer_v = false;
+template<typename T> constexpr bool is_wide_signed_integer_v = false;
+
+template<typename T>
+concept Integer = std::numeric_limits<T>::is_integer || is_wide_integer_v<T>;
+
+template<typename T>
+concept Unsigned = Integer<T> && !std::numeric_limits<T>::is_signed && !is_wide_signed_integer_v<T>;
+
+template<typename T>
+concept Signed = Integer<T> && !Unsigned<T>;
 
 // Signed types
 using int8 = int8_t;
@@ -34,51 +43,32 @@ using uint64 = uint64_t;
 using float32 = float;
 using float64 = double;
 
-/* Convert signed type to unsigned type */
-template<typename> struct unsign;
-template<> struct unsign<int8>    { using type = uint8; };
-template<> struct unsign<int16>   { using type = uint16; };
-template<> struct unsign<int32>   { using type = uint32; };
-template<> struct unsign<int64>   { using type = uint64; };
-template<> struct unsign<uint8>   { using type = uint8; };
-template<> struct unsign<uint16>  { using type = uint16; };
-template<> struct unsign<uint32>  { using type = uint32; };
-template<> struct unsign<uint64>  { using type = uint64; };
+/* Bit widths of integer types */
+template<Integer T> static constexpr size_t bitwidth = std::numeric_limits<T>::digits + std::numeric_limits<T>::is_signed;
+template<Integer T> static constexpr size_t bytewidth = bitwidth<T> / CHAR_BIT;
+template<Integer T> static constexpr size_t half_bitwidth = bitwidth<T> >> 1;
 
-template<typename T> using unsign_t = typename unsign<T>::type;
+template<size_t N> struct unsigned_integer;
+template<> struct unsigned_integer<64> { using type = uint64; };
+template<> struct unsigned_integer<32> { using type = uint32; };
+template<> struct unsigned_integer<16> { using type = uint16; };
+template<> struct unsigned_integer<8>  { using type = uint8; };
+template<size_t N> using unsigned_integer_t = typename unsigned_integer<N>::type;
 
-/* Convert unsigned type to signed type */
-template<typename> struct sign;
-template<> struct sign<uint8>   { using type = int8; };
-template<> struct sign<uint16>  { using type = int16; };
-template<> struct sign<uint32>  { using type = int32; };
-template<> struct sign<uint64>  { using type = int64; };
+template<size_t N> struct signed_integer;
+template<> struct signed_integer<64> { using type = int64; };
+template<> struct signed_integer<32> { using type = int32; };
+template<> struct signed_integer<16> { using type = int16; };
+template<> struct signed_integer<8>  { using type = int8; };
+template<size_t N> using signed_integer_t = typename signed_integer<N>::type;
 
-template<typename T> using sign_t = typename sign<T>::type;
+/* Convert signed to unsigned and vice versa */
+template<Integer T> using unsign_t = unsigned_integer_t<bitwidth<T>>;
+template<Integer T> using sign_t   = signed_integer_t<bitwidth<T>>;
 
 /* Convert type to 2x type */
-template<typename> struct doubled;
-template<> struct doubled<uint8>   { using type = uint16; };
-template<> struct doubled<uint16>  { using type = uint32; };
-template<> struct doubled<uint32>  { using type = uint64; };
-
-template<> struct doubled<int8>    { using type = int16;  };
-template<> struct doubled<int16>   { using type = int32;  };
-template<> struct doubled<int32>   { using type = int64;  };
-
-template<typename T> using doubled_t = typename doubled<T>::type;
-
-template<size_t N, typename T> struct packed       { using type = doubled_t<typename packed<N / 2, T>::type>; };
-template<typename T>           struct packed<1, T> { using type = T; };
-template<size_t N, typename T> using packed_t = typename packed<N, T>::type;
-
-/* Convert type to 2x smaller type */
-template<typename> struct halved;
-template<> struct halved<uint16>  { using type = uint8; };
-template<> struct halved<uint32>  { using type = uint16; };
-template<> struct halved<uint64>  { using type = uint32; };
-
-template<typename T> using halved_t = typename halved<T>::type;
+template<Unsigned T>           using doubled_t = unsigned_integer_t<bitwidth<T> * 2>;
+template<size_t N, Unsigned T> using packed_t  = unsigned_integer_t<bitwidth<T> * N>;
 
 // Byte casts
 static inline std::byte* byte_cast( char* b)
@@ -103,6 +93,22 @@ static inline const std::byte* byte_cast( const uint8* b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) Casting byte to byte is correct
     return reinterpret_cast<const std::byte*>( b);
+}
+
+template <Unsigned To>
+static constexpr To narrow_cast(Integer auto value)
+{
+    return static_cast<To>( value);
+}
+
+constexpr int intify( Unsigned auto value)
+{
+    return static_cast<int>( value);
+}
+
+static constexpr auto signify( Unsigned auto value)
+{
+    return static_cast<sign_t<decltype(value)>>( value);
 }
 
 using Addr = uint64;

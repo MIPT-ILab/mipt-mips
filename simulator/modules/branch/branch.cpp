@@ -8,21 +8,7 @@
 
 template <typename FuncInstr>
 Branch<FuncInstr>::Branch( Module* parent) : Module( parent, "branch")
-{
-    wp_flush_all = make_write_port<bool>("BRANCH_2_ALL_FLUSH", Port::BW);
-    rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
-    rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
-
-    wp_flush_target = make_write_port<Target>("BRANCH_2_FETCH_TARGET", Port::BW);
-    wp_bp_update = make_write_port<BPInterface>("BRANCH_2_FETCH", Port::BW);
-
-    rp_datapath = make_read_port<Instr>("EXECUTE_2_BRANCH", Port::LATENCY);
-    wp_datapath = make_write_port<Instr>("BRANCH_2_WRITEBACK" , Port::BW );    
-
-    wp_bypass = make_write_port<InstructionOutput>("BRANCH_2_EXECUTE_BYPASS", Port::BW);
-
-    wp_bypassing_unit_flush_notify = make_write_port<bool>("BRANCH_2_BYPASSING_UNIT_FLUSH_NOTIFY", Port::BW);
-}
+{ }
 
 template <typename FuncInstr>
 void Branch<FuncInstr>::clock( Cycle cycle)

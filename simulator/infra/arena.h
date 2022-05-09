@@ -14,9 +14,6 @@
 #include <cstdlib>
 #include <memory>
 
-// WARNING
-// This is not a RAII class. You have to destroy objects manually!
-
 template<typename T>
 class Arena
 {
@@ -46,7 +43,7 @@ public:
         return storage[position];
     }
 private:
-    static constexpr std::size_t get_space( std::size_t capacity) noexcept
+    static constexpr std::size_t get_size( std::size_t capacity) noexcept
     {
         return sizeof(T) * capacity;
     }
@@ -54,22 +51,22 @@ private:
     auto get_aligned_storage( std::size_t capacity) const noexcept
     {
         void* ptr = arena.get();
-        auto space = get_space( capacity);
-        auto space_margin = space + sizeof(T);
-        return static_cast<T*>(std::align( alignof(T), space, ptr, space_margin));
+        auto size = get_size( capacity);
+        auto space = size + sizeof(T);
+        return static_cast<T*>(std::align( alignof(T), size, ptr, space));
     }
 
     static void* allocate_memory( std::size_t capacity)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc, hicpp-no-malloc)
-        return std::malloc( get_space( capacity) + sizeof(T));
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
+        return std::malloc( get_size( capacity) + sizeof(T));
     }
 
     struct Deleter
     {
         void operator()(void *p)
         {
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc, hicpp-no-malloc)
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory, cppcoreguidelines-no-malloc)
             std::free(p);
         }
     };

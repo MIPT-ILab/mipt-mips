@@ -7,13 +7,15 @@
 #ifndef RF_H
 #define RF_H
 
+#include <func_sim/operation.h>
+#include <func_sim/register.h>
 #include <infra/macro.h>
 #include <infra/types.h>
 
 #include <array>
 #include <cassert>
 
-template<typename FuncInstr>
+template<Executable FuncInstr>
 class RF
 {
     using Register = typename FuncInstr::Register;

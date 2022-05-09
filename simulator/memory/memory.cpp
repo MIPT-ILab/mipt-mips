@@ -39,7 +39,7 @@ class ZeroMemory : public ReadableMemory
 public:
     size_t memcpy_guest_to_host( std::byte* dst, Addr /* src */, size_t size) const noexcept final;
     void duplicate_to( std::shared_ptr<WriteableMemory> /* target */) const final { }
-    std::string dump() const final { return std::string( "empty memory\n"); }
+    std::string dump() const final { return "empty memory\n"; }
     size_t strlen( Addr /* addr */) const final { return 0; }
 };
 
@@ -67,9 +67,9 @@ std::string ReadableMemory::read_string_limited( Addr addr, size_t size) const
 
 std::string ReadableMemory::read_string_by_size( Addr addr, size_t size) const
 {
-    std::vector<char> tmp( size);
+    std::string tmp( size, '\0');
     memcpy_guest_to_host( byte_cast( tmp.data()), addr, tmp.size());
-    return std::string( tmp.data(), tmp.size()); // but how to move?
+    return tmp;
 }
 
 WriteableMemory::WriteableMemory() = default;
@@ -97,7 +97,7 @@ void WriteableMemory::memset( Addr addr, std::byte value, size_t size)
     	memcpy_host_to_guest( addr + i, &value, 1);
 }
 
-template<typename T, std::endian endian> void
+template<Unsigned T, std::endian endian> void
 WriteableMemory::write_integer( T value, Addr addr, size_t size)
 {
     switch ( size) {

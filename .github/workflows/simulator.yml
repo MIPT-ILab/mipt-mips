@@ -2,13 +2,9 @@ name: "Simulator"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
-    paths:
-      - "simulator/**"
-      - ".github/**"
-      - "*.yml"
+    branches: [ main ]
 
 jobs:
   test:
@@ -37,10 +33,23 @@ jobs:
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install ninja-build
+        sudo apt-get install ninja-build libboost-dev
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+
+    - name: Install Python dependencies
+      run: pip3 install pyyaml
+
+    - name: Install tools on Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir boost
+        curl --progress-bar --location --output boost\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -oboost x boost\download.tar.bz2 -y -bd
+        7z -oboost x boost\download.tar -y -bd
+        cd boost
+        move boost_*\* .
+        del download.*
 
     - name: Create CMake dir
       run: mkdir build
@@ -49,7 +58,7 @@ jobs:
       working-directory: build
       if: matrix.os == 'windows-latest'
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\boost" -DPYTHON3_COMMAND=python -A ${{ matrix.platform }}
         cmake --build . --config Release --target mipt-mips cachesim unit-tests 
         move Release\*.exe .
 
@@ -84,10 +93,8 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Install Ninja
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+    - name: Install Ninja and Boost
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -118,9 +125,9 @@ jobs:
             cxx: g++-10
             gcov: gcov-10
           - name: llvm
-            cc: clang-10
-            cxx: clang++-10
-            gcov: "llvm-cov-10 gcov"
+            cc: clang-14
+            cxx: clang++-14
+            gcov: "llvm-cov-14 gcov"
 
     steps:
     - name: Checkout repository
@@ -133,10 +140,16 @@ jobs:
       with:
         languages: 'cpp'
 
-    - name: Install packages
+    - name: Install LLVM 14
+      if: matrix.config.name == 'llvm'
       run: |
-        sudo apt-get install ninja-build clang++-10 clang-tidy-10 llvm-10
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+        sudo wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo add-apt-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main'
+        sudo apt update -y
+        sudo apt-get install clang++-14 clang-tidy-14 llvm-14
+
+    - name: Install packages
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build
@@ -155,16 +168,16 @@ jobs:
       run: ./unit-tests
 
     - name: Codecov
-      env:
-        GCOV: ${{ matrix.config.gcov }}
-      run: bash <(curl -s https://codecov.io/bash) -x $GCOV -X gcovout
+      run: bash <(curl -s https://codecov.io/bash) -x "${{ matrix.config.gcov }}" -X gcovout
     
     - name: Clang-Tidy
       if: matrix.config.name == 'llvm'
       working-directory: build
-      run: run-clang-tidy-10.py -header-filter='.*' 2> /dev/null
+      continue-on-error: true
+      run: run-clang-tidy-14.py -header-filter='.*' 2> /dev/null
 
     - name: Perform CodeQL Analysis
+      if: matrix.config.name == 'gcc'
       uses: github/codeql-action/analyze@v1
 
   gdb:
@@ -174,7 +187,7 @@ jobs:
     env:
       CC: gcc-10
       CXX: g++-10
-      GDB_VER: gdb-10.1
+      GDB_VER: gdb-10.2
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
 
     steps:
@@ -184,9 +197,7 @@ jobs:
         submodules: 'true'
 
     - name: Install packages
-      run: |
-        sudo apt-get install ninja-build
-        echo "$BOOST_ROOT_1_72_0" >> $GITHUB_PATH
+      run: sudo apt-get install ninja-build libboost-dev
 
     - name: Create CMake dir
       run: mkdir build gdb_build
@@ -234,7 +245,19 @@ jobs:
         submodules: 'true'
 
     - name: Install tools
-      run: choco install opencppcoverage codecov
+      run: |
+        choco install opencppcoverage codecov
+        pip3 install pyyaml
+
+    - name: Install tools on Windows
+      run: |
+        mkdir boost
+        curl --progress-bar --location --output boost\download.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+        7z -oboost x boost\download.tar.bz2 -y -bd
+        7z -oboost x boost\download.tar -y -bd
+        cd boost
+        move boost_*\* .
+        del download.*
 
     - name: Create CMake dir
       run: mkdir build
@@ -242,7 +265,7 @@ jobs:
     - name: Build with Visual Studio
       working-directory: build
       run: |
-        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="$env:BOOST_ROOT_1_72_0" -DPYTHON3_COMMAND=python
+        cmake ../simulator -DENABLE_IPO=1 -DBOOST_ROOT="${{github.workspace}}\boost" -DPYTHON3_COMMAND=python
         cmake --build . --config Debug --target unit-tests     
 
     - name: Unit tests

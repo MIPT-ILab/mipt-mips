@@ -75,14 +75,14 @@ Trap MARSKernel::execute () {
         case 14: read_from_file(); break;
         case 15: write_to_file(); break;
         case 16: close_file(); break;
-        case 17: exit_code = sim->read_cpu_register( a0); return Trap( Trap::HALT);
+        case 17: exit_code = intify( sim->read_cpu_register( a0)); return Trap( Trap::HALT);
         default: return Trap( Trap::UNSUPPORTED_SYSCALL);
     }
     return Trap( Trap::NO_TRAP);
 }
 
 void MARSKernel::print_integer() {
-    auto value = narrow_cast<int64>( sim->read_cpu_register( a0));
+    auto value = intify( sim->read_cpu_register( a0));
     outstream << value;
 }
 
@@ -108,7 +108,7 @@ void MARSKernel::read_integer() {
 }
 
 void MARSKernel::print_character() {
-    outstream << narrow_cast<char>( sim->read_cpu_register( a0));
+    outstream << narrow_cast<unsigned char>( sim->read_cpu_register( a0));
 }
 
 void MARSKernel::read_character() {
@@ -252,7 +252,7 @@ static bool is_mips_le( std::string_view isa)
 {
     static std::unordered_set<std::string_view> isas =
         { "mars", "mars64", "mips32le", "mips32", "mips64", "mips64le" };
-    return isas.count( isa) > 0;
+    return isas.contains( isa);
 }
 
 void MARSKernel::connect_exception_handler()

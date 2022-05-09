@@ -7,6 +7,7 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
+#include <func_sim/register.h>
 #include <func_sim/traps/trap.h>
 #include <infra/macro.h>
 #include <infra/types.h>
@@ -50,8 +51,7 @@ enum class Imm : uint8
     JUMP, JUMP_REL
 };
 
-template<typename T>
-std::string print_immediate( Imm type, T value)
+std::string print_immediate( Imm type, Unsigned auto value)
 {
     std::ostringstream oss;
     switch ( type)
@@ -59,9 +59,9 @@ std::string print_immediate( Imm type, T value)
     case Imm::ADDR:     oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
     case Imm::LOGIC:    oss << ", 0x" << std::hex << value << std::dec; break;
     case Imm::JUMP:     oss <<  " 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP_REL: oss <<    " " << std::dec << narrow_cast<int16>(value); break;
-    case Imm::TRAP:     oss << ", 0x" << std::hex << narrow_cast<int16>(value) << std::dec; break;
-    case Imm::ARITH:    oss << ", "   << std::dec << narrow_cast<int16>(value); break;
+    case Imm::JUMP_REL: oss <<    " " << std::dec << signify( narrow_cast<uint16>( value)); break;
+    case Imm::TRAP:     oss << ", 0x" << std::hex << signify( narrow_cast<uint16>( value)) << std::dec; break;
+    case Imm::ARITH:    oss << ", "   << std::dec << signify( narrow_cast<uint16>( value)); break;
     case Imm::SHIFT:    oss << ", "   << std::dec << value; break;
     case Imm::NO:       break;
     }
@@ -105,7 +105,7 @@ public:
 
     int8 get_accumulation_type() const
     {
-        return (operation == OUT_R_ACCUM) ? 1 : (operation == OUT_R_SUBTR) ? -1 : 0;
+        return (operation == OUT_R_ACCUM) ? int8{ 1} : (operation == OUT_R_SUBTR) ? int8{ -1} : int8{ 0};
     }
     Trap trap_type() const { return trap; }
 
@@ -159,22 +159,14 @@ private:
     uint64 instruction_id = NO_VAL64;
 };
 
-template <typename I>
-struct ALU;
-
-template <typename I>
-struct RISCVMultALU;
-
-template <typename I>
-struct MIPSMultALU;
-
-template<typename T>
+template<Unsigned T>
 class Datapath : public Operation
 {
 public:
-    friend ALU<Datapath>;
-    friend RISCVMultALU<Datapath>;
-    friend MIPSMultALU<Datapath>;
+    friend struct ALU;
+    friend struct Shifter;
+    friend struct RISCVMultALU;
+    friend struct MIPSMultALU;
 
     using Execute = void (*)(Datapath*);
     using RegisterUInt = T;
@@ -197,6 +189,28 @@ public:
     void load( const T& value);
     void execute();
 
+    // Predicate helpers - unary
+    bool ltz() const { return signify( v_src[0]) < 0; }
+    bool gtz() const { return signify( v_src[0]) > 0; }
+    bool lez() const { return signify( v_src[0]) <= 0; }
+    bool gez() const { return signify( v_src[0]) >= 0; }
+
+    // Predicate helpers - binary
+    bool eq()  const { return v_src[0] == v_src[1]; }
+    bool ne()  const { return v_src[0] != v_src[1]; }
+    bool geu() const { return v_src[0] >= v_src[1]; }
+    bool ltu() const { return v_src[0] <  v_src[1]; }
+    bool ge()  const { return signify( v_src[0]) >= signify( v_src[1]); }
+    bool lt()  const { return signify( v_src[0]) <  signify( v_src[1]); }
+
+    // Predicate helpers - immediate
+    bool eqi() const { return v_src[0] == v_imm; }
+    bool nei() const { return v_src[0] != v_imm; }
+    bool lti() const { return signify( v_src[0]) < signify( v_imm); }
+    bool gei() const { return signify( v_src[0]) >= signify( v_imm); }
+    bool ltiu() const { return v_src[0] < v_imm; }
+    bool geiu() const { return v_src[0] >= v_imm; }
+
 protected:
     Datapath(Addr pc, Addr new_pc) : Operation(pc, new_pc) {}
 
@@ -212,14 +226,14 @@ private:
     bool memory_complete = false;
 };
 
-template<typename T>
+template<Unsigned T>
 void Datapath<T>::execute()
 {
     executor(this);
     complete = true;
 }
 
-template<typename T>
+template<Unsigned T>
 void Datapath<T>::load( const T& value)
 {
     memory_complete = true;
@@ -227,7 +241,10 @@ void Datapath<T>::load( const T& value)
     set_v_dst( is_unsigned_load() ? value : sign_extension_for_load(value), 0);
 }
 
-template<typename T, typename R>
+template<typename T>
+concept Executable = std::is_base_of_v<Datapath<typename T::RegisterUInt>, T>;
+
+template<Unsigned T, Register R>
 class BaseInstruction : public Datapath<T>
 {
 public:
@@ -249,7 +266,7 @@ protected:
     std::array<R, MAX_DST_NUM> dst = { R::zero(), R::zero() };
 };
 
-template<typename T, typename R>
+template<Unsigned T, Register R>
 std::string BaseInstruction<T, R>::generate_disasm() const
 {
     std::ostringstream oss;
@@ -276,7 +293,7 @@ std::string BaseInstruction<T, R>::generate_disasm() const
     return std::move( oss).str();
 }
 
-template<typename T, typename R>
+template<Unsigned T, Register R>
 std::ostream& BaseInstruction<T, R>::dump_content( std::ostream& out, const std::string& disasm) const
 {
     if ( this->PC != 0)

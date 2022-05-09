@@ -23,13 +23,13 @@ class Mem : public Module
     private:
         std::shared_ptr<FuncMemory> memory;
 
-        WritePort<Instr>* wp_datapath = nullptr;
-        ReadPort<Instr>* rp_datapath = nullptr;
+        WritePort<Instr>* wp_datapath = make_write_port<Instr>("MEMORY_2_WRITEBACK", Port::BW);
+        ReadPort<Instr>* rp_datapath = make_read_port<Instr>("EXECUTE_2_MEMORY", Port::LATENCY);
 
-        ReadPort<bool>* rp_flush = nullptr;
-        ReadPort<bool>* rp_trap = nullptr;
+        ReadPort<bool>* rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
+        ReadPort<bool>* rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
-        WritePort<InstructionOutput>* wp_bypass = nullptr;
+        WritePort<InstructionOutput>* wp_bypass = make_write_port<InstructionOutput>("MEMORY_2_EXECUTE_BYPASS", Port::BW);
 
     public:
         explicit Mem( Module* parent);

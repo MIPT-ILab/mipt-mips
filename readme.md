@@ -1,7 +1,6 @@
 [![Contributors](https://img.shields.io/github/contributors/mipt-ilab/mipt-mips?label=Contributors)](https://github.com/MIPT-ILab/mipt-mips/graphs/contributors)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/alerts/)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:cpp)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/MIPT-ILab/mipt-mips.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MIPT-ILab/mipt-mips/context:javascript)
 
 # MIPT-V / MIPT-MIPS
 
@@ -29,7 +28,7 @@ Key microarchitecture features:
 * Interstage data bypassing
 
 ### Topology visualization:
-[![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/mipt-mips/tree/master/visualizer)
+[![Topology](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/topology.png)](https://github.com/MIPT-ILab/PipelineFlowchartVis)
 
 ### Pipeline diagrams:
 [![Pipeline](https://raw.githubusercontent.com/wiki/MIPT-ILab/mipt-mips/visualizer.png)](https://github.com/MIPT-ILab/PipelineVis)
@@ -43,7 +42,7 @@ For questions, use our [Discussions](https://github.com/MIPT-ILab/mipt-mips/disc
 We use C++20 features and Boost 1.71. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
 * GCC 10
 * Clang 10.0.0
-* Apple LLVM Version 12.0.0
+* Apple LLVM Version 13.0.0
 * MS Visual Studio 2019 16.8
 
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
@@ -119,7 +118,7 @@ To build simulator faster, we recommend to [install Ninja](https://github.com/ni
 
 ## Test Coverage Chart!
 
-[![Code Coverage](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/master/graphs/tree.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
+[![Code Coverage](https://codecov.io/gh/MIPT-ILab/mipt-mips/branch/main/graphs/tree.svg)](https://codecov.io/gh/MIPT-ILab/mipt-mips)
 
 ## About MIPT-V / MIPT-MIPS
 

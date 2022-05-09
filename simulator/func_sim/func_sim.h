@@ -8,6 +8,7 @@
 #define FUNC_SIM_H
 
 #include "instr_memory.h"
+#include "isa.h"
 #include "rf/rf.h"
 
 #include <infra/config/config.h>
@@ -27,18 +28,18 @@ protected:
     explicit BasicFuncSim( std::string_view isa) : Simulator( isa) { }
 };
 
-template <typename ISA>
+template <ISA I>
 class FuncSim : public BasicFuncSim
 {
-    using FuncInstr = typename ISA::FuncInstr;
-    using Register = typename ISA::Register;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using FuncInstr = typename I::FuncInstr;
+    using Register = typename I::Register;
+    using RegisterUInt = typename I::RegisterUInt;
 
     private:
         RF<FuncInstr> rf;
         uint64 sequence_id = 0;
         std::shared_ptr<FuncMemory> mem;
-        InstrMemoryCached<ISA> imem;
+        InstrMemoryCached<I> imem;
         std::shared_ptr<Kernel> kernel;
         std::unique_ptr<Driver> driver;
 

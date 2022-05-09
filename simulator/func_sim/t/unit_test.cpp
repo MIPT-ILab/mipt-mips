@@ -115,7 +115,7 @@ TEST_CASE( "FuncSim: Register R/W")
     sim->write_cpu_register( 1, narrow_cast<uint64>( -1337));
     sim->write_cpu_register( 2, uint64{ MAX_VAL32});
 
-    CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
+    CHECK( intify( sim->read_cpu_register( 1)) == -1337 );
     CHECK( sim->read_cpu_register( 2) == MAX_VAL32 );
 }
 
@@ -129,7 +129,7 @@ TEST_CASE( "FuncSim: Register Duplication")
 
     sim->duplicate_all_registers_to( sim2.get());
 
-    CHECK( narrow_cast<int32>( sim->read_cpu_register( 1)) == -1337 );
+    CHECK( intify( sim->read_cpu_register( 1)) == -1337 );
     CHECK( sim2->read_cpu_register( 2) == MAX_VAL32 );
 }
 

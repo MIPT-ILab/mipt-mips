@@ -57,7 +57,7 @@ class DataBypass
         auto get_bypass_command( const Instr& instr, size_t src_index) const noexcept
         {
             const auto reg_num = instr.get_src( src_index);
-            return BypassCommand<Register>( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
+            return BypassCommand( get_entry( reg_num).current_stage, long_alu_latency - 1_lt);
         }
 
         // garners the information about a new instruction

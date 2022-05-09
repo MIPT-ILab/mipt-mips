@@ -6,12 +6,12 @@
 #ifndef INSTR_CACHE_H
 #define INSTR_CACHE_H
 
+#include <func_sim/isa.h>
 #include <infra/instrcache/instr_cache.h>
 #include <infra/types.h>
-
 #include <memory/memory.h>
 
-template<typename FuncInstr>
+template<Executable FuncInstr>
 class InstrMemoryIface
 {
 public:
@@ -38,26 +38,26 @@ private:
     const std::endian endian;
 };
 
-template<typename ISA>
-class InstrMemory : public InstrMemoryIface<typename ISA::FuncInstr>
+template<ISA I>
+class InstrMemory : public InstrMemoryIface<typename I::FuncInstr>
 {
 public:
-    using Instr = typename ISA::FuncInstr;
-    explicit InstrMemory( std::endian endian) : InstrMemoryIface<typename ISA::FuncInstr>( endian) { }
-    Instr fetch_instr( Addr PC) override { return ISA::create_instr( this->fetch( PC), this->get_endian(), PC); }
+    using Instr = typename I::FuncInstr;
+    explicit InstrMemory( std::endian endian) : InstrMemoryIface<typename I::FuncInstr>( endian) { }
+    Instr fetch_instr( Addr PC) override { return I::create_instr( this->fetch( PC), this->get_endian(), PC); }
 };
 
 #ifndef INSTR_CACHE_CAPACITY
 #define INSTR_CACHE_CAPACITY 8192
 #endif
 
-template<typename ISA>
-class InstrMemoryCached : public InstrMemory<ISA>
+template<ISA I>
+class InstrMemoryCached : public InstrMemory<I>
 {
-    using Instr = typename ISA::FuncInstr;
+    using Instr = typename I::FuncInstr;
     InstrCache<Addr, Instr, INSTR_CACHE_CAPACITY, 0x0, all_ones<Addr>()> instr_cache{};
 public:
-    explicit InstrMemoryCached( std::endian endian) : InstrMemory<ISA>( endian) { }
+    explicit InstrMemoryCached( std::endian endian) : InstrMemory<I>( endian) { }
     Instr fetch_instr( Addr PC) final
     {
         const auto [found, value] = instr_cache.find( PC);
@@ -68,7 +68,7 @@ public:
         if ( found)
             instr_cache.erase( PC);
 
-        auto instr = InstrMemory<ISA>::fetch_instr( PC);
+        auto instr = InstrMemory<I>::fetch_instr( PC);
         if ( PC != 0)
             instr_cache.update( PC, instr);
         return instr;

@@ -29,24 +29,24 @@ class Execute : public Module
         const Latency last_execution_stage_latency;
 
         /* Inputs */
-        ReadPort<Instr>* rp_datapath = nullptr;
-        ReadPort<Instr>* rp_long_latency_execution_unit = nullptr;
-        ReadPort<bool>* rp_flush = nullptr;
-        ReadPort<bool>* rp_trap = nullptr;
+        ReadPort<Instr>* rp_datapath = make_read_port<Instr>("DECODE_2_EXECUTE", Port::LATENCY);
+        ReadPort<Instr>* rp_long_latency_execution_unit = make_read_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", last_execution_stage_latency);
+        ReadPort<bool>* rp_flush = make_read_port<bool>("BRANCH_2_ALL_FLUSH", Port::LATENCY);
+        ReadPort<bool>* rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
         struct BypassPorts {
-            ReadPort<BypassCommand<Register>>* command_port;
+            ReadPort<BypassCommand>* command_port;
             std::array<ReadPort<InstructionOutput>*, RegisterStage::BYPASSING_STAGES_NUMBER> data_ports;
         };
         std::array<BypassPorts, SRC_REGISTERS_NUM> rps_bypass;
 
         /* Outputs */
-        WritePort<Instr>* wp_mem_datapath = nullptr;
-        WritePort<Instr>* wp_branch_datapath = nullptr;
-        WritePort<Instr>* wp_writeback_datapath = nullptr;
-        WritePort<Instr>* wp_long_latency_execution_unit = nullptr;
-        WritePort<InstructionOutput>* wp_bypass = nullptr;
-        WritePort<InstructionOutput>* wp_long_arithmetic_bypass = nullptr;
+        WritePort<Instr>* wp_mem_datapath = make_write_port<Instr>("EXECUTE_2_MEMORY" , Port::BW );
+        WritePort<Instr>* wp_branch_datapath = make_write_port<Instr>("EXECUTE_2_BRANCH" , Port::BW )   ;
+        WritePort<Instr>* wp_writeback_datapath =  make_write_port<Instr>("EXECUTE_2_WRITEBACK", Port::BW);
+        WritePort<Instr>* wp_long_latency_execution_unit = make_write_port<Instr>("EXECUTE_2_EXECUTE_LONG_LATENCY", Port::BW);
+        WritePort<InstructionOutput>* wp_bypass = make_write_port<InstructionOutput>("EXECUTE_2_EXECUTE_BYPASS", Port::BW);
+        WritePort<InstructionOutput>* wp_long_arithmetic_bypass = make_write_port<InstructionOutput>("EXECUTE_COMPLEX_ALU_2_EXECUTE_BYPASS", Port::BW);
 
         Latency flush_expiration_latency = 0_lt;
 

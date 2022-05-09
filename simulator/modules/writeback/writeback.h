@@ -23,12 +23,12 @@ struct Deadlock final : Exception
     { }
 };
 
-template <typename ISA>
+template <ISA I>
 class Writeback final : public Module
 {
-    using FuncInstr = typename ISA::FuncInstr;
+    using FuncInstr = typename I::FuncInstr;
     using Instr = PerfInstr<FuncInstr>;
-    using RegisterUInt = typename ISA::RegisterUInt;
+    using RegisterUInt = typename I::RegisterUInt;
     using InstructionOutput = std::array< RegisterUInt, MAX_DST_NUM>;
 
 private:
@@ -38,7 +38,7 @@ private:
     Cycle last_writeback_cycle = 0_cl;
     Addr next_PC = 0;
     const std::endian endian;
-    Checker<ISA> checker;
+    Checker<I> checker;
     std::shared_ptr<Kernel> kernel;
     std::unique_ptr<Driver> driver;
 
@@ -46,23 +46,23 @@ private:
     RF<FuncInstr>* rf = nullptr;
 
     auto read_instructions( Cycle cycle);
-    void writeback_instruction( const Writeback<ISA>::Instr& instr, Cycle cycle);
-    void writeback_instruction_system( Writeback<ISA>::Instr* instr, Cycle cycle);
+    void writeback_instruction( const Writeback<I>::Instr& instr, Cycle cycle);
+    void writeback_instruction_system( Writeback<I>::Instr* instr, Cycle cycle);
     void writeback_bubble( Cycle cycle);
     void set_writeback_target( const Target& value, Cycle cycle);
     void set_checker_target( const Target& value);
 
     /* Input */
-    ReadPort<Instr>* rp_mem_datapath = nullptr;
-    ReadPort<Instr>* rp_execute_datapath = nullptr;
-    ReadPort<Instr>* rp_branch_datapath = nullptr;    
-    ReadPort<bool>* rp_trap = nullptr;
+    ReadPort<Instr>* rp_mem_datapath = make_read_port<Instr>("MEMORY_2_WRITEBACK", Port::LATENCY);
+    ReadPort<Instr>* rp_execute_datapath = make_read_port<Instr>("EXECUTE_2_WRITEBACK", Port::LATENCY);
+    ReadPort<Instr>* rp_branch_datapath = make_read_port<Instr>("BRANCH_2_WRITEBACK", Port::LATENCY);    
+    ReadPort<bool>* rp_trap = make_read_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::LATENCY);
 
     /* Output */
-    WritePort<InstructionOutput>* wp_bypass = nullptr;
-    WritePort<Trap>* wp_halt = nullptr;
-    WritePort<bool>* wp_trap = nullptr;
-    WritePort<Target>* wp_target = nullptr;
+    WritePort<InstructionOutput>* wp_bypass = make_write_port<InstructionOutput>("WRITEBACK_2_EXECUTE_BYPASS", Port::BW);
+    WritePort<Trap>* wp_halt = make_write_port<Trap>("WRITEBACK_2_CORE_HALT", Port::BW);
+    WritePort<bool>* wp_trap = make_write_port<bool>("WRITEBACK_2_ALL_FLUSH", Port::BW);
+    WritePort<Target>* wp_target = make_write_port<Target>("WRITEBACK_2_FETCH_TARGET", Port::BW);
 
 public:
     Writeback( Module* parent, std::endian endian);

@@ -15,37 +15,16 @@ namespace config {
     static const Value<uint32> instruction_cache_line_size = { "icache-line-size", 64, "Line size of instruction level 1 cache (in bytes)"};
     /* Prefetch parameters */
     static const Value<uint32> fetchahead_distance = { "fetchahead-size", 32, "Fetchahead distance size"};
-    static const Value<std::string> prefetch_method = { "prefetch-method", "wrong-path", "Type of a Instruction prefetching method"};
+    static const PredicatedValue<std::string> prefetch_method = { "prefetch-method", "wrong-path", "Type of a Instruction prefetching method",
+        []( std::string x) { return x == "next-line" && x == "wrong-path" && x == "no-prefetch"; } };
 } // namespace config
 
 template <typename FuncInstr>
-Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
+Fetch<FuncInstr>::Fetch( Module* parent)
+    : Module( parent, "fetch")
+    , _fetchahead_size( config::fetchahead_distance)
+    , _prefetch_method( config::prefetch_method)
 {
-    wp_datapath = make_write_port<Instr>("FETCH_2_DECODE", Port::BW);
-    rp_stall = make_read_port<bool>("DECODE_2_FETCH_STALL", Port::LATENCY);
-
-    rp_flush_target = make_read_port<Target>("BRANCH_2_FETCH_TARGET", Port::LATENCY);
-
-    wp_target = make_write_port<Target>("TARGET", Port::BW);
-    rp_target = make_read_port<Target>("TARGET", Port::LATENCY);
-
-    wp_hold_pc = make_write_port<Target>("HOLD_PC", Port::BW);
-    rp_hold_pc = make_read_port<Target>("HOLD_PC", Port::LATENCY);
-
-    rp_external_target = make_read_port<Target>("WRITEBACK_2_FETCH_TARGET", Port::LATENCY);
-
-    rp_bp_update = make_read_port<BPInterface>("BRANCH_2_FETCH", Port::LATENCY);
-
-    wp_long_latency_pc_holder = make_write_port<Target>("LONG_LATENCY_PC_HOLDER", Port::BW);
-    rp_long_latency_pc_holder = make_read_port<Target>("LONG_LATENCY_PC_HOLDER", Port::LONG_LATENCY);
-
-    wp_hit_or_miss = make_write_port<bool>("HIT_OR_MISS", Port::BW);
-    rp_hit_or_miss = make_read_port<bool>("HIT_OR_MISS", Port::LATENCY);
-
-    /* port needed for handling misprediction at decode stage */
-    rp_bp_update_from_decode = make_read_port<BPInterface>("DECODE_2_FETCH", Port::LATENCY);
-    rp_flush_target_from_decode = make_read_port<Target>("DECODE_2_FETCH_TARGET", Port::LATENCY);
-
     bp = BaseBP::create_configured_bp();
     tags = CacheTagArray::create(
         config::instruction_cache_type,
@@ -54,13 +33,6 @@ Fetch<FuncInstr>::Fetch( Module* parent) : Module( parent, "fetch")
         config::instruction_cache_line_size,
         32
     );
-
-    _fetchahead_size = config::fetchahead_distance;
-    _prefetch_method = config::prefetch_method;
-
-    if ( _prefetch_method != "next-line" && _prefetch_method != "wrong-path" && _prefetch_method != "no-prefetch")
-        throw PrefetchMethodException("\"" + _prefetch_method +
-            "\" prefetch method is not defined, supported methods are:\nnext-line\nwrong-path\nno-prefetch\n");
 }
 
 template <typename FuncInstr>
@@ -104,7 +76,7 @@ Target Fetch<FuncInstr>::get_target( Cycle cycle)
     if ( hold_target.valid)
         return hold_target;
 
-    return Target();
+    return {};
 }
 
 template <typename FuncInstr>
@@ -157,7 +129,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
     {
         save_flush( cycle);
         clock_instr_cache( cycle);
-        return Target();
+        return {};
     }
 
     /* getting PC */
@@ -165,7 +137,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
 
     /* push bubble */
     if ( !target.valid)
-        return Target();
+        return {};
 
     /* hit or miss */
     auto is_hit = tags->lookup( target.address);
@@ -178,7 +150,7 @@ Target Fetch<FuncInstr>::get_cached_target( Cycle cycle)
 
     /* send PC to cache*/
     wp_long_latency_pc_holder->write( target, cycle);
-    return Target();
+    return {};
 }
 
 

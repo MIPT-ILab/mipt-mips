@@ -21,11 +21,17 @@ public:
     { }
     explicit MainWrapper( std::string_view desc);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+    virtual ~MainWrapper() = default;
+    MainWrapper( const MainWrapper&) = delete;
+    MainWrapper( MainWrapper&&) = delete;
+    MainWrapper& operator=( const MainWrapper&) = delete;
+    MainWrapper& operator=( MainWrapper&&) = delete;  
+
+    // NOLINTNEXTLINE(*-avoid-c-arrays)
     int run( int argc, const char* argv[]) const;
 
 private:
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
+    // NOLINTNEXTLINE(*-avoid-c-arrays)
     virtual int impl( int argc, const char* argv[]) const = 0;
     std::string desc;
     std::ostream& out;
