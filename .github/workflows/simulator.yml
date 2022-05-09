@@ -37,6 +37,9 @@ jobs:
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
 
+    - name: Install Python dependencies
+      run: sudo pip install yaml
+
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
       run: |
