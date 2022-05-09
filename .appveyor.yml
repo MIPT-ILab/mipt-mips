@@ -10,8 +10,9 @@ platform:
   - mingw64
 
 install:
+- set PYTHON_PATH=C:\Python310
 - set PATH=C:\msys64\%platform%;C:\msys64\%platform%\bin;C:\projects\deps\ninja;C:\Libraries\boost_1_73_0;%PATH%
-- pip3.exe install pyyaml
+- pip3 install pyyaml
 
 before_build:
 - git submodule update --init
