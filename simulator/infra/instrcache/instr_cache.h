@@ -10,7 +10,7 @@
 #include <infra/replacement/cache_replacement.h>
 #include <infra/types.h>
 
-#include <sparsehash/dense_hash_map.h>
+#include <sparsehash/dense_hash_map>
 
 #include <memory>
 #include <utility>
