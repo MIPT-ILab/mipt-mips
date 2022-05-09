@@ -77,7 +77,7 @@ TEST_CASE("RISC-V bit manipulation disassembly")
     TEST_RV32_DISASM  ( 0x6007D793, "rori $a5, $a5, 0");  // 01100 | 0000000 (0)  | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x60F7D793, "rori $a5, $a5, 15"); // 01100 | 0001111 (15) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x61F7D793, "rori $a5, $a5, 31"); // 01100 | 0011111 (31) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
-    TEST_RV32_DISASM  ( 0x65F7D793, "unknown"); // this test should pass because shamt[5] bit is 1 (for more info see specification for rori)
+    TEST_RV32_DISASM  ( 0x65F7D793, "unknown"); // this test should pass because shamt[5] bit is 1, see specification for rori
     TEST_RV64_DISASM  ( 0x63F7D793, "rori $a5, $a5, 63"); // 01100 | 0111111 (63) | 01111 ($a5) | 101 | 01111 ($a5) | 0010011
     TEST_RV32_DISASM  ( 0x28D655B3, "gorc $a1, $a2, $a3");
     TEST_RV32_DISASM  ( 0x484F9D93, "bclri $s11, $t6, 4");
