@@ -39,8 +39,8 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-         sudo pip install --upgrade pip
-         sudo pip install yaml
+         sudo pip3 install --upgrade pip
+         sudo pip3 install yaml
 
     - name: Install tools on Windows
       if: matrix.os == 'windows-latest'
