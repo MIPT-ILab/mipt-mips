@@ -94,8 +94,8 @@ file(GLOB_RECURSE RISCV_OPCODES ${RISCV_DIR}/rv* ${RISCV_DIR}/unratified/rv*)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
     COMMAND ${PYTHON3_COMMAND} ${RISCV_DIR}/parse.py -c "rv*" "unratified/rv*"
-	COMMAND ${CMAKE_COMMAND} -E copy encoding.out.h ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
-	WORKING_DIRECTORY ${RISCV_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy encoding.out.h ${CMAKE_CURRENT_LIST_DIR}/riscv.opcode.gen.h
+    WORKING_DIRECTORY ${RISCV_DIR}
     DEPENDS ${RISCV_DIR}/parse.py ${RISCV_OPCODES}
 )
 
