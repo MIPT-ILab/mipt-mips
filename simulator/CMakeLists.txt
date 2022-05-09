@@ -20,7 +20,9 @@ option(ENABLE_ASAN "Enable address sanitizing in debug build" ON)
 option(ENABLE_UBSAN "Enable UB sanitizing in debug build" ON)
 set(GDB_SOURCE_PATH "" CACHE PATH "Path to GDB source tree")
 
-if(NOT DEFINED PYTHON3_COMMAND)
+if(DEFINED $ENV{PYTHON3_COMMAND})
+  set(PYTHON3_COMMAND $ENV{PYTHON3_COMMAND})
+else()
   set(PYTHON3_COMMAND python3)
 endif()
 
