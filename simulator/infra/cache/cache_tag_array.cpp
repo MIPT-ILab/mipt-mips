@@ -9,7 +9,7 @@
 #include "infra/macro.h"
 #include "infra/replacement/cache_replacement.h"
 
-#include <sparsehash/dense_hash_map.h>
+#include <sparsehash/dense_hash_map>
 
 #include <utility>
 #include <vector>

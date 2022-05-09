@@ -45,6 +45,17 @@ ExternalProject_Add(elfio
 )
 include_directories(SYSTEM ${ELFIO_PREFIX}/src/elfio)
 
+set(SPARSEHASH_PREFIX ${CMAKE_HOME_DIRECTORY}/sparsehash)
+ExternalProject_Add(sparsehash
+    PREFIX ${SPARSEHASH_PREFIX}
+    GIT_REPOSITORY https://github.com/sparsehash/sparsehash-c11
+    GIT_TAG v2.11.1
+    CONFIGURE_COMMAND cmake -E echo "Skipping configure step."
+    BUILD_COMMAND cmake -E echo "Skipping build step."
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+)
+include_directories(SYSTEM ${SPARSEHASH_PREFIX}/src/sparsehash)
+
 set(TESTS_CPPS
     infra/t/unit_test.cpp
     infra/cache/t/unit_test.cpp
@@ -219,6 +230,7 @@ add_library(mipt-mips-src OBJECT
 )
 
 add_dependencies(mipt-mips-src elfio)
+add_dependencies(mipt-mips-src sparsehash)
 
 add_library(mipt-mips-cen64-intf STATIC export/cen64/cen64_intf.cpp memory/cen64/cen64_memory.cpp)
 add_executable(mipt-mips export/standalone/main.cpp)
