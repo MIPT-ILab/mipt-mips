@@ -12,6 +12,8 @@
 #include <infra/types.h>
 #include <risc_v/riscv_register/riscv_register.h>
 
+#include <riscv.opcode.gen.h>
+
 #include <cassert>
 
 struct Reg
@@ -56,19 +58,14 @@ struct RISCVInstrDecoder
     std::array<RISCVRegister, Reg::MAX_REG> registers = {};
     const uint32 bytes;
     const uint32 sz;
-    const uint32 I_imm;
-    const uint32 S_imm4_0;
-    const uint32 S_imm11_5;
     const uint32 B_imm11;
     const uint32 B_imm4_1;
     const uint32 B_imm10_5;
     const uint32 B_imm12;
-    const uint32 U_imm;
     const uint32 J_imm19_12;
     const uint32 J_imm11;
     const uint32 J_imm10_1;
     const uint32 J_imm20;
-    const uint32 csr_imm;
     const uint32 CI_imm_1;   // 1st immediate of CI-format instruction
     const uint32 CI_imm_2;
     const uint32 CSS_imm;
@@ -199,15 +196,15 @@ struct RISCVInstrDecoder
     uint32 get_immediate_value( char subset) const noexcept
     {
         switch (subset) {
-        case 'I': return I_imm;
-        case '5': return I_imm & bitmask<uint32>( 5);
-        case '6': return I_imm & bitmask<uint32>( 6);
-        case '7': return I_imm & bitmask<uint32>( 7);
+        case 'I': return apply_mask( bytes, INSN_FIELD_IMM12);
+        case '5': return apply_mask( bytes, INSN_FIELD_IMM5);
+        case '6': return apply_mask( bytes, INSN_FIELD_IMM6);
+        case '7': return apply_mask( bytes, INSN_FIELD_SHAMT);
         case 'B': return get_B_immediate();
-        case 'S': return S_imm4_0 | (S_imm11_5 << 5U);
-        case 'U': return U_imm;
+        case 'S': return apply_mask( bytes, INSN_FIELD_IMM12LO) | ( apply_mask( bytes, INSN_FIELD_IMM12HI) << 5);
+        case 'U': return apply_mask( bytes, INSN_FIELD_IMM20);
         case 'J': return get_J_immediate();
-        case 'C': return csr_imm;
+        case 'C': return apply_mask( bytes, INSN_FIELD_ZIMM);
         case ' ': return 0;
         default:  return get_compressed_immediate_value( subset);
         }
@@ -269,40 +266,35 @@ struct RISCVInstrDecoder
     explicit RISCVInstrDecoder(uint32 raw) noexcept
         : bytes      ( apply_mask( raw, 0b11111111'11111111'11111111'11111111))
         , sz         ( apply_mask( raw, 0b00000000'00000000'00000000'00000011))
-        , I_imm      ( apply_mask( raw, 0b11111111'11110000'00000000'00000000))
-        , S_imm4_0   ( apply_mask( raw, 0b00000000'00000000'00001111'10000000))
-        , S_imm11_5  ( apply_mask( raw, 0b11111110'00000000'00000000'00000000))
         , B_imm11    ( apply_mask( raw, 0b00000000'00000000'00000000'10000000))
         , B_imm4_1   ( apply_mask( raw, 0b00000000'00000000'00001111'00000000))
         , B_imm10_5  ( apply_mask( raw, 0b01111110'00000000'00000000'00000000))
         , B_imm12    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , U_imm      ( apply_mask( raw, 0b11111111'11111111'11110000'00000000))
         , J_imm19_12 ( apply_mask( raw, 0b00000000'00001111'11110000'00000000))
         , J_imm11    ( apply_mask( raw, 0b00000000'00010000'00000000'00000000))
         , J_imm10_1  ( apply_mask( raw, 0b01111111'11100000'00000000'00000000))
         , J_imm20    ( apply_mask( raw, 0b10000000'00000000'00000000'00000000))
-        , csr_imm    ( apply_mask( raw, 0b00000000'00001111'10000000'00000000))
-        , CI_imm_1   ( apply_mask( raw, 0b00010000'00000000))
-        , CI_imm_2   ( apply_mask( raw, 0b00000000'01111100))
-        , CSS_imm    ( apply_mask( raw, 0b00011111'10000000))
-        , CIW_imm    ( apply_mask( raw, 0b00011111'11100000))
-        , CL_imm_1   ( apply_mask( raw, 0b00011100'00000000))
-        , CL_imm_2   ( apply_mask( raw, 0b00000000'01100000))
-        , CJ_imm     ( apply_mask( raw, 0b00011111'11111100))
+        , CI_imm_1   ( apply_mask( raw, INSN_FIELD_C_UIMM8SPHI))
+        , CI_imm_2   ( apply_mask( raw, INSN_FIELD_C_UIMM8SPLO))
+        , CSS_imm    ( apply_mask( raw, INSN_FIELD_C_UIMM9SP_S))
+        , CIW_imm    ( apply_mask( raw, INSN_FIELD_C_NZUIMM10))
+        , CL_imm_1   ( apply_mask( raw, INSN_FIELD_C_UIMM9HI))
+        , CL_imm_2   ( apply_mask( raw, INSN_FIELD_C_UIMM9LO))
+        , CJ_imm     ( apply_mask( raw, INSN_FIELD_C_IMM12))
     {
         registers[Reg::ZERO] = RISCVRegister::zero();
         registers[Reg::SP]   = RISCVRegister::from_cpu_index( 2);
         registers[Reg::RA]   = RISCVRegister::from_cpu_index( 1);
-        registers[Reg::SEPC] = RISCVRegister::from_csr_index( 0x141);
-        registers[Reg::MEPC] = RISCVRegister::from_csr_index( 0x341);
-        registers[Reg::RD]   = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000000'00000000'00001111'10000000));
-        registers[Reg::RS1]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000000'00001111'10000000'00000000));
-        registers[Reg::RS2]  = RISCVRegister::from_cpu_index( apply_mask( raw, 0b00000001'11110000'00000000'00000000));
-        registers[Reg::CSR]  = RISCVRegister::from_csr_index( apply_mask( raw, 0b11111111'11110000'00000000'00000000));
-        registers[Reg::RS2_CMP]  = RISCVRegister::from_cpu_index(      apply_mask( raw, 0b00000000'01111100));
-        registers[Reg::RD_3BIT]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
-        registers[Reg::RS1_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000011'10000000));
-        registers[Reg::RS2_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, 0b00000000'00011100));
+        registers[Reg::SEPC] = RISCVRegister::from_csr_index( CSR_SEPC);
+        registers[Reg::MEPC] = RISCVRegister::from_csr_index( CSR_MEPC);
+        registers[Reg::RD]   = RISCVRegister::from_cpu_index( apply_mask( raw, INSN_FIELD_RD));
+        registers[Reg::RS1]  = RISCVRegister::from_cpu_index( apply_mask( raw, INSN_FIELD_RS1));
+        registers[Reg::RS2]  = RISCVRegister::from_cpu_index( apply_mask( raw, INSN_FIELD_RS2));
+        registers[Reg::CSR]  = RISCVRegister::from_csr_index( apply_mask( raw, INSN_FIELD_CSR));
+        registers[Reg::RS2_CMP]  = RISCVRegister::from_cpu_index( apply_mask( raw, INSN_FIELD_C_RS2));
+        registers[Reg::RD_3BIT]  = RISCVRegister::from_cpu_popular_index( apply_mask( raw, INSN_FIELD_RD_P));
+        registers[Reg::RS1_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, INSN_FIELD_RS1_P));
+        registers[Reg::RS2_3BIT] = RISCVRegister::from_cpu_popular_index( apply_mask( raw, INSN_FIELD_RS2_P));
     }
 };
 
