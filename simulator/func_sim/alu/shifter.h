@@ -127,11 +127,7 @@ public:
     static void gorc( Executable auto* instr) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_v_src2( instr)); }
     static void grev( Executable auto* instr) { instr->v_dst[0] = gen_reverse( instr->v_src[0], shamt_v_src2( instr)); }
 
-    static void orc_b( Executable auto* instr )
-    {
-        static constexpr size_t gorci_orc_b_shamt = 4 | 2 | 1;
-        instr->v_dst[0] = gen_or_combine( instr->v_src[0], gorci_orc_b_shamt);
-    }
+    static void gorci( Executable auto* instr ) { instr->v_dst[0] = gen_or_combine( instr->v_src[0], shamt_imm( instr)); }
 
     // Bit clear, set, invert, extract
     static void bclr( Executable auto* instr)  { instr->v_dst[0] = instr->v_src[0] & ~shamt_v_src2_mask(instr); }
