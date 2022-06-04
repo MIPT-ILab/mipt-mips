@@ -42,7 +42,7 @@ For questions, use our [Discussions](https://github.com/MIPT-ILab/mipt-mips/disc
 We use C++20 features and Boost 1.71. Thus, you have to [use compilers](https://github.com/MIPT-ILab/mipt-mips/wiki/C-compilers) of these versions or newer:
 * GCC 11
 * Clang 13.0.0
-* Apple LLVM Version 13.0.0
+* Apple LLVM Version 13.1.6
 * MS Visual Studio 2019 16.8
 
 [Install Boost](https://github.com/MIPT-ILab/mipt-mips/wiki/Required-libraries) before building the project.
