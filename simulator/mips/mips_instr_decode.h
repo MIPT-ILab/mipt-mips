@@ -84,22 +84,23 @@ struct MIPSInstrDecoder
 
     MIPSRegister get_register( MIPSReg type) const
     {
+        using enum MIPSReg;
         switch ( type) {
-        case MIPSReg::ZERO:   break;
-        case MIPSReg::HI:     return MIPSRegister::mips_hi();
-        case MIPSReg::LO:     return MIPSRegister::mips_lo();
-        case MIPSReg::RA:     return MIPSRegister::return_address();
-        case MIPSReg::RS:     return MIPSRegister::from_cpu_index( rs);
-        case MIPSReg::RT:     return MIPSRegister::from_cpu_index( rt);
-        case MIPSReg::RD:     return MIPSRegister::from_cpu_index( rd);
-        case MIPSReg::CP0_RD: return MIPSRegister::from_cp0_index( rd);
-        case MIPSReg::SR:     return MIPSRegister::status();
-        case MIPSReg::EPC:    return MIPSRegister::epc();
-        case MIPSReg::FD:     return MIPSRegister::from_cp1_index( fd);
-        case MIPSReg::FS:     return MIPSRegister::from_cp1_index( fs);
-        case MIPSReg::FT:     return MIPSRegister::from_cp1_index( ft);
-        case MIPSReg::FR:     return MIPSRegister::from_cp1_index( fmt);
-        case MIPSReg::FCSR:   return MIPSRegister::mips_fcsr();
+        case ZERO:   break;
+        case HI:     return MIPSRegister::mips_hi();
+        case LO:     return MIPSRegister::mips_lo();
+        case RA:     return MIPSRegister::return_address();
+        case RS:     return MIPSRegister::from_cpu_index( rs);
+        case RT:     return MIPSRegister::from_cpu_index( rt);
+        case RD:     return MIPSRegister::from_cpu_index( rd);
+        case CP0_RD: return MIPSRegister::from_cp0_index( rd);
+        case SR:     return MIPSRegister::status();
+        case EPC:    return MIPSRegister::epc();
+        case FD:     return MIPSRegister::from_cp1_index( fd);
+        case FS:     return MIPSRegister::from_cp1_index( fs);
+        case FT:     return MIPSRegister::from_cp1_index( ft);
+        case FR:     return MIPSRegister::from_cp1_index( fmt);
+        case FCSR:   return MIPSRegister::mips_fcsr();
         default: assert(0);
         }
         return MIPSRegister::zero();

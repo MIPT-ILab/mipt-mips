@@ -34,8 +34,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get install ninja-build libboost-dev
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
+        echo "CC=gcc-11" >> $GITHUB_ENV
+        echo "CXX=g++-11" >> $GITHUB_ENV
 
     - name: Install Python dependencies
       run: pip3 install pyyaml
@@ -84,8 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      CC: gcc-10
-      CXX: g++-10
+      CC: gcc-11
+      CXX: g++-11
     
     steps:
     - name: Checkout repository
@@ -121,9 +121,9 @@ jobs:
       matrix:
         config:
           - name: gcc
-            cc: gcc-10
-            cxx: g++-10
-            gcov: gcov-10
+            cc: gcc-11
+            cxx: g++-11
+            gcov: gcov-11
           - name: llvm
             cc: clang-14
             cxx: clang++-14
@@ -185,8 +185,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      CC: gcc-10
-      CXX: g++-10
+      CC: gcc-11
+      CXX: g++-11
       GDB_VER: gdb-10.2
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
 
