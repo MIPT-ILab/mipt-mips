@@ -7,6 +7,7 @@
 
 #include <memory/memory.h>
 
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <vector>

@@ -12,7 +12,16 @@
 #include <infra/macro.h>
 #include <infra/types.h>
 
+#if defined(__GNUC__) && !defined(__clang__) && (__GNUC >= 12)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 #include <boost/multiprecision/cpp_int.hpp>
+
+#if defined(__GNUC__) && !defined(__clang__) && (__GNUC >= 12)
+#pragma GCC diagnostic pop
+#endif
 
 using int128  = boost::multiprecision::int128_t;
 using uint128 = boost::multiprecision::uint128_t;
