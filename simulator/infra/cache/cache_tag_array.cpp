@@ -183,18 +183,25 @@ class SimpleCacheTagArray : public CacheTagArraySize
         std::pair<bool, int32> read_no_touch( Addr addr) const final;
 
     private:
+        static auto create_lookup_helper( int ways)
+        {
+            constexpr int32 impossible_key = INT32_MAX;
+            auto dhm = google::dense_hash_map<Addr, int32>( ways);
+
+            // these are special dense_hash_map requirements
+            dhm.set_empty_key( impossible_key);
+            dhm.set_deleted_key( impossible_key - 1);
+            return dhm;
+        }
+
         struct Tag
         {
             bool is_valid = false;
             Addr tag = {};
         };
 
-        // tags storage
         std::vector<std::vector<Tag>> tags;
-
-        // hash table to lookup tags in O(1)
         std::vector<google::dense_hash_map<Addr, int32>> lookup_helper;
-        const int32 impossible_key = INT32_MAX;
         std::unique_ptr<ReplacementModule> replacement_module = nullptr;
 };
 
@@ -206,15 +213,10 @@ SimpleCacheTagArray::SimpleCacheTagArray(
     const std::string& repl_policy)
         : CacheTagArraySize( size_in_bytes, ways, line_size, addr_size_in_bits)
         , tags( sets, std::vector<Tag>( ways))
-        , lookup_helper( sets, google::dense_hash_map<Addr, int32>( ways))
+        , lookup_helper( sets, create_lookup_helper( ways))
+        , replacement_module( std::make_unique<ReplacementModule>( sets, ways, repl_policy))
 {
-    replacement_module = std::make_unique<ReplacementModule>( sets, ways, repl_policy);
-
-    // these are special dense_hash_map requirements
-    for (uint32 i = 0; i < sets; i++) {
-        lookup_helper[i].set_empty_key( impossible_key);
-        lookup_helper[i].set_deleted_key( impossible_key - 1);
-    }
+    
 }
 
 std::pair<bool, int32> SimpleCacheTagArray::read( Addr addr)
