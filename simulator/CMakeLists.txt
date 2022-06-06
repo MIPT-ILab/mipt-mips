@@ -129,7 +129,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Boost.Multiprecision code emits warnings
 # See https://github.com/boostorg/multiprecision/issues/445
-if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 12.0)
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 12.0 AND ${Boost_VERSION_MAJOR}_${Boost_VERSION_MINOR} VERSION_LESS "1_77")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-array-bounds -Wno-aggressive-loop-optimizations -Wno-stringop-overread -Wno-restrict")
 endif()
 
