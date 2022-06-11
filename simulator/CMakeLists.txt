@@ -127,6 +127,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Boost.Multiprecision code emits warnings
+# See https://github.com/boostorg/multiprecision/issues/445
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 12.0)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-array-bounds -Wno-aggressive-loop-optimizations -Wno-stringop-overread -Wno-restrict")
+endif()
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
     add_link_options(-Wno-unused-command-line-argument)
 endif()
