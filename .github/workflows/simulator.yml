@@ -27,7 +27,7 @@ jobs:
         submodules: 'true'
 
     - name: Install tools on MacOS
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-12'
       run: brew install boost ninja
     
     - name: Install tools on Ubuntu
