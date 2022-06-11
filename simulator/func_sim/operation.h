@@ -53,17 +53,18 @@ enum class Imm : uint8
 
 std::string print_immediate( Imm type, Unsigned auto value)
 {
+    using enum Imm;
     std::ostringstream oss;
     switch ( type)
     {
-    case Imm::ADDR:     oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
-    case Imm::LOGIC:    oss << ", 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP:     oss <<  " 0x" << std::hex << value << std::dec; break;
-    case Imm::JUMP_REL: oss <<    " " << std::dec << signify( narrow_cast<uint16>( value)); break;
-    case Imm::TRAP:     oss << ", 0x" << std::hex << signify( narrow_cast<uint16>( value)) << std::dec; break;
-    case Imm::ARITH:    oss << ", "   << std::dec << signify( narrow_cast<uint16>( value)); break;
-    case Imm::SHIFT:    oss << ", "   << std::dec << value; break;
-    case Imm::NO:       break;
+    case ADDR:     oss << ", 0x" << std::hex << narrow_cast<uint16>(value) << std::dec; break;
+    case LOGIC:    oss << ", 0x" << std::hex << value << std::dec; break;
+    case JUMP:     oss <<  " 0x" << std::hex << value << std::dec; break;
+    case JUMP_REL: oss <<    " " << std::dec << signify( narrow_cast<uint16>( value)); break;
+    case TRAP:     oss << ", 0x" << std::hex << signify( narrow_cast<uint16>( value)) << std::dec; break;
+    case ARITH:    oss << ", "   << std::dec << signify( narrow_cast<uint16>( value)); break;
+    case SHIFT:    oss << ", "   << std::dec << value; break;
+    case NO:       break;
     }
     return std::move( oss).str();
 }

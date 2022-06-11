@@ -11,12 +11,12 @@ jobs:
     name: Test
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-12, windows-latest]
         platform: [Win32, x64]
         exclude:
           - os: ubuntu-latest
             platform: Win32
-          - os: macos-latest
+          - os: macos-12
             platform: Win32
     runs-on: ${{ matrix.os }}
 
@@ -27,15 +27,15 @@ jobs:
         submodules: 'true'
 
     - name: Install tools on MacOS
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-12'
       run: brew install boost ninja
     
     - name: Install tools on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install ninja-build libboost-dev
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
+        sudo apt-get install ninja-build libboost-dev g++-11
+        echo "CC=gcc-11" >> $GITHUB_ENV
+        echo "CXX=g++-11" >> $GITHUB_ENV
 
     - name: Install Python dependencies
       run: pip3 install pyyaml
@@ -84,8 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      CC: gcc-10
-      CXX: g++-10
+      CC: gcc-11
+      CXX: g++-11
     
     steps:
     - name: Checkout repository
@@ -94,7 +94,7 @@ jobs:
         submodules: 'true'
 
     - name: Install Ninja and Boost
-      run: sudo apt-get install ninja-build libboost-dev
+      run: sudo apt-get install ninja-build libboost-dev g++-11
 
     - name: Create CMake dir
       run: mkdir build
@@ -121,9 +121,9 @@ jobs:
       matrix:
         config:
           - name: gcc
-            cc: gcc-10
-            cxx: g++-10
-            gcov: gcov-10
+            cc: gcc-11
+            cxx: g++-11
+            gcov: gcov-11
           - name: llvm
             cc: clang-14
             cxx: clang++-14
@@ -149,7 +149,7 @@ jobs:
         sudo apt-get install clang++-14 clang-tidy-14 llvm-14
 
     - name: Install packages
-      run: sudo apt-get install ninja-build libboost-dev
+      run: sudo apt-get install ninja-build libboost-dev g++-11
 
     - name: Create CMake dir
       run: mkdir build
@@ -185,8 +185,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      CC: gcc-10
-      CXX: g++-10
+      CC: gcc-11
+      CXX: g++-11
       GDB_VER: gdb-10.2
       GDB_DIR: ${{ github.workspace }}/$GDB_VER
 
@@ -197,7 +197,7 @@ jobs:
         submodules: 'true'
 
     - name: Install packages
-      run: sudo apt-get install ninja-build libboost-dev
+      run: sudo apt-get install ninja-build libboost-dev g++-11
 
     - name: Create CMake dir
       run: mkdir build gdb_build

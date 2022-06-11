@@ -87,24 +87,25 @@ public:
         /* updating state */
         void update ( bool is_taken)
         {
+            using enum StateValue;
             if ( is_taken)
             {
                 switch ( value)
                 {
-                    case StateValue::NT:  value = StateValue::WNT; break;
-                    case StateValue::WNT: value = StateValue::WT;  break;
-                    case StateValue::WT:  /* fallthrough */
-                    case StateValue::T:   value = StateValue::T;   break; // saturation
+                    case NT:  value = StateValue::WNT; break;
+                    case WNT: value = StateValue::WT;  break;
+                    case WT:  /* fallthrough */
+                    case T:   value = StateValue::T;   break; // saturation
                 }
             }
             else
             {
                 switch ( value)
                 {
-                    case StateValue::NT:  /* fallthrough, saturation */
-                    case StateValue::WNT: value = StateValue::NT;  break;
-                    case StateValue::WT:  value = StateValue::WNT; break;
-                    case StateValue::T:   value = StateValue::WT;  break;
+                    case NT:  /* fallthrough, saturation */
+                    case WNT: value = StateValue::NT;  break;
+                    case WT:  value = StateValue::WNT; break;
+                    case T:   value = StateValue::WT;  break;
                 }
             }
         }
