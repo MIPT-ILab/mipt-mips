@@ -13,6 +13,8 @@
 namespace config {
     static const AliasedValue<std::string> units_to_log = { "l", "logs", "nothing", "print logs for modules"};
     static const Switch topology_dump = { "tdump", "module topology dump into topology.json" };
+    // command line flag argument for enable/disable json logging
+    static const AliasedSwitch json_dump = { "j", "json-dump", "json logs in .\\logs.json" };
 } // namespace config
 
 template <ISA I>
@@ -30,6 +32,8 @@ PerfSim<I>::PerfSim( std::endian endian, std::string_view isa)
     init_portmap();
     enable_logging( config::units_to_log);
     topology_dumping( config::topology_dump, "topology.json");
+    // json logger configuration
+    enable_json_logging(config::json_dump);
 }
 
 template <ISA I>
@@ -57,6 +61,9 @@ Addr PerfSim<I>::get_pc() const
 template<ISA I>
 Trap PerfSim<I>::run( uint64 instrs_to_run)
 {
+    /* start json dump strings */
+    start_dump_json();
+
     current_trap = Trap( Trap::NO_TRAP);
 
     writeback.set_instrs_to_run( instrs_to_run);
@@ -65,6 +72,9 @@ Trap PerfSim<I>::run( uint64 instrs_to_run)
 
     while (current_trap == Trap::NO_TRAP)
         clock();
+
+    /* end strings */
+    stop_dump_json();
 
     dump_statistics();
 
@@ -95,6 +105,26 @@ void PerfSim<I>::clock_tree( Cycle cycle)
 auto get_rate( int total, float64 piece)
 {
     return total != 0 ? ( piece / total * 100) : 0;
+}
+
+/* standard lines loggers implementation */
+template<ISA I>
+void PerfSim<I>::start_dump_json() {
+    if (jsonout_enabled)
+        (jsonout()) << "[[\n" <<
+        "\t{ \"type\": \"Stage\", \"id\": 0, \"description\": \"Fetch\" },\n" <<
+        "\t{ \"type\": \"Stage\", \"id\": 1, \"description\": \"Decode\" },\n" <<
+        "\t{ \"type\": \"Stage\", \"id\": 2, \"description\": \"Execute\" },\n" <<
+        "\t{ \"type\": \"Stage\", \"id\": 3, \"description\": \"Memory\" },\n" <<
+        "\t{ \"type\": \"Stage\", \"id\": 4, \"description\": \"Writeback\" }";
+}
+
+template<ISA I>
+void PerfSim<I>::stop_dump_json() {
+    if (jsonout_enabled) {
+        (jsonout()) << "\n]]\n";
+        jsonout().close();
+    }
 }
 
 template<ISA I>
